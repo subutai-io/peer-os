@@ -136,6 +136,12 @@ func main() {
 			return nil
 		}}, {
 
+		Name: "info", Usage: "info from host",
+		Action: func(c *cli.Context) error {
+			lib.Info(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
+			return nil
+		}}, {
+
 		Name: "hostname", Usage: "Set hostname of container or host",
 		Action: func(c *cli.Context) error {
 			if len(c.Args().Get(1)) != 0 {
@@ -180,7 +186,7 @@ func main() {
 				Name:  "detect",
 				Usage: "detect resource host IP",
 				Action: func(c *cli.Context) error {
-					lib.DetectIp()
+					lib.Info("ipaddr", "", "")
 					return nil
 				}}, {
 
@@ -209,6 +215,23 @@ func main() {
 			cli.StringFlag{Name: "e", Usage: "end time"}},
 		Action: func(c *cli.Context) error {
 			lib.HostMetrics(c.Args().Get(0), c.String("s"), c.String("e"))
+			return nil
+		}}, {
+
+		Name: "p2p", Usage: "P2P network operations",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr portRange)"},
+			cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
+			cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
+			cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
+			cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"},
+			cli.BoolFlag{Name: "v", Usage: "print p2p version (p2p -v)"}},
+		Action: func(c *cli.Context) error {
+			if c.Bool("v") {
+				lib.P2Pversion()
+			} else {
+				lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
+			}
 			return nil
 		}}, {
 
@@ -286,7 +309,7 @@ func main() {
 
 		Name: "stats", Usage: "statistics from host",
 		Action: func(c *cli.Context) error {
-			lib.Stats(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
+			lib.Info(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
 			return nil
 		}}, {
 
@@ -332,6 +355,21 @@ func main() {
 			cli.BoolFlag{Name: "c", Usage: "check for updates without installation"}},
 		Action: func(c *cli.Context) error {
 			lib.Update(c.Args().Get(0), c.Bool("c"))
+			return nil
+		}}, {
+
+		Name: "vxlan", Usage: "VXLAN tunnels operation",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "create", Usage: "create vxlan tunnel (tunnel -c)"},
+			cli.StringFlag{Name: "delete", Usage: "delete vxlan tunnel (tunnel -d)"},
+			cli.BoolFlag{Name: "list", Usage: "list of vxlan tunnels (tunnel -l)"},
+
+			cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
+			cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
+			cli.StringFlag{Name: "vni", Usage: "vni"},
+		},
+		Action: func(c *cli.Context) error {
+			lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("remoteip"), c.String("vlan"), c.String("vni"), c.Bool("list"))
 			return nil
 		}},
 	}

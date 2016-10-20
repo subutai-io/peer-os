@@ -6,11 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/influxdata/influxdb/client/v2"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/container"
-	"github.com/subutai-io/base/agent/lib/fs"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -19,6 +14,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/influxdata/influxdb/client/v2"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/fs"
+	"github.com/subutai-io/base/agent/lib/net"
+	"github.com/subutai-io/base/agent/log"
 )
 
 var (
@@ -283,9 +285,13 @@ func grep(str, filename string) string {
 	}
 }
 
-func Stats(command, host, interval string) {
+func Info(command, host, interval string) {
+	if command == "ipaddr" {
+		fmt.Println(net.GetIp())
+		return
+	}
 	if len(host) == 0 {
-		log.Error("Empty host name")
+		log.Error("Usage: subutai info <quota|system> <hostname> [interval]")
 	}
 
 	initdb()
