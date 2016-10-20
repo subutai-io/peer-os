@@ -310,7 +310,7 @@ func main() {
 			cli.StringFlag{Name: "d", Usage: "date of backup snapshot"},
 			cli.StringFlag{Name: "c", Usage: "name of new container"}},
 		Action: func(c *cli.Context) error {
-			lib.RestoreContainer(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
+			lib.RestoreContainer(c.Args().Get(0), c.String("d"), c.String("c"))
 			return nil
 		}}, {
 
