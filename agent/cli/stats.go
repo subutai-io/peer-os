@@ -85,26 +85,6 @@ func queryDB(cmd string) (res []client.Result, err error) {
 	return res, err
 }
 
-func n2nLoad(i string) string {
-	res, err := queryDB("SELECT non_negative_derivative(mean(value),1s) as bps FROM host_net WHERE iface =~ /n2n*/ and time > now() - " + i + " GROUP BY time(1m), iface, type fill(none)")
-	if err != nil {
-		log.Warn("No data received for n2n load")
-		return ""
-	}
-	b, _ := json.Marshal(res[0])
-	return string(b)
-}
-
-func proxyLoad(i string) string {
-	res, err := queryDB("SELECT sum(\"in\") as \"in\",sum(out) as out FROM rproxy WHERE time > now() - " + i + " GROUP BY time(1m), domain, ip fill(none)")
-	if err != nil {
-		log.Warn("No data received for reverse proxy load")
-		return ""
-	}
-	b, _ := json.Marshal(res[0])
-	return string(b)
-}
-
 func ramLoad(h string) (memfree, memtotal interface{}) {
 	file, err := os.Open("/proc/meminfo")
 	defer file.Close()
@@ -314,10 +294,6 @@ func Stats(command, host, interval string) {
 	}
 
 	switch command {
-	case "n2n":
-		fmt.Println(n2nLoad(interval))
-	case "proxy":
-		fmt.Println(proxyLoad(interval))
 	case "quota":
 		fmt.Println(quota(host))
 	case "system":

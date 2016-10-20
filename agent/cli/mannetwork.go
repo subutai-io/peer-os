@@ -97,46 +97,6 @@ func P2Pversion() {
 	p2p.Version()
 }
 
-func LxcManagementNetwork(args []string) {
-	if len(args) < 3 {
-		log.Error("Not enough arguments")
-	}
-	switch args[2] {
-	case "-v", "--listvnimap":
-		displayVNIMap()
-	case "-m", "--createvnimap":
-		createVNIMap(args[3], args[4], args[5], args[6])
-	case "-c", "--createtunnel":
-		createTunnel(args[3], args[4], args[5])
-	case "-l", "--listtunnel":
-		listTunnel()
-	}
-}
-
-func listTunnel() {
-	fmt.Println("List of Tunnels\n--------")
-	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
-	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
-	ports := strings.Split(string(ret), "\n")
-
-	for k, port := range ports {
-		if strings.Contains(port, "remote_ip") {
-			iface := strings.Fields(ports[k-2])
-			tunnel := strings.Trim(iface[1], "\"")
-			addr := strings.Fields(port)
-			fmt.Println(tunnel + "-" + strings.Trim(strings.Trim(addr[2], "remote_ip="), "\","))
-		}
-	}
-
-}
-
-func createTunnel(tunnel, addr, tunType string) {
-	ifTunExist(tunnel)
-	err := ioutil.WriteFile(config.Agent.DataPrefix+"var/subutai-network/"+tunnel, []byte(addr), 0600)
-	log.Check(log.ErrorLevel, "Creating tunnel file", err)
-
-}
-
 func ifTunExist(name string) {
 	ret, err := exec.Command("ovs-vsctl", "list-ports", "wan").CombinedOutput()
 	log.Check(log.FatalLevel, "Getting port list", err)
@@ -145,26 +105,6 @@ func ifTunExist(name string) {
 	for _, port := range ports {
 		if port == name {
 			log.Error("Tunnel port " + name + " is already exists")
-		}
-	}
-}
-
-func displayVNIMap() {
-	// tunnel1	8880164	100	04c088b9-e2f5-40b3-bd6c-2305b9a88058
-	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
-	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
-	ports := strings.Split(string(ret), "\n")
-
-	for k, port := range ports {
-		if strings.Contains(port, "env") {
-			iface := strings.Fields(ports[k-2])
-			tunname := strings.Trim(iface[1], "\"")
-			tag := strings.Fields(ports[k-3])[1]
-			addr := strings.Fields(port)
-			// ip := strings.Trim(strings.Trim(addr[3], "remote_ip="), "\",")
-			key := strings.Trim(strings.Trim(addr[2], "key="), "\",")
-			env := strings.Trim(strings.Trim(addr[1], "{env="), "\",")
-			fmt.Println(tunname + " " + key + " " + tag + " " + env)
 		}
 	}
 }

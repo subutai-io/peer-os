@@ -11,6 +11,8 @@ import (
 func LxcStart(name string) {
 	if container.IsContainer(name) && container.State(name) == "STOPPED" {
 		container.Start(name)
+	} else {
+		return
 	}
 	state := container.State(name)
 	for i := 0; i < 60; i++ {

@@ -159,14 +159,6 @@ func main() {
 		}}, {
 
 		Name: "management_network", Usage: "configure management network",
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "listtunnel, l", Usage: "-l"},
-			cli.StringFlag{Name: "createtunnel, c", Usage: "-c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE"},
-
-			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
-			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
-		},
-
 		Subcommands: []cli.Command{
 			{
 				Name:  "tunnel",
@@ -209,11 +201,7 @@ func main() {
 					}
 					return nil
 				}}},
-
-		Action: func(c *cli.Context) error {
-			lib.LxcManagementNetwork(os.Args)
-			return nil
-		}}, {
+	}, {
 
 		Name: "metrics", Usage: "list Subutai container",
 		Flags: []cli.Flag{
@@ -221,18 +209,6 @@ func main() {
 			cli.StringFlag{Name: "e", Usage: "end time"}},
 		Action: func(c *cli.Context) error {
 			lib.HostMetrics(c.Args().Get(0), c.String("s"), c.String("e"))
-			return nil
-		}}, {
-
-		Name: "network", Usage: "containerName set/remove/list network vlan id",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "set, s", Usage: "IPADDRESS/NETMASK"},
-			cli.StringFlag{Name: "vlan, v", Usage: "vlanid"},
-			cli.BoolFlag{Name: "remove, r", Usage: ""},
-			cli.BoolFlag{Name: "list, l", Usage: ""},
-		},
-		Action: func(c *cli.Context) error {
-			lib.LxcNetwork(c.Args().Get(0), c.String("s"), c.String("vlan"), c.Bool("r"), c.Bool("l"))
 			return nil
 		}}, {
 
@@ -293,12 +269,6 @@ func main() {
 			return nil
 		}}, {
 
-		Name: "register", Usage: "register Subutai container",
-		Action: func(c *cli.Context) error {
-			lib.LxcRegister(c.Args().Get(0))
-			return nil
-		}}, {
-
 		Name: "rename", Usage: "rename Subutai container",
 		Action: func(c *cli.Context) error {
 			lib.LxcRename(c.Args().Get(0), c.Args().Get(1))
@@ -355,12 +325,6 @@ func main() {
 					lib.TunList()
 					return nil
 				}},
-		}}, {
-
-		Name: "unregister", Usage: "unregister Subutai container",
-		Action: func(c *cli.Context) error {
-			lib.LxcUnregister(c.Args().Get(0))
-			return nil
 		}}, {
 
 		Name: "update", Usage: "update Subutai management, container or Resource host",
