@@ -17,7 +17,7 @@ public class Commands
 
     public RequestBuilder getCurrentMetricCommand( String hostname )
     {
-        return new RequestBuilder( String.format( "subutai stats system %s", hostname ) );
+        return new RequestBuilder( String.format( "subutai info system %s", hostname ) );
     }
 
 
