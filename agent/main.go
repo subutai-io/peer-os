@@ -40,11 +40,11 @@ func main() {
 		Usage: "debug mode"}}
 
 	app.Commands = []cli.Command{{
-		Name: "attach", Usage: "attach to container",
+		Name: "attach", Usage: "attach to Subutai container",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "c", Usage: "clear environment"},
-			cli.BoolFlag{Name: "x", Usage: "use x86 personality"},
-			cli.BoolFlag{Name: "r", Usage: "connect as regular user"}},
+			cli.BoolFlag{Name: "clear, c", Usage: "clear environment"},
+			cli.BoolFlag{Name: "x86, x", Usage: "use x86 personality"},
+			cli.BoolFlag{Name: "regular, r", Usage: "connect as regular user"}},
 		Action: func(c *cli.Context) error {
 			lib.LxcAttach(c.Args().Get(0), c.Bool("c"), c.Bool("x"), c.Bool("r"))
 			return nil
@@ -52,26 +52,26 @@ func main() {
 
 		Name: "backup", Usage: "backup Subutai container",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "full", Usage: "make full backup"},
-			cli.BoolFlag{Name: "stop", Usage: "stop container at the time of backup"}},
+			cli.BoolFlag{Name: "full, f", Usage: "make full backup"},
+			cli.BoolFlag{Name: "stop, s", Usage: "stop container at the time of backup"}},
 		Action: func(c *cli.Context) error {
-			lib.BackupContainer(c.Args().Get(0), c.Bool("full"), c.Bool("stop"))
+			lib.BackupContainer(c.Args().Get(0), c.Bool("f"), c.Bool("s"))
 			return nil
 		}}, {
 
 		Name: "batch", Usage: "batch commands execution",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "json", Usage: "JSON string with commands"}},
+			cli.StringFlag{Name: "json, j", Usage: "JSON string with commands"}},
 		Action: func(c *cli.Context) error {
-			lib.Batch(c.String("json"))
+			lib.Batch(c.String("j"))
 			return nil
 		}}, {
 
 		Name: "clone", Usage: "clone Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "e", Usage: "set environment id for container"},
-			cli.StringFlag{Name: "i", Usage: "set container IP address and VLAN"},
-			cli.StringFlag{Name: "t", Usage: "token to verify with MH"}},
+			cli.StringFlag{Name: "env, e", Usage: "set environment id for container"},
+			cli.StringFlag{Name: "ipaddr, i", Usage: "set container IP address and VLAN"},
+			cli.StringFlag{Name: "token, t", Usage: "token to verify with MH"}},
 		Action: func(c *cli.Context) error {
 			lib.LxcClone(c.Args().Get(0), c.Args().Get(1), c.String("e"), c.String("i"), c.String("t"))
 			return nil
@@ -83,18 +83,18 @@ func main() {
 			return nil
 		}}, {
 
-		Name: "config", Usage: "containerName add/del key value",
+		Name: "config", Usage: "edit container config",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "o", Usage: "add/del key value"},
-			cli.StringFlag{Name: "k", Usage: "add/del key value"},
-			cli.StringFlag{Name: "v", Usage: "add/del key value"},
+			cli.StringFlag{Name: "operation, o", Usage: "<add|del> operation"},
+			cli.StringFlag{Name: "key, k", Usage: "configuration key"},
+			cli.StringFlag{Name: "value, v", Usage: "configuration value"},
 		},
 		Action: func(c *cli.Context) error {
 			lib.LxcConfig(c.Args().Get(0), c.String("o"), c.String("k"), c.String("v"))
 			return nil
 		}}, {
 
-		Name: "daemon", Usage: "start an agent",
+		Name: "daemon", Usage: "start Subutai agent",
 		Action: func(c *cli.Context) error {
 			config.InitAgentDebug()
 			agent.Start(c)
@@ -103,8 +103,8 @@ func main() {
 
 		Name: "demote", Usage: "demote Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "i", Usage: "network value ie 192.168.1.1/24"},
-			cli.StringFlag{Name: "v", Usage: "vlan id"},
+			cli.StringFlag{Name: "ipaddr, i", Usage: "IPv4 address, ie 192.168.1.1/24"},
+			cli.StringFlag{Name: "vlan, v", Usage: "VLAN tag"},
 		},
 		Action: func(c *cli.Context) error {
 			lib.LxcDemote(c.Args().Get(0), c.String("i"), c.String("v"))
@@ -119,8 +119,8 @@ func main() {
 
 		Name: "export", Usage: "export Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "v", Usage: "template version"},
-			cli.StringFlag{Name: "s", Usage: "template preferred size"}},
+			cli.StringFlag{Name: "version, v", Usage: "template version"},
+			cli.StringFlag{Name: "size, s", Usage: "template preferred size"}},
 		Action: func(c *cli.Context) error {
 			lib.LxcExport(c.Args().Get(0), c.String("v"), c.String("s"))
 			return nil
@@ -130,13 +130,13 @@ func main() {
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "torrent", Usage: "use BitTorrent for downloading (experimental)"},
 			cli.StringFlag{Name: "v", Usage: "template version"},
-			cli.StringFlag{Name: "t", Usage: "token to access kurjun repo"}},
+			cli.StringFlag{Name: "token, t", Usage: "token to access private repo"}},
 		Action: func(c *cli.Context) error {
 			lib.LxcImport(c.Args().Get(0), c.String("v"), c.String("t"), c.Bool("torrent"))
 			return nil
 		}}, {
 
-		Name: "info", Usage: "info from host",
+		Name: "info", Usage: "information about host system",
 		Action: func(c *cli.Context) error {
 			lib.Info(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
 			return nil
@@ -154,11 +154,11 @@ func main() {
 
 		Name: "list", Usage: "list Subutai container",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "c", Usage: "containers only"},
-			cli.BoolFlag{Name: "t", Usage: "templates only"},
-			cli.BoolFlag{Name: "i", Usage: "detailed container info"},
-			cli.BoolFlag{Name: "a", Usage: "with ancestors"},
-			cli.BoolFlag{Name: "p", Usage: "with parent"}},
+			cli.BoolFlag{Name: "container, c", Usage: "containers only"},
+			cli.BoolFlag{Name: "template, t", Usage: "templates only"},
+			cli.BoolFlag{Name: "info, i", Usage: "detailed container info"},
+			cli.BoolFlag{Name: "ancestor, a", Usage: "with ancestors"},
+			cli.BoolFlag{Name: "parent, p", Usage: "with parent"}},
 		Action: func(c *cli.Context) error {
 			lib.LxcList(c.Args().Get(0), c.Bool("c"), c.Bool("t"), c.Bool("i"), c.Bool("a"), c.Bool("p"))
 			return nil
@@ -170,16 +170,16 @@ func main() {
 				Name:  "tunnel",
 				Usage: "tunnels operation",
 				Flags: []cli.Flag{
-					cli.StringFlag{Name: "create", Usage: "create tunnel (tunnel -c)"},
-					cli.StringFlag{Name: "delete", Usage: "delete tunnel (tunnel -d)"},
-					cli.BoolFlag{Name: "list", Usage: "list of tunnels (tunnel -l)"},
+					cli.StringFlag{Name: "create, c", Usage: "create vxlan tunnel"},
+					cli.StringFlag{Name: "delete, d", Usage: "delete vxlan tunnel"},
+					cli.BoolFlag{Name: "list, l", Usage: "list vxlan tunnels"},
 
-					cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
-					cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
-					cli.StringFlag{Name: "vni", Usage: "vni"},
+					cli.StringFlag{Name: "remoteip, r", Usage: "vxlan tunnel remote ip"},
+					cli.StringFlag{Name: "vlan, vl", Usage: "tunnel vlan"},
+					cli.StringFlag{Name: "vni, v", Usage: "vxlan tunnel vni"},
 				},
 				Action: func(c *cli.Context) error {
-					lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("remoteip"), c.String("vlan"), c.String("vni"), c.Bool("list"))
+					lib.VxlanTunnel(c.String("c"), c.String("d"), c.String("r"), c.String("vl"), c.String("v"), c.Bool("l"))
 					return nil
 				}}, {
 
@@ -193,12 +193,12 @@ func main() {
 				Name:  "p2p",
 				Usage: "p2p network operation",
 				Flags: []cli.Flag{
-					cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr portRange)"},
-					cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
-					cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
-					cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
-					cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"},
-					cli.BoolFlag{Name: "v", Usage: "print p2p version (p2p -v)"}},
+					cli.BoolFlag{Name: "create, c", Usage: "create p2p instance (interfaceName hash key ttl localPeepIPAddr portRange)"},
+					cli.BoolFlag{Name: "delete, d", Usage: "delete p2p instance by swarm hash"},
+					cli.BoolFlag{Name: "update, u", Usage: "update p2p instance encryption key (hash newkey ttl)"},
+					cli.BoolFlag{Name: "list, l", Usage: "list of p2p instances"},
+					cli.BoolFlag{Name: "peers, p", Usage: "list of p2p swarm participants by hash"},
+					cli.BoolFlag{Name: "version, v", Usage: "print p2p version"}},
 				Action: func(c *cli.Context) error {
 					if c.Bool("v") {
 						lib.P2Pversion()
@@ -211,8 +211,8 @@ func main() {
 
 		Name: "metrics", Usage: "list Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "start time"},
-			cli.StringFlag{Name: "e", Usage: "end time"}},
+			cli.StringFlag{Name: "start, s", Usage: "start time"},
+			cli.StringFlag{Name: "end, e", Usage: "end time"}},
 		Action: func(c *cli.Context) error {
 			lib.HostMetrics(c.Args().Get(0), c.String("s"), c.String("e"))
 			return nil
@@ -220,16 +220,17 @@ func main() {
 
 		Name: "p2p", Usage: "P2P network operations",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr portRange)"},
-			cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
-			cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
-			cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
-			cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"},
-			cli.BoolFlag{Name: "v", Usage: "print p2p version (p2p -v)"}},
+			cli.BoolFlag{Name: "create, c", Usage: "create p2p instance (interfaceName hash key ttl localPeepIPAddr portRange)"},
+			cli.BoolFlag{Name: "delete, d", Usage: "delete p2p instance by swarm hash"},
+			cli.BoolFlag{Name: "update, u", Usage: "update p2p instance encryption key (hash newkey ttl)"},
+			cli.BoolFlag{Name: "list, l", Usage: "list of p2p instances"},
+			cli.BoolFlag{Name: "peers, p", Usage: "list of p2p swarm participants by hash"},
+			cli.BoolFlag{Name: "version, v", Usage: "print p2p version"}},
 		Action: func(c *cli.Context) error {
 			if c.Bool("v") {
 				lib.P2Pversion()
 			} else {
+				os.Args = append([]string{""}, os.Args...) //workaround to keep compatibility for management_network and p2p bindings
 				lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
 			}
 			return nil
@@ -248,7 +249,7 @@ func main() {
 				Usage:    "add reverse proxy component",
 				HideHelp: true,
 				Flags: []cli.Flag{
-					cli.StringFlag{Name: "domain,d", Usage: "add domain to vlan"},
+					cli.StringFlag{Name: "domain, d", Usage: "add domain to vlan"},
 					cli.StringFlag{Name: "host, h", Usage: "add host to domain on vlan"},
 					cli.StringFlag{Name: "policy, p", Usage: "set load balance policy (rr|lb|hash)"},
 					cli.StringFlag{Name: "file, f", Usage: "specify pem certificate file"}},
@@ -285,8 +286,8 @@ func main() {
 
 		Name: "quota", Usage: "set quotas for Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"},
-			cli.StringFlag{Name: "t", Usage: "set alert threshold"}},
+			cli.StringFlag{Name: "set, s", Usage: "set quota for the specified resource type (cpu, cpuset, ram, disk, network)"},
+			cli.StringFlag{Name: "threshold, t", Usage: "set alert threshold"}},
 		Action: func(c *cli.Context) error {
 			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"), c.String("t"))
 			return nil
@@ -300,8 +301,8 @@ func main() {
 
 		Name: "restore", Usage: "restore Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "d", Usage: "date of backup snapshot"},
-			cli.StringFlag{Name: "c", Usage: "name of new container"}},
+			cli.StringFlag{Name: "date, d", Usage: "date of backup snapshot"},
+			cli.StringFlag{Name: "container, c", Usage: "name of new container"}},
 		Action: func(c *cli.Context) error {
 			lib.RestoreContainer(c.Args().Get(0), c.String("d"), c.String("c"))
 			return nil
@@ -331,7 +332,7 @@ func main() {
 				Name:  "add",
 				Usage: "add ssh tunnel",
 				Flags: []cli.Flag{
-					cli.BoolFlag{Name: "g", Usage: "create tunnel to global proxy"}},
+					cli.BoolFlag{Name: "global, g", Usage: "create tunnel to global proxy"}},
 				Action: func(c *cli.Context) error {
 					lib.TunAdd(c.Args().Get(0), c.Args().Get(1), c.Bool("g"))
 					return nil
@@ -352,7 +353,7 @@ func main() {
 
 		Name: "update", Usage: "update Subutai management, container or Resource host",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "c", Usage: "check for updates without installation"}},
+			cli.BoolFlag{Name: "check, c", Usage: "check for updates without installation"}},
 		Action: func(c *cli.Context) error {
 			lib.Update(c.Args().Get(0), c.Bool("c"))
 			return nil
@@ -360,16 +361,16 @@ func main() {
 
 		Name: "vxlan", Usage: "VXLAN tunnels operation",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "create", Usage: "create vxlan tunnel (tunnel -c)"},
-			cli.StringFlag{Name: "delete", Usage: "delete vxlan tunnel (tunnel -d)"},
-			cli.BoolFlag{Name: "list", Usage: "list of vxlan tunnels (tunnel -l)"},
+			cli.StringFlag{Name: "create, c", Usage: "create vxlan tunnel"},
+			cli.StringFlag{Name: "delete, d", Usage: "delete vxlan tunnel"},
+			cli.BoolFlag{Name: "list, l", Usage: "list vxlan tunnels"},
 
-			cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
-			cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
-			cli.StringFlag{Name: "vni", Usage: "vni"},
+			cli.StringFlag{Name: "remoteip, r", Usage: "vxlan tunnel remote ip"},
+			cli.StringFlag{Name: "vlan, vl", Usage: "tunnel vlan"},
+			cli.StringFlag{Name: "vni, v", Usage: "vxlan tunnel vni"},
 		},
 		Action: func(c *cli.Context) error {
-			lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("remoteip"), c.String("vlan"), c.String("vni"), c.Bool("list"))
+			lib.VxlanTunnel(c.String("c"), c.String("d"), c.String("r"), c.String("vl"), c.String("v"), c.Bool("l"))
 			return nil
 		}},
 	}
