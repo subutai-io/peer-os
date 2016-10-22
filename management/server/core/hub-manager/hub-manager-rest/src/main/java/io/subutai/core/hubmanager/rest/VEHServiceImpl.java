@@ -191,7 +191,7 @@ public class VEHServiceImpl
                 CommandResult commandResult = null;
                 try
                 {
-                    commandResult = containerHost.execute(
+                    containerHost.execute(
                             new RequestBuilder( String.format( url, projectName, ownerName, userName, password ) ) );
 
                     commandResult = containerHost.execute( new RequestBuilder(
@@ -204,7 +204,6 @@ public class VEHServiceImpl
                 {
                     LOG.error( e.getMessage() );
                 }
-                LOG.error( commandResult.getStdOut() );
             }
         }
 

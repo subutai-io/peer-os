@@ -138,13 +138,6 @@ public class KeyManagerTest
 
 
     @Test
-    public void testSignData() throws Exception
-    {
-        keyManager.signData( SignatureType.SHA1_DSA, keyPair, "test" );
-    }
-
-
-    @Test
     public void testVerifySignedData() throws Exception
     {
         byte[] sign = new byte[5];
