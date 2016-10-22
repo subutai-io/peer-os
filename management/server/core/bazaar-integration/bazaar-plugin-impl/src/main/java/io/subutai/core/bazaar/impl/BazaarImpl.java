@@ -141,9 +141,9 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
                     break;
             }
         }
-        catch ( Throwable t )
+        catch ( Exception e )
         {
-            LOG.error( "Failed to handle plugin event [{}]: {}", pluginUid, t.getMessage() );
+            LOG.error( "Failed to handle plugin event [{}]: {}", pluginUid, e.getMessage() );
         }
     }
 

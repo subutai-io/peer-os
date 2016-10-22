@@ -108,13 +108,6 @@ public class PGPEncryptionUtilTest
                         signingKey.getPublicKey() );
 
         assertTrue( Arrays.equals( MESSAGE.getBytes(), decryptedAndVerifiedMessage ) );
-
-        //auto secret key detection
-        decryptedAndVerifiedMessage = PGPEncryptionUtil
-                .decryptAndVerify( signedAndEncryptedMessage, findFile( SECRET_KEYRING ), SECRET_PWD,
-                        signingKey.getPublicKey() );
-
-        assertTrue( Arrays.equals( MESSAGE.getBytes(), decryptedAndVerifiedMessage ) );
     }
 
 
