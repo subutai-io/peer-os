@@ -126,14 +126,7 @@ public class TaskUtil<T>
                 }
             }
 
-            try
-            {
-                Thread.sleep( 100 );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            sleep( 100 );
         }
 
         return taskResults;
@@ -251,14 +244,13 @@ public class TaskUtil<T>
 
     public static void sleep( long millis )
     {
-
         try
         {
             Thread.sleep( millis );
         }
         catch ( InterruptedException e )
         {
-            LOG.warn( e.getMessage() );
+            Thread.currentThread().interrupt();
         }
     }
 }

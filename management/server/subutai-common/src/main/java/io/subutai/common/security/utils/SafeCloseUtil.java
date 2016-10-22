@@ -1,4 +1,4 @@
-package io.subutai.common.security.utils.io;
+package io.subutai.common.security.utils;
 
 
 import java.io.FileInputStream;

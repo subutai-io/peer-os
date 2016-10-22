@@ -26,7 +26,7 @@ import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.common.security.crypto.certificate.CertificateTool;
 import io.subutai.common.security.crypto.key.KeyManager;
 import io.subutai.common.security.crypto.key.KeyPairType;
-import io.subutai.common.security.utils.io.SafeCloseUtil;
+import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.settings.SecuritySettings;
 
 
