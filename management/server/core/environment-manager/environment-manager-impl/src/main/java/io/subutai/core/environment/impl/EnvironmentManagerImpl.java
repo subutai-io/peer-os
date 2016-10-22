@@ -1656,11 +1656,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 {
                     final Environment environment = loadEnvironment( alertEvent.getEnvironmentId() );
                     alertEvent.addLog(
-                            String.format( "Invoking pre-processor of" + " '%s:%s'.", handlerId.getAlertHandlerId(),
+                            String.format( "Invoking pre-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     handler.preProcess( environment, alertValue );
                     alertEvent.addLog(
-                            String.format( "Pre-processor of '%s:%s' " + "finished.", handlerId.getAlertHandlerId(),
+                            String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     alertEvent.addLog(
                             String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
@@ -1674,7 +1674,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                     handlerId.getAlertHandlerPriority() ) );
                     handler.postProcess( environment, alertValue );
                     alertEvent.addLog(
-                            String.format( "Pre-processor of '%s:%s' " + "finished.", handlerId.getAlertHandlerId(),
+                            String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                 }
             }

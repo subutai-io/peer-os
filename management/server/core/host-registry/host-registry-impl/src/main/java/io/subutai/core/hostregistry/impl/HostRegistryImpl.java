@@ -381,7 +381,8 @@ public class HostRegistryImpl implements HostRegistry
     }
 
 
-    protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
+    @Override
+    public String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
 
         HostInterface hostInterface;
@@ -402,7 +403,7 @@ public class HostRegistryImpl implements HostRegistry
 
         if ( hostInterface instanceof NullHostInterface )
         {
-            throw new RuntimeException( "Network interface not found" );
+            throw new IllegalStateException( "Network interface not found" );
         }
 
         return hostInterface.getIp();

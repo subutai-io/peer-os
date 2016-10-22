@@ -27,8 +27,6 @@ import io.subutai.common.command.Request;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
@@ -287,7 +285,7 @@ public class CommandProcessorTest
         WebClient webClient = mock( WebClient.class );
         Response response = mock( Response.class );
 
-        doReturn( "IP" ).when( commandProcessor ).getResourceHostIp( resourceHostInfo );
+        doReturn( "IP" ).when( hostRegistry ).getResourceHostIp( resourceHostInfo );
         doReturn( webClient ).when( commandProcessor ).getWebClient( resourceHostInfo );
         doReturn( response ).when( webClient ).form( any( Form.class ) );
         doReturn( Response.Status.ACCEPTED.getStatusCode() ).when( response ).getStatus();
@@ -325,23 +323,5 @@ public class CommandProcessorTest
         commandProcessor.handleResponse( response );
 
         verify( hostRegistry, times( 2 ) ).updateResourceHostEntryTimestamp( anyString() );
-    }
-
-
-    @Test
-    public void testGetResourcehostIp() throws Exception
-    {
-        HostInterfaces hostInterfaces = mock( HostInterfaces.class );
-        HostInterface hostInterface = mock( HostInterface.class );
-        Set<HostInterface> ifaces = Sets.newHashSet( hostInterface );
-
-        doReturn( hostInterfaces ).when( resourceHostInfo ).getHostInterfaces();
-        doReturn( ifaces ).when( hostInterfaces ).getAll();
-        doReturn( hostInterface ).when( ipUtil ).findAddressableIface( eq( ifaces ), anyString() );
-
-
-        commandProcessor.getResourceHostIp( resourceHostInfo );
-
-        verify( hostInterface ).getIp();
     }
 }

@@ -132,7 +132,7 @@ public class TaskUtil<T>
             }
             catch ( InterruptedException e )
             {
-                break;
+                Thread.currentThread().interrupt();
             }
         }
 

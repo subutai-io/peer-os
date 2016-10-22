@@ -14,7 +14,7 @@ import io.subutai.common.protocol.Tunnels;
  */
 public abstract class P2PUtil
 {
-    public static String P2P_SUBNET_MASK = "255.255.255.0";
+    public static final String P2P_SUBNET_MASK = "255.255.255.0";
 
 
     public static String generateHash( final String envId )

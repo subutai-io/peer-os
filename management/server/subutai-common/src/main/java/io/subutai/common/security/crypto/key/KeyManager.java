@@ -1,8 +1,6 @@
 package io.subutai.common.security.crypto.key;
 
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -187,47 +185,6 @@ public class KeyManager
         }
 
         return secretKey;
-    }
-
-
-    /**
-     * *************************************************************************
-     * **********************************
-     */
-    public boolean verifySignedData( SignatureType signatureType, KeyPair keyPair, String fileName, byte[] sign )
-    {
-        boolean verified = false;
-
-        try
-        {
-            signature = Signature.getInstance( signatureType.jce() );
-            signature.initSign( keyPair.getPrivate() );
-
-            //*************Read data to be signed ****************************
-
-            FileInputStream fis = new FileInputStream( fileName );
-            BufferedInputStream bufin = new BufferedInputStream( fis );
-
-            byte[] buffer = new byte[1024];
-            int len;
-
-            while ( ( len = bufin.read( buffer ) ) >= 0 )
-            {
-                signature.update( buffer, 0, len );
-            }
-
-            bufin.close();
-
-            //*****************************************************************
-
-            verified = signature.verify( sign );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error verifying signed data", e );
-        }
-
-        return verified;
     }
 
 

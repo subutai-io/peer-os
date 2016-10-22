@@ -114,4 +114,6 @@ public interface HostRegistry
     HostInfo getHostInfoById( String hostId ) throws HostDisconnectedException;
 
     void removeResourceHost( String id );
+
+    String getResourceHostIp( ResourceHostInfo resourceHostInfo );
 }

@@ -139,7 +139,7 @@ public class PeerUtil<T>
             }
             catch ( InterruptedException e )
             {
-                break;
+                Thread.currentThread().interrupt();
             }
         }
 
