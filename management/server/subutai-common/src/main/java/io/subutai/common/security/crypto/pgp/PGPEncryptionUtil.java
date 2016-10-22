@@ -91,7 +91,7 @@ import com.google.common.base.Preconditions;
 public class PGPEncryptionUtil
 {
     private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtil.class );
-    public static final BouncyCastleProvider provider = new BouncyCastleProvider();
+    private static final BouncyCastleProvider provider = new BouncyCastleProvider();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
     static

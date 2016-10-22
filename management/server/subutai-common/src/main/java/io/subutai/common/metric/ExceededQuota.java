@@ -129,10 +129,11 @@ public class ExceededQuota
         if ( quotaValue instanceof NumericValueResource )
         {
             return ( ( NumericValueResource ) quotaValue ).getValue().multiply( currentValue.getValue() )
-                                                          .multiply( new BigDecimal( 0.01 ) );
+                                                          .multiply( BigDecimal.valueOf( 0.01 ) );
         }
         throw new UnsupportedOperationException( "Used value unsupported." );
     }
+
 
     @SuppressWarnings( "unchecked" )
     public <T extends ResourceValue> T getCurrentValue( final Class<T> format )

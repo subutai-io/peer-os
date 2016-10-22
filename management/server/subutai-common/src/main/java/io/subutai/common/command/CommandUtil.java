@@ -343,7 +343,7 @@ public class CommandUtil
             }
             catch ( InterruptedException e )
             {
-                break;
+                Thread.currentThread().interrupt();
             }
         }
 

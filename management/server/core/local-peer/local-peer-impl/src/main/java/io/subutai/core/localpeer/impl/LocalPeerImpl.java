@@ -1421,15 +1421,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception
+    public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws PeerException
     {
         HostRegistrationManager registrationManager = ServiceLocator.getServiceNoCache( HostRegistrationManager.class );
 
         Preconditions.checkNotNull( registrationManager );
 
-        String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
+        try
+        {
+            String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
 
-        commandUtil.execute( localPeerCommands.getExchangeKeyCommand( hostname, token ), resourceHost );
+            commandUtil.execute( localPeerCommands.getExchangeKeyCommand( hostname, token ), resourceHost );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( e );
+        }
     }
 
 

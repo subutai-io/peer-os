@@ -153,7 +153,7 @@ public interface LocalPeer extends Peer
 
     void cancelAllTasks();
 
-    void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception;
+    void exchangeKeys( ResourceHost resourceHost, String hostname ) throws PeerException;
 
     void setPeerInfo( PeerInfo peerInfo );
 

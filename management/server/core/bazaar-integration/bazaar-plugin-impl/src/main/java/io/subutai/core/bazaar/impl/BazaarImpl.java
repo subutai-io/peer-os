@@ -56,8 +56,9 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            LOG.warn( "Error loading product from Hub {}", e.getMessage() );
         }
+
         return "";
     }
 

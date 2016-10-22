@@ -168,7 +168,7 @@ public class HostUtil
             }
             catch ( InterruptedException e )
             {
-                break;
+                Thread.currentThread().interrupt();
             }
         }
 

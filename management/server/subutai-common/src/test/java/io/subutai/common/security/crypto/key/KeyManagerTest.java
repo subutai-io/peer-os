@@ -135,13 +135,4 @@ public class KeyManagerTest
     {
         keyManager.generateSecretKey( keyGenerator );
     }
-
-
-    @Test
-    public void testVerifySignedData() throws Exception
-    {
-        byte[] sign = new byte[5];
-
-        keyManager.verifySignedData( SignatureType.SHA1_DSA, keyPair, "test", sign );
-    }
 }

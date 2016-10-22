@@ -85,7 +85,7 @@ public class CommandProcess
         }
         catch ( InterruptedException e )
         {
-            LOG.warn( "Command process interrupted" );
+            Thread.currentThread().interrupt();
         }
 
         return getResult();

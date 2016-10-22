@@ -31,8 +31,6 @@ import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
@@ -57,7 +55,7 @@ public class CommandProcessor implements RestProcessor
     private static final int NOTIFIER_INTERVAL_MS = 300;
     private static final long COMMAND_ENTRY_TIMEOUT =
             ( Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC + Common.DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL ) * 1000
-                    + NOTIFIER_INTERVAL_MS + 1000;
+                    + NOTIFIER_INTERVAL_MS + 1000L;
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
     protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
@@ -198,7 +196,8 @@ public class CommandProcessor implements RestProcessor
             if ( hostRequests == null )
             {
                 hostRequests = Sets.newLinkedHashSet();
-                requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
+                requests.put( resourceHostInfo.getId(), hostRequests,
+                        Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000L );
             }
             String encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
             hostRequests.add( encryptedRequest );
@@ -277,26 +276,27 @@ public class CommandProcessor implements RestProcessor
 
     protected WebClient getWebClient( ResourceHostInfo resourceHostInfo )
     {
-        return RestUtil.createWebClient( String.format( "http://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
-                Common.DEFAULT_AGENT_PORT ), 3000, 5000, 1 );
+        return RestUtil.createWebClient(
+                String.format( "http://%s:%d/trigger", hostRegistry.getResourceHostIp( resourceHostInfo ),
+                        Common.DEFAULT_AGENT_PORT ), 3000, 5000, 1 );
     }
 
 
-    protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
-    {
-
-        Set<HostInterface> hostInterfaces = Sets.newHashSet();
-        hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
-
-        HostInterface hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
-
-        if ( hostInterface instanceof NullHostInterface )
-        {
-            throw new RuntimeException( "Network interface not found" );
-        }
-
-        return hostInterface.getIp();
-    }
+    //    protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
+    //    {
+    //
+    //        Set<HostInterface> hostInterfaces = Sets.newHashSet();
+    //        hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
+    //
+    //        HostInterface hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
+    //
+    //        if ( hostInterface instanceof NullHostInterface )
+    //        {
+    //            throw new IllegalStateException( "Network interface not found" );
+    //        }
+    //
+    //        return hostInterface.getIp();
+    //    }
 
 
     protected ResourceHostInfo getResourceHostInfo( String requestHostId ) throws HostDisconnectedException
