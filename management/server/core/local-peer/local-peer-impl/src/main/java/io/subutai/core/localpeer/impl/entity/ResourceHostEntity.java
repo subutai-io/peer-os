@@ -73,6 +73,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.ResourceHostCommands;
@@ -383,14 +384,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         while ( System.currentTimeMillis() - ts < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 && !containerHost
                 .isConnected() )
         {
-            try
-            {
-                Thread.sleep( 100 );
-            }
-            catch ( InterruptedException e )
-            {
-                throw new ResourceHostException( e );
-            }
+            TaskUtil.sleep( 100 );
         }
 
         if ( !ContainerHostState.RUNNING.equals( getContainerHostState( containerHost ) ) )

@@ -21,6 +21,7 @@ import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.MessageStatus;
 import io.subutai.core.messenger.api.Messenger;
 
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -133,6 +134,6 @@ public class MessageResponseListenerTest
 
         listener.waitResponse( messageRequest, REQUEST_TIMEOUT, RESPONSE_TIMEOUT );
 
-        verify( interruptedException ).printStackTrace( any( PrintStream.class ) );
+        assertTrue( Thread.interrupted() );
     }
 }
