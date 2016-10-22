@@ -80,11 +80,14 @@ public class MessageResponseListener extends MessageListener implements Disposab
         //wait for response
         try
         {
-            semaphoreMap.get( request.getId() ).tryAcquire( responseTimeout + 5, TimeUnit.SECONDS );
+            if ( !semaphoreMap.get( request.getId() ).tryAcquire( responseTimeout + 5, TimeUnit.SECONDS ) )
+            {
+                LOG.warn( "Could not obtain response within timeout interval" );
+            }
         }
         catch ( InterruptedException e )
         {
-            LOG.warn( "ignore", e );
+            Thread.currentThread().interrupt();
         }
 
         //remove semaphore from map
@@ -100,7 +103,7 @@ public class MessageResponseListener extends MessageListener implements Disposab
     {
         MessageResponse messageResponse = message.getPayload( MessageResponse.class );
         //store response to map for waiting thread
-        responses.put( messageResponse.getRequestId(), messageResponse, 5 * 1000 );
+        responses.put( messageResponse.getRequestId(), messageResponse, 5 * 1000L );
 
         //obtain semaphore from map
         Semaphore semaphore = semaphoreMap.remove( messageResponse.getRequestId() );

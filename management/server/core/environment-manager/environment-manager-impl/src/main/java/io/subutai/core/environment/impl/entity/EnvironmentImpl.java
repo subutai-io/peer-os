@@ -66,8 +66,7 @@ import io.subutai.core.identity.api.model.UserDelegate;
  * @see ContainerHost
  */
 @Entity
-@Table( name = "env",
-        uniqueConstraints = @UniqueConstraint( columnNames = { "name", "user_id" } ) )
+@Table( name = "env", uniqueConstraints = @UniqueConstraint( columnNames = { "name", "user_id" } ) )
 @Access( AccessType.FIELD )
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
         setterVisibility = JsonAutoDetect.Visibility.NONE )
@@ -117,8 +116,8 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonIgnore
     private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
-    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentPeerImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = true )
+    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentPeerImpl.class, cascade
+            = CascadeType.ALL, orphanRemoval = true )
     @JsonIgnore
     private Set<EnvironmentPeer> environmentPeers = Sets.newHashSet();
 
@@ -372,12 +371,13 @@ public class EnvironmentImpl implements Environment, Serializable
 
         Preconditions.checkNotNull( peerId, "Environment peer id could not be null." );
 
-        for ( Iterator<EnvironmentPeer> i = environmentPeers.iterator(); ; i.hasNext() )
+        for ( Iterator<EnvironmentPeer> iterator = environmentPeers.iterator(); iterator.hasNext(); )
         {
-            EnvironmentPeer c = i.next();
-            if ( c.getPeerId().equals( peerId ) )
+            final EnvironmentPeer environmentPeer = iterator.next();
+
+            if ( environmentPeer.getPeerId().equals( peerId ) )
             {
-                i.remove();
+                iterator.remove();
                 break;
             }
         }
