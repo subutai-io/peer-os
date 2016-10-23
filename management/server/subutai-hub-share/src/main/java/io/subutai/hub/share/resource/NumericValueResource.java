@@ -39,7 +39,7 @@ public class NumericValueResource implements ResourceValue<BigDecimal>
 
     public NumericValueResource( final double value )
     {
-        this.value = new BigDecimal( value );
+        this.value = BigDecimal.valueOf( value );
     }
 
 

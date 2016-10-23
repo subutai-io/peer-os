@@ -114,7 +114,7 @@ public class ConfigManager
     public WebClient getTrustedWebClientWithAuth( String path, final String hubIp )
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
-        String baseUrl = String.format( "https://%s:" + HUB_PORT, hubIp );
+        String baseUrl = String.format( "https://%s:%d", hubIp, HUB_PORT );
 
         return HttpClient.createTrustedWebClientWithAuth( baseUrl + path, keyStore,
                 SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(), hPublicKey.getFingerprint() );

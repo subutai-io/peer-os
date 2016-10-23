@@ -226,9 +226,9 @@ class HttpClient
     {
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
 
-        httpClientPolicy.setConnectionTimeout( 1000 * 60 );
+        httpClientPolicy.setConnectionTimeout( 1000 * 60L );
 
-        httpClientPolicy.setReceiveTimeout( 1000 * 60 * 5 );
+        httpClientPolicy.setReceiveTimeout( 1000 * 60 * 5L );
 
         httpClientPolicy.setMaxRetransmits( 3 );
 

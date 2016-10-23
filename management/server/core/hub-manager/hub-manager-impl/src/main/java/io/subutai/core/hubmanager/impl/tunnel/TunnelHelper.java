@@ -36,7 +36,7 @@ public class TunnelHelper
         while ( exec )
         {
             tryCount++;
-            exec = tryCount > 3 ? false : true;
+            exec = tryCount <= 3;
             try
             {
                 CommandResult result = resourceHost.execute( new RequestBuilder( cmd ) );
@@ -51,7 +51,6 @@ public class TunnelHelper
             catch ( CommandException e )
             {
                 LOG.error( e.getMessage() );
-                e.printStackTrace();
             }
 
             try
@@ -60,7 +59,7 @@ public class TunnelHelper
             }
             catch ( InterruptedException e )
             {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
 
@@ -68,7 +67,7 @@ public class TunnelHelper
     }
 
 
-    public static void sendError( String link, String errorLog, ConfigManager configManager )
+    static void sendError( String link, String errorLog, ConfigManager configManager )
     {
         TunnelInfoDto tunnelInfoDto = new TunnelInfoDto();
         tunnelInfoDto.setTunnelStatus( ERROR );
@@ -77,7 +76,7 @@ public class TunnelHelper
     }
 
 
-    public static Response updateTunnelStatus( String link, TunnelInfoDto tunnelInfoDto, ConfigManager configManager )
+    static Response updateTunnelStatus( String link, TunnelInfoDto tunnelInfoDto, ConfigManager configManager )
     {
         WebClient client = null;
         try
@@ -103,7 +102,7 @@ public class TunnelHelper
     }
 
 
-    public static TunnelInfoDto getPeerTunnelState( String link, ConfigManager configManager )
+    static TunnelInfoDto getPeerTunnelState( String link, ConfigManager configManager )
     {
         try
         {

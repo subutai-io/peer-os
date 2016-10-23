@@ -43,7 +43,7 @@ public class Login extends HttpServlet
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
 
 
-            if( !Strings.isNullOrEmpty( newPassword ))
+            if ( !Strings.isNullOrEmpty( newPassword ) )
             {
                 identityManager.changeUserPassword( username, password, newPassword );
                 password = newPassword;
@@ -60,7 +60,7 @@ public class Login extends HttpServlet
                     }
                     else
                     {
-                        throw new Exception( "Karaf Auth Module is loading, please try again later" );
+                        throw new IllegalStateException( "Karaf Auth Module is loading, please try again later" );
                     }
                 }
                 else if ( !Strings.isNullOrEmpty( sptoken ) )
@@ -73,8 +73,8 @@ public class Login extends HttpServlet
                 else
                 {
                     request.setAttribute( "error", "Please enter username or password" );
-                    response.getWriter().write( "Error, Please enter username or password" );
-                    response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                    setResponse( response, "Error, Please enter username or password",
+                            HttpServletResponse.SC_UNAUTHORIZED );
                 }
 
                 authenticateUser( request, response, user, sptoken );
@@ -82,29 +82,42 @@ public class Login extends HttpServlet
             catch ( IdentityExpiredException e )
             {
                 request.setAttribute( "error", "Your credentials are expired  !!!" );
-                response.getWriter().write( "Please create a new password. The old one is expired" );
-                response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
+                setResponse( response, "Please create a new password. The old one is expired",
+                        HttpServletResponse.SC_PRECONDITION_FAILED );
             }
             catch ( SessionBlockedException e )
             {
                 request.setAttribute( "error", "Account is blocked !!!" );
-                response.getWriter().write( "Account is blocked" );
-                response.setStatus( HttpServletResponse.SC_FORBIDDEN );
+                setResponse( response, "Account is blocked", HttpServletResponse.SC_FORBIDDEN );
             }
             catch ( InvalidLoginException e )
             {
                 request.setAttribute( "error", "Wrong Auth Credentials !!!" );
-                response.getWriter().write( "Wrong Auth Credentials" );
-                response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                setResponse( response, "Wrong Auth Credentials", HttpServletResponse.SC_UNAUTHORIZED );
             }
         }
         catch ( Exception e )
         {
             request.setAttribute( "error", "karaf exceptions !!!" );
-            response.getWriter().write( "Error: " + e.getMessage() );
-            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+            setResponse( response, "Error: " + e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
     }
+
+
+    private void setResponse( HttpServletResponse response, String status, int statusCode )
+    {
+
+        try
+        {
+            response.getWriter().write( status );
+            response.setStatus( statusCode );
+        }
+        catch ( IOException e )
+        {
+            logger.error( "Could not send response: {}", e.getMessage() );
+        }
+    }
+
 
     private void authenticateUser( HttpServletRequest request, HttpServletResponse response, User user, String sptoken )
             throws InvalidLoginException
@@ -143,11 +156,12 @@ public class Login extends HttpServlet
         response.addCookie( fingerprint );
     }
 
+
     @Override
     protected void doGet( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
     {
-        doPost( req , resp );
+        doPost( req, resp );
         resp.sendRedirect( "/" );
     }
 }

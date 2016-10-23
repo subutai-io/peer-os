@@ -88,12 +88,16 @@ public class TrackerImpl implements Tracker
         {
             //*********************************
             long userId = 0;
-            User user   = identityManager.getActiveUser();
+            User user = identityManager.getActiveUser();
 
-            if(user != null)
+            if ( user != null )
+            {
                 userId = user.getId();
+            }
             else
+            {
                 userId = identityManager.getSystemUser().getId();
+            }
 
             //*********************************
 
@@ -229,7 +233,7 @@ public class TrackerImpl implements Tracker
                 }
                 catch ( InterruptedException e )
                 {
-                    return;
+                    Thread.currentThread().interrupt();
                 }
             }
             else

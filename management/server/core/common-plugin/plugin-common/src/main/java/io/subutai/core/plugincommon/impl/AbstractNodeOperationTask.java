@@ -50,7 +50,7 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
                     }
                     catch ( InterruptedException ex )
                     {
-                        break;
+                        Thread.currentThread().interrupt();
                     }
                 }
                 else
@@ -97,7 +97,7 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
             }
             catch ( InterruptedException ex )
             {
-                break;
+                Thread.currentThread().interrupt();
             }
             if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
             {

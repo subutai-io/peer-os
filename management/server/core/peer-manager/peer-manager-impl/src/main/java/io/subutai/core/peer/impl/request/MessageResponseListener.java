@@ -80,7 +80,7 @@ public class MessageResponseListener extends MessageListener implements Disposab
         //wait for response
         try
         {
-            if ( !semaphoreMap.get( request.getId() ).tryAcquire( responseTimeout + 5, TimeUnit.SECONDS ) )
+            if ( !semaphoreMap.get( request.getId() ).tryAcquire( responseTimeout + 5L, TimeUnit.SECONDS ) )
             {
                 LOG.warn( "Could not obtain response within timeout interval" );
             }
