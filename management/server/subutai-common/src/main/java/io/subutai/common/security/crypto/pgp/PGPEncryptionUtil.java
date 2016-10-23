@@ -1293,22 +1293,19 @@ public class PGPEncryptionUtil
      */
     public static PGPPrivateKey getPrivateKey( final PGPSecretKey secretKey, final String secretPwd )
     {
+        Preconditions.checkNotNull( secretKey );
+        Preconditions.checkNotNull( secretPwd );
+
         try
         {
-            if ( secretKey != null )
-            {
-                return secretKey.extractPrivateKey( new JcePBESecretKeyDecryptorBuilder().setProvider( provider )
-                                                                                         .build( secretPwd
-                                                                                                 .toCharArray() ) );
-            }
+            return secretKey.extractPrivateKey(
+                    new JcePBESecretKeyDecryptorBuilder().setProvider( provider ).build( secretPwd.toCharArray() ) );
         }
         catch ( final Exception e )
         {
-            // Don't print the passphrase but do print null if that's what it was
-            final String passphraseMessage = ( secretPwd == null ) ? "null" : "supplied";
-            System.err.println(
-                    "Unable to extract key " + secretKey.getKeyID() + " using " + passphraseMessage + " passphrase" );
+            logger.error( "Unable to extract key {}: {}", secretKey.getKeyID(), e.getMessage() );
         }
+
         return null;
     }
 

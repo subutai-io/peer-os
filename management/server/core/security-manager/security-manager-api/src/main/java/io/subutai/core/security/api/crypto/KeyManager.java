@@ -4,7 +4,6 @@ package io.subutai.core.security.api.crypto;
 import java.io.InputStream;
 import java.util.List;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -140,9 +139,6 @@ public interface KeyManager
          *
          */
     PGPPublicKeyRing setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel );
-
-    PGPPublicKeyRing setKeyTrust( String sourceFingerprint, String targetFingerprint, String encryptedMessage )
-            throws PGPException;
 
 
     /* ***************************************************************
