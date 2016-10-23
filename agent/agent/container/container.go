@@ -14,8 +14,9 @@ import (
 	lxc "gopkg.in/lxc/go-lxc.v2"
 )
 
+// Container describes Subutai container with all required options for the Management server.
 type Container struct {
-	Id         string        `json:"id"`
+	ID         string        `json:"id"`
 	Name       string        `json:"name"`
 	Hostname   string        `json:"hostname"`
 	Status     string        `json:"status,omitempty"`
@@ -26,7 +27,8 @@ type Container struct {
 	Pk         string        `json:"publicKey,omitempty"`
 }
 
-func GetCredentials(name, container string) (uid int, gid int) {
+// Credentials returns information about IDs from container. This informations is user for command execution only.
+func Credentials(name, container string) (uid int, gid int) {
 	path := config.Agent.LxcPrefix + container + "/rootfs/etc/passwd"
 	u, g := parsePasswd(path, name)
 	uid, _ = strconv.Atoi(u)
@@ -51,7 +53,8 @@ func parsePasswd(path, name string) (uid string, gid string) {
 	return "", ""
 }
 
-func GetActiveContainers(details bool) []Container {
+// Active provides list of active Subutai containers.
+func Active(details bool) []Container {
 	contArr := []Container{}
 
 	for _, c := range cont.Containers() {
@@ -59,12 +62,12 @@ func GetActiveContainers(details bool) []Container {
 		configpath := config.Agent.LxcPrefix + c + "/config"
 
 		container := Container{
-			Id:         gpg.GetFingerprint(c),
+			ID:         gpg.GetFingerprint(c),
 			Name:       c,
 			Hostname:   strings.TrimSpace(string(hostname)),
 			Status:     cont.State(c),
 			Arch:       strings.ToUpper(cont.GetConfigItem(configpath, "lxc.arch")),
-			Interfaces: GetContainerIfaces(c),
+			Interfaces: interfaces(c),
 			Parent:     cont.GetConfigItem(configpath, "subutai.parent"),
 		}
 		if details {
@@ -76,7 +79,7 @@ func GetActiveContainers(details bool) []Container {
 	return contArr
 }
 
-func GetContainerIfaces(name string) []utils.Iface {
+func interfaces(name string) []utils.Iface {
 	iface := new(utils.Iface)
 
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)

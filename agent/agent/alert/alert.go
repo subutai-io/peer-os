@@ -209,7 +209,7 @@ func Current(list []container.Container) []Load {
 		}
 
 		if item.CPU != nil || item.RAM != nil || len(item.Disk) > 0 {
-			item.Container = v.Id
+			item.Container = v.ID
 			loadList = append(loadList, item)
 		}
 	}

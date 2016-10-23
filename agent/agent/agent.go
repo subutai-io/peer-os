@@ -101,7 +101,7 @@ func checkSS() (status bool) {
 
 func connectionMonitor() {
 	for {
-		container.ContainersRestoreState()
+		container.StateRestore()
 
 		if !checkSS() {
 			time.Sleep(time.Second * 10)
@@ -135,7 +135,7 @@ func heartbeat() bool {
 		return false
 	}
 	hostname, _ = os.Hostname()
-	pool = container.GetActiveContainers(false)
+	pool = container.Active(false)
 	beat := Heartbeat{
 		Type:       "HEARTBEAT",
 		Hostname:   hostname,
@@ -294,7 +294,7 @@ func heartbeatCall(rw http.ResponseWriter, request *http.Request) {
 
 func nameByID(id string) string {
 	for _, c := range pool {
-		if c.Id == id {
+		if c.ID == id {
 			return c.Name
 		}
 	}

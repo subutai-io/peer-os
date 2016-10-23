@@ -216,7 +216,7 @@ func AttachContainer(name string, req RequestOptions, out_c chan<- ResponseOptio
 	defer rep.Close()
 
 	opts := lxc.DefaultAttachOptions
-	opts.UID, opts.GID = container.GetCredentials(req.RunAs, name)
+	opts.UID, opts.GID = container.Credentials(req.RunAs, name)
 	opts.StdoutFd = wop.Fd()
 	opts.StderrFd = wep.Fd()
 	opts.Cwd = req.WorkingDir

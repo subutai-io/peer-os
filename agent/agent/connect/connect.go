@@ -44,7 +44,7 @@ func Request(user, pass string) {
 		Arch:       strings.ToUpper(runtime.GOARCH),
 		Cert:       utils.PublicCert(),
 		Ifaces:     utils.GetInterfaces(),
-		Containers: container.GetActiveContainers(true),
+		Containers: container.Active(true),
 	})
 	log.Check(log.WarnLevel, "Marshal Resource host json: "+string(rh), err)
 
