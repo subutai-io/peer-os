@@ -15,22 +15,23 @@ import (
 	cont "github.com/subutai-io/base/agent/lib/container"
 )
 
-type Values struct {
+type values struct {
 	Current int `json:"current,omitempty"`
 	Quota   int `json:"quota,omitempty"`
 }
 
-type HDD struct {
+type hdd struct {
 	Partition string `json:"partition"`
 	Current   int    `json:"current"`
 	Quota     int    `json:"quota"`
 }
 
+//Load describes container usage stats. If alert active for this container the Management server receives this data.
 type Load struct {
 	Container string  `json:"id,omitempty"`
-	CPU       *Values `json:"cpu,omitempty"`
-	RAM       *Values `json:"ram,omitempty"`
-	Disk      []HDD   `json:"hdd,omitempty"`
+	CPU       *values `json:"cpu,omitempty"`
+	RAM       *values `json:"ram,omitempty"`
+	Disk      []hdd   `json:"hdd,omitempty"`
 }
 
 var (
@@ -76,11 +77,11 @@ func ramQuota(cont string) []int {
 
 func quotaCPU(name string) int {
 	cfsPeriod := 100000
-	cfs_quota_us, err := ioutil.ReadFile("/sys/fs/cgroup/cpu,cpuacct/lxc/" + name + "/cpu.cfs_quota_us")
+	cfsQuotaUs, err := ioutil.ReadFile("/sys/fs/cgroup/cpu,cpuacct/lxc/" + name + "/cpu.cfs_quota_us")
 	if err != nil {
 		return -1
 	}
-	quota, _ := strconv.Atoi(strings.TrimSpace(string(cfs_quota_us)))
+	quota, _ := strconv.Atoi(strings.TrimSpace(string(cfsQuotaUs)))
 	return quota * 100 / cfsPeriod / runtime.NumCPU()
 }
 
@@ -142,10 +143,11 @@ func diskQuota(mountid, diskMap string) []int {
 	return diskUsage
 }
 
-func AlertProcessing() {
+//Processing works as a daemon, collecting information about containers stats and preparing list of active alerts.
+func Processing() {
 	for {
-		stats = Alert()
-		for k, _ := range cpu {
+		stats = alertLoad()
+		for k := range cpu {
 			if _, ok := stats[k]; !ok {
 				delete(cpu, k)
 			}
@@ -154,7 +156,7 @@ func AlertProcessing() {
 	}
 }
 
-func Alert() (load map[string]Load) {
+func alertLoad() (load map[string]Load) {
 	load = make(map[string]Load)
 	diskMap := stat()
 	diskIDs := id()
@@ -168,47 +170,48 @@ func Alert() (load map[string]Load) {
 		cpuValues := cpuLoad(cont.Name())
 		ramValues := ramQuota(cont.Name())
 
-		disk := []HDD{}
+		disk := []hdd{}
 		for _, v := range []string{"rootfs", "opt", "var", "home"} {
 			diskValues := diskQuota(diskIDs["lib/lxc/"+cont.Name()+"/"+v], diskMap)
-			disk = append(disk, HDD{Current: diskValues[0], Quota: diskValues[1], Partition: v})
+			disk = append(disk, hdd{Current: diskValues[0], Quota: diskValues[1], Partition: v})
 		}
 
 		load[cont.Name()] = Load{
-			CPU:  &Values{Current: cpuValues[0], Quota: cpuValues[1]},
-			RAM:  &Values{Current: ramValues[0], Quota: ramValues[1]},
+			CPU:  &values{Current: cpuValues[0], Quota: cpuValues[1]},
+			RAM:  &values{Current: ramValues[0], Quota: ramValues[1]},
 			Disk: disk,
 		}
 	}
 	return load
 }
 
-func CurrentAlerts(list []container.Container) []Load {
-	var load []Load
+//Current return the list of active alerts. It will be used in heartbeat to notify the Management server.
+func Current(list []container.Container) []Load {
+	var loadList []Load
 	for _, v := range list {
 		var item Load
 
 		threshold, _ := strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.cpu"))
 		if threshold > 0 && stats[v.Name].CPU != nil && stats[v.Name].CPU.Current > threshold {
-			item.CPU = &Values{Current: stats[v.Name].CPU.Current, Quota: stats[v.Name].CPU.Quota}
+			item.CPU = &values{Current: stats[v.Name].CPU.Current, Quota: stats[v.Name].CPU.Quota}
 		}
 
 		threshold, _ = strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.ram"))
 		if threshold > 0 && stats[v.Name].RAM != nil && stats[v.Name].RAM.Current > threshold {
-			item.RAM = &Values{Current: stats[v.Name].RAM.Current, Quota: stats[v.Name].RAM.Quota}
+			item.RAM = &values{Current: stats[v.Name].RAM.Current, Quota: stats[v.Name].RAM.Quota}
 		}
 
 		for _, value := range stats[v.Name].Disk {
 			threshold, _ = strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.disk."+value.Partition))
 			if threshold > 0 && value.Current > threshold {
-				item.Disk = append(item.Disk, HDD{Current: value.Current, Quota: value.Quota, Partition: value.Partition})
+				item.Disk = append(item.Disk, hdd{Current: value.Current, Quota: value.Quota, Partition: value.Partition})
 			}
 		}
 
 		if item.CPU != nil || item.RAM != nil || len(item.Disk) > 0 {
 			item.Container = v.Id
-			load = append(load, item)
+			loadList = append(loadList, item)
 		}
 	}
-	return load
+	return loadList
 }

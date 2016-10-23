@@ -73,7 +73,7 @@ func Start(c *cli.Context) {
 
 	go lib.Collect()
 	go connectionMonitor()
-	go alert.AlertProcessing()
+	go alert.Processing()
 
 	for {
 		if heartbeat() {
@@ -144,7 +144,7 @@ func heartbeat() bool {
 		Instance:   instanceType,
 		Containers: pool,
 		Interfaces: utils.GetInterfaces(),
-		Alert:      alert.CurrentAlerts(pool),
+		Alert:      alert.Current(pool),
 	}
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
