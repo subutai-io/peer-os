@@ -163,7 +163,14 @@ public class Login extends HttpServlet
     protected void doGet( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
     {
-        doPost( req, resp );
-        resp.sendRedirect( "/" );
+        try
+        {
+            doPost( req, resp );
+            resp.sendRedirect( "/" );
+        }
+        catch ( Exception e )
+        {
+            logger.error( "Error in doGet: {}", e.getMessage() );
+        }
     }
 }

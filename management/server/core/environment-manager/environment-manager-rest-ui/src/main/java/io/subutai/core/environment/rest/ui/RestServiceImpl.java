@@ -115,23 +115,10 @@ public class RestServiceImpl implements RestService
     public Response listTemplates()
     {
         Set<Template> templates = templateManager.getTemplates().stream().filter(
-                n -> !n.getName().equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                 .filter( n -> !n.getName().matches( "(?i)cassandra14|" +
-                                                         "cassandra16|" +
-                                                         "elasticsearch14|" +
-                                                         "elasticsearch16|" +
-                                                         "hadoop14|" +
-                                                         "hadoop16|" +
-                                                         "mongo14|" +
-                                                         "mongo16|" +
-                                                         "openjre714|" +
-                                                         "openjre716|" +
-                                                         "solr14|" +
-                                                         "solr16|" +
-                                                         "storm14|" +
-                                                         "storm16|" +
-                                                         "zookeeper14|" +
-                                                         "zookeeper16" ) ).collect( Collectors.toSet() );
+                n -> !n.getName().equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) ).filter( n -> !n.getName().matches(
+                "(?i)cassandra14|" + "cassandra16|" + "elasticsearch14|" + "elasticsearch16|" + "hadoop14|"
+                        + "hadoop16|" + "mongo14|" + "mongo16|" + "openjre714|" + "openjre716|" + "solr14|" + "solr16|"
+                        + "storm14|" + "storm16|" + "zookeeper14|" + "zookeeper16" ) ).collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
@@ -489,7 +476,10 @@ public class RestServiceImpl implements RestService
             {
                 attr.getDataHandler().getContent();
                 File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
-                file.createNewFile();
+                if ( !file.createNewFile() )
+                {
+                    LOG.info( "Domain ssl cert exists, overwriting..." );
+                }
                 attr.transferTo( file );
 
                 path = System.getProperty( "java.io.tmpdir" ) + "/" + environmentId;
@@ -772,7 +762,8 @@ public class RestServiceImpl implements RestService
         {
             for ( Peer peer : peers )
             {
-                taskCompletionService.submit( () -> {
+                taskCompletionService.submit( () ->
+                {
                     PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(), peer.isLocal() );
                     if ( peer.isOnline() )
                     {
@@ -957,7 +948,8 @@ public class RestServiceImpl implements RestService
         try
         {
             Set<PeerTemplatesDownloadProgress> set =
-                    environmentManager.loadEnvironment( environmentId ).getPeers().stream().map( p -> {
+                    environmentManager.loadEnvironment( environmentId ).getPeers().stream().map( p ->
+                    {
                         try
                         {
                             return p.getTemplateDownloadProgress( new EnvironmentId( environmentId ) );

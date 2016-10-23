@@ -54,21 +54,22 @@ public class IndexFilter implements Filter
                             throw new RuntimeException( "No Peer owner is set yet..." );
                         }
                         Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+                        fingerprint.setSecure( true );
                         response.addCookie( fingerprint );
                     }
                 }
                 catch ( Exception ex )
                 {
                     Cookie fingerprint = new Cookie( "su_fingerprint", "no owner" );
+                    fingerprint.setSecure( true );
                     response.addCookie( fingerprint );
                 }
                 view.forward( servletRequest, response );
             }
-            if ( !( url.startsWith( "/rest" ) || url.startsWith( "/subutai" ) ||
-                    url.startsWith( "/fav" ) || url.startsWith( "/plugin" ) ||
-                    url.startsWith( "/assets" ) || url.startsWith( "/css" ) ||
-                    url.startsWith( "/fonts" ) || url.startsWith( "/scripts" ) ||
-                    url.startsWith( "/login" ) ) && !url.contains( "#" ) )
+            if ( !( url.startsWith( "/rest" ) || url.startsWith( "/subutai" ) || url.startsWith( "/fav" ) || url
+                    .startsWith( "/plugin" ) || url.startsWith( "/assets" ) || url.startsWith( "/css" ) || url
+                    .startsWith( "/fonts" ) || url.startsWith( "/scripts" ) || url.startsWith( "/login" ) ) && !url
+                    .contains( "#" ) )
             {
                 try
                 {

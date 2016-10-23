@@ -23,6 +23,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -40,7 +41,7 @@ public class VEHServiceImpl
         String ownerName = "";
         String userName = "";
         String password = "";
-        String domain = "";
+        String domain = null;
 
         String url = "https://hub.subut.ai/vehs/rest/%s";
 
@@ -83,10 +84,13 @@ public class VEHServiceImpl
             if ( containerHost.getContainerName().equals( "Container_12" ) )
             {
                 String sptoken = executeRequest(
-                        "https://127.0.0.1:8443/rest/v1/identity/gettoken?username=admin&password=secret" );
-                String evnUrl = "https://127.0.0.1:8443/rest/ui/environments/%s?sptoken=%s";
+                        String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
+                                Common.DEFAULT_PUBLIC_URL ) );
+                String evnUrl = "%s/rest/ui/environments/%s?sptoken=%s";
 
-                executeRequestDelete( String.format( evnUrl, containerHost.getEnvironmentId().toString(), sptoken ) );
+                executeRequestDelete(
+                        String.format( evnUrl, Common.DEFAULT_PUBLIC_URL, containerHost.getEnvironmentId().toString(),
+                                sptoken ) );
             }
         }
 
@@ -100,10 +104,10 @@ public class VEHServiceImpl
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
 
-        String sptoken =
-                executeRequest( "https://127.0.0.1:8443/rest/v1/identity/gettoken?username=admin&password=secret" );
+        String sptoken = executeRequest( String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
+                Common.DEFAULT_PUBLIC_URL ) );
 
-        String evnUrl = "https://127.0.0.1:8443/rest/v1/environments?sptoken=%s";
+        String evnUrl = "%s/rest/v1/environments?sptoken=%s";
 
 
         String peerId = peerManager.getLocalPeer().getId();
@@ -121,24 +125,21 @@ public class VEHServiceImpl
 
         if ( !hasSite )
         {
-            executeRequestPost( String.format( evnUrl, sptoken ),
+            executeRequestPost( String.format( evnUrl, Common.DEFAULT_PUBLIC_URL, sptoken ),
                     String.format( body, UUID.randomUUID(), projectName, peerId, peerId, resourceHost.getId() ) );
         }
 
         try
         {
-            Thread.sleep( 20 * 1000 );
+            Thread.sleep( 20 * 1000L );
         }
         catch ( InterruptedException e )
         {
-            LOG.error( e.getMessage() );
+            Thread.currentThread().interrupt();
         }
 
 
         String ip = deployStaticSite( peerManager, projectName, ownerName, userName, password );
-
-
-        LOG.error( "containerIP: " + ip );
 
 
         String conf =
@@ -155,14 +156,16 @@ public class VEHServiceImpl
             resourceHost.execute( new RequestBuilder( "mkdir -p /var/lib/apps/subutai/current/nginx-includes/" ) );
 
             resourceHost.execute( new RequestBuilder( String.format( conf, domain, ip, domain, domain ) ) );
+
             try
             {
-                Thread.sleep( 5 * 1000 );
+                Thread.sleep( 5 * 1000L );
             }
             catch ( InterruptedException e )
             {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
+
             resourceHost.execute( new RequestBuilder( "systemctl restart *nginx*" ) );
         }
         catch ( Exception e )
