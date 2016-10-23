@@ -19,7 +19,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
@@ -181,7 +180,7 @@ public class AppScaleManager
         while ( exec )
         {
             tryCount++;
-            exec = tryCount > 3 ? false : true;
+            exec = tryCount <= 3;
 
             if ( !ch.isConnected() )
             {
@@ -194,7 +193,7 @@ public class AppScaleManager
             }
             catch ( InterruptedException e )
             {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
 
@@ -202,7 +201,7 @@ public class AppScaleManager
     }
 
 
-    public void createTunnel( String link, final AppScaleConfigDto config, ConfigManager configManager )
+    void createTunnel( String link, final AppScaleConfigDto config, ConfigManager configManager )
     {
         TunnelInfoDto tunnelInfoDto = config.getTunnelInfoDto();
 
@@ -214,7 +213,12 @@ public class AppScaleManager
         CommandResult commandResult = TunnelHelper.execute( resourceHost,
                 String.format( cmd, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(), "" ) );
 
+        Preconditions.checkNotNull( commandResult );
+
         tunnelInfoDto = TunnelHelper.parseResult( link, commandResult.getStdOut(), configManager );
+
+        Preconditions.checkNotNull( tunnelInfoDto );
+
         tunnelInfoDto.setTunnelStatus( TunnelInfoDto.TunnelStatus.READY );
 
         String tunnelLink = link + "/tunnel";
@@ -248,8 +252,9 @@ public class AppScaleManager
         CommandResult res =
                 TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" );
 
-        String vlanString = res.getStdOut().substring( 11, 14 );
-        return vlanString;
+        Preconditions.checkNotNull( res );
+
+        return res.getStdOut().substring( 11, 14 );
     }
 
 

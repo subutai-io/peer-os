@@ -33,7 +33,7 @@ import com.google.common.base.Strings;
  */
 public class PGPKeyUtil
 {
-    public static final BouncyCastleProvider provider = new BouncyCastleProvider();
+    private static final BouncyCastleProvider provider = new BouncyCastleProvider();
 
     public static final int HEX_SHORT_KEY_ID_LENGTH = 8;
     public static final int HEX_LONG_KEY_ID_LENGTH = 16;

@@ -1529,7 +1529,6 @@ public class PGPEncryptionUtil
             }
             catch ( GeneralSecurityException gse )
             {
-                gse.printStackTrace();
                 return null;
             }
         }

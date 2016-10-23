@@ -198,8 +198,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
             }
             catch ( InterruptedException e )
             {
-                log.error( e.getMessage() );
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
 

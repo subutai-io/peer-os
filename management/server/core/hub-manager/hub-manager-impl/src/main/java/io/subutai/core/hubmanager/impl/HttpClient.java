@@ -18,8 +18,8 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 public class HttpClient
 {
-    private static long defaultReceiveTimeout = 1000 * 60 * 5;
-    private static long defaultConnectionTimeout = 1000 * 60;
+    private static long defaultReceiveTimeout = 1000 * 60 * 5L;
+    private static long defaultConnectionTimeout = 1000 * 60L;
     private static int defaultMaxRetransmits = 3;
 
 

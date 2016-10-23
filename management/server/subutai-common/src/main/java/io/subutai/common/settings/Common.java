@@ -63,15 +63,15 @@ public class Common
     public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_HOSTNAME = "management";
     public static final int CONTAINER_SSH_TIMEOUT_SEC = 1800;
-    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 180 * 60;// 3 hour
+    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 180 * 60L;// 3 hour
     public static final String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";
     public static final String DEFAULT_DOMAIN_NAME = "intra.lan";
 
     //http/rest client settings
-    public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 10;
-    public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15;
+    public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 10L;
+    public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15L;
     public static final int DEFAULT_MAX_RETRANSMITS = 3;
 
     public static final String ETC_HOSTS_FILE = "/etc/hosts";

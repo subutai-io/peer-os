@@ -110,7 +110,7 @@ public class AccessControlInterceptorTest
 
         verify( interceptorChain ).abort();
 
-        doReturn( ChannelSettings.URL_ACCESS_PX1[0] ).when( request ).getRequestURI();
+        doReturn( "/rest/v1/identity/auth").when( request ).getRequestURI();
         doReturn( -1 ).when( request ).getLocalPort();
 
         accessControlInterceptor.handleMessage( message );

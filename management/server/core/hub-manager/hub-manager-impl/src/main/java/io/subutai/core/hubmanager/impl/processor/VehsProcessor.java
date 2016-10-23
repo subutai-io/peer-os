@@ -278,7 +278,7 @@ public class VehsProcessor implements StateLinkProcessor
             }
             catch ( InterruptedException e )
             {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
 
