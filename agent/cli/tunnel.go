@@ -140,7 +140,7 @@ func getArgs(global bool, socket string) ([]string, string) {
 	var tunsrv string
 	var args []string
 	if global {
-		cdn, err := net.LookupIP(config.Cdn.Url)
+		cdn, err := net.LookupIP(config.CDN.URL)
 		log.Check(log.ErrorLevel, "Resolving nearest tunnel node address", err)
 		tunsrv = cdn[0].String()
 		args = []string{"-i", config.Agent.AppPrefix + "etc/ssh.pem", "-N", "-p", "8022", "-R", "0:" + socket, "-o", "StrictHostKeyChecking=no", "tunnel@" + tunsrv}

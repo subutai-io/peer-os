@@ -53,11 +53,11 @@ type metainfo struct {
 func templId(t *templ, kurjun *http.Client, token string) {
 	var meta metainfo
 
-	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&token=" + token
+	url := config.CDN.Kurjun + "/template/info?name=" + t.name + "&token=" + token
 	if t.name == "management" && len(t.branch) != 0 {
-		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&token=" + token
+		url = config.CDN.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&token=" + token
 	} else if t.name == "management" {
-		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "&token=" + token
+		url = config.CDN.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "&token=" + token
 	}
 
 	response, err := kurjun.Get(url)
@@ -66,7 +66,7 @@ func templId(t *templ, kurjun *http.Client, token string) {
 
 	if err == nil && response.StatusCode == 404 && t.name == "management" {
 		log.Warn("Requested management version not found, getting latest available")
-		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.branch + "&token=" + token)
+		response, err = kurjun.Get(config.CDN.Kurjun + "/template/info?name=" + t.name + "&version=" + t.branch + "&token=" + token)
 	}
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return
@@ -133,12 +133,12 @@ func download(t templ, kurjun *http.Client, token string, torrent bool) bool {
 	log.Check(log.FatalLevel, "Creating file "+t.file, err)
 	defer out.Close()
 
-	url := config.Cdn.Kurjun + "/template/download?id=" + t.id
+	url := config.CDN.Kurjun + "/template/download?id=" + t.id
 
 	if torrent {
 		url = "http://" + config.Management.Host + ":8338/kurjun/rest/template/download?id=" + t.id
 	} else if len(t.owner) > 0 {
-		url = config.Cdn.Kurjun + "/template/" + t.owner[0] + "/" + t.file
+		url = config.CDN.Kurjun + "/template/" + t.owner[0] + "/" + t.file
 	}
 	response, err := kurjun.Get(url)
 	log.Check(log.FatalLevel, "Getting "+url, err)
@@ -198,7 +198,7 @@ func idToName(id string, kurjun *http.Client, token string) string {
 
 	//Since only kurjun knows template's ID, we cannot define if we have template already installed in system by ID as we do it by name, so unreachable kurjun in this case is a deadend for us
 	//To omit this issue we should add ID into template config and use this ID as a "primary key" to any request
-	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/info?id=" + id + "&token=" + token)
+	response, err := kurjun.Get(config.CDN.Kurjun + "/template/info?id=" + id + "&token=" + token)
 	log.Check(log.ErrorLevel, "Getting kurjun response", err)
 	defer response.Body.Close()
 

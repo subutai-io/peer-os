@@ -89,7 +89,7 @@ func interfaces(name string) []utils.Iface {
 
 	iface.InterfaceName = "eth0"
 	listip, _ := c.IPAddress(iface.InterfaceName)
-	iface.Ip = strings.Join(listip, " ")
+	iface.IP = strings.Join(listip, " ")
 
 	return []utils.Iface{*iface}
 }

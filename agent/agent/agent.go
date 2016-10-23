@@ -219,7 +219,7 @@ func execute(rsp executer.EncRequest) {
 				payload = gpg.EncryptWrapper(contName, config.Management.GpgUser, jsonR, pub, keyring)
 			}
 			message, err := json.Marshal(map[string]string{
-				"hostID":   elem.ID,
+				"hostId":   elem.ID,
 				"response": payload,
 			})
 			log.Check(log.WarnLevel, "Marshal response json "+elem.CommandID, err)
