@@ -4,7 +4,6 @@ package io.subutai.core.security.impl.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
@@ -272,35 +271,6 @@ public class KeyManagerImpl implements KeyManager
         PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( targetFingerprint );
 
         return setKeyTrust( sourceSecRing, targetPubRing, trustLevel );
-    }
-
-
-    @Override
-    public PGPPublicKeyRing setKeyTrust( final String sourceFingerprint, final String targetFingerprint,
-                                         final String encryptedMessage ) throws PGPException
-    {
-
-        byte[] decrypted = encryptionTool.decrypt( encryptedMessage.getBytes() );
-
-        try
-        {
-            String decryptedMessage = new String( decrypted, "UTF-8" );
-
-            // TODO trust message signature verification should be verified on message separately from signature
-            // since on client side primarily Object properties are set then serialized to JSON and signature is
-            // generated from this string and set as additional Object property. Finally Object serialized
-            // again to JSON with signature and encoded with recipient's (management's), and sent as trust message.
-            //
-            // trustMessage:
-            // { [ ( "I Fully trust myself to manage this Environment") signed by User] encrypted by Peer PubKey}
-
-            //            TrustMessage trustMessage = JsonUtil.fromJson( decryptedMessage, TrustMessage.class );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            LOG.error( "Error converting byte array to string with UTF-8 format.", e );
-        }
-        return null;
     }
 
 
@@ -924,7 +894,6 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public PGPPrivateKey getPrivateKey( String identityId )
     {
-        PGPPrivateKey privateKey;
 
         if ( Strings.isNullOrEmpty( identityId ) )
         {
@@ -937,9 +906,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( secretKey != null )
             {
-                privateKey = PGPEncryptionUtil.getPrivateKey( secretKey, keyData.getSecretKeyringPwd() );
-
-                return privateKey;
+                return PGPEncryptionUtil.getPrivateKey( secretKey, keyData.getSecretKeyringPwd() );
             }
             else
             {
