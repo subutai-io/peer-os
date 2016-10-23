@@ -177,14 +177,14 @@ func execute(rsp executer.EncRequest) {
 	var req executer.Request
 	var md, contName, pub, keyring, payload string
 
-	if rsp.HostId == fingerprint {
+	if rsp.HostID == fingerprint {
 		md = gpg.DecryptWrapper(rsp.Request)
 	} else {
-		contName = nameByID(rsp.HostId)
+		contName = nameByID(rsp.HostID)
 		if contName == "" {
 			lastHeartbeat = []byte{}
 			heartbeat()
-			contName = nameByID(rsp.HostId)
+			contName = nameByID(rsp.HostID)
 			if contName == "" {
 				return
 			}
@@ -201,7 +201,7 @@ func execute(rsp executer.EncRequest) {
 
 	//create channels for stdout and stderr
 	sOut := make(chan executer.ResponseOptions)
-	if rsp.HostId == fingerprint {
+	if rsp.HostID == fingerprint {
 		go executer.ExecHost(req.Request, sOut)
 	} else {
 		go executer.AttachContainer(contName, req.Request, sOut)
@@ -213,16 +213,16 @@ func execute(rsp executer.EncRequest) {
 			resp := executer.Response{ResponseOpts: elem}
 			jsonR, err := json.Marshal(resp)
 			log.Check(log.WarnLevel, "Marshal response", err)
-			if rsp.HostId == fingerprint {
+			if rsp.HostID == fingerprint {
 				payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, jsonR)
 			} else {
 				payload = gpg.EncryptWrapper(contName, config.Management.GpgUser, jsonR, pub, keyring)
 			}
 			message, err := json.Marshal(map[string]string{
-				"hostId":   elem.Id,
+				"hostID":   elem.ID,
 				"response": payload,
 			})
-			log.Check(log.WarnLevel, "Marshal response json "+elem.CommandId, err)
+			log.Check(log.WarnLevel, "Marshal response json "+elem.CommandID, err)
 			go response(message)
 		} else {
 			sOut = nil

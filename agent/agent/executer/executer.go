@@ -20,19 +20,23 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+// EncRequest describes encrypted JSON request from Management server.
 type EncRequest struct {
-	HostId  string `json:"hostid"`
+	HostID  string `json:"hostid"`
 	Request string `json:"request"`
 }
+
+// Request is a encapsulation for RequestOptions required by the Management server.
 type Request struct {
-	Id      string         `json:"id"`
+	ID      string         `json:"id"`
 	Request RequestOptions `json:"request"`
 }
 
+// RequestOptions describes parameters of the request for command execution.
 type RequestOptions struct {
 	Type        string            `json:"type"`
-	Id          string            `json:"id"`
-	CommandId   string            `json:"commandId"`
+	ID          string            `json:"id"`
+	CommandID   string            `json:"commandId"`
 	WorkingDir  string            `json:"workingDirectory"`
 	Command     string            `json:"command"`
 	Args        []string          `json:"args"`
@@ -44,15 +48,17 @@ type RequestOptions struct {
 	IsDaemon    int               `json:"isDaemon"`
 }
 
+// Response is a encapsulation for ResponseOptions required by the Management server.
 type Response struct {
 	ResponseOpts ResponseOptions `json:"response"`
-	Id           string          `json:"id"`
+	ID           string          `json:"id"`
 }
 
+// ResponseOptions describes parameters of the response for command execution.
 type ResponseOptions struct {
 	Type           string `json:"type"`
-	Id             string `json:"id"`
-	CommandId      string `json:"commandId"`
+	ID             string `json:"id"`
+	CommandID      string `json:"commandId"`
 	Pid            int    `json:"pid"`
 	ResponseNumber int    `json:"responseNumber,omitempty"`
 	StdOut         string `json:"stdOut,omitempty"`
@@ -62,10 +68,10 @@ type ResponseOptions struct {
 
 // ExecHost executes request inside Resource host
 // and sends output as response.
-func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
+func ExecHost(req RequestOptions, outCh chan<- ResponseOptions) {
 	cmd := buildCmd(&req)
 	if cmd == nil {
-		close(out_c)
+		close(outCh)
 		return
 	}
 	rop, wop, _ := os.Pipe()
@@ -81,7 +87,7 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 		cmd.SysProcAttr.Credential = &syscall.Credential{Uid: 0, Gid: 0}
 	}
 	err := cmd.Start()
-	log.Check(log.WarnLevel, "Executing command: "+req.CommandId+" "+req.Command+" "+strings.Join(req.Args, " "), err)
+	log.Check(log.WarnLevel, "Executing command: "+req.CommandID+" "+req.Command+" "+strings.Join(req.Args, " "), err)
 
 	wop.Close()
 	wep.Close()
@@ -96,7 +102,7 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		outputSender(stdout, stderr, out_c, &response)
+		outputSender(stdout, stderr, outCh, &response)
 	}()
 
 	done := make(chan error)
@@ -108,11 +114,11 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 		if req.IsDaemon != 1 {
 			response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
 		}
-		out_c <- response
+		outCh <- response
 	case <-time.After(time.Duration(req.Timeout) * time.Second):
 		if req.IsDaemon == 1 {
 			response.ExitCode = "0"
-			out_c <- response
+			outCh <- response
 			<-done
 		} else {
 			cmd.Process.Kill()
@@ -123,10 +129,10 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 			} else {
 				response.ExitCode = "-1"
 			}
-			out_c <- response
+			outCh <- response
 		}
 	}
-	close(out_c)
+	close(outCh)
 }
 
 func outputReader(read *os.File, ch chan<- string) {
@@ -199,16 +205,16 @@ func buildCmd(r *RequestOptions) *exec.Cmd {
 func genericResponse(req RequestOptions) ResponseOptions {
 	return ResponseOptions{
 		Type:           "EXECUTE_RESPONSE",
-		CommandId:      req.CommandId,
-		Id:             req.Id,
+		CommandID:      req.CommandID,
+		ID:             req.ID,
 		ResponseNumber: 1,
 	}
 }
 
 // AttachContainer executes request inside Container host
 // and sends output as response.
-func AttachContainer(name string, req RequestOptions, out_c chan<- ResponseOptions) {
-	lxc_c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
+func AttachContainer(name string, req RequestOptions, outCh chan<- ResponseOptions) {
+	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 
 	rop, wop, _ := os.Pipe()
 	rep, wep, _ := os.Pipe()
@@ -231,7 +237,7 @@ func AttachContainer(name string, req RequestOptions, out_c chan<- ResponseOptio
 
 	log.Debug("Executing command in container " + name + ":" + cmd.String())
 	go func() {
-		exitCode, _ = lxc_c.RunCommandStatus([]string{"timeout", strconv.Itoa(req.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
+		exitCode, _ = c.RunCommandStatus([]string{"timeout", strconv.Itoa(req.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
 		wop.Close()
 		wep.Close()
 	}()
@@ -242,7 +248,7 @@ func AttachContainer(name string, req RequestOptions, out_c chan<- ResponseOptio
 	go outputReader(rep, stderr)
 
 	var response = genericResponse(req)
-	outputSender(stdout, stderr, out_c, &response)
+	outputSender(stdout, stderr, outCh, &response)
 	if exitCode == 0 {
 		response.Type = "EXECUTE_RESPONSE"
 		response.ExitCode = strconv.Itoa(exitCode)
@@ -252,7 +258,7 @@ func AttachContainer(name string, req RequestOptions, out_c chan<- ResponseOptio
 		}
 		response.ExitCode = strconv.Itoa(exitCode / 256)
 	}
-	out_c <- response
-	lxc.Release(lxc_c)
-	close(out_c)
+	outCh <- response
+	lxc.Release(c)
+	close(outCh)
 }
