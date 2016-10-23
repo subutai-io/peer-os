@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.dao.DaoManager;
@@ -38,10 +36,9 @@ public class TrackerImpl implements Tracker
     /**
      * Used to serialize/deserialize tracker operation to/from json format
      */
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = LoggerFactory.getLogger( TrackerImpl.class.getName() );
     private static final String SOURCE_IS_EMPTY_MSG = "Source is null or empty";
-    protected TrackerOperationDataService dataService;
+    TrackerOperationDataService dataService;
     private DaoManager daoManager;
     private IdentityManager identityManager;
     private final ScheduledExecutorService purger = Executors.newSingleThreadScheduledExecutor();
@@ -87,7 +84,7 @@ public class TrackerImpl implements Tracker
         try
         {
             //*********************************
-            long userId = 0;
+            long userId ;
             User user = identityManager.getActiveUser();
 
             if ( user != null )

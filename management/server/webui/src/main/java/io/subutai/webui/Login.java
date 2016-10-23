@@ -128,6 +128,7 @@ public class Login extends HttpServlet
         }
         request.getSession().setAttribute( "userSessionData", sptoken );
         Cookie ctoken = new Cookie( "sptoken", sptoken );
+        ctoken.setSecure( true );
         //                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
 
         logger.info( user.getFingerprint() );
@@ -136,6 +137,7 @@ public class Login extends HttpServlet
         logger.info( user.getSecurityKeyId() );
         logger.info( user.getUserName() );
         Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+        fingerprint.setSecure( true );
         //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
 
 
