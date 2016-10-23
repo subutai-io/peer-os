@@ -24,14 +24,16 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+//Response covers heartbeat date because of format required by Management server.
 type Response struct {
 	Beat Heartbeat `json:"response"`
 }
 
+//Heartbeat describes JSON formated information that Agent sends to Management server.
 type Heartbeat struct {
 	Type       string                `json:"type"`
 	Hostname   string                `json:"hostname"`
-	Id         string                `json:"id"`
+	ID         string                `json:"id"`
 	Arch       string                `json:"arch"`
 	Instance   string                `json:"instance"`
 	Interfaces []utils.Iface         `json:"interfaces,omitempty"`
@@ -60,6 +62,7 @@ func initAgent() {
 	client = utils.TLSConfig()
 }
 
+//Start starting Subutai Agent daemon, all required goroutines and keep working during all life cycle.
 func Start(c *cli.Context) {
 	initAgent()
 
@@ -136,7 +139,7 @@ func heartbeat() bool {
 	beat := Heartbeat{
 		Type:       "HEARTBEAT",
 		Hostname:   hostname,
-		Id:         fingerprint,
+		ID:         fingerprint,
 		Arch:       instanceArch,
 		Instance:   instanceType,
 		Containers: pool,
@@ -177,11 +180,11 @@ func execute(rsp executer.EncRequest) {
 	if rsp.HostId == fingerprint {
 		md = gpg.DecryptWrapper(rsp.Request)
 	} else {
-		contName = nameById(rsp.HostId)
+		contName = nameByID(rsp.HostId)
 		if contName == "" {
 			lastHeartbeat = []byte{}
 			heartbeat()
-			contName = nameById(rsp.HostId)
+			contName = nameByID(rsp.HostId)
 			if contName == "" {
 				return
 			}
@@ -289,7 +292,7 @@ func heartbeatCall(rw http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func nameById(id string) string {
+func nameByID(id string) string {
 	for _, c := range pool {
 		if c.Id == id {
 			return c.Name

@@ -11,8 +11,8 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-var Version string = "unknown"
-var Commit string = "unknown"
+var version string = "unknown"
+var commit string = "unknown"
 
 func init() {
 	if os.Getuid() != 0 {
@@ -30,9 +30,9 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
 	if len(config.Template.Branch) != 0 {
-		Commit = config.Template.Branch + "/" + Commit
+		commit = config.Template.Branch + "/" + commit
 	}
-	app.Version = Version + " " + Commit
+	app.Version = version + " " + commit
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
