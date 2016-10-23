@@ -160,49 +160,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response upSite()
-    {
-
-        Thread thread = new Thread()
-        {
-            public void run()
-            {
-                VEHServiceImpl.upSite( peerManager );
-            }
-        };
-
-        thread.start();
-
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response downSite()
-    {
-
-        Thread thread = new Thread()
-        {
-            public void run()
-            {
-                VEHServiceImpl.downSite( peerManager );
-            }
-        };
-
-        thread.start();
-
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response checksum()
-    {
-        return VEHServiceImpl.getChecksum( peerManager );
-    }
-
-
     public CommandExecutor getCommandExecutor()
     {
         return commandExecutor;

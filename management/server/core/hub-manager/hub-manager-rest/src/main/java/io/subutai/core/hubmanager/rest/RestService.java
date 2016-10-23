@@ -56,22 +56,4 @@ public interface RestService
     @Path( "/registration_state" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegistrationState();
-
-    //TODO after finish ENVIRONMENT MANAGEMENT should delete this method
-    @POST
-    @Path( "/upSite" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response upSite();
-
-    //TODO after finish ENVIRONMENT MANAGEMENT should delete this method
-    @DELETE
-    @Path( "/downSite" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response downSite();
-
-    //TODO after finish ENVIRONMENT MANAGEMENT should delete this method
-    @GET
-    @Path( "/checksum" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response checksum();
 }
