@@ -110,7 +110,7 @@ func connectionMonitor() {
 
 		if fingerprint == "" || config.Management.GpgUser == "" {
 			fingerprint = gpg.GetFingerprint("rh@subutai.io")
-			connect.Connect(config.Agent.GpgUser, config.Management.Secret)
+			connect.Request(config.Agent.GpgUser, config.Management.Secret)
 		} else {
 			resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
 			if err == nil && resp.StatusCode == http.StatusOK {
@@ -118,7 +118,7 @@ func connectionMonitor() {
 				log.Debug("Connection monitor check - success")
 			} else {
 				log.Debug("Connection monitor check - failed")
-				connect.Connect(config.Agent.GpgUser, config.Management.Secret)
+				connect.Request(config.Agent.GpgUser, config.Management.Secret)
 				lastHeartbeat = []byte{}
 				go heartbeat()
 			}

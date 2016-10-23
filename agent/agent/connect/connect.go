@@ -31,7 +31,8 @@ type rHost struct {
 	Containers []container.Container `json:"hostInfos"`
 }
 
-func Connect(user, pass string) {
+//Request collecting connection request and sends to the Management server.
+func Request(user, pass string) {
 	log.Debug("Connecting to " + config.Management.Host + ":" + config.Management.Port)
 	hostname, _ := os.Hostname()
 
