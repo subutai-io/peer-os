@@ -8,6 +8,9 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.base.Strings;
@@ -22,6 +25,8 @@ import io.subutai.core.pluginmanager.api.model.PluginDetails;
 
 public class RestServiceImpl implements RestService
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
+
     private static final String ERROR_KEY = "ERROR";
     private PluginManager pluginManager;
     private IdentityManager identityManager;
@@ -35,7 +40,8 @@ public class RestServiceImpl implements RestService
         if ( !Strings.isNullOrEmpty( permissionJson ) )
         {
             permissions = JsonUtil.fromJson( permissionJson, new TypeToken<ArrayList<PermissionJson>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
 
         if ( kar == null )
@@ -46,7 +52,12 @@ public class RestServiceImpl implements RestService
         try
         {
             File karFile = new File( System.getProperty( "karaf.home" ) + "/deploy/" + name + ".kar" );
-            karFile.createNewFile();
+            
+            if ( !karFile.createNewFile() )
+            {
+                LOG.info( "Plugin {} already exists. Overwriting", name );
+            }
+
             kar.transferTo( karFile );
 
             pluginManager.register( name, version, karFile.getAbsolutePath(), permissions );
@@ -86,7 +97,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            LOG.error( "Error deleting profile {}", e.getMessage() );
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
 
@@ -95,32 +107,8 @@ public class RestServiceImpl implements RestService
 
 
     //todo implement or remove
-    @Override
     public Response setPermissions( final String pluginId, final String permissionJson )
     {
-        //        PluginDetails pluginInfo = pluginManager.getConfigDataService().getPluginDetails( Long.parseLong(
-        // pluginId ) );
-        //        Role role = identityManager.getRole( pluginInfo.getRoleId() );
-        //
-        //        if ( !Strings.isNullOrEmpty( permissionJson ) )
-        //        {
-        //            ArrayList<PermissionJson> permissions =
-        //                    JsonUtil.fromJson( permissionJson, new TypeToken<ArrayList<PermissionJson>>()
-        //                    {
-        //                    }.getType() );
-        //
-        //            identityManager.removeAllRolePermissions( role.getId() );
-        //
-        //            for ( final PermissionJson permission : permissions )
-        //            {
-        //                Permission per = identityManager
-        //                        .createPermission( permission.getObject(), permission.getScope(), permission
-        // .getRead(),
-        //                                permission.getWrite(), permission.getUpdate(), permission.getDelete() );
-        //                identityManager.assignRolePermission( role.getId(), per );
-        //            }
-        //        }
-
         return Response.status( Response.Status.OK ).build();
     }
 
