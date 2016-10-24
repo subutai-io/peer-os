@@ -169,7 +169,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
-    public class Cpu
+    public class Cpu implements Serializable
     {
         String current;
         String quota;
@@ -195,7 +195,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
-    public class Ram
+    public class Ram implements Serializable
     {
         String current;
         String quota;
@@ -228,7 +228,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
-    public class Hdd
+    public class Hdd implements Serializable
     {
         String partition;
         String current;
