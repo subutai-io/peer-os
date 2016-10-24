@@ -24,7 +24,6 @@ public class SubutaiInfo
         catch ( ConfigurationException e )
         {
             LOG.error( "Error in loading git.properties file." );
-            e.printStackTrace();
         }
         return config;
     }

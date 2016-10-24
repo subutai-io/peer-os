@@ -443,7 +443,6 @@ public class HubManagerImpl implements HubManager
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
             throw new Exception( "Could not retrieve product data", e );
         }
     }
@@ -653,7 +652,6 @@ public class HubManagerImpl implements HubManager
         catch ( Exception e )
         {
             log.error( e.getMessage() );
-            e.printStackTrace();
         }
     }
 

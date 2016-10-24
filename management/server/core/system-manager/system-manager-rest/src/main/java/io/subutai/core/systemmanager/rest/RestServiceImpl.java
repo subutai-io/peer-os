@@ -40,7 +40,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
-            e.printStackTrace();
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
@@ -51,6 +51,7 @@ public class RestServiceImpl implements RestService
     public Response setPeerSettings()
     {
         systemManager.setPeerSettings();
+
         return Response.status( Response.Status.OK ).build();
     }
 
@@ -89,8 +90,9 @@ public class RestServiceImpl implements RestService
         }
         catch ( PeerException e )
         {
+            LOG.error( e.getMessage() );
+
             Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-            e.printStackTrace();
         }
         return Response.status( Response.Status.OK ).build();
     }
@@ -109,7 +111,7 @@ public class RestServiceImpl implements RestService
         catch ( ConfigurationException e )
         {
             LOG.error( e.getMessage() );
-            e.printStackTrace();
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
@@ -127,7 +129,7 @@ public class RestServiceImpl implements RestService
         catch ( ConfigurationException e )
         {
             LOG.error( e.getMessage() );
-            e.printStackTrace();
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
@@ -140,6 +142,7 @@ public class RestServiceImpl implements RestService
     public Response getAdvancedSettings()
     {
         AdvancedSettings pojo = systemManager.getAdvancedSettings();
+
         String advancedSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( advancedSettingsInfo ).build();
@@ -150,6 +153,7 @@ public class RestServiceImpl implements RestService
     public Response getManagementUpdates()
     {
         SystemInfo pojo = systemManager.getManagementUpdates();
+
         String subutaiInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( subutaiInfo ).build();

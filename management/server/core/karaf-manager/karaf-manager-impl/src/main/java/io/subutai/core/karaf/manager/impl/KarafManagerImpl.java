@@ -18,6 +18,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 
@@ -32,6 +35,9 @@ import io.subutai.core.karaf.manager.api.KarafManager;
 @PermitAll
 public class KarafManagerImpl implements KarafManager
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( KarafManagerImpl.class.getName() );
+
 
     private CommandProcessor commandProcessor = null;
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
@@ -118,7 +124,7 @@ public class KarafManagerImpl implements KarafManager
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
         }
         finally
         {
