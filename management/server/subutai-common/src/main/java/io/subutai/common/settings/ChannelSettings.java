@@ -19,6 +19,12 @@ public class ChannelSettings
     };
 
 
+    private ChannelSettings()
+    {
+        throw new IllegalAccessError("Utility class");
+    }
+
+
     public static boolean checkURLAccess( String uri )
     {
 

@@ -36,16 +36,22 @@ import io.subutai.common.security.exception.SystemSecurityException;
 public class TokenUtil
 {
 
+    private TokenUtil()
+    {
+        throw new IllegalAccessError("Utility class");
+    }
+
+
     //************************************************
-    public static String createToken(String headerJson, String claimJson,String sharedKey)
+    public static String createToken( String headerJson, String claimJson, String sharedKey )
     {
         try
         {
-            JWSHeader header = JWSHeader.parse(headerJson) ;
+            JWSHeader header = JWSHeader.parse( headerJson );
             JWSSigner signer = new MACSigner( sharedKey.getBytes() );
-            JWTClaimsSet claimsSet = JWTClaimsSet.parse( claimJson ) ;
+            JWTClaimsSet claimsSet = JWTClaimsSet.parse( claimJson );
 
-            SignedJWT signedJWT = new SignedJWT(header, claimsSet);
+            SignedJWT signedJWT = new SignedJWT( header, claimsSet );
             signedJWT.sign( signer );
 
             return signedJWT.serialize();
@@ -58,13 +64,13 @@ public class TokenUtil
 
 
     //************************************************
-    public static boolean verifySignature(String token, String sharedKey)
+    public static boolean verifySignature( String token, String sharedKey )
     {
         boolean verifiedSignature = false;
 
         try
         {
-            JWSObject jwsObject  = JWSObject.parse( token );
+            JWSObject jwsObject = JWSObject.parse( token );
             JWSVerifier verifier = new MACVerifier( sharedKey.getBytes() );
             verifiedSignature = jwsObject.verify( verifier );
         }
@@ -77,7 +83,7 @@ public class TokenUtil
 
 
     //************************************************
-    public static Payload parseToken(String token)
+    public static Payload parseToken( String token )
     {
         Payload payload = null;
         try
@@ -95,11 +101,11 @@ public class TokenUtil
 
 
     //************************************************
-    public static String getSubject(String token)
+    public static String getSubject( String token )
     {
         try
         {
-            Payload payload   = parseToken(token);
+            Payload payload = parseToken( token );
             JSONObject obj = payload.toJSONObject();
             return obj.get( "sub" ).toString();
         }
@@ -111,37 +117,43 @@ public class TokenUtil
 
 
     //************************************************
-    public static boolean verifyToken(String token, String sharedKey) throws SystemSecurityException
+    public static boolean verifyToken( String token, String sharedKey ) throws SystemSecurityException
     {
-        return verifySignatureAndDate(token, sharedKey);
+        return verifySignatureAndDate( token, sharedKey );
     }
 
 
     //************************************************
-    public static boolean verifySignatureAndDate(String token, String sharedKey) throws SystemSecurityException
+    public static boolean verifySignatureAndDate( String token, String sharedKey ) throws SystemSecurityException
     {
         try
         {
-            JWSObject jwsObject  = JWSObject.parse( token );
+            JWSObject jwsObject = JWSObject.parse( token );
             JWSVerifier verifier = new MACVerifier( sharedKey.getBytes() );
 
-            if(jwsObject.verify( verifier ))
+            if ( jwsObject.verify( verifier ) )
             {
-                long date = getDate(token,jwsObject);
+                long date = getDate( token, jwsObject );
 
-                if(date == 0)
+                if ( date == 0 )
+                {
                     return true;
-                else if(System.currentTimeMillis() <= date)
+                }
+                else if ( System.currentTimeMillis() <= date )
+                {
                     return true;
+                }
                 else
+                {
                     throw new IdentityExpiredException();
+                }
             }
             else
             {
                 throw new InvalidLoginException();
             }
         }
-        catch ( JOSEException |ParseException ex )
+        catch ( JOSEException | ParseException ex )
         {
             throw new InvalidLoginException();
         }
@@ -149,17 +161,16 @@ public class TokenUtil
 
 
     //************************************************
-    public static boolean isDateValid(String token)
+    public static boolean isDateValid( String token )
     {
-        long date = getDate(token);
+        long date = getDate( token );
 
         return System.currentTimeMillis() <= date;
     }
 
 
-
     //************************************************
-    public static Payload parseToken(String token, JWSObject jwsObject)
+    public static Payload parseToken( String token, JWSObject jwsObject )
     {
         Payload payload = null;
         try
@@ -175,13 +186,13 @@ public class TokenUtil
 
 
     //************************************************
-    public static long getDate(String token)
+    public static long getDate( String token )
     {
         try
         {
-            Payload payload   = parseToken(token);
+            Payload payload = parseToken( token );
             JSONObject obj = payload.toJSONObject();
-            return (long)obj.get( "exp" );
+            return ( long ) obj.get( "exp" );
         }
         catch ( Exception ex )
         {
@@ -191,13 +202,13 @@ public class TokenUtil
 
 
     //************************************************
-    public static long getDate(String token, JWSObject jwsObject)
+    public static long getDate( String token, JWSObject jwsObject )
     {
         try
         {
-            Payload payload   = parseToken(token, jwsObject);
+            Payload payload = parseToken( token, jwsObject );
             JSONObject obj = payload.toJSONObject();
-            return (long)obj.get( "exp" );
+            return ( long ) obj.get( "exp" );
         }
         catch ( Exception ex )
         {
@@ -207,20 +218,20 @@ public class TokenUtil
 
 
     //************************************************
-    public static String createTokenRSA(PrivateKey privateKey,String headerJson, String claimJson)
+    public static String createTokenRSA( PrivateKey privateKey, String headerJson, String claimJson )
     {
         try
         {
-            JWSSigner signer = new RSASSASigner((RSAPrivateKey )privateKey);
+            JWSSigner signer = new RSASSASigner( ( RSAPrivateKey ) privateKey );
 
-            Payload pl = new Payload(claimJson);
-            JWSObject jwsObject = new JWSObject(new JWSHeader( JWSAlgorithm.RS256),pl);
+            Payload pl = new Payload( claimJson );
+            JWSObject jwsObject = new JWSObject( new JWSHeader( JWSAlgorithm.RS256 ), pl );
 
-            jwsObject.sign(signer);
+            jwsObject.sign( signer );
 
             return jwsObject.serialize();
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
             return "";
         }
@@ -228,15 +239,15 @@ public class TokenUtil
 
 
     //************************************************
-    public static boolean verifyTokenRSA(PublicKey pKey, String token)
+    public static boolean verifyTokenRSA( PublicKey pKey, String token )
     {
         try
         {
-            Payload pl = new Payload(token);
-            JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.RS256),pl);
-            JWSVerifier verifier = new RSASSAVerifier((RSAPublicKey )pKey);
+            Payload pl = new Payload( token );
+            JWSObject jwsObject = new JWSObject( new JWSHeader( JWSAlgorithm.RS256 ), pl );
+            JWSVerifier verifier = new RSASSAVerifier( ( RSAPublicKey ) pKey );
 
-            return jwsObject.verify(verifier);
+            return jwsObject.verify( verifier );
         }
         catch ( JOSEException e )
         {
@@ -251,15 +262,12 @@ public class TokenUtil
         try
         {
             KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance( "RSA" );
-            keyGenerator.initialize(1024);
+            keyGenerator.initialize( 1024 );
             return keyGenerator.genKeyPair();
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
             return null;
         }
     }
-
-
-
 }

@@ -22,6 +22,12 @@ public class SerializeUtilities
     private static final Logger LOG = LoggerFactory.getLogger( SerializeUtilities.class.getName() );
 
 
+    private SerializeUtilities()
+    {
+        throw new IllegalAccessError("Utility class");
+    }
+
+
     /**
      * Reads a file and deserializes it to an object of given class.
      *

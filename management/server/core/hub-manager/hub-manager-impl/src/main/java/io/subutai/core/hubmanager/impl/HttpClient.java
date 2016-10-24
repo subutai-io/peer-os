@@ -22,6 +22,12 @@ public class HttpClient
     private static int defaultMaxRetransmits = 3;
 
 
+    private HttpClient()
+    {
+        throw new IllegalAccessError("Utility class");
+    }
+
+
     public static WebClient createTrustedWebClientWithAuth( String url, KeyStore keyStore, char[] keyStorePassword,
                                                             byte[] serverFingerprint ) throws HubManagerException
     {

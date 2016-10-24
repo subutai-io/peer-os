@@ -29,6 +29,12 @@ public class JsonUtil
     public static final ObjectMapper MAPPER = createMapper( null );
 
 
+    private JsonUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static ObjectNode objectNode()
     {
         return FACTORY.objectNode();
@@ -71,9 +77,7 @@ public class JsonUtil
 
     public static <T> T fromCbor( byte data[], Class<T> type ) throws IOException
     {
-        return ArrayUtils.isNotEmpty( data )
-               ? CBOR_MAPPER.readValue( data, type )
-               : null;
+        return ArrayUtils.isNotEmpty( data ) ? CBOR_MAPPER.readValue( data, type ) : null;
     }
 
 

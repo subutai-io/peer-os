@@ -25,4 +25,9 @@ public class KeyServerParams
     public static final String OFF = "off";
     public static final String MR_OUTPUT_FORMAT_VERSION = "1";
 
+
+    private KeyServerParams()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
 }

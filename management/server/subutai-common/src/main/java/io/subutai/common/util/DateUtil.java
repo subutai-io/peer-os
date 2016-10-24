@@ -9,11 +9,17 @@ import java.util.TimeZone;
 
 public class DateUtil
 {
+    private DateUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
 
     public static long getUnixTimestamp()
     {
         return Instant.now().getEpochSecond();
     }
+
 
     public static String convertMillisToHHMMSS( long millis )
     {

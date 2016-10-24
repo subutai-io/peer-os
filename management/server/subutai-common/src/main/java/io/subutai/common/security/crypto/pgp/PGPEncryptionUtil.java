@@ -99,6 +99,12 @@ public class PGPEncryptionUtil
         Security.addProvider( provider );
     }
 
+    private PGPEncryptionUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored )
             throws PGPException
     {

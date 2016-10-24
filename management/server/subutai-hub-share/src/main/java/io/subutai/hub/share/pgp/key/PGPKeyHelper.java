@@ -32,9 +32,16 @@ public class PGPKeyHelper
         Security.addProvider( new BouncyCastleProvider() );
     }
 
+    private PGPKeyHelper()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static PGPPublicKey readPublicKey( InputStream is ) throws IOException, PGPException
     {
-        PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( is ), new JcaKeyFingerprintCalculator() );
+        PGPPublicKeyRingCollection pgpPub =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( is ), new JcaKeyFingerprintCalculator() );
 
         Iterator keyRingIter = pgpPub.getKeyRings();
 
@@ -84,7 +91,8 @@ public class PGPKeyHelper
 
     private static PGPSecretKey readSecretKey( InputStream is ) throws IOException, PGPException
     {
-        PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( is ), new JcaKeyFingerprintCalculator() );
+        PGPSecretKeyRingCollection pgpSec =
+                new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( is ), new JcaKeyFingerprintCalculator() );
         Iterator keyRingIter = pgpSec.getKeyRings();
 
         while ( keyRingIter.hasNext() )
@@ -111,7 +119,8 @@ public class PGPKeyHelper
     {
         PGPSecretKey secretKey = readSecretKey( is );
 
-        return secretKey.extractPrivateKey( new JcePBESecretKeyDecryptorBuilder().setProvider( "BC" ).build( password.toCharArray() ) );
+        return secretKey.extractPrivateKey(
+                new JcePBESecretKeyDecryptorBuilder().setProvider( "BC" ).build( password.toCharArray() ) );
     }
 
 

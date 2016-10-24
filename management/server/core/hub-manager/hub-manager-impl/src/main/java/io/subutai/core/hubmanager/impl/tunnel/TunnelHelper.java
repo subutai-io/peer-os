@@ -27,6 +27,12 @@ public class TunnelHelper
     private static String COMMAND = "";
 
 
+    private TunnelHelper()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static CommandResult execute( ResourceHost resourceHost, String cmd )
     {
         COMMAND = cmd;

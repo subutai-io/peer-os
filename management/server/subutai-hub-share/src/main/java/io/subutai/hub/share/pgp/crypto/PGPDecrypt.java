@@ -22,13 +22,21 @@ import org.bouncycastle.util.io.Streams;
 
 public class PGPDecrypt
 {
+
+    private PGPDecrypt()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static byte[] decrypt( byte encData[], PGPPrivateKey privateKey ) throws PGPException, IOException
     {
         PGPPublicKeyEncryptedData pgpEncData = getPGPEncryptedData( encData );
 
         InputStream is = getInputStream( privateKey, pgpEncData );
 
-        // IMPORTANT: pipe() should be before verify(). Otherwise we get "java.io.EOFException: Unexpected end of ZIP input stream".
+        // IMPORTANT: pipe() should be before verify(). Otherwise we get "java.io.EOFException: Unexpected end of ZIP
+        // input stream".
         byte data[] = pipe( is );
 
         if ( !pgpEncData.verify() )
@@ -52,9 +60,11 @@ public class PGPDecrypt
     }
 
 
-    private static InputStream getInputStream( PGPPrivateKey privateKey, PGPPublicKeyEncryptedData pgpEncData ) throws PGPException, IOException
+    private static InputStream getInputStream( PGPPrivateKey privateKey, PGPPublicKeyEncryptedData pgpEncData )
+            throws PGPException, IOException
     {
-        InputStream is = pgpEncData.getDataStream( new JcePublicKeyDataDecryptorFactoryBuilder().setProvider( "BC" ).build( privateKey ) );
+        InputStream is = pgpEncData
+                .getDataStream( new JcePublicKeyDataDecryptorFactoryBuilder().setProvider( "BC" ).build( privateKey ) );
 
         JcaPGPObjectFactory objectFactory = new JcaPGPObjectFactory( is );
 

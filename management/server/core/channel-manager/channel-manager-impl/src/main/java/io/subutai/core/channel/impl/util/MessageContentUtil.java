@@ -32,6 +32,13 @@ import io.subutai.core.security.api.crypto.KeyManager;
  */
 public class MessageContentUtil
 {
+
+    private MessageContentUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
 
 

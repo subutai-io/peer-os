@@ -16,16 +16,24 @@ import org.bouncycastle.openpgp.PGPSignature;
  */
 public class PGPSignatureUtil
 {
+
+    private PGPSignatureUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     /**
-     * Checks if publicKey is signed by signerPublicKey, without any verification. In future we have to review carefully the PGP Specs and implement
-     * the verification. See also: http://osdir.com/ml/encryption.bouncy-castle.devel/2006-12/msg00005.html
+     * Checks if publicKey is signed by signerPublicKey, without any verification. In future we have to review carefully
+     * the PGP Specs and implement the verification. See also: http://osdir.com/ml/encryption.bouncy-castle
+     * .devel/2006-12/msg00005.html
      */
     public static boolean isSignedBy( PGPPublicKey pubKey, PGPPublicKey signerPubKey )
     {
         PGPSignature sig = getSignatures( pubKey ).get( signerPubKey.getKeyID() );
 
-        return sig != null &&
-                ( sig.getSignatureType() == PGPSignature.DEFAULT_CERTIFICATION || sig.getSignatureType() == PGPSignature.DIRECT_KEY );
+        return sig != null && ( sig.getSignatureType() == PGPSignature.DEFAULT_CERTIFICATION
+                || sig.getSignatureType() == PGPSignature.DIRECT_KEY );
     }
 
 
@@ -55,7 +63,8 @@ public class PGPSignatureUtil
     {
         if ( !Objects.deepEquals( targetKey.getFingerprint(), sourceKey.getFingerprint() ) )
         {
-            throw new IllegalArgumentException( "Signature merge can be done for different instances of the same public key only" );
+            throw new IllegalArgumentException(
+                    "Signature merge can be done for different instances of the same public key only" );
         }
 
         return copySignatures( targetKey, sourceKey );

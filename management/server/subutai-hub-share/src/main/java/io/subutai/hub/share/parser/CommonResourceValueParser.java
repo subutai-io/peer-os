@@ -11,6 +11,12 @@ import io.subutai.hub.share.resource.ResourceValueParser;
  */
 public final class CommonResourceValueParser
 {
+    private CommonResourceValueParser()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static ResourceValueParser getInstance( ContainerResourceType type )
     {
         ResourceValueParser result = null;

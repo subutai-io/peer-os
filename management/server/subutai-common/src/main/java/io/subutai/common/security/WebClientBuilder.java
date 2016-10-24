@@ -39,6 +39,12 @@ public class WebClientBuilder
     private static final String ENVIRONMENT_URL_TEMPLATE = "https://%s:%s/rest/v1/env%s";
 
 
+    private WebClientBuilder()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static WebClient buildPeerWebClient( final PeerInfo peerInfo, final String path, final Object provider,
                                                 long connectTimeoutMs, long readTimeoutMs, int maxAttempts )
     {
