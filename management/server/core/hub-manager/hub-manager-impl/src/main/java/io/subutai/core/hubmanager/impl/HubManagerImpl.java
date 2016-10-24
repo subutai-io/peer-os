@@ -33,6 +33,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -452,11 +453,12 @@ public class HubManagerImpl implements HubManager
     @Override
     public void installPlugin( String url, String name, String uid ) throws HubManagerException
     {
+        InputStream initialStream = null;
         try
         {
             WebClient webClient = RestUtil.createTrustedWebClient( url );
             File product = webClient.get( File.class );
-            InputStream initialStream = FileUtils.openInputStream( product );
+            initialStream = FileUtils.openInputStream( product );
             File targetFile =
                     new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
             FileUtils.copyInputStreamToFile( initialStream, targetFile );
@@ -487,6 +489,10 @@ public class HubManagerImpl implements HubManager
         catch ( Exception e )
         {
             throw new HubManagerException( e );
+        }
+        finally
+        {
+            SafeCloseUtil.close( initialStream );
         }
     }
 

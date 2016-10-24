@@ -164,7 +164,7 @@ public class HeartbeatProcessor implements Runnable
                 }
                 else
                 {
-                    throw new Exception( "Error to send heartbeat: " + restResult.getError() );
+                    throw new HubManagerException( "Error to send heartbeat: " + restResult.getError() );
                 }
             }
 

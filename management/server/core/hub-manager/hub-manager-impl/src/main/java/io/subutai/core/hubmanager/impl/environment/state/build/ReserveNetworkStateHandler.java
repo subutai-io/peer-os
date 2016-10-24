@@ -72,24 +72,31 @@ public class ReserveNetworkStateHandler extends StateHandler
     }
 
 
-    private EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto ) throws Exception
+    private EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-
-        P2PConfig p2pConfig =
-                new P2PConfig( peerDto.getPeerId(), env.getId(), env.getP2pHash(), env.getP2pKey(), env.getP2pTTL() );
-
-        log.info( "peerDto.RHs.size: {}", peerDto.getRhs().size() );
-
-        for ( EnvironmentPeerRHDto rhDto : peerDto.getRhs() )
+        try
         {
-            log.info( "- rhDto: id={}, p2pIp: {}", rhDto.getId(), rhDto.getP2pIp() );
+            EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
-            p2pConfig.addRhP2pIp( new RhP2PIpEntity( rhDto.getId(), rhDto.getP2pIp() ) );
+            P2PConfig p2pConfig = new P2PConfig( peerDto.getPeerId(), env.getId(), env.getP2pHash(), env.getP2pKey(),
+                    env.getP2pTTL() );
+
+            log.info( "peerDto.RHs.size: {}", peerDto.getRhs().size() );
+
+            for ( EnvironmentPeerRHDto rhDto : peerDto.getRhs() )
+            {
+                log.info( "- rhDto: id={}, p2pIp: {}", rhDto.getId(), rhDto.getP2pIp() );
+
+                p2pConfig.addRhP2pIp( new RhP2PIpEntity( rhDto.getId(), rhDto.getP2pIp() ) );
+            }
+
+            ctx.localPeer.joinP2PSwarm( p2pConfig );
+
+            return peerDto;
         }
-
-        ctx.localPeer.joinP2PSwarm( p2pConfig );
-
-        return peerDto;
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 }
