@@ -1,7 +1,6 @@
 package io.subutai.core.bazaar.impl;
 
 
-import java.io.IOException;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -19,6 +18,7 @@ import io.subutai.core.bazaar.api.dao.ConfigDataService;
 import io.subutai.core.bazaar.api.model.Plugin;
 import io.subutai.core.bazaar.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
@@ -72,7 +72,8 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
 
 
     @Override
-    public void installPlugin( String name, String version, String kar, String url, String uid ) throws IOException
+    public void installPlugin( String name, String version, String kar, String url, String uid )
+            throws HubManagerException
     {
         this.hubManager.installPlugin( kar, name, uid );
         this.configDataService.savePlugin( name, version, kar, url, uid );
@@ -90,7 +91,7 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
 
     @Override
     public void restorePlugin( Long id, String name, String version, String kar, String url, String uid )
-            throws IOException
+            throws HubManagerException
     {
         this.hubManager.uninstallPlugin( name, uid );
         this.hubManager.installPlugin( kar, name, uid );

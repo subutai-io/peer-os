@@ -30,6 +30,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -96,7 +97,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
     }
 
 
-    public void process( boolean sendMetrics ) throws Exception
+    public void process( boolean sendMetrics ) throws HubManagerException
     {
         if ( hubManager.isRegistered() )
         {

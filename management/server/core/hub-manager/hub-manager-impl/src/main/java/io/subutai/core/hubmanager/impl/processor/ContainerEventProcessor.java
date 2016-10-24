@@ -11,6 +11,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
@@ -53,7 +54,7 @@ public class ContainerEventProcessor implements Runnable
     }
 
 
-    public void process() throws Exception
+    public void process() throws HubManagerException
     {
         if ( !hubManager.isRegistered() )
         {

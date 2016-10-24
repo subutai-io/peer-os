@@ -13,6 +13,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -119,7 +120,7 @@ public class HeartbeatProcessor implements Runnable
      * to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor sets this option.
      * See HubEnvironmentProcessor for example.
      */
-    public void sendHeartbeat( boolean force ) throws Exception
+    public void sendHeartbeat( boolean force ) throws HubManagerException
     {
         if ( !hubManager.isRegistered() )
         {
@@ -139,7 +140,7 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    private synchronized void doHeartbeat() throws Exception
+    private synchronized void doHeartbeat() throws HubManagerException
     {
         log.info( "Heartbeat - START" );
 
@@ -173,7 +174,7 @@ public class HeartbeatProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            throw new Exception( e.getMessage(), e );
+            throw new HubManagerException( e.getMessage(), e );
         }
         finally
         {
