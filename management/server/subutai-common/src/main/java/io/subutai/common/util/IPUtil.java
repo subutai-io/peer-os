@@ -16,6 +16,7 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.LocalPeer;
@@ -158,7 +159,7 @@ public class IPUtil
         }
         catch ( Exception e )
         {
-            throw new RuntimeException( "Error obtaining addressable net interface", e );
+            throw new ActionFailedException( "Error obtaining addressable net interface", e );
         }
 
         return result;

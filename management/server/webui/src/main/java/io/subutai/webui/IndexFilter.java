@@ -51,7 +51,7 @@ public class IndexFilter implements Filter
                         User user = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
                         if ( Strings.isNullOrEmpty( user.getFingerprint() ) )
                         {
-                            throw new RuntimeException( "No Peer owner is set yet..." );
+                            throw new IllegalStateException( "No Peer owner is set yet..." );
                         }
                         Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
                         fingerprint.setSecure( true );

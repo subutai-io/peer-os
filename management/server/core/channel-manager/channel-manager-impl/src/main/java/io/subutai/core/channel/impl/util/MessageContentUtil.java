@@ -4,8 +4,6 @@ package io.subutai.core.channel.impl.util;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.AccessControlException;
 
@@ -23,6 +21,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -119,7 +118,7 @@ public class MessageContentUtil
      *
      */
     protected static byte[] decryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                       byte[] data ) throws PGPException
+                                         byte[] data ) throws PGPException
     {
 
         try
@@ -155,7 +154,6 @@ public class MessageContentUtil
             throw new PGPException( ex.toString() );
         }
     }
-
 
 
     /* ******************************************************
@@ -206,7 +204,7 @@ public class MessageContentUtil
         }
         catch ( Exception ioe )
         {
-            throw new RuntimeException( ioe );
+            throw new ActionFailedException( "Error encrypting content", ioe );
         }
     }
 
