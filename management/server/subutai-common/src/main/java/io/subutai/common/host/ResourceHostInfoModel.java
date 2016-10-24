@@ -131,10 +131,10 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
 
     public class Alert implements Serializable
     {
-        String id;
-        Cpu cpu;
-        Ram ram;
-        Set<Hdd> hdd;
+        private String id;
+        private Cpu cpu;
+        private Ram ram;
+        private Set<Hdd> hdd;
 
 
         public String getId()
