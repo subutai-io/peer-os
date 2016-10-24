@@ -43,10 +43,8 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     private String hostname;
 
     @JoinColumn( name = "net_interfaces" )
-    @OneToMany( orphanRemoval = true,
-            targetEntity = HostInterfaceImpl.class,
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER )
+    @OneToMany( orphanRemoval = true, targetEntity = HostInterfaceImpl.class, cascade = CascadeType.ALL, fetch =
+            FetchType.EAGER )
     @Expose
     private Set<HostInterface> interfaces = Sets.newHashSet();
 
@@ -75,11 +73,8 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Expose
     private ResourceHostRegistrationStatus status = ResourceHostRegistrationStatus.REQUESTED;
 
-    @OneToMany( targetEntity = ContainerInfoImpl.class,
-            mappedBy = "requestedHost",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER,
-            orphanRemoval = true )
+    @OneToMany( targetEntity = ContainerInfoImpl.class, mappedBy = "requestedHost", cascade = CascadeType.ALL, fetch
+            = FetchType.EAGER, orphanRemoval = true )
     @Expose
     private Set<ContainerInfo> hostInfos = Sets.newHashSet();
 
@@ -259,16 +254,8 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Override
     public String toString()
     {
-        return "RequestedHostImpl{" +
-                "id='" + id + '\'' +
-                ", hostname='" + hostname + '\'' +
-                ", status=" + status +
-                ", arch=" + arch +
-                ", secret='" + secret + '\'' +
-                ", publicKey='" + publicKey + '\'' +
-                ", hostInterfaces=" + interfaces +
-                ", hostInfos=" + hostInfos +
-                ", cert=" + cert +
-                '}';
+        return "RequestedHostImpl{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", status=" + status
+                + ", arch=" + arch + ", secret='" + secret + '\'' + ", publicKey='" + publicKey + '\''
+                + ", hostInterfaces=" + interfaces + ", hostInfos=" + hostInfos + ", cert=" + cert + '}';
     }
 }

@@ -11,8 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -23,9 +21,9 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
  */
 public class ProxyEnvironment extends EnvironmentImpl
 {
-    private final Logger log = LoggerFactory.getLogger( getClass() );
+    private final static Logger log = LoggerFactory.getLogger( ProxyEnvironment.class );
 
-    private final EnvironmentAdapter environmentAdapter;
+    private transient final EnvironmentAdapter environmentAdapter;
 
 
     ProxyEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
@@ -54,6 +52,7 @@ public class ProxyEnvironment extends EnvironmentImpl
 
         setStatus( EnvironmentStatus.HEALTHY );
     }
+
 
     private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, EnvironmentManagerImpl environmentManager,
                                                            ProxyContainerHelper proxyContainerHelper )

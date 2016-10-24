@@ -1,10 +1,11 @@
 package io.subutai.common.security.relation.model;
 
 
+import java.io.Serializable;
 import java.util.Map;
 
 
-public interface RelationInfo
+public interface RelationInfo extends Serializable
 {
     long getId();
 

@@ -1,10 +1,11 @@
 package io.subutai.common.environment;
 
 
+import java.io.Serializable;
 import java.util.Set;
 
 
-public interface EnvironmentPeer
+public interface EnvironmentPeer extends Serializable
 {
     String getPeerId();
 
@@ -14,7 +15,7 @@ public interface EnvironmentPeer
 
     void setEnvironment( Environment environment );
 
-    public void addRhP2pIps( Set<RhP2pIp> rhP2pIps );
+    void addRhP2pIps( Set<RhP2pIp> rhP2pIps );
 
-    public Set<RhP2pIp> getRhP2pIps();
+    Set<RhP2pIp> getRhP2pIps();
 }

@@ -35,7 +35,7 @@ import io.subutai.core.registration.api.service.ContainerInfo;
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "node_container_host_model" )
-public class ContainerInfoImpl implements ContainerInfo, Serializable
+public class ContainerInfoImpl implements ContainerInfo
 {
     @Id
     @Column( name = "id" )

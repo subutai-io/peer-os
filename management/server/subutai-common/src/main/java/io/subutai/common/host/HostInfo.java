@@ -1,6 +1,8 @@
 package io.subutai.common.host;
 
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -10,28 +12,28 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @JsonSerialize( as = HostInfoModel.class )
 @JsonDeserialize( as = HostInfoModel.class )
-public interface HostInfo extends Comparable<HostInfo>
+public interface HostInfo extends Comparable<HostInfo>, Serializable
 {
     /**
      * Returns id of host
      */
-    public String getId();
+    String getId();
 
 
     /**
      * Returns hostname of host
      */
-    public String getHostname();
+    String getHostname();
 
 
     /**
      * Returns network interfaces of host
      */
-    public HostInterfaces getHostInterfaces();
+    HostInterfaces getHostInterfaces();
 
 
     /**
      * Returns architecture of host
      */
-    public HostArchitecture getArch();
+    HostArchitecture getArch();
 }

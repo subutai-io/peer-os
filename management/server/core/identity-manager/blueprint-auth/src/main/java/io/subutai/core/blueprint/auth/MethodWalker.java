@@ -27,9 +27,6 @@ import io.subutai.common.security.relation.Trait;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 
 
-/**
- * Created by ape-craft on 5/2/16.
- */
 public class MethodWalker
 {
     private final Logger logger;

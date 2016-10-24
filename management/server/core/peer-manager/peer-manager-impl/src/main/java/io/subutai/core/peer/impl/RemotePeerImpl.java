@@ -102,20 +102,20 @@ public class RemotePeerImpl implements RemotePeer
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class );
 
+    private transient final SecurityManager securityManager;
+    protected transient final Messenger messenger;
+    private transient final CommandResponseListener commandResponseListener;
+    private transient final MessageResponseListener messageResponseListener;
+    private transient final Object provider;
+    protected transient JsonUtil jsonUtil = new JsonUtil();
+    private transient IdentityManager identityManager;
+    private transient RelationManager relationManager;
+    private transient PeerManager peerManager;
+    private transient PeerWebClient peerWebClient;
+    private transient EnvironmentWebClient environmentWebClient;
+
     private final String localPeerId;
-    private final SecurityManager securityManager;
     protected final PeerInfo peerInfo;
-    protected final Messenger messenger;
-    private final CommandResponseListener commandResponseListener;
-    private final MessageResponseListener messageResponseListener;
-    private final Object provider;
-    protected JsonUtil jsonUtil = new JsonUtil();
-    private String baseUrl;
-    private IdentityManager identityManager;
-    private RelationManager relationManager;
-    private PeerManager peerManager;
-    private PeerWebClient peerWebClient;
-    private EnvironmentWebClient environmentWebClient;
 
 
     public RemotePeerImpl( String localPeerId, SecurityManager securityManager, final PeerInfo peerInfo,

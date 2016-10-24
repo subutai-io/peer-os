@@ -78,7 +78,7 @@ import io.subutai.hub.share.quota.ContainerQuota;
 @Entity
 @Table( name = "env_con" )
 @Access( AccessType.FIELD )
-public class EnvironmentContainerImpl implements EnvironmentContainerHost, Serializable
+public class EnvironmentContainerImpl implements EnvironmentContainerHost
 {
     private static final Logger logger = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
 
@@ -144,7 +144,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Transient
     @JsonIgnore
-    protected EnvironmentManagerImpl environmentManager;
+    protected transient EnvironmentManagerImpl environmentManager;
 
     @Transient
     @JsonIgnore
@@ -155,7 +155,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     private Environment parent;
 
     @Transient
-    private EnvironmentAdapter envAdapter;
+    private transient EnvironmentAdapter envAdapter;
 
 
     protected EnvironmentContainerImpl()
@@ -198,6 +198,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         Preconditions.checkNotNull( environmentManager );
 
         this.environmentManager = environmentManager;
+    }
+
+
+    public void setEnvironmentAdapter( EnvironmentAdapter envAdapter )
+    {
+        this.envAdapter = envAdapter;
     }
 
 
@@ -319,12 +325,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         getPeer().stopContainer( getContainerId() );
 
         envAdapter.onContainerStop( environment.getId(), getId() );
-    }
-
-
-    public void setEnvironmentAdapter( EnvironmentAdapter envAdapter )
-    {
-        this.envAdapter = envAdapter;
     }
 
 
