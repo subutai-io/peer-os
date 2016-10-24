@@ -1,12 +1,15 @@
 package io.subutai.common.peer;
 
 
+import java.io.Serializable;
+
+
 /**
  * Alert handler identifier class
  */
-public interface EnvironmentAlertHandler
+public interface EnvironmentAlertHandler extends Serializable
 {
-    public String getAlertHandlerId();
+    String getAlertHandlerId();
 
-    public AlertHandlerPriority getAlertHandlerPriority();
+    AlertHandlerPriority getAlertHandlerPriority();
 }

@@ -1,6 +1,7 @@
 package io.subutai.common.host;
 
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,7 +20,7 @@ import com.google.common.collect.Sets;
 /**
  * Host interfaces collection
  */
-public class HostInterfaces
+public class HostInterfaces implements Serializable
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostInterfaces.class );
 

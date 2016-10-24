@@ -76,7 +76,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Transient
     @JsonIgnore
-    private EnvironmentManagerImpl environmentManager;
+    private transient EnvironmentManagerImpl environmentManager;
 
     @Id
     @Column( name = "environment_id" )

@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.entity;
 
 
-import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -30,7 +29,7 @@ import io.subutai.common.environment.RhP2pIp;
 @Entity
 @Table( name = "env_peer" )
 @Access( AccessType.FIELD )
-public class EnvironmentPeerImpl implements EnvironmentPeer, Serializable
+public class EnvironmentPeerImpl implements EnvironmentPeer
 {
     @Id
     @Column( name = "id" )
@@ -44,9 +43,7 @@ public class EnvironmentPeerImpl implements EnvironmentPeer, Serializable
     private Integer vlan;
 
     @ElementCollection( targetClass = RhP2PIpEntity.class, fetch = FetchType.EAGER )
-    @CollectionTable(
-            name = "RH_P2P_IP",
-            joinColumns = @JoinColumn( name = "PEER_ID" ) )
+    @CollectionTable( name = "RH_P2P_IP", joinColumns = @JoinColumn( name = "PEER_ID" ) )
     private Set<RhP2pIp> rhP2pIps;
 
     @ManyToOne( targetEntity = EnvironmentImpl.class )

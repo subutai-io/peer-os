@@ -99,12 +99,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
     private static final Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
-    private final Cache<String, Map<String, Integer>> envTemplatesDownloadPercent = CacheBuilder.newBuilder().
+    private transient final Cache<String, Map<String, Integer>> envTemplatesDownloadPercent = CacheBuilder.newBuilder().
             expireAfterAccess( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC, TimeUnit.HOURS ).build();
 
 
-    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER,
-            targetEntity = ContainerHostEntity.class, orphanRemoval = true )
+    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity =
+            ContainerHostEntity.class, orphanRemoval = true )
     private Set<ContainerHost> containersHosts = Sets.newHashSet();
 
     @Column( name = "instance" )
@@ -118,10 +118,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Transient
-    protected CommandUtil commandUtil = new CommandUtil();
+    protected transient CommandUtil commandUtil = new CommandUtil();
 
     @Transient
-    protected ResourceHostCommands resourceHostCommands = new ResourceHostCommands();
+    protected transient ResourceHostCommands resourceHostCommands = new ResourceHostCommands();
 
 
     @Transient

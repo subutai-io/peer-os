@@ -164,28 +164,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
 
-    private DaoManager daoManager;
-    private TemplateManager templateManager;
-    Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
-    private CommandExecutor commandExecutor;
-    private QuotaManager quotaManager;
-    private Monitor monitor;
-    ResourceHostDataService resourceHostDataService;
-    private HostRegistry hostRegistry;
-    CommandUtil commandUtil = new CommandUtil();
-    ExceptionUtil exceptionUtil = new ExceptionUtil();
-    Set<RequestListener> requestListeners = Sets.newHashSet();
-    PeerInfo peerInfo;
-    private SecurityManager securityManager;
-    ServiceLocator serviceLocator = new ServiceLocator();
-    private IdentityManager identityManager;
-    private RelationManager relationManager;
+    private transient DaoManager daoManager;
+    private transient TemplateManager templateManager;
+    transient Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
+    private transient CommandExecutor commandExecutor;
+    private transient QuotaManager quotaManager;
+    private transient Monitor monitor;
+    transient ResourceHostDataService resourceHostDataService;
+    private transient HostRegistry hostRegistry;
+    transient CommandUtil commandUtil = new CommandUtil();
+    transient ExceptionUtil exceptionUtil = new ExceptionUtil();
+    transient Set<RequestListener> requestListeners = Sets.newHashSet();
+    private transient SecurityManager securityManager;
+    transient ServiceLocator serviceLocator = new ServiceLocator();
+    private transient IdentityManager identityManager;
+    private transient RelationManager relationManager;
+    private transient NetworkResourceDaoImpl networkResourceDao;
+    private transient final LocalPeerCommands localPeerCommands = new LocalPeerCommands();
+    private transient final HostUtil hostUtil = new HostUtil();
+    protected transient SystemSettings systemSettings;
 
     volatile boolean initialized = false;
-    private NetworkResourceDaoImpl networkResourceDao;
-    private final LocalPeerCommands localPeerCommands = new LocalPeerCommands();
-    private final HostUtil hostUtil = new HostUtil();
-    protected SystemSettings systemSettings;
+    PeerInfo peerInfo;
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, QuotaManager quotaManager,

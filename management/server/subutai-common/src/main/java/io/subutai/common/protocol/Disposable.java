@@ -12,5 +12,5 @@ package io.subutai.common.protocol;
 public interface Disposable
 {
 
-    public void dispose();
+    void dispose();
 }

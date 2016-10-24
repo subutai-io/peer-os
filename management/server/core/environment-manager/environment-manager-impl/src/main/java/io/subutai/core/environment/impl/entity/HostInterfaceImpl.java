@@ -27,7 +27,7 @@ import io.subutai.common.host.HostInterface;
 @Entity
 @Table( name = "env_con_intf" )
 @Access( AccessType.FIELD )
-public class HostInterfaceImpl implements HostInterface, Serializable
+public class HostInterfaceImpl implements HostInterface
 {
     @Id
     @GeneratedValue

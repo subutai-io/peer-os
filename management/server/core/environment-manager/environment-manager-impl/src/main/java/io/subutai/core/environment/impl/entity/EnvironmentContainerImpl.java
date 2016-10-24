@@ -130,7 +130,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
             HostInterfaceImpl.class, orphanRemoval = true )
     @JsonIgnore
-    protected transient Set<HostInterface> hostInterfaces = new HashSet<>();
+    protected Set<HostInterface> hostInterfaces = new HashSet<>();
 
 
     @Column( name = "domain_name" )
@@ -148,14 +148,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Transient
     @JsonIgnore
-    private transient ContainerId containerId;
+    private ContainerId containerId;
 
     //workaround for JPA problem setting parent environment field
     @Transient
     private Environment parent;
 
     @Transient
-    private EnvironmentAdapter envAdapter;
+    private transient EnvironmentAdapter envAdapter;
 
 
     protected EnvironmentContainerImpl()
@@ -198,6 +198,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         Preconditions.checkNotNull( environmentManager );
 
         this.environmentManager = environmentManager;
+    }
+
+
+    public void setEnvironmentAdapter( EnvironmentAdapter envAdapter )
+    {
+        this.envAdapter = envAdapter;
     }
 
 
@@ -319,12 +325,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         getPeer().stopContainer( getContainerId() );
 
         envAdapter.onContainerStop( environment.getId(), getId() );
-    }
-
-
-    public void setEnvironmentAdapter( EnvironmentAdapter envAdapter )
-    {
-        this.envAdapter = envAdapter;
     }
 
 
