@@ -54,6 +54,7 @@ func BackupContainer(container string, full, stop bool) {
 	log.Debug("last snapshot dir: " + lastSnapshotDir)
 
 	if !full && lastSnapshotDir == "" {
+		log.Check(log.WarnLevel, "Deleting .backup file to "+container+" container", os.Remove(config.Agent.LxcPrefix+container+"/.backup"))
 		log.Fatal("Last backup not found or corrupted. Try make full backup.")
 	}
 

@@ -2,16 +2,17 @@ package lib
 
 import (
 	"fmt"
-	"github.com/subutai-io/base/agent/cli/lib"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/gpg"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/fs"
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/log"
 )
 
 var (
@@ -19,6 +20,7 @@ var (
 	confinc  = config.Agent.DataPrefix + "nginx-includes/"
 )
 
+// ProxyAdd checks input args and perform required operations to configure reverse proxy
 func ProxyAdd(vlan, domain, node, policy, cert string) {
 	if vlan == "" {
 		log.Error("Please specify VLAN")
@@ -45,6 +47,7 @@ func ProxyAdd(vlan, domain, node, policy, cert string) {
 	}
 }
 
+// ProxyDel checks what need to be removed - domain or node and pass args to required functions
 func ProxyDel(vlan, node string, domain bool) {
 	if isVlanExist(vlan) {
 		if domain && node == "" {
@@ -60,6 +63,7 @@ func ProxyDel(vlan, node string, domain bool) {
 	// }
 }
 
+// ProxyCheck exits with 0 code if domain or node is exists in specified vlan, otherwise exitcode is 1
 func ProxyCheck(vlan, node string, domain bool) {
 	if vlan != "" && domain {
 		if d := getDomain(vlan); d != "" {
@@ -79,11 +83,13 @@ func ProxyCheck(vlan, node string, domain bool) {
 	}
 }
 
+// restart reloads nginx process
 func restart() {
 	log.Check(log.FatalLevel, "Reloading nginx",
 		exec.Command("nginx.sh", "-s", "reload").Run())
 }
 
+// addDomain creates new domain config from pattern and adjusts it
 func addDomain(vlan, domain, cert string) {
 	if _, err := os.Stat(confinc); os.IsNotExist(err) {
 		err := os.MkdirAll(confinc, 0755)
@@ -101,7 +107,7 @@ func addDomain(vlan, domain, cert string) {
 				os.Exit(1)
 			}
 		}
-		lib.CopyFile(conftmpl+"vhost-ssl.example", confinc+vlan+".conf")
+		fs.Copy(conftmpl+"vhost-ssl.example", confinc+vlan+".conf")
 		crt, key := gpg.ParsePem(cert)
 		err := ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+currentDT+".crt", crt, 0644)
 		if err != nil {
@@ -118,18 +124,20 @@ func addDomain(vlan, domain, cert string) {
 		addLine(confinc+vlan+".conf", "ssl_certificate_key /var/lib/apps/subutai/current/web/ssl/UNIXDATE.key;",
 			"	ssl_certificate_key "+config.Agent.DataPrefix+"web/ssl/"+currentDT+".key;", true)
 	} else {
-		lib.CopyFile(conftmpl+"vhost.example", confinc+vlan+".conf")
+		fs.Copy(conftmpl+"vhost.example", confinc+vlan+".conf")
 	}
 	addLine(confinc+vlan+".conf", "upstream DOMAIN-upstream {", "upstream "+domain+"-upstream {", true)
 	addLine(confinc+vlan+".conf", "server_name DOMAIN;", "	server_name "+domain+";", true)
 	addLine(confinc+vlan+".conf", "proxy_pass http://DOMAIN-upstream/;", "	proxy_pass http://"+domain+"-upstream/;", true)
 }
 
+// addNode adds configuration lines to domain configuration
 func addNode(vlan, node string) {
 	delLine(confinc+vlan+".conf", "server localhost:81;")
 	addLine(confinc+vlan+".conf", "#Add new host here", "	server "+node+";", false)
 }
 
+// delDomain removes domain configuration file and all related stuff
 func delDomain(vlan string) {
 	// get and remove cert files
 	f, err := ioutil.ReadFile(confinc + vlan + ".conf")
@@ -149,6 +157,7 @@ func delDomain(vlan string) {
 	os.Remove(confinc + vlan + ".conf")
 }
 
+// delNode removes node configuration entries from domain config
 func delNode(vlan, node string) {
 	delLine(confinc+vlan+".conf", "server "+node+";")
 	if nodeCount(vlan) == 0 {
@@ -156,6 +165,7 @@ func delNode(vlan, node string) {
 	}
 }
 
+// getDomain returns domain name assigned to specified vlan
 func getDomain(vlan string) string {
 	f, err := ioutil.ReadFile(confinc + vlan + ".conf")
 	if err != nil {
@@ -173,6 +183,7 @@ func getDomain(vlan string) string {
 	return ""
 }
 
+// isVlanExist is true is domain was configured on specified vlan and false if not
 func isVlanExist(vlan string) bool {
 	if _, err := os.Stat(confinc + vlan + ".conf"); err == nil {
 		return true
@@ -181,10 +192,12 @@ func isVlanExist(vlan string) bool {
 	}
 }
 
+// isNodeExist is true if specified node belongs to vlan, otherwise it is false
 func isNodeExist(vlan, node string) bool {
 	return addLine(confinc+vlan+".conf", "server "+node+";", "", false)
 }
 
+// nodeCount returns the number of nodes assigned to domain on specified vlan
 func nodeCount(vlan string) int {
 	f, err := ioutil.ReadFile(confinc + vlan + ".conf")
 	if !log.Check(log.DebugLevel, "Cannot read file "+confinc+vlan+".conf", err) {
@@ -193,12 +206,14 @@ func nodeCount(vlan string) int {
 	return 0
 }
 
+// setPolicy configures load balance policy for domain on specified vlan
 func setPolicy(vlan, policy string) {
 	delLine(confinc+vlan+".conf", "ip_hash;")
 	delLine(confinc+vlan+".conf", "least_time header;")
 	addLine(confinc+vlan+".conf", "#Add new host here", "	"+policy, false)
 }
 
+// addLine adds, removes, replaces and checks if line exists in specified file
 func addLine(path, after, line string, replace bool) bool {
 	f, err := ioutil.ReadFile(path)
 	if !log.Check(log.DebugLevel, "Cannot read file "+path, err) {
@@ -225,6 +240,7 @@ func addLine(path, after, line string, replace bool) bool {
 	return false
 }
 
+// delLine removes specified line from file
 func delLine(path, line string) {
 	var lines2 []string
 	f, err := ioutil.ReadFile(path)

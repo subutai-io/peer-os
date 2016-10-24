@@ -33,7 +33,7 @@ func LxcPromote(name string) {
 	if container.State(name) == "RUNNING" {
 		container.Stop(name)
 	}
-	net.RemoveDefaultGW(name)
+	net.RestoreDefaultConf(name)
 
 	cleanupFS(config.Agent.LxcPrefix+name+"/rootfs/.git", 0000)
 	cleanupFS(config.Agent.LxcPrefix+name+"/var/log/", 0775)
@@ -42,8 +42,6 @@ func LxcPromote(name string) {
 
 	makeDiff(name)
 
-	iface := container.GetConfigItem(config.Agent.LxcPrefix+name+"/config", "lxc.network.veth.pair")
-	net.ConfigureOVS(iface)
 	container.ResetNet(name)
 	fs.ReadOnly(name, true)
 	log.Info(name + " promoted")
