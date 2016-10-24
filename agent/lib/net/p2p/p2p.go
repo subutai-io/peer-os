@@ -48,6 +48,7 @@ func RemoveByIface(name string) {
 	iptablesCleanUp(name)
 }
 
+// iptablesCleanUp removes Iptables rules applied for passed interface
 func iptablesCleanUp(name string) {
 	out, _ := exec.Command("iptables-save").Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))

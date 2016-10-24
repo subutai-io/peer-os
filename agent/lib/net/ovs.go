@@ -11,6 +11,7 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+// RateLimit sets throughput limits for container's network interfaces if "quota" is specified
 func RateLimit(nic string, rate ...string) string {
 	if rate[0] != "" {
 		burst, _ := strconv.Atoi(rate[0])
@@ -37,15 +38,7 @@ func RateLimit(nic string, rate ...string) string {
 	return ""
 }
 
-func UpdateNetwork(iface, vlan string) {
-	log.Check(log.FatalLevel, "Setting OVS port", exec.Command("ovs-vsctl", "set", "port", iface, "tag="+vlan).Run())
-}
-
-func ConfigureOVS(iface string) {
-	exec.Command("ovs-vsctl", "--if-exists", "del-port", "br-int", iface).Run()
-	exec.Command("ovs-vsctl", "--if-exists", "del-port", "br-mng", iface).Run()
-}
-
+// GetIp returns IP address that should be used for host access
 func GetIp() string {
 	out, err := exec.Command("ovs-vsctl", "list-ports", "wan").Output()
 	log.Check(log.ErrorLevel, "Getting WAN ports", err)

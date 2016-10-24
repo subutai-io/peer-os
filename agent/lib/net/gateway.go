@@ -5,20 +5,11 @@ import (
 	"github.com/subutai-io/base/agent/log"
 	"io"
 	"io/ioutil"
-	"net"
 	"os"
 	"os/exec"
 )
 
-func CalculateGW(ipS string) string {
-	ip, ipnet, err := net.ParseCIDR(ipS)
-	log.Check(log.FatalLevel, "Parsing IP", err)
-	ip = ip.To4()
-	ip = ip.Mask(ipnet.Mask)
-	ip[3]++
-	return ip.String()
-}
-
+// DelIface removes OVS bridges and ports by name, brings system interface down
 func DelIface(iface string) {
 	log.Debug("Removing interface " + iface)
 	exec.Command("ovs-vsctl", "--if-exists", "del-br", iface).Run()
@@ -26,7 +17,8 @@ func DelIface(iface string) {
 	exec.Command("ifconfig", iface, "down").Run()
 }
 
-func RemoveDefaultGW(contName string) {
+// RestoreDefaultConf restores default values in "hosts" and "resolv.conf" inside container
+func RestoreDefaultConf(contName string) {
 	filePath := config.Agent.LxcPrefix + contName + "/rootfs/etc/"
 	for _, file := range []string{"hosts", "resolv.conf"} {
 
@@ -50,12 +42,13 @@ func RemoveDefaultGW(contName string) {
 			val = "127.0.0.1\tlocalhost\n127.0.1.1\t" + contName
 		}
 		if log.Check(log.WarnLevel, "Applying new config", ioutil.WriteFile(filePath+file, []byte(val), 0644)) {
-			rollbackGW(contName)
+			rollbackConf(contName)
 		}
 	}
 }
 
-func rollbackGW(contName string) {
+// If RestoreDefaultConf fails, rollbackConf restores old configs
+func rollbackConf(contName string) {
 	filePath := config.Agent.LxcPrefix + contName + "/rootfs/etc/"
 	for _, file := range []string{"hosts", "resolv.conf"} {
 		log.Check(log.FatalLevel, "Removing incorrect"+file, os.Remove(filePath+file))
