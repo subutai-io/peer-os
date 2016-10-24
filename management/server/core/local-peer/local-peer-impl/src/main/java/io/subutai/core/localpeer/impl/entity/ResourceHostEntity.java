@@ -114,7 +114,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
             HostInterfaceEntity.class, orphanRemoval = true )
     @JsonIgnore
-    protected Set<HostInterface> netInterfaces = new HashSet<>();
+    private Set<HostInterface> netInterfaces = new HashSet<>();
 
 
     @Transient

@@ -1,7 +1,7 @@
 package io.subutai.common.host;
 
 
-import java.util.HashSet;
+import java.io.Serializable;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,7 +21,6 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     private InstanceType instance;
     @JsonIgnore
     private Set<Alert> alert = Sets.newHashSet();
-    ;
 
 
     public ResourceHostInfoModel( final ResourceHostInfo resourceHostInfo )
@@ -130,36 +129,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
-    /*
-            {
-                "alert": [
-                    {
-                        "id": "CE399A38D78A8815C95A87A5B54FA60751092C73",
-                        "cpu": {
-                            "current": 87,
-                            "quota": 15
-                        },
-                        "ram": {
-                            "current": 90,
-                            "quota": 1024
-                        },
-                        "hdd": [
-                            {
-                                "partition": "Var",
-                                "current": 86,
-                                "quota": 10
-                            },
-                            {
-                                "partition": "Opt",
-                                "current": 86,
-                                "quota": 10
-                            }
-                        ]
-                    }
-                ]
-            }
-    */
-    public class Alert
+    public class Alert implements Serializable
     {
         String id;
         Cpu cpu;
