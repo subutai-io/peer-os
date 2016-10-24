@@ -2,6 +2,7 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Date;
@@ -449,7 +450,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void installPlugin( String url, String name, String uid ) throws Exception
+    public void installPlugin( String url, String name, String uid ) throws IOException
     {
         WebClient webClient = RestUtil.createTrustedWebClient( url );
         File product = webClient.get( File.class );

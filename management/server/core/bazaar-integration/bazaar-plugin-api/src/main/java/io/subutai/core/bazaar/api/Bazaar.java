@@ -1,21 +1,23 @@
 package io.subutai.core.bazaar.api;
 
 
+import java.io.IOException;
 import java.util.List;
 
 import io.subutai.core.bazaar.api.model.Plugin;
 
+
 public interface Bazaar
 {
-	String getChecksum();
+    String getChecksum();
 
-	String getProducts();
+    String getProducts();
 
-	List <Plugin> getPlugins();
+    List<Plugin> getPlugins();
 
-	void installPlugin (String name, String version, String kar, String url, String uid) throws Exception;
+    void installPlugin( String name, String version, String kar, String url, String uid ) throws IOException;
 
-	void uninstallPlugin (Long id, String name);
+    void uninstallPlugin( Long id, String name );
 
-	void restorePlugin (Long id, String name, String version, String kar, String url, String uid) throws Exception;
+    void restorePlugin( Long id, String name, String version, String kar, String url, String uid ) throws IOException;
 }

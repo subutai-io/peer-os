@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.api;
 
 
+import java.io.IOException;
 import java.util.Map;
 
 import io.subutai.core.hubmanager.api.model.Config;
@@ -25,7 +26,7 @@ public interface HubManager
 
     String getProducts() throws Exception;
 
-    void installPlugin( String url, String filename, String uid ) throws Exception;
+    void installPlugin( String url, String filename, String uid ) throws IOException;
 
     void uninstallPlugin( String name, String uid );
 
