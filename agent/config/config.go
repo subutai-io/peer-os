@@ -22,7 +22,7 @@ type agentConfig struct {
 	GpgPassword string
 }
 type managementConfig struct {
-	Cdn           string
+	CDN           string
 	Host          string
 	Port          string
 	Secret        string
@@ -39,8 +39,8 @@ type influxdbConfig struct {
 }
 type cdnConfig struct {
 	Allowinsecure bool
-	Url           string
-	Sslport       string
+	URL           string
+	SSLport       string
 	Kurjun        string
 }
 type templateConfig struct {
@@ -52,7 +52,7 @@ type configFile struct {
 	Agent      agentConfig
 	Management managementConfig
 	Influxdb   influxdbConfig
-	Cdn        cdnConfig
+	CDN        cdnConfig
 	Template   templateConfig
 }
 
@@ -98,7 +98,7 @@ var (
 	// Influxdb describes configuration options for InluxDB server
 	Influxdb influxdbConfig
 	// CDN url and port
-	Cdn cdnConfig
+	CDN cdnConfig
 	// Template describes template configuration options
 	Template templateConfig
 )
@@ -122,15 +122,17 @@ func init() {
 	Influxdb = config.Influxdb
 	Template = config.Template
 	Management = config.Management
-	Cdn = config.Cdn
+	CDN = config.CDN
 }
 
+// InitAgentDebug turns on Debug output for the Subutai Agent.
 func InitAgentDebug() {
 	if config.Agent.Debug {
 		log.Level(log.DebugLevel)
 	}
 }
 
+// CheckKurjun checks if the Kurjun node available.
 func CheckKurjun() (*http.Client, error) {
 	// _, err := net.DialTimeout("tcp", Management.Host+":8339", time.Duration(2)*time.Second)
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
@@ -138,8 +140,8 @@ func CheckKurjun() (*http.Client, error) {
 	// if !log.Check(log.InfoLevel, "Trying local repo", err) {
 	// Cdn.Kurjun = "https://" + Management.Host + ":8339/rest/kurjun"
 	// } else {
-	_, err := net.DialTimeout("tcp", Cdn.Url+":"+Cdn.Sslport, time.Duration(2)*time.Second)
-	for c := 0; err != nil && c < 5; _, err = net.DialTimeout("tcp", Cdn.Url+":"+Cdn.Sslport, time.Duration(2)*time.Second) {
+	_, err := net.DialTimeout("tcp", CDN.URL+":"+CDN.SSLport, time.Duration(2)*time.Second)
+	for c := 0; err != nil && c < 5; _, err = net.DialTimeout("tcp", CDN.URL+":"+CDN.SSLport, time.Duration(2)*time.Second) {
 		log.Info("CDN unreachable, retrying")
 		time.Sleep(3 * time.Second)
 		c++
@@ -148,8 +150,8 @@ func CheckKurjun() (*http.Client, error) {
 		return nil, err
 	}
 
-	Cdn.Kurjun = "https://" + Cdn.Url + ":" + Cdn.Sslport + "/kurjun/rest"
-	if !Cdn.Allowinsecure {
+	CDN.Kurjun = "https://" + CDN.URL + ":" + CDN.SSLport + "/kurjun/rest"
+	if !CDN.Allowinsecure {
 		client = &http.Client{}
 	}
 	// }

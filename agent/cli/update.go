@@ -33,11 +33,11 @@ func ifUpdateable(installed int) string {
 
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
-	if !config.Cdn.Allowinsecure {
+	if !config.CDN.Allowinsecure {
 		client = &http.Client{}
 	}
-	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/info?name=subutai_")
-	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/info?name=subutai_", err)
+	resp, err := client.Get("https://" + config.CDN.URL + ":" + config.CDN.SSLport + "/kurjun/rest/file/info?name=subutai_")
+	log.Check(log.FatalLevel, "GET: https://"+config.CDN.URL+":"+config.CDN.SSLport+"/kurjun/rest/file/info?name=subutai_", err)
 	defer resp.Body.Close()
 	js, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
@@ -98,11 +98,11 @@ func upgradeRh(hash string) {
 	defer file.Close()
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
-	if !config.Cdn.Allowinsecure {
+	if !config.CDN.Allowinsecure {
 		client = &http.Client{}
 	}
-	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?id=" + hash)
-	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?id="+hash, err)
+	resp, err := client.Get("https://" + config.CDN.URL + ":" + config.CDN.SSLport + "/kurjun/rest/file/get?id=" + hash)
+	log.Check(log.FatalLevel, "GET: https://"+config.CDN.URL+":"+config.CDN.SSLport+"/kurjun/rest/file/get?id="+hash, err)
 	defer resp.Body.Close()
 	log.Info("Downloading snap package")
 	bar := pb.New(int(resp.ContentLength)).SetUnits(pb.U_BYTES)

@@ -22,7 +22,7 @@ func Mac() string {
 
 func MngInit() {
 	fs.ReadOnly("management", false)
-	container.SetContainerUid("management")
+	container.SetContainerUID("management")
 	container.SetContainerConf("management", [][]string{
 		{"lxc.network.hwaddr", Mac()},
 		{"lxc.network.veth.pair", "management"},
@@ -34,26 +34,24 @@ func MngInit() {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + "management/var var none bind,rw 0 0"},
 	})
 	container.SetApt("management")
-	container.SetContainerUid("management")
+	container.SetContainerUID("management")
 	gpg.GenerateKey("management")
 	container.Start("management")
 
-	ip := net.GetIp()
-
-	log.Info("******************************")
-	log.Info("Subutai Management UI will shortly be available at https://" + ip + ":8443 (admin/secret)")
-	log.Info("SSH access to Management: ssh root@" + ip + " -p2222 (ubuntu)")
-	log.Info("Don't forget to change default passwords")
-	log.Info("******************************")
+	log.Info("********************")
+	log.Info("Subutai Management UI will be shortly available at https://" + net.GetIp() + ":8443")
+	log.Info("login: admin")
+	log.Info("password: secret")
+	log.Info("********************")
 }
 
 func MngStop() {
-	for _, port := range []string{"5005", "8443", "8444"} {
-		exec.Command("iptables", "-t", "nat", "-D", "PREROUTING", "-i", "wan", "-p",
-			"tcp", "--dport", port, "-j", "DNAT", "--to-destination", "10.10.10.1:"+port).Run()
+	for _, iface := range []string{"wan", "eth1", "eth2"} {
+		for _, port := range []string{"8443", "8444"} {
+			exec.Command("iptables", "-t", "nat", "-D", "PREROUTING", "-i", iface, "-p",
+				"tcp", "--dport", port, "-j", "DNAT", "--to-destination", "10.10.10.1:"+port).Run()
+		}
 	}
-	exec.Command("iptables", "-t", "nat", "-D", "PREROUTING", "-i", "wan", "-p",
-		"tcp", "--dport", "2222", "-j", "DNAT", "--to-destination", "10.10.10.1:22").Run()
 }
 
 func MngDel() {

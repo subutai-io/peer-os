@@ -24,14 +24,16 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+//Response covers heartbeat date because of format required by Management server.
 type Response struct {
 	Beat Heartbeat `json:"response"`
 }
 
+//Heartbeat describes JSON formated information that Agent sends to Management server.
 type Heartbeat struct {
 	Type       string                `json:"type"`
 	Hostname   string                `json:"hostname"`
-	Id         string                `json:"id"`
+	ID         string                `json:"id"`
 	Arch       string                `json:"arch"`
 	Instance   string                `json:"instance"`
 	Interfaces []utils.Iface         `json:"interfaces,omitempty"`
@@ -60,6 +62,7 @@ func initAgent() {
 	client = utils.TLSConfig()
 }
 
+//Start starting Subutai Agent daemon, all required goroutines and keep working during all life cycle.
 func Start(c *cli.Context) {
 	initAgent()
 
@@ -70,7 +73,7 @@ func Start(c *cli.Context) {
 
 	go lib.Collect()
 	go connectionMonitor()
-	go alert.AlertProcessing()
+	go alert.Processing()
 
 	for {
 		if heartbeat() {
@@ -98,7 +101,7 @@ func checkSS() (status bool) {
 
 func connectionMonitor() {
 	for {
-		container.ContainersRestoreState()
+		container.StateRestore()
 
 		if !checkSS() {
 			time.Sleep(time.Second * 10)
@@ -107,7 +110,7 @@ func connectionMonitor() {
 
 		if fingerprint == "" || config.Management.GpgUser == "" {
 			fingerprint = gpg.GetFingerprint("rh@subutai.io")
-			connect.Connect(config.Agent.GpgUser, config.Management.Secret)
+			connect.Request(config.Agent.GpgUser, config.Management.Secret)
 		} else {
 			resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
 			if err == nil && resp.StatusCode == http.StatusOK {
@@ -115,7 +118,7 @@ func connectionMonitor() {
 				log.Debug("Connection monitor check - success")
 			} else {
 				log.Debug("Connection monitor check - failed")
-				connect.Connect(config.Agent.GpgUser, config.Management.Secret)
+				connect.Request(config.Agent.GpgUser, config.Management.Secret)
 				lastHeartbeat = []byte{}
 				go heartbeat()
 			}
@@ -132,16 +135,16 @@ func heartbeat() bool {
 		return false
 	}
 	hostname, _ = os.Hostname()
-	pool = container.GetActiveContainers(false)
+	pool = container.Active(false)
 	beat := Heartbeat{
 		Type:       "HEARTBEAT",
 		Hostname:   hostname,
-		Id:         fingerprint,
+		ID:         fingerprint,
 		Arch:       instanceArch,
 		Instance:   instanceType,
 		Containers: pool,
 		Interfaces: utils.GetInterfaces(),
-		Alert:      alert.CurrentAlerts(pool),
+		Alert:      alert.Current(pool),
 	}
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
@@ -174,14 +177,14 @@ func execute(rsp executer.EncRequest) {
 	var req executer.Request
 	var md, contName, pub, keyring, payload string
 
-	if rsp.HostId == fingerprint {
+	if rsp.HostID == fingerprint {
 		md = gpg.DecryptWrapper(rsp.Request)
 	} else {
-		contName = nameById(rsp.HostId)
+		contName = nameByID(rsp.HostID)
 		if contName == "" {
 			lastHeartbeat = []byte{}
 			heartbeat()
-			contName = nameById(rsp.HostId)
+			contName = nameByID(rsp.HostID)
 			if contName == "" {
 				return
 			}
@@ -198,7 +201,7 @@ func execute(rsp executer.EncRequest) {
 
 	//create channels for stdout and stderr
 	sOut := make(chan executer.ResponseOptions)
-	if rsp.HostId == fingerprint {
+	if rsp.HostID == fingerprint {
 		go executer.ExecHost(req.Request, sOut)
 	} else {
 		go executer.AttachContainer(contName, req.Request, sOut)
@@ -210,16 +213,16 @@ func execute(rsp executer.EncRequest) {
 			resp := executer.Response{ResponseOpts: elem}
 			jsonR, err := json.Marshal(resp)
 			log.Check(log.WarnLevel, "Marshal response", err)
-			if rsp.HostId == fingerprint {
+			if rsp.HostID == fingerprint {
 				payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, jsonR)
 			} else {
 				payload = gpg.EncryptWrapper(contName, config.Management.GpgUser, jsonR, pub, keyring)
 			}
 			message, err := json.Marshal(map[string]string{
-				"hostId":   elem.Id,
+				"hostId":   elem.ID,
 				"response": payload,
 			})
-			log.Check(log.WarnLevel, "Marshal response json "+elem.CommandId, err)
+			log.Check(log.WarnLevel, "Marshal response json "+elem.CommandID, err)
 			go response(message)
 		} else {
 			sOut = nil
@@ -289,9 +292,9 @@ func heartbeatCall(rw http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func nameById(id string) string {
+func nameByID(id string) string {
 	for _, c := range pool {
-		if c.Id == id {
+		if c.ID == id {
 			return c.Name
 		}
 	}

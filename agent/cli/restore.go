@@ -42,7 +42,7 @@ func RestoreContainer(container, date, newContainer string) {
 	tarball, _ := filepath.Glob(backupDir + container + "_" + date + "*.tar.gz")
 
 	if len(tarball) == 0 {
-		log.Fatal("Backup file for found: " + backupDir + container + "_" + date + "*.tar.gz")
+		log.Fatal("Backup file not found: " + backupDir + container + "_" + date + "*.tar.gz")
 	}
 
 	if !strings.Contains(tarball[0], "Full") {
