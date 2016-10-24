@@ -78,7 +78,7 @@ import io.subutai.hub.share.quota.ContainerQuota;
 @Entity
 @Table( name = "env_con" )
 @Access( AccessType.FIELD )
-public class EnvironmentContainerImpl implements EnvironmentContainerHost, Serializable
+public class EnvironmentContainerImpl implements EnvironmentContainerHost
 {
     private static final Logger logger = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
 

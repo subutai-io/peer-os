@@ -11,28 +11,28 @@ public interface ContainerInfo extends ContainerHostInfo
     /**
      * Return container template name
      */
-    public String getTemplateName();
+    String getTemplateName();
 
     /**
      * Returns container vlan
      */
-    public Integer getVlan();
+    Integer getVlan();
 
 
     /**
      * Container host public key
      */
-    public String getPublicKey();
+    String getPublicKey();
 
 
     /**
      * Get container host info status
      */
-    public ResourceHostRegistrationStatus getStatus();
+    ResourceHostRegistrationStatus getStatus();
 
 
     /**
      * Returns host gateway, if container has environment relation if not returns empty string
      */
-    public String getGateway();
+    String getGateway();
 }

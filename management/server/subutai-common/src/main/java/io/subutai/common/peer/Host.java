@@ -1,8 +1,6 @@
 package io.subutai.common.peer;
 
 
-import java.io.Serializable;
-
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -15,7 +13,7 @@ import io.subutai.common.security.relation.RelationLink;
 /**
  * Base Host interface.
  */
-public interface Host extends HostInfo, Serializable, RelationLink
+public interface Host extends HostInfo, RelationLink
 {
     /**
      * Returns reference to parent peer
