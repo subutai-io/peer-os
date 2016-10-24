@@ -6,6 +6,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -21,28 +22,35 @@ public class DeletePeerStateHandler extends StateHandler
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        logStart();
-
-        Environment env = getEnvironment( peerDto );
-
-        log.info( "env: {}", env );
-
-        boolean isHubEnvironment = env == null || env.getPeerId().equals( "hub" );
-
-        if ( isHubEnvironment )
+        try
         {
-            deleteHubEnvironment( peerDto );
+            logStart();
+
+            Environment env = getEnvironment( peerDto );
+
+            log.info( "env: {}", env );
+
+            boolean isHubEnvironment = env == null || env.getPeerId().equals( "hub" );
+
+            if ( isHubEnvironment )
+            {
+                deleteHubEnvironment( peerDto );
+            }
+            else
+            {
+                deleteLocalEnvironment( env );
+            }
+
+            logEnd();
+
+            return null;
         }
-        else
+        catch ( Exception e )
         {
-            deleteLocalEnvironment( env );
+            throw new HubManagerException( e );
         }
-
-        logEnd();
-
-        return null;
     }
 
 

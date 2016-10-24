@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.impl.environment.state.change;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerId;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -24,57 +25,66 @@ public class ContainerStateHandler extends StateHandler
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        logStart();
-
-        EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
-
-        EnvironmentNodesDto resultDto = null;
-
-        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+        try
         {
-            PeerId peerId = new PeerId( nodesDto.getPeerId() );
+            logStart();
 
-            EnvironmentId envId = new EnvironmentId( nodesDto.getEnvironmentId() );
+            EnvironmentDto envDto =
+                    ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
-            if ( nodesDto.getPeerId().equals( ctx.localPeer.getId() ) )
+            EnvironmentNodesDto resultDto = null;
+
+            for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
             {
-                for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+                PeerId peerId = new PeerId( nodesDto.getPeerId() );
+
+                EnvironmentId envId = new EnvironmentId( nodesDto.getEnvironmentId() );
+
+                if ( nodesDto.getPeerId().equals( ctx.localPeer.getId() ) )
                 {
-                    ContainerId containerId = new ContainerId( nodeDto.getContainerId(), nodeDto.getHostName(), peerId, envId );
-
-                    if ( nodeDto.getState().equals( ContainerStateDto.STOPPING ) )
+                    for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
                     {
-                        ctx.localPeer.stopContainer( containerId );
+                        ContainerId containerId =
+                                new ContainerId( nodeDto.getContainerId(), nodeDto.getHostName(), peerId, envId );
 
-                        nodeDto.setState( ContainerStateDto.STOPPED );
+                        if ( nodeDto.getState().equals( ContainerStateDto.STOPPING ) )
+                        {
+                            ctx.localPeer.stopContainer( containerId );
+
+                            nodeDto.setState( ContainerStateDto.STOPPED );
+                        }
+
+                        if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+                        {
+                            ctx.localPeer.startContainer( containerId );
+
+                            nodeDto.setState( ContainerStateDto.RUNNING );
+                        }
+
+                        if ( nodeDto.getState().equals( ContainerStateDto.ABORTING ) )
+                        {
+                            ctx.localPeer.destroyContainer( containerId );
+
+                            nodeDto.setState( ContainerStateDto.FROZEN );
+                        }
                     }
 
-                    if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
-                    {
-                        ctx.localPeer.startContainer( containerId );
+                    resultDto = nodesDto;
 
-                        nodeDto.setState( ContainerStateDto.RUNNING );
-                    }
-
-                    if ( nodeDto.getState().equals( ContainerStateDto.ABORTING ) )
-                    {
-                        ctx.localPeer.destroyContainer( containerId );
-
-                        nodeDto.setState( ContainerStateDto.FROZEN );
-                    }
+                    break;
                 }
-
-                resultDto = nodesDto;
-
-                break;
             }
+
+            logEnd();
+
+            return resultDto;
         }
-
-        logEnd();
-
-        return resultDto;
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 

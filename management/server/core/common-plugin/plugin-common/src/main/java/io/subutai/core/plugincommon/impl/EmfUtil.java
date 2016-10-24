@@ -27,11 +27,12 @@ public class EmfUtil
         ServiceReference[] refs = null;
         try
         {
-            refs = context.getServiceReferences( EntityManagerFactory.class.getName(), "(osgi.unit.name=pluginsPUnit)" );
+            refs = context.getServiceReferences( EntityManagerFactory.class.getName(),
+                    "(osgi.unit.name=pluginsPUnit)" );
         }
         catch ( Exception isEx )
         {
-            throw new RuntimeException( "Filter error", isEx );
+            throw new IllegalStateException( "Filter error", isEx );
         }
         if ( refs != null )
         {

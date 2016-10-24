@@ -2,9 +2,6 @@ package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 
 import javax.ws.rs.core.Response;
 
@@ -16,6 +13,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.metric.api.Monitor;
@@ -64,7 +62,7 @@ public class ResourceHostMonitorProcessor implements Runnable
     }
 
 
-    public void sendResourceHostMonitoringData() throws Exception
+    public void sendResourceHostMonitoringData() throws HubManagerException
     {
         if ( manager.isRegistered() )
         {
@@ -154,13 +152,12 @@ public class ResourceHostMonitorProcessor implements Runnable
                     }
                     else
                     {
-                        throw new Exception(
+                        throw new HubManagerException(
                                 "Could not send resource hosts monitoring data: " + r.readEntity( String.class ) );
                     }
                 }
             }
-            catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
-                    NoSuchAlgorithmException e )
+            catch ( PGPException | IOException e )
             {
                 log.error( "Could not send resource hosts monitoring data.", e );
             }

@@ -13,4 +13,10 @@ public class ActionFailedException extends RuntimeException
     {
         super( message );
     }
+
+
+    public ActionFailedException( final Throwable cause )
+    {
+        super( cause );
+    }
 }

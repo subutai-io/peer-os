@@ -4,12 +4,14 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
+
 
 public class ReserveNetworkStateHandler extends StateHandler
 {
@@ -20,38 +22,53 @@ public class ReserveNetworkStateHandler extends StateHandler
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        logStart();
+        try
+        {
+            logStart();
 
-        reserveNetwork( peerDto );
+            reserveNetwork( peerDto );
 
-        EnvironmentPeerDto resultDto = setupP2P( peerDto );
+            EnvironmentPeerDto resultDto = setupP2P( peerDto );
 
-        logEnd();
+            logEnd();
 
-        return resultDto;
+            return resultDto;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
-    private void reserveNetwork( EnvironmentPeerDto peerDto ) throws Exception
+    private void reserveNetwork( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        EnvironmentInfoDto envInfo = peerDto.getEnvironmentInfo();
-
-        ReservedNetworkResources networkResources = ctx.localPeer.getReservedNetworkResources();
-
-        if ( networkResources.findByEnvironmentId( envInfo.getId() ) != null )
+        try
         {
-            // Already done. For example, duplicated request.
-            return;
+            EnvironmentInfoDto envInfo = peerDto.getEnvironmentInfo();
+
+            ReservedNetworkResources networkResources = ctx.localPeer.getReservedNetworkResources();
+
+            if ( networkResources.findByEnvironmentId( envInfo.getId() ) != null )
+            {
+                // Already done. For example, duplicated request.
+                return;
+            }
+
+            String subnetWithoutMask = envInfo.getSubnetCidr().replace( "/24", "" );
+
+            NetworkResourceImpl networkResource =
+                    new NetworkResourceImpl( envInfo.getId(), envInfo.getVni(), envInfo.getP2pSubnet(),
+                            subnetWithoutMask );
+
+            peerDto.setVlan( ctx.localPeer.reserveNetworkResource( networkResource ) );
         }
-
-        String subnetWithoutMask = envInfo.getSubnetCidr().replace( "/24", "" );
-
-        NetworkResourceImpl networkResource =
-                new NetworkResourceImpl( envInfo.getId(), envInfo.getVni(), envInfo.getP2pSubnet(), subnetWithoutMask );
-
-        peerDto.setVlan( ctx.localPeer.reserveNetworkResource( networkResource ) );
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
@@ -59,7 +76,8 @@ public class ReserveNetworkStateHandler extends StateHandler
     {
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
-        P2PConfig p2pConfig = new P2PConfig( peerDto.getPeerId(), env.getId(), env.getP2pHash(), env.getP2pKey(), env.getP2pTTL() );
+        P2PConfig p2pConfig =
+                new P2PConfig( peerDto.getPeerId(), env.getId(), env.getP2pHash(), env.getP2pKey(), env.getP2pTTL() );
 
         log.info( "peerDto.RHs.size: {}", peerDto.getRhs().size() );
 

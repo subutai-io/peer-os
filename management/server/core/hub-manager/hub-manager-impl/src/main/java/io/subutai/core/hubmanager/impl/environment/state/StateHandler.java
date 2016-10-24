@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
@@ -37,7 +38,7 @@ public abstract class StateHandler
     }
 
 
-    protected abstract Object doHandle( EnvironmentPeerDto peerDto ) throws Exception;
+    protected abstract Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException;
 
 
     public void handle( final EnvironmentPeerDto peerDto )
@@ -60,8 +61,8 @@ public abstract class StateHandler
 
 
     /**
-     * Most of operations are performed with a Hub user account, i.e. using its token. But for some operations a peer token may be required.
-     * For example, removing a user account after an environment destroy.
+     * Most of operations are performed with a Hub user account, i.e. using its token. But for some operations a peer
+     * token may be required. For example, removing a user account after an environment destroy.
      */
     protected String getToken( EnvironmentPeerDto peerDto )
     {
@@ -114,11 +115,12 @@ public abstract class StateHandler
         ctx.restClient.post( path( PATH, peerDto ), peerDto );
     }
 
+
     protected String path( String format, EnvironmentPeerDto peerDto )
     {
-        return StringUtils.countMatches( format, "%s" ) == 1
-            ? String.format( format, peerDto.getEnvironmentInfo().getId() )
-            : String.format( format, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
+        return StringUtils.countMatches( format, "%s" ) == 1 ?
+               String.format( format, peerDto.getEnvironmentInfo().getId() ) :
+               String.format( format, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
     }
 
 

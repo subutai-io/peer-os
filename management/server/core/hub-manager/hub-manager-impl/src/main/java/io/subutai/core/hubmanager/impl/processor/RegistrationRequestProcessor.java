@@ -6,8 +6,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -34,7 +36,8 @@ public class RegistrationRequestProcessor implements Runnable
 
 
     public RegistrationRequestProcessor( final HubManagerImpl integration, final PeerManager peerManager,
-                                         final HostRegistrationManager registrationManager, final HubRestClient restClient )
+                                         final HostRegistrationManager registrationManager,
+                                         final HubRestClient restClient )
     {
         this.peerManager = peerManager;
         this.manager = integration;
@@ -59,7 +62,7 @@ public class RegistrationRequestProcessor implements Runnable
     }
 
 
-    public void sendRegistrationRequests() throws Exception
+    public void sendRegistrationRequests() throws HubManagerException
     {
         if ( manager.isRegistered() )
         {
@@ -70,7 +73,15 @@ public class RegistrationRequestProcessor implements Runnable
             requestedHostsDto.setPeerId( localPeer.getId() );
 
             List<RequestedHost> requestedHosts = registrationManager.getRequests();
-            ResourceHost managementHost = localPeer.getManagementHost();
+            ResourceHost managementHost ;
+            try
+            {
+                managementHost = localPeer.getManagementHost();
+            }
+            catch ( HostNotFoundException e )
+            {
+                throw new HubManagerException( e );
+            }
 
             for ( RequestedHost requestedHost : requestedHosts )
             {
@@ -89,7 +100,7 @@ public class RegistrationRequestProcessor implements Runnable
             RestResult<Object> restResult = restClient.post( path, requestedHostsDto );
             if ( !restResult.isSuccess() )
             {
-                throw new Exception( "Error on sending requested host data: " + restResult.getError() );
+                throw new HubManagerException( "Error on sending requested host data: " + restResult.getError() );
             }
         }
     }

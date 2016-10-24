@@ -39,7 +39,7 @@ public class ContainerCommandProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks )
     {
         boolean fastMode = false;
 

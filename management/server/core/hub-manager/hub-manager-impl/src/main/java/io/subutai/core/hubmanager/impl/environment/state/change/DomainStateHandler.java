@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.impl.environment.state.change;
 import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -27,66 +28,74 @@ public class DomainStateHandler extends StateHandler
      * TODO balanceStrategy should come from Hub
      */
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        logStart();
-
-        EnvironmentDto envDto =
-                ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
-
-        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-
-        if ( StringUtils.isNotEmpty( env.getDomainName() ) )
+        try
         {
-            ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
+            logStart();
 
-            String existingDomain = ctx.localPeer.getVniDomain( env.getVni() );
+            EnvironmentDto envDto =
+                    ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
-            if ( existingDomain != null )
+            EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+
+            if ( StringUtils.isNotEmpty( env.getDomainName() ) )
             {
-                if ( !existingDomain.trim().equalsIgnoreCase( env.getDomainName().trim() ) )
+                ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
+
+                String existingDomain = ctx.localPeer.getVniDomain( env.getVni() );
+
+                if ( existingDomain != null )
                 {
-                    ctx.localPeer.removeVniDomain( env.getVni() );
-                    ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName().trim(), balanceStrategy,
-                            env.getSslCertPath() );
-                }
-            }
-            else
-            {
-                ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
-            }
-
-            for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
-            {
-                if ( nodesDto.getPeerId().equals( ctx.localPeer.getId() ) )
-                {
-                    for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+                    if ( !existingDomain.trim().equalsIgnoreCase( env.getDomainName().trim() ) )
                     {
-                        try
-                        {
-                            String ip = nodeDto.getIp().replace( "/24", "" );
+                        ctx.localPeer.removeVniDomain( env.getVni() );
+                        ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName().trim(), balanceStrategy,
+                                env.getSslCertPath() );
+                    }
+                }
+                else
+                {
+                    ctx.localPeer
+                            .setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
+                }
 
-                            if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
-                            {
-                                ctx.localPeer.addIpToVniDomain( ip, env.getVni() );
-                            }
-                        }
-                        catch ( Exception e )
+                for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+                {
+                    if ( nodesDto.getPeerId().equals( ctx.localPeer.getId() ) )
+                    {
+                        for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
                         {
-                            log.error( "Could not add container IP to domain: " + nodeDto.getContainerName() );
+                            try
+                            {
+                                String ip = nodeDto.getIp().replace( "/24", "" );
+
+                                if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
+                                {
+                                    ctx.localPeer.addIpToVniDomain( ip, env.getVni() );
+                                }
+                            }
+                            catch ( Exception e )
+                            {
+                                log.error( "Could not add container IP to domain: " + nodeDto.getContainerName() );
+                            }
                         }
                     }
                 }
             }
+            else
+            {
+                ctx.localPeer.removeVniDomain( env.getVni() );
+            }
+
+            logEnd();
+
+            return peerDto;
         }
-        else
+        catch ( Exception e )
         {
-            ctx.localPeer.removeVniDomain( env.getVni() );
+            throw new HubManagerException( e );
         }
-
-        logEnd();
-
-        return peerDto;
     }
 
 

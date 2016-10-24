@@ -20,6 +20,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -39,20 +40,27 @@ public class ConfigureContainerStateHandler extends StateHandler
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        logStart();
+        try
+        {
+            logStart();
 
-        EnvironmentDto envDto =
-                ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
+            EnvironmentDto envDto =
+                    ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
-        peerDto = configureSsh( peerDto, envDto );
+            peerDto = configureSsh( peerDto, envDto );
 
-        configureHosts( envDto );
+            configureHosts( envDto );
 
-        logEnd();
+            logEnd();
 
-        return peerDto;
+            return peerDto;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 

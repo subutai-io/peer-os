@@ -43,7 +43,7 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerImpl( Object provider ) throws Exception
+    public SecurityManagerImpl( Object provider )
     {
         keyData = new SecurityKeyData();
 

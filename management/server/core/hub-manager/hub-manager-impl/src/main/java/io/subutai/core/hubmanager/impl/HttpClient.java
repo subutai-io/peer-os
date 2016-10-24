@@ -2,9 +2,6 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -15,6 +12,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
+
 
 public class HttpClient
 {
@@ -24,42 +23,50 @@ public class HttpClient
 
 
     public static WebClient createTrustedWebClientWithAuth( String url, KeyStore keyStore, char[] keyStorePassword,
-                                                            byte[] serverFingerprint )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+                                                            byte[] serverFingerprint ) throws HubManagerException
     {
-        WebClient client = WebClient.create( url );
+        try
+        {
+            WebClient client = WebClient.create( url );
 
-        // A client certificate is not provided in SSL context if async connection is used.
-        // See details: #311 - Registration failure due to inability to find fingerprint.
-        Map<String, Object> requestContext = WebClient.getConfig( client ).getRequestContext();
-        requestContext.put( "use.async.http.conduit", Boolean.FALSE );
+            // A client certificate is not provided in SSL context if async connection is used.
+            // See details: #311 - Registration failure due to inability to find fingerprint.
+            Map<String, Object> requestContext = WebClient.getConfig( client ).getRequestContext();
+            requestContext.put( "use.async.http.conduit", Boolean.FALSE );
 
-        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+            HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
-        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+            HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
 
-        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+            httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
 
-        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+            httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
 
-        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+            httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
 
-        httpConduit.setClient( httpClientPolicy );
+            httpConduit.setClient( httpClientPolicy );
 
-        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+            KeyManagerFactory keyManagerFactory =
+                    KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
 
-        keyManagerFactory.init( keyStore, keyStorePassword );
+            keyManagerFactory.init( keyStore, keyStorePassword );
 
-        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+            TLSClientParameters tlsClientParameters = new TLSClientParameters();
 
-        tlsClientParameters.setDisableCNCheck( true );
+            tlsClientParameters.setDisableCNCheck( true );
 
-        tlsClientParameters.setTrustManagers( new TrustManager[] { new FingerprintTrustManager( serverFingerprint ) } );
+            tlsClientParameters
+                    .setTrustManagers( new TrustManager[] { new FingerprintTrustManager( serverFingerprint ) } );
 
-        tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
+            tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
 
-        httpConduit.setTlsClientParameters( tlsClientParameters );
+            httpConduit.setTlsClientParameters( tlsClientParameters );
 
-        return client;
+            return client;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 }

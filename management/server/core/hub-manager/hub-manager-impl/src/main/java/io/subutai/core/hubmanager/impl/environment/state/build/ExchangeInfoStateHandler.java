@@ -3,6 +3,7 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.security.objects.TokenType;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.identity.api.model.User;
@@ -19,24 +20,32 @@ public class ExchangeInfoStateHandler extends StateHandler
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        logStart();
-
-        EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
-
-        User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
-        UserToken token = ctx.identityManager.getUserToken( user.getId() );
-        if ( token == null )
+        try
         {
-            token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), null );
+            logStart();
+
+            EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
+
+            User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
+            UserToken token = ctx.identityManager.getUserToken( user.getId() );
+            if ( token == null )
+            {
+                token = ctx.identityManager
+                        .createUserToken( user, null, null, null, TokenType.Permanent.getId(), null );
+            }
+            resultDto.setEnvOwnerToken( token.getFullToken() );
+            resultDto.setEnvOwnerTokenId( user.getAuthId() );
+
+            logEnd();
+
+            return resultDto;
         }
-        resultDto.setEnvOwnerToken( token.getFullToken() );
-        resultDto.setEnvOwnerTokenId( user.getAuthId() );
-
-        logEnd();
-
-        return resultDto;
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 

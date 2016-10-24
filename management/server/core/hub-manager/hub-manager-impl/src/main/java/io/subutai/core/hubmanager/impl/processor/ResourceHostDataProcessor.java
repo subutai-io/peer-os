@@ -248,7 +248,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
     }
 
 
-    private void processConfigs( ResourceHostMetric rhMetric ) throws Exception
+    private void processConfigs( ResourceHostMetric rhMetric )
     {
         log.info( "Getting resource host configs..." );
 
@@ -340,51 +340,58 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
     }
 
 
-    private void processP2PLogs( ResourceHost rh, Date startDate, Date endDate ) throws Exception
+    private void processP2PLogs( ResourceHost rh, Date startDate, Date endDate ) throws HubManagerException
     {
-        log.info( "Getting p2p logs: {} - {}", startDate, endDate );
-
-        P2pLogs p2pLogs = rh.getP2pLogs( JournalCtlLevel.ERROR, startDate, endDate );
-
-        String p2pStatus = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
-
-        List<P2PDto> p2pList = Lists.newArrayList();
-
-        for ( final P2Pinfo info : monitor.getP2PStatus() )
+        try
         {
-            P2PDto dto = new P2PDto();
-            dto.setRhId( info.getRhId() );
-            dto.setRhVersion( info.getRhVersion() );
-            dto.setP2pVersion( info.getP2pVersion() );
-            dto.setP2pStatus( info.getP2pStatus() );
-            dto.setState( info.getState() );
-            dto.setP2pErrorLogs( info.getP2pErrorLogs() );
+            log.info( "Getting p2p logs: {} - {}", startDate, endDate );
 
-            p2pList.add( dto );
+            P2pLogs p2pLogs = rh.getP2pLogs( JournalCtlLevel.ERROR, startDate, endDate );
+
+            String p2pStatus = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+
+            List<P2PDto> p2pList = Lists.newArrayList();
+
+            for ( final P2Pinfo info : monitor.getP2PStatus() )
+            {
+                P2PDto dto = new P2PDto();
+                dto.setRhId( info.getRhId() );
+                dto.setRhVersion( info.getRhVersion() );
+                dto.setP2pVersion( info.getP2pVersion() );
+                dto.setP2pStatus( info.getP2pStatus() );
+                dto.setState( info.getState() );
+                dto.setP2pErrorLogs( info.getP2pErrorLogs() );
+
+                p2pList.add( dto );
+            }
+
+            log.info( "logs.size: {}", p2pLogs.getLogs().size() );
+
+            if ( p2pLogs.isEmpty() && p2pStatus == null )
+            {
+                return;
+            }
+
+            SystemLogsDto logsDto = new SystemLogsDto();
+
+            logsDto.setLogs( p2pLogs.getLogs() );
+            logsDto.setStatus( p2pStatus );
+            logsDto.setP2PInfo( p2pList );
+
+            log.info( "Sending p2p logs and status to Hub..." );
+
+            String path = format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", localPeer.getId(), rh.getId() );
+
+            RestResult<Object> restResult = restClient.post( path, logsDto );
+
+            if ( restResult.isSuccess() )
+            {
+                log.info( "Processing p2p logs completed successfully" );
+            }
         }
-
-        log.info( "logs.size: {}", p2pLogs.getLogs().size() );
-
-        if ( p2pLogs.isEmpty() && p2pStatus == null )
+        catch ( Exception e )
         {
-            return;
-        }
-
-        SystemLogsDto logsDto = new SystemLogsDto();
-
-        logsDto.setLogs( p2pLogs.getLogs() );
-        logsDto.setStatus( p2pStatus );
-        logsDto.setP2PInfo( p2pList );
-
-        log.info( "Sending p2p logs and status to Hub..." );
-
-        String path = format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", localPeer.getId(), rh.getId() );
-
-        RestResult<Object> restResult = restClient.post( path, logsDto );
-
-        if ( restResult.isSuccess() )
-        {
-            log.info( "Processing p2p logs completed successfully" );
+            throw new HubManagerException( e );
         }
     }
 

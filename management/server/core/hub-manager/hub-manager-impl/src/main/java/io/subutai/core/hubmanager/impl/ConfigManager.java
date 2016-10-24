@@ -5,9 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 
 import javax.ws.rs.core.Response;
 
@@ -24,6 +21,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
@@ -60,30 +58,37 @@ public class ConfigManager
 
 
     public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager,
-                          final IdentityManager identityManager ) throws Exception
+                          final IdentityManager identityManager ) throws HubManagerException
     {
-        this.identityManager = identityManager;
+        try
+        {
+            this.identityManager = identityManager;
 
-        this.peerManager = peerManager;
+            this.peerManager = peerManager;
 
-        this.sender = securityManager.getKeyManager().getPrivateKey( null );
+            this.sender = securityManager.getKeyManager().getPrivateKey( null );
 
-        this.peerId = peerManager.getLocalPeer().getId();
+            this.peerId = peerManager.getLocalPeer().getId();
 
-        this.hPublicKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
+            this.hPublicKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
 
-        this.ownerPublicKey =
-                securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
-                               .getPublicKey();
+            this.ownerPublicKey =
+                    securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
+                                   .getPublicKey();
 
-        this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
+            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
-        this.messenger = new PGPMessenger( sender, hPublicKey );
+            this.messenger = new PGPMessenger( sender, hPublicKey );
 
-        this.keyStoreTool = new KeyStoreTool();
+            this.keyStoreTool = new KeyStoreTool();
 
-        this.keyStore = keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS,
-                PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) );
+            this.keyStore = keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS,
+                    PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) );
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
@@ -111,8 +116,7 @@ public class ConfigManager
     }
 
 
-    public WebClient getTrustedWebClientWithAuth( String path, final String hubIp )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+    public WebClient getTrustedWebClientWithAuth( String path, final String hubIp ) throws HubManagerException
     {
         String baseUrl = String.format( "https://%s:%d", hubIp, HUB_PORT );
 

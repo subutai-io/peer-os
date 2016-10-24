@@ -15,6 +15,7 @@ import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.hub.share.dto.host.ResourceHostCommandBatchDto;
 import io.subutai.hub.share.dto.host.ResourceHostCommandRequestDto;
@@ -39,7 +40,7 @@ public class ResourceHostCommandProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         boolean fastMode = false;
 

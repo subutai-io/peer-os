@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
@@ -56,7 +57,7 @@ public class VersionInfoProcessor implements Runnable
     }
 
 
-    public void sendVersionInfo() throws Exception
+    public void sendVersionInfo() throws HubManagerException
     {
         if ( manager.isRegistered() )
         {
@@ -70,15 +71,22 @@ public class VersionInfoProcessor implements Runnable
             versionInfoDto.setBranch( SubutaiInfo.getBranch() );
             versionInfoDto.setCommitId( SubutaiInfo.getCommitId() );
 
-            ResourceHost host = configManager.getPeerManager().getLocalPeer().getManagementHost();
+            try
+            {
+                ResourceHost host = configManager.getPeerManager().getLocalPeer().getManagementHost();
 
-            versionInfoDto.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
-            versionInfoDto.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
+                versionInfoDto.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+                versionInfoDto.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
+            }
+            catch ( Exception e )
+            {
+                throw new HubManagerException( e );
+            }
 
             RestResult<Object> restResult = restClient.post( path, versionInfoDto );
             if ( !restResult.isSuccess() )
             {
-                throw new Exception( "Error on sending version info to hub: " + restResult.getError() );
+                throw new HubManagerException( "Error on sending version info to hub: " + restResult.getError() );
             }
         }
     }

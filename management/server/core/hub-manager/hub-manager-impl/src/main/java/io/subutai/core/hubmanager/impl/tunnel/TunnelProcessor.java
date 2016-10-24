@@ -17,6 +17,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
@@ -44,7 +45,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         for ( String stateLink : stateLinks )
         {

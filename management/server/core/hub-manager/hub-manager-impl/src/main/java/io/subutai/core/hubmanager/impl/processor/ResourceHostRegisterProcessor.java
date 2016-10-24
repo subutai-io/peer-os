@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.peer.api.PeerManager;
@@ -31,8 +32,8 @@ public class ResourceHostRegisterProcessor implements StateLinkProcessor
     private static final Pattern RH_DATA_PATTERN = Pattern.compile( "/rest/v1/peers/.*/requested-hosts/.*" );
 
 
-    public ResourceHostRegisterProcessor( final HostRegistrationManager registrationManager, final PeerManager peerManager,
-                                          final HubRestClient restClient )
+    public ResourceHostRegisterProcessor( final HostRegistrationManager registrationManager,
+                                          final PeerManager peerManager, final HubRestClient restClient )
     {
         this.registrationManager = registrationManager;
         this.peerManager = peerManager;
@@ -41,7 +42,7 @@ public class ResourceHostRegisterProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         for ( String link : stateLinks )
         {

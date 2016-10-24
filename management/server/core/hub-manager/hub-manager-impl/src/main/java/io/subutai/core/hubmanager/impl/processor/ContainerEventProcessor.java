@@ -75,7 +75,7 @@ public class ContainerEventProcessor implements Runnable
     }
 
 
-    private void sendContainerStates( ResourceHost rh ) throws Exception
+    private void sendContainerStates( ResourceHost rh ) throws HubManagerException
     {
         log.info( "ResourceHost: id={}, hostname={}, containers={}", rh.getId(), rh.getHostname(),
                 rh.getContainerHosts().size() );
@@ -90,7 +90,7 @@ public class ContainerEventProcessor implements Runnable
     }
 
 
-    private void sendContainerState( ContainerHost ch ) throws Exception
+    private void sendContainerState( ContainerHost ch ) throws HubManagerException
     {
         log.info( "- ContainerHost: id={}, name={}, environmentId={}, state={}", ch.getId(), ch.getContainerName(),
                 ch.getEnvironmentId(), ch.getState() );
@@ -105,16 +105,23 @@ public class ContainerEventProcessor implements Runnable
     }
 
 
-    private Response doRequest( ContainerEventDto dto ) throws Exception
+    private Response doRequest( ContainerEventDto dto ) throws HubManagerException
     {
-        String path = String.format( "/rest/v2/containers/%s/events", dto.getContainerId() );
+        try
+        {
+            String path = String.format( "/rest/v2/containers/%s/events", dto.getContainerId() );
 
-        WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
-        byte[] plainData = JsonUtil.toCbor( dto );
+            byte[] plainData = JsonUtil.toCbor( dto );
 
-        byte[] encryptedData = configManager.getMessenger().produce( plainData );
+            byte[] encryptedData = configManager.getMessenger().produce( plainData );
 
-        return client.post( encryptedData );
+            return client.post( encryptedData );
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 }

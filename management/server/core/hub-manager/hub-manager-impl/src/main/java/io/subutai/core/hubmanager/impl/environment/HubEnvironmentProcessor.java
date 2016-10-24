@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandlerFactory;
@@ -38,7 +39,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
     {
         boolean fastMode = false;
 
@@ -56,7 +57,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
     }
 
 
-    private void processStateLink( String link ) throws Exception
+    private void processStateLink( String link ) throws HubManagerException
     {
         if ( LINKS_IN_PROGRESS.contains( link ) )
         {
@@ -74,6 +75,10 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             StateHandler handler = handlerFactory.getHandler( peerDto.getState() );
 
             handler.handle( peerDto );
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
         }
         finally
         {
