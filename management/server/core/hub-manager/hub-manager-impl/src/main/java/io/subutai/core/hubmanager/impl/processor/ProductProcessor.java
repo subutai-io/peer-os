@@ -27,6 +27,7 @@ import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
@@ -271,7 +272,7 @@ public class ProductProcessor implements StateLinkProcessor
         }
         catch ( PGPException | JsonProcessingException e )
         {
-            throw new IllegalStateException( "Could not send product data.", e );
+            throw new ActionFailedException( "Could not send product data.", e );
         }
     }
 

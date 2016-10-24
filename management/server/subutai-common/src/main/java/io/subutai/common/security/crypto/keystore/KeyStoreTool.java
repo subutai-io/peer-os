@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.common.security.crypto.certificate.CertificateTool;
 import io.subutai.common.security.crypto.key.KeyManager;
@@ -233,7 +234,7 @@ public class KeyStoreTool
         }
         catch ( KeyStoreException e )
         {
-            throw new RuntimeException( "Error getting certificate", e );
+            throw new ActionFailedException( "Error getting certificate", e );
         }
     }
 
@@ -259,12 +260,13 @@ public class KeyStoreTool
         }
         catch ( Exception e )
         {
-            throw new RuntimeException( "Error importing certificate", e );
+            throw new ActionFailedException( "Error importing certificate", e );
         }
     }
 
 
-    public KeyStore createPeerCertKeystore( String alias, String cn ) throws Exception
+    public KeyStore createPeerCertKeystore( String alias, String cn )
+            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException
     {
 
         KeyManager sslkeyMan = new KeyManager();

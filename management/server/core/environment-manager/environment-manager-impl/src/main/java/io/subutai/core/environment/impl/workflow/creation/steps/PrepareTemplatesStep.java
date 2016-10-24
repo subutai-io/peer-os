@@ -4,9 +4,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -25,8 +22,6 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class PrepareTemplatesStep
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( PrepareTemplatesStep.class );
-
     private final Environment environment;
     private final Topology topology;
     private final PeerManager peerManager;

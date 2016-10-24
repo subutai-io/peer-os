@@ -9,6 +9,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -32,7 +33,7 @@ public class SystemSettings
         }
         catch ( ConfigurationException e )
         {
-            throw new RuntimeException( "Failed to load subutaisettings.cfg file.", e );
+            throw new ActionFailedException( "Failed to load subutaisettings.cfg file.", e );
         }
     }
 

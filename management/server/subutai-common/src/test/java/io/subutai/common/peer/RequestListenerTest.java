@@ -7,9 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.peer.Payload;
-import io.subutai.common.peer.RequestListener;
-
 import static junit.framework.TestCase.assertEquals;
 
 
@@ -33,7 +30,7 @@ public class RequestListenerTest
 
 
         @Override
-        public Object onRequest( final Payload payload ) throws Exception
+        public Object onRequest( final Payload payload )
         {
             return payload;
         }

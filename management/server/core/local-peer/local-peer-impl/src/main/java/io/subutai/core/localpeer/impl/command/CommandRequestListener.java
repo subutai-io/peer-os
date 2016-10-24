@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandCallback;
-import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandRequest;
 import io.subutai.common.command.CommandResponse;
 import io.subutai.common.command.CommandResult;
@@ -42,7 +41,7 @@ public class CommandRequestListener extends RequestListener
 
 
     @Override
-    public Object onRequest( final Payload payload ) throws PeerException
+    public Object onRequest( final Payload payload )
     {
         final CommandRequest commandRequest = payload.getMessage( CommandRequest.class );
 
@@ -56,7 +55,7 @@ public class CommandRequestListener extends RequestListener
                 localPeer.executeAsync( commandRequest.getRequestBuilder(), host,
                         new CommandRequestCallback( commandRequest, sourcePeer ) );
             }
-            catch ( CommandException e )
+            catch ( Exception e )
             {
                 LOG.error( "Error in onMessage", e );
             }

@@ -587,7 +587,7 @@ public class PGPEncryptionUtil
 
 
     private static PGPKeyRingGenerator generateKeyRingGenerator( String userId, String secretPwd, KeyPair keyPair )
-            throws Exception
+            throws PGPException
     {
         return generateKeyRingGenerator( userId, secretPwd.toCharArray(), 0xc0, 2048, keyPair );
     }
@@ -606,7 +606,7 @@ public class PGPEncryptionUtil
     // 0xff, or about 2 million iterations.  I'll use 0xc0 as a
     // default -- about 130,000 iterations.
     private static PGPKeyRingGenerator generateKeyRingGenerator( String id, char[] pass, int s2kcount, int keySize,
-                                                                 KeyPair keyPair ) throws Exception
+                                                                 KeyPair keyPair ) throws PGPException
     {
         // This object generates individual key-pairs.
         RSAKeyPairGenerator kpg = new RSAKeyPairGenerator();
@@ -922,7 +922,8 @@ public class PGPEncryptionUtil
     /*
      * verify a clear text signed file
      */
-    public static boolean verifyClearSign( byte[] message, PGPPublicKeyRing pgpRings ) throws Exception
+    public static boolean verifyClearSign( byte[] message, PGPPublicKeyRing pgpRings )
+            throws IOException, PGPException, SignatureException
     {
         ArmoredInputStream aIn = new ArmoredInputStream( new ByteArrayInputStream( message ) );
         ByteArrayOutputStream bout = new ByteArrayOutputStream();

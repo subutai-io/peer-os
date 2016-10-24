@@ -39,6 +39,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
@@ -336,7 +337,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         }
         catch ( PeerException e )
         {
-            throw new RuntimeException( e.getMessage(), e );
+            throw new ActionFailedException( String.format( "Error resolving peer: %s", e.getMessage() ) );
         }
     }
 

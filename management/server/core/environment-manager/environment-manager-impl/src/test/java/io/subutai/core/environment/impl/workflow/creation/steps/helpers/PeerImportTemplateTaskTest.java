@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.Peer;
 import io.subutai.core.environment.impl.TestHelper;
 
@@ -53,9 +54,9 @@ public class PeerImportTemplateTaskTest
 
             task.call();
 
-            fail( "IllegalStateException expected" );
+            fail( "ActionFailedException expected" );
         }
-        catch ( IllegalStateException e )
+        catch ( ActionFailedException e )
         {
         }
 
