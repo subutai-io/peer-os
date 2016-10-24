@@ -22,7 +22,7 @@ func Mac() string {
 
 func MngInit() {
 	fs.ReadOnly("management", false)
-	container.SetContainerUid("management")
+	container.SetContainerUID("management")
 	container.SetContainerConf("management", [][]string{
 		{"lxc.network.hwaddr", Mac()},
 		{"lxc.network.veth.pair", "management"},
@@ -34,7 +34,7 @@ func MngInit() {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + "management/var var none bind,rw 0 0"},
 	})
 	container.SetApt("management")
-	container.SetContainerUid("management")
+	container.SetContainerUID("management")
 	gpg.GenerateKey("management")
 	container.Start("management")
 

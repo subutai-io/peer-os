@@ -25,13 +25,12 @@ func All() []string {
 	return lxc.DefinedContainerNames(config.Agent.LxcPrefix)
 }
 
+// IsTemplate checks if Subutai container is template.
 func IsTemplate(name string) bool {
-	if fs.IsSubvolumeReadonly(config.Agent.LxcPrefix + name + "/rootfs/") {
-		return true
-	}
-	return false
+	return fs.IsSubvolumeReadonly(config.Agent.LxcPrefix + name + "/rootfs/")
 }
 
+// Templates returns list of all templates
 func Templates() (containers []string) {
 	for _, name := range All() {
 		if IsTemplate(name) {
@@ -41,6 +40,7 @@ func Templates() (containers []string) {
 	return
 }
 
+// Containers returns list of all containers
 func Containers() (containers []string) {
 	for _, name := range All() {
 		if !IsTemplate(name) {
@@ -50,6 +50,7 @@ func Containers() (containers []string) {
 	return
 }
 
+// IsContainer checks is container exist.
 func IsContainer(name string) bool {
 	for _, item := range All() {
 		if name == item {
@@ -59,6 +60,7 @@ func IsContainer(name string) bool {
 	return false
 }
 
+// State returns container stat in human readable format.
 func State(name string) (state string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	if err != nil {
@@ -85,9 +87,10 @@ func State(name string) (state string) {
 	return "UNKNOWN"
 }
 
+// SetApt configures APT configuration inside Subutai container.
 func SetApt(name string) {
-	root := GetConfigItem(config.Agent.LxcPrefix+name+"/config", "subutai.parent")
-	for parent := name; root != parent; root = GetConfigItem(config.Agent.LxcPrefix+parent+"/config", "subutai.parent") {
+	root := GetParent(name)
+	for parent := name; root != parent; root = GetParent(name) {
 		parent = root
 	}
 	if root != "master" {
@@ -111,12 +114,7 @@ func SetApt(name string) {
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/apt/sources.list.d/subutai-repo.list", kurjun, 0644))
 }
 
-func AptUpdate(name string) {
-	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
-	log.Check(log.FatalLevel, "Looking for container "+name, err)
-	c.RunCommand([]string{"bash", "-c", "sleep 5 && apt update -o Acquire::http::Timeout=5 -o Dir::Etc::sourcelist=\"/etc/apt/sources.list.d/subutai-repo.list\" >/dev/null 2>&1 &"}, lxc.DefaultAttachOptions)
-}
-
+// Start starts the Subutai container.
 func Start(name string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	log.Check(log.FatalLevel, "Looking for container "+name, err)
@@ -133,6 +131,7 @@ func Start(name string) {
 	}
 }
 
+// Stop stops the Subutai container.
 func Stop(name string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	log.Check(log.FatalLevel, "Looking for container "+name, err)
@@ -149,6 +148,7 @@ func Stop(name string) {
 	}
 }
 
+// AttachExec executes a command inside Subutai container.
 func AttachExec(name string, command []string) (output []string, err error) {
 	if !IsContainer(name) {
 		return output, errors.New("Container does not exists")
@@ -159,23 +159,23 @@ func AttachExec(name string, command []string) (output []string, err error) {
 		return output, errors.New("Container is " + container.State().String())
 	}
 
-	buf_r, buf_w, _ := os.Pipe()
-	buf_r_err, buf_w_err, _ := os.Pipe()
+	bufR, bufW, _ := os.Pipe()
+	bufRErr, bufWErr, _ := os.Pipe()
 	container.RunCommand(command, lxc.AttachOptions{
 		Namespaces: -1,
 		UID:        0,
 		GID:        0,
-		StdoutFd:   buf_w.Fd(),
-		StderrFd:   buf_w_err.Fd(),
+		StdoutFd:   bufW.Fd(),
+		StderrFd:   bufWErr.Fd(),
 	})
 
-	buf_w.Close()
-	defer buf_r.Close()
+	bufW.Close()
+	defer bufR.Close()
 
-	buf_w_err.Close()
-	defer buf_r_err.Close()
+	bufWErr.Close()
+	defer bufRErr.Close()
 
-	out := bufio.NewScanner(buf_r)
+	out := bufio.NewScanner(bufR)
 	for out.Scan() {
 		output = append(output, out.Text())
 	}
@@ -183,6 +183,7 @@ func AttachExec(name string, command []string) (output []string, err error) {
 	return output, nil
 }
 
+// Destroy deletes the Subutai container.
 func Destroy(name string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	if !log.Check(log.WarnLevel, "Creating container object", err) && c.State() == lxc.RUNNING {
@@ -193,6 +194,7 @@ func Destroy(name string) {
 	log.Info(name + " destroyed")
 }
 
+// GetParent return a parent of the Subutai container.
 func GetParent(name string) string {
 	if !IsContainer(name) {
 		return "Container does not exists"
@@ -201,6 +203,7 @@ func GetParent(name string) string {
 	return GetConfigItem(configFileName, "subutai.parent")
 }
 
+// Clone create the duplicate container from the Subutai template.
 func Clone(parent, child string) {
 	var backend lxc.BackendStore
 	backend.Set("btrfs")
@@ -228,6 +231,8 @@ func Clone(parent, child string) {
 	})
 }
 
+// ResetNet sets default parameters of the network configuration for container.
+// It's used right before converting container into template.
 func ResetNet(name string) {
 	SetContainerConf(name, [][]string{
 		{"lxc.network.type", "veth"},
@@ -242,6 +247,8 @@ func ResetNet(name string) {
 	})
 }
 
+// QuotaRAM sets the memory quota to the Subutai container.
+// If quota size argument is missing, it's just return current value.
 func QuotaRAM(name string, size ...string) int {
 	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	i, _ := strconv.Atoi(size[0])
@@ -289,6 +296,7 @@ func QuotaCPU(name string, size ...string) int {
 	return result * 100 / cfsPeriod / runtime.NumCPU()
 }
 
+// QuotaCPUset sets particular cores that can be used by the Subutai container.
 func QuotaCPUset(name string, size ...string) string {
 	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	if size[0] != "" {
@@ -298,12 +306,14 @@ func QuotaCPUset(name string, size ...string) string {
 	return c.CgroupItem("cpuset.cpus")[0]
 }
 
+// QuotaNet sets network bandwidth for the Subutai container.
 func QuotaNet(name string, size ...string) string {
 	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	nic := GetConfigItem(c.ConfigFileName(), "lxc.network.veth.pair")
 	return net.RateLimit(nic, size[0])
 }
 
+// SetContainerConf sets any parameter in the configuration file of the Subutai container.
 func SetContainerConf(container string, conf [][]string) {
 	confPath := config.Agent.LxcPrefix + container + "/config"
 	newconf := ""
@@ -337,6 +347,7 @@ func SetContainerConf(container string, conf [][]string) {
 	log.Check(log.FatalLevel, "Writing container config "+confPath, ioutil.WriteFile(confPath, []byte(newconf), 0644))
 }
 
+// GetConfigItem return any parameter from the configuration file of the Subutai container.
 func GetConfigItem(path, item string) string {
 	config, _ := os.Open(path)
 	defer config.Close()
@@ -350,7 +361,9 @@ func GetConfigItem(path, item string) string {
 	return ""
 }
 
-func SetContainerUid(c string) {
+// SetContainerUID sets UID map shifting for the Subutai container.
+// It's required option for any unprivileged LXC container.
+func SetContainerUID(c string) {
 	var uidlast []byte
 
 	uidlast, _ = ioutil.ReadFile(config.Agent.LxcPrefix + "uidmaplast")
@@ -376,10 +389,11 @@ func SetContainerUid(c string) {
 	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/opt/", parentuid, newuid, "65536").Run()
 	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/var/", parentuid, newuid, "65536").Run()
 
-	log.Check(log.ErrorLevel, "Setting chmod 755 on lxc home", os.Chmod(config.Agent.LxcPrefix+c, 0755))
+	log.Check(log.ErrorLevel, "Setting chmod 600 on lxc home", os.Chmod(config.Agent.LxcPrefix+c, 0600))
 }
 
-func SetDns(name string) {
+// SetDNS configures the Subutai containers to use internal DNS-server from the Resource Host.
+func SetDNS(name string) {
 	dns := GetConfigItem(config.Agent.LxcPrefix+name+"/config", "lxc.network.ipv4.gateway")
 	if len(dns) == 0 {
 		dns = "10.10.0.254"
@@ -394,7 +408,8 @@ func SetDns(name string) {
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolv.conf", resolv, 0644))
 }
 
-func SetEnvId(name, envId string) {
+// SetEnvID is deprecated function and should be removed.
+func SetEnvID(name, envID string) {
 	err := os.MkdirAll(config.Agent.LxcPrefix+name+"/rootfs/etc/subutai", 755)
 	log.Check(log.FatalLevel, "Creating etc/subutai directory", err)
 
@@ -402,12 +417,13 @@ func SetEnvId(name, envId string) {
 	log.Check(log.FatalLevel, "Creating lxc-config file", err)
 	defer config.Close()
 
-	_, err = config.WriteString("[Subutai-Agent]\n" + envId + "\n")
+	_, err = config.WriteString("[Subutai-Agent]\n" + envID + "\n")
 	log.Check(log.FatalLevel, "Writing environment id to config", err)
 
 	config.Sync()
 }
 
+// SetStaticNet sets static IP-address for the Subutai container.
 func SetStaticNet(name string) {
 	data, err := ioutil.ReadFile(config.Agent.LxcPrefix + name + "/rootfs/etc/network/interfaces")
 	log.Check(log.WarnLevel, "Opening /etc/network/interfaces", err)
@@ -417,6 +433,7 @@ func SetStaticNet(name string) {
 	log.Check(log.WarnLevel, "Setting internal eth0 interface to manual", err)
 }
 
+// DisableSSHPwd disabling SSH password access to the Subutai container.
 func DisableSSHPwd(name string) {
 	input, err := ioutil.ReadFile(config.Agent.LxcPrefix + name + "/rootfs/etc/ssh/sshd_config")
 	if log.Check(log.DebugLevel, "Opening sshd config", err) {

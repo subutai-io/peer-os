@@ -31,7 +31,7 @@ func LxcClone(parent, child, envId, addr, token string) {
 	}
 
 	if len(envId) != 0 {
-		container.SetEnvId(child, envId)
+		container.SetEnvID(child, envId)
 	}
 
 	if len(addr) != 0 {
@@ -39,9 +39,9 @@ func LxcClone(parent, child, envId, addr, token string) {
 	}
 
 	//Need to change it in parent templates
-	container.SetContainerUid(child)
+	container.SetContainerUID(child)
 	container.SetApt(child)
-	container.SetDns(child)
+	container.SetDNS(child)
 
 	//Security matters workaround. Need to change it in parent templates
 	container.DisableSSHPwd(child)
