@@ -21,7 +21,13 @@ import org.slf4j.LoggerFactory;
 public class SecurityUtilities
 {
     private static Logger LOG = LoggerFactory.getLogger( SecurityUtilities.class );
-    public static final int DEFAULT_KEY_SIZE = 128;
+    private static final int DEFAULT_KEY_SIZE = 128;
+
+
+    private SecurityUtilities()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
 
 
     /**

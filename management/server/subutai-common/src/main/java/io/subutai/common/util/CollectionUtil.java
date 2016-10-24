@@ -11,7 +11,15 @@ import java.util.Map;
  * Provides utility functions for working with collections
  */
 public class CollectionUtil
+
+
 {
+    private CollectionUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static boolean isCollectionEmpty( Collection col )
     {
         return col == null || col.isEmpty();

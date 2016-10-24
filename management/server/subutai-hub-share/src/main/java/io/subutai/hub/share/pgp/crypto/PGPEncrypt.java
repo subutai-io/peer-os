@@ -22,6 +22,12 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodG
 
 public class PGPEncrypt
 {
+    private PGPEncrypt()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static byte[] encrypt( byte data[], PGPPublicKey publicKey ) throws IOException, PGPException
     {
         byte[] compressedData = compress( data );
@@ -45,10 +51,9 @@ public class PGPEncrypt
     private static PGPEncryptedDataGenerator getEncryptedGenerator( PGPPublicKey publicKey )
     {
         PGPEncryptedDataGenerator encGen = new PGPEncryptedDataGenerator(
-                new JcePGPDataEncryptorBuilder( PGPEncryptedData.CAST5 )
-                        .setWithIntegrityPacket( true )
-                        .setSecureRandom( new SecureRandom() )
-                        .setProvider( "BC" ) );
+                new JcePGPDataEncryptorBuilder( PGPEncryptedData.CAST5 ).setWithIntegrityPacket( true )
+                                                                        .setSecureRandom( new SecureRandom() )
+                                                                        .setProvider( "BC" ) );
 
         encGen.addMethod( new JcePublicKeyKeyEncryptionMethodGenerator( publicKey ).setProvider( "BC" ) );
 
@@ -64,7 +69,8 @@ public class PGPEncrypt
 
         OutputStream compressOut = compressGen.open( bos );
 
-        OutputStream os = new PGPLiteralDataGenerator().open( compressOut, PGPLiteralData.BINARY, "", data.length, new Date() );
+        OutputStream os =
+                new PGPLiteralDataGenerator().open( compressOut, PGPLiteralData.BINARY, "", data.length, new Date() );
 
         os.write( data );
 
@@ -74,5 +80,4 @@ public class PGPEncrypt
 
         return bos.toByteArray();
     }
-
 }

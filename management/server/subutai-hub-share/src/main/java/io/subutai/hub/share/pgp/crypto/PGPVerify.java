@@ -21,6 +21,12 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProv
 
 public class PGPVerify
 {
+    private PGPVerify()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static byte[] verify( byte signedData[], PGPPublicKey publicKey ) throws IOException, PGPException
     {
         JcaPGPObjectFactory objectFactory = getObjectFactory( signedData );

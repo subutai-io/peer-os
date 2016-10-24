@@ -24,6 +24,12 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 
 public class PGPSign
 {
+    private PGPSign()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static byte[] sign( byte data[], PGPPrivateKey privateKey ) throws IOException, PGPException
     {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

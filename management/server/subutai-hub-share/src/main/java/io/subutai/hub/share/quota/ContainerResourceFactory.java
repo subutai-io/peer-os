@@ -6,14 +6,18 @@ import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.NumericValueResource;
 import io.subutai.hub.share.resource.ResourceValue;
 
-import static io.subutai.hub.share.resource.ContainerResourceType.*;
-
 
 /**
  * Factory method for container resource classes
  */
 public class ContainerResourceFactory
 {
+    private ContainerResourceFactory()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static ContainerResource createContainerResource( ContainerResourceType containerResourceType,
                                                              ResourceValue resourceValue )
     {

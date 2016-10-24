@@ -19,6 +19,12 @@ public class SecurityUtil
     private static final Logger LOG = LoggerFactory.getLogger( SecurityUtil.class.getName() );
 
 
+    private SecurityUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     private static String ByteArrayToString( byte[] bytes )
     {
         StringBuilder sb = new StringBuilder();

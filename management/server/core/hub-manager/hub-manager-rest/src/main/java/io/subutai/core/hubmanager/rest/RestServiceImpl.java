@@ -168,7 +168,7 @@ public class RestServiceImpl implements RestService
         {
             public void run()
             {
-                VEHServiceImpl.upSite( peerManager );
+                VEHServiceUtil.upSite( peerManager );
             }
         };
 
@@ -186,7 +186,7 @@ public class RestServiceImpl implements RestService
         {
             public void run()
             {
-                VEHServiceImpl.downSite( peerManager );
+                VEHServiceUtil.downSite( peerManager );
             }
         };
 
@@ -199,7 +199,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response checksum()
     {
-        return VEHServiceImpl.getChecksum( peerManager );
+        return VEHServiceUtil.getChecksum( peerManager );
     }
 
 

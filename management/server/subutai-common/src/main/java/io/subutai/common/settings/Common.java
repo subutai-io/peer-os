@@ -79,4 +79,10 @@ public class Common
     public static final String CONTAINER_SSH_FOLDER = "/root/.ssh";
     public static final String CONTAINER_SSH_FILE = String.format( "%s/authorized_keys", CONTAINER_SSH_FOLDER );
     public static final int MAX_KEYS_IN_ECHO_CMD = 100;
+
+
+    private Common()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
 }

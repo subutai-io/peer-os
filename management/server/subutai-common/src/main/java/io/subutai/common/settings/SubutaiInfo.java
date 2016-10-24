@@ -14,6 +14,12 @@ public class SubutaiInfo
     private static PropertiesConfiguration PROPERTIES = loadProperties();
 
 
+    private SubutaiInfo()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static PropertiesConfiguration loadProperties()
     {
         PropertiesConfiguration config = null;
@@ -43,37 +49,37 @@ public class SubutaiInfo
 
     public static String getCommitterUserName()
     {
-        return String.valueOf( PROPERTIES.getProperty( "git.commit.user.name" ));
+        return String.valueOf( PROPERTIES.getProperty( "git.commit.user.name" ) );
     }
 
 
     public static String getCommitterUserEmail()
     {
-        return String.valueOf( PROPERTIES.getProperty( "git.commit.user.email" ));
+        return String.valueOf( PROPERTIES.getProperty( "git.commit.user.email" ) );
     }
 
 
     public static String getBuilderUserName()
     {
-        return String.valueOf( PROPERTIES.getProperty( "git.build.user.name" ));
+        return String.valueOf( PROPERTIES.getProperty( "git.build.user.name" ) );
     }
 
 
     public static String getBuilderUserEmail()
     {
-        return String.valueOf( PROPERTIES.getProperty( "git.build.user.email" ));
+        return String.valueOf( PROPERTIES.getProperty( "git.build.user.email" ) );
     }
 
 
     public static String getBuildTime()
     {
-        return String.valueOf( PROPERTIES.getProperty( "git.build.time" ));
+        return String.valueOf( PROPERTIES.getProperty( "git.build.time" ) );
     }
 
 
     public static String getVersion()
     {
-        return String.valueOf( PROPERTIES.getProperty( "git.build.version" ));
+        return String.valueOf( PROPERTIES.getProperty( "git.build.version" ) );
     }
 }
 

@@ -13,6 +13,13 @@ import io.subutai.common.exception.NetworkException;
 
 public class SocketUtil
 {
+
+    private SocketUtil()
+    {
+        throw new IllegalAccessError("Utility class");
+    }
+
+
     public static void check( String node, int timeout, int port ) throws NetworkException
     {
         Socket s = null;

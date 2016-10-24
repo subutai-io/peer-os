@@ -18,6 +18,11 @@ import io.subutai.core.keyserver.impl.model.PublicKeyStoreEntity;
  */
 public class SecurityKeyUtil
 {
+    private SecurityKeyUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
 
     /********************************************
      * Convert BouncyCastle PGPKey to SecurityKey entity

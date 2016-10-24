@@ -30,9 +30,15 @@ import io.subutai.core.peer.api.PeerManager;
 
 //TODO after finish ENVIRONMENT MANAGEMENT should delete this class
 //TODO close webclient with RestUtil.close
-public class VEHServiceImpl
+public class VEHServiceUtil
 {
-    private static final Logger LOG = LoggerFactory.getLogger( VEHServiceImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( VEHServiceUtil.class.getName() );
+
+
+    private VEHServiceUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
 
 
     public static Response upSite( PeerManager peerManager )

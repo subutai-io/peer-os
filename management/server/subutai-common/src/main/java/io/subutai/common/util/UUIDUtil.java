@@ -13,6 +13,11 @@ import com.fasterxml.uuid.Generators;
 public class UUIDUtil
 {
 
+    private UUIDUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
 
     public static UUID generateTimeBasedUUID()
     {
