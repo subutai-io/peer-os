@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"github.com/subutai-io/base/agent/cli/lib"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/fs"
@@ -57,14 +56,14 @@ func LxcExport(name, version, prefsize string) {
 	})
 
 	src := config.Agent.LxcPrefix + name
-	lib.CopyFile(src+"/fstab", dst+"/fstab")
-	lib.CopyFile(src+"/config", dst+"/config")
-	lib.CopyFile(src+"/packages", dst+"/packages")
+	fs.Copy(src+"/fstab", dst+"/fstab")
+	fs.Copy(src+"/config", dst+"/config")
+	fs.Copy(src+"/packages", dst+"/packages")
 	if parent != name {
-		lib.CopyFile(src+"/diff/var.diff", dst+"/diff/var.diff")
-		lib.CopyFile(src+"/diff/opt.diff", dst+"/diff/opt.diff")
-		lib.CopyFile(src+"/diff/home.diff", dst+"/diff/home.diff")
-		lib.CopyFile(src+"/diff/rootfs.diff", dst+"/diff/rootfs.diff")
+		fs.Copy(src+"/diff/var.diff", dst+"/diff/var.diff")
+		fs.Copy(src+"/diff/opt.diff", dst+"/diff/opt.diff")
+		fs.Copy(src+"/diff/home.diff", dst+"/diff/home.diff")
+		fs.Copy(src+"/diff/rootfs.diff", dst+"/diff/rootfs.diff")
 	}
 
 	container.SetContainerConf(name, [][]string{

@@ -1,4 +1,4 @@
-package lib
+package fs
 
 import (
 	"github.com/subutai-io/base/agent/log"
@@ -6,7 +6,8 @@ import (
 	"os"
 )
 
-func CopyFile(source string, dest string) {
+// Copy creates a copy of passed "source" file to "dest" file
+func Copy(source string, dest string) {
 	sf, err := os.Open(source)
 	log.Check(log.FatalLevel, "Opening file "+source, err)
 	defer sf.Close()
