@@ -58,7 +58,7 @@ public class TestCommand extends SubutaiShellCommandSupport
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
         }
         return null;
     }

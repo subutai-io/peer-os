@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
@@ -69,6 +71,9 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     private void startProccess( String tools )
     {
         Set<String> envs = getEnvIds( format( GET_ENV_URL, configManager.getPeerId() ), configManager );
+
+        Preconditions.checkNotNull( envs );
+
         for ( String envId : envs )
         {
             checkEnvironmentHealth( envId, tools );
@@ -81,6 +86,8 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
         JSONObject result = new JSONObject();
         Set<ContainerHost> containerHosts = peerManager.getLocalPeer().findContainersByEnvironmentId( envId );
         EnvironmentDto environmentDto = getEnvironmentPeerDto( format( GET_ENV_CONTAINERS_URL, envId ), configManager );
+
+        Preconditions.checkNotNull( environmentDto );
 
         List<EnvironmentNodesDto> environmentNodeDtoList = environmentDto.getNodes();
 
@@ -138,7 +145,6 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
             catch ( CommandException e )
             {
                 log.error( e.getMessage() );
-                e.printStackTrace();
             }
         }
     }
@@ -147,7 +153,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     private void executeCheckCommand( String key, ContainerHost sourceContainer, String cmd, JSONObject result,
                                       int timeout )
     {
-        CommandResult res = null;
+        CommandResult res;
         try
         {
             if ( isChConnected( sourceContainer ) )
@@ -172,7 +178,6 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
         catch ( Exception e )
         {
             log.error( e.getMessage() );
-            e.printStackTrace();
         }
     }
 
@@ -185,7 +190,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
         while ( exec )
         {
             tryCount++;
-            exec = tryCount > 3 ? false : true;
+            exec = tryCount <= 3;
 
             if ( !ch.isConnected() )
             {

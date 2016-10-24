@@ -231,7 +231,6 @@ public class AppScaleManager
         catch ( Exception e )
         {
             log.error( "Error getting vlan : {}", e.getMessage() );
-            e.printStackTrace();
         }
 
         String revpx = "sed -i -e 's/https:\\/\\/$host$request_uri/https:\\/\\/$host:%s$request_uri/g' "
@@ -282,7 +281,6 @@ public class AppScaleManager
         catch ( HostNotFoundException e )
         {
             log.error( e.getMessage() );
-            e.printStackTrace();
         }
 
         return resourceHost;

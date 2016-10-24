@@ -62,7 +62,7 @@ public class VEHServiceImpl
         }
         catch ( JSONException e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
         }
         setupSite( peerManager, projectName, ownerName, userName, password, domain );
 

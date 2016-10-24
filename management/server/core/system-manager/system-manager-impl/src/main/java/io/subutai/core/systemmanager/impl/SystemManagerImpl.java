@@ -135,8 +135,10 @@ public class SystemManagerImpl implements SystemManager
         }
         catch ( HostNotFoundException | ResourceHostException e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
+
             pojo.setRhVersion( "No RH connected" );
+
             return pojo;
         }
 
@@ -212,7 +214,7 @@ public class SystemManagerImpl implements SystemManager
         }
         catch ( IOException e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
         }
 
         return pojo;
@@ -241,13 +243,15 @@ public class SystemManagerImpl implements SystemManager
         }
         catch ( HostNotFoundException e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
+
             info.setRhVersion( "No RH connected" );
+
             return info;
         }
         catch ( CommandException e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
         }
 
         return info;
@@ -265,14 +269,10 @@ public class SystemManagerImpl implements SystemManager
 
             return true;
         }
-        catch ( HostNotFoundException e )
+        catch ( HostNotFoundException | CommandException e )
         {
-            e.printStackTrace();
-            return false;
-        }
-        catch ( CommandException e )
-        {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
+
             return false;
         }
     }

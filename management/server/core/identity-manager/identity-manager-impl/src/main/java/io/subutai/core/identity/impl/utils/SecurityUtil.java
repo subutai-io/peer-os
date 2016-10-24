@@ -7,14 +7,19 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Security Utils for Hashing and etc
  */
 public class SecurityUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SecurityUtil.class.getName() );
 
-    private static String ByteArrayToString(byte[] bytes)
+
+    private static String ByteArrayToString( byte[] bytes )
     {
         StringBuilder sb = new StringBuilder();
         for ( final byte aByte : bytes )
@@ -28,19 +33,19 @@ public class SecurityUtil
 
     /* *************************************************
      */
-    public static String generateHash(String item)
+    public static String generateHash( String item )
     {
         String generatedPassword = null;
         try
         {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(item.getBytes());
+            MessageDigest md = MessageDigest.getInstance( "MD5" );
+            md.update( item.getBytes() );
             byte[] bytes = md.digest();
-            generatedPassword = ByteArrayToString(bytes);
+            generatedPassword = ByteArrayToString( bytes );
         }
-        catch (NoSuchAlgorithmException e)
+        catch ( NoSuchAlgorithmException e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
         }
 
         return generatedPassword;
@@ -58,11 +63,11 @@ public class SecurityUtil
             md.update( salt.getBytes() );
             byte[] bytes = md.digest( passwordToHash.getBytes() );
 
-            generatedPassword = ByteArrayToString(bytes);
+            generatedPassword = ByteArrayToString( bytes );
         }
         catch ( NoSuchAlgorithmException e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
         }
         return generatedPassword;
     }

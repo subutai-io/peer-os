@@ -603,7 +603,7 @@ public class MonitorImpl implements Monitor, HostListener
                     }
                     catch ( JSONException e )
                     {
-                        e.printStackTrace();
+                        LOG.warn( e.getMessage() );
                     }
                 }
 
@@ -611,8 +611,8 @@ public class MonitorImpl implements Monitor, HostListener
             }
             catch ( CommandException | ResourceHostException e )
             {
-                e.printStackTrace();
                 LOG.error( "Error while getting RH version and P2P status. Seems RH is not connected." );
+
                 info.setRhVersion( "No RH connected" );
             }
         }
