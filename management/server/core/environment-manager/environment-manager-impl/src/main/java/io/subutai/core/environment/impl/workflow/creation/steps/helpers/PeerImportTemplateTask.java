@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.tracker.TrackerOperation;
 
@@ -71,7 +72,7 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
             trackerOperation.addLog( String.format( "Template import failed on peer %s", peer.getName() ) );
 
             //throw to let caller fail-fast
-            throw new IllegalStateException( String.format( "Template import failed on peer %s", peer.getName() ) );
+            throw new ActionFailedException( String.format( "Template import failed on peer %s", peer.getName() ) );
         }
 
         return response;
