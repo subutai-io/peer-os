@@ -130,7 +130,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
             HostInterfaceImpl.class, orphanRemoval = true )
     @JsonIgnore
-    protected Set<HostInterface> hostInterfaces = new HashSet<>();
+    protected transient Set<HostInterface> hostInterfaces = new HashSet<>();
 
 
     @Column( name = "domain_name" )
@@ -144,11 +144,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Transient
     @JsonIgnore
-    protected EnvironmentManagerImpl environmentManager;
+    protected transient EnvironmentManagerImpl environmentManager;
 
     @Transient
     @JsonIgnore
-    private ContainerId containerId;
+    private transient ContainerId containerId;
 
     //workaround for JPA problem setting parent environment field
     @Transient
