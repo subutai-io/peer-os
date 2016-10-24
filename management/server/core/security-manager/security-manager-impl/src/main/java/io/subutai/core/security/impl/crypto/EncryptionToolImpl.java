@@ -12,6 +12,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
@@ -99,7 +100,7 @@ public class EncryptionToolImpl implements EncryptionTool
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new ActionFailedException( e );
         }
     }
 
@@ -115,7 +116,7 @@ public class EncryptionToolImpl implements EncryptionTool
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new ActionFailedException( e );
         }
     }
 
@@ -329,7 +330,7 @@ public class EncryptionToolImpl implements EncryptionTool
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new ActionFailedException( e );
         }
     }
 
@@ -353,7 +354,7 @@ public class EncryptionToolImpl implements EncryptionTool
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new ActionFailedException( e );
         }
     }
 

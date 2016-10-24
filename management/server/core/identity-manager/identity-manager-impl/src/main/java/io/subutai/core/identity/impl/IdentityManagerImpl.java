@@ -198,10 +198,10 @@ public class IdentityManagerImpl implements IdentityManager
             //*********************************************
             for ( final PermissionObject aPermsp : permsp )
             {
-                if ( aPermsp != PermissionObject.IdentityManagement &&
-                        aPermsp != PermissionObject.KarafServerAdministration &&
-                        aPermsp != PermissionObject.PeerManagement &&
-                        aPermsp != PermissionObject.ResourceManagement )
+                if ( aPermsp != PermissionObject.IdentityManagement
+                        && aPermsp != PermissionObject.KarafServerAdministration
+                        && aPermsp != PermissionObject.PeerManagement
+                        && aPermsp != PermissionObject.ResourceManagement )
                 {
                     per = createPermission( aPermsp.getId(), 3, true, true, true, true );
                     assignRolePermission( role, per );
@@ -1175,7 +1175,7 @@ public class IdentityManagerImpl implements IdentityManager
     @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                            boolean generateKeyPair, boolean createUserDelegate ) throws Exception
+                            boolean generateKeyPair, boolean createUserDelegate ) throws SystemSecurityException
     {
         User user = new UserEntity();
         String salt = "";
@@ -1230,7 +1230,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( Exception e )
         {
-            throw new Exception( "Internal error", e );
+            throw new SystemSecurityException( "Internal error", e );
         }
 
         return user;
@@ -1251,7 +1251,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
-    public User modifyUser( User user, String password ) throws Exception
+    public User modifyUser( User user, String password ) throws SystemSecurityException
     {
         //******Cannot update Internal User *************
         if ( user.getType() == UserType.System.getId() )
@@ -1281,7 +1281,7 @@ public class IdentityManagerImpl implements IdentityManager
         catch ( Exception e )
         {
             LOGGER.error( "modify user exception", e );
-            throw new Exception( "Internal error" );
+            throw new SystemSecurityException( "Internal error" );
         }
 
         return user;
@@ -1312,7 +1312,8 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public boolean changeUserPassword( String userName, String oldPassword, String newPassword ) throws Exception
+    public boolean changeUserPassword( String userName, String oldPassword, String newPassword )
+            throws SystemSecurityException
     {
         User user = identityDataService.getUserByUsername( userName );
         return changeUserPassword( user, oldPassword, newPassword );
@@ -1323,7 +1324,8 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws Exception
+    public boolean changeUserPassword( long userId, String oldPassword, String newPassword )
+            throws SystemSecurityException
     {
         User user = identityDataService.getUser( userId );
         return changeUserPassword( user, oldPassword, newPassword );
@@ -1334,7 +1336,8 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public boolean changeUserPassword( User user, String oldPassword, String newPassword ) throws Exception
+    public boolean changeUserPassword( User user, String oldPassword, String newPassword )
+            throws SystemSecurityException
     {
         String salt;
 
@@ -1370,7 +1373,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( NoSuchAlgorithmException | NoSuchProviderException e )
         {
-            throw new Exception( "Internal error" );
+            throw new SystemSecurityException( "Internal error" );
         }
 
         return true;
@@ -1438,10 +1441,8 @@ public class IdentityManagerImpl implements IdentityManager
             throw new IllegalArgumentException( "User name cannot be shorter than 4 characters." );
         }
 
-        if ( userName.equalsIgnoreCase( "token" ) ||
-                userName.equalsIgnoreCase( "administrator" ) ||
-                userName.equalsIgnoreCase( "authmessage" ) ||
-                userName.equalsIgnoreCase( "system" ) )
+        if ( userName.equalsIgnoreCase( "token" ) || userName.equalsIgnoreCase( "administrator" ) || userName
+                .equalsIgnoreCase( "authmessage" ) || userName.equalsIgnoreCase( "system" ) )
         {
             throw new IllegalArgumentException( "User name is reserved by the system." );
         }
@@ -1457,9 +1458,8 @@ public class IdentityManagerImpl implements IdentityManager
             throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
         }
 
-        if ( password.equalsIgnoreCase( userName ) ||
-                password.equalsIgnoreCase( "password" ) ||
-                password.equalsIgnoreCase( "system" ) )
+        if ( password.equalsIgnoreCase( userName ) || password.equalsIgnoreCase( "password" ) || password
+                .equalsIgnoreCase( "system" ) )
         {
             throw new IllegalArgumentException( "Password doesn't match security measures" );
         }

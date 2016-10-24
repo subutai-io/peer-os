@@ -19,6 +19,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.environment.api.EnvironmentEventListener;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
@@ -56,7 +57,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
 
     public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager,
-                           IdentityManager identityManager ) throws Exception
+                           IdentityManager identityManager ) throws HubManagerException
     {
         daoHelper = new DaoHelper( daoManager );
 
@@ -147,7 +148,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     @Override
     public void removeSshKey( final String envId, final String sshKey )
     {
-        String path = format( ENVIRONMENT_SSHKEY_URL , envId ) + "/remove";
+        String path = format( ENVIRONMENT_SSHKEY_URL, envId ) + "/remove";
 
         httpClient.doPost( path, sshKey );
     }
@@ -156,7 +157,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     @Override
     public void addSshKey( final String envId, final String sshKey )
     {
-        String path = format( ENVIRONMENT_SSHKEY_URL , envId ) + "/add";
+        String path = format( ENVIRONMENT_SSHKEY_URL, envId ) + "/add";
         httpClient.doPost( path, sshKey );
     }
 

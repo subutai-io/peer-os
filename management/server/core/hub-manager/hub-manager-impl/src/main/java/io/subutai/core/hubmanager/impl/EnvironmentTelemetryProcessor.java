@@ -337,7 +337,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
 
 
     @Override
-    public boolean processStateLinks( Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( Set<String> stateLinks )
     {
 
         if ( hubManager.isRegistered() )

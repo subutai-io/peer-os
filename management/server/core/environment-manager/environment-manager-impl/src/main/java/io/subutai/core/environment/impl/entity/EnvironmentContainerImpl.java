@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.entity;
 
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -130,7 +129,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
             HostInterfaceImpl.class, orphanRemoval = true )
     @JsonIgnore
-    protected Set<HostInterface> hostInterfaces = new HashSet<>();
+    private Set<HostInterface> hostInterfaces = new HashSet<>();
 
 
     @Column( name = "domain_name" )

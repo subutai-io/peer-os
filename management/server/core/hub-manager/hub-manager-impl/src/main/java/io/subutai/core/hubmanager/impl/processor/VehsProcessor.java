@@ -2,9 +2,6 @@ package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +25,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.VehsDto;
@@ -61,7 +59,7 @@ public class VehsProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         for ( String link : stateLinks )
         {
@@ -82,7 +80,7 @@ public class VehsProcessor implements StateLinkProcessor
     }
 
 
-    private EnvironmentPeerDto getEnvPeerDto( String link ) throws Exception
+    private EnvironmentPeerDto getEnvPeerDto( String link ) throws HubManagerException
     {
         try
         {
@@ -94,10 +92,9 @@ public class VehsProcessor implements StateLinkProcessor
 
             return JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( PGPException | IOException e )
         {
-            throw new Exception( "Could not retrieve environment peer data", e );
+            throw new HubManagerException( "Could not retrieve environment peer data", e );
         }
     }
 

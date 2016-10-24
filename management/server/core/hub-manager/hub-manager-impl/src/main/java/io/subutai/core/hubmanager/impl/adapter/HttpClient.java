@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
@@ -32,6 +31,7 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.json.JsonUtil;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
@@ -51,7 +51,7 @@ class HttpClient
     private final String PEER_KEY_FINGERPRINT;
 
 
-    private synchronized KeyStore getPeerKeyStore() throws Exception
+    private synchronized KeyStore getPeerKeyStore() throws HubManagerException
     {
         if ( peerKeyStore == null )
         {
@@ -62,15 +62,22 @@ class HttpClient
     }
 
 
-    HttpClient( SecurityManager securityManager ) throws IOException, PGPException, KeyStoreException
+    HttpClient( SecurityManager securityManager ) throws HubManagerException
     {
-        PGPPrivateKey senderKey = securityManager.getKeyManager().getPrivateKey( null );
+        try
+        {
+            PGPPrivateKey senderKey = securityManager.getKeyManager().getPrivateKey( null );
 
-        PGPPublicKey receiverKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
+            PGPPublicKey receiverKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
 
-        messenger = new PGPMessenger( senderKey, receiverKey );
+            messenger = new PGPMessenger( senderKey, receiverKey );
 
-        PEER_KEY_FINGERPRINT = PGPKeyHelper.getFingerprint( securityManager.getKeyManager().getPublicKey( null ) );
+            PEER_KEY_FINGERPRINT = PGPKeyHelper.getFingerprint( securityManager.getKeyManager().getPublicKey( null ) );
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
@@ -170,15 +177,22 @@ class HttpClient
     }
 
 
-    private KeyStore loadKeyStore() throws Exception
+    private KeyStore loadKeyStore() throws HubManagerException
     {
         KeyStoreTool keyStoreTool = new KeyStoreTool();
 
-        return keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS, PEER_KEY_FINGERPRINT );
+        try
+        {
+            return keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS, PEER_KEY_FINGERPRINT );
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
-    private WebClient getWebClient( String path ) throws Exception
+    private WebClient getWebClient( String path ) throws HubManagerException
     {
         WebClient client = WebClient.create( HUB_ADDRESS + path );
 
@@ -204,21 +218,29 @@ class HttpClient
     }
 
 
-    private TLSClientParameters getTLSClientParameters() throws Exception
+    private TLSClientParameters getTLSClientParameters() throws HubManagerException
     {
-        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        try
+        {
+            TLSClientParameters tlsClientParameters = new TLSClientParameters();
 
-        tlsClientParameters.setDisableCNCheck( true );
+            tlsClientParameters.setDisableCNCheck( true );
 
-        tlsClientParameters.setTrustManagers( getTrustManagers() );
+            tlsClientParameters.setTrustManagers( getTrustManagers() );
 
-        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+            KeyManagerFactory keyManagerFactory =
+                    KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
 
-        keyManagerFactory.init( getPeerKeyStore(), SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
+            keyManagerFactory.init( getPeerKeyStore(), SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
 
-        tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
+            tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
 
-        return tlsClientParameters;
+            return tlsClientParameters;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 

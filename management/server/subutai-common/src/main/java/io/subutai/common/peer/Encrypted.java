@@ -1,6 +1,8 @@
 package io.subutai.common.peer;
 
 
+import java.security.GeneralSecurityException;
+
 import javax.crypto.Cipher;
 
 import io.subutai.common.serialize.Serializer;
@@ -15,7 +17,9 @@ public class Encrypted
     private byte[] encrypted;
 
 
-    public Encrypted() {}
+    public Encrypted()
+    {
+    }
 
 
     /**
@@ -37,7 +41,7 @@ public class Encrypted
      *
      * @throws Exception if serialization or encryption failed
      */
-    public Encrypted( Object object, byte[] key ) throws Exception
+    public Encrypted( Object object, byte[] key ) throws GeneralSecurityException
     {
         this.encrypted = encrypt( Serializer.getInstance().serialize( object ), key );
     }
@@ -54,7 +58,7 @@ public class Encrypted
      *
      * @throws Exception if decryption or deserialization failed
      */
-    public <T> T decrypt( byte[] key, Class<T> clazz ) throws Exception
+    public <T> T decrypt( byte[] key, Class<T> clazz ) throws GeneralSecurityException
     {
         byte[] decrypted = this.decrypt( key );
         return Serializer.getInstance().deserialize( decrypted, clazz );
@@ -70,7 +74,7 @@ public class Encrypted
      *
      * @throws Exception if an exception occured
      */
-    public byte[] decrypt( byte[] key ) throws Exception
+    public byte[] decrypt( byte[] key ) throws GeneralSecurityException
     {
         return decrypt( this.encrypted, key );
     }
@@ -86,7 +90,7 @@ public class Encrypted
      *
      * @throws Exception if an exception occurred
      */
-    private byte[] decrypt( byte[] data, byte[] key ) throws Exception
+    private byte[] decrypt( byte[] data, byte[] key ) throws GeneralSecurityException
     {
         return SecurityUtilities.cipher( data, key, Cipher.DECRYPT_MODE );
     }
@@ -102,7 +106,7 @@ public class Encrypted
      *
      * @throws Exception if an exception occurred
      */
-    private byte[] encrypt( byte[] data, byte[] key ) throws Exception
+    private byte[] encrypt( byte[] data, byte[] key ) throws GeneralSecurityException
     {
         return SecurityUtilities.cipher( data, key, Cipher.ENCRYPT_MODE );
     }

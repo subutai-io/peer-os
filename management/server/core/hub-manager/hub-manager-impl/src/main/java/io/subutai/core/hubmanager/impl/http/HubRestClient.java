@@ -18,6 +18,7 @@ import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -46,13 +47,13 @@ public class HubRestClient
     /**
      * Throws exception if result is not successful
      */
-    public <T> T getStrict( String url, Class<T> clazz ) throws Exception
+    public <T> T getStrict( String url, Class<T> clazz ) throws HubManagerException
     {
         RestResult<T> restResult = get( url, clazz );
 
         if ( !restResult.isSuccess() )
         {
-            throw new Exception( restResult.getError() );
+            throw new HubManagerException( restResult.getError() );
         }
 
         return restResult.getEntity();
@@ -69,6 +70,7 @@ public class HubRestClient
     {
         return post( url, body, Object.class );
     }
+
 
     /**
      * Executes POST request without encrypting body and response
@@ -148,7 +150,8 @@ public class HubRestClient
     }
 
 
-    private <T> RestResult<T> handleResponse( Response response, Class<T> clazz, boolean encrypt ) throws IOException, PGPException
+    private <T> RestResult<T> handleResponse( Response response, Class<T> clazz, boolean encrypt )
+            throws IOException, PGPException
     {
         RestResult<T> restResult = new RestResult<>( response.getStatus() );
 

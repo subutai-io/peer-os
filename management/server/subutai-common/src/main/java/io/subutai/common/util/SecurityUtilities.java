@@ -1,6 +1,7 @@
 package io.subutai.common.util;
 
 
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -78,7 +79,7 @@ public class SecurityUtilities
      *
      * @throws Exception if the en/decryption failed
      */
-    public static byte[] cipher( byte[] data, byte[] key, int mode ) throws Exception
+    public static byte[] cipher( byte[] data, byte[] key, int mode ) throws GeneralSecurityException
     {
         // generate secret key specs, provider independent
         SecretKeySpec keySpec = new SecretKeySpec( key, "AES" );

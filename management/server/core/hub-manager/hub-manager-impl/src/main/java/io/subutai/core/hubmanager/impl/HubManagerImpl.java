@@ -40,6 +40,7 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
@@ -304,7 +305,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void sendHeartbeat() throws Exception
+    public void sendHeartbeat() throws HubManagerException
     {
         resourceHostDataProcessor.process( false );
         heartbeatProcessor.sendHeartbeat( true );
@@ -336,7 +337,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void sendResourceHostInfo() throws Exception
+    public void sendResourceHostInfo() throws HubManagerException
     {
         resourceHostDataProcessor.process( true );
     }
@@ -344,7 +345,7 @@ public class HubManagerImpl implements HubManager
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String hupIp, String email, String password, String peerName ) throws Exception
+    public void registerPeer( String hupIp, String email, String password, String peerName ) throws HubManagerException
     {
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
@@ -392,7 +393,7 @@ public class HubManagerImpl implements HubManager
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void unregisterPeer() throws Exception
+    public void unregisterPeer() throws HubManagerException
     {
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, null );
 
@@ -401,7 +402,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public String getHubDns() throws Exception
+    public String getHubDns() throws HubManagerException
     {
         Config config = getConfigDataService().getHubConfig( configManager.getPeerId() );
 
@@ -417,7 +418,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public String getProducts() throws Exception
+    public String getProducts() throws HubManagerException
     {
         try
         {
@@ -443,43 +444,50 @@ public class HubManagerImpl implements HubManager
         }
         catch ( Exception e )
         {
-            throw new Exception( "Could not retrieve product data", e );
+            throw new HubManagerException( "Could not retrieve product data", e );
         }
     }
 
 
     @Override
-    public void installPlugin( String url, String name, String uid ) throws Exception
+    public void installPlugin( String url, String name, String uid ) throws HubManagerException
     {
-        WebClient webClient = RestUtil.createTrustedWebClient( url );
-        File product = webClient.get( File.class );
-        InputStream initialStream = FileUtils.openInputStream( product );
-        File targetFile =
-                new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-        FileUtils.copyInputStreamToFile( initialStream, targetFile );
-        initialStream.close();
-
-        if ( isRegistered() )
+        try
         {
-            ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
-            Set<String> links = new HashSet<>();
-            links.add( productProcessor.getProductProcessUrl( uid ) );
-            PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
-            peerProductDataDto.setProductId( uid );
-            peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
-            peerProductDataDto.setInstallDate( new Date() );
+            WebClient webClient = RestUtil.createTrustedWebClient( url );
+            File product = webClient.get( File.class );
+            InputStream initialStream = FileUtils.openInputStream( product );
+            File targetFile =
+                    new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+            FileUtils.copyInputStreamToFile( initialStream, targetFile );
+            initialStream.close();
 
-            try
+            if ( isRegistered() )
             {
-                productProcessor.updatePeerProductData( peerProductDataDto );
+                ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
+                Set<String> links = new HashSet<>();
+                links.add( productProcessor.getProductProcessUrl( uid ) );
+                PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
+                peerProductDataDto.setProductId( uid );
+                peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
+                peerProductDataDto.setInstallDate( new Date() );
+
+                try
+                {
+                    productProcessor.updatePeerProductData( peerProductDataDto );
+                }
+                catch ( Exception e )
+                {
+                    log.error( "Failed to send plugin install command to Hub: {}", e.getMessage() );
+                }
             }
-            catch ( Exception e )
-            {
-                log.error( "Failed to send plugin install command to Hub: {}", e.getMessage() );
-            }
+
+            log.debug( "Product installed successfully..." );
         }
-
-        log.debug( "Product installed successfully..." );
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
@@ -522,7 +530,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public Map<String, String> getPeerInfo() throws Exception
+    public Map<String, String> getPeerInfo() throws HubManagerException
     {
         Map<String, String> result = new HashMap<>();
         try
@@ -545,7 +553,7 @@ public class HubManagerImpl implements HubManager
         }
         catch ( Exception e )
         {
-            throw new Exception( "Could not retrieve Peer info", e );
+            throw new HubManagerException( "Could not retrieve Peer info", e );
         }
         return result;
     }
