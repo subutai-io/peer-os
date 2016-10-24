@@ -49,16 +49,23 @@ public class ExchangeInfoStateHandler extends StateHandler
     }
 
 
-    public EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto ) throws Exception
+    public EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        UsedNetworkResources usedNetworkResources = ctx.localPeer.getUsedNetworkResources();
+        try
+        {
+            UsedNetworkResources usedNetworkResources = ctx.localPeer.getUsedNetworkResources();
 
-        peerDto.setVnis( usedNetworkResources.getVnis() );
+            peerDto.setVnis( usedNetworkResources.getVnis() );
 
-        peerDto.setContainerSubnets( usedNetworkResources.getContainerSubnets() );
+            peerDto.setContainerSubnets( usedNetworkResources.getContainerSubnets() );
 
-        peerDto.setP2pSubnets( usedNetworkResources.getP2pSubnets() );
+            peerDto.setP2pSubnets( usedNetworkResources.getP2pSubnets() );
 
-        return peerDto;
+            return peerDto;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 }

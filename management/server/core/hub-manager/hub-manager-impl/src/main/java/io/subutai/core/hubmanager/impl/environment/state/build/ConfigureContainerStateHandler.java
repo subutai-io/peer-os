@@ -71,96 +71,99 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
-    public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws Exception
+    public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
+            throws HubManagerException
     {
-        final SshKeys sshKeys = new SshKeys();
-        String[] currentSshKeys = null;
-        Set<String> currentSshKeysSet = new HashSet<>();
-        boolean isSshKeysCleaned = false;
-
-        EnvironmentId envId = new EnvironmentId( envDto.getId() );
-
-        currentSshKeys = getCurrentSshKeys( envDto.getId() );
-        currentSshKeysSet = new HashSet<>( Arrays.asList( currentSshKeys ) );
-
-        Set<String> keys = new HashSet<>();
-        Set<String> allKeys = new HashSet<>();
-        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
-        {
-            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
-            {
-                if ( nodeDto.getSshKeys() != null )
-                {
-                    Set<String> existingKeys = new HashSet<>();
-                    keys.addAll( nodeDto.getSshKeys() );
-                    allKeys.addAll( nodeDto.getSshKeys() );
-                    for ( String sshKey : nodeDto.getSshKeys() )
-                    {
-                        if ( currentSshKeysSet.contains( sshKey ) )
-                        {
-                            existingKeys.add( sshKey );
-                        }
-                    }
-                    keys.removeAll( existingKeys );
-                }
-            }
-        }
-
-        removeKeys( envId, allKeys, currentSshKeys, isSshKeysCleaned );
-
-        if ( keys.isEmpty() )
-        {
-            return peerDto;
-        }
-        sshKeys.addStringKeys( keys );
-
-        Environment environment = null;
         try
         {
-            environment = ctx.envManager.loadEnvironment( envDto.getId() );
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            log.info( e.getMessage() );
-        }
+            final SshKeys sshKeys = new SshKeys();
+            String[] currentSshKeys;
+            Set<String> currentSshKeysSet;
 
-        if ( environment != null && !environment.getPeerId().equals( "hub" ) )
-        {
-            Set<Peer> peers = environment.getPeers();
-            for ( final Peer peer : peers )
+            EnvironmentId envId = new EnvironmentId( envDto.getId() );
+
+            currentSshKeys = getCurrentSshKeys( envDto.getId() );
+            currentSshKeysSet = new HashSet<>( Arrays.asList( currentSshKeys ) );
+
+            Set<String> keys = new HashSet<>();
+            Set<String> allKeys = new HashSet<>();
+            for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
             {
-                if ( peer.isOnline() )
+                for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
                 {
-                    peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+                    if ( nodeDto.getSshKeys() != null )
+                    {
+                        Set<String> existingKeys = new HashSet<>();
+                        keys.addAll( nodeDto.getSshKeys() );
+                        allKeys.addAll( nodeDto.getSshKeys() );
+                        for ( String sshKey : nodeDto.getSshKeys() )
+                        {
+                            if ( currentSshKeysSet.contains( sshKey ) )
+                            {
+                                existingKeys.add( sshKey );
+                            }
+                        }
+                        keys.removeAll( existingKeys );
+                    }
                 }
             }
 
-            for ( SshKey sshKey : sshKeys.getKeys() )
+            removeKeys( envId, allKeys, currentSshKeys );
+
+            if ( keys.isEmpty() )
             {
-                ctx.envManager.addSshKeyToEnvironmentEntity( environment.getId(), sshKey.getPublicKey() );
+                return peerDto;
             }
-        }
-        else
-        {
-            ctx.localPeer.configureSshInEnvironment( envId, sshKeys );
-        }
+            sshKeys.addStringKeys( keys );
 
-        for ( SSHKeyDto sshKeyDto : peerDto.getEnvironmentInfo().getSshKeys() )
-        {
-            sshKeyDto.addConfiguredPeer( ctx.localPeer.getId() );
-        }
+            Environment environment = null;
+            try
+            {
+                environment = ctx.envManager.loadEnvironment( envDto.getId() );
+            }
+            catch ( EnvironmentNotFoundException e )
+            {
+                log.info( e.getMessage() );
+            }
 
-        return peerDto;
+            if ( environment != null && !environment.getPeerId().equals( "hub" ) )
+            {
+                Set<Peer> peers = environment.getPeers();
+                for ( final Peer peer : peers )
+                {
+                    if ( peer.isOnline() )
+                    {
+                        peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+                    }
+                }
+
+                for ( SshKey sshKey : sshKeys.getKeys() )
+                {
+                    ctx.envManager.addSshKeyToEnvironmentEntity( environment.getId(), sshKey.getPublicKey() );
+                }
+            }
+            else
+            {
+                ctx.localPeer.configureSshInEnvironment( envId, sshKeys );
+            }
+
+            for ( SSHKeyDto sshKeyDto : peerDto.getEnvironmentInfo().getSshKeys() )
+            {
+                sshKeyDto.addConfiguredPeer( ctx.localPeer.getId() );
+            }
+
+            return peerDto;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
-    private void removeKeys( EnvironmentId envId, Set<String> sshKeys, String[] currentSshKeys,
-                             boolean isSshKeysCleaned )
+    private void removeKeys( EnvironmentId envId, Set<String> sshKeys, String[] currentSshKeys )
     {
-        if ( isSshKeysCleaned )
-        {
-            return;
-        }
+
 
         try
         {
@@ -214,7 +217,7 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
-    public void configureHosts( EnvironmentDto envDto ) throws Exception
+    public void configureHosts( EnvironmentDto envDto )
     {
         log.info( "Configuring hosts:" );
 

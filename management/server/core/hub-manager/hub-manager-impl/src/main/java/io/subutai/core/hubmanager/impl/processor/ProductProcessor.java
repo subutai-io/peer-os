@@ -22,6 +22,7 @@ import org.apache.http.HttpStatus;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
@@ -150,6 +151,7 @@ public class ProductProcessor implements StateLinkProcessor
                 installingProcess( _peerProductDataDto );
             }
         }
+        InputStream initialStream = null;
         try
         {
 
@@ -159,7 +161,7 @@ public class ProductProcessor implements StateLinkProcessor
                 WebClient webClient = RestUtil.createTrustedWebClient( url );
 
                 File product = webClient.get( File.class );
-                InputStream initialStream = FileUtils.openInputStream( product );
+                initialStream = FileUtils.openInputStream( product );
                 File targetFile = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
                 FileUtils.copyInputStreamToFile( initialStream, targetFile );
             }
@@ -167,6 +169,10 @@ public class ProductProcessor implements StateLinkProcessor
         catch ( Exception e )
         {
             throw new HubManagerException( e );
+        }
+        finally
+        {
+            SafeCloseUtil.close( initialStream );
         }
 
         LOG.debug( "Product installed successfully..." );

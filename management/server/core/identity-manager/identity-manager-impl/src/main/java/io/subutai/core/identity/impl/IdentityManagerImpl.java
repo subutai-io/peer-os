@@ -135,7 +135,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     //*****************************************************
-    private void createDefaultUsers() throws Exception
+    private void createDefaultUsers() throws SystemSecurityException
     {
         if ( identityDataService.getAllUsers().size() < 1 )
         {
@@ -979,14 +979,14 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( acc == null )
             {
-                throw new RuntimeException( "access control context is null" );
+                throw new IllegalStateException( "access control context is null" );
             }
 
             subject = Subject.getSubject( acc );
 
             if ( subject == null )
             {
-                throw new RuntimeException( "subject is null" );
+                throw new IllegalStateException( "subject is null" );
             }
         }
         catch ( Exception ex )
