@@ -389,7 +389,7 @@ func SetContainerUID(c string) {
 	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/opt/", parentuid, newuid, "65536").Run()
 	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/var/", parentuid, newuid, "65536").Run()
 
-	log.Check(log.ErrorLevel, "Setting chmod 600 on lxc home", os.Chmod(config.Agent.LxcPrefix+c, 0600))
+	log.Check(log.ErrorLevel, "Setting chmod 755 on lxc home", os.Chmod(config.Agent.LxcPrefix+c, 0755))
 }
 
 // SetDNS configures the Subutai containers to use internal DNS-server from the Resource Host.
