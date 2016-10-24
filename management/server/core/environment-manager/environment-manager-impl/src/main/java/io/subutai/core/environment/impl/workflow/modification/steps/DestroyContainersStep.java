@@ -3,7 +3,9 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.List;
 
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
@@ -35,7 +37,7 @@ public class DestroyContainersStep
     }
 
 
-    public Environment execute() throws Exception
+    public Environment execute() throws EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         if ( !CollectionUtil.isCollectionEmpty( removedContainers ) )
         {

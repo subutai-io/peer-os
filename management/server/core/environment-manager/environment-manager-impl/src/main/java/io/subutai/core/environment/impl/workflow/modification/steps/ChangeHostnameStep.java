@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
@@ -35,7 +36,7 @@ public class ChangeHostnameStep
     }
 
 
-    public Environment execute() throws Exception
+    public Environment execute() throws EnvironmentModificationException, EnvironmentNotFoundException
     {
 
         renameUtil.addTask( new RenameContainerTask( environment, containerId, newHostname ) );
