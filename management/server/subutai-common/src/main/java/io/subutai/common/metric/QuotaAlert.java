@@ -16,7 +16,7 @@ public class QuotaAlert extends AbstractAlert<QuotaAlertValue> implements Alert
     public QuotaAlert( @JsonProperty( "alert" ) final QuotaAlertValue alertValue,
                        @JsonProperty( "createdTime" ) Long createdTime )
     {
-        super(alertValue.getValue().getHostId(), alertValue);
+        super( alertValue.getValue().getHostId(), alertValue );
         Preconditions.checkNotNull( createdTime );
         Preconditions.checkNotNull( alertValue );
         Preconditions.checkNotNull( alertValue.getValue() );
@@ -34,12 +34,4 @@ public class QuotaAlert extends AbstractAlert<QuotaAlertValue> implements Alert
     {
         return getHostId() + ":" + alert.getValue().getContainerResourceType();
     }
-
-
-//    @JsonIgnore
-//    @Override
-//    public AlertType getType()
-//    {
-//        return AlertType.ENVIRONMENT_ALERT;
-//    }
 }

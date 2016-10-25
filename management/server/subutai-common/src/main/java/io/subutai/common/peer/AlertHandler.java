@@ -30,7 +30,6 @@ public interface AlertHandler<T extends AlertValue>
      */
     String getDescription();
 
-    //    void setAlertValue(AlertValue<T> alertValue);
 
     /**
      * Pre processor implementation. Should be implemented preparation actions before alert processing

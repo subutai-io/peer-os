@@ -99,7 +99,7 @@ class UserDelegateDAO
         {
             daoManager.startTransaction( em );
             em.persist( item );
-            //em.flush();
+
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )

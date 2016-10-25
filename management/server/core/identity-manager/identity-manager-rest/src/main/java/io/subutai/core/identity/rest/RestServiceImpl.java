@@ -52,7 +52,6 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //password = URLDecoder.decode( password, "UTF-8" );
             String token = identityManager.getUserToken( userName, password );
 
             if ( !Strings.isNullOrEmpty( token ) )
@@ -147,7 +146,6 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //password = URLDecoder.decode( password, "UTF-8" );
             User user = identityManager.authenticateByAuthSignature( userName, password );
 
             if ( user != null )

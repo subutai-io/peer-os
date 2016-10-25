@@ -637,7 +637,6 @@ public class PGPEncryptionUtil
 
         // Add a self-signature on the id
         PGPSignatureSubpacketGenerator signhashgen = new PGPSignatureSubpacketGenerator();
-        //        signhashgen.setTrust(false, 0, 3);
 
         // Add signed metadata on the signature.
         // 1) Declare its purpose
@@ -664,15 +663,11 @@ public class PGPEncryptionUtil
         // Add metadata to declare its purpose
         enchashgen.setKeyFlags( false, KeyFlags.ENCRYPT_COMMS | KeyFlags.ENCRYPT_STORAGE );
 
-        //        enchashgen.setTrust(false, 0, 3);
         // Objects used to encrypt the secret key.
         PGPDigestCalculator sha1Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA1 );
-        //        PGPDigestCalculator sha256Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA256 );
 
         // bcpg 1.48 exposes this API that includes s2kcount. Earlier
         // versions use a default of 0x60.
-        //        PBESecretKeyEncryptor pske = ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.AES_256 ) )
-        // .build( pass );
         PBESecretKeyEncryptor pske =
                 ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.CAST5, sha1Calc, s2kcount ) ).build( pass );
         // Finally, create the keyring itself. The constructor
@@ -800,7 +795,6 @@ public class PGPEncryptionUtil
 
             sGen.generateOnePassVersion( false ).encode( bOut );
 
-            //        File file = new File( fileName );
             PGPLiteralDataGenerator lGen = new PGPLiteralDataGenerator();
             OutputStream lOut =
                     lGen.open( bOut, PGPLiteralData.BINARY, "filename", new Date(), new byte[4096] );         //

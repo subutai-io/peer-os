@@ -29,8 +29,6 @@ public abstract class AbstractAlert<T extends AlertValue> implements Alert
 
     abstract public String getId();
 
-//    abstract public AlertType getType();
-
 
     public HostId getHostId()
     {

@@ -282,23 +282,6 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    //    protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
-    //    {
-    //
-    //        Set<HostInterface> hostInterfaces = Sets.newHashSet();
-    //        hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
-    //
-    //        HostInterface hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
-    //
-    //        if ( hostInterface instanceof NullHostInterface )
-    //        {
-    //            throw new IllegalStateException( "Network interface not found" );
-    //        }
-    //
-    //        return hostInterface.getIp();
-    //    }
-
-
     protected ResourceHostInfo getResourceHostInfo( String requestHostId ) throws HostDisconnectedException
     {
         try

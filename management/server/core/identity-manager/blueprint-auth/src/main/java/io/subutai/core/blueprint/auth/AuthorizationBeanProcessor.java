@@ -46,8 +46,6 @@ public class AuthorizationBeanProcessor implements BeanProcessor
 
     public Object afterInit( Object bean, String beanName, BeanCreator beanCreator, BeanMetadata beanData )
     {
-//        BundleContext ctx = FrameworkUtil.getBundle( bean.getClass() ).getBundleContext();
-//        ServiceReference serviceReference = ctx.getServiceReference( beanData.getProperties() );
         return bean;
     }
 

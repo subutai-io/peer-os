@@ -1343,7 +1343,7 @@ public class PeerManagerImpl implements PeerManager
 
                 peerInfo.setPublicUrl( publicUrl.toLowerCase() );
                 peerInfo.setPublicSecurePort( securePort );
-                //                peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
+
                 peerInfo.setManualSetting( manualSetting );
 
                 peerData.setInfo( toJson( peerInfo ) );

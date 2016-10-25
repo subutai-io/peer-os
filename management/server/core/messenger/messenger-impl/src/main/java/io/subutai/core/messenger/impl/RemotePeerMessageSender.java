@@ -24,7 +24,6 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerMessageSender.class.getName() );
 
-    //    private Peer localPeer;
     private Peer targetPeer;
     private Set<Envelope> envelopes;
 
