@@ -131,7 +131,7 @@ public class MessageContentUtil
 
         try
         {
-            if ( data == null || data.length == 0 )
+            if ( ArrayUtils.isEmpty( data ) )
             {
                 return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
@@ -194,7 +194,7 @@ public class MessageContentUtil
             byte[] finalMessage = originalMessage.length > 0 ?
                                   encryptData( securityManager, hostIdSource, hostIdTarget, originalMessage ) : null;
 
-            if ( finalMessage != null )
+            if ( !ArrayUtils.isEmpty( finalMessage ) )
             {
 
                 InputStream replaceInStream = new ByteArrayInputStream( finalMessage );
@@ -227,9 +227,9 @@ public class MessageContentUtil
     {
         try
         {
-            if ( data == null || data.length == 0 )
+            if ( ArrayUtils.isEmpty( data ) )
             {
-                return null;
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
             else
             {

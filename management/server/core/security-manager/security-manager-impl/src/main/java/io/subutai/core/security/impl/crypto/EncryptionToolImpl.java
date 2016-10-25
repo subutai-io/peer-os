@@ -10,6 +10,8 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.exception.ActionFailedException;
@@ -159,7 +161,7 @@ public class EncryptionToolImpl implements EncryptionTool
         }
         catch ( Exception ex )
         {
-            return null;
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
     }
 
