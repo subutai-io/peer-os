@@ -2090,11 +2090,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
 
-        Set<ResourceHost> resourceHosts = getResourceHosts();
+        Set<ResourceHost> resourceHostSet = getResourceHosts();
 
         HostUtil.Tasks hostTasks = new HostUtil.Tasks();
 
-        for ( final ResourceHost resourceHost : resourceHosts )
+        for ( final ResourceHost resourceHost : resourceHostSet )
         {
             hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
         }
@@ -2146,11 +2146,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     String.format( "No reserved network resources found for environment %s", environmentId ) );
         }
 
-        Set<ResourceHost> resourceHosts = getResourceHosts();
+        Set<ResourceHost> resourceHostSet = getResourceHosts();
 
         HostUtil.Tasks tasks = new HostUtil.Tasks();
 
-        for ( final ResourceHost resourceHost : resourceHosts )
+        for ( final ResourceHost resourceHost : resourceHostSet )
         {
             //setup tunnel only if this RH participates in the swarm
             if ( p2pIps.findByRhId( resourceHost.getId() ) != null )
@@ -2181,11 +2181,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
-        Set<ResourceHost> resourceHosts = getResourceHosts();
+        Set<ResourceHost> resourceHostSet = getResourceHosts();
 
         HostUtil.Tasks tasks = new HostUtil.Tasks();
 
-        for ( final ResourceHost resourceHost : resourceHosts )
+        for ( final ResourceHost resourceHost : resourceHostSet )
         {
             tasks.addTask( resourceHost, new ResetP2PSwarmSecretTask( resourceHost, p2PCredentials.getP2pHash(),
                     p2PCredentials.getP2pSecretKey(), p2PCredentials.getP2pTtlSeconds() ) );
@@ -2267,11 +2267,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         final String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
 
-        Set<ResourceHost> resourceHosts = getResourceHosts();
+        Set<ResourceHost> resourceHostSet = getResourceHosts();
 
         HostUtil.Tasks tasks = new HostUtil.Tasks();
 
-        for ( final ResourceHost resourceHost : resourceHosts )
+        for ( final ResourceHost resourceHost : resourceHostSet )
         {
             final RhP2pIp rhP2pIp = config.findByRhId( resourceHost.getId() );
 
@@ -2338,11 +2338,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
         //send cleanup command to RHs
-        Set<ResourceHost> resourceHosts = getResourceHosts();
+        Set<ResourceHost> resourceHostSet = getResourceHosts();
 
         HostUtil.Tasks tasks = new HostUtil.Tasks();
 
-        for ( final ResourceHost resourceHost : resourceHosts )
+        for ( final ResourceHost resourceHost : resourceHostSet )
         {
             tasks.addTask( resourceHost, new CleanupEnvironmentTask( resourceHost, reservedNetworkResource ) );
         }

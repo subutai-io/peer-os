@@ -1019,7 +1019,6 @@ public class PeerManagerImpl implements PeerManager
 
         try
         {
-            RegistrationClient registrationClient = new RegistrationClientImpl( provider );
             PeerData peerData = loadPeerData( request.getPeerInfo().getId() );
 
             try

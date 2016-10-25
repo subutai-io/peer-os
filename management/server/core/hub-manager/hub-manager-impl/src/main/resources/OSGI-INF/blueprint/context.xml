@@ -34,7 +34,7 @@
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
-  <reference id="registrationManager"
+  <reference id="hostRegistrationManager"
              interface="io.subutai.core.registration.api.HostRegistrationManager" />
 
   <reference id="commandExecutor" availability="mandatory"
@@ -52,7 +52,7 @@
     <property name="peerManager" ref="peerManager" />
     <property name="environmentManager" ref="environmentManager" />
     <property name="identityManager" ref="identityManager" />
-    <property name="registrationManager" ref="registrationManager" />
+    <property name="hostRegistrationManager" ref="hostRegistrationManager" />
     <property name="monitor" ref="monitor" />
     <property name="commandExecutor" ref="commandExecutor" />
     <argument ref="daoManagerHub" />
