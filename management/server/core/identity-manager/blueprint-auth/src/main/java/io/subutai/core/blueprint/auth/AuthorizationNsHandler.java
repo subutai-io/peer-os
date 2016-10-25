@@ -38,7 +38,7 @@ import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 public class AuthorizationNsHandler implements NamespaceHandler
 {
 
-    private void parseElement( Element elt, ComponentMetadata cm, ParserContext pc )
+    private void parseElement( Element elt, ParserContext pc )
     {
         ComponentDefinitionRegistry cdr = pc.getComponentDefinitionRegistry();
 
@@ -75,15 +75,17 @@ public class AuthorizationNsHandler implements NamespaceHandler
     {
         if ( node instanceof Element )
         {
-            parseElement( ( Element ) node, cm, pc );
+            parseElement( ( Element ) node, pc );
         }
+
         return cm;
     }
 
 
     public Metadata parse( Element elt, ParserContext pc )
     {
-        parseElement( elt, pc.getEnclosingComponent(), pc );
+        parseElement( elt, pc );
+
         return null;
     }
 

@@ -4,13 +4,10 @@
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.1.0"
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xsi:schemaLocation="http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
-    >
+>
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
-
-  <reference id="environmentManager" availability="mandatory"
-             interface="io.subutai.core.environment.api.EnvironmentManager" />
 
   <reference id="hostRegistry" availability="mandatory"
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
@@ -28,11 +25,11 @@
         scope="singleton" destroy-method="destroy">
     <argument ref="peerManager" />
     <argument ref="daoManagerMetric" />
-    <argument ref="environmentManager" />
     <argument ref="hostRegistry" />
   </bean>
 
   <service ref="monitor" interface="io.subutai.core.metric.api.Monitor" />
+
   <service ref="monitor" interface="io.subutai.core.hostregistry.api.HostListener" />
 
   <reference-list id="alertListener"

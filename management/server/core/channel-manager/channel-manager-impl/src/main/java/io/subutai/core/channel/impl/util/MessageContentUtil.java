@@ -102,7 +102,7 @@ public class MessageContentUtil
             int copied = IOUtils.copyAndCloseInput( is, os );
             os.flush();
 
-            byte[] data = copied > 0 ? decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() ) : null;
+            byte[] data = copied > 0 ? decryptData( securityManager, hostIdSource, os.getBytes() ) : null;
             org.apache.commons.io.IOUtils.closeQuietly( os );
 
             if ( !ArrayUtils.isEmpty( data ) )
@@ -125,8 +125,8 @@ public class MessageContentUtil
     /* ******************************************************
      *
      */
-    protected static byte[] decryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                         byte[] data ) throws PGPException
+    private static byte[] decryptData( SecurityManager securityManager, String hostIdSource, byte[] data )
+            throws PGPException
     {
 
         try
@@ -191,8 +191,8 @@ public class MessageContentUtil
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
             //do something with original message to produce finalMessage
-            byte[] finalMessage = originalMessage.length > 0 ?
-                                  encryptData( securityManager, hostIdSource, hostIdTarget, originalMessage ) : null;
+            byte[] finalMessage =
+                    originalMessage.length > 0 ? encryptData( securityManager, hostIdTarget, originalMessage ) : null;
 
             if ( !ArrayUtils.isEmpty( finalMessage ) )
             {
@@ -222,8 +222,8 @@ public class MessageContentUtil
      */
 
 
-    private static byte[] encryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                       byte[] data ) throws PGPException
+    private static byte[] encryptData( SecurityManager securityManager, String hostIdTarget, byte[] data )
+            throws PGPException
     {
         try
         {

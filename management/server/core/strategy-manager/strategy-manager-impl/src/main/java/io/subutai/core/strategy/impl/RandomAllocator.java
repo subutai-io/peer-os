@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
 
@@ -27,8 +26,7 @@ public class RandomAllocator extends PeerResources
     }
 
 
-    public boolean allocate( final String containerName, final String templateId, final ContainerSize size,
-                             ContainerQuota containerQuota )
+    public boolean allocate( final String containerName, final String templateId, final ContainerSize size )
     {
         final Collection<HostResources> preferredHosts = getPreferredHosts();
 

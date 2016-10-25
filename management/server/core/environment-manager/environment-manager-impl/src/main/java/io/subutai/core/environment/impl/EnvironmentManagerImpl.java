@@ -466,7 +466,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         save( environment );
 
-        createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
+        createEnvironmentKeyPair( environment.getEnvironmentId() );
 
         setTransientFields( Sets.<Environment>newHashSet( environment ) );
 
@@ -1314,8 +1314,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected PGPSecretKeyRing createEnvironmentKeyPair( EnvironmentId envId, String userSecKeyId )
-            throws EnvironmentCreationException
+    PGPSecretKeyRing createEnvironmentKeyPair( EnvironmentId envId ) throws EnvironmentCreationException
     {
         KeyManager keyManager = securityManager.getKeyManager();
         String pairId = envId.getId();

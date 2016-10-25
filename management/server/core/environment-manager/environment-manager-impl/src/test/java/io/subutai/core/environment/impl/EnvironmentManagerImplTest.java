@@ -423,8 +423,7 @@ public class EnvironmentManagerImplTest
     public void testCreateEmptyEnvironment() throws Exception
     {
         PGPSecretKeyRing secretKeyRing = mock( PGPSecretKeyRing.class );
-        doReturn( secretKeyRing ).when( environmentManager ).createEnvironmentKeyPair( any( EnvironmentId.class ),
-                eq( TestHelper.USER_ID.toString() ) );
+        doReturn( secretKeyRing ).when( environmentManager ).createEnvironmentKeyPair( any( EnvironmentId.class ) );
 
         environmentManager.createEmptyEnvironment( topology );
 
@@ -1070,7 +1069,7 @@ public class EnvironmentManagerImplTest
         doReturn( secRing ).when( pgpKeyUtil ).getSecretKeyRing( any( byte[].class ) );
         doReturn( pubRing ).when( pgpKeyUtil ).getPublicKeyRing( any( byte[].class ) );
 
-        environmentManager.createEnvironmentKeyPair( TestHelper.ENVIRONMENT_ID, "" );
+        environmentManager.createEnvironmentKeyPair( TestHelper.ENVIRONMENT_ID );
 
         verify( keyManager ).saveSecretKeyRing( TestHelper.ENV_ID, SecurityKeyType.EnvironmentKey.getId(), secRing );
         verify( keyManager ).savePublicKeyRing( TestHelper.ENV_ID, SecurityKeyType.EnvironmentKey.getId(), pubRing );

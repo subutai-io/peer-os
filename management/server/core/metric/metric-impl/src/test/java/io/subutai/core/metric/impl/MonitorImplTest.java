@@ -121,7 +121,7 @@ public class MonitorImplTest
         public MonitorImplExt( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager,
                                HostRegistry hostRegistry ) throws MonitorException
         {
-            super( peerManager, daoManager, environmentManager, hostRegistry );
+            super( peerManager, daoManager, hostRegistry );
         }
 
 
@@ -223,7 +223,7 @@ public class MonitorImplTest
         Monitor monitor1 = null;
         try
         {
-            monitor1 = new MonitorImpl( peerManager, daoManager, environmentManager, hostRegistry );
+            monitor1 = new MonitorImpl( peerManager, daoManager, hostRegistry );
         }
         catch ( MonitorException e )
         {

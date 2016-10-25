@@ -134,7 +134,7 @@ public class TokenUtil
 
             if ( jwsObject.verify( verifier ) )
             {
-                long date = getDate( token, jwsObject );
+                long date = getDate( jwsObject );
 
                 if ( date == 0 )
                 {
@@ -171,7 +171,7 @@ public class TokenUtil
 
 
     //************************************************
-    public static Payload parseToken( String token, JWSObject jwsObject )
+    public static Payload parseToken( JWSObject jwsObject )
     {
         Payload payload = null;
         try
@@ -204,11 +204,11 @@ public class TokenUtil
 
 
     //************************************************
-    public static long getDate( String token, JWSObject jwsObject )
+    public static long getDate(  JWSObject jwsObject )
     {
         try
         {
-            Payload payload = parseToken( token, jwsObject );
+            Payload payload = parseToken( jwsObject );
             JSONObject obj = payload.toJSONObject();
             return ( long ) obj.get( "exp" );
         }
@@ -220,7 +220,7 @@ public class TokenUtil
 
 
     //************************************************
-    public static String createTokenRSA( PrivateKey privateKey, String headerJson, String claimJson )
+    public static String createTokenRSA( PrivateKey privateKey,  String claimJson )
     {
         try
         {

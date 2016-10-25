@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
@@ -27,20 +24,8 @@ import io.subutai.hub.share.resource.PeerResources;
  */
 public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( UnlimitedPlacementStrategy.class );
 
     private List<NodeSchema> scheme = new ArrayList<>();
-    private static UnlimitedPlacementStrategy instance;
-
-
-    public static UnlimitedPlacementStrategy getInstance()
-    {
-        if ( instance == null )
-        {
-            instance = new UnlimitedPlacementStrategy();
-        }
-        return instance;
-    }
 
 
     @Override
@@ -64,7 +49,7 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     {
         Topology result = new Topology( environmentName );
 
-        Set<Node> ng = distribute( nodeSchema, peerGroupResources, quotas );
+        Set<Node> ng = distribute( nodeSchema, peerGroupResources );
         for ( Node node : ng )
         {
             result.addNodePlacement( node.getPeerId(), node );
@@ -81,8 +66,8 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     }
 
 
-    protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
-                                    Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
+    protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources )
+            throws StrategyException
     {
 
         // build list of allocators
@@ -108,8 +93,8 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             boolean allocated = false;
             for ( RandomAllocator resourceAllocator : preferredAllocators )
             {
-                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize(),
-                        quotas.get( nodeSchema.getSize() ) );
+                allocated =
+                        resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize() );
                 if ( allocated )
                 {
                     break;
