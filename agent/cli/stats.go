@@ -217,8 +217,8 @@ func diskQuotaUsage(path string) int {
 	return diskUsage
 }
 
+// quota returns Json string with container's resource quota information
 func quota(h string) string {
-
 	usage := new(quotaUsage)
 	usage.Container = h
 	usage.CPU = cpuQuotaUsage(h)
@@ -237,8 +237,8 @@ func quota(h string) string {
 	return string(a)
 }
 
+// sysload gathers cpu model information with cpu, ram and disk load and returns it as Json string
 func sysLoad(h string) string {
-
 	result := new(hostStat)
 	result.Host = h
 	result.CPU.Idle = cpuLoad(h)
@@ -257,6 +257,7 @@ func sysLoad(h string) string {
 	return string(a)
 }
 
+// grep searches for "src" regexp key in "filename" and returns value if found
 func grep(str, filename string) string {
 	regex, err := regexp.Compile(str)
 	if err != nil {
@@ -285,6 +286,8 @@ func grep(str, filename string) string {
 	}
 }
 
+// Info command's purposed is to display common system information, such as
+// external IP address to access the container host quotas, its CPU model, RAM size, etc. It's mainly used for internal SS needs.
 func Info(command, host, interval string) {
 	if command == "ipaddr" {
 		fmt.Println(net.GetIp())

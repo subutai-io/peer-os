@@ -17,6 +17,14 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+// The tunnel feature is based on SSH tunnels and works in combination with Subutai Helpers and serves as an easy solution for bypassing NATs.
+// In Subutai, tunnels are used to access the SS management server's web UI from the Hub, and open direct connection to containers, etc.
+// There are two types of channels - local (default), which is created from destination address to host and global (-g flag), from destination to Subutai Helper node.
+// Tunnels may also be set to be permanent (default) or temporary (ttl in seconds). The default destination port is 22.
+// Subutai tunnels have a continuous state checking mechanism which keeps opened tunnels alive and closes outdated tunnels to keep the system network connections clean.
+// This mechanism may re-create a tunnel if it was dropped unintentionally (system reboot, network interruption, etc.), but newly created tunnels will have different "entrance" address.
+
+// TunAdd adds tunnel to specified network socket
 func TunAdd(socket, timeout string, global bool) {
 	if len(socket) == 0 {
 		log.Error("Please specify socket")
@@ -61,6 +69,7 @@ func TunAdd(socket, timeout string, global bool) {
 	log.Error("Cannot get tunnel port")
 }
 
+// TunList performs tunnel check and shows "alive" tunnels
 func TunList() {
 	TunCheck()
 	f := getList()
@@ -75,6 +84,7 @@ func TunList() {
 	log.Check(log.WarnLevel, "Scanning tunnel list", scanner.Err())
 }
 
+// TunDel removes tunnel entry from list and kills running tunnel process
 func TunDel(socket string, pid ...string) {
 	f := getList()
 	defer f.Close()
@@ -97,6 +107,7 @@ func TunDel(socket string, pid ...string) {
 	log.Check(log.WarnLevel, "Scanning tunnel list", scanner.Err())
 }
 
+// TunCheck reads list, checks tunnel ttl, its state and then adds or removes required tunnels
 func TunCheck() {
 	f := getList()
 	defer f.Close()
@@ -125,6 +136,7 @@ func TunCheck() {
 	log.Check(log.WarnLevel, "Scanning tunnel list", scanner.Err())
 }
 
+// getList returns file with tunnels list
 func getList() *os.File {
 	f, err := os.Open(config.Agent.DataPrefix + "var/subutai-network/ssh-tunnels")
 	if os.IsNotExist(err) {
@@ -136,6 +148,7 @@ func getList() *os.File {
 	return f
 }
 
+// getArgs builds command line to execute in system
 func getArgs(global bool, socket string) ([]string, string) {
 	var tunsrv string
 	var args []string
@@ -151,6 +164,7 @@ func getArgs(global bool, socket string) ([]string, string) {
 	return args, tunsrv
 }
 
+// addToList appends new tunnel entry to tunnels list
 func addToList(file, line string) {
 	f, err := os.OpenFile(config.Agent.DataPrefix+"var/subutai-network/"+file, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	log.Check(log.ErrorLevel, "Writing tunnel list", err)
@@ -161,6 +175,7 @@ func addToList(file, line string) {
 	}
 }
 
+// delEntry removes tunnel entry from list in file
 func delEntry(pid string) {
 	f := getList()
 	defer f.Close()
@@ -180,6 +195,7 @@ func delEntry(pid string) {
 		os.Rename(config.Agent.DataPrefix+"var/subutai-network/ssh-tunnels.new", config.Agent.DataPrefix+"var/subutai-network/ssh-tunnels"))
 }
 
+// tunOpen checks tunnel sockets state to define if tunnel is alive
 func tunOpen(remote, local string) bool {
 	if _, err := net.DialTimeout("tcp", local, time.Second*1); err != nil {
 		log.Debug("Local socket connectivity problem")

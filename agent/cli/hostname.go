@@ -12,7 +12,7 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
-// LxcHostname sets the hostname of container
+// LxcHostname command changes container configs to apply a new name for the container. Used for internal SS purposes.
 func LxcHostname(c, name string) {
 	if !container.IsContainer(c) || container.IsTemplate(c) {
 		log.Error(c + " is not an container")

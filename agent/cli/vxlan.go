@@ -9,6 +9,9 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+// VxlanTunnel function controls Subutai VXLAN, which is network layer built on top of P2P swarms and intended to be environment communication bridges between physically separate hosts.
+// Each Subutai environment has its own separate VXLAN tunnel so all internal network traffic goes through isolated channels,
+// doesn't matter if environment located on single peer or distributed between multiple peers.
 func VxlanTunnel(create, del, remoteip, vlan, vni string, list bool) {
 	if len(create) > 0 {
 		tunnelCreate(create, remoteip, vlan, vni)
@@ -21,6 +24,7 @@ func VxlanTunnel(create, del, remoteip, vlan, vni string, list bool) {
 	}
 }
 
+// tunnelCreate creates VXLAN tunnel
 func tunnelCreate(tunnel, addr, vlan, vni string) {
 	log.Check(log.WarnLevel, "Creating bridge ", exec.Command("ovs-vsctl", "--may-exist", "add-br", "gw-"+vlan).Run())
 
@@ -31,6 +35,7 @@ func tunnelCreate(tunnel, addr, vlan, vni string) {
 	log.Check(log.FatalLevel, "MakeVNIMap set port: ", exec.Command("ovs-vsctl", "--if-exists", "set", "port", tunnel, "tag="+vlan).Run())
 }
 
+//tunnelList prints a list of existing VXLAN tunnels
 func tunnelList() {
 	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
 	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)

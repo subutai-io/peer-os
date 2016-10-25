@@ -19,6 +19,10 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+// BackupContainer takes a snapshots of each container's volume and stores it in the /mnt/backups/container_name/datetime/ directory.
+// A full backup creates a delta-file of each BTRFS subvolume. An incremental backup (default) creates a delta-file with the difference of changes between the current and last snapshots.
+// All deltas are compressed to archives in /mnt/backups/ directory (container_datetime.tar.gz or container_datetime_Full.tar.gz for full backup).
+// A changelog file can be found next to backups archive (container_datetime_changelog.txt or container_datetime_Full_changelog.txt) which contains a list of changes made between two backups.
 func BackupContainer(container string, full, stop bool) {
 	const backupDir = "/mnt/backups/"
 	var changelog []string
@@ -123,6 +127,7 @@ func BackupContainer(container string, full, stop bool) {
 	log.Check(log.WarnLevel, "Deleting .backup file to "+container+" container", os.Remove(config.Agent.LxcPrefix+container+"/.backup"))
 }
 
+// GetContainerMountPoints returns array of paths to all containers mountpoints
 func GetContainerMountPoints(container string) []string {
 	var mountPoints []string
 
@@ -150,6 +155,7 @@ func GetContainerMountPoints(container string) []string {
 	return mountPoints
 }
 
+// GetModifiedList generates a list of changed files for backup changelog
 func GetModifiedList(td, ytd, rdir string) []string {
 	var list []string
 
@@ -190,6 +196,7 @@ func GetModifiedList(td, ytd, rdir string) []string {
 	return list
 }
 
+// GetLastSnapshotDir returns a path to latest snapshot directory
 func GetLastSnapshotDir(currentDT, path string) string {
 	lastSnapshot := ""
 

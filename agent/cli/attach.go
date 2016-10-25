@@ -10,7 +10,10 @@ import (
 	"gopkg.in/lxc/go-lxc.v2"
 )
 
-// LxcAttach connects user to the container shell.
+// LxcAttach allows user to use container's TTY.
+// <container name> - should be available running Subutai container,
+// otherwise command will return error message and non-zero exit code.
+// This command is not fully implemented, please use lxc-attach <container name> command instead.
 func LxcAttach(name string, clear, x86, regular bool) {
 	var wg sync.WaitGroup
 

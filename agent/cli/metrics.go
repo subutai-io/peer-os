@@ -40,6 +40,7 @@ func queryInfluxDB(clnt client.Client, cmd string) (res []client.Result, err err
 	return res, nil
 }
 
+// CleanupNetStat drops data from database about network trafic for specified VLAN
 func CleanupNetStat(vlan string) {
 	c, _ := client.NewHTTPClient(client.HTTPConfig{
 		Addr:               "https://" + config.Influxdb.Server + ":8086",
@@ -51,6 +52,15 @@ func CleanupNetStat(vlan string) {
 	queryInfluxDB(c, `drop series from host_net where iface = 'gw-`+vlan+`'`)
 }
 
+// HostMetrics function retrieves monitoring data from a time-series database deployed in the SS Management server
+// for container hosts and Resource Hosts. Statistics are being collected by the Subutai daemon
+// and includes common information like CPU utilization, network load, RAM and disk usage for both containers and hosts.
+// Since the database is located on the SS Management Host, hosts which are not a part of a Subutai peer have no access to this information.
+// Data aggregation in the time-series database has following configuration:
+// - last hour statistic is stored "as is"
+// - last day data aggregates to 1 minute interval
+// - last week is in 5 minute intervals
+// After 7 days all statistics is are overwritten by new incoming data.
 func HostMetrics(host, start, end string) {
 	// Make client
 	c, _ := client.NewHTTPClient(client.HTTPConfig{

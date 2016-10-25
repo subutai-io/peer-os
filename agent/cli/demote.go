@@ -9,6 +9,11 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+// LxcDemote converts template into regular Subutai container.
+// A Subutai template is a "locked down" container only to be used for cloning purposes. It cannot be started, and its file system cannot be modified: it's read-only.
+// Normal operational containers are promoted into templates, but sometimes you might want to demote them back to regular containers.
+// This is what the demote sub command does: it reverts a template without children back into a normal container.
+// Demoted container will use NAT network interface and dynamic IP address if opposite options are not specified.
 func LxcDemote(name, ip, vlan string) {
 	if !container.IsTemplate(name) {
 		log.Error("Container " + name + " is not a template")
@@ -20,6 +25,7 @@ func LxcDemote(name, ip, vlan string) {
 	log.Info(name + " demote succesfully")
 }
 
+// netConf sets default values for container network
 func netConf(name, ip, vlan string) {
 	container.SetContainerConf(name, [][]string{
 		{"lxc.network.ipv4", ip},

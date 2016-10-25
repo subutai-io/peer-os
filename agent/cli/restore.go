@@ -18,6 +18,7 @@ import (
 	"github.com/pivotal-golang/archiver/extractor"
 )
 
+// RestoreContainer restores a Subutai container to a snapshot at a specified timestamp if such a backup archive is available.
 func RestoreContainer(container, date, newContainer string) {
 	const backupDir = "/mnt/backups/"
 
@@ -126,6 +127,7 @@ func RestoreContainer(container, date, newContainer string) {
 
 }
 
+// Position returns index of string from "slice" which contains "value"
 func Position(slice []string, value string) int {
 	for p, v := range slice {
 		if strings.Contains(v, value) {
@@ -135,6 +137,7 @@ func Position(slice []string, value string) int {
 	return -1
 }
 
+// Unpack extract passed archive to directory
 func Unpack(archive, dir string) {
 	tgz := extractor.NewTgz()
 	tgz.Extract(archive, dir)

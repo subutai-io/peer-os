@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-//LxcRename renames the container
+// LxcRename renames a Subutai container impacting filesystem paths, configuration values, etc.
 func LxcRename(src, dst string) {
 	run := false
 	if container.State(src) == "RUNNING" {

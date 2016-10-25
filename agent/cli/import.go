@@ -50,6 +50,8 @@ type metainfo struct {
 	Signs map[string]string `json:"signature"`
 }
 
+// templId retrieves the id of a template on global repository with specified version.
+// If certain version is not set, then latest id will be returned
 func templId(t *templ, kurjun *http.Client, token string) {
 	var meta metainfo
 
@@ -88,6 +90,7 @@ func templId(t *templ, kurjun *http.Client, token string) {
 	t.signature = meta.Signs
 }
 
+// md5sum returns MD5 hash sum of specified file
 func md5sum(filePath string) string {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -102,6 +105,7 @@ func md5sum(filePath string) string {
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
+// checkLocal reads content of local templates folder to check if required archive is present there
 func checkLocal(t *templ) bool {
 	var response string
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
@@ -125,6 +129,7 @@ func checkLocal(t *templ) bool {
 	return false
 }
 
+// download gets template archive from global repository
 func download(t templ, kurjun *http.Client, token string, torrent bool) bool {
 	if len(t.id) == 0 {
 		return false
@@ -193,6 +198,7 @@ func download(t templ, kurjun *http.Client, token string, torrent bool) bool {
 	return false
 }
 
+// idToName retrieves template name from global repository by passed id string
 func idToName(id string, kurjun *http.Client, token string) string {
 	var meta metainfo
 
@@ -212,6 +218,7 @@ func idToName(id string, kurjun *http.Client, token string) string {
 	return meta.Name
 }
 
+// lockSubutai creates lock file for period of import for certain template to prevent conflicts during write operation
 func lockSubutai(file string) bool {
 	lock, err := lockfile.New("/var/run/lock/subutai." + file)
 	if log.Check(log.DebugLevel, "Init lock "+file, err) {
@@ -226,10 +233,23 @@ func lockSubutai(file string) bool {
 	return true
 }
 
+// unlockSubutai removes lock file
 func unlockSubutai() {
 	lock.Unlock()
 }
 
+// LxcImport function deploys a Subutai template on a Resource Host. The import algorithm works with both the global template repository and a local directory
+// to provide more flexibility to enable working with published and custom local templates. Official published templates in the global repository have a overriding scope
+// over custom local artifacts if there's any template naming conflict.
+// If Internet access is lost, or it is not possible to upload custom templates to the repository, the filesystem path /mnt/lib/lxc/tmpdir/ could be used as local repository;
+// the import sub command checks this directory if a requested published template or the global repository is not available.
+// The import binding handles security checks to confirm the authenticity and integrity of templates. Besides using strict SSL connections for downloads,
+// it verifies the fingerprint and its checksum for each template: an MD5 hash sum signed with author's GPG key. Import executes different integrity and authenticity checks of the template
+// transparent to the user to protect system integrity from all possible risks related to template data transfers over the network.
+// The template's version may be specified with the `-v` option. By default import retrieves the latest available template version from repository.
+// The repository supports public, group private (shared), and private files. Import without specifying a security token can only access public templates.
+// `subutai import management` is a special operation which differs from the import of other templates. Besides the usual template deployment operations,
+// "import management" demotes the template, starts its container, transforms the host network, and forwards a few host ports, etc.
 func LxcImport(name, version, token string, torrent bool) {
 	var kurjun *http.Client
 

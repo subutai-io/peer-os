@@ -12,6 +12,7 @@ import (
 	"text/tabwriter"
 )
 
+// printHeader prints list headerline
 func printHeader(w io.Writer, c, t, i, a, p bool) {
 	var header, line string
 	if i {
@@ -39,6 +40,7 @@ func printHeader(w io.Writer, c, t, i, a, p bool) {
 	fmt.Fprintln(w, line)
 }
 
+// printList prints list
 func printList(list []string, c, t, i, a, p bool) {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 1, '\t', 0)
@@ -49,8 +51,7 @@ func printList(list []string, c, t, i, a, p bool) {
 	w.Flush()
 }
 
-// LxcList list the containers
-// defined and active containers in order
+// LxcList function shows a listing of Subutai instances with information such as IP address, parent template, etc.
 func LxcList(name string, c, t, i, a, p bool) {
 	list := []string{}
 	if i {
@@ -85,6 +86,8 @@ func LxcList(name string, c, t, i, a, p bool) {
 	printList(list, c, t, i, a, p)
 
 }
+
+// addParent adds parent to each template in list
 func addParent(list []string) []string {
 	for i := range list {
 		parent := container.GetParent(strings.Fields(list[i])[0])
@@ -93,6 +96,7 @@ func addParent(list []string) []string {
 	return list
 }
 
+// addAncestors adds ancestors to each template in list
 func addAncestors(list []string) []string {
 	for i := range list {
 		child := strings.Fields(list[i])[0]
@@ -110,6 +114,7 @@ func addAncestors(list []string) []string {
 	return list
 }
 
+// info adds container's IP and NIC to list
 func info(name string) (result []string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	log.Check(log.FatalLevel, "Looking for container "+name, err)

@@ -20,6 +20,12 @@ var (
 	confinc  = config.Agent.DataPrefix + "nginx-includes/"
 )
 
+// The reverse proxy component in Subutai provides and easy way to assign domain name and forward HTTP(S) traffic to certain environment.
+// The proxy binding is used to manage Subutai reverse proxies.
+// Each proxy subcommand works with config patterns: adding, removing or checking certain lines, and reloading the proxy daemon if needed, etc.
+// The reverse proxy functionality supports three common load balancing strategies - round-robin, load based and "sticky" sessions.
+// It can also accept SSL certificates in .pem file format and install it for a domain.
+
 // ProxyAdd checks input args and perform required operations to configure reverse proxy
 func ProxyAdd(vlan, domain, node, policy, cert string) {
 	if vlan == "" {

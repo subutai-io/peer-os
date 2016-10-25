@@ -7,6 +7,11 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+// P2P function controls and configures the peer-to-peer network structure:
+// the swarm which includes all hosts with same the same swarm hash and secret key.
+// P2P is a base layer for Subutai environment networking:
+// all containers in same environment are connected to each other via VXLAN tunnels and are accesses as if they were in one LAN.
+// It doesn't matter where the containers are physically located.
 func P2P(create, remove, update, list, peers bool, args []string) {
 	if create {
 		if len(args) > 9 {
@@ -45,6 +50,7 @@ func P2P(create, remove, update, list, peers bool, args []string) {
 	}
 }
 
+// P2Pversion prints version of p2p daemon
 func P2Pversion() {
 	p2p.Version()
 }
