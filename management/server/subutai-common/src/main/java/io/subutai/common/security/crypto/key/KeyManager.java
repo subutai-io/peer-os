@@ -113,7 +113,7 @@ public class KeyManager
      * *************************************************************************
      * **********************************
      */
-    public byte[] generatePrivateKeyPairBytes( KeyPair keyPair )
+    public byte[] generatePrivateKeyPairBytes()
     {
         byte[] privateKeyBytes = null;
 
@@ -134,7 +134,7 @@ public class KeyManager
      * *************************************************************************
      * **********************************
      */
-    public byte[] generatePublicKeyPairBytes( KeyPair keyPair )
+    public byte[] generatePublicKeyPairBytes()
     {
         byte[] publicKeyBytes = null;
 

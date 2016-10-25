@@ -60,7 +60,7 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
 
     protected void findSourceHost( Environment environment, final String sourceHostId ) throws AlertHandlerException
     {
-        EnvironmentContainerHost sourceHost = null;
+        EnvironmentContainerHost aSourceHost = null;
 
         //get environment containers and find alert's source host
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
@@ -69,17 +69,17 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
         {
             if ( containerHost.getId().equalsIgnoreCase( sourceHostId ) )
             {
-                sourceHost = containerHost;
+                aSourceHost = containerHost;
                 break;
             }
         }
 
-        if ( sourceHost == null )
+        if ( aSourceHost == null )
         {
             throw new AlertHandlerException( "Source host not found." );
         }
 
-        this.sourceHost = sourceHost;
+        this.sourceHost = aSourceHost;
     }
 
 

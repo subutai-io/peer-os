@@ -279,8 +279,6 @@ public class KeyStoreTool
 
         certificateData.setCommonName( cn );
 
-        CertificateTool certificateTool = new CertificateTool();
-
         X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
 
         KeyStore keyStore = KeyStore.getInstance( KeyStoreType.JKS.jce() );

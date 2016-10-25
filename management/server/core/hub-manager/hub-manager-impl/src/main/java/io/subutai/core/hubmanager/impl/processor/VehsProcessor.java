@@ -130,9 +130,6 @@ public class VehsProcessor implements StateLinkProcessor
                         case COLLECT_METRIC:
                             collectMetric( environmentDto, vehsDto, peerDto );
                             break;
-                        case DELETE:
-                            deleteHS( environmentDto, vehsDto, peerDto );
-                            break;
                     }
                 }
                 log.info( vehsDto.getProjectName() );
@@ -149,7 +146,7 @@ public class VehsProcessor implements StateLinkProcessor
     {
         Preconditions.checkNotNull( vehsDto );
 
-        List<ContainerHost> containerHosts = getContainers( environmentDto, vehsDto );
+        List<ContainerHost> containerHosts = getContainers( environmentDto );
         for ( ContainerHost containerHost : containerHosts )
         {
             CommandResult commandResult = execute( containerHost, "bash collectMetrics.sh /var/log/nginx/access.log" );
@@ -158,20 +155,14 @@ public class VehsProcessor implements StateLinkProcessor
 
             String verifyDataUrl = String.format( "/rest/v1/vehs/metric/%s", peerDto.getEnvironmentInfo().getId() );
             vehsDto.setData( commandResult.getStdOut() );
-            sendPutRequest( verifyDataUrl, vehsDto, peerDto, VehsDto.VehsState.READY );
+            sendPutRequest( verifyDataUrl, vehsDto, VehsDto.VehsState.READY );
         }
-    }
-
-
-    private void deleteHS( final EnvironmentDto environmentDto, final VehsDto vehsDto, EnvironmentPeerDto peerDto )
-    {
-
     }
 
 
     private void verifyChecksumHS( EnvironmentDto environmentDto, VehsDto vehsDto, EnvironmentPeerDto peerDto )
     {
-        List<ContainerHost> containerHosts = getContainers( environmentDto, vehsDto );
+        List<ContainerHost> containerHosts = getContainers( environmentDto );
 
         for ( ContainerHost containerHost : containerHosts )
         {
@@ -179,14 +170,14 @@ public class VehsProcessor implements StateLinkProcessor
             Preconditions.checkNotNull( commandResult );
             String verifyDataUrl = String.format( "/rest/v1/vehs/verify/%s", peerDto.getEnvironmentInfo().getId() );
             vehsDto.setData( commandResult.getStdOut() );
-            sendPutRequest( verifyDataUrl, vehsDto, peerDto, VehsDto.VehsState.READY );
+            sendPutRequest( verifyDataUrl, vehsDto, VehsDto.VehsState.READY );
         }
     }
 
 
     private void deployHS( EnvironmentDto environmentDto, VehsDto vehsDto, EnvironmentPeerDto peerDto )
     {
-        List<ContainerHost> containerHosts = getContainers( environmentDto, vehsDto );
+        List<ContainerHost> containerHosts = getContainers( environmentDto );
 
         for ( ContainerHost containerHost : containerHosts )
         {
@@ -201,12 +192,11 @@ public class VehsProcessor implements StateLinkProcessor
             log.info( commandResult.getStdOut() );
         }
         String vehsPeerDataUrl = String.format( "/rest/v1/vehs/%s", peerDto.getEnvironmentInfo().getId() );
-        sendPutRequest( vehsPeerDataUrl, vehsDto, peerDto, VehsDto.VehsState.READY );
+        sendPutRequest( vehsPeerDataUrl, vehsDto, VehsDto.VehsState.READY );
     }
 
 
-    private void sendPutRequest( final String url, final VehsDto vehsDto, final EnvironmentPeerDto peerDto,
-                                 final VehsDto.VehsState status )
+    private void sendPutRequest( final String url, final VehsDto vehsDto, final VehsDto.VehsState status )
     {
         try
         {
@@ -230,7 +220,7 @@ public class VehsProcessor implements StateLinkProcessor
     }
 
 
-    private List<ContainerHost> getContainers( EnvironmentDto environmentDto, VehsDto vehsDto )
+    private List<ContainerHost> getContainers( EnvironmentDto environmentDto )
     {
         List<ContainerHost> cs = new ArrayList<>();
         LocalPeer localPeer = peerManager.getLocalPeer();

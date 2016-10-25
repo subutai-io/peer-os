@@ -47,10 +47,11 @@ public class SystemConfProcessor implements StateLinkProcessor
             Matcher systemConfMatcher = SYSTEM_CONF_PATTERN.matcher( link );
             if ( systemConfMatcher.matches() )
             {
-                SystemConfDto systemConfDto = getSystemInfo( link );
+                getSystemInfo( link );
+
                 try
                 {
-                    processSystemConf( systemConfDto );
+                    processSystemConf();
                 }
                 catch ( Exception e )
                 {
@@ -102,7 +103,7 @@ public class SystemConfProcessor implements StateLinkProcessor
     }
 
 
-    private void processSystemConf( final SystemConfDto systemConfDto ) throws HubManagerException
+    private void processSystemConf() throws HubManagerException
     {
         //todo implement
     }

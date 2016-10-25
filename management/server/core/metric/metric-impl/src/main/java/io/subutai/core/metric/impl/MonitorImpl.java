@@ -57,7 +57,6 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
@@ -95,8 +94,8 @@ public class MonitorImpl implements Monitor, HostListener
     protected ObjectMapper mapper = new ObjectMapper();
 
 
-    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager,
-                        HostRegistry hostRegistry ) throws MonitorException
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, HostRegistry hostRegistry )
+            throws MonitorException
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
@@ -434,10 +433,9 @@ public class MonitorImpl implements Monitor, HostListener
 
     private void deliverAlertPackToPeer( final AlertEvent alertEvent )
     {
-        Peer peer = null;
         try
         {
-            peer = peerManager.getPeer( alertEvent.getPeerId() );
+            Peer peer = peerManager.getPeer( alertEvent.getPeerId() );
             new AlertDeliver( peer, alertEvent ).run();
         }
         catch ( PeerException e )

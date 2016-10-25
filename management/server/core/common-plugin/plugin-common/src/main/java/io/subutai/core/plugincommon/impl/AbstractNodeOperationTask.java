@@ -62,8 +62,8 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
 
         if ( containerHost != null )
         {
-            UUID trackID = runTask();
-            waitUntilOperationFinish( trackID );
+            UUID theTrackID = runTask();
+            waitUntilOperationFinish( theTrackID );
         }
     }
 

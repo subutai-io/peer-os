@@ -112,14 +112,14 @@ public class KeyManagerTest
     @Test
     public void testGeneratePrivateKeyPairBytes() throws Exception
     {
-        assertNotNull( keyManager.generatePrivateKeyPairBytes( keyPair ) );
+        assertNotNull( keyManager.generatePrivateKeyPairBytes() );
     }
 
 
     @Test
     public void testGeneratePublicKeyPairBytes() throws Exception
     {
-        assertNotNull( keyManager.generatePublicKeyPairBytes( keyPair ) );
+        assertNotNull( keyManager.generatePublicKeyPairBytes() );
     }
 
 

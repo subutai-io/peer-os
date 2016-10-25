@@ -37,8 +37,8 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.lxc.quota.impl.dao.QuotaDataService;
-import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerResource;
 import io.subutai.hub.share.quota.ContainerResourceFactory;
@@ -198,7 +198,7 @@ public class QuotaManagerImpl implements QuotaManager
                 try
                 {
                     ResourceHost resourceHost = localPeer.getResourceHostByName( resourceHostMetric.getHostName() );
-                    BigDecimal[] usedResources = getUsedResources( resourceHost, peerId );
+                    BigDecimal[] usedResources = getUsedResources();
 
                     BigDecimal cpuLimit = getCpuLimit( policy );
 
@@ -230,9 +230,7 @@ public class QuotaManagerImpl implements QuotaManager
             LOGGER.debug( e.getMessage(), e );
         }
 
-        PeerResources peerResources =
-                new PeerResources( localPeer.getId(), environmentLimit, containerLimit, networkLimit, resources );
-        return peerResources;
+        return new PeerResources( localPeer.getId(), environmentLimit, containerLimit, networkLimit, resources );
     }
 
 
@@ -254,7 +252,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    private BigDecimal[] getUsedResources( final ResourceHost resourceHost, final String peerId ) throws QuotaException
+    private BigDecimal[] getUsedResources() throws QuotaException
     {
         BigDecimal cpuAccumulo = BigDecimal.ZERO;
         BigDecimal ramAccumulo = BigDecimal.ZERO;
@@ -389,7 +387,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    protected CommandResult executeOnContainersResourceHost( ContainerId containerId, RequestBuilder command )
+    private CommandResult executeOnContainersResourceHost( ContainerId containerId, RequestBuilder command )
             throws QuotaException
     {
         try

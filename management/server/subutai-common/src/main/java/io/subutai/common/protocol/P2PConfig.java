@@ -53,11 +53,11 @@ public class P2PConfig
 
     public Set<RhP2pIp> getRhP2pIps()
     {
-        Set<RhP2pIp> rhP2pIps = Sets.newHashSet();
+        Set<RhP2pIp> rhP2pIpsSet = Sets.newHashSet();
 
-        rhP2pIps.addAll( this.rhP2pIps );
+        rhP2pIpsSet.addAll( this.rhP2pIps );
 
-        return rhP2pIps;
+        return rhP2pIpsSet;
     }
 
 

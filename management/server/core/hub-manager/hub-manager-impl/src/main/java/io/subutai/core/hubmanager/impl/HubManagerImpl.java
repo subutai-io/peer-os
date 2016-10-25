@@ -129,7 +129,7 @@ public class HubManagerImpl implements HubManager
 
     private IdentityManager identityManager;
 
-    private HostRegistrationManager registrationManager;
+    private HostRegistrationManager hostRegistrationManager;
 
     private HeartbeatProcessor heartbeatProcessor;
 
@@ -211,12 +211,12 @@ public class HubManagerImpl implements HubManager
 
             tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
-            VersionInfoProcessor versionInfoProcessor = new VersionInfoProcessor( this, peerManager, configManager );
+            versionInfoProcessor = new VersionInfoProcessor( this, peerManager, configManager );
 
             versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
             registrationRequestProcessor =
-                    new RegistrationRequestProcessor( this, peerManager, registrationManager, restClient );
+                    new RegistrationRequestProcessor( this, peerManager, hostRegistrationManager, restClient );
 
             registrationRequestExecutor
                     .scheduleWithFixedDelay( registrationRequestProcessor, 20, 30, TimeUnit.SECONDS );
@@ -270,7 +270,7 @@ public class HubManagerImpl implements HubManager
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
         StateLinkProcessor resourceHostRegisterProcessor =
-                new ResourceHostRegisterProcessor( registrationManager, peerManager, restClient );
+                new ResourceHostRegisterProcessor( hostRegistrationManager, peerManager, restClient );
 
         StateLinkProcessor containerCommandProcessor = new ContainerCommandProcessor( ctx );
 
@@ -634,9 +634,9 @@ public class HubManagerImpl implements HubManager
     }
 
 
-    public void setRegistrationManager( final HostRegistrationManager registrationManager )
+    public void setHostRegistrationManager( final HostRegistrationManager hostRegistrationManager )
     {
-        this.registrationManager = registrationManager;
+        this.hostRegistrationManager = hostRegistrationManager;
     }
 
 

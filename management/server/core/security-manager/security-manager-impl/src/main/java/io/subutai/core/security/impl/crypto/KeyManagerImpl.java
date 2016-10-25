@@ -662,11 +662,11 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            byte[] keyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
+            byte[] aKeyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
 
-            if ( keyData != null )
+            if ( aKeyData != null )
             {
-                return PGPKeyUtil.readPublicKeyRing( keyData );
+                return PGPKeyUtil.readPublicKeyRing( aKeyData );
             }
         }
         catch ( Exception e )
@@ -698,9 +698,9 @@ public class KeyManagerImpl implements KeyManager
                 return "";
             }
             {
-                byte[] keyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
+                byte[] aKeyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
 
-                return PGPEncryptionUtil.armorByteArrayToString( keyData );
+                return PGPEncryptionUtil.armorByteArrayToString( aKeyData );
             }
         }
         catch ( Exception ex )
@@ -737,9 +737,9 @@ public class KeyManagerImpl implements KeyManager
             else
             {
 
-                byte[] keyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
+                byte[] aKeyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
 
-                publicKeyRing = PGPKeyUtil.readPublicKeyRing( keyData );
+                publicKeyRing = PGPKeyUtil.readPublicKeyRing( aKeyData );
 
                 return publicKeyRing;
             }

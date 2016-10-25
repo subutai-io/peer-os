@@ -6,9 +6,6 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.JsonUtil;
@@ -22,7 +19,6 @@ import io.subutai.core.keyserver.api.model.PublicKeyStore;
 public class KeyServerRestImpl implements KeyServerRest
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( KeyServerRestImpl.class.getName() );
 
     // Keyserver service
     private KeyServer keyServer;
@@ -149,24 +145,6 @@ public class KeyServerRestImpl implements KeyServerRest
     /* *******************************
      *
      */
-    public KeyServer getKeyServer()
-    {
-        return keyServer;
-    }
-
-
-    /* *******************************
-     *
-     */
-    public void setKeyServer( KeyServer keyServer )
-    {
-        this.keyServer = keyServer;
-    }
-
-
-    /* *******************************
-     *
-     */
     private Response handleGetOperation( String searchParam )
     {
         if ( searchParam.length() > 2 && "0x".equalsIgnoreCase( searchParam.substring( 0, 2 ) ) )
@@ -212,7 +190,7 @@ public class KeyServerRestImpl implements KeyServerRest
      */
     private Response getKey( String keyId, short searchBy )
     {
-        PublicKeyStore securityKey = null;
+        PublicKeyStore securityKey;
 
         try
         {
@@ -247,14 +225,5 @@ public class KeyServerRestImpl implements KeyServerRest
         {
             return Response.status( Response.Status.NOT_IMPLEMENTED ).entity( "Invalid input parameter" ).build();
         }
-    }
-
-
-    /* *******************************
-     *
-     */
-    private Response handleIndexOperation( String searchParam )
-    {
-        return null;
     }
 }

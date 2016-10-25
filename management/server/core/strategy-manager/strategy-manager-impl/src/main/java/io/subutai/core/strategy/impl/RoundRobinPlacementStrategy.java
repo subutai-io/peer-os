@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Iterators;
 
 import io.subutai.common.environment.Node;
@@ -29,20 +26,8 @@ import io.subutai.hub.share.resource.PeerResources;
  */
 public class RoundRobinPlacementStrategy implements RoundRobinStrategy
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( RoundRobinPlacementStrategy.class );
 
     private List<NodeSchema> scheme = new ArrayList<>();
-    private static RoundRobinPlacementStrategy instance;
-
-
-    public static RoundRobinPlacementStrategy getInstance()
-    {
-        if ( instance == null )
-        {
-            instance = new RoundRobinPlacementStrategy();
-        }
-        return instance;
-    }
 
 
     @Override
@@ -66,7 +51,7 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
     {
         Topology result = new Topology( environmentName );
 
-        Set<Node> ng = distribute( nodeSchema, peerGroupResources, quotas );
+        Set<Node> ng = distribute( nodeSchema, peerGroupResources );
         for ( Node node : ng )
         {
             result.addNodePlacement( node.getPeerId(), node );
@@ -83,8 +68,8 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
     }
 
 
-    protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
-                                    Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
+    protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources )
+            throws StrategyException
     {
         // build list of allocators
         List<RoundRobinAllocator> allocators = new ArrayList<>();
@@ -111,8 +96,8 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             {
 
                 final RoundRobinAllocator resourceAllocator = iterator.next();
-                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize(),
-                        quotas.get( nodeSchema.getSize() ) );
+                allocated =
+                        resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize() );
                 if ( allocated )
                 {
                     break;

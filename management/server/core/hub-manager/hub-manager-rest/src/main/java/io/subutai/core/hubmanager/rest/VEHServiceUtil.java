@@ -126,7 +126,7 @@ public class VEHServiceUtil
                 + "        ]\n" + "    },\n" + "    \"subnet\": null,\n" + "    \"sshKey\": null\n" + "}";
 
 
-        boolean hasSite = hasStaticSite( peerManager, projectName, ownerName, userName, password );
+        boolean hasSite = hasStaticSite( peerManager );
 
         if ( !hasSite )
         {
@@ -218,8 +218,7 @@ public class VEHServiceUtil
     }
 
 
-    private static boolean hasStaticSite( PeerManager peerManager, final String projectName, final String ownerName,
-                                          final String userName, final String password )
+    private static boolean hasStaticSite( PeerManager peerManager )
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
         Set<ContainerHost> containerHosts = resourceHost.getContainerHosts();
