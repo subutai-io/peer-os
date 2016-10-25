@@ -49,7 +49,7 @@ public class WebClientBuilder
                                                 long connectTimeoutMs, long readTimeoutMs, int maxAttempts )
     {
         String effectiveUrl = String.format( PEER_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
-                ( path.startsWith( "/" ) ? path : "/" + path ) );
+                path.startsWith( "/" ) ? path : "/" + path );
         WebClient client;
         if ( provider == null )
         {
@@ -108,7 +108,7 @@ public class WebClientBuilder
                                                        int maxAttempts )
     {
         String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
-                ( path.startsWith( "/" ) ? path : "/" + path ) );
+                path.startsWith( "/" ) ? path : "/" + path );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -150,7 +150,7 @@ public class WebClientBuilder
                                                        final Object provider )
     {
         String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
-                ( path.startsWith( "/" ) ? path : "/" + path ) );
+                path.startsWith( "/" ) ? path : "/" + path );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );

@@ -895,7 +895,7 @@ public class IdentityManagerImpl implements IdentityManager
 
                     if ( obj instanceof SessionEntity )
                     {
-                        session = ( ( Session ) obj );
+                        session = ( Session ) obj;
                         break;
                     }
                 }

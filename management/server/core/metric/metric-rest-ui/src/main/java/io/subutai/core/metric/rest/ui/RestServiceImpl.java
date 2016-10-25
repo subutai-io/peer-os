@@ -47,7 +47,7 @@ public class RestServiceImpl implements RestService
             Calendar calendar = Calendar.getInstance();
             Date current =
                     new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
-            calendar.add( Calendar.HOUR, ( -interval ) );
+            calendar.add( Calendar.HOUR, -interval );
             Date start = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
 
             Host host;

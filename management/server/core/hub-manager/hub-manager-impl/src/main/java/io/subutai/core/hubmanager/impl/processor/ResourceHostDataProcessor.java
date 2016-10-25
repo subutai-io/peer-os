@@ -228,7 +228,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
         {
             sum += list.get( 1 );
         }
-        return ( sum / values.size() );
+        return sum / values.size();
     }
 
 

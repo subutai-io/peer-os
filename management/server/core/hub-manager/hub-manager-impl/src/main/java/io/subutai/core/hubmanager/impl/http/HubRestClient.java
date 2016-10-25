@@ -189,7 +189,7 @@ public class HubRestClient
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        InputStream is = ( ( InputStream ) response.getEntity() );
+        InputStream is = ( InputStream ) response.getEntity();
 
         IOUtils.copy( is, bos );
 
