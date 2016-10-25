@@ -73,7 +73,7 @@ public class AppScaleProcessor implements StateLinkProcessor
 
         Preconditions.checkNotNull( config );
 
-        if ( config.getState() != null && config.getState().equals( "ENABLING_DOMAIN" ) )
+        if ( config.getState() != null && "ENABLING_DOMAIN".equals( config.getState() ) )
         {
             appScaleManager.createTunnel( stateLink, config, configManager );
         }

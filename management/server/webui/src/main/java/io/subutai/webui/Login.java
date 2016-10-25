@@ -146,7 +146,7 @@ public class Login extends HttpServlet
             Cookie[] cookies = request.getCookies();
             for ( final Cookie cookie : cookies )
             {
-                if ( cookie.getName().equals( "sptoken" ) )
+                if ( "sptoken".equals( cookie.getName() ) )
                 {
                     cookie.setValue( "" );
                     cookie.setPath( "/" );

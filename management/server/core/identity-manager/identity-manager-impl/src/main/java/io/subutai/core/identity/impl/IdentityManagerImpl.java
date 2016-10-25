@@ -346,7 +346,7 @@ public class IdentityManagerImpl implements IdentityManager
         User user = null;
 
         //-------------------------------------
-        if ( login.equals( "token" ) )
+        if ( "token".equalsIgnoreCase( login ) )
         {
             sessionId = password;
         }
@@ -646,7 +646,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         User user;
 
-        if ( userName.equalsIgnoreCase( "token" ) )
+        if ( "token".equalsIgnoreCase( userName ) )
         {
             user = authenticateByToken( password );
         }
@@ -1010,7 +1010,7 @@ public class IdentityManagerImpl implements IdentityManager
         try
         {
             //***************Cannot use TOKEN keyword *******
-            if ( userName.equalsIgnoreCase( "token" ) )
+            if ( "token".equalsIgnoreCase( userName ) )
             {
                 throw new IllegalArgumentException( "Cannot use TOKEN keyword." );
             }
@@ -1441,8 +1441,8 @@ public class IdentityManagerImpl implements IdentityManager
             throw new IllegalArgumentException( "User name cannot be shorter than 4 characters." );
         }
 
-        if ( userName.equalsIgnoreCase( "token" ) || userName.equalsIgnoreCase( "administrator" ) || userName
-                .equalsIgnoreCase( "authmessage" ) || userName.equalsIgnoreCase( "system" ) )
+        if ( "token".equalsIgnoreCase( userName ) || "administrator".equalsIgnoreCase( userName ) || "authmessage"
+                .equalsIgnoreCase( userName ) || "system".equalsIgnoreCase( userName ) )
         {
             throw new IllegalArgumentException( "User name is reserved by the system." );
         }
@@ -1458,8 +1458,8 @@ public class IdentityManagerImpl implements IdentityManager
             throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
         }
 
-        if ( password.equalsIgnoreCase( userName ) || password.equalsIgnoreCase( "password" ) || password
-                .equalsIgnoreCase( "system" ) )
+        if ( password.equalsIgnoreCase( userName ) || "password".equalsIgnoreCase( password ) || "system"
+                .equalsIgnoreCase( password ) )
         {
             throw new IllegalArgumentException( "Password doesn't match security measures" );
         }
