@@ -81,12 +81,11 @@ public class VEHServiceUtil
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
         Set<ContainerHost> containerHosts = resourceHost.getContainerHosts();
-        ContainerHost containerHost = null;
-        Iterator<ContainerHost> iterator = containerHosts.iterator();
+        ContainerHost containerHost;
 
-        while ( iterator.hasNext() )
+        for ( final ContainerHost containerHost1 : containerHosts )
         {
-            containerHost = iterator.next();
+            containerHost = containerHost1;
             if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
                 String sptoken = executeRequest(
@@ -188,7 +187,7 @@ public class VEHServiceUtil
         String url = "bash pullMySite.sh %s %s %s \"%s\"";
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
         Set<ContainerHost> containerHosts = resourceHost.getContainerHosts();
-        ContainerHost containerHost = null;
+        ContainerHost containerHost;
         Iterator<ContainerHost> iterator = containerHosts.iterator();
 
         while ( iterator.hasNext() )
@@ -197,13 +196,12 @@ public class VEHServiceUtil
 
             if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
-                CommandResult commandResult = null;
                 try
                 {
                     containerHost.execute(
                             new RequestBuilder( String.format( url, projectName, ownerName, userName, password ) ) );
 
-                    commandResult = containerHost.execute( new RequestBuilder(
+                    CommandResult commandResult = containerHost.execute( new RequestBuilder(
                             "/sbin/ifconfig $1 | grep \"inet addr\" |grep 192 | awk -F: '{print "
                                     + "$2}' | awk '{print $1}'" ) );
 
@@ -225,7 +223,7 @@ public class VEHServiceUtil
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
         Set<ContainerHost> containerHosts = resourceHost.getContainerHosts();
-        ContainerHost containerHost = null;
+        ContainerHost containerHost;
         Iterator<ContainerHost> iterator = containerHosts.iterator();
 
         while ( iterator.hasNext() )
@@ -327,7 +325,7 @@ public class VEHServiceUtil
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
         Set<ContainerHost> containerHosts = resourceHost.getContainerHosts();
-        ContainerHost containerHost = null;
+        ContainerHost containerHost;
         Iterator<ContainerHost> iterator = containerHosts.iterator();
 
         while ( iterator.hasNext() )

@@ -23,6 +23,7 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
 {
     private static final Logger LOG = LoggerFactory.getLogger( RequiredDeserializer.class );
 
+
     @Override
     public T deserialize( final JsonElement jsonElement, final Type type,
                           final JsonDeserializationContext jsonDeserializationContext ) throws JsonParseException
@@ -31,7 +32,7 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
 
         Field[] fields = object.getClass().getDeclaredFields();
 
-        for( Field field : fields )
+        for ( Field field : fields )
         {
             validate( field, object );
         }
@@ -42,43 +43,45 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
 
     private void validate( Field field, T object )
     {
-        if( field.getAnnotation( GsonRequired.class ) != null )
+        if ( field.getAnnotation( GsonRequired.class ) != null )
         {
             try
             {
-                field.setAccessible(true);
+                field.setAccessible( true );
 
                 switch ( field.getAnnotation( GsonRequired.class ).validation() )
                 {
                     case GREATER_THAN_ZERO:
                         try
                         {
-                            if( field.get( object ) == null && Integer.parseInt( ( String ) field.get( object ) ) <= 0 )
+                            if ( field.get( object ) == null
+                                    && Integer.parseInt( ( String ) field.get( object ) ) <= 0 )
                             {
-                                throw new JsonParseException( "Json validation failed expected x > field: " + field.getName() );
+                                throw new JsonParseException(
+                                        "Json validation failed expected x > field: " + field.getName() );
                             }
                         }
                         catch ( Exception e )
                         {
-                            throw new JsonParseException( "Json parse error, expected int for the field: " + field.getName() );
+                            throw new JsonParseException(
+                                    "Json parse error, expected int for the field: " + field.getName() );
                         }
 
                         break;
                     default:
 
-                        if( field.get( object ) == null ||
-                                field.get( object ) instanceof Collection<?> &&
-                                        ( ( Collection ) field.get( object ) ).size() == 0 )
+                        if ( field.get( object ) == null || field.get( object ) instanceof Collection<?>
+                                && ( ( Collection ) field.get( object ) ).size() == 0 )
                         {
                             throw new JsonParseException( "Missing Json field: " + field.getName() );
                         }
-                        if( field.get( object ) instanceof Collection<?> )
+                        if ( field.get( object ) instanceof Collection<?> )
                         {
                             Gson gson = RequiredDeserializer.createValidatingGson();
 
-                            Collection<?> iterable = ( Collection ) field.get( object );
-
-                            gson.fromJson( new Gson().toJson( field.get( object ) ), new TypeToken<Collection<?>>() {}.getType() );
+                            gson.fromJson( new Gson().toJson( field.get( object ) ), new TypeToken<Collection<?>>()
+                            {
+                            }.getType() );
                         }
                 }
             }
@@ -89,10 +92,10 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
         }
     }
 
+
     public static Gson createValidatingGson()
     {
-        return new GsonBuilder()
-                .registerTypeAdapter( Node.class, new RequiredDeserializer<Node>() )
-                .setPrettyPrinting().create();
+        return new GsonBuilder().registerTypeAdapter( Node.class, new RequiredDeserializer<Node>() ).setPrettyPrinting()
+                                .create();
     }
 }

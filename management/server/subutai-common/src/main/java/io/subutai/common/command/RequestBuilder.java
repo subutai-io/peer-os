@@ -278,7 +278,7 @@ public class RequestBuilder
     }
 
 
-    public static class RequestImpl implements Request
+    private static class RequestImpl implements Request
     {
         private RequestType type;
         private String id;
@@ -294,25 +294,13 @@ public class RequestBuilder
         private Integer isDaemon;
 
 
-        public RequestImpl( final RequestType type, final String id, final String workingDirectory,
-                            final String command, final List<String> args, final Map<String, String> environment,
-                            final OutputRedirection stdOut, final OutputRedirection stdErr, final String runAs,
-                            final Integer timeout, final Integer isDaemon )
-        {
-            this( type, id, UUID.randomUUID(), workingDirectory, command, args, environment, stdOut, stdErr, runAs,
-                    timeout, isDaemon );
-        }
-
-
-        public RequestImpl( final RequestType type, final String id, final UUID commandId,
-                            final String workingDirectory, final String command, final List<String> args,
-                            final Map<String, String> environment, final OutputRedirection stdOut,
-                            final OutputRedirection stdErr, final String runAs, final Integer timeout,
-                            final Integer isDaemon )
+        RequestImpl( final RequestType type, final String id, final String workingDirectory, final String command,
+                     final List<String> args, final Map<String, String> environment, final OutputRedirection stdOut,
+                     final OutputRedirection stdErr, final String runAs, final Integer timeout, final Integer isDaemon )
         {
             this.type = type;
             this.id = id;
-            this.commandId = commandId;
+            this.commandId = UUID.randomUUID();
             this.workingDirectory = workingDirectory;
             this.command = command;
             this.args = args;

@@ -78,7 +78,7 @@ public class PluginManagerImpl implements PluginManager
     @Override
     public void setPermissions( final Long pluginId, final String permissionJson )
     {
-        PluginDetails pluginInfo = configDataService.getPluginDetails( pluginId );
+        //todo implement
     }
 
 

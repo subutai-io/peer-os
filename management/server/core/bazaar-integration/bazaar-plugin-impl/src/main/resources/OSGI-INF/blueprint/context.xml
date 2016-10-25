@@ -19,7 +19,7 @@
   </service>
 
   <bean id="bazaarPluginImpl" class="io.subutai.core.bazaar.impl.BazaarImpl"
-        scope="singleton" activation="eager" init-method="init">
+        scope="singleton" activation="eager">
     <argument ref="integration" />
     <argument ref="daoManagerPlugin" />
   </bean>
