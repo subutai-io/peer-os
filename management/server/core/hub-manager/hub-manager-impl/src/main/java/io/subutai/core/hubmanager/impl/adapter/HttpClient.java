@@ -168,7 +168,7 @@ class HttpClient
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
-        InputStream is = ( ( InputStream ) response.getEntity() );
+        InputStream is = ( InputStream ) response.getEntity();
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 

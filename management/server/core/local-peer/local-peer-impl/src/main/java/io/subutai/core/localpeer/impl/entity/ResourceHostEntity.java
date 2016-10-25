@@ -620,7 +620,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         Set<ContainerHost> containerHosts = getContainerHostsByEnvironmentId( environmentId.getId() );
 
-        if ( containerHosts.size() > 0 )
+        if ( !containerHosts.isEmpty() )
         {
             for ( ContainerHost containerHost : containerHosts )
             {

@@ -79,7 +79,7 @@ public class RestServiceImpl implements RestService
                     peerManager.getRegistrationRequests().stream().map( d -> new RegistrationDataDto( d ) )
                                .collect( Collectors.toList() );
 
-            if ( registrationDatas.size() > 0 )
+            if ( !registrationDatas.isEmpty() )
             {
                 ExecutorService taskExecutor = Executors.newFixedThreadPool( registrationDatas.size() );
 

@@ -55,7 +55,7 @@ public class IPUtil
                 long ipLo = ipToLong( InetAddress.getByName( ipStart ) );
                 long ipHi = ipToLong( InetAddress.getByName( ipEnd ) );
                 long ipToTest = ipToLong( InetAddress.getByName( ipToCheck ) );
-                return ( ipToTest >= ipLo && ipToTest <= ipHi );
+                return ipToTest >= ipLo && ipToTest <= ipHi;
             }
         }
         catch ( Exception e )

@@ -10,10 +10,7 @@ import io.subutai.common.host.HostId;
 /**
  * Alert value interface
  */
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "type" )
+@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type" )
 @JsonSubTypes( {
         @JsonSubTypes.Type( value = QuotaAlert.class, name = "QuotaAlert" ),
         @JsonSubTypes.Type( value = StringAlert.class, name = "StringAlert" ),
@@ -26,7 +23,6 @@ public interface Alert
 
     String getId();
 
-    //    AlertType getType();
 
     long getCreatedTime();
 

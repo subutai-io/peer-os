@@ -8,6 +8,8 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.common.util.CollectionUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -70,11 +72,11 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
                         break;
                     default:
 
-                        if ( field.get( object ) == null || field.get( object ) instanceof Collection<?>
-                                && ( ( Collection ) field.get( object ) ).size() == 0 )
+                        if ( CollectionUtils.isEmpty( ( Collection ) field.get( object ) ) )
                         {
                             throw new JsonParseException( "Missing Json field: " + field.getName() );
                         }
+
                         if ( field.get( object ) instanceof Collection<?> )
                         {
                             Gson gson = RequiredDeserializer.createValidatingGson();

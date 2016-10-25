@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.apache.cxf.common.util.CollectionUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.Expose;
@@ -51,6 +53,6 @@ public class ResourceHostMetrics
     @JsonIgnore
     public boolean isEmpty()
     {
-        return resources == null || resources.size() == 0;
+        return CollectionUtils.isEmpty( resources );
     }
 }

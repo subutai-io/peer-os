@@ -243,7 +243,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 // it is ok
                 break;
             case UNREGISTER:
-                if ( isPeerInUse( ( ( String ) peerAction.getData() ) ) )
+                if ( isPeerInUse( ( String ) peerAction.getData() ) )
                 {
                     response = PeerActionResponse.Fail( "Peer in use." );
                 }

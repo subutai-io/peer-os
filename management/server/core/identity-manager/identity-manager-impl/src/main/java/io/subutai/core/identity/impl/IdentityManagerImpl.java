@@ -137,7 +137,7 @@ public class IdentityManagerImpl implements IdentityManager
     //*****************************************************
     private void createDefaultUsers() throws SystemSecurityException
     {
-        if ( identityDataService.getAllUsers().size() < 1 )
+        if ( identityDataService.getAllUsers().isEmpty() )
         {
             PermissionObject permsp[] = PermissionObject.values();
             Role role;
@@ -148,7 +148,6 @@ public class IdentityManagerImpl implements IdentityManager
             User internal =
                     createUser( SYSTEM_USERNAME, "", "System User", "internal@subutai.io", UserType.System.getId(), 3,
                             false, false );
-            //User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1, 3, false, false );
             User admin =
                     createUser( "admin", "secret", "Administrator", "admin@subutai.io", UserType.Regular.getId(), 3,
                             true, true );
@@ -160,7 +159,6 @@ public class IdentityManagerImpl implements IdentityManager
 
             //****Create Roles ******************************************
             role = createRole( "Karaf-Manager", UserType.System.getId() );
-            //assignUserRole( karaf, role );
             assignUserRole( admin, role );
 
             per = createPermission( PermissionObject.KarafServerAdministration.getId(), 1, true, true, true, true );
@@ -895,7 +893,7 @@ public class IdentityManagerImpl implements IdentityManager
 
                     if ( obj instanceof SessionEntity )
                     {
-                        session = ( ( Session ) obj );
+                        session = ( Session ) obj;
                         break;
                     }
                 }

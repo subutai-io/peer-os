@@ -730,8 +730,8 @@ public class KeyManagerImpl implements KeyManager
 
             if ( keyIden == null )
             {
-                //throw new NullPointerException( "***** Error! Key Identity not found." );
                 LOG.warn( "*******  SecurityKey (getPublicKeyRing) not found for identityID:" + identityId );
+
                 return null;
             }
             else

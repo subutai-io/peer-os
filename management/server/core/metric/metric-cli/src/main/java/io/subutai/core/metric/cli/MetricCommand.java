@@ -53,7 +53,7 @@ public class MetricCommand extends SubutaiShellCommandSupport
         //calculate start date (current date - given # of hours)
         Calendar calendar = Calendar.getInstance();
         Date current = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
-        calendar.add( Calendar.HOUR, ( -lastHours ) );
+        calendar.add( Calendar.HOUR, -lastHours );
         Date start = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
 
         HistoricalMetrics metrics = monitor.getMetricsSeries( host, start, current );

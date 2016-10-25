@@ -31,8 +31,8 @@ public class EnvironmentUserHelper
     private final HubRestClient restClient;
 
 
-    public EnvironmentUserHelper( IdentityManager identityManager, ConfigDataService configDataService, EnvironmentManager environmentManager,
-                                  HubRestClient restClient )
+    public EnvironmentUserHelper( IdentityManager identityManager, ConfigDataService configDataService,
+                                  EnvironmentManager environmentManager, HubRestClient restClient )
     {
         this.identityManager = identityManager;
 
@@ -55,9 +55,10 @@ public class EnvironmentUserHelper
             return;
         }
 
-        log.debug( "Deleting environment owner: id={}, name={}, email={}", user.getId(), user.getUserName(), user.getEmail() );
+        log.debug( "Deleting environment owner: id={}, name={}, email={}", user.getId(), user.getUserName(),
+                user.getEmail() );
 
-        boolean hasLocalEnvironments = environmentManager.getEnvironmentsByOwnerId( user.getId() ).size() > 0;
+        boolean hasLocalEnvironments = !environmentManager.getEnvironmentsByOwnerId( user.getId() ).isEmpty();
 
         if ( hasLocalEnvironments )
         {

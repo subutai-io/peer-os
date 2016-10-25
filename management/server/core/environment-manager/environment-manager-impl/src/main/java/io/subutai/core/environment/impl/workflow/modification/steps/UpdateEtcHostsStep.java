@@ -68,11 +68,6 @@ public class UpdateEtcHostsStep
             }
         }
 
-        //        if ( peerResults.hasFailures() )
-        //        {
-        //            throw new EnvironmentModificationException( "Failed to update hosts across all peers" );
-        //        }
-
 
         return environment;
     }

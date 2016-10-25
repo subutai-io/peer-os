@@ -190,8 +190,7 @@ public class RestServiceImpl implements RestService
             }
 
             return Response.serverError().entity(
-                    JsonUtil.toJson( ERROR_KEY, ( e.getMessage() == null ? "Internal error" : e.getMessage() ) ) )
-                           .build();
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
 
         return Response.ok( JsonUtil.toJson( envCreationRef ) ).build();
@@ -274,7 +273,7 @@ public class RestServiceImpl implements RestService
 
 
             Topology topology = null;
-            if ( schema.size() > 0 )
+            if ( !schema.isEmpty() )
             {
                 final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
                 final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
@@ -960,7 +959,7 @@ public class RestServiceImpl implements RestService
                         }
                     } ).collect( Collectors.toSet() );
 
-            if ( set.stream().filter( s -> s.getTemplatesDownloadProgresses().size() > 0 ).count() == 0 )
+            if ( set.stream().filter( s -> !s.getTemplatesDownloadProgresses().isEmpty() ).count() == 0 )
             {
                 return Response.ok().build();
             }

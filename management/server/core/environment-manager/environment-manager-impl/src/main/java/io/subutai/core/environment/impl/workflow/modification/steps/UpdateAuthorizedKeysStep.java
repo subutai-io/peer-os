@@ -68,11 +68,6 @@ public class UpdateAuthorizedKeysStep
             }
         }
 
-        //        if ( peerResults.hasFailures() )
-        //        {
-        //            throw new EnvironmentModificationException( "Failed to update authorized keys across all peers" );
-        //        }
-
 
         return environment;
     }

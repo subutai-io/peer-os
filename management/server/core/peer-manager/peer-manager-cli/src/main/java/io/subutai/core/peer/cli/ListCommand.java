@@ -29,7 +29,7 @@ public class ListCommand extends SubutaiShellCommandSupport
     {
         List<Peer> list = peerManager.getPeers();
         System.out.println( "Found " + list.size() + " registered peer(s)" );
-        if ( list.size() > 0 )
+        if ( !list.isEmpty() )
         {
             System.out.println( "Status\tL/R\tID\tOwner ID\tIP\tPeer name\tPublic URL" );
 
@@ -48,8 +48,8 @@ public class ListCommand extends SubutaiShellCommandSupport
                 {
                     PeerInfo info = peer.getPeerInfo();
                     System.out.println( String.format( "%s\t%s\t%s\t%s\t%s\t%s\t%s", peerStatus,
-                                    peer.isLocal() ? "local" : "remote", peer.getId(), info.getOwnerId(), info.getIp(),
-                                    info.getName(), info.getPublicUrl() ) );
+                            peer.isLocal() ? "local" : "remote", peer.getId(), info.getOwnerId(), info.getIp(),
+                            info.getName(), info.getPublicUrl() ) );
                 }
                 catch ( Exception e )
                 {
