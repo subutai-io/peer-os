@@ -10,7 +10,7 @@ import org.junit.Test;
 import io.subutai.hub.share.pgp.common.PGPTestDataFactory;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class PGPMessengerTest
@@ -55,9 +55,9 @@ public class PGPMessengerTest
     @Test
     public void testNull() throws PGPException
     {
-        assertNull( aliceToBobbyMessenger.produce( null ) );
+        assertTrue( aliceToBobbyMessenger.produce( null ).length == 0 );
 
-        assertNull( aliceToBobbyMessenger.consume( null ) );
+        assertTrue( aliceToBobbyMessenger.consume( null ).length == 0 );
     }
 
 

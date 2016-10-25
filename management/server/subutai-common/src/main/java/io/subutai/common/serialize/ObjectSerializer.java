@@ -12,6 +12,8 @@ import javax.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.ArrayUtils;
+
 
 public class ObjectSerializer implements Serializable
 {
@@ -63,7 +65,7 @@ public class ObjectSerializer implements Serializable
             LOG.warn( e.getMessage() );
         }
 
-        return null;
+        return ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
 

@@ -2,6 +2,7 @@ package io.subutai.core.plugincommon.mock;
 
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -30,14 +31,14 @@ public class TrackerMock implements Tracker
     @Override
     public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit )
     {
-        return null;
+        return Collections.emptyList();
     }
 
 
     @Override
     public List<String> getTrackerOperationSources()
     {
-        return null;
+        return Collections.emptyList();
     }
 
 
@@ -47,18 +48,24 @@ public class TrackerMock implements Tracker
 
     }
 
+
     @Override
-    public void setOperationViewState(String source, UUID operationId, boolean viewed) throws SQLException {
+    public void setOperationViewState( String source, UUID operationId, boolean viewed ) throws SQLException
+    {
 
     }
 
+
     @Override
-    public void setOperationsViewStates(boolean viewed) throws SQLException {
+    public void setOperationsViewStates( boolean viewed ) throws SQLException
+    {
 
     }
 
+
     @Override
-    public List<TrackerOperationView> getNotifications() throws SQLException {
-        return null;
+    public List<TrackerOperationView> getNotifications() throws SQLException
+    {
+        return Collections.emptyList();
     }
 }
