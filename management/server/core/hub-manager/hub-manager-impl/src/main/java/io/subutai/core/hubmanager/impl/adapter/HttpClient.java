@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -164,7 +165,7 @@ class HttpClient
     {
         if ( response.getEntity() == null )
         {
-            return null;
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
         InputStream is = ( ( InputStream ) response.getEntity() );

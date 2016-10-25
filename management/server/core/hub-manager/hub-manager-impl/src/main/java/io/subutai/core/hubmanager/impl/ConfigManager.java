@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
@@ -135,7 +136,7 @@ public class ConfigManager
     {
         if ( response.getEntity() == null )
         {
-            return null;
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

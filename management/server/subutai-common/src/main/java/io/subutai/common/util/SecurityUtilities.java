@@ -14,6 +14,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.ArrayUtils;
+
 
 /**
  * Security utilities
@@ -54,7 +56,8 @@ public class SecurityUtilities
         {
             LOG.warn( e.getMessage() );
         }
-        return null;
+
+        return ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
 
@@ -70,7 +73,8 @@ public class SecurityUtilities
         {
             LOG.warn( e.getMessage() );
         }
-        return null;
+
+        return ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
 

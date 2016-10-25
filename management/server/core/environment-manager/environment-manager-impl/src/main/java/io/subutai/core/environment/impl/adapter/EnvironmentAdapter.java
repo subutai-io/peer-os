@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.EnvironmentPeer;
+import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerHost;
@@ -299,11 +299,5 @@ public class EnvironmentAdapter
     public void addSshKey( String envId, String sshKey )
     {
         hubAdapter.addSshKey( envId, sshKey );
-    }
-
-
-    public HubAdapter getHubAdapter()
-    {
-        return hubAdapter;
     }
 }

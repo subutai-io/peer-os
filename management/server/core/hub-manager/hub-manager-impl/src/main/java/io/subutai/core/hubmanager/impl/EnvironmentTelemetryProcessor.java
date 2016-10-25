@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -71,8 +72,6 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     private void startProccess( String tools )
     {
         Set<String> envs = getEnvIds( format( GET_ENV_URL, configManager.getPeerId() ), configManager );
-
-        Preconditions.checkNotNull( envs );
 
         for ( String envId : envs )
         {
@@ -288,7 +287,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
                 log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", res.getStatus(),
                         res.getStatusInfo().getReasonPhrase() );
 
-                return null;
+                return Collections.emptySet();
             }
 
             byte[] encryptedContent = configManager.readContent( res );
@@ -300,7 +299,8 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
         catch ( Exception e )
         {
             log.error( e.getMessage() );
-            return null;
+
+            return Collections.emptySet();
         }
     }
 

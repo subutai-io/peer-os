@@ -16,6 +16,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -104,7 +105,7 @@ public class MessageContentUtil
             byte[] data = copied > 0 ? decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() ) : null;
             org.apache.commons.io.IOUtils.closeQuietly( os );
 
-            if ( data != null )
+            if ( !ArrayUtils.isEmpty( data ) )
             {
                 LOG.debug( String.format( "Decrypted payload: \"%s\"", new String( data ) ) );
                 message.setContent( InputStream.class, new ByteArrayInputStream( data ) );
@@ -132,7 +133,7 @@ public class MessageContentUtil
         {
             if ( data == null || data.length == 0 )
             {
-                return null;
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
             else
             {

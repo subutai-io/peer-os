@@ -47,7 +47,8 @@ public class DateSerializer extends XmlAdapter<String, Date> implements Serializ
         {
             LOG.warn( e.getMessage() );
         }
-        return null;
+
+        return new byte[0];
     }
 
 

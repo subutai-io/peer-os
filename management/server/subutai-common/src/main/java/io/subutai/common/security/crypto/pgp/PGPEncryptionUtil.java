@@ -82,6 +82,8 @@ import org.bouncycastle.util.io.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import com.google.common.base.Preconditions;
 
 
@@ -1534,7 +1536,7 @@ public class PGPEncryptionUtil
             }
             catch ( GeneralSecurityException gse )
             {
-                return null;
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
         }
     }

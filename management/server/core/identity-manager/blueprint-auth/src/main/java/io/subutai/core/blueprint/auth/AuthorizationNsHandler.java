@@ -20,6 +20,7 @@ package io.subutai.core.blueprint.auth;
 
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
@@ -96,6 +97,6 @@ public class AuthorizationNsHandler implements NamespaceHandler
     @SuppressWarnings( "rawtypes" )
     public Set<Class> getManagedClasses()
     {
-        return null;
+        return Collections.emptySet();
     }
 }
