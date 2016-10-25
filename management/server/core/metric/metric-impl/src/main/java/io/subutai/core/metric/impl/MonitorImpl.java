@@ -588,13 +588,13 @@ public class MonitorImpl implements Monitor, HostListener
 
                         for ( int i = 0; i < entities.length(); i++ )
                         {
-                            if ( entities.getJSONObject( i ).get( "key" ).equals( "P2P" ) )
+                            if ( "P2P".equals( entities.getJSONObject( i ).get( "key" ) ) )
                             {
                                 info.setP2pVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
                                         entities.getJSONObject( i ).getString( "rangeTo" ) );
                             }
 
-                            if ( entities.getJSONObject( i ).get( "key" ).equals( "RESOURCE_HOST" ) )
+                            if ( "RESOURCE_HOST".equals( entities.getJSONObject( i ).get( "key" ) ) )
                             {
                                 info.setRhVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
                                         entities.getJSONObject( i ).getString( "rangeTo" ) );

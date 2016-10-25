@@ -87,7 +87,7 @@ public class VEHServiceUtil
         while ( iterator.hasNext() )
         {
             containerHost = iterator.next();
-            if ( containerHost.getContainerName().equals( "Container_12" ) )
+            if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
                 String sptoken = executeRequest(
                         String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
@@ -195,7 +195,7 @@ public class VEHServiceUtil
         {
             containerHost = iterator.next();
 
-            if ( containerHost.getContainerName().equals( "Container_12" ) )
+            if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
                 CommandResult commandResult = null;
                 try
@@ -231,7 +231,8 @@ public class VEHServiceUtil
         while ( iterator.hasNext() )
         {
             containerHost = iterator.next();
-            if ( containerHost.getContainerName().equals( "Container_12" ) )
+
+            if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
                 return true;
             }
@@ -333,7 +334,7 @@ public class VEHServiceUtil
         {
             containerHost = iterator.next();
 
-            if ( containerHost.getContainerName().equals( "Container_12" ) )
+            if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
                 CommandResult commandResult = null;
                 try

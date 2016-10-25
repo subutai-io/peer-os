@@ -35,7 +35,7 @@ public class SocketUtil
         }
         catch ( IOException e )
         {
-            if ( e.getMessage().equals( "Connection refused" ) )
+            if ( "Connection refused".equals( e.getMessage() ) )
             {
                 reason = "port " + port + " on " + node + " is closed.";
             }

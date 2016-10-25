@@ -88,7 +88,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         log.debug( "Active user: username={}, email={}", user.getUserName(), user.getEmail() );
 
         // For the admin, get peer owner data from Hub
-        if ( user.getUserName().equals( "admin" ) )
+        if ( "admin".equals( user.getUserName() ) )
         {
             return getOwnerId();
         }

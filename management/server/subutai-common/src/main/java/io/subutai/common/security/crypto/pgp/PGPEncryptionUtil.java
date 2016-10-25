@@ -1034,23 +1034,23 @@ public class PGPEncryptionUtil
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int digest;
 
-        if ( digestName.equals( "SHA256" ) )
+        if ( "SHA256".equals( digestName ) )
         {
             digest = PGPUtil.SHA256;
         }
-        else if ( digestName.equals( "SHA384" ) )
+        else if ( "SHA384".equals( digestName ) )
         {
             digest = PGPUtil.SHA384;
         }
-        else if ( digestName.equals( "SHA512" ) )
+        else if ( "SHA512".equals( digestName ) )
         {
             digest = PGPUtil.SHA512;
         }
-        else if ( digestName.equals( "MD5" ) )
+        else if ( "MD5".equals( digestName ) )
         {
             digest = PGPUtil.MD5;
         }
-        else if ( digestName.equals( "RIPEMD160" ) )
+        else if ( "RIPEMD160".equals( digestName ) )
         {
             digest = PGPUtil.RIPEMD160;
         }
@@ -1505,7 +1505,7 @@ public class PGPEncryptionUtil
         @Override
         public AlgorithmIdentifier getAlgorithmIdentifier()
         {
-            if ( signature.getAlgorithm().equals( "SHA256withRSA" ) )
+            if ( "SHA256withRSA".equals( signature.getAlgorithm() ) )
             {
                 return PKCS1_SHA256_WITH_RSA_OID;
             }

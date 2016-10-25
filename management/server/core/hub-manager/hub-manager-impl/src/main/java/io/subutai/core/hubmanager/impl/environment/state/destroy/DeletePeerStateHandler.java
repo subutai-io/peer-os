@@ -32,7 +32,7 @@ public class DeletePeerStateHandler extends StateHandler
 
             log.info( "env: {}", env );
 
-            boolean isHubEnvironment = env == null || env.getPeerId().equals( "hub" );
+            boolean isHubEnvironment = env == null || "hub".equals( env.getPeerId() );
 
             if ( isHubEnvironment )
             {

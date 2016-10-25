@@ -85,7 +85,7 @@ public class UsedHostNetResourcesTask extends HostUtil.Task<Object>
             }
 
             //add WAN subnet to prevent collisions
-            if ( iface.getName().equalsIgnoreCase( "wan" ) )
+            if ( "wan".equalsIgnoreCase( iface.getName() ) )
             {
                 usedNetworkResources.addContainerSubnet( iface.getIp() );
                 usedNetworkResources.addP2pSubnet( iface.getIp() );

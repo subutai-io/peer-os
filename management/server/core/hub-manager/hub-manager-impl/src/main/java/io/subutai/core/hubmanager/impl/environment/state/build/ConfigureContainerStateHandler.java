@@ -126,7 +126,7 @@ public class ConfigureContainerStateHandler extends StateHandler
                 log.info( e.getMessage() );
             }
 
-            if ( environment != null && !environment.getPeerId().equals( "hub" ) )
+            if ( environment != null && !"hub".equals( environment.getPeerId() ) )
             {
                 Set<Peer> peers = environment.getPeers();
                 for ( final Peer peer : peers )

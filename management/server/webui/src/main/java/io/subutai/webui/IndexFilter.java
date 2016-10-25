@@ -39,7 +39,7 @@ public class IndexFilter implements Filter
         {
             String url = ( ( HttpServletRequest ) servletRequest ).getRequestURI();
 
-            if ( url.equals( "" ) || url.equals( "/" ) )
+            if ( "".equals( url ) || "/".equals( url ) )
             {
                 RequestDispatcher view = servletRequest.getRequestDispatcher( "index.html" );
                 HttpServletResponse response = ( HttpServletResponse ) servletResponse;
