@@ -256,7 +256,7 @@ public class PluginDataService
             query.setParameter( "id", key );
 
             List<String> infoList = query.getResultList();
-            if ( infoList.size() > 0 )
+            if ( !infoList.isEmpty() )
             {
                 result = gson.fromJson( infoList.get( 0 ), clazz );
             }
@@ -360,7 +360,7 @@ public class PluginDataService
             }
 
             List<String> infoList = query.getResultList();
-            if ( infoList.size() > 0 )
+            if ( !infoList.isEmpty() )
             {
                 result = infoList.get( 0 );
             }

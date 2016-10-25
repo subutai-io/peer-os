@@ -22,8 +22,7 @@ import io.subutai.core.peer.api.PeerManager;
 public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
-    @Argument( name = "templateName", description = "Template name",
-            index = 0, multiValued = false, required = true )
+    @Argument( name = "templateName", description = "Template name", index = 0, multiValued = false, required = true )
     /**
      * {@value templateName} template to clone for environment hosts
      * {@code required = true}
@@ -31,23 +30,22 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
             String templateName;
 
 
-    @Argument( name = "numberOfContainers", description = "Number of containers",
-            index = 1, multiValued = false, required = true )
+    @Argument( name = "numberOfContainers", description = "Number of containers", index = 1, multiValued = false,
+            required = true )
     /**
      * {@value numberOfContainers }number of container hosts to create in environment
      * {@code required = true}
      */
             int numberOfContainers;
-    @Argument( name = "subnetCidr", description = "Subnet in CIDR notation",
-            index = 2, multiValued = false, required = true )
+    @Argument( name = "subnetCidr", description = "Subnet in CIDR notation", index = 2, multiValued = false, required
+            = true )
     /**
      * {@value subnetCidr } Subnet in CIDR notation
      * {@code required = true}
      */
             String subnetCidr;
 
-    @Argument( name = "async", description = "asynchronous build",
-            index = 3, multiValued = false, required = false )
+    @Argument( name = "async", description = "asynchronous build", index = 3, multiValued = false, required = false )
     /**
      * {@value async} Create environment asynchronously
      * {@code async = false}
@@ -75,7 +73,7 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
         String peerId = peerManager.getLocalPeer().getId();
         final Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
 
-        if ( resourceHosts.size() < 1 )
+        if ( resourceHosts.isEmpty() )
         {
             System.out.println( "There are no resource hosts to build environment" );
             return null;

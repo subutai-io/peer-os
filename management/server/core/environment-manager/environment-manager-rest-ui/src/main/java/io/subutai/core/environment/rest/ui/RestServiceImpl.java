@@ -273,7 +273,7 @@ public class RestServiceImpl implements RestService
 
 
             Topology topology = null;
-            if ( schema.size() > 0 )
+            if ( !schema.isEmpty() )
             {
                 final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
                 final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
@@ -959,7 +959,7 @@ public class RestServiceImpl implements RestService
                         }
                     } ).collect( Collectors.toSet() );
 
-            if ( set.stream().filter( s -> s.getTemplatesDownloadProgresses().size() > 0 ).count() == 0 )
+            if ( set.stream().filter( s -> !s.getTemplatesDownloadProgresses().isEmpty() ).count() == 0 )
             {
                 return Response.ok().build();
             }

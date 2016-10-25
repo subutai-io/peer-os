@@ -179,7 +179,7 @@ class UserDAO
             query.setParameter( "userName", userName );
 
             List<UserEntity> users = query.getResultList();
-            if ( users.size() > 0 )
+            if ( !users.isEmpty() )
             {
                 result = users.iterator().next();
             }
@@ -211,7 +211,7 @@ class UserDAO
             query.setParameter( "keyId", keyId );
 
             List<UserEntity> users = query.getResultList();
-            if ( users.size() > 0 )
+            if ( !users.isEmpty() )
             {
                 result = users.iterator().next();
             }

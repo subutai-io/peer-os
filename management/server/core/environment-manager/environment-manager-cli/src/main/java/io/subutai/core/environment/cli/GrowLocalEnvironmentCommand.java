@@ -27,8 +27,7 @@ import io.subutai.core.peer.api.PeerManager;
 public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
-    @Argument( name = "envId", description = "Environment id",
-            index = 0, multiValued = false, required = true )
+    @Argument( name = "envId", description = "Environment id", index = 0, multiValued = false, required = true )
     /**
      * {@value environmentId} target environment id to grow
      * <p>{@code required = true}</p>
@@ -36,8 +35,7 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
             String environmentId;
 
 
-    @Argument( name = "templateName", description = "Template name",
-            index = 1, multiValued = false, required = true )
+    @Argument( name = "templateName", description = "Template name", index = 1, multiValued = false, required = true )
     /**
      * {@value templateName} template to clone for new environment container host
      * <p>{@code required = true}</p>
@@ -45,8 +43,8 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
             String templateName;
 
 
-    @Argument( name = "numberOfContainers", description = "Number of containers",
-            index = 2, multiValued = false, required = true )
+    @Argument( name = "numberOfContainers", description = "Number of containers", index = 2, multiValued = false,
+            required = true )
     /**
      * {@value numberOfContainers} number of containers to add to environment
      * <p>{@code required = true}</p>
@@ -54,8 +52,7 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
             int numberOfContainers;
 
 
-    @Argument( name = "async", description = "asynchronous build",
-            index = 3, multiValued = false, required = false )
+    @Argument( name = "async", description = "asynchronous build", index = 3, multiValued = false, required = false )
     /**
      * {@value async} grow environment asynchronously
      * <p>{@code required = false}, {@code default = false}</p>
@@ -84,7 +81,7 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         String peerId = peerManager.getLocalPeer().getId();
         final Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
 
-        if ( resourceHosts.size() < 1 )
+        if ( resourceHosts.isEmpty() )
         {
             System.out.println( "There are no resource hosts to build environment" );
             return null;

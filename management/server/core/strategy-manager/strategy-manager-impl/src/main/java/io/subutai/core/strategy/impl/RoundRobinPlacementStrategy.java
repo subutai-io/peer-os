@@ -79,7 +79,7 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             allocators.add( resourceAllocator );
         }
 
-        if ( allocators.size() < 1 )
+        if ( allocators.isEmpty() )
         {
             throw new StrategyException( "There are no resource hosts to place containers." );
         }

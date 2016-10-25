@@ -39,9 +39,9 @@ public class CommandBatch
 
     public void addCommand( Command comm )
     {
-        if ( this.type == Type.STANDARD && commands.size() > 0 )
+        if ( this.type == Type.STANDARD && !commands.isEmpty() )
         {
-            throw new IllegalArgumentException( "Standard command already contain command." );
+            throw new IllegalArgumentException( "Standard command already contains a command" );
         }
 
         commands.add( comm );
@@ -51,9 +51,9 @@ public class CommandBatch
     @Override
     public String toString()
     {
-        if ( commands.size() < 1 )
+        if ( commands.isEmpty() )
         {
-            throw new IllegalStateException( "There is no command in command batch." );
+            throw new IllegalStateException( "There is no command in command batch" );
         }
 
         if ( type == Type.JSON )
@@ -67,7 +67,10 @@ public class CommandBatch
     }
 
 
-    public String asJson() {return JsonUtil.toJson( commands );}
+    public String asJson()
+    {
+        return JsonUtil.toJson( commands );
+    }
 
 
     public String asChain()

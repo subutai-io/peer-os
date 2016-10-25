@@ -137,7 +137,7 @@ public class IdentityManagerImpl implements IdentityManager
     //*****************************************************
     private void createDefaultUsers() throws SystemSecurityException
     {
-        if ( identityDataService.getAllUsers().size() < 1 )
+        if ( identityDataService.getAllUsers().isEmpty() )
         {
             PermissionObject permsp[] = PermissionObject.values();
             Role role;

@@ -30,7 +30,7 @@ public class RandomAllocator extends PeerResources
     {
         final Collection<HostResources> preferredHosts = getPreferredHosts();
 
-        if ( preferredHosts.size() < 1 )
+        if ( preferredHosts.isEmpty() )
         {
             return false;
         }

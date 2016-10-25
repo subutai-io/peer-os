@@ -237,7 +237,7 @@ class UserTokenDAO
 
             if ( result != null )
             {
-                if ( result.size() > 0 )
+                if ( !result.isEmpty() )
                 {
                     tk = result.get( 0 );
                 }
@@ -276,7 +276,7 @@ class UserTokenDAO
 
             if ( result != null )
             {
-                if ( result.size() > 0 )
+                if ( !result.isEmpty() )
                 {
                     tk = result.get( 0 );
                 }

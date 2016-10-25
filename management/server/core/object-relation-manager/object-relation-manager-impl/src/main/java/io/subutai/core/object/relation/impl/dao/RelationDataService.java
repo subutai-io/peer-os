@@ -169,15 +169,12 @@ public class RelationDataService
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "DELETE FROM RelationImpl AS rln"
-                    + " WHERE rln.source.uniqueIdentifier=:id"
-                    + " OR rln.target.uniqueIdentifier=:id"
-                    + " OR rln.trustedObject.uniqueIdentifier=:id" );
+            Query qr = em.createQuery( "DELETE FROM RelationImpl AS rln" + " WHERE rln.source.uniqueIdentifier=:id"
+                    + " OR rln.target.uniqueIdentifier=:id" + " OR rln.trustedObject.uniqueIdentifier=:id" );
             qr.setParameter( "id", link.getUniqueIdentifier() );
             qr.executeUpdate();
 
-            qr = em.createQuery( "DELETE FROM RelationLinkImpl AS link"
-                    + " WHERE link.uniqueIdentifier=:id" );
+            qr = em.createQuery( "DELETE FROM RelationLinkImpl AS link" + " WHERE link.uniqueIdentifier=:id" );
             qr.setParameter( "id", link.getUniqueIdentifier() );
             qr.executeUpdate();
 
@@ -335,12 +332,13 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
-                    + " where ss.source.uniqueIdentifier=:source AND ss.trustedObject.uniqueIdentifier=:trustedObject" );
+                    + " where ss.source.uniqueIdentifier=:source AND ss.trustedObject"
+                    + ".uniqueIdentifier=:trustedObject" );
             qr.setParameter( "source", source.getUniqueIdentifier() );
             qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             List<Relation> list = qr.getResultList();
 
-            if ( list.size() > 0 )
+            if ( !list.isEmpty() )
             {
                 result = list.get( 0 );
             }
@@ -364,8 +362,7 @@ public class RelationDataService
         Relation result = null;
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " WHERE ss.source.uniqueIdentifier=:source"
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " WHERE ss.source.uniqueIdentifier=:source"
                     + " AND ss.target.uniqueIdentifier=:target"
                     + " AND ss.trustedObject.uniqueIdentifier=:trustedObject" );
             qr.setParameter( "source", source.getUniqueIdentifier() );
@@ -373,7 +370,7 @@ public class RelationDataService
             qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             List<Relation> list = qr.getResultList();
 
-            if ( list.size() > 0 )
+            if ( !list.isEmpty() )
             {
                 result = list.get( 0 );
             }
@@ -396,10 +393,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
-                    + " WHERE ss.source.uniqueIdentifier=:source"
-                    + " AND ss.trustedObject.uniqueIdentifier=:trustedObject"
-                    + " ORDER BY ss.relationStatus DESC" );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss" + " WHERE ss.source.uniqueIdentifier=:source"
+                    + " AND ss.trustedObject.uniqueIdentifier=:trustedObject" + " ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "source", source.getUniqueIdentifier() );
             qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             result.addAll( qr.getResultList() );
@@ -422,14 +417,13 @@ public class RelationDataService
         Relation result = null;
         try
         {
-            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
-                    + " WHERE ss.target.uniqueIdentifier=:target"
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss" + " WHERE ss.target.uniqueIdentifier=:target"
                     + " AND ss.trustedObject.uniqueIdentifier=:trustedObject" );
             qr.setParameter( "target", target.getUniqueIdentifier() );
             qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             List<Relation> list = qr.getResultList();
 
-            if ( list.size() > 0 )
+            if ( !list.isEmpty() )
             {
                 result = list.get( 0 );
             }
@@ -452,10 +446,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
-                    + " WHERE ss.target.uniqueIdentifier=:target"
-                    + " AND ss.trustedObject.uniqueIdentifier=:trustedObject"
-                    + " ORDER BY ss.relationStatus DESC" );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss" + " WHERE ss.target.uniqueIdentifier=:target"
+                    + " AND ss.trustedObject.uniqueIdentifier=:trustedObject" + " ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "target", target.getUniqueIdentifier() );
             qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             result.addAll( qr.getResultList() );
@@ -478,14 +470,14 @@ public class RelationDataService
         RelationLink result = null;
         try
         {
-            Query qr = em.createQuery( "SELECT ss FROM RelationLinkImpl AS ss"
-                    + " WHERE ss.uniqueIdentifier=:uniqueIdentifier"
-                    + " AND ss.classPath=:classPath" );
+            Query qr = em.createQuery(
+                    "SELECT ss FROM RelationLinkImpl AS ss" + " WHERE ss.uniqueIdentifier=:uniqueIdentifier"
+                            + " AND ss.classPath=:classPath" );
             qr.setParameter( "uniqueIdentifier", relationLink.getUniqueIdentifier() );
             qr.setParameter( "classPath", relationLink.getClassPath() );
             List<RelationLink> list = qr.getResultList();
 
-            if ( list.size() > 0 )
+            if ( !list.isEmpty() )
             {
                 result = list.get( 0 );
             }
@@ -513,7 +505,7 @@ public class RelationDataService
             qr.setParameter( "uniqueIdentifier", uniqueIdentifier );
             List<RelationLink> list = qr.getResultList();
 
-            if ( list.size() > 0 )
+            if ( !list.isEmpty() )
             {
                 result = list.get( 0 );
             }
@@ -542,7 +534,7 @@ public class RelationDataService
             qr.setParameter( "token", token );
             List<RelationChallengeImpl> list = qr.getResultList();
 
-            if ( list.size() > 0 )
+            if ( !list.isEmpty() )
             {
                 result = list.get( 0 );
             }

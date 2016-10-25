@@ -71,7 +71,7 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
     @Override
     public String getModulesListJson()
     {
-        if ( modules.size() == 0 )
+        if ( modules.isEmpty() )
         {
             return "{}";
         }
