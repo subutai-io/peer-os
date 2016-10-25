@@ -174,11 +174,11 @@ public class PluginDataService
 
         List<T> result = new ArrayList<>();
 
-        boolean isAdmin = true;
+        boolean isAdmin = false;
 
         long userId = getActiveUserId();
 
-        if ( userId == 0 )
+        if ( userId == 2 )
         {
             isAdmin = true;
         }
@@ -229,11 +229,11 @@ public class PluginDataService
         EntityManager em = emf.createEntityManager();
         T result = null;
 
-        boolean isAdmin = true;
+        boolean isAdmin = false;
 
         long userId = getActiveUserId();
 
-        if ( userId == 0 )
+        if ( userId == 2 )
         {
             isAdmin = true;
         }
@@ -283,11 +283,11 @@ public class PluginDataService
         EntityManager em = emf.createEntityManager();
         List<String> result = new ArrayList<>();
 
-        boolean isAdmin = true;
+        boolean isAdmin = false;
 
         long userId = getActiveUserId();
 
-        if ( userId == 0 )
+        if ( userId == 2 )
         {
             isAdmin = true;
         }
@@ -333,11 +333,11 @@ public class PluginDataService
 
         String result = null;
 
-        boolean isAdmin = true;
+        boolean isAdmin = false;
 
         long userId = getActiveUserId();
 
-        if ( userId == 0 )
+        if ( userId == 2 )
         {
             isAdmin = true;
         }
