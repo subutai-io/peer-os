@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 
 public class DateSerializer extends XmlAdapter<String, Date> implements Serializable
 {
@@ -48,7 +50,7 @@ public class DateSerializer extends XmlAdapter<String, Date> implements Serializ
             LOG.warn( e.getMessage() );
         }
 
-        return new byte[0];
+        return ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
 
