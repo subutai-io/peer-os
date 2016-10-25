@@ -63,7 +63,7 @@ func DecryptWrapper(args ...string) string {
 	}
 	command := exec.Command("/bin/bash", "-c", gpg)
 	stdin, err := command.StdinPipe()
-	if log.Check(log.WarnLevel, "Opening Stdin Pipe", err) {
+	if err == nil {
 		_, err = stdin.Write([]byte(args[0]))
 		log.Check(log.DebugLevel, "Writing to stdin of gpg", err)
 		log.Check(log.DebugLevel, "Closing stdin of gpg", stdin.Close())
@@ -83,7 +83,7 @@ func EncryptWrapper(user, recipient string, message []byte, args ...string) stri
 	}
 	command := exec.Command("/bin/bash", "-c", gpg)
 	stdin, err := command.StdinPipe()
-	if err != nil {
+	if err == nil {
 		_, err = stdin.Write(message)
 		log.Check(log.DebugLevel, "Writing to stdin of gpg", err)
 		log.Check(log.DebugLevel, "Closing stdin of gpg", stdin.Close())

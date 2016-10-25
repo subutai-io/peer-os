@@ -55,7 +55,8 @@ var (
 
 func initAgent() {
 	// move .gnupg dir to app home
-	os.Setenv("GNUPGHOME", config.Agent.DataPrefix+".gnupg")
+	err := os.Setenv("GNUPGHOME", config.Agent.DataPrefix+".gnupg")
+	log.Check(log.DebugLevel, "Setting GNUPGHOME environment variable", err)
 
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
@@ -91,7 +92,7 @@ func Start(c *cli.Context) {
 func checkSS() (status bool) {
 	resp, err := client.Get("https://" + config.Management.Host + ":8443/rest/v1/peer/inited")
 	if err == nil {
-		resp.Body.Close()
+		log.Check(log.DebugLevel, "Closing Management server response", resp.Body.Close())
 		if resp.StatusCode == http.StatusOK {
 			return true
 		}
@@ -102,7 +103,6 @@ func checkSS() (status bool) {
 func connectionMonitor() {
 	for {
 		container.StateRestore()
-
 		if !checkSS() {
 			time.Sleep(time.Second * 10)
 			continue
@@ -114,7 +114,7 @@ func connectionMonitor() {
 		} else {
 			resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
 			if err == nil && resp.StatusCode == http.StatusOK {
-				resp.Body.Close()
+				log.Check(log.DebugLevel, "Closing Management server response", resp.Body.Close())
 				log.Debug("Connection monitor check - success")
 			} else {
 				log.Debug("Connection monitor check - failed")
@@ -134,7 +134,12 @@ func heartbeat() bool {
 	if len(lastHeartbeat) > 0 && time.Since(lastHeartbeatTime) < time.Second*5 {
 		return false
 	}
-	hostname, _ = os.Hostname()
+	var err error
+	hostname, err = os.Hostname()
+	if err != nil {
+		return false
+	}
+
 	pool = container.Active(false)
 	beat := Heartbeat{
 		Type:       "HEARTBEAT",
@@ -147,8 +152,8 @@ func heartbeat() bool {
 		Alert:      alert.Current(pool),
 	}
 	res := Response{Beat: beat}
-	jbeat, _ := json.Marshal(&res)
-
+	jbeat, err := json.Marshal(&res)
+	log.Check(log.WarnLevel, "Marshaling heartbeat JSON", err)
 	lastHeartbeatTime = time.Now()
 	if string(jbeat) == string(lastHeartbeat) {
 		return true
@@ -164,7 +169,8 @@ func heartbeat() bool {
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
 	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
 		log.Debug(resp.Status)
-		resp.Body.Close()
+		log.Check(log.DebugLevel, "Closing Management server response", resp.Body.Close())
+
 		if resp.StatusCode == http.StatusAccepted {
 			return true
 		}
@@ -234,7 +240,7 @@ func execute(rsp executer.EncRequest) {
 func response(msg []byte) {
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/response", url.Values{"response": {string(msg)}})
 	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) {
-		resp.Body.Close()
+		log.Check(log.DebugLevel, "Closing Management server response", resp.Body.Close())
 		if resp.StatusCode == http.StatusAccepted {
 			return
 		}
@@ -251,7 +257,6 @@ func command() {
 	if log.Check(log.WarnLevel, "Getting requests", err) {
 		return
 	}
-	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNoContent {
 		return
 	}
@@ -259,10 +264,13 @@ func command() {
 	data, err := ioutil.ReadAll(resp.Body)
 	if !log.Check(log.WarnLevel, "Reading body", err) {
 		log.Check(log.WarnLevel, "Unmarshal payload", json.Unmarshal(data, &rsp))
+
 		for _, request := range rsp {
 			go execute(request)
 		}
 	}
+	log.Check(log.DebugLevel, "Closing Management server response", resp.Body.Close())
+
 }
 
 func ping(rw http.ResponseWriter, request *http.Request) {
