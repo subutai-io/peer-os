@@ -2,7 +2,6 @@ package io.subutai.core.karaf.manager.impl;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -25,6 +24,7 @@ import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.core.karaf.manager.api.KarafManager;
 
@@ -69,6 +69,7 @@ public class KarafManagerImpl implements KarafManager
                 }
                 catch ( Exception e )
                 {
+                    LOG.error( e.getMessage() );
                 }
 
                 printStream.flush();
@@ -128,17 +129,7 @@ public class KarafManagerImpl implements KarafManager
         }
         finally
         {
-            if ( connector != null )
-            {
-                try
-                {
-                    connector.close();
-                }
-                catch ( IOException e )
-                {
-                    //ignore
-                }
-            }
+            SafeCloseUtil.close( connector );
         }
 
         return result;

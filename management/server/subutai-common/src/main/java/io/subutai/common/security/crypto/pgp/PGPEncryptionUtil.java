@@ -234,6 +234,7 @@ public class PGPEncryptionUtil
             for ( int safety = 0; ( safety++ < 1000 ) && !( object instanceof PGPLiteralData );
                   object = pgpFact.nextObject() )
             {
+                //ignore
             }
             return ( PGPLiteralData ) object;
         }

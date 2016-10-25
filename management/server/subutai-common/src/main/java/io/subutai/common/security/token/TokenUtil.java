@@ -38,7 +38,7 @@ public class TokenUtil
 
     private TokenUtil()
     {
-        throw new IllegalAccessError("Utility class");
+        throw new IllegalAccessError( "Utility class" );
     }
 
 
@@ -76,6 +76,7 @@ public class TokenUtil
         }
         catch ( Exception ignore )
         {
+            //ignore
         }
 
         return verifiedSignature;
@@ -179,6 +180,7 @@ public class TokenUtil
         }
         catch ( Exception ignore )
         {
+            //ignore
         }
 
         return payload;

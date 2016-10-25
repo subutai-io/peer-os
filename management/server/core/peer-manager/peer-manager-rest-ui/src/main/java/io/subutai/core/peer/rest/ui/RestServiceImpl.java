@@ -85,8 +85,10 @@ public class RestServiceImpl implements RestService
 
                 CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
 
-                registrationDatas.forEach( d -> {
-                    taskCompletionService.submit( () -> {
+                registrationDatas.forEach( d ->
+                {
+                    taskCompletionService.submit( () ->
+                    {
                         try
                         {
                             if ( d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED )
@@ -115,6 +117,7 @@ public class RestServiceImpl implements RestService
                     }
                     catch ( ExecutionException | InterruptedException e )
                     {
+                        LOGGER.error( e.getMessage() );
                     }
                 }
             }

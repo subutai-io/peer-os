@@ -104,9 +104,6 @@ public class SystemConfProcessor implements StateLinkProcessor
 
     private void processSystemConf( final SystemConfDto systemConfDto ) throws HubManagerException
     {
-        switch ( systemConfDto.getKey() )
-        {
-            //TODO write cases for System types
-        }
+        //todo implement
     }
 }
