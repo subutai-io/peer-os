@@ -15,13 +15,15 @@ import (
 // IsSubvolumeReadonly checks if BTRFS subvolume have "readonly" property.
 // It's used in Subutai to check if LXC container template or not.
 func IsSubvolumeReadonly(path string) bool {
-	out, _ := exec.Command("btrfs", "property", "get", "-ts", path).Output()
+	out, err := exec.Command("btrfs", "property", "get", "-ts", path).Output()
+	log.Check(log.DebugLevel, "Getting BTRFS subvolume readonly property", err)
 	return strings.Contains(string(out), "true")
 }
 
 // IsSubvolume checks if path BTRFS subvolume.
 func IsSubvolume(path string) bool {
-	out, _ := exec.Command("btrfs", "subvolume", "show", path).CombinedOutput()
+	out, err := exec.Command("btrfs", "subvolume", "show", path).CombinedOutput()
+	log.Check(log.DebugLevel, "Checking is path BTRFS subvolume", err)
 	return strings.Contains(string(out), "Subvolume ID")
 }
 
@@ -69,7 +71,8 @@ func qgroupDestroy(path string) {
 // NEED REFACTORING
 func id(path string) string {
 	path = strings.Replace(path, config.Agent.LxcPrefix, "", -1)
-	out, _ := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
+	out, err := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
+	log.Check(log.DebugLevel, "Getting BTRFS subvolume list", err)
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
