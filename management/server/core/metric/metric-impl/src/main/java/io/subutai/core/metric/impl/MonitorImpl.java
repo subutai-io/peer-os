@@ -363,8 +363,9 @@ public class MonitorImpl implements Monitor, HostListener
                 resourceHostMetric.updateMetrics( m );
             }
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
 
         return resourceHostMetric;

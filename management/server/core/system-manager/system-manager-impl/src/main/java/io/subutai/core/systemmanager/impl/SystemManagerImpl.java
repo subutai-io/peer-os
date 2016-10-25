@@ -4,11 +4,6 @@ package io.subutai.core.systemmanager.impl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +16,6 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.identity.api.IdentityManager;
@@ -45,11 +39,6 @@ public class SystemManagerImpl implements SystemManager
     private IdentityManager identityManager;
     private PeerManager peerManager;
 
-    protected Set<SettingsListener> listeners =
-            Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
-
-    protected ExecutorService notifierPool = Executors.newCachedThreadPool();
-
     protected SystemSettings systemSettings;
 
 
@@ -62,54 +51,6 @@ public class SystemManagerImpl implements SystemManager
     protected SystemSettings getSystemSettings()
     {
         return new SystemSettings();
-    }
-
-
-    public void addListener( SettingsListener listener )
-    {
-
-        if ( listener != null )
-        {
-            listeners.add( listener );
-        }
-    }
-
-
-    public void removeListener( SettingsListener listener )
-    {
-        if ( listener != null )
-        {
-            listeners.remove( listener );
-        }
-    }
-
-
-    public void dispose()
-    {
-        notifierPool.shutdown();
-        listeners.clear();
-    }
-
-
-    protected void notifyListeners()
-    {
-        for ( final SettingsListener listener : listeners )
-        {
-            notifierPool.execute( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        listener.settingsChanged();
-                    }
-                    catch ( Exception ignore )
-                    {
-                    }
-                }
-            } );
-        }
     }
 
 

@@ -10,6 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.collect.Maps;
@@ -26,6 +29,8 @@ import io.subutai.core.identity.impl.model.SessionEntity;
  */
 public class SessionManagerImpl implements SessionManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SessionManagerImpl.class.getName() );
+
     //Session Expiration time in mins
     //****************************************
     private static int SESSION_TIMEOUT = 30;
@@ -38,7 +43,7 @@ public class SessionManagerImpl implements SessionManager
 
 
     //*****************************************
-    public SessionManagerImpl(IdentityDataService identityDataService)
+    public SessionManagerImpl( IdentityDataService identityDataService )
     {
         this.identityDataService = identityDataService;
     }
@@ -56,10 +61,11 @@ public class SessionManagerImpl implements SessionManager
                 try
                 {
                     removeInvalidTokens();
-                    invalidateSessions(null);
+                    invalidateSessions( null );
                 }
-                catch(Exception ignore)
+                catch ( Exception e )
                 {
+                    LOG.error( e.getMessage() );
                 }
             }
         }, 5, 5, TimeUnit.MINUTES );
@@ -91,7 +97,7 @@ public class SessionManagerImpl implements SessionManager
                 userSession = new SessionEntity();
                 userSession.setUser( user );
                 userSession.setStatus( 1 );
-                userSession.setStartDate(currentDate );
+                userSession.setStartDate( currentDate );
                 userSession.setEndDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
                 sessionContext.put( sessionId, userSession );
             }
@@ -101,8 +107,9 @@ public class SessionManagerImpl implements SessionManager
             }
         }
 
-        catch ( Exception ex )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
 
         return userSession;
@@ -113,14 +120,18 @@ public class SessionManagerImpl implements SessionManager
      *
      */
     @Override
-    public Session getValidSession( String sessionId)
+    public Session getValidSession( String sessionId )
     {
         Session sc = sessionContext.get( sessionId );
 
         if ( sc != null )
+        {
             return sc;
+        }
         else
+        {
             return null;
+        }
     }
 
 
@@ -143,7 +154,7 @@ public class SessionManagerImpl implements SessionManager
     {
         Session sc = sessionContext.get( sessionId );
 
-        if(sc != null)
+        if ( sc != null )
         {
             extendSessionTime( sc );
         }
@@ -160,8 +171,9 @@ public class SessionManagerImpl implements SessionManager
         {
             sessionContext.remove( sessionId );
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
     }
 
@@ -171,9 +183,9 @@ public class SessionManagerImpl implements SessionManager
      */
     @PermitAll
     @Override
-    public void invalidateSessions(Date currentDate)
+    public void invalidateSessions( Date currentDate )
     {
-        if(currentDate == null)
+        if ( currentDate == null )
         {
             currentDate = new Date( System.currentTimeMillis() );
         }
@@ -218,5 +230,4 @@ public class SessionManagerImpl implements SessionManager
     {
         return sessionContext;
     }
-
 }

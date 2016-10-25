@@ -1028,9 +1028,9 @@ public class KeyManagerImpl implements KeyManager
             saveSecretKeyRing( identityId, type, PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() ) );
             savePublicKeyRing( identityId, type, PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() ) );
         }
-        catch ( Exception ignored )
+        catch ( Exception e )
         {
-
+            LOG.error( e.getMessage() );
         }
     }
 
@@ -1053,9 +1053,9 @@ public class KeyManagerImpl implements KeyManager
                 LOG.info( identityId + " Cannot be removed (possibly ManagementHost):" );
             }
         }
-        catch ( Exception ignored )
+        catch ( Exception e )
         {
-
+            LOG.error( e.getMessage() );
         }
     }
 

@@ -1,6 +1,7 @@
 package io.subutai.common.security.utils;
 
 
+import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -145,6 +146,22 @@ public class SafeCloseUtil
             if ( zipFile != null )
             {
                 zipFile.close();
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.warn( String.format( LOG_FORMAT, "closeable" ) );
+        }
+    }
+
+
+    public static void close( Closeable closeable )
+    {
+        try
+        {
+            if ( closeable != null )
+            {
+                closeable.close();
             }
         }
         catch ( IOException ex )

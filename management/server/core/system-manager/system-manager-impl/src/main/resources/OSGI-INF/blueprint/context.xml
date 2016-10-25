@@ -9,19 +9,12 @@
              interface="io.subutai.core.peer.api.PeerManager" />
 
   <bean id="systemManagerImpl" scope="singleton"
-        class="io.subutai.core.systemmanager.impl.SystemManagerImpl" destroy-method="dispose">
+        class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
     <property name="identityManager" ref="identityManager" />
     <property name="peerManager" ref="peerManager" />
   </bean>
 
   <service ref="systemManagerImpl"
            interface="io.subutai.core.systemmanager.api.SystemManager" />
-
-  <reference-list id="listener"
-                  interface="io.subutai.common.settings.SettingsListener"
-                  availability="optional">
-    <reference-listener ref="systemManagerImpl"
-                        bind-method="addListener" unbind-method="removeListener" />
-  </reference-list>
 
 </blueprint>
