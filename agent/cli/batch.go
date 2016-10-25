@@ -13,6 +13,7 @@ type batchLine struct {
 	Action string   `json:"action"`
 	Args   []string `json:"args"`
 }
+
 type outputLine struct {
 	Output   string `json:"output"`
 	ExitCode string `json:"exitcode"`

@@ -127,8 +127,10 @@ func upgradeRh(hash string) {
 }
 
 // Update operation can be divided into two different types: container updates and Resource Host updates.
+//
 // Container updates simply perform apt-get update and upgrade operations inside target containers without any extra commands.
 // Since SS Management is just another container, the Subutai update command works fine with the management container too.
+//
 // The second type of update, a Resource Host update, checks the Subutai repository and compares available snap packages with those currently installed in the system and,
 // if a newer version is found, it downloads and installs it. Please note, system security policies requires that such commands should be performed by the superuser manually,
 // otherwise an application's attempt to update itself will be blocked.

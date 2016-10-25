@@ -192,6 +192,8 @@ func download(t templ, kurjun *http.Client, token string, torrent bool) bool {
 		log.Check(log.FatalLevel, "Writing response body to file", err)
 	}
 
+	time.Sleep(time.Millisecond * 300) // Added sleep to prevent output collision with progress bar.
+
 	if id := strings.Split(t.id, "."); len(id) > 0 && id[len(id)-1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
 		return true
 	}
@@ -241,13 +243,17 @@ func unlockSubutai() {
 // LxcImport function deploys a Subutai template on a Resource Host. The import algorithm works with both the global template repository and a local directory
 // to provide more flexibility to enable working with published and custom local templates. Official published templates in the global repository have a overriding scope
 // over custom local artifacts if there's any template naming conflict.
-// If Internet access is lost, or it is not possible to upload custom templates to the repository, the filesystem path /mnt/lib/lxc/tmpdir/ could be used as local repository;
+//
+// If Internet access is lost, or it is not possible to upload custom templates to the repository, the filesystem path `/mnt/lib/lxc/tmpdir/` could be used as local repository;
 // the import sub command checks this directory if a requested published template or the global repository is not available.
+//
 // The import binding handles security checks to confirm the authenticity and integrity of templates. Besides using strict SSL connections for downloads,
 // it verifies the fingerprint and its checksum for each template: an MD5 hash sum signed with author's GPG key. Import executes different integrity and authenticity checks of the template
 // transparent to the user to protect system integrity from all possible risks related to template data transfers over the network.
+//
 // The template's version may be specified with the `-v` option. By default import retrieves the latest available template version from repository.
 // The repository supports public, group private (shared), and private files. Import without specifying a security token can only access public templates.
+//
 // `subutai import management` is a special operation which differs from the import of other templates. Besides the usual template deployment operations,
 // "import management" demotes the template, starts its container, transforms the host network, and forwards a few host ports, etc.
 func LxcImport(name, version, token string, torrent bool) {
@@ -353,11 +359,10 @@ func LxcImport(name, version, token string, torrent bool) {
 		}
 		if !downloaded && !download(t, kurjun, token, torrent) {
 			log.Error("Failed to download or verify template " + t.name)
+		} else {
+			log.Info("File integrity verified")
 		}
-		log.Info("File integrity verified")
 	}
-
-	time.Sleep(time.Millisecond * 200) // Added sleep to prevent output collision with progress bar.
 
 	log.Info("Unpacking template " + t.name)
 	log.Debug(config.Agent.LxcPrefix + "tmpdir/ " + t.file + " to " + t.name)

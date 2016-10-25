@@ -19,9 +19,9 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
-// BackupContainer takes a snapshots of each container's volume and stores it in the /mnt/backups/container_name/datetime/ directory.
+// BackupContainer takes a snapshots of each container's volume and stores it in the `/mnt/backups/container_name/datetime/` directory.
 // A full backup creates a delta-file of each BTRFS subvolume. An incremental backup (default) creates a delta-file with the difference of changes between the current and last snapshots.
-// All deltas are compressed to archives in /mnt/backups/ directory (container_datetime.tar.gz or container_datetime_Full.tar.gz for full backup).
+// All deltas are compressed to archives in `/mnt/backups/` directory (container_datetime.tar.gz or container_datetime_Full.tar.gz for full backup).
 // A changelog file can be found next to backups archive (container_datetime_changelog.txt or container_datetime_Full_changelog.txt) which contains a list of changes made between two backups.
 func BackupContainer(container string, full, stop bool) {
 	const backupDir = "/mnt/backups/"
@@ -54,7 +54,7 @@ func BackupContainer(container string, full, stop bool) {
 		fs.SubvolumeCreate(backupDir + container)
 	}
 
-	lastSnapshotDir := GetLastSnapshotDir(currentDT, backupDir+container)
+	lastSnapshotDir := getLastSnapshotDir(currentDT, backupDir+container)
 	log.Debug("last snapshot dir: " + lastSnapshotDir)
 
 	if !full && lastSnapshotDir == "" {
@@ -82,7 +82,7 @@ func BackupContainer(container string, full, stop bool) {
 		}
 	}
 
-	for _, subvol := range GetContainerMountPoints(container) {
+	for _, subvol := range getContainerMountPoints(container) {
 		subvolBase := path.Base(subvol)
 
 		subvolBaseMountpointPath := "/" + subvolBase
@@ -104,7 +104,7 @@ func BackupContainer(container string, full, stop bool) {
 		}
 
 		if lastSnapshotDir != "" {
-			changelog = append(changelog, GetModifiedList(containerSnapshotDir+"/"+subvolBase+"/",
+			changelog = append(changelog, getModifiedList(containerSnapshotDir+"/"+subvolBase+"/",
 				lastSnapshotDir+"/"+subvolBase+"/",
 				subvolBaseMountpointPath+"/")...)
 
@@ -127,8 +127,8 @@ func BackupContainer(container string, full, stop bool) {
 	log.Check(log.WarnLevel, "Deleting .backup file to "+container+" container", os.Remove(config.Agent.LxcPrefix+container+"/.backup"))
 }
 
-// GetContainerMountPoints returns array of paths to all containers mountpoints
-func GetContainerMountPoints(container string) []string {
+// getContainerMountPoints returns array of paths to all containers mountpoints
+func getContainerMountPoints(container string) []string {
 	var mountPoints []string
 
 	configPath := config.Agent.LxcPrefix + container + "/config"
@@ -155,8 +155,8 @@ func GetContainerMountPoints(container string) []string {
 	return mountPoints
 }
 
-// GetModifiedList generates a list of changed files for backup changelog
-func GetModifiedList(td, ytd, rdir string) []string {
+// getModifiedList generates a list of changed files for backup changelog
+func getModifiedList(td, ytd, rdir string) []string {
 	var list []string
 
 	data, err := exec.Command("rsync", "-avun", `--delete`, `--out-format="%i %n %L"`, td, ytd).Output()
@@ -196,8 +196,8 @@ func GetModifiedList(td, ytd, rdir string) []string {
 	return list
 }
 
-// GetLastSnapshotDir returns a path to latest snapshot directory
-func GetLastSnapshotDir(currentDT, path string) string {
+// getLastSnapshotDir returns a path to latest snapshot directory
+func getLastSnapshotDir(currentDT, path string) string {
 	lastSnapshot := ""
 
 	dirs, _ := filepath.Glob(path + "/*")

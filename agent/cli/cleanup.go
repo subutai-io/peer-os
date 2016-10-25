@@ -1,6 +1,8 @@
 package lib
 
 import (
+	"github.com/influxdata/influxdb/client/v2"
+
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/net"
@@ -18,6 +20,18 @@ func Cleanup(vlan string) {
 	}
 	net.DelIface("gw-" + vlan)
 	p2p.RemoveByIface("p2p" + vlan)
-	CleanupNetStat(vlan)
+	cleanupNetStat(vlan)
 	ProxyDel(vlan, "", true)
+}
+
+// cleanupNetStat drops data from database about network trafic for specified VLAN
+func cleanupNetStat(vlan string) {
+	c, _ := client.NewHTTPClient(client.HTTPConfig{
+		Addr:               "https://" + config.Influxdb.Server + ":8086",
+		Username:           config.Influxdb.User,
+		Password:           config.Influxdb.Pass,
+		InsecureSkipVerify: true,
+	})
+	queryInfluxDB(c, `drop series from host_net where iface = 'p2p`+vlan+`'`)
+	queryInfluxDB(c, `drop series from host_net where iface = 'gw-`+vlan+`'`)
 }
