@@ -155,14 +155,20 @@ func Stat(path, index string, raw bool) string {
 // If size argument is set, it sets new quota value.
 func DiskQuota(path string, size ...string) string {
 	parent := id(path)
-	exec.Command("btrfs", "qgroup", "create", "1/"+parent, config.Agent.LxcPrefix+path).Run()
+	if err := exec.Command("btrfs", "qgroup", "create", "1/"+parent, config.Agent.LxcPrefix+path).Run(); err != nil {
+		return err.Error()
+	}
 
 	for _, subvol := range []string{"/rootfs", "/opt", "/var", "/home"} {
 		index := id(path + subvol)
-		exec.Command("btrfs", "qgroup", "assign", "0/"+index, "1/"+parent, config.Agent.LxcPrefix+path).Run()
+		if err := exec.Command("btrfs", "qgroup", "assign", "0/"+index, "1/"+parent, config.Agent.LxcPrefix+path).Run(); err != nil {
+			return err.Error()
+		}
 	}
 	if size != nil {
-		exec.Command("btrfs", "qgroup", "limit", size[0]+"G", "1/"+parent, config.Agent.LxcPrefix+path).Run()
+		if err := exec.Command("btrfs", "qgroup", "limit", size[0]+"G", "1/"+parent, config.Agent.LxcPrefix+path).Run(); err != nil {
+			return err.Error()
+		}
 	}
 	return Stat(path, "quota", false)
 }
@@ -171,7 +177,9 @@ func DiskQuota(path string, size ...string) string {
 // If size argument is set, it sets new quota value.
 func Quota(path string, size ...string) string {
 	if size != nil {
-		exec.Command("btrfs", "qgroup", "limit", size[0]+"G", config.Agent.LxcPrefix+path).Run()
+		if err := exec.Command("btrfs", "qgroup", "limit", size[0]+"G", config.Agent.LxcPrefix+path).Run(); err != nil {
+			return err.Error()
+		}
 	}
 	return Stat(path, "quota", false)
 }
