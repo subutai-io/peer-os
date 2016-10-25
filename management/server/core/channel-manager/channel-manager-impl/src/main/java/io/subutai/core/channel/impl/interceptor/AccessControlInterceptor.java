@@ -113,7 +113,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
     //******************************************************************
     protected Session authenticateAccess( Message message, HttpServletRequest req )
     {
-        String sptoken = "";
+        String sptoken;
 
         if ( message == null )
         {

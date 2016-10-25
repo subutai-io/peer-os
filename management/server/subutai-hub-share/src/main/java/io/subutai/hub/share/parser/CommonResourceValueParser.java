@@ -19,7 +19,7 @@ public final class CommonResourceValueParser
 
     public static ResourceValueParser getInstance( ContainerResourceType type )
     {
-        ResourceValueParser result = null;
+        ResourceValueParser result;
         switch ( type )
         {
             case CPU:

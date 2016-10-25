@@ -417,7 +417,7 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Set<EnvironmentContainerHost> containerHosts;
 
-        synchronized ( this.containers )
+        synchronized ( this )
         {
             containerHosts =
                     CollectionUtil.isCollectionEmpty( this.containers ) ? Sets.<EnvironmentContainerHost>newHashSet() :
@@ -459,6 +459,33 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    public void addContainers( Set<EnvironmentContainerImpl> containers )
+    {
+        if ( CollectionUtil.isCollectionEmpty( containers ) )
+        {
+            return;
+        }
+
+        for ( EnvironmentContainerImpl container : containers )
+        {
+            container.setEnvironment( this );
+        }
+
+        synchronized ( this )
+        {
+            this.containers.addAll( containers );
+        }
+    }
+
+
+    public synchronized void removeContainer( EnvironmentContainerHost container )
+    {
+        Preconditions.checkNotNull( container );
+
+        this.containers.remove( container );
+    }
+
+
     @Override
     public void destroyContainer( EnvironmentContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
@@ -478,36 +505,6 @@ public class EnvironmentImpl implements Environment, Serializable
         }
 
         return peers;
-    }
-
-
-    public void removeContainer( ContainerHost container )
-    {
-        Preconditions.checkNotNull( container );
-
-        synchronized ( this.containers )
-        {
-            this.containers.remove( container );
-        }
-    }
-
-
-    public void addContainers( Set<EnvironmentContainerImpl> containers )
-    {
-        if ( CollectionUtil.isCollectionEmpty( containers ) )
-        {
-            return;
-        }
-
-        for ( EnvironmentContainerImpl container : containers )
-        {
-            container.setEnvironment( this );
-        }
-
-        synchronized ( this.containers )
-        {
-            this.containers.addAll( containers );
-        }
     }
 
 
@@ -557,7 +554,7 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public void setSubnetCidr( final String cidr )
     {
-        SubnetUtils subnetUtils = new SubnetUtils( cidr );
+        new SubnetUtils( cidr );
 
         this.subnetCidr = cidr;
     }

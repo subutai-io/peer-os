@@ -279,7 +279,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     public boolean allHasReadPermissions( final RelationMeta relationMeta )
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, false, false, false, Ownership.ALL.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
 
         Map<String, String> traits = Maps.newHashMap();
         traits.put( "ownership", Ownership.ALL.getName() );

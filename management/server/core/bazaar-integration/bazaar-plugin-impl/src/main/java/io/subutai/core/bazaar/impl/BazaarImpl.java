@@ -5,10 +5,6 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.SynchronousBundleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,18 +19,16 @@ import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
-public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleListener
+public class BazaarImpl implements Bazaar, HubEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( BazaarImpl.class );
     private HubManager hubManager;
-    private DaoManager daoManager;
     private ConfigDataService configDataService;
 
 
     public BazaarImpl( final HubManager hubManager, final DaoManager daoManager )
     {
-        this.daoManager = daoManager;
-        this.configDataService = new ConfigDataServiceImpl( this.daoManager );
+        this.configDataService = new ConfigDataServiceImpl( daoManager );
         this.hubManager = hubManager;
     }
 
@@ -52,8 +46,7 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
         try
         {
 
-            String result = this.hubManager.getProducts();
-            return result;
+            return this.hubManager.getProducts();
         }
         catch ( Exception e )
         {
@@ -119,7 +112,7 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
                     JSONObject productDtosJSON = new JSONObject( jsonString );
                     JSONArray products = productDtosJSON.getJSONArray( "productDtos" );
 
-                    String name = "", version = "", kar = "", url = "", uid = pluginUid;
+                    String name = "", version = "", kar = "", url = "";
 
                     for ( int i = 0; i < products.length(); ++i )
                     {
@@ -133,7 +126,7 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
                             url = name.toLowerCase();
                         }
                     }
-                    this.configDataService.savePlugin( name, version, kar, url, uid );
+                    this.configDataService.savePlugin( name, version, kar, url, pluginUid );
                     break;
                 case REMOVE:
                     List<Plugin> plugins = this.configDataService.getPluginByUid( pluginUid );
@@ -147,27 +140,6 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
         catch ( Exception e )
         {
             LOG.error( "Failed to handle plugin event [{}]: {}", pluginUid, e.getMessage() );
-        }
-    }
-
-
-    public void init()
-    {
-        BundleContext ctx = FrameworkUtil.getBundle( getClass() ).getBundleContext();
-
-        ctx.addBundleListener( this );
-    }
-
-
-    @Override
-    public void bundleChanged( final BundleEvent event )
-    {
-        if ( event.getType() == BundleEvent.STARTED )
-        {
-            // bundle name e.g. Subutai Cassandra Plugin Web UI
-            String bundleName = event.getBundle().getHeaders().get( "Bundle-Name" );
-            // bundle version
-            String version = event.getBundle().getVersion().toString();
         }
     }
 }

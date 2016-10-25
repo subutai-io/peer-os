@@ -1178,7 +1178,6 @@ public class IdentityManagerImpl implements IdentityManager
                             boolean generateKeyPair, boolean createUserDelegate ) throws SystemSecurityException
     {
         User user = new UserEntity();
-        String salt = "";
 
         //*********************************
         if ( Strings.isNullOrEmpty( userName ) )
@@ -1196,7 +1195,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
-            salt = SecurityUtil.generateSecureRandom();
+            String salt = SecurityUtil.generateSecureRandom();
             password = SecurityUtil.generateSecurePassword( password, salt );
 
 
