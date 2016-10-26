@@ -21,7 +21,7 @@ import io.subutai.webui.api.WebuiModuleService;
 public class WebuiModuleServiceImpl implements WebuiModuleService
 {
     private static final Logger LOG = LoggerFactory.getLogger( WebuiModuleServiceImpl.class.getName() );
-    private Set<WebuiModule> modules = new HashSet<WebuiModule>();
+    private Set<WebuiModule> modules = new HashSet<>();
 
     private BundleContext bcontext;
     private String subutaiAppJs;

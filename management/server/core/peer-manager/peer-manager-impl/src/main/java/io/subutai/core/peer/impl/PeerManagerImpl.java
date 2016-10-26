@@ -688,45 +688,59 @@ public class PeerManagerImpl implements PeerManager
             throws PeerException
     {
         RegistrationData result = new RegistrationData( localPeer.getPeerInfo(), keyPhrase, status );
+
         switch ( status )
         {
             case REQUESTED:
             case APPROVED:
-                String sslCert =
-                        securityManager.getKeyStoreManager().exportCertificate( Common.DEFAULT_PUBLIC_SECURE_PORT, "" );
-
-                PGPPublicKey pkey = securityManager.getKeyManager().getPublicKey( localPeerId );
-                try
-                {
-                    byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-                    Encrypted encryptedSslCert = new Encrypted( sslCert, key );
-                    result.setSslCert( encryptedSslCert );
-                    String publicKey = PGPKeyUtil.exportAscii( pkey );
-                    Encrypted encryptedPublicKey = new Encrypted( publicKey, key );
-                    result.setPublicKey( encryptedPublicKey );
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( e.getMessage(), e );
-                }
+                setApprovedResult( result, keyPhrase );
                 break;
             case UNREGISTERED:
-                try
-                {
-                    byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-                    Encrypted encryptedData = new Encrypted( keyPhrase, key );
-                    result.setSslCert( encryptedData );
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( e.getMessage(), e );
-                }
+                setUnregisteredResult( result, keyPhrase );
                 break;
             default:
                 LOG.info( "Requested {}", status );
                 break;
         }
+
         return result;
+    }
+
+
+    private void setUnregisteredResult( final RegistrationData result, final String keyPhrase )
+    {
+        try
+        {
+            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+            Encrypted encryptedData = new Encrypted( keyPhrase, key );
+            result.setSslCert( encryptedData );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage(), e );
+        }
+    }
+
+
+    private void setApprovedResult( final RegistrationData result, final String keyPhrase )
+    {
+        String sslCert =
+                securityManager.getKeyStoreManager().exportCertificate( Common.DEFAULT_PUBLIC_SECURE_PORT, "" );
+
+        PGPPublicKey pkey = securityManager.getKeyManager().getPublicKey( localPeerId );
+        try
+        {
+            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+            Encrypted encryptedSslCert = new Encrypted( sslCert, key );
+            result.setSslCert( encryptedSslCert );
+            String publicKey = PGPKeyUtil.exportAscii( pkey );
+            Encrypted encryptedPublicKey = new Encrypted( publicKey, key );
+            result.setPublicKey( encryptedPublicKey );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage(), e );
+        }
     }
 
 

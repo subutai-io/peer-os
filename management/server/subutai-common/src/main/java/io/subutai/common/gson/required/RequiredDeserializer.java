@@ -54,43 +54,50 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
                 switch ( field.getAnnotation( GsonRequired.class ).validation() )
                 {
                     case GREATER_THAN_ZERO:
-                        try
-                        {
-                            if ( field.get( object ) == null
-                                    && Integer.parseInt( ( String ) field.get( object ) ) <= 0 )
-                            {
-                                throw new JsonParseException(
-                                        "Json validation failed expected x > field: " + field.getName() );
-                            }
-                        }
-                        catch ( Exception e )
-                        {
-                            throw new JsonParseException(
-                                    "Json parse error, expected int for the field: " + field.getName() );
-                        }
-
+                        checkGreaterThanZero( field, object );
                         break;
                     default:
-
-                        if ( CollectionUtils.isEmpty( ( Collection ) field.get( object ) ) )
-                        {
-                            throw new JsonParseException( "Missing Json field: " + field.getName() );
-                        }
-
-                        if ( field.get( object ) instanceof Collection<?> )
-                        {
-                            Gson gson = RequiredDeserializer.createValidatingGson();
-
-                            gson.fromJson( new Gson().toJson( field.get( object ) ), new TypeToken<Collection<?>>()
-                            {
-                            }.getType() );
-                        }
+                        checkCollection( field, object );
                 }
             }
             catch ( IllegalAccessException | IllegalArgumentException e )
             {
                 LOG.error( "Deserialization error", e );
             }
+        }
+    }
+
+
+    private void checkCollection( Field field, T object ) throws IllegalAccessException
+    {
+        if ( CollectionUtils.isEmpty( ( Collection ) field.get( object ) ) )
+        {
+            throw new JsonParseException( "Missing Json field: " + field.getName() );
+        }
+
+        if ( field.get( object ) instanceof Collection<?> )
+        {
+            Gson gson = RequiredDeserializer.createValidatingGson();
+
+            gson.fromJson( new Gson().toJson( field.get( object ) ), new TypeToken<Collection<?>>()
+            {
+            }.getType() );
+        }
+    }
+
+
+    private void checkGreaterThanZero( Field field, T object )
+    {
+        try
+        {
+            if ( field.get( object ) == null || Integer.parseInt( ( String ) field.get( object ) ) <= 0 )
+            {
+                throw new JsonParseException( "Json validation failed expected x > field: " + field.getName() );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new JsonParseException( "Json parse error, expected int for the field: " + field.getName() );
         }
     }
 

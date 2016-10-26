@@ -58,7 +58,7 @@ public class RelationInfoImpl implements RelationInfo
     @MapKeyColumn( name = "trait_key" )
     @Column( name = "trait_value" )
     //    @CollectionTable( name = "relation_traits", joinColumns = @JoinColumn( name = "relation_info_id" ) )
-    private Map<String, String> relationTraits = new HashMap<String, String>(); // maps from attribute name to value
+    private Map<String, String> relationTraits = new HashMap<>(); // maps from attribute name to value
 
 
     public RelationInfoImpl()
@@ -189,10 +189,7 @@ public class RelationInfoImpl implements RelationInfo
     @Override
     public String toString()
     {
-        return "RelationInfoImpl{" +
-                "id=" + id +
-                ", ownershipLevel=" + ownershipLevel +
-                ", relationTraits=" + relationTraits +
-                '}';
+        return "RelationInfoImpl{" + "id=" + id + ", ownershipLevel=" + ownershipLevel + ", relationTraits="
+                + relationTraits + '}';
     }
 }

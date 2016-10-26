@@ -128,7 +128,7 @@ public enum SignatureType
 	 */
 	public static List<SignatureType> dsaSignatureTypes()
 	{
-		List<SignatureType> signatureTypes = new ArrayList<SignatureType>();
+		List<SignatureType> signatureTypes = new ArrayList<>();
 
 		signatureTypes.add( SHA1_DSA );
 		signatureTypes.add( SHA224_DSA );
@@ -147,7 +147,7 @@ public enum SignatureType
 	 */
 	public static List<SignatureType> ecdsaSignatureTypes()
 	{
-		List<SignatureType> signatureTypes = new ArrayList<SignatureType>();
+		List<SignatureType> signatureTypes = new ArrayList<>();
 
 		signatureTypes.add( SHA1_ECDSA );
 		// signatureTypes.add(SHA224_ECDSA); // not supported by Sun provider
@@ -166,7 +166,7 @@ public enum SignatureType
 	 */
 	public static List<SignatureType> rsaSignatureTypes()
 	{
-		List<SignatureType> signatureTypes = new ArrayList<SignatureType>();
+		List<SignatureType> signatureTypes = new ArrayList<>();
 
 		signatureTypes.add( MD2_RSA );
 		signatureTypes.add( MD5_RSA );

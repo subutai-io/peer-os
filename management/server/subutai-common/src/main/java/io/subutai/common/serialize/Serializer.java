@@ -7,7 +7,7 @@ public class Serializer implements Serializable {
 
     private static Serializer instance;
 
-    private List<Serializable> serializers = new ArrayList<Serializable>();
+    private List<Serializable> serializers = new ArrayList<>();
 
     /**
      * Registers Serializers responsible for different types. 

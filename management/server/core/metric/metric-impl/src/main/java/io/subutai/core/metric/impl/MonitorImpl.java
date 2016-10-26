@@ -312,11 +312,6 @@ public class MonitorImpl implements Monitor, HostListener
         {
             LOG.warn( e.getMessage() );
         }
-        //          Example of usage:
-        //                QuotaAlertValue quotaAlertValue = alert.getAlertValue( QuotaAlertValue.class );
-        //                StringAlertValue stringAlertValue = alert.getAlertValue( StringAlertValue.class );
-        //                ExceededQuota v1 = quotaAlertValue.getValue();
-        //                String v2 = stringAlertValue.getValue();
 
         return packet;
     }
