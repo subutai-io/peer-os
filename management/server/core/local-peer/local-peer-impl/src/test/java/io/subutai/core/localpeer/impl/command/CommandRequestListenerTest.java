@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -30,7 +29,9 @@ import io.subutai.core.peer.api.PeerManager;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,15 +68,16 @@ public class CommandRequestListenerTest
     @Before
     public void setUp() throws Exception
     {
-        listener = new CommandRequestListener();
+        listener = spy( new CommandRequestListener() );
         when( payload.getMessage( CommandRequest.class ) ).thenReturn( commandRequest );
         when( peerManager.getPeer( any( String.class ) ) ).thenReturn( sourcePeer );
         when( localPeer.bindHost( any( String.class ) ) ).thenReturn( host );
+        doReturn( peerManager ).when( listener ).getPeerManager();
+        doReturn( localPeer ).when( peerManager ).getLocalPeer();
     }
 
 
     @Test
-    @Ignore
     public void testOnRequest() throws Exception
     {
         listener.onRequest( payload );

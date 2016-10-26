@@ -86,7 +86,7 @@ public class SetQuota extends SubutaiShellCommandSupport
 
         final ResourceValue value = parser.parse( quotaValue );
 
-        ContainerResource containerResource = ContainerResourceFactory.createContainerResource( type, value );
+        ContainerResource containerResource = getContainerResource( type, value );
 
         containerQuota.add( new Quota( containerResource, threshold ) );
         final ContainerHost container = localPeer.getContainerHostByName( containerName );
@@ -100,5 +100,11 @@ public class SetQuota extends SubutaiShellCommandSupport
             quotaManager.setQuota( id, containerQuota );
         }
         return null;
+    }
+
+
+    protected ContainerResource getContainerResource( ContainerResourceType type, ResourceValue value )
+    {
+        return ContainerResourceFactory.createContainerResource( type, value );
     }
 }

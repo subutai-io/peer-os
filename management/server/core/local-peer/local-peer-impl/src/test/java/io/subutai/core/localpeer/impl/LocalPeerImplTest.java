@@ -83,7 +83,6 @@ import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -363,12 +362,11 @@ public class LocalPeerImplTest
 
 
     @Test
-    @Ignore
     public void testGetContainerHostState() throws Exception
     {
         localPeer.getContainerState( containerHost.getContainerId() );
 
-        verify( containerHost ).getState();
+        verify( containerHostInfo ).getState();
     }
 
 
@@ -489,26 +487,16 @@ public class LocalPeerImplTest
     }
 
 
-    @Ignore
-    @Test( expected = PeerException.class )
-    public void testSetDefaultGateway() throws Exception
-    {
-
-        verify( commandUtil ).execute( any( RequestBuilder.class ), eq( containerHost ) );
-
-        throwCommandException();
-    }
-
-
     @Test
-    @Ignore
     public void testIsConnected() throws Exception
     {
         assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );
 
-        assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
+        doReturn( "" ).when( hostInfo ).getId();
+
+        assertFalse( localPeer.isConnected( containerHost.getContainerId() ) );
 
         HostDisconnectedException hostDisconnectedException = mock( HostDisconnectedException.class );
 
@@ -519,7 +507,6 @@ public class LocalPeerImplTest
 
 
     @Test( expected = PeerException.class )
-    @Ignore
     public void testGetQuotaInfo() throws Exception
     {
         localPeer.getQuota( containerId );

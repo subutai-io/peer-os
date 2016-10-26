@@ -4,7 +4,6 @@ package io.subutai.core.environment.cli;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -51,12 +50,9 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
 
 
     @Test
-    @Ignore
     public void testDoExecute() throws Exception
     {
         command.doExecute();
-
-        //        verify( peer ).getQuotaInfo( containerHost, QuotaType.QUOTA_TYPE_CPU );
 
         when( environment.getContainerHostByHostname( anyString() ) ).thenReturn( null );
 
