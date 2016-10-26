@@ -75,20 +75,20 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
         while ( !Thread.interrupted() )
         {
             TrackerOperationView po = tracker.getTrackerOperation( clusterConfig.getProductKey(), trackID );
-            if ( po != null )
+
+            if ( po != null && po.getState() != OperationState.RUNNING )
             {
-                if ( po.getState() != OperationState.RUNNING )
+
+                if ( po.getLog().toLowerCase().contains( getProductStoppedIdentifier().toLowerCase() ) )
                 {
-                    if ( po.getLog().toLowerCase().contains( getProductStoppedIdentifier().toLowerCase() ) )
-                    {
-                        state = NodeState.STOPPED;
-                    }
-                    else if ( po.getLog().toLowerCase().contains( getProductRunningIdentifier().toLowerCase() ) )
-                    {
-                        state = NodeState.RUNNING;
-                    }
-                    break;
+                    state = NodeState.STOPPED;
                 }
+                else if ( po.getLog().toLowerCase().contains( getProductRunningIdentifier().toLowerCase() ) )
+                {
+                    state = NodeState.RUNNING;
+                }
+
+                break;
             }
 
             try

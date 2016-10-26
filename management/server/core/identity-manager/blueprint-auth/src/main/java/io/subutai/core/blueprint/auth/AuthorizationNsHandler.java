@@ -42,12 +42,10 @@ public class AuthorizationNsHandler implements NamespaceHandler
     {
         ComponentDefinitionRegistry cdr = pc.getComponentDefinitionRegistry();
 
-        if ( "enable".equals( elt.getLocalName() ) )
+        if ( "enable".equals( elt.getLocalName() ) && !cdr
+                .containsComponentDefinition( AuthorizationBeanProcessor.AUTH_PROCESSOR_BEAN_NAME ) )
         {
-            if ( !cdr.containsComponentDefinition( AuthorizationBeanProcessor.AUTH_PROCESSOR_BEAN_NAME ) )
-            {
-                cdr.registerComponentDefinition( authBeanProcessor( pc, cdr ) );
-            }
+            cdr.registerComponentDefinition( authBeanProcessor( pc, cdr ) );
         }
     }
 

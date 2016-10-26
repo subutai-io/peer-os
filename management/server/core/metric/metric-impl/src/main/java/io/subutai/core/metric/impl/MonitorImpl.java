@@ -281,14 +281,13 @@ public class MonitorImpl implements Monitor, HostListener
         }
 
         AlertEvent alertEvent = alertQueue.get( alert.getId() );
-        if ( alertEvent != null )
+
+        if ( alertEvent != null && !alertEvent.isExpired() )
         {
-            if ( !alertEvent.isExpired() )
-            {
-                // skipping, alert already exists
-                LOG.debug( String.format( "Alert already in queue. %s", alertEvent ) );
-                return;
-            }
+            // skipping, alert already exists
+            LOG.debug( String.format( "Alert already in queue. %s", alertEvent ) );
+
+            return;
         }
 
         alertEvent = buildAlertPack( alert );

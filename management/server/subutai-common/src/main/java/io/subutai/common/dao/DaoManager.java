@@ -30,12 +30,9 @@ public class DaoManager
 
     public void destroy()
     {
-        if ( entityManagerFactory != null )
+        if ( entityManagerFactory != null && entityManagerFactory.isOpen() )
         {
-            if ( entityManagerFactory.isOpen() )
-            {
-                entityManagerFactory.close();
-            }
+            entityManagerFactory.close();
         }
     }
 
@@ -84,13 +81,11 @@ public class DaoManager
      */
     public short rollBackTransaction( EntityManager em )
     {
-        if ( em != null )
+        if ( em != null && em.getTransaction().isActive() )
         {
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
+            em.getTransaction().rollback();
         }
+
         return 1;
     }
 

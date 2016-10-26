@@ -235,12 +235,9 @@ class UserTokenDAO
             qr.setParameter( "userId", userId );
             result = qr.getResultList();
 
-            if ( result != null )
+            if ( result != null && !result.isEmpty() )
             {
-                if ( !result.isEmpty() )
-                {
-                    tk = result.get( 0 );
-                }
+                tk = result.get( 0 );
             }
         }
         catch ( Exception e )
@@ -274,12 +271,9 @@ class UserTokenDAO
 
             result = qr.getResultList();
 
-            if ( result != null )
+            if ( result != null && !result.isEmpty() )
             {
-                if ( !result.isEmpty() )
-                {
-                    tk = result.get( 0 );
-                }
+                tk = result.get( 0 );
             }
         }
         catch ( Exception e )
