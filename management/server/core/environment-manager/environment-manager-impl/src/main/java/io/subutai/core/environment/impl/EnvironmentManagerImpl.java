@@ -237,11 +237,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkNotNull( peerAction );
 
         PeerActionResponse response = PeerActionResponse.Ok();
+
         switch ( peerAction.getType() )
         {
-            case REGISTER:
-                // it is ok
-                break;
             case UNREGISTER:
                 if ( isPeerInUse( ( String ) peerAction.getData() ) )
                 {
@@ -249,7 +247,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 }
 
                 break;
+            default:
+                LOG.info( "Peer action {}", peerAction.getType() );
+                break;
         }
+
         return response;
     }
 

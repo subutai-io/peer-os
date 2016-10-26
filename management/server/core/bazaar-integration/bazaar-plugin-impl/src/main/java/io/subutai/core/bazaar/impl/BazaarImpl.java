@@ -45,7 +45,6 @@ public class BazaarImpl implements Bazaar, HubEventListener
     {
         try
         {
-
             return this.hubManager.getProducts();
         }
         catch ( Exception e )
@@ -134,6 +133,9 @@ public class BazaarImpl implements Bazaar, HubEventListener
                     {
                         this.configDataService.deletePlugin( plugins.get( 0 ).getId() );
                     }
+                    break;
+                default:
+                    LOG.info( "Plugin installation requested" );
                     break;
             }
         }

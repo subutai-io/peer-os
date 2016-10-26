@@ -130,7 +130,8 @@ public class ProductProcessor implements StateLinkProcessor
             case REMOVE:
                 removingProcess( peerProductDataDTO );
                 break;
-            case INSTALLED:
+            default:
+                LOG.info( "Requested {}", peerProductDataDTO.getState() );
                 break;
         }
     }

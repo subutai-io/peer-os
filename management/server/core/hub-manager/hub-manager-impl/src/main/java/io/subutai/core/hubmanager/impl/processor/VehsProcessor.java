@@ -130,6 +130,9 @@ public class VehsProcessor implements StateLinkProcessor
                         case COLLECT_METRIC:
                             collectMetric( environmentDto, vehsDto, peerDto );
                             break;
+                        default:
+                            log.info( "Requested {}", vehsDto.getState() );
+                            break;
                     }
                 }
                 log.info( vehsDto.getProjectName() );

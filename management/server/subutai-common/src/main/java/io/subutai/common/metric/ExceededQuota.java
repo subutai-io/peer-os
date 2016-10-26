@@ -105,6 +105,9 @@ public class ExceededQuota
                 case VAR:
                     result = new ContainerVarResource( ( ByteValueResource ) quotaValue );
                     break;
+                default:
+                    // no-op
+                    break;
             }
 
             return ( T ) result;
