@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"subutai/agent/monitor"
 	"sync"
 	"time"
 
@@ -72,7 +73,7 @@ func Start(c *cli.Context) {
 	http.HandleFunc("/heartbeat", heartbeatCall)
 	go http.ListenAndServe(":7070", nil)
 
-	go lib.Collect()
+	go monitor.Collect()
 	go connectionMonitor()
 	go alert.Processing()
 
