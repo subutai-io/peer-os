@@ -107,32 +107,10 @@ public class BazaarImpl implements Bazaar, HubEventListener
             switch ( state )
             {
                 case INSTALLED:
-                    String jsonString = getProducts();
-                    JSONObject productDtosJSON = new JSONObject( jsonString );
-                    JSONArray products = productDtosJSON.getJSONArray( "productDtos" );
-
-                    String name = "", version = "", kar = "", url = "";
-
-                    for ( int i = 0; i < products.length(); ++i )
-                    {
-                        JSONObject product = products.getJSONObject( i );
-                        if ( product.get( "id" ).equals( pluginUid ) )
-                        {
-                            name = product.getString( "name" );
-                            version = product.getString( "version" );
-                            JSONArray metadata = product.getJSONArray( "metadata" );
-                            kar = metadata.length() > 0 ? metadata.getString( 0 ) : "";
-                            url = name.toLowerCase();
-                        }
-                    }
-                    this.configDataService.savePlugin( name, version, kar, url, pluginUid );
+                    savePlugin( pluginUid );
                     break;
                 case REMOVE:
-                    List<Plugin> plugins = this.configDataService.getPluginByUid( pluginUid );
-                    if ( !plugins.isEmpty() )
-                    {
-                        this.configDataService.deletePlugin( plugins.get( 0 ).getId() );
-                    }
+                    deletePlugin( pluginUid );
                     break;
                 default:
                     LOG.info( "Plugin installation requested" );
@@ -143,5 +121,39 @@ public class BazaarImpl implements Bazaar, HubEventListener
         {
             LOG.error( "Failed to handle plugin event [{}]: {}", pluginUid, e.getMessage() );
         }
+    }
+
+
+    private void deletePlugin( String pluginUid )
+    {
+        List<Plugin> plugins = this.configDataService.getPluginByUid( pluginUid );
+        if ( !plugins.isEmpty() )
+        {
+            this.configDataService.deletePlugin( plugins.get( 0 ).getId() );
+        }
+    }
+
+
+    private void savePlugin( String pluginUid )
+    {
+        String jsonString = getProducts();
+        JSONObject productDtosJSON = new JSONObject( jsonString );
+        JSONArray products = productDtosJSON.getJSONArray( "productDtos" );
+
+        String name = "", version = "", kar = "", url = "";
+
+        for ( int i = 0; i < products.length(); ++i )
+        {
+            JSONObject product = products.getJSONObject( i );
+            if ( product.get( "id" ).equals( pluginUid ) )
+            {
+                name = product.getString( "name" );
+                version = product.getString( "version" );
+                JSONArray metadata = product.getJSONArray( "metadata" );
+                kar = metadata.length() > 0 ? metadata.getString( 0 ) : "";
+                url = name.toLowerCase();
+            }
+        }
+        this.configDataService.savePlugin( name, version, kar, url, pluginUid );
     }
 }

@@ -245,7 +245,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 {
                     response = PeerActionResponse.Fail( "Peer in use." );
                 }
-
                 break;
             default:
                 LOG.info( "Peer action {}", peerAction.getType() );
