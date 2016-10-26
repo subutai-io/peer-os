@@ -140,7 +140,6 @@ public class ProductProcessor implements StateLinkProcessor
     private void installingProcess( final PeerProductDataDto peerProductDataDTO ) throws HubManagerException
     {
         LOG.debug( "Installing Product to Local Peer..." );
-        boolean isSuccess = false;
         ProductDtoV1_2 productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
 
         // install dependencies first (if plugin has dependencies)
@@ -196,6 +195,7 @@ public class ProductProcessor implements StateLinkProcessor
 
         // TODO: check that there is no installed plugins, which depends on this plugin
 
+        //TODO check what we are deleting here!!!
         for ( String url : productDTO.getMetadata() )
         {
             File file = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );

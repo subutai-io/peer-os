@@ -1,7 +1,6 @@
 package io.subutai.core.pluginmanager.impl;
 
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +39,7 @@ public class PluginManagerImpl implements PluginManager
 
     @Override
     public void register( final String name, final String version, final String pathToKar,
-                          final ArrayList<PermissionJson> permissions )
+                          final List<PermissionJson> permissions )
     {
         Date newDate = new Date();
         Calendar cal = Calendar.getInstance();

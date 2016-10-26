@@ -25,7 +25,9 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,16 +63,16 @@ public class RequestNotifierTest
     @Before
     public void setUp() throws Exception
     {
-        requestNotifier = new RequestNotifier( messenger, requestListener, message, messageRequest, localPeer );
+        requestNotifier = spy(new RequestNotifier( messenger, requestListener, message, messageRequest, localPeer ));
         when( messageRequest.getPayload() ).thenReturn( payload );
         when( requestListener.onRequest( payload ) ).thenReturn( response );
         when( peerManager.getPeer( any( String.class ) ) ).thenReturn( peer );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
+        doReturn( peerManager ).when( requestNotifier ).getPeerManager();
     }
 
 
     @Test
-    @Ignore
     public void testRun() throws Exception
     {
         requestNotifier.run();

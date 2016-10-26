@@ -28,10 +28,12 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -69,7 +71,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
     @Before
     public void setUp() throws Exception
     {
-        tracker = new TrackerImpl();
+        tracker = spy( new TrackerImpl() );
         tracker.dataService = dataService;
         tracker.setIdentityManager( identityManager );
         doReturn( user ).when( identityManager ).getActiveUser();
@@ -90,10 +92,11 @@ public class TrackerImplTest extends SystemOutRedirectTest
     }
 
 
-    @Ignore
     @Test
     public void testGetProductOperation() throws Exception
     {
+        doReturn( 2 ).when( user ).getType();
+        doReturn( 3 ).when( user ).getTrustLevel();
         tracker.getTrackerOperation( SOURCE, OPERATION_ID );
 
         verify( dataService ).getTrackerOperation( SOURCE, OPERATION_ID );
@@ -117,14 +120,20 @@ public class TrackerImplTest extends SystemOutRedirectTest
     }
 
 
-    @Ignore
     @Test
     public void testGetTrackerOperations() throws Exception
     {
+        tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
+
+        verify( dataService ).getRecentUserOperations( eq( SOURCE ), isA( Date.class ), isA( Date.class ), anyInt(), anyInt() );
+
+        doReturn( 2 ).when( user ).getType();
+        doReturn( 3 ).when( user ).getTrustLevel();
 
         tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
 
         verify( dataService ).getTrackerOperations( eq( SOURCE ), isA( Date.class ), isA( Date.class ), anyInt() );
+
     }
 
 
@@ -137,11 +146,10 @@ public class TrackerImplTest extends SystemOutRedirectTest
     }
 
 
-    @Ignore
     @Test
     public void testPrintOperationLog() throws Exception
     {
-        when( dataService.getTrackerOperation( SOURCE, OPERATION_ID ) ).thenReturn( productOperationView );
+        doReturn( productOperationView ).when( tracker ).getTrackerOperation( SOURCE.toUpperCase(), OPERATION_ID );
         when( productOperationView.getLog() ).thenReturn( "log" );
         when( productOperationView.getState() ).thenReturn( OperationState.RUNNING )
                                                .thenReturn( OperationState.SUCCEEDED );

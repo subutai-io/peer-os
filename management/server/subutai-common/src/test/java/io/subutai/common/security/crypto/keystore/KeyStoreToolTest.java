@@ -4,7 +4,6 @@ package io.subutai.common.security.crypto.keystore;
 import java.security.KeyStore;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -34,7 +33,6 @@ public class KeyStoreToolTest
 
 
     @Test
-    @Ignore
     public void testGetKeyPair() throws Exception
     {
         when( keyStoreData.getAlias() ).thenReturn( "alias" );

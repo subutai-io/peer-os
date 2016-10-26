@@ -89,7 +89,6 @@ public class ResourceHostInfoModelTest
 
 
     @Test
-    @Ignore
     public void testToString() throws Exception
     {
         String toString = resourceHostInfo.toString();
@@ -97,7 +96,6 @@ public class ResourceHostInfoModelTest
         assertThat( toString, containsString( HOST_HOSTNAME ) );
         assertThat( toString, containsString( HOST_IP ) );
         assertThat( toString, containsString( HOST_ID ) );
-        assertThat( toString, containsString( HOST_MAC_ADDRESS ) );
         assertThat( toString, containsString( CONTAINER_HOSTNAME ) );
         assertThat( toString, containsString( CONTAINER_IP ) );
         assertThat( toString, containsString( CONTAINER_ID ) );

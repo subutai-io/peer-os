@@ -82,13 +82,13 @@ public class RestServiceImpl implements RestService
     private final TemplateManager templateManager;
     private final StrategyManager strategyManager;
     private final QuotaManager quotaManager;
+    private final SecureEnvironmentManager secureEnvironmentManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
-    private SecureEnvironmentManager secureEnvironmentManager;
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
                             final TemplateManager templateManager, final StrategyManager strategyManager,
-                            final QuotaManager quotaManager )
+                            final QuotaManager quotaManager, final SecureEnvironmentManager secureEnvironmentManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
@@ -100,11 +100,6 @@ public class RestServiceImpl implements RestService
         this.templateManager = templateManager;
         this.strategyManager = strategyManager;
         this.quotaManager = quotaManager;
-    }
-
-
-    public void setSecureEnvironmentManager( final SecureEnvironmentManager secureEnvironmentManager )
-    {
         this.secureEnvironmentManager = secureEnvironmentManager;
     }
 
@@ -243,9 +238,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            String name = environmentManager.getEnvironments().stream()
-                                            .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
-                                            .findFirst().get().getName();
+            String name = environmentManager.loadEnvironment( environmentId ).getName();
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
@@ -304,9 +297,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            String name = environmentManager.getEnvironments().stream()
-                                            .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
-                                            .findFirst().get().getName();
+            String name = environmentManager.loadEnvironment( environmentId ).getName();
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
             {
@@ -786,7 +777,7 @@ public class RestServiceImpl implements RestService
 
             taskExecutor.shutdown();
 
-            for ( Peer ignored : peers )
+            for ( int i = 0; i < peers.size(); i++ )
             {
                 try
                 {
