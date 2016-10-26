@@ -30,7 +30,7 @@
     <argument ref="templateRegistry" />
     <argument ref="strategyManager" />
     <argument ref="quotaManager" />
-    <property name="secureEnvironmentManager" ref="secureEnvironmentManager" />
+    <argument ref="secureEnvironmentManager" />
   </bean>
 
   <jaxrs:server address="/ui/environments" id="environmentRestUIService">

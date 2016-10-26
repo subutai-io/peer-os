@@ -108,7 +108,7 @@ public class RestServiceImpl implements RestService
 
                 taskExecutor.shutdown();
 
-                for ( RegistrationDataDto registrationData : registrationDatas )
+                for ( int i = 0; i < registrationDatas.size(); i++ )
                 {
                     try
                     {
