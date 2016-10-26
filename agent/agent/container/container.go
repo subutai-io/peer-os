@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"subutai/log"
 
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/config"
@@ -31,13 +32,18 @@ type Container struct {
 func Credentials(name, container string) (uid int, gid int) {
 	path := config.Agent.LxcPrefix + container + "/rootfs/etc/passwd"
 	u, g := parsePasswd(path, name)
-	uid, _ = strconv.Atoi(u)
-	gid, _ = strconv.Atoi(g)
+	uid, err := strconv.Atoi(u)
+	log.Check(log.DebugLevel, "Parsing user UID from container", err)
+	gid, err = strconv.Atoi(g)
+	log.Check(log.DebugLevel, "Parsing user GID from container", err)
 	return uid, gid
 }
 
 func parsePasswd(path, name string) (uid string, gid string) {
-	file, _ := os.Open(path)
+	file, err := os.Open(path)
+	if err != nil {
+		return "", ""
+	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
@@ -58,7 +64,10 @@ func Active(details bool) []Container {
 	contArr := []Container{}
 
 	for _, c := range cont.Containers() {
-		hostname, _ := ioutil.ReadFile(config.Agent.LxcPrefix + c + "/rootfs/etc/hostname")
+		hostname, err := ioutil.ReadFile(config.Agent.LxcPrefix + c + "/rootfs/etc/hostname")
+		if err != nil {
+			continue
+		}
 		configpath := config.Agent.LxcPrefix + c + "/config"
 
 		container := Container{
@@ -88,8 +97,10 @@ func interfaces(name string) []utils.Iface {
 	}
 
 	iface.InterfaceName = "eth0"
-	listip, _ := c.IPAddress(iface.InterfaceName)
-	iface.IP = strings.Join(listip, " ")
+	listip, err := c.IPAddress(iface.InterfaceName)
+	if err == nil {
+		iface.IP = strings.Join(listip, " ")
+	}
 
 	return []utils.Iface{*iface}
 }
