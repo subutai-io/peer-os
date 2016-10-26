@@ -6,12 +6,14 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"subutai/log"
 
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
+
 	cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
+
 	lxc "gopkg.in/lxc/go-lxc.v2"
 )
 
