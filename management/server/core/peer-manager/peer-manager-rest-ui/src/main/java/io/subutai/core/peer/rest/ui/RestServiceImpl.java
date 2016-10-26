@@ -47,8 +47,8 @@ public class RestServiceImpl implements RestService
 
     private class RegistrationDataDto
     {
-        public boolean isOnline = false;
-        public RegistrationData registrationData;
+        private boolean isOnline = false;
+        private RegistrationData registrationData;
 
 
         public RegistrationDataDto( RegistrationData registrationData )

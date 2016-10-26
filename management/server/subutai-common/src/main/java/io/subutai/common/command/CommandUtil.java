@@ -235,39 +235,8 @@ public class CommandUtil
         {
             final String hostCommandId = String.format( "%s-%s", host.getId(), hostCommandPrefix );
 
-            Future<CommandResult> commandFuture = taskCompletionService.submit( new Callable<CommandResult>()
-            {
-                @Override
-                public CommandResult call() throws Exception
-                {
-                    try
-                    {
-                        return execute( requestBuilder, host );
-                    }
-                    finally
-                    {
-                        if ( environmentId != null )
-                        {
-                            synchronized ( environmentCommandsFuturesMap )
-                            {
-                                Map<String, EnvironmentCommandFuture> environmentCommandFutures =
-                                        environmentCommandsFuturesMap.get( environmentId );
-
-                                if ( environmentCommandFutures != null )
-                                {
-                                    environmentCommandFutures.remove( hostCommandId );
-
-                                    if ( environmentCommandFutures.isEmpty() )
-                                    {
-                                        environmentCommandsFuturesMap.remove( environmentId );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } );
-
+            Future<CommandResult> commandFuture = taskCompletionService
+                    .submit( new HostCommandTask( requestBuilder, host, environmentId, hostCommandId ) );
 
             if ( environmentId != null )
             {
@@ -348,6 +317,56 @@ public class CommandUtil
         }
 
         return new HostCommandResults( hostCommandResults );
+    }
+
+
+    private class HostCommandTask implements Callable<CommandResult>
+    {
+        private final RequestBuilder requestBuilder;
+        private final Host host;
+        private final String environmentId;
+        private final String hostCommandId;
+
+
+        HostCommandTask( final RequestBuilder requestBuilder, final Host host, final String environmentId,
+                         final String hostCommandId )
+        {
+            this.requestBuilder = requestBuilder;
+            this.host = host;
+            this.environmentId = environmentId;
+            this.hostCommandId = hostCommandId;
+        }
+
+
+        @Override
+        public CommandResult call() throws Exception
+        {
+            try
+            {
+                return execute( requestBuilder, host );
+            }
+            finally
+            {
+                if ( environmentId != null )
+                {
+                    synchronized ( environmentCommandsFuturesMap )
+                    {
+                        Map<String, EnvironmentCommandFuture> environmentCommandFutures =
+                                environmentCommandsFuturesMap.get( environmentId );
+
+                        if ( environmentCommandFutures != null )
+                        {
+                            environmentCommandFutures.remove( hostCommandId );
+
+                            if ( environmentCommandFutures.isEmpty() )
+                            {
+                                environmentCommandsFuturesMap.remove( environmentId );
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 

@@ -1,9 +1,6 @@
 package io.subutai.core.executor.cli;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -26,9 +23,6 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 @Command( scope = "command", name = "exec-async", description = "Executes command asynchronously" )
 public class ExecAsyncCommand extends SubutaiShellCommandSupport
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger( ExecAsyncCommand.class.getName() );
-
     private final CommandExecutor executor;
 
     @Argument( index = 0, name = "host id", required = true, multiValued = false, description = "id of host on which "
@@ -61,7 +55,7 @@ public class ExecAsyncCommand extends SubutaiShellCommandSupport
             @Override
             public void onResponse( final Response response, final CommandResult commandResult )
             {
-                LOG.info( response.toString() );
+                log.info( response.toString() );
             }
         } );
 

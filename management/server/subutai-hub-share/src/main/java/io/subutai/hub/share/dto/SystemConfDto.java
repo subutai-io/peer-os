@@ -8,8 +8,8 @@ public class SystemConfDto
     private String[] globalKurjunUrls;
     private String[] localKurjunUrls;
 
-    public String publicUrl;
-    public int publicSecurePort;
+    private String publicUrl;
+    private int publicSecurePort;
 
 
     public SystemConfDto( SystemConfigurationType key )

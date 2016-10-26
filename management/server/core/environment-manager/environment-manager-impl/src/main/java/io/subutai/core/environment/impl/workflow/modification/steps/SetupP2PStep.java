@@ -132,7 +132,7 @@ public class SetupP2PStep
 
         PeerUtil.PeerTaskResults<Object> p2pResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult<Object> p2pResult : p2pResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<Object> p2pResult : p2pResults.getResults() )
         {
             if ( p2pResult.hasSucceeded() )
             {
@@ -169,7 +169,7 @@ public class SetupP2PStep
 
         PeerUtil.PeerTaskResults<Object> tunnelResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult tunnelResult : tunnelResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult tunnelResult : tunnelResults.getResults() )
         {
             if ( tunnelResult.hasSucceeded() )
             {

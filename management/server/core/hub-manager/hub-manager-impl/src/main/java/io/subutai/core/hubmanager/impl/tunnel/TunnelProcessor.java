@@ -65,7 +65,6 @@ public class TunnelProcessor implements StateLinkProcessor
 
         if ( tunnelInfoDto != null )
         {
-
             switch ( tunnelInfoDto.getTunnelStatus() )
             {
                 case PENDING:
@@ -74,6 +73,9 @@ public class TunnelProcessor implements StateLinkProcessor
 
                 case DELETE:
                     deleteTunnel( stateLink, tunnelInfoDto );
+                    break;
+                default:
+                    LOG.info( "Requested {}", tunnelInfoDto.getTunnelStatus() );
                     break;
             }
         }

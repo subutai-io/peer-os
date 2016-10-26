@@ -3,9 +3,6 @@ package io.subutai.common.peer;
 
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.hub.share.quota.ContainerCpuResource;
@@ -19,7 +16,6 @@ import io.subutai.hub.share.resource.ContainerResourceType;
  */
 public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<QuotaAlertValue>
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger( ExceededQuotaAlertHandler.class );
     private EnvironmentContainerHost sourceHost;
     protected ContainerCpuResource cpuResource;
     protected ContainerRamResource ramResource;
@@ -55,7 +51,8 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
 
     @Override
     public void postProcess( final Environment environment, final QuotaAlertValue alert ) throws AlertHandlerException
-    {}
+    {
+    }
 
 
     protected void findSourceHost( Environment environment, final String sourceHostId ) throws AlertHandlerException

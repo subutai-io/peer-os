@@ -166,7 +166,7 @@ public class TestHelper
         doReturn( Sets.newHashSet( peer ) ).when( environment ).getPeers();
         doReturn( peerTaskResults ).when( peerUtil ).executeParallel();
         doReturn( peerTaskResults ).when( peerUtil ).executeParallelFailFast();
-        doReturn( Sets.newHashSet( peerTaskResult ) ).when( peerTaskResults ).getPeerTaskResults();
+        doReturn( Sets.newHashSet( peerTaskResult ) ).when( peerTaskResults ).getResults();
         doReturn( peer ).when( peerTaskResult ).getPeer();
     }
 
@@ -176,6 +176,6 @@ public class TestHelper
 
         doReturn( taskResults ).when( taskUtil ).executeParallel();
         doReturn( taskResults ).when( taskUtil ).executeParallelFailFast();
-        doReturn( Sets.newHashSet( taskResult ) ).when( taskResults ).getTaskResults();
+        doReturn( Sets.newHashSet( taskResult ) ).when( taskResults ).getResults();
     }
 }

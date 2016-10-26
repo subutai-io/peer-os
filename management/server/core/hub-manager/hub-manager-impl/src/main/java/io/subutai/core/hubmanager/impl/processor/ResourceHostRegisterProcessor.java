@@ -100,6 +100,9 @@ public class ResourceHostRegisterProcessor implements StateLinkProcessor
                 registrationManager.removeRequest( resourceHostDataDto.getRequestId() );
                 deleteResourceHostData( resourceHostDataDto );
                 break;
+            default:
+                LOG.info( "Requested {}", resourceHostDataDto.getState() );
+                break;
         }
     }
 

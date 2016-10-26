@@ -12,6 +12,8 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 import io.subutai.webui.api.WebuiModule;
 import io.subutai.webui.api.WebuiModuleService;
 
@@ -108,13 +110,10 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
             {
                 String moduleInfo = module.getAngularDependecyList();
 
-                if ( null != moduleInfo && moduleInfo.length() > 0 )
+                if ( !Strings.isNullOrEmpty( moduleInfo ) && !isPluginPresent( module, builder ) )
                 {
                     //add only if a plugin with such a name is not already present
-                    if ( builder.indexOf( String.format( ".state('%s'", module.getName().toLowerCase() ) ) == -1 )
-                    {
-                        builder.append( module.getAngularDependecyList() ).append( "\n" );
-                    }
+                    builder.append( moduleInfo ).append( "\n" );
                 }
             }
             catch ( Exception e )
@@ -124,6 +123,12 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
         }
 
         return subutaiAppJs.replace( ".state()", builder.toString() );
+    }
+
+
+    private boolean isPluginPresent( final WebuiModule module, final StringBuilder builder )
+    {
+        return builder.indexOf( String.format( ".state('%s'", module.getName().toLowerCase() ) ) != -1;
     }
 
 

@@ -25,7 +25,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.plugincommon.model.ClusterDataEntity;
 
-
+//TODO refactor this class esp secuirty related places
 public class PluginDataService
 {
     private EntityManagerFactory emf;

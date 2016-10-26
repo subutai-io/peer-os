@@ -51,7 +51,7 @@ public class DestroyContainersStep
 
             TaskUtil.TaskResults<Object> destroyResults = destroyUtil.executeParallel();
 
-            for ( TaskUtil.TaskResult<Object> destroyResult : destroyResults.getTaskResults() )
+            for ( TaskUtil.TaskResult<Object> destroyResult : destroyResults.getResults() )
             {
                 ContainerHost containerHost = ( ( ContainerDestroyTask ) destroyResult.getTask() ).getContainerHost();
 

@@ -1489,6 +1489,10 @@ public class IdentityManagerImpl implements IdentityManager
                             return permission.isUpdate();
                         case Delete:
                             return permission.isDelete();
+                        default:
+                            // no-op
+                            break;
+
                     }
                 }
             }

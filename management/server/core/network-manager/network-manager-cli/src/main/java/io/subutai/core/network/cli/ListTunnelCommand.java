@@ -1,9 +1,6 @@
 package io.subutai.core.network.cli;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -19,12 +16,9 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 @Command( scope = "net", name = "tunnel-list", description = "Lists tunnels" )
 public class ListTunnelCommand extends SubutaiShellCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ListTunnelCommand.class.getName() );
-
     private final LocalPeer localPeer;
 
-    @Argument( index = 0, name = "host id", required = false, multiValued = false,
-            description = "host id" )
+    @Argument( index = 0, name = "host id", required = false, multiValued = false, description = "host id" )
     String hostId;
 
 
@@ -56,7 +50,7 @@ public class ListTunnelCommand extends SubutaiShellCommandSupport
         catch ( Exception e )
         {
             System.out.println( e.getMessage() );
-            LOG.error( "Error in ListTunnelCommand", e );
+            log.error( "Error in ListTunnelCommand", e );
         }
 
         return null;

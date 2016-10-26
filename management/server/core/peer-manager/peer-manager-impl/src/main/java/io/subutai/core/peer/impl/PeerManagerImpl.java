@@ -722,6 +722,9 @@ public class PeerManagerImpl implements PeerManager
                     LOG.warn( e.getMessage(), e );
                 }
                 break;
+            default:
+                LOG.info( "Requested {}", status );
+                break;
         }
         return result;
     }

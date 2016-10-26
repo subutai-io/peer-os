@@ -26,28 +26,28 @@ public class SecretKeyStoreEntity implements SecretKeyStore
 
     /********* column names *******/
 
-    private static final String KEY_FINGERPRINT = "kfingerprint";
-    private static final String STATUS = "status";
-    private static final String TYPE = "type";
-    private static final String DATA = "data";
-    private static final String PWD = "pwd";
+    private static final String KEY_FINGERPRINT_NAME = "kfingerprint";
+    private static final String STATUS_NAME = "status";
+    private static final String TYPE_NAME = "type";
+    private static final String DATA_NAME = "data";
+    private static final String PWD_NAME = "pwd";
 
 
     @Id
-    @Column( name = KEY_FINGERPRINT )
+    @Column( name = KEY_FINGERPRINT_NAME )
     private String keyFingerprint;
 
-    @Column( name = STATUS )
+    @Column( name = STATUS_NAME )
     private short status = 1;
 
-    @Column( name = TYPE )
+    @Column( name = TYPE_NAME )
     private int type = 1;
 
-    @Column( name = PWD )
+    @Column( name = PWD_NAME )
     private String pwd;
 
     @Lob
-    @Column( name = DATA )
+    @Column( name = DATA_NAME )
     private byte[] data;
 
 

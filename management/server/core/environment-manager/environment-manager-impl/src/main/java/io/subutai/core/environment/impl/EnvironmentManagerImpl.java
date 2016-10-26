@@ -237,11 +237,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkNotNull( peerAction );
 
         PeerActionResponse response = PeerActionResponse.Ok();
+
         switch ( peerAction.getType() )
         {
-            case REGISTER:
-                // it is ok
-                break;
             case UNREGISTER:
                 if ( isPeerInUse( ( String ) peerAction.getData() ) )
                 {
@@ -249,7 +247,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 }
 
                 break;
+            default:
+                LOG.info( "Peer action {}", peerAction.getType() );
+                break;
         }
+
         return response;
     }
 
@@ -581,10 +583,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
                     newContainers.removeAll( oldContainers );
 
-                    if ( !newContainers.isEmpty() )
-                    {
-                        notifyOnEnvironmentGrown( loadEnvironment( environment.getId() ), newContainers );
-                    }
+                    notifyOnEnvironmentGrown( loadEnvironment( environment.getId() ), newContainers );
 
                     removeActiveWorkflow( environment.getId() );
                 }
@@ -1457,16 +1456,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void notifyOnEnvironmentGrown( final Environment environment,
                                           final Set<EnvironmentContainerHost> containers )
     {
-        for ( final EnvironmentEventListener listener : listeners )
+        if ( !containers.isEmpty() )
         {
-            executor.submit( new Runnable()
+            for ( final EnvironmentEventListener listener : listeners )
             {
-                @Override
-                public void run()
+                executor.submit( new Runnable()
                 {
-                    listener.onEnvironmentGrown( environment, containers );
-                }
-            } );
+                    @Override
+                    public void run()
+                    {
+                        listener.onEnvironmentGrown( environment, containers );
+                    }
+                } );
+            }
         }
     }
 

@@ -54,7 +54,7 @@ public class UpdateEtcHostsStep
         PeerUtil.PeerTaskResults<Object> peerResults = peerUtil.executeParallel();
 
 
-        for ( PeerUtil.PeerTaskResult peerResult : peerResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult peerResult : peerResults.getResults() )
         {
             if ( peerResult.hasSucceeded() )
             {

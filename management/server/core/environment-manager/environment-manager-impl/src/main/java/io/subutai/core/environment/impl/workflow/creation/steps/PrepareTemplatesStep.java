@@ -57,7 +57,7 @@ public class PrepareTemplatesStep
 
         boolean succeeded = true;
 
-        for ( PeerUtil.PeerTaskResult<PrepareTemplatesResponse> templateResult : templateResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<PrepareTemplatesResponse> templateResult : templateResults.getResults() )
         {
             succeeded &= templateResult.getResult().hasSucceeded();
         }

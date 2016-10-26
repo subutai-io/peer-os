@@ -43,7 +43,7 @@ public class ChangeHostnameStep
 
         TaskUtil.TaskResults<Object> renameResults = renameUtil.executeParallel();
 
-        TaskUtil.TaskResult<Object> renameResult = renameResults.getTaskResults().iterator().next();
+        TaskUtil.TaskResult<Object> renameResult = renameResults.getResults().iterator().next();
 
         EnvironmentContainerImpl container = ( EnvironmentContainerImpl ) renameResult.getResult();
 

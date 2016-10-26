@@ -83,12 +83,9 @@ public class KeyStoreTool
                 else
                 {
                     File keyStoresFolder = new File( file.getParent() );
-                    if ( keyStoresFolder.mkdirs() )
+                    if ( keyStoresFolder.mkdirs() && file.createNewFile() )
                     {
-                        if ( file.createNewFile() )
-                        {
-                            LOGGER.info( "Created keystore file" );
-                        }
+                        LOGGER.info( "Created keystore file" );
                     }
 
                     keyStore = KeyStore.getInstance( keyStoreData.getKeyStoreType().jce() );

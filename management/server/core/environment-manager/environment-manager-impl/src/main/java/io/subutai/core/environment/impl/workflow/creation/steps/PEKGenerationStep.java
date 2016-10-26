@@ -94,7 +94,7 @@ public class PEKGenerationStep
 
         PeerUtil.PeerTaskResults<Object> pekResults = pekUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult pekResult : pekResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult pekResult : pekResults.getResults() )
         {
             if ( pekResult.hasSucceeded() )
             {

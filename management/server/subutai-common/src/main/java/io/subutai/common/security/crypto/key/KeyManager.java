@@ -204,18 +204,6 @@ public class KeyManager
     }
 
 
-    public KeyPair getKeypair()
-    {
-        return keyPair;
-    }
-
-
-    public void setKeypair( KeyPair keypair )
-    {
-        this.keyPair = keypair;
-    }
-
-
     public PrivateKey getPrivateKey()
     {
         return privateKey;
