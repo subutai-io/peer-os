@@ -77,7 +77,7 @@ func parsefile(hostname, lxc, cgtype, filename string) {
 	for scanner.Scan() {
 		line := strings.Split(scanner.Text(), " ")
 		value, err := strconv.ParseInt(line[1], 10, 62)
-		log.Check(log.DebugLevel, "Pacing file from proc", err)
+		log.Check(log.DebugLevel, "Parsing file from proc", err)
 		if cgtype == "memory" && lxcmemory[line[0]] {
 			point, err := client.NewPoint("lxc_"+cgtype,
 				map[string]string{"hostname": lxc, "type": line[0]},
@@ -135,9 +135,9 @@ func netStat() {
 		if strings.Contains(scanner.Text(), ":") {
 			line := strings.Fields(scanner.Text())
 			traffic[0], err = strconv.ParseInt(line[1], 10, 64)
-			log.Check(log.DebugLevel, "Pacing network stat file from proc", err)
+			log.Check(log.DebugLevel, "Parsing network stat file from proc", err)
 			traffic[1], err = strconv.ParseInt(line[9], 10, 64)
-			log.Check(log.DebugLevel, "Pacing network stat file from proc", err)
+			log.Check(log.DebugLevel, "Parsing network stat file from proc", err)
 
 			nicname := strings.Split(line[0], ":")[0]
 			metric := "host_net"
@@ -182,7 +182,7 @@ func btrfsStat() {
 		path := strings.Split(list[line[0]], "/")
 		if len(path) > 3 {
 			value, err := strconv.Atoi(line[2])
-			log.Check(log.DebugLevel, "Pacing network stat file from proc", err)
+			log.Check(log.DebugLevel, "Parsing network stat file from proc", err)
 			point, err := client.NewPoint("lxc_disk",
 				map[string]string{"hostname": path[2], "mount": path[3], "type": "used"},
 				map[string]interface{}{"value": value},
@@ -208,7 +208,7 @@ func diskFree() {
 		if strings.HasPrefix(line[0], "/dev") {
 			for i := range metrics {
 				value, err := strconv.Atoi(line[i+1])
-				log.Check(log.DebugLevel, "Pacing network disk stats", err)
+				log.Check(log.DebugLevel, "Parsing network disk stats", err)
 				point, err := client.NewPoint("host_disk",
 					map[string]string{"hostname": hostname, "mount": line[5], "type": metrics[i]},
 					map[string]interface{}{"value": value},
@@ -233,7 +233,7 @@ func memStat() {
 	for scanner.Scan() {
 		line := strings.Fields(strings.Replace(scanner.Text(), ":", "", -1))
 		value, err := strconv.ParseInt(line[1], 10, 62)
-		log.Check(log.DebugLevel, "Pacing network memory stats from proc", err)
+		log.Check(log.DebugLevel, "Parsing network memory stats from proc", err)
 		if memory[line[0]] {
 			point, err := client.NewPoint("host_memory",
 				map[string]string{"hostname": hostname, "type": line[0]},
@@ -260,7 +260,7 @@ func cpuStat() {
 		if line[0] == "cpu" {
 			for i := range cpu {
 				value, err := strconv.Atoi(line[i+1])
-				log.Check(log.DebugLevel, "Pacing network CPU stats from proc", err)
+				log.Check(log.DebugLevel, "Parsing network CPU stats from proc", err)
 				point, err := client.NewPoint("host_cpu",
 					map[string]string{"hostname": hostname, "type": cpu[i]},
 					map[string]interface{}{"value": value / runtime.NumCPU()},

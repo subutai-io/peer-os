@@ -37,14 +37,15 @@ func GetInterfaces() []Iface {
 		}
 		inter := new(Iface)
 		inter.InterfaceName = ifac.Name
-		addrs, _ := ifac.Addrs()
-		for _, addr := range addrs {
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ipv4 := v.IP.To4().String()
-				if ipv4 != "<nil>" {
-					inter.IP = ipv4
-					list = append(list, *inter)
+		if addrs, err := ifac.Addrs(); err == nil {
+			for _, addr := range addrs {
+				switch v := addr.(type) {
+				case *net.IPNet:
+					ipv4 := v.IP.To4().String()
+					if ipv4 != "<nil>" {
+						inter.IP = ipv4
+						list = append(list, *inter)
+					}
 				}
 			}
 		}
@@ -88,7 +89,8 @@ func TLSConfig() *http.Client {
 }
 
 func x509generate() {
-	hostname, _ := os.Hostname()
+	hostname, err := os.Hostname()
+	log.Check(log.DebugLevel, "Getting Resource Host hostname", err)
 	host := []string{hostname}
 	priv, err := rsa.GenerateKey(rand.Reader, 2048)
 	if log.Check(log.WarnLevel, "Generating private key", err) {
@@ -120,21 +122,24 @@ func x509generate() {
 		return
 	}
 
-	os.MkdirAll(config.Agent.DataPrefix+"ssl", 0700)
+	log.Check(log.DebugLevel, "Creating directory for SSL certificates", os.MkdirAll(config.Agent.DataPrefix+"ssl", 0700))
 
 	certOut, err := os.Create(config.Agent.DataPrefix + "ssl/cert.pem")
 	if log.Check(log.WarnLevel, "Opening cert.pem for writing", err) {
 		return
 	}
-	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
-	certOut.Close()
+	err = pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+	log.Check(log.DebugLevel, "Encoding certificate", err)
+	log.Check(log.DebugLevel, "Closing certificate", certOut.Close())
 
 	keyOut, err := os.OpenFile(config.Agent.DataPrefix+"ssl/key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if log.Check(log.WarnLevel, "Opening key.pem for writing", err) {
 		return
 	}
-	pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)})
-	keyOut.Close()
+	err = pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)})
+	log.Check(log.DebugLevel, "Encoding certificate key", err)
+	log.Check(log.DebugLevel, "Closing certificate key", keyOut.Close())
+
 }
 
 func newTLSConfig() *tls.Config {
