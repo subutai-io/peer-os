@@ -47,9 +47,7 @@ public class KeyManagerTest
 
         keyManager.setKeyGen( keyPairGenerator );
         keyManager.setKeyGen( keyGenerator );
-        keyManager.setKeypair( keyPair );
         keyManager.setKeyPairGen( keyPairGenerator );
-        keyManager.setKeypair( keyPair );
         keyManager.setPrivateKey( privateKey );
         keyManager.setPublicKey( publicKey );
         keyManager.setKeyPair( keyPair );
@@ -62,7 +60,6 @@ public class KeyManagerTest
     public void testProperties()
     {
         assertNotNull( keyManager.getKeyGen() );
-        assertNotNull( keyManager.getKeypair() );
         assertNotNull( keyManager.getKeyPair() );
         assertNotNull( keyManager.getPrivateKey() );
         assertNotNull( keyManager.getPublicKey() );
