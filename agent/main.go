@@ -2,9 +2,9 @@ package main
 
 import (
 	"os"
-	"subutai/cli"
 
 	"github.com/subutai-io/base/agent/agent"
+	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/log"
 

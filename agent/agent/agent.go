@@ -8,7 +8,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"subutai/cli"
 
 	"sync"
 	"time"
@@ -21,6 +20,7 @@ import (
 	"github.com/subutai-io/base/agent/agent/executer"
 	"github.com/subutai-io/base/agent/agent/monitor"
 	"github.com/subutai-io/base/agent/agent/utils"
+	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
