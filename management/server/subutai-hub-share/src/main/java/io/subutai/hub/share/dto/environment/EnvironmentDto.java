@@ -9,15 +9,7 @@ public class EnvironmentDto
 {
     public enum BuildState
     {
-        CREATED,
-        EXCHANGE_INFO,
-        SETUP_P2P,
-        BUILD_CONTAINER,
-        CONFIGURE_CONTAINER,
-        DESTROYING,
-        DESTROYED,
-        DISABLED,
-        READY
+        CREATED, EXCHANGE_INFO, SETUP_P2P, BUILD_CONTAINER, CONFIGURE_CONTAINER, DESTROYING, DESTROYED, DISABLED, READY
     }
 
 
@@ -37,7 +29,7 @@ public class EnvironmentDto
 
     private String ownerToken;
 
-    private ArrayList<EnvironmentPeerDto> peers = new ArrayList<>();
+    private List<EnvironmentPeerDto> peers = new ArrayList<>();
 
     private List<EnvironmentNodesDto> nodes = new ArrayList<>();
 
@@ -102,7 +94,7 @@ public class EnvironmentDto
     }
 
 
-    public void setPeers( final ArrayList<EnvironmentPeerDto> peers )
+    public void setPeers( final List<EnvironmentPeerDto> peers )
     {
         this.peers = peers;
     }
