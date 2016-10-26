@@ -1,12 +1,13 @@
-package lib
+package cli
 
 import (
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/container"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/log"
 )
 
 // LxcConfig function allows read and write container's configuration file through command line.

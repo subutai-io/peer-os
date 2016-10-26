@@ -1,15 +1,16 @@
-package lib
+package cli
 
 import (
 	"fmt"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/container"
-	"github.com/subutai-io/base/agent/log"
-	lxc "gopkg.in/lxc/go-lxc.v2"
 	"io"
 	"os"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/log"
+	lxc "gopkg.in/lxc/go-lxc.v2"
 )
 
 // printHeader prints list headerline

@@ -8,11 +8,12 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"subutai/cli"
 
 	"sync"
 	"time"
 
-	"github.com/codegangsta/cli"
+	gcli "github.com/codegangsta/cli"
 
 	"github.com/subutai-io/base/agent/agent/alert"
 	"github.com/subutai-io/base/agent/agent/connect"
@@ -20,7 +21,6 @@ import (
 	"github.com/subutai-io/base/agent/agent/executer"
 	"github.com/subutai-io/base/agent/agent/monitor"
 	"github.com/subutai-io/base/agent/agent/utils"
-	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
@@ -66,7 +66,7 @@ func initAgent() {
 }
 
 //Start starting Subutai Agent daemon, all required goroutines and keep working during all life cycle.
-func Start(c *cli.Context) {
+func Start(c *gcli.Context) {
 	initAgent()
 
 	http.HandleFunc("/trigger", trigger)
@@ -84,7 +84,7 @@ func Start(c *cli.Context) {
 		} else {
 			time.Sleep(5 * time.Second)
 		}
-		lib.TunCheck()
+		cli.TunCheck()
 		for !checkSS() {
 			time.Sleep(time.Second * 10)
 		}
