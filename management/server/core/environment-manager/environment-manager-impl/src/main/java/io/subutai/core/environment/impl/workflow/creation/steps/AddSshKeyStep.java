@@ -55,7 +55,7 @@ public class AddSshKeyStep
 
             PeerUtil.PeerTaskResults<Object> keyResults = keyUtil.executeParallel();
 
-            for ( PeerUtil.PeerTaskResult keyResult : keyResults.getPeerTaskResults() )
+            for ( PeerUtil.PeerTaskResult keyResult : keyResults.getResults() )
             {
                 if ( keyResult.hasSucceeded() )
                 {

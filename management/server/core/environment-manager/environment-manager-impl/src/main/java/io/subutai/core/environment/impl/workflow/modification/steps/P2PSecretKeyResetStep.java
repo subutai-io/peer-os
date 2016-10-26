@@ -46,7 +46,7 @@ public class P2PSecretKeyResetStep
 
         PeerUtil.PeerTaskResults<Object> resetResults = resetUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult resetResult : resetResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult resetResult : resetResults.getResults() )
         {
             if ( resetResult.hasSucceeded() )
             {

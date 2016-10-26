@@ -81,7 +81,7 @@ public class RegisterHostsStep
 
         PeerUtil.PeerTaskResults<Object> hostResults = hostUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult hostResult : hostResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult hostResult : hostResults.getResults() )
         {
 
             if ( hostResult.hasSucceeded() )

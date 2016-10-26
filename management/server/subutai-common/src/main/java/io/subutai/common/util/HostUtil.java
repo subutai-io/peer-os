@@ -448,62 +448,7 @@ public class HostUtil
 
         task.setTaskState( Task.TaskState.RUNNING );
 
-        final Future<Boolean> taskFuture = taskExecutor.submit( new Callable<Boolean>()
-        {
-            @Override
-            public Boolean call() throws Exception
-            {
-                try
-                {
-                    task.setResult( task.call() );
-
-                    task.setTaskState( Task.TaskState.SUCCEEDED );
-
-                    return true;
-                }
-                catch ( Exception e )
-                {
-                    task.setException( e );
-
-                    if ( task.getTaskState() == Task.TaskState.CANCELLED )
-                    {
-                        LOG.warn( "Task {} was cancelled", task.name() );
-                    }
-                    else
-                    {
-                        LOG.error( "Error executing task {}", task.name(), e );
-
-                        task.setTaskState( Task.TaskState.FAILED );
-                    }
-
-                    return false;
-                }
-                finally
-                {
-                    //remove completed task
-                    allTasks.remove( task );
-
-                    if ( environmentId != null )
-                    {
-                        synchronized ( environmentTasksFuturesMap )
-                        {
-                            Map<Task, EnvironmentTaskFuture> environmentTaskFutures =
-                                    environmentTasksFuturesMap.get( environmentId );
-
-                            if ( environmentTaskFutures != null )
-                            {
-                                environmentTaskFutures.remove( task );
-
-                                if ( environmentTaskFutures.isEmpty() )
-                                {
-                                    environmentTasksFuturesMap.remove( environmentId );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } );
+        final Future<Boolean> taskFuture = taskExecutor.submit( new HostTaskCommand<>( task, environmentId ) );
 
         if ( environmentId != null )
         {
@@ -525,6 +470,75 @@ public class HostUtil
         }
 
         return taskFuture;
+    }
+
+
+    class HostTaskCommand<R> implements Callable<Boolean>
+    {
+        private final Task<R> task;
+        private final String environmentId;
+
+
+        HostTaskCommand( final Task<R> task, final String environmentId )
+        {
+            this.task = task;
+            this.environmentId = environmentId;
+        }
+
+
+        @Override
+        public Boolean call() throws Exception
+        {
+            try
+            {
+                task.setResult( task.call() );
+
+                task.setTaskState( Task.TaskState.SUCCEEDED );
+
+                return true;
+            }
+            catch ( Exception e )
+            {
+                task.setException( e );
+
+                if ( task.getTaskState() == Task.TaskState.CANCELLED )
+                {
+                    LOG.warn( "Task {} was cancelled", task.name() );
+                }
+                else
+                {
+                    LOG.error( "Error executing task {}", task.name(), e );
+
+                    task.setTaskState( Task.TaskState.FAILED );
+                }
+
+                return false;
+            }
+            finally
+            {
+                //remove completed task
+                allTasks.remove( task );
+
+                if ( environmentId != null )
+                {
+                    synchronized ( environmentTasksFuturesMap )
+                    {
+                        Map<Task, EnvironmentTaskFuture> environmentTaskFutures =
+                                environmentTasksFuturesMap.get( environmentId );
+
+                        if ( environmentTaskFutures != null )
+                        {
+                            environmentTaskFutures.remove( task );
+
+                            if ( environmentTaskFutures.isEmpty() )
+                            {
+                                environmentTasksFuturesMap.remove( environmentId );
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 

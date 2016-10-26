@@ -120,7 +120,7 @@ public class ContainerCloneStep
         boolean succeeded = true;
 
         for ( PeerUtil.PeerTaskResult<CreateEnvironmentContainersResponse> cloneResult : cloneResults
-                .getPeerTaskResults() )
+                .getResults() )
         {
             CreateEnvironmentContainersResponse response = cloneResult.getResult();
             String peerId = cloneResult.getPeer().getId();

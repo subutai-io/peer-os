@@ -120,7 +120,7 @@ public class MonitorImpl implements Monitor, HostListener
 
     public void addAlertListener( AlertListener alertListener )
     {
-        if ( alertListener != null && alertListener.getId() != null && !"".equals( alertListener.getId().trim() ) )
+        if ( alertListener != null && alertListener.getId() != null && !alertListener.getId().trim().isEmpty() )
         {
             alertListeners.add( alertListener );
         }
@@ -129,7 +129,10 @@ public class MonitorImpl implements Monitor, HostListener
 
     public void removeAlertListener( AlertListener alertListener )
     {
-        alertListeners.remove( alertListener );
+        if ( alertListener != null )
+        {
+            alertListeners.remove( alertListener );
+        }
     }
 
 

@@ -95,7 +95,7 @@ public class RegisterSshStep
 
         PeerUtil.PeerTaskResults<Object> appendResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult appendResult : appendResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult appendResult : appendResults.getResults() )
         {
             if ( appendResult.hasSucceeded() )
             {
@@ -144,7 +144,7 @@ public class RegisterSshStep
 
         PeerUtil.PeerTaskResults<Object> createResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult createResult : createResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult createResult : createResults.getResults() )
         {
             if ( createResult.hasSucceeded() )
             {

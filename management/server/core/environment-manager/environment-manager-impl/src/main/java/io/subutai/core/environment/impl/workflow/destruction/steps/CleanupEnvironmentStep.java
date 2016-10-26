@@ -51,7 +51,7 @@ public class CleanupEnvironmentStep
 
         PeerUtil.PeerTaskResults<Object> cleanupResults = cleanupUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult cleanupResult : cleanupResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult cleanupResult : cleanupResults.getResults() )
         {
             if ( cleanupResult.hasSucceeded() )
             {

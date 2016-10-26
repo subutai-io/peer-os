@@ -54,7 +54,7 @@ public class ChangeQuotaStep
 
                 TaskUtil.TaskResults<Object> quotaResults = quotaUtil.executeParallel();
 
-                for ( TaskUtil.TaskResult quotaResult : quotaResults.getTaskResults() )
+                for ( TaskUtil.TaskResult quotaResult : quotaResults.getResults() )
                 {
                     if ( quotaResult.hasSucceeded() )
                     {

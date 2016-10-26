@@ -1,9 +1,6 @@
 package io.subutai.core.hostregistry.cli;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -18,8 +15,6 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 @Command( scope = "host", name = "container-host", description = "Prints details about container host" )
 public class GetContainerHostInfoCommand extends SubutaiShellCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( GetContainerHostInfoCommand.class.getName() );
-
     private final HostRegistry hostRegistry;
 
     @Argument( index = 0, name = "hostname or id", required = true, multiValued = false, description = "container "
@@ -57,7 +52,7 @@ public class GetContainerHostInfoCommand extends SubutaiShellCommandSupport
         catch ( HostDisconnectedException e )
         {
             System.out.println( "Host is not connected" );
-            LOG.error( "Error in GetContainerHostInfoCommand", e );
+            log.error( "Error in GetContainerHostInfoCommand", e );
         }
 
         return null;

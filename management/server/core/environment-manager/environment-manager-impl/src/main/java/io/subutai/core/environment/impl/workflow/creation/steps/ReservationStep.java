@@ -71,7 +71,7 @@ public class ReservationStep
 
         PeerUtil.PeerTaskResults<Object> netQueryResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult netQueryResult : netQueryResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult netQueryResult : netQueryResults.getResults() )
         {
             if ( netQueryResult.hasSucceeded() )
             {
@@ -144,7 +144,7 @@ public class ReservationStep
 
         PeerUtil.PeerTaskResults<Object> netReservationResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult<Object> netReservationResult : netReservationResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<Object> netReservationResult : netReservationResults.getResults() )
         {
             if ( netReservationResult.hasSucceeded() )
             {
