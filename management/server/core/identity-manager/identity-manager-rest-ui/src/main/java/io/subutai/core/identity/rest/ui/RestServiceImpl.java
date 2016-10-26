@@ -204,7 +204,7 @@ public class RestServiceImpl implements RestService
 
                 if ( !Strings.isNullOrEmpty( rolesJson ) )
                 {
-                    List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
+                    List<Long> roleIds = jsonUtil.from( rolesJson, new TypeToken<ArrayList<Long>>()
                     {
                     }.getType() );
 
@@ -220,7 +220,7 @@ public class RestServiceImpl implements RestService
                 newUser.setFullName( fullName );
                 newUser.setTrustLevel( Integer.parseInt( trustLevel ) );
 
-                List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
+                List<Long> roleIds = jsonUtil.from( rolesJson, new TypeToken<ArrayList<Long>>()
                 {
                 }.getType() );
 

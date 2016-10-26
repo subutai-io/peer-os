@@ -133,6 +133,7 @@ public class HubManagerImpl implements HubManager
 
     private HeartbeatProcessor heartbeatProcessor;
 
+    //todo inject this as dependency
     private ResourceHostDataProcessor resourceHostDataProcessor;
 
     private ContainerEventProcessor containerEventProcessor;
@@ -203,6 +204,7 @@ public class HubManagerImpl implements HubManager
 
             containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
+            //todo inject this as dependency
             HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
