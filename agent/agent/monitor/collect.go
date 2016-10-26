@@ -9,13 +9,13 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"subutai/log"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/log"
 )
 
 var (
