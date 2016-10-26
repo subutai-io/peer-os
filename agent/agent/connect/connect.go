@@ -34,7 +34,8 @@ type rHost struct {
 //Request collecting connection request and sends to the Management server.
 func Request(user, pass string) {
 	log.Debug("Connecting to " + config.Management.Host + ":" + config.Management.Port)
-	hostname, _ := os.Hostname()
+	hostname, err := os.Hostname()
+	log.Check(log.DebugLevel, "Getting Resource Host hostname", err)
 
 	rh, err := json.Marshal(rHost{
 		Hostname:   hostname,
@@ -57,7 +58,7 @@ func Request(user, pass string) {
 			bytes.NewBuffer([]byte(gpg.EncryptWrapper(user, config.Management.GpgUser, rh))))
 
 		if !log.Check(log.WarnLevel, "POSTing registration request to SS", err) {
-			resp.Body.Close()
+			log.Check(log.DebugLevel, "Closing Management server response", resp.Body.Close())
 		}
 	}
 }
@@ -72,8 +73,10 @@ func getKey() []byte {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		key, _ := ioutil.ReadAll(resp.Body)
-		return key
+		key, err := ioutil.ReadAll(resp.Body)
+		if err == nil {
+			return key
+		}
 	}
 
 	log.Warn("Failed to fetch PK from Management Server. Status Code " + strconv.Itoa(resp.StatusCode))
@@ -83,8 +86,13 @@ func getKey() []byte {
 func extractKeyID(k []byte) string {
 	command := exec.Command("gpg")
 	stdin, err := command.StdinPipe()
-	stdin.Write(k)
-	stdin.Close()
+	if err != nil {
+		return ""
+	}
+
+	_, err = stdin.Write(k)
+	log.Check(log.DebugLevel, "Writing to stdin pipe", err)
+	log.Check(log.DebugLevel, "Closing stdin pipe", stdin.Close())
 	out, err := command.Output()
 	log.Check(log.WarnLevel, "Extracting ID from Key", err)
 
