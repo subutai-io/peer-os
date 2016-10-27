@@ -88,7 +88,7 @@ public class DateSerializer extends XmlAdapter<String, Date> implements Serializ
     @Override
     public String marshal( Date date ) throws Exception
     {
-        return date.getTime() + "";
+        return Long.toString( date.getTime() );
     }
 
 

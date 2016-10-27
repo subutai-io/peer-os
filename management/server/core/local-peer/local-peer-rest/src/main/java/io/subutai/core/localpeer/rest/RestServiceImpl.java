@@ -34,7 +34,6 @@ import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 
 
@@ -42,7 +41,6 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private final LocalPeer localPeer;
-    protected JsonUtil jsonUtil = new JsonUtil();
 
 
     public RestServiceImpl( final LocalPeer localPeer )

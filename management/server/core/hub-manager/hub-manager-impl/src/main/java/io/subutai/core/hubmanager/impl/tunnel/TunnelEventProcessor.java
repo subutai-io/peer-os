@@ -154,12 +154,11 @@ public class TunnelEventProcessor implements Runnable
         {
             ipPort = map.get( -1L );
         }
-
         else
         {
-            for ( long key : map.keySet() )
+            for ( Map.Entry<Long, String> entry : map.entrySet() )
             {
-                ipPort = map.get( key );
+                ipPort = entry.getValue();
             }
         }
 
