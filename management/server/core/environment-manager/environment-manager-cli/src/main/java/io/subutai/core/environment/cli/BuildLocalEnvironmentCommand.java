@@ -1,15 +1,14 @@
 package io.subutai.core.environment.cli;
 
 
+import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
@@ -23,8 +22,7 @@ import io.subutai.core.peer.api.PeerManager;
 public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
-    @Argument( name = "templateName", description = "Template name",
-            index = 0, multiValued = false, required = true )
+    @Argument( name = "templateName", description = "Template name", index = 0, multiValued = false, required = true )
     /**
      * {@value templateName} template to clone for environment hosts
      * {@code required = true}
@@ -32,23 +30,22 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
             String templateName;
 
 
-    @Argument( name = "numberOfContainers", description = "Number of containers",
-            index = 1, multiValued = false, required = true )
+    @Argument( name = "numberOfContainers", description = "Number of containers", index = 1, multiValued = false,
+            required = true )
     /**
      * {@value numberOfContainers }number of container hosts to create in environment
      * {@code required = true}
      */
             int numberOfContainers;
-    @Argument( name = "subnetCidr", description = "Subnet in CIDR notation",
-            index = 2, multiValued = false, required = true )
+    @Argument( name = "subnetCidr", description = "Subnet in CIDR notation", index = 2, multiValued = false, required
+            = true )
     /**
      * {@value subnetCidr } Subnet in CIDR notation
      * {@code required = true}
      */
             String subnetCidr;
 
-    @Argument( name = "async", description = "asynchronous build",
-            index = 3, multiValued = false, required = false )
+    @Argument( name = "async", description = "asynchronous build", index = 3, multiValued = false, required = false )
     /**
      * {@value async} Create environment asynchronously
      * {@code async = false}
@@ -76,22 +73,23 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
         String peerId = peerManager.getLocalPeer().getId();
         final Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
 
-        if ( resourceHosts.size() < 1 )
+        if ( resourceHosts.isEmpty() )
         {
             System.out.println( "There are no resource hosts to build environment" );
             return null;
         }
         String hostId = resourceHosts.iterator().next().getId();
-        Node node =
-                new Node( UUID.randomUUID().toString(), "NodeGroup1", templateName, ContainerSize.TINY, 1, 1, peerId,
-                        hostId );
+        String containerName = String.format( "Container%d", new Random().nextInt( 999 ) );
+
+        Node node = new Node( containerName, containerName, ContainerSize.TINY, peerId, hostId,
+                peerManager.getLocalPeer().getTemplateByName( templateName ).getId() );
 
         Topology topology = new Topology( "Dummy environment name" );
         topology.addNodePlacement( peerId, node );
 
-        Environment environment = environmentManager.createEnvironment( topology, async );
+        environmentManager.createEnvironment( topology, async );
 
-        System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
+        System.out.println( "Environment creation started" );
 
         return null;
     }

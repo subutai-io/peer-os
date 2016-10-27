@@ -46,7 +46,7 @@ public class SetQuotaTask extends HostUtil.Task
     @Override
     public Object call() throws Exception
     {
-        resourceHost.setContainerQuota( containerHost, request.getContainerSize() );
+        resourceHost.setContainerSize( containerHost, request.getContainerSize() );
 
         return null;
     }

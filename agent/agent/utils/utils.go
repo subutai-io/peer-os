@@ -19,17 +19,19 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+// Iface describes network interfaces of the Resource Host.
 type Iface struct {
 	InterfaceName string `json:"interfaceName"`
-	Ip            string `json:"ip"`
+	IP            string `json:"ip"`
 }
 
+// GetInterfaces returns list of network interfaces with addresses for Resource Host
 func GetInterfaces() []Iface {
-	n_ifaces, err := net.Interfaces()
+	ifaces, err := net.Interfaces()
 	log.Check(log.WarnLevel, "Getting network interfaces", err)
 
-	l_ifaces := []Iface{}
-	for _, ifac := range n_ifaces {
+	list := []Iface{}
+	for _, ifac := range ifaces {
 		if ifac.Name == "lo0" || ifac.Name == "lo" || !strings.Contains(ifac.Flags.String(), "up") {
 			continue
 		}
@@ -41,15 +43,16 @@ func GetInterfaces() []Iface {
 			case *net.IPNet:
 				ipv4 := v.IP.To4().String()
 				if ipv4 != "<nil>" {
-					inter.Ip = ipv4
-					l_ifaces = append(l_ifaces, *inter)
+					inter.IP = ipv4
+					list = append(list, *inter)
 				}
 			}
 		}
 	}
-	return l_ifaces
+	return list
 }
 
+// PublicCert returns Public SSL certificate for Resource Host
 func PublicCert() string {
 	pemCerts, err := ioutil.ReadFile(config.Agent.DataPrefix + "ssl/cert.pem")
 	if log.Check(log.WarnLevel, "Checking cert.pem file", err) {
@@ -58,6 +61,7 @@ func PublicCert() string {
 	return string(pemCerts)
 }
 
+// InstanceType returns type of the Resource host: EC2 or LOCAL
 func InstanceType() string {
 	uuid, err := ioutil.ReadFile("/sys/hypervisor/uuid")
 	if !log.Check(log.DebugLevel, "Checking if AWS ec2 by reading /sys/hypervisor/uuid", err) {
@@ -68,6 +72,7 @@ func InstanceType() string {
 	return "LOCAL"
 }
 
+// TLSConfig provides HTTP client for Bi-directional SSL connection with Management server.
 func TLSConfig() *http.Client {
 	tlsconfig := newTLSConfig()
 	for tlsconfig == nil || len(tlsconfig.Certificates[0].Certificate) == 0 {

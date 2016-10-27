@@ -1,10 +1,11 @@
 package io.subutai.core.identity.api.model;
 
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public interface Role
+public interface Role extends Serializable
 {
 
     void setType( final int type );

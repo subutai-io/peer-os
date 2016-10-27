@@ -8,6 +8,9 @@ import java.util.TreeMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
@@ -39,11 +42,12 @@ public class EnvironmentAlertHandlersImpl implements EnvironmentAlertHandlers
     @Override
     public void add( EnvironmentAlertHandler environmentAlertHandler, AlertHandler alertHandler )
     {
-        if ( environmentAlertHandler == null || environmentAlertHandler.getAlertHandlerId() == null
-                || environmentAlertHandler.getAlertHandlerPriority() == null )
-        {
-            throw new IllegalArgumentException( "Invalid alert handler id." );
-        }
+        Preconditions.checkNotNull( environmentAlertHandler, "Invalid environment alert handler" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentAlertHandler.getAlertHandlerId() ),
+                "Invalid environment handler id" );
+        Preconditions.checkNotNull( environmentAlertHandler.getAlertHandlerPriority(),
+                "Invalid environment handler priority" );
+
         this.handlers.put( environmentAlertHandler, alertHandler );
     }
 
@@ -76,7 +80,7 @@ public class EnvironmentAlertHandlersImpl implements EnvironmentAlertHandlers
         } );
     }
 
-
+    @Override
     public AlertHandler getHandler( final EnvironmentAlertHandler handlerId )
     {
         return handlers.get( handlerId );

@@ -1,6 +1,7 @@
 package io.subutai.core.keyserver.impl.dao;
 
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -30,10 +31,11 @@ public class KeyServerDAOImpl implements KeyServerDAO
     /********************************
      *
      */
-    public KeyServerDAOImpl( DaoManager daoManager)
+    public KeyServerDAOImpl( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
+
 
     /********************************
      *
@@ -45,15 +47,16 @@ public class KeyServerDAOImpl implements KeyServerDAO
 
         try
         {
-            Query query = em.createQuery( "select SK from PublicKeyStoreEntity as SK where SK.fingerprint=:fingerprint" );
-            query.setParameter( "fingerprint", fingerprint);
-            PublicKeyStore securityKey  = (PublicKeyStore)query.getSingleResult();
+            Query query =
+                    em.createQuery( "select SK from PublicKeyStoreEntity as SK where SK.fingerprint=:fingerprint" );
+            query.setParameter( "fingerprint", fingerprint );
+            PublicKeyStore securityKey = ( PublicKeyStore ) query.getSingleResult();
 
             return securityKey;
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "KeyManagerDAOImpl findByFingerprint:"+ex.toString() );
+            LOG.error( "KeyManagerDAOImpl findByFingerprint:" + ex.toString() );
             return null;
         }
         finally
@@ -61,6 +64,7 @@ public class KeyServerDAOImpl implements KeyServerDAO
             daoManager.closeEntityManager( em );
         }
     }
+
 
     /********************************
      *
@@ -73,10 +77,10 @@ public class KeyServerDAOImpl implements KeyServerDAO
         try
         {
             Query query = em.createQuery( "select SK from PublicKeyStoreEntity as SK where SK.shortKeyId=:shortKeyId" );
-            query.setParameter( "shortKeyId", shortKeyId);
-            List<PublicKeyStore> securityKeyList  = query.getResultList();
+            query.setParameter( "shortKeyId", shortKeyId );
+            List<PublicKeyStore> securityKeyList = query.getResultList();
 
-            if(securityKeyList!=null)
+            if ( securityKeyList != null )
             {
                 return securityKeyList.get( 0 );
             }
@@ -85,9 +89,9 @@ public class KeyServerDAOImpl implements KeyServerDAO
                 return null;
             }
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "KeyManagerDAOImpl findByShortKeyId:"+ex.toString() );
+            LOG.error( "KeyManagerDAOImpl findByShortKeyId:" + ex.toString() );
             return null;
         }
         finally
@@ -121,9 +125,9 @@ public class KeyServerDAOImpl implements KeyServerDAO
 
             return securityKey;
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "KeyManagerDAOImpl findByKeyId:"+ex.toString() );
+            LOG.error( "KeyManagerDAOImpl findByKeyId:" + ex.toString() );
             return null;
         }
         finally
@@ -144,14 +148,14 @@ public class KeyServerDAOImpl implements KeyServerDAO
         try
         {
             Query query = em.createQuery( "select SK from PublicKeyStoreEntity as SK" );
-            List<PublicKeyStore> securityKeyList  = query.getResultList();
+            List<PublicKeyStore> securityKeyList = query.getResultList();
 
             return securityKeyList;
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "KeyManagerDAOImpl findByAll:"+ex.toString() );
-            return null;
+            LOG.error( "KeyManagerDAOImpl findByAll:" + ex.toString() );
+            return Collections.emptyList();
         }
         finally
         {
@@ -173,11 +177,10 @@ public class KeyServerDAOImpl implements KeyServerDAO
             daoManager.startTransaction( em );
             em.merge( keyStore );
             daoManager.commitTransaction( em );
-
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "KeyManagerDAOImpl save:"+ex.toString(), ex );
+            LOG.error( "KeyManagerDAOImpl save:" + ex.toString(), ex );
             daoManager.rollBackTransaction( em );
         }
         finally
@@ -200,11 +203,10 @@ public class KeyServerDAOImpl implements KeyServerDAO
             daoManager.startTransaction( em );
             em.merge( keyStore );
             daoManager.commitTransaction( em );
-
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "KeyManagerDAOImpl save:"+ex.toString() );
+            LOG.error( "KeyManagerDAOImpl save:" + ex.toString() );
             daoManager.rollBackTransaction( em );
         }
         finally
@@ -225,13 +227,12 @@ public class KeyServerDAOImpl implements KeyServerDAO
         try
         {
             daoManager.startTransaction( em );
-            em.remove ( keyStore );
+            em.remove( keyStore );
             daoManager.commitTransaction( em );
-
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "KeyManagerDAOImpl delete:"+ex.toString() );
+            LOG.error( "KeyManagerDAOImpl delete:" + ex.toString() );
             daoManager.rollBackTransaction( em );
         }
         finally
@@ -258,11 +259,10 @@ public class KeyServerDAOImpl implements KeyServerDAO
             query.executeUpdate();
 
             daoManager.commitTransaction( em );
-
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "KeyManagerDAOImpl deleteById:"+ex.toString() );
+            LOG.error( "KeyManagerDAOImpl deleteById:" + ex.toString() );
             daoManager.rollBackTransaction( em );
         }
         finally

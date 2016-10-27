@@ -33,6 +33,7 @@ public class CommandResponseListener extends RequestListener implements Disposab
     }
 
 
+    @Override
     public void dispose()
     {
         callbacks.dispose();
@@ -43,7 +44,7 @@ public class CommandResponseListener extends RequestListener implements Disposab
     {
         if ( callback != null )
         {
-            callbacks.put( commandId, callback, timeout * 1000 + Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT * 2 * 1000,
+            callbacks.put( commandId, callback, timeout * 1000L + Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT * 2 * 1000,
                     new CommandResponseExpiryCallback( semaphore ) );
         }
     }

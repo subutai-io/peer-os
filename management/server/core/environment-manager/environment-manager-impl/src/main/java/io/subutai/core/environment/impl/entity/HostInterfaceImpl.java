@@ -27,7 +27,7 @@ import io.subutai.common.host.HostInterface;
 @Entity
 @Table( name = "env_con_intf" )
 @Access( AccessType.FIELD )
-public class HostInterfaceImpl implements HostInterface, Serializable
+public class HostInterfaceImpl implements HostInterface
 {
     @Id
     @GeneratedValue
@@ -51,19 +51,13 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     public HostInterfaceImpl( final HostInterface s )
     {
         this.interfaceName = s.getName();
-        this.ip = s.getIp().replace( "addr:", "" );
+        this.ip = s.getIp();
     }
 
 
     public Long getId()
     {
         return id;
-    }
-
-
-    public void setId( final Long id )
-    {
-        this.id = id;
     }
 
 

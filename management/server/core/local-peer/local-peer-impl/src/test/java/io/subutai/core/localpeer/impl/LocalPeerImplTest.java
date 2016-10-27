@@ -46,15 +46,13 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ByteValueResource;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -62,7 +60,6 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
@@ -74,6 +71,10 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.template.api.TemplateManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.QuotaException;
+import io.subutai.hub.share.resource.ByteValueResource;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -82,7 +83,6 @@ import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -169,7 +169,7 @@ public class LocalPeerImplTest
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
-    TemplateKurjun template;
+    Template template;
     @Mock
     ContainerHostInfoModel containerHostInfoModel;
 
@@ -224,6 +224,27 @@ public class LocalPeerImplTest
     @Mock
     Future future;
 
+    @Mock
+    SystemSettings systemSettings2;
+
+
+    class LocalPeerImplForTest extends LocalPeerImpl
+    {
+        public LocalPeerImplForTest( final DaoManager daoManager, final TemplateManager templateManager,
+                                     final QuotaManager quotaManager, final CommandExecutor commandExecutor,
+                                     final HostRegistry hostRegistry, final Monitor monitor,
+                                     final SecurityManager securityManager )
+        {
+            super( daoManager, templateManager, quotaManager, commandExecutor, hostRegistry, monitor, securityManager );
+        }
+
+
+        protected SystemSettings getSystemSettings()
+        {
+            return systemSettings2;
+        }
+    }
+
 
     @Before
     public void setUp() throws Exception
@@ -238,8 +259,8 @@ public class LocalPeerImplTest
 
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
-        localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, commandExecutor, hostRegistry,
-                monitor, securityManager ) );
+        localPeer = spy( new LocalPeerImplForTest( daoManager, templateRegistry, quotaManager, commandExecutor,
+                hostRegistry, monitor, securityManager ) );
         localPeer.setIdentityManager( identityManager );
         localPeer.setRelationManager( relationManager );
 
@@ -266,7 +287,7 @@ public class LocalPeerImplTest
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
         when( resourceHostDataService.getAll() ).thenReturn( Sets.newHashSet( resourceHost ) );
-        when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
+        when( templateRegistry.getTemplateByName( TEMPLATE_NAME ) ).thenReturn( template );
         when( template.getName() ).thenReturn( TEMPLATE_NAME );
         when( resourceHost.isConnected() ).thenReturn( true );
         when( hostRegistry.getContainerHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( containerHostInfo );
@@ -341,12 +362,11 @@ public class LocalPeerImplTest
 
 
     @Test
-    @Ignore
     public void testGetContainerHostState() throws Exception
     {
         localPeer.getContainerState( containerHost.getContainerId() );
 
-        verify( containerHost ).getState();
+        verify( containerHostInfo ).getState();
     }
 
 
@@ -467,26 +487,16 @@ public class LocalPeerImplTest
     }
 
 
-    @Ignore
-    @Test( expected = PeerException.class )
-    public void testSetDefaultGateway() throws Exception
-    {
-
-        verify( commandUtil ).execute( any( RequestBuilder.class ), eq( containerHost ) );
-
-        throwCommandException();
-    }
-
-
     @Test
-    @Ignore
     public void testIsConnected() throws Exception
     {
         assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );
 
-        assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
+        doReturn( "" ).when( hostInfo ).getId();
+
+        assertFalse( localPeer.isConnected( containerHost.getContainerId() ) );
 
         HostDisconnectedException hostDisconnectedException = mock( HostDisconnectedException.class );
 
@@ -497,7 +507,6 @@ public class LocalPeerImplTest
 
 
     @Test( expected = PeerException.class )
-    @Ignore
     public void testGetQuotaInfo() throws Exception
     {
         localPeer.getQuota( containerId );
@@ -587,15 +596,6 @@ public class LocalPeerImplTest
     }
 
 
-    @Test
-    public void testGetTemplate() throws Exception
-    {
-        localPeer.getTemplate( TEMPLATE_NAME );
-
-        verify( templateRegistry ).getTemplate( TEMPLATE_NAME );
-    }
-
-
     @Test( expected = PeerException.class )
     public void testSendRequestInternal() throws Exception
     {
@@ -625,7 +625,7 @@ public class LocalPeerImplTest
         when( resourceHostInfo.getHostname() ).thenReturn( Common.MANAGEMENT_HOSTNAME );
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
         when( resourceHostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
-        doReturn( managementHost ).when( localPeer).getManagementHost() ;
+        doReturn( managementHost ).when( localPeer ).getManagementHost();
 
         localPeer.initialized = true;
         localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );

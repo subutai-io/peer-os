@@ -41,9 +41,9 @@ public class PGPMessenger
 
     public byte[] produce( byte data[] ) throws PGPException
     {
-        if ( data == null )
+        if ( ArrayUtils.isEmpty( data ) )
         {
-            return null;
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
         try
@@ -63,7 +63,7 @@ public class PGPMessenger
     {
         if ( ArrayUtils.isEmpty( encData ) )
         {
-            return encData;
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
         try

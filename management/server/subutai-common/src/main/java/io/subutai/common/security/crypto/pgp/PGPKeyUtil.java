@@ -25,13 +25,15 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
+import com.google.common.base.Strings;
+
 
 /**
  * ***************************************** Key utility class for PGP Keys
  */
 public class PGPKeyUtil
 {
-    public static final BouncyCastleProvider provider = new BouncyCastleProvider();
+    private static final BouncyCastleProvider provider = new BouncyCastleProvider();
 
     public static final int HEX_SHORT_KEY_ID_LENGTH = 8;
     public static final int HEX_LONG_KEY_ID_LENGTH = 16;
@@ -49,14 +51,6 @@ public class PGPKeyUtil
     }
 
     /**
-     * ***********************************************************************************
-     */
-    private PGPKeyUtil()
-    {
-    }
-
-
-    /**
      * *********************************************************************************** Hex encode given numeric key
      * id.
      *
@@ -72,21 +66,6 @@ public class PGPKeyUtil
 
 
     /**
-     * *********************************************************************************** Hex encode given numeric key
-     * id as a short key id.
-     *
-     * @param keyId key id
-     *
-     * @return hex encoded short key id string representing given numeric key id
-     */
-    public static String encodeNumericKeyIdShort( long keyId )
-    {
-        String longKeyId = encodeNumericKeyId( keyId );
-        return longKeyId.substring( 8 );
-    }
-
-
-    /**
      * *********************************************************************************** Retrieves long key id out of
      * given fingerprint. Fingerprint is a 40 hex digits, last 16 digits make up the long key id.
      *
@@ -96,22 +75,12 @@ public class PGPKeyUtil
      */
     public static String getKeyId( String fingerprint )
     {
-        return fingerprint.substring( 24 ).toUpperCase();
-    }
+        if ( !Strings.isNullOrEmpty( fingerprint ) && fingerprint.length() > 24 )
+        {
+            return fingerprint.substring( 24 ).toUpperCase();
+        }
 
-
-    /**
-     * *********************************************************************************** Retrieves long key id out of
-     * given fingerprint. Fingerprint is a 40 hex digits, last 16 digits make up the long key id.
-     *
-     * @param fingerprint fingerprint bytes array
-     *
-     * @return long key id
-     */
-    public static String getKeyId( byte[] fingerprint )
-    {
-        char[] hex = Hex.encodeHex( fingerprint, false );
-        return getKeyId( new String( hex ) );
+        return null;
     }
 
 
@@ -141,22 +110,12 @@ public class PGPKeyUtil
      */
     public static String getShortKeyId( String fingerprint )
     {
-        return fingerprint.substring( 32 ).toUpperCase();
-    }
+        if ( !Strings.isNullOrEmpty( fingerprint ) && fingerprint.length() > 32 )
+        {
+            return fingerprint.substring( 32 ).toUpperCase();
+        }
 
-
-    /**
-     * *********************************************************************************** Retrieves short key id out of
-     * given fingerprint. Fingerprint a is 40 hex digits, last 8 digits make up the short key id.
-     *
-     * @param fingerprint fingerprint bytes array
-     *
-     * @return short key id
-     */
-    public static String getShortKeyId( byte[] fingerprint )
-    {
-        char[] hex = Hex.encodeHex( fingerprint, false );
-        return getShortKeyId( new String( hex ) );
+        return null;
     }
 
 
@@ -267,27 +226,9 @@ public class PGPKeyUtil
     /**
      * *****************************************
      */
-    public static PGPPublicKey readPublicKey( String key ) throws PGPException
+    public static PGPPublicKey readPublicKey( String armoredKey ) throws PGPException
     {
-        return readPublicKey( new ByteArrayInputStream( key.getBytes( StandardCharsets.UTF_8 ) ) );
-    }
-
-
-    /* *****************************************
-     *
-     */
-    public static PGPPublicKey readPublicKey( byte[] keyMaterial ) throws PGPException
-    {
-        return readPublicKey( new ByteArrayInputStream( keyMaterial ) );
-    }
-
-
-    /* *****************************************
-     *
-     */
-    public static PGPPublicKeyRing readPublicKeyRing( byte[] keyMaterial ) throws PGPException
-    {
-        return readPublicKeyRing( new ByteArrayInputStream( keyMaterial ) );
+        return readPublicKey( new ByteArrayInputStream( armoredKey.getBytes( StandardCharsets.UTF_8 ) ) );
     }
 
 
@@ -338,12 +279,27 @@ public class PGPKeyUtil
     }
 
 
+    /* *****************************************
+     *
+     */
+    public static PGPPublicKeyRing readPublicKeyRing( byte[] keyMaterial ) throws PGPException
+    {
+        return readPublicKeyRing( new ByteArrayInputStream( keyMaterial ) );
+    }
+
+
+    public PGPPublicKeyRing getPublicKeyRing( byte[] keyMaterial ) throws PGPException
+    {
+        return readPublicKeyRing( new ByteArrayInputStream( keyMaterial ) );
+    }
+
+
     /* *******************************************
      *
      */
-    public static PGPPublicKeyRing readPublicKeyRing( String key ) throws PGPException
+    public static PGPPublicKeyRing readPublicKeyRing( String armoredKey ) throws PGPException
     {
-        return readPublicKeyRing( new ByteArrayInputStream( key.getBytes( StandardCharsets.UTF_8 ) ) );
+        return readPublicKeyRing( new ByteArrayInputStream( armoredKey.getBytes( StandardCharsets.UTF_8 ) ) );
     }
 
 
@@ -396,21 +352,18 @@ public class PGPKeyUtil
     }
 
 
+    public PGPSecretKeyRing getSecretKeyRing( byte[] keyMaterial ) throws PGPException
+    {
+        return readSecretKeyRing( new ByteArrayInputStream( keyMaterial ) );
+    }
+
+
     /* *****************************************
      *
      */
     public static ByteArrayInputStream readSecretKeyRingInputStream( byte[] keyMaterial ) throws PGPException
     {
         return new ByteArrayInputStream( keyMaterial );
-    }
-
-
-    /* *******************************************
-     *
-     */
-    public static PGPSecretKeyRing readSecretKeyRing( String key ) throws PGPException
-    {
-        return readSecretKeyRing( new ByteArrayInputStream( key.getBytes( StandardCharsets.UTF_8 ) ) );
     }
 
 

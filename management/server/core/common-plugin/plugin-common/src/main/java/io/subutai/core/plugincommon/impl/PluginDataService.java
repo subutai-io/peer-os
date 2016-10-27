@@ -25,7 +25,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.plugincommon.model.ClusterDataEntity;
 
-
+//TODO refactor this class esp secuirty related places
 public class PluginDataService
 {
     private EntityManagerFactory emf;
@@ -110,14 +110,7 @@ public class PluginDataService
         String infoJson = gson.toJson( info );
         EntityManager em = emf.createEntityManager();
 
-        long userId = 0;
-        try
-        {
-            userId = getActiveUserId();
-        }
-        catch ( Exception e )
-        {
-        }
+        long userId = getActiveUserId();
 
         try
         {
@@ -147,16 +140,8 @@ public class PluginDataService
     public void update( String source, String key, final String info ) throws SQLException
     {
         EntityManager em = emf.createEntityManager();
-        long userId = 0;
 
-        try
-        {
-            userId = getActiveUserId();
-        }
-        catch ( Exception e )
-        {
-        }
-
+        long userId = getActiveUserId();
 
         try
         {
@@ -186,20 +171,16 @@ public class PluginDataService
     public <T> List<T> getInfo( String source, final Class<T> clazz ) throws SQLException
     {
         EntityManager em = emf.createEntityManager();
-        List<T> result = new ArrayList<>();
-        long userId = 0;
-        boolean isAdmin = true;
-        try
-        {
-            userId = getActiveUserId();
 
-            if ( userId == 0 )
-            {
-                isAdmin = true;
-            }
-        }
-        catch ( Exception e )
+        List<T> result = new ArrayList<>();
+
+        boolean isAdmin = false;
+
+        long userId = getActiveUserId();
+
+        if ( userId == 2 )
         {
+            isAdmin = true;
         }
 
         try
@@ -247,19 +228,14 @@ public class PluginDataService
     {
         EntityManager em = emf.createEntityManager();
         T result = null;
-        long userId = 0;
-        boolean isAdmin = true;
-        try
-        {
-            userId = getActiveUserId();
 
-            if ( userId == 0 )
-            {
-                isAdmin = true;
-            }
-        }
-        catch ( Exception e )
+        boolean isAdmin = false;
+
+        long userId = getActiveUserId();
+
+        if ( userId == 2 )
         {
+            isAdmin = true;
         }
 
         try
@@ -280,7 +256,7 @@ public class PluginDataService
             query.setParameter( "id", key );
 
             List<String> infoList = query.getResultList();
-            if ( infoList.size() > 0 )
+            if ( !infoList.isEmpty() )
             {
                 result = gson.fromJson( infoList.get( 0 ), clazz );
             }
@@ -306,19 +282,14 @@ public class PluginDataService
     {
         EntityManager em = emf.createEntityManager();
         List<String> result = new ArrayList<>();
-        long userId = 0;
-        boolean isAdmin = true;
-        try
-        {
-            userId = getActiveUserId();
 
-            if ( userId == 0 )
-            {
-                isAdmin = true;
-            }
-        }
-        catch ( Exception e )
+        boolean isAdmin = false;
+
+        long userId = getActiveUserId();
+
+        if ( userId == 2 )
         {
+            isAdmin = true;
         }
 
         try
@@ -359,20 +330,16 @@ public class PluginDataService
     public String getInfo( String source, String key ) throws SQLException
     {
         EntityManager em = emf.createEntityManager();
-        String result = null;
-        long userId = 0;
-        boolean isAdmin = true;
-        try
-        {
-            userId = getActiveUserId();
 
-            if ( userId == 0 )
-            {
-                isAdmin = true;
-            }
-        }
-        catch ( Exception e )
+        String result = null;
+
+        boolean isAdmin = false;
+
+        long userId = getActiveUserId();
+
+        if ( userId == 2 )
         {
+            isAdmin = true;
         }
 
         try
@@ -393,7 +360,7 @@ public class PluginDataService
             }
 
             List<String> infoList = query.getResultList();
-            if ( infoList.size() > 0 )
+            if ( !infoList.isEmpty() )
             {
                 result = infoList.get( 0 );
             }

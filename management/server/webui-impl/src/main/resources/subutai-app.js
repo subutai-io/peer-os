@@ -11,7 +11,8 @@ var app = angular.module('subutai-app', [
     'nvd3',
     'cfp.loadingBar',
     'uiSwitch',
-    'ngFileUpload'
+    'ngFileUpload',
+    'subutai.nav-menu'
 ])
     .config(routesConf)
 
@@ -50,25 +51,35 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         return vm.isRegistrationFormVisible;
     };
 
-	if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null) && getCookie('sptoken')) {
+	if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null
+		|| localStorage.getItem('currentUserToken') != getCookie('sptoken')) && getCookie('sptoken')) {
+		console.log("get login details");
 		$http.get(SERVER_URL + "rest/ui/identity/user", {
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		}).success(function (data) {
+
+			localStorage.removeItem('currentUser');
+			localStorage.removeItem('currentUserPermissions');
+			localStorage.removeItem('currentUserToken');
+
 			localStorage.setItem('currentUser', data.userName);
+			localStorage.setItem('currentUserToken', getCookie('sptoken'));
 
-            var perms = [];
-            for( var i = 0; i < data.roles.length; i++ )
-            {
-                for( var j = 0; j < data.roles[i].permissions.length; j++ )
-                {
-                    perms.push(data.roles[i].permissions[j].object);
-                }
-            }
+			var perms = [];
+			for( var i = 0; i < data.roles.length; i++ ) {
+				for( var j = 0; j < data.roles[i].permissions.length; j++ ) {
+					perms.push(data.roles[i].permissions[j].object);
+				}
+			}
 
-            localStorage.setItem('currentUserPermissions', perms);
-            vm.currentUser = localStorage.getItem('currentUser');
+			localStorage.setItem('currentUserPermissions', perms);
+			vm.currentUser = localStorage.getItem('currentUser');
+
+			location.reload();
 		});
+	} else {
+		vm.currentUser = localStorage.getItem('currentUser');
 	}
 
     function checkIfRegistered(afterRegistration) {
@@ -107,7 +118,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     vm.hub = {
         login: "",
-        password: ""
+        password: "",
+        peerName: "",
     };
 
 
@@ -133,7 +145,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     function hubRegister() {
         vm.hubRegisterError = false;
         hubPopupLoadScreen(true);
-        var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&password=' + encodeURIComponent( vm.hub.password );
+        var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&peerName='+ vm.hub.peerName + '&password=' + encodeURIComponent( vm.hub.password );
         $http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
             withCredentials: true,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -340,12 +352,22 @@ function SubutaiController($rootScope) {
     var vm = this;
     vm.bodyClass = '';
     vm.activeState = '';
+    vm.adminMenus = false;
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
         if (angular.isDefined(toState.data.bodyClass)) {
             vm.bodyClass = toState.data.bodyClass;
             vm.activeState = toState.name;
+
+            vm.adminMenus = false;
+            if( localStorage.getItem("currentUserPermissions") )
+                for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
+                    if (localStorage.getItem("currentUserPermissions")[i] == 6) {
+                        vm.adminMenus = true;
+                    }
+                }
+
             return;
         }
 

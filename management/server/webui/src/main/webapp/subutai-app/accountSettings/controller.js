@@ -71,7 +71,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	identitySrv.getConfig().success(function (data) {
 		if (data.isUpdatesAvailable) {
 			$rootScope.notifications = {
-				"message": "SS updates available",
+				"message": "Updates available",
 				"updateMessage": true,
 				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
 				"links": [
@@ -138,6 +138,10 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 			if (vm.message) {
 				$('.bp-sign-input').addClass('bp-sign-target');
 			}
+
+			identitySrv.getCurrentUser().success(function (data) {
+				vm.activeUser = data;
+			});
 		});
 	}
 

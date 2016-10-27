@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC14-SNAPSHOT</version>
+    <version>4.0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>subutai-common</artifactId>
@@ -16,19 +16,14 @@
   <packaging>bundle</packaging>
 
   <dependencies>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
-      <version>${jackson-jaxrs.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

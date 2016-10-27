@@ -8,9 +8,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.resource.ByteUnit;
-import io.subutai.common.resource.DiskResource;
-import io.subutai.common.resource.ResourceType;
+
+import io.subutai.hub.share.resource.ByteUnit;
+import io.subutai.hub.share.resource.DiskResource;
+import io.subutai.hub.share.resource.ResourceType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

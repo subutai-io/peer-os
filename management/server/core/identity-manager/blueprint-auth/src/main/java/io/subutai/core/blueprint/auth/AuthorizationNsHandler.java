@@ -20,6 +20,7 @@ package io.subutai.core.blueprint.auth;
 
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
@@ -37,16 +38,14 @@ import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 public class AuthorizationNsHandler implements NamespaceHandler
 {
 
-    private void parseElement( Element elt, ComponentMetadata cm, ParserContext pc )
+    private void parseElement( Element elt, ParserContext pc )
     {
         ComponentDefinitionRegistry cdr = pc.getComponentDefinitionRegistry();
 
-        if ( "enable".equals( elt.getLocalName() ) )
+        if ( "enable".equals( elt.getLocalName() ) && !cdr
+                .containsComponentDefinition( AuthorizationBeanProcessor.AUTH_PROCESSOR_BEAN_NAME ) )
         {
-            if ( !cdr.containsComponentDefinition( AuthorizationBeanProcessor.AUTH_PROCESSOR_BEAN_NAME ) )
-            {
-                cdr.registerComponentDefinition( authBeanProcessor( pc, cdr ) );
-            }
+            cdr.registerComponentDefinition( authBeanProcessor( pc, cdr ) );
         }
     }
 
@@ -70,32 +69,38 @@ public class AuthorizationNsHandler implements NamespaceHandler
     }
 
 
+    @Override
     public ComponentMetadata decorate( Node node, ComponentMetadata cm, ParserContext pc )
     {
         if ( node instanceof Element )
         {
-            parseElement( ( Element ) node, cm, pc );
+            parseElement( ( Element ) node, pc );
         }
+
         return cm;
     }
 
 
+    @Override
     public Metadata parse( Element elt, ParserContext pc )
     {
-        parseElement( elt, pc.getEnclosingComponent(), pc );
+        parseElement( elt, pc );
+
         return null;
     }
 
 
+    @Override
     public URL getSchemaLocation( String namespace )
     {
         return this.getClass().getResource( "/authz10.xsd" );
     }
 
 
+    @Override
     @SuppressWarnings( "rawtypes" )
     public Set<Class> getManagedClasses()
     {
-        return null;
+        return Collections.emptySet();
     }
 }

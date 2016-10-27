@@ -23,15 +23,13 @@ import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.security.crypto.key.KeyManager;
 import io.subutai.common.security.crypto.key.KeyPairType;
 
 
 /**
  * Utility class to generate self-signed certificates.
- *
- * @author James Moger
- *
  */
 /**
  * @author nisakov
@@ -116,7 +114,7 @@ public class CertificateTool
         }
         catch ( Exception t )
         {
-            throw new RuntimeException( "Failed to generate self-signed certificate!", t );
+            throw new ActionFailedException( "Failed to generate self-signed certificate!", t );
         }
     }
 
@@ -140,7 +138,7 @@ public class CertificateTool
         }
         catch ( Exception e )
         {
-            throw new RuntimeException( "Failed to convert PEM to certificate", e );
+            throw new ActionFailedException( "Failed to convert PEM to certificate", e );
         }
     }
 
@@ -158,7 +156,7 @@ public class CertificateTool
         }
         catch ( IOException e )
         {
-            throw new RuntimeException( "Failed to convert certificate to PEM", e );
+            throw new ActionFailedException( "Failed to convert certificate to PEM", e );
         }
     }
 }

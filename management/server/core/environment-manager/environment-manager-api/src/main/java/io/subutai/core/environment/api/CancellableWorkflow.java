@@ -54,11 +54,13 @@ public abstract class CancellableWorkflow<T> extends Workflow<T>
         }
         catch ( InterruptedException e )
         {
-            //ignore
+            Thread.currentThread().interrupt();
         }
-
-        //call cancellation handler
-        onCancellation();
+        finally
+        {
+            //call cancellation handler
+            onCancellation();
+        }
     }
 
 

@@ -1,11 +1,14 @@
 package io.subutai.common.environment;
 
 
-public interface RhP2pIp
+import java.io.Serializable;
+
+
+public interface RhP2pIp extends Serializable
 {
 
-    public String getRhId();
+    String getRhId();
 
 
-    public String getP2pIp();
+    String getP2pIp();
 }

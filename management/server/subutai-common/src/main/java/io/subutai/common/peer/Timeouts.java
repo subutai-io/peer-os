@@ -3,6 +3,12 @@ package io.subutai.common.peer;
 
 public class Timeouts
 {
+    private Timeouts()
+    {
+        throw new IllegalAccessError("Utility class");
+    }
+
+
     public static final int COMMAND_REQUEST_MESSAGE_TIMEOUT = 10 * 60;
     public static final int PEER_MESSAGE_TIMEOUT = 10 * 60;
     public static final int CREATE_CONTAINER_REQUEST_TIMEOUT = 10 * 60;

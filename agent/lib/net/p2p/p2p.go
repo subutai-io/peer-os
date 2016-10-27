@@ -11,18 +11,24 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
-func Create(interfaceName, localPeepIPAddr, hash, key, ttl string) {
-	if localPeepIPAddr == "dhcp" {
-		log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "start", "-key", key, "-dev", interfaceName, "-ttl", ttl, "-hash", hash).Run())
-	} else {
-		log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-ttl", ttl, "-hash", hash).Run())
+// Create adds new P2P interface to the Resource Host. This interface connected to the swarm.
+func Create(interfaceName, localPeepIPAddr, hash, key, ttl, portRange string) {
+	cmd := []string{"start", "-key", key, "-dev", interfaceName, "-ttl", ttl, "-hash", hash}
+	if localPeepIPAddr != "dhcp" {
+		cmd = append(cmd, "-ip", localPeepIPAddr)
 	}
+	if len(portRange) > 2 {
+		cmd = append(cmd, "-ports", localPeepIPAddr)
+	}
+	log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", cmd...).Run())
 }
 
+// Remove deletes P2P interface from the Resource Host.
 func Remove(hash string) {
 	log.Check(log.WarnLevel, "Removing p2p interface", exec.Command("p2p", "stop", "-hash", hash).Run())
 }
 
+// RemoveByIface deletes P2P interface from the Resource Host.
 func RemoveByIface(name string) {
 	mac := ""
 	interfaces, _ := net.Interfaces()
@@ -39,10 +45,11 @@ func RemoveByIface(name string) {
 			Remove(line[2])
 		}
 	}
-	IptablesCleanUp(name)
+	iptablesCleanUp(name)
 }
 
-func IptablesCleanUp(name string) {
+// iptablesCleanUp removes Iptables rules applied for passed interface
+func iptablesCleanUp(name string) {
 	out, _ := exec.Command("iptables-save").Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
@@ -55,17 +62,20 @@ func IptablesCleanUp(name string) {
 	}
 }
 
+// UpdateKey sets new encryption key for the P2P instance to replace it during work.
 func UpdateKey(hash, newkey, ttl string) {
 	err := exec.Command("p2p", "set", "-key", newkey, "-ttl", ttl, "-hash", hash).Run()
 	log.Check(log.FatalLevel, "Updating p2p key", err)
 }
 
+// Version returns version of the P2P on the Resource Host.
 func Version() {
 	out, err := exec.Command("p2p", "version").CombinedOutput()
 	fmt.Printf("%s", out)
 	log.Check(log.FatalLevel, "Getting p2p version", err)
 }
 
+// Peers prints list of the participants of the swarm.
 func Peers(hash string) {
 	args := []string{"show", "-hash", hash}
 	if hash == "" {

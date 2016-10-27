@@ -10,7 +10,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
 
@@ -25,7 +25,7 @@ public class ContainerInfoJson implements ContainerInfo
     private HostArchitecture arch;
     private String publicKey;
     private String gateway;
-    private RegistrationStatus status = RegistrationStatus.REQUESTED;
+    private ResourceHostRegistrationStatus status = ResourceHostRegistrationStatus.REQUESTED;
     private ContainerHostState state;
 
 
@@ -86,11 +86,6 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setGateway( final String gateway )
-    {
-        this.gateway = gateway;
-    }
-
 
     @Override
     public ContainerHostState getState()
@@ -130,11 +125,6 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
-
 
     @Override
     public Integer getVlan()
@@ -143,10 +133,6 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setVlan( final Integer vlan )
-    {
-        this.vlan = vlan;
-    }
 
 
     @Override
@@ -156,23 +142,15 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setPublicKey( final String publicKey )
-    {
-        this.publicKey = publicKey;
-    }
 
 
     @Override
-    public RegistrationStatus getStatus()
+    public ResourceHostRegistrationStatus getStatus()
     {
         return status;
     }
 
 
-    public void setStatus( final RegistrationStatus status )
-    {
-        this.status = status;
-    }
 
 
     @Override

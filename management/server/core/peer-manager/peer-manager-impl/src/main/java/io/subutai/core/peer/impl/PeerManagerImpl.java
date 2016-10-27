@@ -21,10 +21,10 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -40,13 +40,13 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
-import io.subutai.common.resource.PeerGroupResources;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
@@ -54,12 +54,10 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
@@ -72,6 +70,8 @@ import io.subutai.core.peer.impl.dao.PeerDataService;
 import io.subutai.core.peer.impl.entity.PeerData;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.resource.PeerGroupResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -81,7 +81,6 @@ import io.subutai.core.security.api.SecurityManager;
 public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
-    private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
     final int MAX_CONTAINER_LIMIT = 20;
     final int MAX_ENVIRONMENT_LIMIT = 20;
     protected PeerDataService peerDataService;
@@ -94,7 +93,6 @@ public class PeerManagerImpl implements PeerManager
     private Object provider;
     private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
     private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
-    private TemplateManager templateManager;
     private IdentityManager identityManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
@@ -106,14 +104,13 @@ public class PeerManagerImpl implements PeerManager
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
                             MessageResponseListener messageResponseListener, SecurityManager securityManager,
-                            TemplateManager templateManager, IdentityManager identityManager, Object provider )
+                            IdentityManager identityManager, Object provider )
     {
         Preconditions.checkNotNull( messenger );
         Preconditions.checkNotNull( localPeer );
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkNotNull( messageResponseListener );
         Preconditions.checkNotNull( securityManager );
-        Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( provider );
 
@@ -122,7 +119,6 @@ public class PeerManagerImpl implements PeerManager
         this.daoManager = daoManager;
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
-        this.templateManager = templateManager;
         this.identityManager = identityManager;
         this.provider = provider;
         commandResponseListener = new CommandResponseListener();
@@ -156,7 +152,7 @@ public class PeerManagerImpl implements PeerManager
             for ( PeerData peerData : this.peerDataService.getAll() )
             {
                 Peer peer = constructPeerPojo( peerData );
-                addPeerToRegistry( peer );
+                updatePeerInCache( peer );
             }
 
             localIpSetter = Executors.newSingleThreadScheduledExecutor();
@@ -251,13 +247,17 @@ public class PeerManagerImpl implements PeerManager
                     registrationData.getPeerInfo().getPublicSecurePort() );
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
             String decryptedSslCert = encryptedSslCert.decrypt( key, String.class );
-            securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(),
+            securityManager.getKeyStoreManager().importCertAsTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT,
                     registrationData.getPeerInfo().getId(), decryptedSslCert );
             securityManager.getHttpContextManager().reloadKeyStore();
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
             final Integer order = getMaxOrder() + 1;
+
+            registrationData.getPeerInfo()
+                            .setName( String.format( "Peer on %s", registrationData.getPeerInfo().getIp() ) );
+
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ), order );
@@ -266,16 +266,13 @@ public class PeerManagerImpl implements PeerManager
 
             Peer newPeer = constructPeerPojo( peerData );
 
-            addPeerToRegistry( newPeer );
-
-            templateManager.addRemoteRepository( new URL(
-                    String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
-                            SystemSettings.getSecurePortX1() ) ), registrationData.getToken() );
+            updatePeerInCache( newPeer );
 
             Encrypted encryptedPublicKey = registrationData.getPublicKey();
             String publicKey = encryptedPublicKey.decrypt( key, String.class );
             securityManager.getKeyManager()
-                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), ( short ) 3, publicKey );
+                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), SecurityKeyType.PeerKey.getId(),
+                                   publicKey );
         }
         catch ( GeneralSecurityException e )
         {
@@ -324,7 +321,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void addPeerToRegistry( final Peer peer )
+    protected void updatePeerInCache( final Peer peer )
     {
         Preconditions.checkNotNull( peer, "Peer could not be null." );
 
@@ -332,7 +329,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void removePeer( String id )
+    protected void removePeerFromCache( String id )
     {
         Peer peer = this.peers.get( id );
         if ( peer != null )
@@ -417,14 +414,10 @@ public class PeerManagerImpl implements PeerManager
             securityManager.getKeyManager().removePublicKeyRing( registrationData.getPeerInfo().getId() );
             //*******************************************************************
 
-            securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(),
+            securityManager.getKeyStoreManager().removeCertFromTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT,
                     registrationData.getPeerInfo().getId() );
 
             securityManager.getHttpContextManager().reloadKeyStore();
-
-            templateManager.removeRemoteRepository( new URL(
-                    String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
-                            SystemSettings.getSecurePortX1() ) ) );
         }
         catch ( Exception e )
         {
@@ -437,7 +430,42 @@ public class PeerManagerImpl implements PeerManager
         relationManager.removeRelation( relationMeta );
 
         removePeerData( registrationData.getPeerInfo().getId() );
-        removePeer( registrationData.getPeerInfo().getId() );
+        removePeerFromCache( registrationData.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public void setName( final String peerId, final String newName ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newName ), "Invalid peer name" );
+
+
+        PeerData peerData = loadPeerData( peerId );
+
+        if ( peerData == null )
+        {
+            throw new PeerNotRegisteredException();
+        }
+
+        Peer peer = constructPeerPojo( peerData );
+
+        peer.getPeerInfo().setName( newName );
+
+        try
+        {
+            peerData.setInfo( toJson( peer.getPeerInfo() ) );
+        }
+        catch ( IOException e )
+        {
+            throw new PeerException( e );
+        }
+
+        //update db
+        updatePeerData( peerData );
+
+        //update cache
+        updatePeerInCache( peer );
     }
 
 
@@ -537,7 +565,10 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( e.getMessage() );
         }
 
+        registrationData.getPeerInfo().setName( String.format( "Peer on %s", registrationData.getPeerInfo().getIp() ) );
+
         addRequest( registrationData );
+
         return new RegistrationData( localPeer.getPeerInfo(), registrationData.getKeyPhrase(),
                 RegistrationStatus.WAIT );
     }
@@ -657,42 +688,59 @@ public class PeerManagerImpl implements PeerManager
             throws PeerException
     {
         RegistrationData result = new RegistrationData( localPeer.getPeerInfo(), keyPhrase, status );
+
         switch ( status )
         {
             case REQUESTED:
             case APPROVED:
-                String sslCert =
-                        securityManager.getKeyStoreManager().exportCertificate( SystemSettings.getSecurePortX2(), "" );
-
-                PGPPublicKey pkey = securityManager.getKeyManager().getPublicKey( localPeerId );
-                try
-                {
-                    byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-                    Encrypted encryptedSslCert = new Encrypted( sslCert, key );
-                    result.setSslCert( encryptedSslCert );
-                    String publicKey = PGPKeyUtil.exportAscii( pkey );
-                    Encrypted encryptedPublicKey = new Encrypted( publicKey, key );
-                    result.setPublicKey( encryptedPublicKey );
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( e.getMessage(), e );
-                }
+                setApprovedResult( result, keyPhrase );
                 break;
             case UNREGISTERED:
-                try
-                {
-                    byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-                    Encrypted encryptedData = new Encrypted( keyPhrase, key );
-                    result.setSslCert( encryptedData );
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( e.getMessage(), e );
-                }
+                setUnregisteredResult( result, keyPhrase );
+                break;
+            default:
+                LOG.info( "Requested {}", status );
                 break;
         }
+
         return result;
+    }
+
+
+    private void setUnregisteredResult( final RegistrationData result, final String keyPhrase )
+    {
+        try
+        {
+            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+            Encrypted encryptedData = new Encrypted( keyPhrase, key );
+            result.setSslCert( encryptedData );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage(), e );
+        }
+    }
+
+
+    private void setApprovedResult( final RegistrationData result, final String keyPhrase )
+    {
+        String sslCert =
+                securityManager.getKeyStoreManager().exportCertificate( Common.DEFAULT_PUBLIC_SECURE_PORT, "" );
+
+        PGPPublicKey pkey = securityManager.getKeyManager().getPublicKey( localPeerId );
+        try
+        {
+            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+            Encrypted encryptedSslCert = new Encrypted( sslCert, key );
+            result.setSslCert( encryptedSslCert );
+            String publicKey = PGPKeyUtil.exportAscii( pkey );
+            Encrypted encryptedPublicKey = new Encrypted( publicKey, key );
+            result.setPublicKey( encryptedPublicKey );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage(), e );
+        }
     }
 
 
@@ -734,7 +782,9 @@ public class PeerManagerImpl implements PeerManager
 
             RegistrationData result = registrationClient.sendInitRequest( destinationUrl.toString(), registrationData );
 
+            result.getPeerInfo().setName( String.format( "Peer on %s", peerInfo.getIp() ) );
             result.setKeyPhrase( keyPhrase );
+
             addRequest( result );
         }
         catch ( Exception e )
@@ -745,6 +795,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @Override
     public void checkHostAvailability( final String destinationHost ) throws PeerException
     {
         URL url = checkDestinationHostConstraints( destinationHost );
@@ -802,7 +853,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( MalformedURLException e )
         {
-            return new URL( String.format( "https://%s:%d/", destinationHost, SystemSettings.getSecurePortX1() ) );
+            return new URL( String.format( "https://%s:%d/", destinationHost, Common.DEFAULT_PUBLIC_PORT ) );
         }
     }
 
@@ -986,7 +1037,6 @@ public class PeerManagerImpl implements PeerManager
 
         try
         {
-            RegistrationClient registrationClient = new RegistrationClientImpl( provider );
             PeerData peerData = loadPeerData( request.getPeerInfo().getId() );
 
             try
@@ -1311,7 +1361,7 @@ public class PeerManagerImpl implements PeerManager
 
                 peerInfo.setPublicUrl( publicUrl.toLowerCase() );
                 peerInfo.setPublicSecurePort( securePort );
-                peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
+
                 peerInfo.setManualSetting( manualSetting );
 
                 peerData.setInfo( toJson( peerInfo ) );
@@ -1319,7 +1369,7 @@ public class PeerManagerImpl implements PeerManager
                 peerDataService.saveOrUpdate( peerData );
 
                 Peer peer = constructPeerPojo( peerData );
-                addPeerToRegistry( peer );
+                updatePeerInCache( peer );
             }
             catch ( Exception e )
             {
@@ -1348,8 +1398,8 @@ public class PeerManagerImpl implements PeerManager
                 try
                 {
                     if ( localPeer.isInitialized() && (
-                            SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() )
-                                    || !localPeer.getPeerInfo().isManualSetting() ) )
+                            Common.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
+                                    .getPeerInfo().isManualSetting() ) )
                     {
 
                         HostInterface eth1 = localPeer.getManagementHost().getInterfaceByName( "eth1" );

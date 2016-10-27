@@ -14,6 +14,7 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
@@ -23,19 +24,20 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
+import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -47,52 +49,52 @@ public interface Peer extends RelationLink
     /**
      * Returns id of peer
      */
-    public String getId();
+    String getId();
 
     /**
      * Returns name of peer
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns owner id of peer
      */
-    public String getOwnerId();
+    String getOwnerId();
 
     /**
      * Returns metadata object of peer
      */
-    public PeerInfo getPeerInfo();
+    PeerInfo getPeerInfo();
 
     /**
      * Creates environment container group on the peer
      *
      * @param request - container creation request
      */
-    public CreateEnvironmentContainersResponse createEnvironmentContainers(
-            final CreateEnvironmentContainersRequest request ) throws PeerException;
+    CreateEnvironmentContainersResponse createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+            throws PeerException;
 
 
     /**
      * Start container on the peer
      */
-    public void startContainer( ContainerId containerId ) throws PeerException;
+    void startContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Stops container on the peer
      */
-    public void stopContainer( ContainerId containerId ) throws PeerException;
+    void stopContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Destroys container on the peer
      */
-    public void destroyContainer( ContainerId containerId ) throws PeerException;
+    void destroyContainer( ContainerId containerId ) throws PeerException;
 
 
     /**
      * Returns true of the host is connected, false otherwise
      */
-    public boolean isConnected( HostId hostId );
+    boolean isConnected( HostId hostId );
 
     /**
      * Executes command on the container
@@ -100,7 +102,7 @@ public interface Peer extends RelationLink
      * @param requestBuilder - command
      * @param host - target host
      */
-    public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
+    CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
 
     /**
      * Executes command on the container
@@ -109,8 +111,7 @@ public interface Peer extends RelationLink
      * @param host - target host
      * @param callback - callback to trigger on each response chunk to the command
      */
-    public CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback )
-            throws CommandException;
+    CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback ) throws CommandException;
 
     /**
      * Executes command on the container asynchronously
@@ -119,7 +120,7 @@ public interface Peer extends RelationLink
      * @param host - target host
      * @param callback - callback to trigger on each response chunk to the command
      */
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+    void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException;
 
     /**
@@ -128,23 +129,18 @@ public interface Peer extends RelationLink
      * @param requestBuilder - command
      * @param host - target host
      */
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
+    void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
 
     /**
      * Returns true if this a local peer, false otherwise
      */
-    public boolean isLocal();
+    boolean isLocal();
 
-
-    /**
-     * Returns template by name
-     */
-    public TemplateKurjun getTemplate( String templateName ) throws PeerException;
 
     /**
      * Returns true of the peer is reachable online, false otherwise
      */
-    public boolean isOnline();
+    boolean isOnline();
 
     /**
      * Sends message to the peer
@@ -158,8 +154,8 @@ public interface Peer extends RelationLink
      *
      * @return - response from the recipient
      */
-    public <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType,
-                                 int responseTimeout, Map<String, String> headers ) throws PeerException;
+    <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType, int responseTimeout,
+                          Map<String, String> headers ) throws PeerException;
 
     /**
      * Sends message to the peer
@@ -169,20 +165,22 @@ public interface Peer extends RelationLink
      * @param requestTimeout - message timeout
      * @param headers - map of http headers to pass with message
      */
-    public <T> void sendRequest( T request, String recipient, int requestTimeout, Map<String, String> headers )
+    <T> void sendRequest( T request, String recipient, int requestTimeout, Map<String, String> headers )
             throws PeerException;
 
     /**
      * Returns state of container
      */
-    public ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
+    ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
 
     /**
      * Returns set of container information of the environment
      */
-    public Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
+    Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
     //******** Quota functions ***********
+
+    void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize ) throws PeerException;
 
     /**
      * Returns resource usage of process on container by its PID
@@ -190,26 +188,32 @@ public interface Peer extends RelationLink
      * @param containerId - target container
      * @param pid - pid of process
      */
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
+    ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
 
 
     //networking
 
     UsedNetworkResources getUsedNetworkResources() throws PeerException;
 
-    void reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
+    Integer reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
+
+    void updateEtcHostsWithNewContainerHostname( EnvironmentId environmentId, String oldHostname, String newHostname )
+            throws PeerException;
+
+    void updateAuthorizedKeysWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
+                                                       String newHostname ) throws PeerException;
 
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers
      */
-    public void setupTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
+    void setupTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
 
 
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto ) throws PeerException;
+    PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto ) throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
@@ -251,7 +255,9 @@ public interface Peer extends RelationLink
 
     void alert( AlertEvent alert ) throws PeerException;
 
-    String getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
+    String getHistoricalMetrics( HostId hostId, Date startTime, Date endTime ) throws PeerException;
+
+    HistoricalMetrics getMetricsSeries( HostId hostId, Date startTime, Date endTime ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 
@@ -264,20 +270,28 @@ public interface Peer extends RelationLink
 
     void configureSshInEnvironment( EnvironmentId environmentId, SshKeys sshKeys ) throws PeerException;
 
-    void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+    void removeFromAuthorizedKeys( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
-    void addSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+    void addToAuthorizedKeys( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 
     void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
+
+    void addCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
+
+    void removeCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
 
     SshKeys getSshKeys( EnvironmentId environmentId, SshEncryptionType sshEncryptionType ) throws PeerException;
 
     SshKey createSshKey( EnvironmentId environmentId, ContainerId containerId, SshEncryptionType encType )
             throws PeerException;
 
+    SshKeys getContainerAuthorizedKeys( ContainerId containerId ) throws PeerException;
+
     void setContainerHostname( ContainerId containerId, String hostname ) throws PeerException;
 
     RegistrationStatus getStatus();
+
+    PeerTemplatesDownloadProgress getTemplateDownloadProgress( EnvironmentId environmentId ) throws PeerException;
 }

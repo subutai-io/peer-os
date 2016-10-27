@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RequestListener;
 
@@ -29,10 +30,10 @@ public class CreateEnvironmentContainersRequestListener extends RequestListener
 
 
     @Override
-    public Object onRequest( final Payload payload ) throws Exception
+    public Object onRequest( final Payload payload ) throws PeerException
     {
-        CreateEnvironmentContainersRequest request =
-                payload.getMessage( CreateEnvironmentContainersRequest.class );
+        CreateEnvironmentContainersRequest request = payload.getMessage( CreateEnvironmentContainersRequest.class );
+
         if ( request != null )
         {
 

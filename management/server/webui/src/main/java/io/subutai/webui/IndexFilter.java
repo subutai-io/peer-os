@@ -39,7 +39,7 @@ public class IndexFilter implements Filter
         {
             String url = ( ( HttpServletRequest ) servletRequest ).getRequestURI();
 
-            if ( url.equals( "" ) || url.equals( "/" ) )
+            if ( "".equals( url ) || "/".equals( url ) )
             {
                 RequestDispatcher view = servletRequest.getRequestDispatcher( "index.html" );
                 HttpServletResponse response = ( HttpServletResponse ) servletResponse;
@@ -51,24 +51,25 @@ public class IndexFilter implements Filter
                         User user = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
                         if ( Strings.isNullOrEmpty( user.getFingerprint() ) )
                         {
-                            throw new RuntimeException( "No Peer owner is set yet..." );
+                            throw new IllegalStateException( "No Peer owner is set yet..." );
                         }
                         Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+                        fingerprint.setSecure( true );
                         response.addCookie( fingerprint );
                     }
                 }
                 catch ( Exception ex )
                 {
                     Cookie fingerprint = new Cookie( "su_fingerprint", "no owner" );
+                    fingerprint.setSecure( true );
                     response.addCookie( fingerprint );
                 }
                 view.forward( servletRequest, response );
             }
-            if ( !( url.startsWith( "/rest" ) || url.startsWith( "/subutai" ) ||
-                    url.startsWith( "/fav" ) || url.startsWith( "/plugin" ) ||
-                    url.startsWith( "/assets" ) || url.startsWith( "/css" ) ||
-                    url.startsWith( "/fonts" ) || url.startsWith( "/scripts" ) ||
-                    url.startsWith( "/login" ) ) && !url.contains( "#" ) )
+            if ( !( url.startsWith( "/rest" ) || url.startsWith( "/subutai" ) || url.startsWith( "/fav" ) || url
+                    .startsWith( "/plugin" ) || url.startsWith( "/assets" ) || url.startsWith( "/css" ) || url
+                    .startsWith( "/fonts" ) || url.startsWith( "/scripts" ) || url.startsWith( "/login" ) ) && !url
+                    .contains( "#" ) )
             {
                 try
                 {

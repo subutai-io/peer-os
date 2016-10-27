@@ -7,20 +7,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.PeerGroupResources;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.UnlimitedStrategy;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.PeerGroupResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -28,28 +24,8 @@ import io.subutai.core.strategy.api.UnlimitedStrategy;
  */
 public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( UnlimitedPlacementStrategy.class );
 
     private List<NodeSchema> scheme = new ArrayList<>();
-    private static UnlimitedPlacementStrategy instance;
-
-
-    public static UnlimitedPlacementStrategy getInstance()
-    {
-        if ( instance == null )
-        {
-            instance = new UnlimitedPlacementStrategy();
-        }
-        return instance;
-    }
-
-
-    public UnlimitedPlacementStrategy()
-    {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master", 0, 0 ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.SMALL, "hadoop", 0, 0 ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.HUGE, "cassandra", 0, 0 ) );
-    }
 
 
     @Override
@@ -67,29 +43,13 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
 
     @Override
-    public Topology distribute( final String environmentName, PeerGroupResources peerGroupResources,
-                                Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
-    {
-        Topology result = new Topology( environmentName );
-
-        Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
-        for ( Node node : nodes )
-        {
-            result.addNodePlacement( node.getPeerId(), node );
-        }
-
-        return result;
-    }
-
-
-    @Override
     public Topology distribute( final String environmentName, final List<NodeSchema> nodeSchema,
                                 final PeerGroupResources peerGroupResources,
                                 final Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
         Topology result = new Topology( environmentName );
 
-        Set<Node> ng = distribute( nodeSchema, peerGroupResources, quotas );
+        Set<Node> ng = distribute( nodeSchema, peerGroupResources );
         for ( Node node : ng )
         {
             result.addNodePlacement( node.getPeerId(), node );
@@ -106,8 +66,8 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     }
 
 
-    protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
-                                    Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
+    protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources )
+            throws StrategyException
     {
 
         // build list of allocators
@@ -118,7 +78,7 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             allocators.add( resourceAllocator );
         }
 
-        if ( allocators.size() < 1 )
+        if ( allocators.isEmpty() )
         {
             throw new StrategyException( "There are no resource hosts to place containers." );
         }
@@ -133,9 +93,8 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             boolean allocated = false;
             for ( RandomAllocator resourceAllocator : preferredAllocators )
             {
-                allocated = resourceAllocator
-                        .allocate( containerName, nodeSchema.getTemplateName(), nodeSchema.getSize(),
-                                quotas.get( nodeSchema.getSize() ) );
+                allocated =
+                        resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize() );
                 if ( allocated )
                 {
                     break;
@@ -153,14 +112,14 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
         for ( RandomAllocator resourceAllocator : allocators )
         {
-            List<RandomAllocator.AllocatedContainer> containers = resourceAllocator.getContainers();
+            List<AllocatedContainer> containers = resourceAllocator.getContainers();
             if ( !containers.isEmpty() )
             {
-                for ( RandomAllocator.AllocatedContainer container : containers )
+                for ( AllocatedContainer container : containers )
                 {
-                    Node node =
-                            new Node( UUID.randomUUID().toString(), container.getName(), container.getTemplateName(),
-                                    container.getSize(), 0, 0, container.getPeerId(), container.getHostId() );
+                    Node node = new Node( container.getName(), container.getName(), container.getSize(),
+                            container.getPeerId(), container.getHostId(), container.getTemplateId() );
+
                     nodes.add( node );
                 }
             }
@@ -181,6 +140,6 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
     private String generateContainerName( final NodeSchema nodeSchema )
     {
-        return nodeSchema.getName().replaceAll( "\\s+", "_" );
+        return nodeSchema.getName().replaceAll( "\\s+", "" );
     }
 }

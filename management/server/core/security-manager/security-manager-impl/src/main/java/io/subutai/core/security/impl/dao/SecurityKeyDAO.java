@@ -69,7 +69,7 @@ class SecurityKeyDAO
             qr.setParameter( "publicKeyFingerprint", fingerprint );
             List<SecurityKeyEntity> result = qr.getResultList();
 
-            if ( result.size() > 0 )
+            if ( !result.isEmpty() )
             {
                 key = result.get( 0 );
             }

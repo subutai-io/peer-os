@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -17,6 +20,9 @@ import io.subutai.core.identity.impl.model.RoleEntity;
  */
 class RoleDAO
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( RoleDAO.class.getName() );
+
     private DaoManager daoManager = null;
 
 
@@ -40,8 +46,9 @@ class RoleDAO
         {
             result = em.find( RoleEntity.class, id );
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -62,8 +69,9 @@ class RoleDAO
         {
             result = em.createQuery( "select h from RoleEntity h", Role.class ).getResultList();
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -89,6 +97,8 @@ class RoleDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -113,6 +123,8 @@ class RoleDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -136,6 +148,8 @@ class RoleDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {

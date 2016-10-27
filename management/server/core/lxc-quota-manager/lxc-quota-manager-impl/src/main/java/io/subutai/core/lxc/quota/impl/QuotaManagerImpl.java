@@ -4,7 +4,7 @@ package io.subutai.core.lxc.quota.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +13,10 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
@@ -24,7 +24,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.dao.DaoManager;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -34,60 +33,53 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.ContainerResource;
-import io.subutai.common.quota.ContainerResourceFactory;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.CpuResource;
-import io.subutai.common.resource.DiskResource;
-import io.subutai.common.resource.HostResources;
-import io.subutai.common.resource.PeerResources;
-import io.subutai.common.resource.RamResource;
-import io.subutai.common.resource.ResourceValue;
-import io.subutai.common.resource.ResourceValueParser;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.lxc.quota.impl.dao.QuotaDataService;
-import io.subutai.core.lxc.quota.impl.parser.CommonResourceValueParser;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.parser.CommonResourceValueParser;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerResource;
+import io.subutai.hub.share.quota.ContainerResourceFactory;
+import io.subutai.hub.share.quota.Quota;
+import io.subutai.hub.share.quota.QuotaException;
+import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.hub.share.resource.CpuResource;
+import io.subutai.hub.share.resource.DiskResource;
+import io.subutai.hub.share.resource.HostResources;
+import io.subutai.hub.share.resource.PeerResources;
+import io.subutai.hub.share.resource.RamResource;
+import io.subutai.hub.share.resource.ResourceValue;
+import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 public class QuotaManagerImpl implements QuotaManager
 {
 
-    public static final BigDecimal ONE_HUNDRED = new BigDecimal( 100 );
+    public static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf( 100 );
 
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
     private LocalPeer localPeer;
     private PeerManager peerManager;
     private CommandUtil commandUtil;
     protected Commands commands = new Commands();
-    private Map<ContainerResourceType, ResourceValueParser> valueParsers = new HashMap<>();
-    private HashMap<ContainerSize, ContainerQuota> containerQuotas = new HashMap<>();
+    private EnumMap<ContainerSize, ContainerQuota> containerQuotas = new EnumMap<>( ContainerSize.class );
     private String defaultQuota;
-    private DaoManager daoManager;
-    private QuotaDataService quotaDataService;
     private ObjectMapper mapper = new ObjectMapper();
 
 
-    public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer, DaoManager daoManager )
+    public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer )
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( localPeer );
-        Preconditions.checkNotNull( daoManager );
         this.peerManager = peerManager;
         this.localPeer = localPeer;
         this.commandUtil = new CommandUtil();
-        this.daoManager = daoManager;
     }
 
 
     public void init() throws QuotaException
     {
         initDefaultQuotas();
-        this.quotaDataService = new QuotaDataService( daoManager );
     }
 
 
@@ -198,7 +190,7 @@ public class QuotaManagerImpl implements QuotaManager
                 try
                 {
                     ResourceHost resourceHost = localPeer.getResourceHostByName( resourceHostMetric.getHostName() );
-                    BigDecimal[] usedResources = getUsedResources( resourceHost, peerId );
+                    BigDecimal[] usedResources = getUsedResources();
 
                     BigDecimal cpuLimit = getCpuLimit( policy );
 
@@ -230,9 +222,7 @@ public class QuotaManagerImpl implements QuotaManager
             LOGGER.debug( e.getMessage(), e );
         }
 
-        PeerResources peerResources =
-                new PeerResources( localPeer.getId(), environmentLimit, containerLimit, networkLimit, resources );
-        return peerResources;
+        return new PeerResources( localPeer.getId(), environmentLimit, containerLimit, networkLimit, resources );
     }
 
 
@@ -254,7 +244,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    private BigDecimal[] getUsedResources( final ResourceHost resourceHost, final String peerId ) throws QuotaException
+    private BigDecimal[] getUsedResources() throws QuotaException
     {
         BigDecimal cpuAccumulo = BigDecimal.ZERO;
         BigDecimal ramAccumulo = BigDecimal.ZERO;
@@ -309,19 +299,8 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
         Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
 
-        for ( Quota quota : containerQuota.getAll() )
-        {
-            final Integer threshold = quota.getThreshold();
-            if ( threshold != null && threshold >= 0 && threshold <= 100 && quota.getResource() != null )
-            {
-                executeOnContainersResourceHost( containerId,
-                        commands.getWriteQuotaCommand( containerId.getHostName(), quota.getResource(), threshold ) );
-            }
-            else
-            {
-                LOGGER.warn( "Invalid quota.", quota );
-            }
-        }
+        executeOnContainersResourceHost( containerId,
+                commands.getSetQuotaCommand( containerId.getHostName(), containerQuota ) );
     }
 
 
@@ -400,7 +379,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    protected CommandResult executeOnContainersResourceHost( ContainerId containerId, RequestBuilder command )
+    private CommandResult executeOnContainersResourceHost( ContainerId containerId, RequestBuilder command )
             throws QuotaException
     {
         try

@@ -1,11 +1,10 @@
 package io.subutai.common.host;
 
 
-import java.util.HashSet;
+import java.io.Serializable;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 
@@ -17,41 +16,22 @@ import io.subutai.common.util.CollectionUtil;
  */
 public class ResourceHostInfoModel extends HostInfoModel implements ResourceHostInfo
 {
-    private Set<ContainerHostInfoModel> containers;
+    private Set<ContainerHostInfoModel> containers = Sets.newHashSet();
     @JsonIgnore
     private InstanceType instance;
     @JsonIgnore
-    private Set<Alert> alert;
+    private Set<Alert> alert = Sets.newHashSet();
 
 
-    public ResourceHostInfoModel( final HostInfo hostInfo )
+    public ResourceHostInfoModel( final ResourceHostInfo resourceHostInfo )
     {
-        super( hostInfo );
-    }
+        super( resourceHostInfo );
 
-
-    public void setContainers( final Set<ContainerHostInfoModel> containers )
-    {
-        this.containers = containers;
-    }
-
-
-    public void setInstance( final InstanceType instance )
-    {
-        this.instance = instance;
-    }
-
-
-    public void addRamAlert( final String hostId, String current, String quota )
-    {
-        final Alert a = new Alert();
-        a.id = hostId;
-        a.ram = new Ram( current, quota );
-        if ( alert == null )
+        this.instance = resourceHostInfo.getInstanceType();
+        for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
         {
-            alert = new HashSet<>();
+            containers.add( new ContainerHostInfoModel( containerHostInfo ) );
         }
-        this.alert.add( a );
     }
 
 
@@ -149,41 +129,12 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
-    /*
-            {
-                "alert": [
-                    {
-                        "id": "CE399A38D78A8815C95A87A5B54FA60751092C73",
-                        "cpu": {
-                            "current": 87,
-                            "quota": 15
-                        },
-                        "ram": {
-                            "current": 90,
-                            "quota": 1024
-                        },
-                        "hdd": [
-                            {
-                                "partition": "Var",
-                                "current": 86,
-                                "quota": 10
-                            },
-                            {
-                                "partition": "Opt",
-                                "current": 86,
-                                "quota": 10
-                            }
-                        ]
-                    }
-                ]
-            }
-    */
-    public class Alert
+    public class Alert implements Serializable
     {
-        String id;
-        Cpu cpu;
-        Ram ram;
-        Set<Hdd> hdd;
+        private String id;
+        private Cpu cpu;
+        private Ram ram;
+        private Set<Hdd> hdd;
 
 
         public String getId()
@@ -218,7 +169,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
-    public class Cpu
+    public class Cpu implements Serializable
     {
         String current;
         String quota;
@@ -244,7 +195,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
-    public class Ram
+    public class Ram implements Serializable
     {
         String current;
         String quota;
@@ -277,7 +228,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
-    public class Hdd
+    public class Hdd implements Serializable
     {
         String partition;
         String current;
@@ -317,8 +268,4 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
                     + '\'' + '}';
         }
     }
-
-
-
-
 }

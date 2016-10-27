@@ -1,19 +1,22 @@
 package io.subutai.common.metric;
 
 
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import io.subutai.common.host.HostId;
 
 
 /**
  * Alert value interface
+ *
+ * Example of usage:
+ * QuotaAlertValue quotaAlertValue = alert.getAlertValue( QuotaAlertValue.class );
+ * StringAlertValue stringAlertValue = alert.getAlertValue( StringAlertValue.class );
+ * ExceededQuota v1 = quotaAlertValue.getValue();
+ * String v2 = stringAlertValue.getValue();
  */
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "type" )
+@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type" )
 @JsonSubTypes( {
         @JsonSubTypes.Type( value = QuotaAlert.class, name = "QuotaAlert" ),
         @JsonSubTypes.Type( value = StringAlert.class, name = "StringAlert" ),
@@ -26,7 +29,6 @@ public interface Alert
 
     String getId();
 
-    //    AlertType getType();
 
     long getCreatedTime();
 

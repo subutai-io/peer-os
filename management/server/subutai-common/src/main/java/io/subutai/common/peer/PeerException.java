@@ -29,7 +29,7 @@ public class PeerException extends Exception
         super( message, cause );
     }
 
-
+    @Override
     public String toString()
     {
         return super.toString();

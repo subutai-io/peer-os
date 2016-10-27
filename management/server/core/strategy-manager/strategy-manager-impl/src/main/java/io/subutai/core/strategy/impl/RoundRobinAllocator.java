@@ -8,9 +8,9 @@ import java.util.List;
 import com.google.common.collect.Iterators;
 
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.HostResources;
-import io.subutai.common.resource.PeerResources;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.HostResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -32,12 +32,11 @@ public class RoundRobinAllocator extends PeerResources
     }
 
 
-    public boolean allocate( final String containerName, final String templateName, final ContainerSize size,
-                             ContainerQuota containerQuota )
+    public boolean allocate( final String containerName, final String templateId, final ContainerSize size )
     {
         HostResources hostResources = iterator.next();
         AllocatedContainer container =
-                new AllocatedContainer( containerName, templateName, size, getPeerId(), hostResources.getHostId() );
+                new AllocatedContainer( containerName, templateId, size, getPeerId(), hostResources.getHostId() );
         containers.add( container );
 
         return true;

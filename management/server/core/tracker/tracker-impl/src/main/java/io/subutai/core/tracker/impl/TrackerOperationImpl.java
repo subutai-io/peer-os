@@ -66,54 +66,63 @@ public class TrackerOperationImpl implements TrackerOperation
     }
 
 
+    @Override
     public String getDescription()
     {
         return description;
     }
 
 
+    @Override
     public UUID getId()
     {
         return id;
     }
 
 
+    @Override
     public String getLog()
     {
         return log.toString();
     }
 
 
+    @Override
     public String getSource()
     {
         return source;
     }
 
 
+    @Override
     public Date createDate()
     {
         return ( Date ) createDate.clone();
     }
 
 
+    @Override
     public OperationState getState()
     {
         return state;
     }
 
 
+    @Override
     public void addLog( String logString )
     {
         addLog( logString, state );
     }
 
 
+    @Override
     public void addLogDone( String logString )
     {
         addLog( logString, OperationState.SUCCEEDED );
     }
 
 
+    @Override
     public void addLogFailed( String logString )
     {
         addLog( logString, OperationState.FAILED );
@@ -136,7 +145,7 @@ public class TrackerOperationImpl implements TrackerOperation
                 log.append( "\n" );
             }
             log.append( String.format( "{\"date\" : %s, \"log\" : \"%s\", \"state\" : \"%s\"},",
-                    new Timestamp( System.currentTimeMillis() ).getTime(), logString.replace("\"", "\\\""), state ) );
+                    new Timestamp( System.currentTimeMillis() ).getTime(), logString.replace( "\"", "\\\"" ), state ) );
         }
         this.state = state;
         tracker.saveTrackerOperation( source, this );

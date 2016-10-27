@@ -23,15 +23,13 @@ public class NullHostInterface extends HostInterfaceModel
     @Override
     public String getName()
     {
-        return "NULL";
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public String getIp()
     {
-        return "0.0.0.0";
+        throw new UnsupportedOperationException();
     }
-
-
 }

@@ -25,6 +25,7 @@ public class RegisterHostsStep
     private final Topology topology;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> hostUtil = new PeerUtil<>();
 
 
     public RegisterHostsStep( final Topology topology, final EnvironmentImpl environment,
@@ -62,7 +63,6 @@ public class RegisterHostsStep
                     .put( host.getHostname(), host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() );
         }
 
-        PeerUtil<Object> hostUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
@@ -81,7 +81,7 @@ public class RegisterHostsStep
 
         PeerUtil.PeerTaskResults<Object> hostResults = hostUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult hostResult : hostResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult hostResult : hostResults.getResults() )
         {
 
             if ( hostResult.hasSucceeded() )

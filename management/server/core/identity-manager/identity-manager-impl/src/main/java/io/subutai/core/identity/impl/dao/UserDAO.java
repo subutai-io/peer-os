@@ -21,7 +21,8 @@ import io.subutai.core.identity.impl.model.UserEntity;
  */
 class UserDAO
 {
-    private static final Logger logger = LoggerFactory.getLogger( UserDAO.class );
+    private static final Logger LOG = LoggerFactory.getLogger( UserDAO.class );
+
     private DaoManager daoManager = null;
 
 
@@ -51,6 +52,8 @@ class UserDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -74,6 +77,7 @@ class UserDAO
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -100,6 +104,8 @@ class UserDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -124,6 +130,8 @@ class UserDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -146,8 +154,9 @@ class UserDAO
         }
         catch ( Exception e )
         {
-            logger.error( "Error updating user", e );
             daoManager.rollBackTransaction( em );
+
+            LOG.error( "Error updating user", e );
         }
         finally
         {
@@ -170,18 +179,20 @@ class UserDAO
             query.setParameter( "userName", userName );
 
             List<UserEntity> users = query.getResultList();
-            if ( users.size() > 0 )
+            if ( !users.isEmpty() )
             {
                 result = users.iterator().next();
             }
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {
             daoManager.closeEntityManager( em );
         }
+
         return result;
     }
 
@@ -200,18 +211,20 @@ class UserDAO
             query.setParameter( "keyId", keyId );
 
             List<UserEntity> users = query.getResultList();
-            if ( users.size() > 0 )
+            if ( !users.isEmpty() )
             {
                 result = users.iterator().next();
             }
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {
             daoManager.closeEntityManager( em );
         }
+
         return result;
     }
 }

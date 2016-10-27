@@ -10,6 +10,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
@@ -23,6 +24,7 @@ public class RegisterSshStep
     private final Topology topology;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public RegisterSshStep( final Topology topology, final EnvironmentImpl environment,
@@ -76,11 +78,10 @@ public class RegisterSshStep
     {
         Set<Peer> peers = environment.getPeers();
 
-        PeerUtil<Object> appendUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            appendUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
                 public Object call() throws Exception
@@ -92,9 +93,9 @@ public class RegisterSshStep
             } ) );
         }
 
-        PeerUtil.PeerTaskResults<Object> appendResults = appendUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> appendResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult appendResult : appendResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult appendResult : appendResults.getResults() )
         {
             if ( appendResult.hasSucceeded() )
             {
@@ -122,16 +123,16 @@ public class RegisterSshStep
 
         Set<Peer> peers = environment.getPeers();
 
-        PeerUtil<Object> createUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            createUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
                 public Object call() throws Exception
                 {
                     SshKeys sshPublicKeys = peer.readOrCreateSshKeysForEnvironment( environment.getEnvironmentId(),
+                            topology.getSshKeyType() == SshEncryptionType.UNKNOWN ? SshEncryptionType.RSA :
                             topology.getSshKeyType() );
 
                     allSshKeys.addKeys( sshPublicKeys.getKeys() );
@@ -141,9 +142,9 @@ public class RegisterSshStep
             } ) );
         }
 
-        PeerUtil.PeerTaskResults<Object> createResults = createUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> createResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult createResult : createResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult createResult : createResults.getResults() )
         {
             if ( createResult.hasSucceeded() )
             {

@@ -10,8 +10,11 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import com.google.common.base.Strings;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
@@ -82,29 +85,6 @@ public class EncryptionToolImpl implements EncryptionTool
 
 
     /**
-     * Verifies that a public key is signed with another public key
-     *
-     * @param keyToVerify the public key to verify
-     * @param keyToVerifyWith the key to verify with
-     *
-     * @return true if verified, false otherwise
-     */
-    @Override
-    public boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith )
-    {
-        try
-        {
-            return PGPEncryptionUtil.verifyPublicKey( keyToVerify, keyToVerifyWith );
-        }
-        catch ( Exception e )
-        {
-            //throw custom  exception
-            throw new RuntimeException( e );
-        }
-    }
-
-
-    /**
      * Removes signature
      *
      * @param keyToRemoveFrom the key to verify with
@@ -122,7 +102,7 @@ public class EncryptionToolImpl implements EncryptionTool
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new ActionFailedException( e );
         }
     }
 
@@ -138,7 +118,7 @@ public class EncryptionToolImpl implements EncryptionTool
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new ActionFailedException( e );
         }
     }
 
@@ -181,7 +161,7 @@ public class EncryptionToolImpl implements EncryptionTool
         }
         catch ( Exception ex )
         {
-            return null;
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
     }
 
@@ -352,7 +332,7 @@ public class EncryptionToolImpl implements EncryptionTool
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new ActionFailedException( e );
         }
     }
 
@@ -376,7 +356,7 @@ public class EncryptionToolImpl implements EncryptionTool
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new ActionFailedException( e );
         }
     }
 

@@ -13,17 +13,20 @@ import com.google.common.base.Strings;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -38,6 +41,7 @@ public class NetworkManagerImpl implements NetworkManager
     private static final String LINE_DELIMITER = System.lineSeparator();
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
+    protected SystemSettings systemSettings;
 
 
     public NetworkManagerImpl( final PeerManager peerManager )
@@ -45,8 +49,14 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( peerManager );
 
         this.peerManager = peerManager;
+        this.systemSettings = getSystemSettings();
     }
 
+
+    protected SystemSettings getSystemSettings()
+    {
+        return new SystemSettings();
+    }
 
     //---------------- P2P SECTION BEGIN ------------------------
 
@@ -65,7 +75,9 @@ public class NetworkManagerImpl implements NetworkManager
 
 
         execute( host, commands.getJoinP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
-                getUnixTimestampOffset( secretKeyTtlSec ) ) );
+                getUnixTimestampOffset( secretKeyTtlSec ),
+                String.format( "%d-%d", systemSettings.getP2pPortStartRange(),
+                        systemSettings.getP2pPortEndRange() ) ) );
     }
 
 
@@ -109,6 +121,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
+    @Override
     public String getP2pVersion( final Host host ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
@@ -140,11 +153,8 @@ public class NetworkManagerImpl implements NetworkManager
             {
                 String logLine = st.nextToken();
 
-                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) )
-                {
-                    p2pLogs.addLog( logLine );
-                }
-                else if ( logLine.contains( String.format( "[%s]", logLevel.name() ) ) )
+                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) || logLine
+                        .contains( String.format( "[%s]", logLevel.name() ) ) )
                 {
                     p2pLogs.addLog( logLine );
                 }
@@ -237,7 +247,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 "Invalid vlan" );
 
-        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( vLanId ) );
+        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( String.valueOf( vLanId ) ) );
     }
 
 
@@ -252,7 +262,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( proxyLoadBalanceStrategy, "Invalid strategy" );
 
         execute( getManagementHost(),
-                commands.getSetVlanDomainCommand( vLanId, domain, proxyLoadBalanceStrategy, sslCertPath ) );
+                commands.getSetVlanDomainCommand( String.valueOf( vLanId ), domain, proxyLoadBalanceStrategy,
+                        sslCertPath ) );
     }
 
 
@@ -288,9 +299,10 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
 
-        execute( getManagementHost(), commands.getAddIpToVlanDomainCommand( hostIp, vLanId ) );
+        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
+
+        execute( getManagementHost(), commands.getAddIpToVlanDomainCommand( hostIp, String.valueOf( vLanId ) ) );
     }
 
 
@@ -314,8 +326,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( sshIdleTimeout > 0, "Timeout must be greater than 0" );
         Preconditions.checkArgument( containerIp.matches( Common.HOSTNAME_REGEX ), "Invalid container IP" );
 
-        CommandResult result =
-                execute( getManagementHost(), commands.getSetupContainerSshTunnelCommand( containerIp, sshIdleTimeout ) );
+        CommandResult result = execute( getManagementHost(),
+                commands.getSetupContainerSshTunnelCommand( containerIp, sshIdleTimeout ) );
 
         try
         {
@@ -371,5 +383,31 @@ public class NetworkManagerImpl implements NetworkManager
         {
             throw new NetworkManagerException( e );
         }
+    }
+
+
+    @Override
+    public void addCustomProxy( final CustomProxyConfig proxyConfig, ContainerHost containerHost )
+            throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( proxyConfig );
+        Preconditions.checkNotNull( containerHost );
+
+        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( proxyConfig.getVlan() ) );
+        execute( getManagementHost(), commands.getSetVlanDomainCommand( proxyConfig.getVlan(), proxyConfig.getDomain(),
+                ProxyLoadBalanceStrategy.NONE,
+                String.format( "/mnt/lib/lxc/%s/rootfs/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
+        execute( getManagementHost(), commands.getAddIpToVlanDomainCommand(
+                proxyConfig.getHost() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
+                proxyConfig.getVlan() ) );
+    }
+
+
+    @Override
+    public void removeCustomProxy( final String vlan ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( vlan ) );
+
+        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( vlan ) );
     }
 }

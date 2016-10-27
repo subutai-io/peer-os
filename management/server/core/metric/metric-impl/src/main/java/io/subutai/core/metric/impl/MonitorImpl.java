@@ -15,14 +15,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import javax.ws.rs.core.Response;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.command.CommandException;
@@ -30,7 +37,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.DaoException;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
@@ -48,13 +54,17 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.common.util.RestUtil;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
+import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.resource.HistoricalMetrics;
 
 
 /**
@@ -84,8 +94,8 @@ public class MonitorImpl implements Monitor, HostListener
     protected ObjectMapper mapper = new ObjectMapper();
 
 
-    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager,
-                        HostRegistry hostRegistry ) throws MonitorException
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, HostRegistry hostRegistry )
+            throws MonitorException
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
@@ -110,7 +120,7 @@ public class MonitorImpl implements Monitor, HostListener
 
     public void addAlertListener( AlertListener alertListener )
     {
-        if ( alertListener != null && alertListener.getId() != null && !"".equals( alertListener.getId().trim() ) )
+        if ( alertListener != null && alertListener.getId() != null && !alertListener.getId().trim().isEmpty() )
         {
             alertListeners.add( alertListener );
         }
@@ -119,7 +129,10 @@ public class MonitorImpl implements Monitor, HostListener
 
     public void removeAlertListener( AlertListener alertListener )
     {
-        alertListeners.remove( alertListener );
+        if ( alertListener != null )
+        {
+            alertListeners.remove( alertListener );
+        }
     }
 
 
@@ -271,14 +284,13 @@ public class MonitorImpl implements Monitor, HostListener
         }
 
         AlertEvent alertEvent = alertQueue.get( alert.getId() );
-        if ( alertEvent != null )
+
+        if ( alertEvent != null && !alertEvent.isExpired() )
         {
-            if ( !alertEvent.isExpired() )
-            {
-                // skipping, alert already exists
-                LOG.debug( String.format( "Alert already in queue. %s", alertEvent ) );
-                return;
-            }
+            // skipping, alert already exists
+            LOG.debug( String.format( "Alert already in queue. %s", alertEvent ) );
+
+            return;
         }
 
         alertEvent = buildAlertPack( alert );
@@ -300,11 +312,6 @@ public class MonitorImpl implements Monitor, HostListener
         {
             LOG.warn( e.getMessage() );
         }
-        //          Example of usage:
-        //                QuotaAlertValue quotaAlertValue = alert.getAlertValue( QuotaAlertValue.class );
-        //                StringAlertValue stringAlertValue = alert.getAlertValue( StringAlertValue.class );
-        //                ExceededQuota v1 = quotaAlertValue.getValue();
-        //                String v2 = stringAlertValue.getValue();
 
         return packet;
     }
@@ -324,7 +331,10 @@ public class MonitorImpl implements Monitor, HostListener
         for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
         {
             final ResourceHostMetric m = getResourceHostMetric( resourceHost );
-            result.addMetric( m );
+            if ( m != null )
+            {
+                result.addMetric( m );
+            }
         }
 
         return result;
@@ -333,21 +343,27 @@ public class MonitorImpl implements Monitor, HostListener
 
     private ResourceHostMetric getResourceHostMetric( final ResourceHost resourceHost )
     {
-        ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
+        ResourceHostMetric resourceHostMetric = null;
+
         try
         {
-            HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
-            resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
+            ResourceHostInfo hostInfo = hostRegistry.getResourceHostInfoById( resourceHost.getId() );
+            ResourceHostInfoModel resourceHostInfoModel = new ResourceHostInfoModel( hostInfo );
+            resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId(), resourceHostInfoModel );
+            resourceHostMetric.setManagement( resourceHost.isManagementHost() );
+            resourceHostMetric.setConnected( true );
+
             ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
             if ( m != null )
             {
                 resourceHostMetric.updateMetrics( m );
-                resourceHostMetric.setConnected( true );
             }
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
+
         return resourceHostMetric;
     }
 
@@ -414,10 +430,9 @@ public class MonitorImpl implements Monitor, HostListener
 
     private void deliverAlertPackToPeer( final AlertEvent alertEvent )
     {
-        Peer peer = null;
         try
         {
-            peer = peerManager.getPeer( alertEvent.getPeerId() );
+            Peer peer = peerManager.getPeer( alertEvent.getPeerId() );
             new AlertDeliver( peer, alertEvent ).run();
         }
         catch ( PeerException e )
@@ -475,5 +490,186 @@ public class MonitorImpl implements Monitor, HostListener
     public void putAlert( final Alert alert )
     {
         queueAlertResource( alert );
+    }
+
+
+    @Override
+    public List<P2Pinfo> getP2PStatus()
+    {
+        List<P2Pinfo> pojos = Lists.newArrayList();
+
+        for ( final ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
+        {
+            P2PInfoPojo info = new P2PInfoPojo();
+
+            try
+            {
+                List<String> statusLines = Lists.newArrayList();
+
+                String status = resourceHost.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+
+                String lines[] = status.split( "\\r?\\n" );
+
+                for ( final String line : lines )
+                {
+                    String[] part = line.split( Pattern.quote( "|" ) );
+
+                    if ( part.length > 2 )
+                    {
+                        statusLines.add( line );
+                    }
+                }
+
+                int errors = 0;
+
+                List<String> stateList = Lists.newArrayList();
+                List<String> errorList = Lists.newArrayList();
+
+                for ( final String statusLine : statusLines )
+                {
+                    if ( statusLine.contains( "LastError" ) )
+                    {
+                        String[] part = statusLine.split( Pattern.quote( "|" ) );
+
+                        for ( final String s : part )
+                        {
+                            if ( s.contains( "State:" ) )
+                            {
+                                String state = s.replace( "State:", "" ).trim();
+                                stateList.add( state );
+                            }
+                            if ( s.contains( "LastError:" ) )
+                            {
+                                String error = s.replace( "LastError:", "" ).trim();
+                                errorList.add( String.format( "%s (%s) - %s", error, part[0], part[1] ) );
+                            }
+                        }
+                        errors++;
+                    }
+                }
+
+                if ( errors > 0 && errors == statusLines.size() )
+                {
+                    info.setP2pStatus( 2 );
+                }
+                else if ( errors == 0 )
+                {
+                    info.setP2pStatus( 0 );
+                }
+                else if ( errors > 0 && errors < statusLines.size() )
+                {
+                    info.setP2pStatus( 1 );
+                }
+
+                info.setRhId( resourceHost.getId() );
+                info.setRhName( resourceHost.getHostname() );
+                info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
+                info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+                info.setState( stateList );
+                info.setP2pErrorLogs( errorList );
+
+
+                WebClient client =
+                        RestUtil.createTrustedWebClient( "https://hub.subut.ai:443/rest/v1/system/versions/range" );
+                Response response = client.get();
+
+                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+                {
+                    try
+                    {
+                        String output = response.readEntity( String.class );
+
+                        JSONArray entities = new JSONArray( output );
+
+
+                        for ( int i = 0; i < entities.length(); i++ )
+                        {
+                            if ( "P2P".equals( entities.getJSONObject( i ).get( "key" ) ) )
+                            {
+                                info.setP2pVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
+                                        entities.getJSONObject( i ).getString( "rangeTo" ) );
+                            }
+
+                            if ( "RESOURCE_HOST".equals( entities.getJSONObject( i ).get( "key" ) ) )
+                            {
+                                info.setRhVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
+                                        entities.getJSONObject( i ).getString( "rangeTo" ) );
+                            }
+                        }
+                    }
+                    catch ( JSONException e )
+                    {
+                        LOG.warn( e.getMessage() );
+                    }
+                }
+
+                pojos.add( info );
+            }
+            catch ( CommandException | ResourceHostException e )
+            {
+                LOG.error( "Error while getting RH version and P2P status. Seems RH is not connected." );
+
+                info.setRhVersion( "No RH connected" );
+            }
+        }
+
+        return pojos;
+    }
+
+
+    @Override
+    public HistoricalMetrics getMetricsSeries( final Host host, Date startTime, Date endTime )
+    {
+        HistoricalMetrics result = new HistoricalMetrics();
+
+        try
+        {
+            CommandResult commandResult = getHistoricalMetricsResp( host, startTime, endTime );
+
+
+            if ( null != commandResult && commandResult.hasSucceeded() )
+            {
+                result = mapper.readValue( commandResult.getStdOut(), HistoricalMetrics.class );
+            }
+            else
+            {
+                LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
+                        commandResult != null ? commandResult.getStdErr() : "" ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not run command successfully! Error: {}", e );
+        }
+
+
+        return result;
+    }
+
+
+    private CommandResult getHistoricalMetricsResp( final Host host, final Date startTime, final Date endTime )
+            throws CommandException, HostNotFoundException
+    {
+        Preconditions.checkNotNull( host );
+
+        RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
+
+        CommandResult commandResult;
+        if ( host instanceof ResourceHost )
+        {
+            commandResult =
+                    peerManager.getLocalPeer().getResourceHostById( host.getId() ).execute( historicalMetricCommand );
+        }
+        else if ( host instanceof ContainerHost )
+        {
+            commandResult = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId() )
+                                       .execute( historicalMetricCommand );
+        }
+        else
+        {
+            commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
+        }
+
+        return commandResult;
     }
 }

@@ -1,8 +1,10 @@
 package io.subutai.common.host;
 
 
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import java.io.Serializable;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 /**
@@ -10,15 +12,15 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
  */
 @JsonSerialize( as = HostInterfaceModel.class )
 @JsonDeserialize( as = HostInterfaceModel.class )
-public interface HostInterface
+public interface HostInterface extends Serializable
 {
     /**
      * returns network interface name
      */
-    public String getName();
+    String getName();
 
     /**
      * returns ip address
      */
-    public String getIp();
+    String getIp();
 }

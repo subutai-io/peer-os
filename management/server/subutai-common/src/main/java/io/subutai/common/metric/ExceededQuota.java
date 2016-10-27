@@ -3,23 +3,24 @@ package io.subutai.common.metric;
 
 import java.math.BigDecimal;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.subutai.common.host.HostId;
-import io.subutai.common.quota.ContainerCpuResource;
-import io.subutai.common.quota.ContainerHomeResource;
-import io.subutai.common.quota.ContainerOptResource;
-import io.subutai.common.quota.ContainerRamResource;
-import io.subutai.common.quota.ContainerResource;
-import io.subutai.common.quota.ContainerRootfsResource;
-import io.subutai.common.quota.ContainerVarResource;
-import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.NumericValueResource;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.hub.share.quota.ContainerCpuResource;
+import io.subutai.hub.share.quota.ContainerHomeResource;
+import io.subutai.hub.share.quota.ContainerOptResource;
+import io.subutai.hub.share.quota.ContainerRamResource;
+import io.subutai.hub.share.quota.ContainerResource;
+import io.subutai.hub.share.quota.ContainerRootfsResource;
+import io.subutai.hub.share.quota.ContainerVarResource;
+import io.subutai.hub.share.resource.ByteValueResource;
+import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.hub.share.resource.NumericValueResource;
+import io.subutai.hub.share.resource.ResourceValue;
 
 
 /**
@@ -79,7 +80,7 @@ public class ExceededQuota
     }
 
 
-    public <T extends ContainerResource> T getContainerResource( final Class<T> format )
+    public <T extends ContainerResource> T getContainerResourceQuota( final Class<T> format )
     {
         ContainerResource result = null;
         try
@@ -103,6 +104,9 @@ public class ExceededQuota
                     break;
                 case VAR:
                     result = new ContainerVarResource( ( ByteValueResource ) quotaValue );
+                    break;
+                default:
+                    // no-op
                     break;
             }
 
@@ -128,28 +132,14 @@ public class ExceededQuota
         if ( quotaValue instanceof NumericValueResource )
         {
             return ( ( NumericValueResource ) quotaValue ).getValue().multiply( currentValue.getValue() )
-                                                          .multiply( new BigDecimal( 0.01 ) );
+                                                          .multiply( BigDecimal.valueOf( 0.01 ) );
         }
         throw new UnsupportedOperationException( "Used value unsupported." );
     }
 
 
     @SuppressWarnings( "unchecked" )
-    public <T> T getQuotaValue( final Class<T> format )
-    {
-        try
-        {
-            return ( T ) quotaValue;
-        }
-        catch ( ClassCastException cce )
-        {
-            return null;
-        }
-    }
-
-
-    @SuppressWarnings( "unchecked" )
-    public <T> T getCurrentValue( final Class<T> format )
+    public <T extends ResourceValue> T getCurrentValue( final Class<T> format )
     {
         try
         {

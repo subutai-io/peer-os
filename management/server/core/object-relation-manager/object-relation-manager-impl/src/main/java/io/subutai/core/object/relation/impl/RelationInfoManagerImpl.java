@@ -176,51 +176,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-    // TODO also verify source of trust, like if A -> B -> C, check does really A has permission to create relation
-    // between B and C
-    // C should give correct verification through relationship path.
-    private boolean isRelationValid( final RelationInfo relationInfo, final RelationMeta relationMeta )
-    {
-
-        Set<RelationLink> relationLinks = Sets.newHashSet();
-
-        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSource() );
-        List<Relation> byTargetRelations = relationDataService.findByTarget( target );
-
-        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObject() );
-        List<Relation> bySourceRelations = relationDataService.findBySource( target );
-
-        // When relation info is found check that relation was granted from verified source
-        for ( final Relation targetRelation : byTargetRelations )
-        {
-            if ( targetRelation.getTrustedObject().equals( object ) )
-            {
-                // Requested relation should be less then or equal to relation that was granted
-                return compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0;
-            }
-            int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
-            if ( result != -3 )
-            {
-                return result >= 0;
-            }
-        }
-
-        // TODO instead of getting deep one/two steps later implement full relation lookup with source - target -
-        // object relationship verification
-        // relationship verification should be done at transaction point between relation links, checks should be
-        // applied towards granting link, as does this granting link has permissions to set new relation link and new
-        // relation link doesn't exceed relation link grantee has
-        for ( final Relation sourceRelation : bySourceRelations )
-        {
-            if ( sourceRelation.getTrustedObject().equals( object ) )
-            {
-                // Requested relation should be less then or equal to relation that was granted
-                return compareRelationships( sourceRelation.getRelationInfo(), relationInfo ) >= 0;
-            }
-        }
-
-        return false;
-    }
 
 
     // return -3 means no relation exist
@@ -324,7 +279,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     public boolean allHasReadPermissions( final RelationMeta relationMeta )
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, false, false, false, Ownership.ALL.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
 
         Map<String, String> traits = Maps.newHashMap();
         traits.put( "ownership", Ownership.ALL.getName() );
@@ -342,138 +296,12 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-    public boolean groupHasDeletePermissions( final RelationLink relationLink )
-    {
-        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, false, true, Ownership.GROUP.getLevel
-                () );
-
-        Map<String, String> traits = Maps.newHashMap();
-        traits.put( "ownership", Ownership.GROUP.getName() );
-        traits.put( "delete", "true" );
-        relationInfoMeta.setRelationTraits( traits );
-        try
-        {
-            checkRelation( relationLink, relationInfoMeta, null );
-            return true;
-            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            return false;
-        }
-    }
 
 
-    @Override
-    public boolean groupHasUpdatePermissions( final RelationLink relationLink )
-    {
-        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, true, false, Ownership.GROUP.getLevel
-                () );
-
-        Map<String, String> traits = Maps.newHashMap();
-        traits.put( "ownership", Ownership.GROUP.getName() );
-        traits.put( "update", "true" );
-        relationInfoMeta.setRelationTraits( traits );
-        try
-        {
-            checkRelation( relationLink, relationInfoMeta, null );
-            return true;
-            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            return false;
-        }
-    }
 
 
-    @Override
-    public boolean allHasReadPermissions( final RelationLink relationLink )
-    {
-        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, false, false, false, Ownership.ALL.getLevel() );
-
-        Map<String, String> traits = Maps.newHashMap();
-        traits.put( "ownership", Ownership.ALL.getName() );
-        traits.put( "read", "true" );
-        relationInfoMeta.setRelationTraits( traits );
-        try
-        {
-            checkRelation( relationLink, relationInfoMeta, null );
-            return true;
-            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            return false;
-        }
-    }
 
 
-    @Override
-    public boolean allHasWritePermissions( final RelationLink relationLink )
-    {
-        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, true, false, false, Ownership.ALL.getLevel() );
-
-        Map<String, String> traits = Maps.newHashMap();
-        traits.put( "ownership", Ownership.ALL.getName() );
-        traits.put( "write", "true" );
-        relationInfoMeta.setRelationTraits( traits );
-        try
-        {
-            checkRelation( relationLink, relationInfoMeta, null );
-            return true;
-            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            return false;
-        }
-    }
-
-
-    @Override
-    public boolean allHasDeletePermissions( final RelationLink relationLink )
-    {
-        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, false, true, Ownership.ALL.getLevel() );
-
-        Map<String, String> traits = Maps.newHashMap();
-        traits.put( "ownership", Ownership.ALL.getName() );
-        traits.put( "delete", "true" );
-        relationInfoMeta.setRelationTraits( traits );
-
-        try
-        {
-            checkRelation( relationLink, relationInfoMeta, null );
-            return true;
-            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            return false;
-        }
-    }
-
-
-    @Override
-    public boolean allHasUpdatePermissions( final RelationLink relationLink )
-    {
-        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, true, false, Ownership.ALL.getLevel() );
-
-        Map<String, String> traits = Maps.newHashMap();
-        traits.put( "ownership", Ownership.ALL.getName() );
-        traits.put( "update", "true" );
-        relationInfoMeta.setRelationTraits( traits );
-
-        try
-        {
-            checkRelation( relationLink, relationInfoMeta, null );
-            return true;
-        }
-        catch ( RelationVerificationException e )
-        {
-            return false;
-        }
-    }
 
 
     @Override

@@ -39,13 +39,13 @@ public class ExpiringCache<K, V>
      */
     public ExpiringCache()
     {
-
         evictor = Executors.newSingleThreadScheduledExecutor();
 
         expirationNotifier = Executors.newCachedThreadPool();
 
         evictor.scheduleWithFixedDelay( new Runnable()
         {
+            @Override
             public void run()
             {
                 try
@@ -82,7 +82,7 @@ public class ExpiringCache<K, V>
     {
         expirationNotifier.execute( new Runnable()
         {
-
+            @Override
             public void run()
             {
                 callback.callExpiryCallback();

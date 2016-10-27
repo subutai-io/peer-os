@@ -1,6 +1,7 @@
 package io.subutai.core.identity.rest.ui;
 
 
+import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,12 +59,15 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllUsers() ) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllUsers().stream()
+                                                            .filter( user -> user.getType() != UserType.System.getId() )
+                                                            .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting users #getUsers", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
     }
 
@@ -78,7 +82,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting users #getUsers", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
     }
 
@@ -94,9 +99,11 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting activeUser user #getActiveUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
     }
+
 
     @Override
     public Response getPublicKeyData( final Long userId )
@@ -108,17 +115,17 @@ public class RestServiceImpl implements RestService
         {
             PGPPublicKeyRing pubRing = securityManager.getKeyManager().getPublicKeyRing( user.getSecurityKeyId() );
 
-            keyData.setFingerprint( PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint()));
+            keyData.setFingerprint( PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint() ) );
             keyData.setKey( PGPEncryptionUtil.armorByteArrayToString( pubRing.getEncoded() ) );
             keyData.setAuthId( user.getAuthId() );
 
-            for (Iterator<String> iter = pubRing.getPublicKey().getUserIDs(); iter.hasNext(); )
+            for ( Iterator<String> iter = pubRing.getPublicKey().getUserIDs(); iter.hasNext(); )
             {
                 String id = iter.next();
 
-                if(!Strings.isNullOrEmpty( id ))
+                if ( !Strings.isNullOrEmpty( id ) )
                 {
-                    keyData.setUserId( keyData.getUserId()+":"+ id);
+                    keyData.setUserId( keyData.getUserId() + ":" + id );
                 }
             }
 
@@ -127,7 +134,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting Public Key Data #getPublicKeyData", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
     }
 
@@ -143,15 +151,19 @@ public class RestServiceImpl implements RestService
 
             SecurityKey keyData = securityManager.getKeyManager().getKeyData( user.getSecurityKeyId() );
 
-            if(keyData != null)
+            if ( keyData != null )
             {
                 String pFprint = keyData.getPublicKeyFingerprint();
                 String sFprint = keyData.getSecretKeyFingerprint();
 
-                if(pFprint.equals( sFprint ))
+                if ( pFprint.equals( sFprint ) )
+                {
                     status = 1;
+                }
                 else
+                {
                     status = 2;
+                }
             }
 
             return Response.ok( jsonUtil.to( status ) ).build();
@@ -162,7 +174,6 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
-
 
 
     @Override
@@ -181,45 +192,59 @@ public class RestServiceImpl implements RestService
             {
 
 
-                if( username.toLowerCase().indexOf( "sys" ) == 0 || username.toLowerCase().indexOf( "admin" ) == 0 )
+                if ( username.toLowerCase().indexOf( "sys" ) == 0 || username.toLowerCase().indexOf( "admin" ) == 0 )
                 {
                     LOGGER.warn( "#saveUser forbidden, username is reserved" );
-                    return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();
+                    return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+                                   .entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();
                 }
 
-                newUser = identityManager
-                        .createUser( username, password, fullName, email, UserType.Regular.getId(), Integer.parseInt( trustLevel ), false, true );
+                newUser = identityManager.createUser( username, password, fullName, email, UserType.Regular.getId(),
+                        Integer.parseInt( trustLevel ), false, true );
 
                 if ( !Strings.isNullOrEmpty( rolesJson ) )
                 {
-                    List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
-                    {}.getType() );
+                    List<Long> roleIds = jsonUtil.from( rolesJson, new TypeToken<ArrayList<Long>>()
+                    {
+                    }.getType() );
 
 
-                    roleIds.stream().forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
+                    roleIds.stream()
+                           .forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
                 }
             }
             else
             {
                 newUser = identityManager.getUser( userId );
-                newUser.setEmail(email);
-                newUser.setFullName(fullName);
-                newUser.setTrustLevel(Integer.parseInt( trustLevel ));
+                newUser.setEmail( email );
+                newUser.setFullName( fullName );
+                newUser.setTrustLevel( Integer.parseInt( trustLevel ) );
 
-                List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
-                {}.getType() );
+                List<Long> roleIds = jsonUtil.from( rolesJson, new TypeToken<ArrayList<Long>>()
+                {
+                }.getType() );
 
-                newUser.setRoles( roleIds.stream().map( r -> identityManager.getRole( r )).collect( Collectors.toList()));
+                newUser.setRoles(
+                        roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() ) );
 
-                identityManager.modifyUser(newUser, password);
+                identityManager.modifyUser( newUser, password );
             }
-
-
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting new user #setUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( "Error setting new user #setUser", e );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+                               .entity( JsonUtil.toJson( "You don't have permission to perform this operation" ) )
+                               .build();
+            }
+            else
+            {
+                LOGGER.error( "Error setting new user #setUser", e );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+                               .entity( JsonUtil.toJson( e.toString() ) ).build();
+            }
         }
 
         return Response.ok().build();
@@ -250,12 +275,13 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            identityManager.approveDelegatedUser(trustMessage);
+            identityManager.approveDelegatedUser( trustMessage );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new user #setUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
 
         return Response.ok().build();
@@ -272,7 +298,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new user #setUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
 
         return Response.ok().build();
@@ -297,14 +324,15 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setUserPublicKey(String publicKey)
+    public Response setUserPublicKey( String publicKey )
     {
         try
         {
             identityManager.setUserPublicKey( identityManager.getActiveUser().getId(), publicKey );
         }
-        catch ( Exception e ) {
-            LOGGER.error("Error updating user public key", e);
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error updating user public key", e );
             return Response.serverError().build();
         }
         return Response.ok().build();
@@ -321,7 +349,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error deleting user #deleteUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
 
         return Response.ok().build();
@@ -335,12 +364,15 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllRoles() ) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllRoles().stream()
+                                                            .filter( role -> role.getType() != UserType.System.getId() )
+                                                            .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting roles #getRoles", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
     }
 
@@ -386,7 +418,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new role #createRole", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
 
         return Response.ok().build();
@@ -403,7 +436,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error deleting role #deleteRole", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
 
         return Response.ok().build();
@@ -422,7 +456,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error receiving permissions", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
     }
 
@@ -456,12 +491,13 @@ public class RestServiceImpl implements RestService
 
             return Response.ok( JsonUtil.toJson( list ) ).build();
             */
-            return Response.ok( "Tokens").build();
+            return Response.ok( "Tokens" ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error receiving user tokens", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
     }
 
@@ -481,12 +517,13 @@ public class RestServiceImpl implements RestService
             cal.add( Calendar.HOUR_OF_DAY, period );
 
             //identityManager
-              //      .createUserToken( identityManager.getUser( userId ), token, null, "subutai.io", 2, cal.getTime() );
+            //      .createUserToken( identityManager.getUser( userId ), token, null, "subutai.io", 2, cal.getTime() );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error creating new user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
 
         return Response.ok().build();
@@ -517,7 +554,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error updating user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
 
         return Response.ok().build();
@@ -536,7 +574,8 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error updating new user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
+                           .build();
         }
 
 
@@ -555,5 +594,4 @@ public class RestServiceImpl implements RestService
 
         return Response.ok( JsonUtil.toJson( map ) ).build();
     }
-
 }

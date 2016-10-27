@@ -9,8 +9,6 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.RegistrationStatus;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.Quota;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -20,17 +18,14 @@ import io.subutai.core.peer.api.PeerManager;
 /**
  * Clean target environment
  */
-@Command( scope = "environment", name = "clean", description = "Command to view environment" )
+@Command( scope = "environment", name = "clean", description = "Destroys containers of not registered peers within "
+        + "this environment" )
 public class CleanEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
     @Argument( name = "envId", description = "Environment id",
             index = 0, multiValued = false, required = true )
-    /**
-     * {@value environmentId} environment id to view info about
-     * <p>{@code required = true}</p>
-     */
-            String environmentId;
+    String environmentId;
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
@@ -73,7 +68,8 @@ public class CleanEnvironmentCommand extends SubutaiShellCommandSupport
             if ( peerStatus == RegistrationStatus.NOT_REGISTERED )
             {
                 environment.destroyContainer( containerHost, false );
-                System.out.println( "Container destroyed: " + containerHost.getHostname() );
+                System.out.format( "Container %s destroyed. Its peer registeration not found%n",
+                        containerHost.getHostname() );
             }
         }
 

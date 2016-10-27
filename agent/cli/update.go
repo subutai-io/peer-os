@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -14,24 +15,64 @@ import (
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
 
 type snap struct {
-	Version string `json:"version"`
+	Id        string            `json:"id"`
+	Name      string            `json:"name"`
+	Owner     []string          `json:"owner"`
+	Version   string            `json:"version"`
+	Signature map[string]string `json:"signature"`
 }
 
-func getAvailable(name string) string {
-	var update snap
-	client := &http.Client{}
-	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/info?name=" + name)
-	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/info?name="+name, err)
+func ifUpdateable(installed int) string {
+	var update []snap
+	var hash string
+
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
+	if !config.CDN.Allowinsecure {
+		client = &http.Client{}
+	}
+	resp, err := client.Get("https://" + config.CDN.URL + ":" + config.CDN.SSLport + "/kurjun/rest/file/info?name=subutai_")
+	log.Check(log.FatalLevel, "GET: https://"+config.CDN.URL+":"+config.CDN.SSLport+"/kurjun/rest/file/info?name=subutai_", err)
 	defer resp.Body.Close()
 	js, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
 	log.Check(log.FatalLevel, "Parsing file list", json.Unmarshal(js, &update))
-	log.Debug("Available: " + update.Version)
-	return update.Version
+
+	for _, v := range update {
+		available, err := strconv.Atoi(v.Version)
+		log.Check(log.ErrorLevel, "Matching update "+v.Version, err)
+		if len(config.Template.Branch) != 0 && strings.HasSuffix(v.Name, config.Template.Arch+"-"+config.Template.Branch+".snap") && installed < available && verifyAuthor(v) {
+			log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
+			installed = available
+			hash = v.Id
+		} else if len(config.Template.Branch) == 0 && strings.HasSuffix(v.Name, config.Template.Arch+".snap") && installed < available && verifyAuthor(v) {
+			log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
+			installed = available
+			hash = v.Id
+		}
+	}
+
+	log.Debug("Latest version: " + strconv.Itoa(installed))
+	return hash
+}
+
+func verifyAuthor(p snap) bool {
+	if _, ok := p.Signature["jenkins"]; !ok {
+		log.Debug("Update is not owned by Subutai team, ignoring")
+		return false
+	}
+	signedhash := gpg.VerifySignature(gpg.KurjunUserPK("jenkins"), p.Signature["jenkins"])
+	if p.Id != signedhash {
+		log.Debug("Signature does not match with update hash")
+		return false
+	}
+	log.Debug("Digital signature and file integrity verified")
+	return true
 }
 
 func getInstalled() string {
@@ -50,14 +91,18 @@ func getInstalled() string {
 	return "0"
 }
 
-func upgradeRh(packet string) {
+func upgradeRh(hash string) {
 	log.Info("Updating Resource host")
-	file, err := os.Create("/tmp/" + packet)
+	file, err := os.Create("/tmp/" + hash)
 	log.Check(log.FatalLevel, "Creating update file", err)
 	defer file.Close()
-	client := &http.Client{}
-	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?name=" + packet)
-	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?name="+packet, err)
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
+	if !config.CDN.Allowinsecure {
+		client = &http.Client{}
+	}
+	resp, err := client.Get("https://" + config.CDN.URL + ":" + config.CDN.SSLport + "/kurjun/rest/file/get?id=" + hash)
+	log.Check(log.FatalLevel, "GET: https://"+config.CDN.URL+":"+config.CDN.SSLport+"/kurjun/rest/file/get?id="+hash, err)
 	defer resp.Body.Close()
 	log.Info("Downloading snap package")
 	bar := pb.New(int(resp.ContentLength)).SetUnits(pb.U_BYTES)
@@ -66,40 +111,37 @@ func upgradeRh(packet string) {
 
 	_, err = io.Copy(file, rd)
 	log.Check(log.FatalLevel, "Writing response to file", err)
+	if hash != md5sum("/tmp/"+hash) {
+		log.Error("Hash does not match")
+	}
 
-	log.Check(log.FatalLevel, "Installing update /tmp/"+packet,
-		exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+packet).Run())
-	log.Check(log.FatalLevel, "Removing update file /tmp/"+packet, os.Remove("/tmp/"+packet))
+	log.Info("Installing update")
+	log.Check(log.FatalLevel, "Installing update /tmp/"+hash,
+		exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+hash).Run())
+	log.Check(log.FatalLevel, "Removing update file /tmp/"+hash, os.Remove("/tmp/"+hash))
 
 }
 
 func Update(name string, check bool) {
+	if !lockSubutai(name + ".update") {
+		log.Error("Another update process is already running")
+	}
+	defer unlockSubutai()
 	switch name {
 	case "rh":
-		if !lockSubutai("rh.update") {
-			log.Error("Another update process is already running")
-		}
-		defer unlockSubutai()
-
-		packet := "subutai_" + config.Template.Version + "_" + config.Template.Arch + ".snap"
-		if len(config.Template.Branch) != 0 {
-			packet = "subutai_" + config.Template.Version + "_" + config.Template.Arch + "-" + config.Template.Branch + ".snap"
-		}
 
 		installed, err := strconv.Atoi(getInstalled())
 		log.Check(log.FatalLevel, "Converting installed package timestamp to int", err)
-		available, err := strconv.Atoi(getAvailable(packet))
-		log.Check(log.FatalLevel, "Converting available package timestamp to int", err)
 
-		if installed >= available {
+		newsnap := ifUpdateable(installed)
+		if len(newsnap) == 0 {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
-			log.Info("Update is avalable")
+			log.Info("Update is available")
 			os.Exit(0)
 		}
-
-		upgradeRh(packet)
+		upgradeRh(newsnap)
 
 	default:
 		if !container.IsContainer(name) {
@@ -113,7 +155,7 @@ func Update(name string, check bool) {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
-			log.Info("Update is avalable")
+			log.Info("Update is available")
 			os.Exit(0)
 		}
 		_, err = container.AttachExec(name, []string{"apt-get", "-qq", "upgrade", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5"})

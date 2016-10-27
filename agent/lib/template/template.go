@@ -15,7 +15,7 @@ import (
 
 func IsRegistered(templateName string) bool {
 	returnValue := true
-	restTemplateURL := config.Cdn.Kurjun + templateName
+	restTemplateURL := config.CDN.Kurjun + templateName
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},

@@ -1,7 +1,7 @@
 package io.subutai.core.lxc.quota.impl;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public class QuotaOutput

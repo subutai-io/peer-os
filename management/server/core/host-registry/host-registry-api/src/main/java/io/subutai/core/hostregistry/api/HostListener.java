@@ -17,5 +17,5 @@ public interface HostListener
      *
      * @param resourceHostInfo - resource host info of host from which this heartbeat came
      */
-    public void onHeartbeat( ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts );
+    void onHeartbeat( ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts );
 }

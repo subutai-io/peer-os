@@ -11,10 +11,12 @@ public class PeerActionResponse
         OK, FAIL
     }
 
+
     public boolean isOk()
     {
         return this.type == ResponseType.OK;
     }
+
 
     private ResponseType type;
 
@@ -30,7 +32,7 @@ public class PeerActionResponse
 
     public static PeerActionResponse Ok( Object... data )
     {
-        return new PeerActionResponse( ResponseType.OK );
+        return new PeerActionResponse( ResponseType.OK, data );
     }
 
 

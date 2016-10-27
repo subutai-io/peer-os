@@ -21,9 +21,9 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
  */
 public class ProxyEnvironment extends EnvironmentImpl
 {
-    private final Logger log = LoggerFactory.getLogger( getClass() );
+    private final static Logger log = LoggerFactory.getLogger( ProxyEnvironment.class );
 
-    private final EnvironmentAdapter environmentAdapter;
+    private transient final EnvironmentAdapter environmentAdapter;
 
 
     ProxyEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
@@ -68,7 +68,8 @@ public class ProxyEnvironment extends EnvironmentImpl
             for ( JsonNode node : arr )
             {
                 ProxyEnvironmentContainer ch =
-                        new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
+                        new ProxyEnvironmentContainer( node, node.get( "templateId" ).asText(), environmentManager,
+                                localContainerIds );
 
                 ch.setEnvironment( this );
 

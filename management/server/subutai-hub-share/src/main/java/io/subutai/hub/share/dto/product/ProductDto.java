@@ -10,11 +10,18 @@ import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
 
 
 //Version 1.1
 public class ProductDto
 {
+    private static final Logger LOG = LoggerFactory.getLogger( ProductDto.class.getName() );
+
+
     public enum Type
     {
         PLUGIN
@@ -59,7 +66,7 @@ public class ProductDto
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
         }
         this.ownerId = objProduct.getString( "ownerId" );
         this.version = objProduct.getString( "version" );
@@ -171,6 +178,8 @@ public class ProductDto
 
     public void setMetadata( final Set<String> metadata )
     {
+        Preconditions.checkNotNull( metadata );
+
         this.metadata = metadata;
     }
 

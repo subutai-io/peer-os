@@ -6,11 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import org.apache.commons.lang.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -126,7 +125,7 @@ public class Topology
 
         if ( StringUtils.isEmpty( node.getHostname() ) )
         {
-            node.setHostname( UUID.randomUUID().toString() );
+            node.setHostname( node.getName().replaceAll( "\\s+", "" ) );
         }
 
         Set<Node> peerNodes = nodeGroupPlacement.get( peerId );

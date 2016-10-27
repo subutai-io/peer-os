@@ -3,7 +3,9 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.List;
 
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
@@ -22,6 +24,7 @@ public class DestroyContainersStep
     private final EnvironmentManagerImpl environmentManager;
     private final List<String> removedContainers;
     private final TrackerOperation trackerOperation;
+    protected TaskUtil<Object> destroyUtil = new TaskUtil<>();
 
 
     public DestroyContainersStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
@@ -34,11 +37,10 @@ public class DestroyContainersStep
     }
 
 
-    public Environment execute() throws Exception
+    public Environment execute() throws EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         if ( !CollectionUtil.isCollectionEmpty( removedContainers ) )
         {
-            TaskUtil<Environment> destroyUtil = new TaskUtil<>();
 
             for ( String containerId : removedContainers )
             {
@@ -47,9 +49,9 @@ public class DestroyContainersStep
                 destroyUtil.addTask( new ContainerDestroyTask( containerHost ) );
             }
 
-            TaskUtil.TaskResults<Environment> destroyResults = destroyUtil.executeParallel();
+            TaskUtil.TaskResults<Object> destroyResults = destroyUtil.executeParallel();
 
-            for ( TaskUtil.TaskResult<Environment> destroyResult : destroyResults.getTaskResults() )
+            for ( TaskUtil.TaskResult<Object> destroyResult : destroyResults.getResults() )
             {
                 ContainerHost containerHost = ( ( ContainerDestroyTask ) destroyResult.getTask() ).getContainerHost();
 

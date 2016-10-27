@@ -2,9 +2,6 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -15,51 +12,67 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
+
 
 public class HttpClient
 {
-    private static long defaultReceiveTimeout = 1000 * 60 * 5;
-    private static long defaultConnectionTimeout = 1000 * 60;
+    private static long defaultReceiveTimeout = 1000 * 60 * 5L;
+    private static long defaultConnectionTimeout = 1000 * 60L;
     private static int defaultMaxRetransmits = 3;
 
 
-    public static WebClient createTrustedWebClientWithAuth( String url, KeyStore keyStore, char[] keyStorePassword,
-                                                            byte[] serverFingerprint )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+    private HttpClient()
     {
-        WebClient client = WebClient.create( url );
+        throw new IllegalAccessError("Utility class");
+    }
 
-        // A client certificate is not provided in SSL context if async connection is used.
-        // See details: #311 - Registration failure due to inability to find fingerprint.
-        Map<String, Object> requestContext = WebClient.getConfig( client ).getRequestContext();
-        requestContext.put( "use.async.http.conduit", Boolean.FALSE );
 
-        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+    public static WebClient createTrustedWebClientWithAuth( String url, KeyStore keyStore, char[] keyStorePassword,
+                                                            byte[] serverFingerprint ) throws HubManagerException
+    {
+        try
+        {
+            WebClient client = WebClient.create( url );
 
-        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+            // A client certificate is not provided in SSL context if async connection is used.
+            // See details: #311 - Registration failure due to inability to find fingerprint.
+            Map<String, Object> requestContext = WebClient.getConfig( client ).getRequestContext();
+            requestContext.put( "use.async.http.conduit", Boolean.FALSE );
 
-        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+            HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
-        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+            HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
 
-        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+            httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
 
-        httpConduit.setClient( httpClientPolicy );
+            httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
 
-        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+            httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
 
-        keyManagerFactory.init( keyStore, keyStorePassword );
+            httpConduit.setClient( httpClientPolicy );
 
-        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+            KeyManagerFactory keyManagerFactory =
+                    KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
 
-        tlsClientParameters.setDisableCNCheck( true );
+            keyManagerFactory.init( keyStore, keyStorePassword );
 
-        tlsClientParameters.setTrustManagers( new TrustManager[] { new FingerprintTrustManager( serverFingerprint ) } );
+            TLSClientParameters tlsClientParameters = new TLSClientParameters();
 
-        tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
+            tlsClientParameters.setDisableCNCheck( true );
 
-        httpConduit.setTlsClientParameters( tlsClientParameters );
+            tlsClientParameters
+                    .setTrustManagers( new TrustManager[] { new FingerprintTrustManager( serverFingerprint ) } );
 
-        return client;
+            tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
+
+            httpConduit.setTlsClientParameters( tlsClientParameters );
+
+            return client;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 }

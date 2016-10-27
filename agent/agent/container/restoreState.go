@@ -16,20 +16,21 @@ func init() {
 	contsStatus = make(map[string]int)
 }
 
-func ContainersRestoreState() {
-	for _, cont := range GetActiveContainers(false) {
+// StateRestore checks container state and starting or stopping containers if required.
+func StateRestore() {
+	for _, cont := range Active(false) {
 		var start, stop bool
 
 		switch contsStatus[cont.Name] {
 		case 100:
 		case 5:
 			{
-				log.Debug("Failed to START sontainer " + cont.Name + " after 5 attempts")
+				log.Debug("Failed to START container " + cont.Name + " after 5 attempts")
 				contsStatus[cont.Name] = 100
 			}
 		case -5:
 			{
-				log.Debug("Failed to STOP sontainer " + cont.Name + " after 5 attempts")
+				log.Debug("Failed to STOP container " + cont.Name + " after 5 attempts")
 				contsStatus[cont.Name] = 100
 			}
 		case 10:

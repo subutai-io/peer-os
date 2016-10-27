@@ -14,7 +14,6 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
-import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
@@ -41,7 +40,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
-            e.printStackTrace();
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
@@ -52,6 +51,7 @@ public class RestServiceImpl implements RestService
     public Response setPeerSettings()
     {
         systemManager.setPeerSettings();
+
         return Response.status( Response.Status.OK ).build();
     }
 
@@ -63,49 +63,6 @@ public class RestServiceImpl implements RestService
         String peerSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( peerSettingsInfo ).build();
-    }
-
-
-    @Override
-    public Response getKurjunSettings()
-    {
-        try
-        {
-            KurjunSettings pojo = systemManager.getKurjunSettings();
-            String kurjunSettingsInfo = JsonUtil.GSON.toJson( pojo );
-
-            return Response.status( Response.Status.OK ).entity( kurjunSettingsInfo ).build();
-        }
-        catch ( ConfigurationException e )
-        {
-            LOG.error( e.getMessage() );
-            e.printStackTrace();
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
-        }
-    }
-
-
-    @Override
-    public Response setKurjunSettingsQuotas( final String publicDiskQuota, final String publicThreshold,
-                                             final String publicTimeFrame, final String trustDiskQuota,
-                                             final String trustThreshold, final String trustTimeFrame )
-            throws ConfigurationException
-    {
-
-        boolean isSaved = systemManager
-                .setKurjunSettingsQuotas( Long.parseLong( publicDiskQuota ), Long.parseLong( publicThreshold ),
-                        Long.parseLong( publicTimeFrame ), Long.parseLong( trustDiskQuota ),
-                        Long.parseLong( trustThreshold ), Long.parseLong( trustTimeFrame ) );
-
-        if ( isSaved )
-        {
-            return Response.status( Response.Status.OK ).build();
-        }
-        else
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
     }
 
 
@@ -133,30 +90,10 @@ public class RestServiceImpl implements RestService
         }
         catch ( PeerException e )
         {
-            Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-            e.printStackTrace();
-        }
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response setKurjunSettingsUrls( final String globalKurjunUrls, final String localKurjunUrls )
-    {
-
-        try
-        {
-            systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ), localKurjunUrls.split( "," ) );
-
-            systemManager.sendSystemConfigToHub();
-        }
-        catch ( ConfigurationException e )
-        {
             LOG.error( e.getMessage() );
-            e.printStackTrace();
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
 
+            Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
         return Response.status( Response.Status.OK ).build();
     }
 
@@ -174,7 +111,7 @@ public class RestServiceImpl implements RestService
         catch ( ConfigurationException e )
         {
             LOG.error( e.getMessage() );
-            e.printStackTrace();
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
@@ -182,22 +119,17 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                        final String publicUrl, final String agentPort, final String publicSecurePort,
-                                        final String keyServer )
+    public Response setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
+                                        final String endRange )
     {
-        //todo remove securePortX3
         try
         {
-            systemManager.setNetworkSettings( securePortX1, securePortX2, publicUrl, agentPort, publicSecurePort,
-                    keyServer );
-
-            systemManager.sendSystemConfigToHub();
+            systemManager.setNetworkSettings( publicUrl, publicSecurePort, startRange, endRange );
         }
         catch ( ConfigurationException e )
         {
             LOG.error( e.getMessage() );
-            e.printStackTrace();
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
@@ -210,6 +142,7 @@ public class RestServiceImpl implements RestService
     public Response getAdvancedSettings()
     {
         AdvancedSettings pojo = systemManager.getAdvancedSettings();
+
         String advancedSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( advancedSettingsInfo ).build();
@@ -220,6 +153,7 @@ public class RestServiceImpl implements RestService
     public Response getManagementUpdates()
     {
         SystemInfo pojo = systemManager.getManagementUpdates();
+
         String subutaiInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( subutaiInfo ).build();

@@ -20,12 +20,9 @@
 
   <!-- ************************************************************************************************** -->
 
-  <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
-
-  <bean id="securityManager" scope="singleton" init-method="init" destroy-method="destroy"
+  <bean id="securityManager" scope="singleton" init-method="init"
         class="io.subutai.core.security.impl.SecurityManagerImpl">
 
-    <argument ref="jsonProvider" />
     <property name="daoManager" ref="daoSecurityManager" />
     <property name="keyServer" ref="keyServer" />
 

@@ -87,13 +87,12 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    User authenticateByToken( String token )  throws SystemSecurityException;
+    User authenticateByToken( String token ) throws SystemSecurityException;
 
 
     /* *************************************************
      */
     User authenticateUser( String userName, String password );
-
 
 
     /* *************************************************
@@ -190,7 +189,6 @@ public interface IdentityManager
     void setTrustLevel( User user, int trustLevel );
 
 
-
     /* *************************************************
      */
     UserDelegate createUserDelegate( User user, String delegateUserId, boolean genKeyPair );
@@ -199,9 +197,9 @@ public interface IdentityManager
     /* *************************************************
     */
     User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                     boolean generateKeyPair, boolean createUserDelegate ) throws Exception;
+                     boolean generateKeyPair, boolean createUserDelegate ) throws SystemSecurityException;
 
-    User modifyUser( User user, String password ) throws Exception;
+    User modifyUser( User user, String password ) throws SystemSecurityException;
 
 
     void approveDelegatedUser( String trustMessage );
@@ -209,7 +207,7 @@ public interface IdentityManager
 
     void createIdentityDelegationDocument();
 
-        
+
     User getUserByUsername( String userName );
 
 
@@ -226,17 +224,17 @@ public interface IdentityManager
     /* *************************************************
      */
     @PermitAll
-    boolean changeUserPassword( String userName, String oldPassword, String newPassword ) throws Exception;
+    boolean changeUserPassword( String userName, String oldPassword, String newPassword ) throws SystemSecurityException;
 
     /* *************************************************
          */
-    boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws Exception;
+    boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws SystemSecurityException;
 
 
     /* *************************************************
      */
     @PermitAll
-    boolean changeUserPassword( User user, String oldPassword, String newPassword ) throws Exception;
+    boolean changeUserPassword( User user, String oldPassword, String newPassword ) throws SystemSecurityException;
 
     /* *************************************************
          */

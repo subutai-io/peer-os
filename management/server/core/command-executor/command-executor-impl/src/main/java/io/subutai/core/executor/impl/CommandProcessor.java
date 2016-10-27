@@ -32,8 +32,9 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -54,7 +55,7 @@ public class CommandProcessor implements RestProcessor
     private static final int NOTIFIER_INTERVAL_MS = 300;
     private static final long COMMAND_ENTRY_TIMEOUT =
             ( Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC + Common.DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL ) * 1000
-                    + NOTIFIER_INTERVAL_MS + 1000;
+                    + NOTIFIER_INTERVAL_MS + 1000L;
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
     protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
@@ -63,6 +64,9 @@ public class CommandProcessor implements RestProcessor
     protected ExecutorService notifierPool = Executors.newCachedThreadPool();
     protected Set<HeartbeatListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
+
+    JsonUtil jsonUtil = new JsonUtil();
+    IPUtil ipUtil = new IPUtil();
 
 
     public void addListener( HeartbeatListener listener )
@@ -86,7 +90,7 @@ public class CommandProcessor implements RestProcessor
     @Override
     public void handleHeartbeat( final HeartBeat heartBeat )
     {
-        LOG.debug( String.format( "Heartbeat:%n%s", JsonUtil.toJson( heartBeat ) ) );
+        LOG.debug( String.format( "Heartbeat:%n%s", jsonUtil.to( heartBeat ) ) );
 
         for ( final HeartbeatListener listener : listeners )
         {
@@ -119,6 +123,7 @@ public class CommandProcessor implements RestProcessor
 
         notifier.scheduleWithFixedDelay( new Runnable()
         {
+            @Override
             public void run()
             {
                 try
@@ -154,7 +159,7 @@ public class CommandProcessor implements RestProcessor
                 new CommandProcessExpiryCallback() );
         if ( !queued )
         {
-            throw new CommandException( "This command is already queued for execution" );
+            throw new CommandException( "Command id is null " );
         }
 
         //send command
@@ -162,7 +167,7 @@ public class CommandProcessor implements RestProcessor
         {
             commandProcess.start();
 
-            String command = JsonUtil.toJson( new RequestWrapper( request ) );
+            String command = jsonUtil.to( new RequestWrapper( request ) );
 
             LOG.debug( String.format( "Sending:%n%s", command ) );
 
@@ -192,9 +197,10 @@ public class CommandProcessor implements RestProcessor
             if ( hostRequests == null )
             {
                 hostRequests = Sets.newLinkedHashSet();
-                requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
+                requests.put( resourceHostInfo.getId(), hostRequests,
+                        Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000L );
             }
-            String encryptedRequest = encrypt( JsonUtil.toJsonMinified( request ), request.getId() );
+            String encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
             hostRequests.add( encryptedRequest );
         }
     }
@@ -248,11 +254,13 @@ public class CommandProcessor implements RestProcessor
     protected void notifyAgent( ResourceHostInfo resourceHostInfo )
     {
         WebClient webClient = null;
+        javax.ws.rs.core.Response response = null;
+
         try
         {
             webClient = getWebClient( resourceHostInfo );
 
-            javax.ws.rs.core.Response response = webClient.form( new Form() );
+            response = webClient.form( new Form() );
 
             if ( response.getStatus() == javax.ws.rs.core.Response.Status.OK.getStatusCode()
                     || response.getStatus() == javax.ws.rs.core.Response.Status.ACCEPTED.getStatusCode() )
@@ -262,21 +270,16 @@ public class CommandProcessor implements RestProcessor
         }
         finally
         {
-            RestUtil.close( webClient );
+            RestUtil.close( response, webClient );
         }
     }
 
 
     protected WebClient getWebClient( ResourceHostInfo resourceHostInfo )
     {
-        return RestUtil.createWebClient( String.format( "http://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
-                SystemSettings.getAgentPort() ), 3000, 5000, 1 );
-    }
-
-
-    protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
-    {
-        return resourceHostInfo.getHostInterfaces().findByName( Common.RH_INTERFACE ).getIp();
+        return RestUtil.createWebClient(
+                String.format( "http://%s:%d/trigger", hostRegistry.getResourceHostIp( resourceHostInfo ),
+                        Common.DEFAULT_AGENT_PORT ), 3000, 5000, 1 );
     }
 
 
@@ -298,6 +301,12 @@ public class CommandProcessor implements RestProcessor
     protected SecurityManager getSecurityManager()
     {
         return ServiceLocator.getServiceNoCache( SecurityManager.class );
+    }
+
+
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 
@@ -341,7 +350,7 @@ public class CommandProcessor implements RestProcessor
             }
             else
             {
-                LOG.warn( String.format( "Callback not found for response: %s", JsonUtil.toJson( response ) ) );
+                LOG.warn( String.format( "Callback not found for response: %s", jsonUtil.to( response ) ) );
             }
 
             //update rh timestamp

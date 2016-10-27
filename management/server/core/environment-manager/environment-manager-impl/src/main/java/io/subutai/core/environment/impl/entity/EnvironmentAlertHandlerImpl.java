@@ -1,8 +1,6 @@
 package io.subutai.core.environment.impl.entity;
 
 
-import java.io.Serializable;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -24,8 +22,7 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 @Entity
 @Table( name = "env_alert_handler" )
 @Access( AccessType.FIELD )
-public class EnvironmentAlertHandlerImpl
-        implements EnvironmentAlertHandler, Serializable, Comparable<EnvironmentAlertHandler>
+public class EnvironmentAlertHandlerImpl implements EnvironmentAlertHandler, Comparable<EnvironmentAlertHandler>
 {
     @Column( name = "h_id", nullable = false )
     private String handlerId;
@@ -59,6 +56,7 @@ public class EnvironmentAlertHandlerImpl
     }
 
 
+    @Override
     public AlertHandlerPriority getAlertHandlerPriority()
     {
         return handlerPriority;

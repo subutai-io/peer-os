@@ -31,23 +31,24 @@ public class CreateEnvironmentContainersResponse
             if ( task.getTaskState() == HostUtil.Task.TaskState.SUCCEEDED )
             {
                 responses.add( new CloneResponse( task.getHost().getId(), request.getHostname(),
-                        request.getContainerName(), request.getTemplateName(), request.getTemplateArch(),
-                        request.getIp(), cloneContainerTask.getResult(), task.getDuration() ) );
+                        request.getContainerName(), request.getTemplateId(), request.getTemplateArch(),
+                        request.getIp(), cloneContainerTask.getResult(), task.getDuration(),
+                        request.getContainerSize() ) );
 
                 this.messages.add( String
-                        .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getId(),
+                        .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getHostname(),
                                 task.getDurationFormatted() ) );
             }
             else if ( task.getTaskState() == HostUtil.Task.TaskState.FAILED )
             {
                 this.messages.add( String
-                        .format( "Task (%s) failed on host %s [%s]", task.name(), task.getHost().getId(),
+                        .format( "Task (%s) failed on host %s [%s]", task.name(), task.getHost().getHostname(),
                                 task.getFailureReason() ) );
             }
             else
             {
                 this.messages.add( String.format( "Task (%s) is %s on host %s [%s]", task.name(), task.getTaskState(),
-                        task.getHost().getId(), task.getDurationFormatted() ) );
+                        task.getHost().getHostname(), task.getDurationFormatted() ) );
             }
         }
 
@@ -70,19 +71,5 @@ public class CreateEnvironmentContainersResponse
     public boolean hasSucceeded()
     {
         return hasSucceeded;
-    }
-
-
-    public CloneResponse findByHostname( final String hostname )
-    {
-        for ( CloneResponse response : responses )
-        {
-            if ( response.getHostname().equalsIgnoreCase( hostname ) )
-            {
-                return response;
-            }
-        }
-
-        return null;
     }
 }

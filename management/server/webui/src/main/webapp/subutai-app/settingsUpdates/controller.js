@@ -44,7 +44,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 			//SweetAlert.swal("ERROR!", "Save config error: " + error, "error");
 			//getConfig();
 			setInterval(function() {
-				getConfig();
+				update();
 			}, 120000);
 		});
 

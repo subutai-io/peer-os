@@ -4,9 +4,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -25,12 +22,11 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class PrepareTemplatesStep
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( PrepareTemplatesStep.class );
-
     private final Environment environment;
     private final Topology topology;
     private final PeerManager peerManager;
     private final TrackerOperation operationTracker;
+    protected PeerUtil<PrepareTemplatesResponse> templateUtil = new PeerUtil<>();
 
 
     public PrepareTemplatesStep( final Environment environment, final PeerManager peerManager, final Topology topology,
@@ -47,7 +43,6 @@ public class PrepareTemplatesStep
     {
         Map<String, Set<Node>> placement = topology.getNodeGroupPlacement();
 
-        PeerUtil<PrepareTemplatesResponse> templateUtil = new PeerUtil<>();
 
         for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
         {
@@ -62,7 +57,7 @@ public class PrepareTemplatesStep
 
         boolean succeeded = true;
 
-        for ( PeerUtil.PeerTaskResult<PrepareTemplatesResponse> templateResult : templateResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<PrepareTemplatesResponse> templateResult : templateResults.getResults() )
         {
             succeeded &= templateResult.getResult().hasSucceeded();
         }

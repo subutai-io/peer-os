@@ -41,8 +41,6 @@
   <reference id="localPeer" availability="mandatory"
              interface="io.subutai.common.peer.LocalPeer" />
 
-  <reference id="templateRegistry" interface="io.subutai.core.kurjun.api.TemplateManager" />
-
   <reference id="relationManager" interface="io.subutai.common.security.relation.RelationManager" />
 
   <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
@@ -50,7 +48,7 @@
     <argument ref="messenger" />
   </bean>
 
-  <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+  <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
 
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="io.subutai.core.peer.impl.PeerManagerImpl">
@@ -59,7 +57,6 @@
     <argument ref="daoManagerPeer" />
     <argument ref="messageResponseListener" />
     <argument ref="securityManager" />
-    <argument ref="templateRegistry" />
     <argument ref="identityManager" />
     <argument ref="jsonProvider" />
     <property name="relationManager" ref="relationManager" />

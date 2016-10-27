@@ -3,9 +3,10 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/subutai-io/base/agent/log"
 	"os/exec"
 	"strings"
+
+	"github.com/subutai-io/base/agent/log"
 )
 
 type batchLine struct {
@@ -17,6 +18,7 @@ type outputLine struct {
 	ExitCode string `json:"exitcode"`
 }
 
+// Batch execute multiple commands in one request.
 func Batch(data string) {
 	var jsonBlob = []byte(data)
 	var list []batchLine

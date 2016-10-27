@@ -139,7 +139,7 @@ public class PeerUtil<T>
             }
             catch ( InterruptedException e )
             {
-                break;
+                Thread.currentThread().interrupt();
             }
         }
 
@@ -230,17 +230,17 @@ public class PeerUtil<T>
 
     public static class PeerTaskResults<T>
     {
-        private final Set<PeerTaskResult<T>> peerTaskResults;
+        private final Set<PeerTaskResult<T>> results;
         private boolean hasFailures = false;
 
 
-        protected PeerTaskResults( final Set<PeerTaskResult<T>> peerTaskResults )
+        protected PeerTaskResults( final Set<PeerTaskResult<T>> results )
         {
-            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerTaskResults ) );
+            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( results ) );
 
-            this.peerTaskResults = peerTaskResults;
+            this.results = results;
 
-            for ( PeerTaskResult peerTaskResult : peerTaskResults )
+            for ( PeerTaskResult peerTaskResult : results )
             {
                 if ( !peerTaskResult.hasSucceeded() )
                 {
@@ -258,9 +258,9 @@ public class PeerUtil<T>
         }
 
 
-        public Set<PeerTaskResult<T>> getPeerTaskResults()
+        public Set<PeerTaskResult<T>> getResults()
         {
-            return peerTaskResults;
+            return results;
         }
     }
 }

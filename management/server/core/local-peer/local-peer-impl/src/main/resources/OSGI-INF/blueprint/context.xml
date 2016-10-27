@@ -21,8 +21,8 @@
 
   <reference id="commandExecutor" interface="io.subutai.core.executor.api.CommandExecutor" />
 
-  <reference id="templateRegistry" availability="optional"
-             interface="io.subutai.core.kurjun.api.TemplateManager" />
+  <reference id="templateManager" availability="optional"
+             interface="io.subutai.core.template.api.TemplateManager" />
 
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
@@ -44,7 +44,7 @@
   <bean id="localPeer" class="io.subutai.core.localpeer.impl.LocalPeerImpl" init-method="init"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="daoManagerPeer" />
-    <argument ref="templateRegistry" />
+    <argument ref="templateManager" />
     <argument ref="quotaManager" />
     <argument ref="commandExecutor" />
     <argument ref="hostRegistry" />

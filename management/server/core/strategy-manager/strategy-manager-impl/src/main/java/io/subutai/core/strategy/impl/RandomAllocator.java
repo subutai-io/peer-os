@@ -7,9 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.HostResources;
-import io.subutai.common.resource.PeerResources;
+import io.subutai.hub.share.resource.HostResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -27,17 +26,16 @@ public class RandomAllocator extends PeerResources
     }
 
 
-    public boolean allocate( final String containerName, final String templateName, final ContainerSize size,
-                             ContainerQuota containerQuota )
+    public boolean allocate( final String containerName, final String templateId, final ContainerSize size )
     {
         final Collection<HostResources> preferredHosts = getPreferredHosts();
 
-        if ( preferredHosts.size() < 1 )
+        if ( preferredHosts.isEmpty() )
         {
             return false;
         }
 
-        AllocatedContainer container = new AllocatedContainer( containerName, templateName, size, getPeerId(),
+        AllocatedContainer container = new AllocatedContainer( containerName, templateId, size, getPeerId(),
                 getPreferredHosts().iterator().next().getHostId() );
         containers.add( container );
 
@@ -50,57 +48,6 @@ public class RandomAllocator extends PeerResources
         List<HostResources> result = new ArrayList<>( getHostResources() );
         Collections.shuffle( result );
         return result;
-    }
-
-
-    public class AllocatedContainer
-    {
-        private final String name;
-        private String templateName;
-        private ContainerSize size;
-        private String hostId;
-        private String peerId;
-
-
-        public AllocatedContainer( final String name, final String templateName, final ContainerSize size,
-                                   final String peerId, final String hostId )
-        {
-            this.name = name;
-            this.templateName = templateName;
-            this.size = size;
-            this.hostId = hostId;
-            this.peerId = peerId;
-        }
-
-
-        public String getName()
-        {
-            return name;
-        }
-
-
-        public String getTemplateName()
-        {
-            return templateName;
-        }
-
-
-        public ContainerSize getSize()
-        {
-            return size;
-        }
-
-
-        public String getHostId()
-        {
-            return hostId;
-        }
-
-
-        public String getPeerId()
-        {
-            return peerId;
-        }
     }
 
 

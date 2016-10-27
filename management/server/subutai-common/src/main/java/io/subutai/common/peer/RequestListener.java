@@ -4,8 +4,6 @@ package io.subutai.common.peer;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.peer.Payload;
-
 
 public abstract class RequestListener
 {
@@ -26,5 +24,5 @@ public abstract class RequestListener
     }
 
 
-    public abstract Object onRequest( Payload payload ) throws Exception;
+    public abstract Object onRequest( Payload payload ) throws PeerException;
 }

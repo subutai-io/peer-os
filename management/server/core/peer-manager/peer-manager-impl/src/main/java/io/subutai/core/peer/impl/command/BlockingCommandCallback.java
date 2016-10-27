@@ -53,8 +53,9 @@ public class BlockingCommandCallback implements CommandCallback
         }
         catch ( InterruptedException e )
         {
-            //ignore
+            Thread.currentThread().interrupt();
         }
+
         return commandResult;
     }
 }

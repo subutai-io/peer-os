@@ -4,48 +4,57 @@ package io.subutai.core.registration.rest.transitional;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
 public class RequestedHostJson implements RequestedHost
 {
+    @Expose
     private String id;
+    @Expose
     private String hostname;
+    @Expose
     private Set<HostInterfaceJson> interfaces = Sets.newHashSet();
+    @Expose
     private HostArchitecture arch;
+    @Expose
     private String secret;
-
+    @Expose
     private String publicKey;
-    private String restHook;
-    private RegistrationStatus status;
+    @Expose
+    private ResourceHostRegistrationStatus status;
+    @Expose
     private String cert;
-
+    @Expose
+    private boolean isManagement = false;
+    @Expose
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
 
 
-    public RequestedHostJson()
+    public RequestedHostJson( RequestedHost requestedHost )
     {
-        this.arch = HostArchitecture.AMD64;
-    }
+        this.id = requestedHost.getId();
+        this.hostname = requestedHost.getHostname();
+        this.secret = requestedHost.getSecret();
+        this.publicKey = requestedHost.getPublicKey();
+        this.cert = requestedHost.getCert();
+        this.arch = requestedHost.getArch();
+        this.status = requestedHost.getStatus();
 
-
-    public RequestedHostJson( final String id, final String hostname, final HostArchitecture arch,
-                              final String publicKey, final String restHook, final RegistrationStatus status )
-    {
-        this.id = id;
-        this.hostname = hostname;
-        this.arch = arch;
-        this.publicKey = publicKey;
-        this.restHook = restHook;
-        this.status = status;
-        if ( arch == null )
+        for ( HostInterface hostInterface : requestedHost.getInterfaces() )
         {
-            this.arch = HostArchitecture.AMD64;
+            this.interfaces.add( new HostInterfaceJson( hostInterface ) );
+        }
+
+        for ( ContainerInfo containerInfo : requestedHost.getHostInfos() )
+        {
+            this.hostInfos.add( new ContainerInfoJson( containerInfo ) );
         }
     }
 
@@ -69,17 +78,11 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
-    public Set<HostInterface> getNetHostInterfaces()
+    public Set<HostInterface> getInterfaces()
     {
         Set<HostInterface> temp = Sets.newHashSet();
         temp.addAll( interfaces );
         return temp;
-    }
-
-
-    public void setInterfaces( final Set<HostInterfaceJson> interfaces )
-    {
-        this.interfaces = interfaces;
     }
 
 
@@ -106,42 +109,22 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
-    @Override
-    public String getRestHook()
+    public void setManagement( final boolean isManagement )
     {
-        return restHook;
+        this.isManagement = isManagement;
     }
 
 
     @Override
-    public void setRestHook( final String restHook )
-    {
-        this.restHook = restHook;
-    }
-
-
-    @Override
-    public RegistrationStatus getStatus()
+    public ResourceHostRegistrationStatus getStatus()
     {
         return status;
-    }
-
-
-    public void setStatus( final RegistrationStatus status )
-    {
-        this.status = status;
     }
 
 
     public String getSecret()
     {
         return secret;
-    }
-
-
-    public void setSecret( final String secret )
-    {
-        this.secret = secret;
     }
 
 
@@ -181,7 +164,6 @@ public class RequestedHostJson implements RequestedHost
                 ", arch=" + arch +
                 ", secret='" + secret + '\'' +
                 ", publicKey='" + publicKey + '\'' +
-                ", restHook='" + restHook + '\'' +
                 ", status=" + status +
                 ", hostInfos=" + hostInfos +
                 ", cert=" + cert +

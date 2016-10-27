@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -21,7 +19,6 @@ import io.subutai.core.keyserver.api.model.PublicKeyStore;
 public class KeyServerRestImpl implements KeyServerRest
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( KeyServerRestImpl.class.getName() );
 
     // Keyserver service
     private KeyServer keyServer;
@@ -88,16 +85,9 @@ public class KeyServerRestImpl implements KeyServerRest
 
             if ( KeyServerParams.HKP_OPERATION_GET.equalsIgnoreCase( operation ) )
             {
-                return handleGetOperation(searchParam);
+                return handleGetOperation( searchParam );
             }
-            else if ( KeyServerParams.HKP_OPERATION_INDEX.equalsIgnoreCase( operation ) )
-            {
 
-            }
-            else if ( KeyServerParams.HKP_OPERATION_VINDEX.equalsIgnoreCase( operation ) )
-            {
-
-            }
 
             return Response.ok( searchParam ).build();
         }
@@ -155,24 +145,6 @@ public class KeyServerRestImpl implements KeyServerRest
     /* *******************************
      *
      */
-    public KeyServer getKeyServer()
-    {
-        return keyServer;
-    }
-
-
-    /* *******************************
-     *
-     */
-    public void setKeyServer( KeyServer keyServer )
-    {
-        this.keyServer = keyServer;
-    }
-
-
-    /* *******************************
-     *
-     */
     private Response handleGetOperation( String searchParam )
     {
         if ( searchParam.length() > 2 && "0x".equalsIgnoreCase( searchParam.substring( 0, 2 ) ) )
@@ -193,17 +165,18 @@ public class KeyServerRestImpl implements KeyServerRest
                 }
                 else if ( PGPKeyUtil.isFingerprint( searchParam ) )
                 {
-                    return getKey( searchParam, (short)2);
+                    return getKey( searchParam, ( short ) 2 );
                 }
                 else if ( PGPKeyUtil.isShortKeyId( searchParam ) )
                 {
-                    return getKey( searchParam, (short)3);
+                    return getKey( searchParam, ( short ) 3 );
                 }
                 else
                 {
-                    return Response.status( Response.Status.NOT_IMPLEMENTED ).entity( "Invalid input parameter" ).build();
+                    return Response.status( Response.Status.NOT_IMPLEMENTED ).entity( "Invalid input parameter" )
+                                   .build();
                 }
-           }
+            }
         }
         else
         {
@@ -215,21 +188,21 @@ public class KeyServerRestImpl implements KeyServerRest
     /* *******************************
      *
      */
-    private Response getKey( String keyId,short searchBy )
+    private Response getKey( String keyId, short searchBy )
     {
-        PublicKeyStore securityKey = null;
+        PublicKeyStore securityKey;
 
         try
         {
-            if(searchBy == 1)
+            if ( searchBy == 1 )
             {
                 securityKey = keyServer.getPublicKey( keyId );
             }
-            else if(searchBy == 2)
+            else if ( searchBy == 2 )
             {
                 securityKey = keyServer.getPublicKeyByFingerprint( keyId );
             }
-            else if(searchBy == 3)
+            else if ( searchBy == 3 )
             {
                 securityKey = keyServer.getPublicKeyByShortKeyId( keyId );
             }
@@ -239,27 +212,18 @@ public class KeyServerRestImpl implements KeyServerRest
             }
 
 
-            if(securityKey!=null)
+            if ( securityKey != null )
             {
-                return Response.ok( PGPEncryptionUtil.armorByteArrayToString( securityKey.getKeyData() )).build();
+                return Response.ok( PGPEncryptionUtil.armorByteArrayToString( securityKey.getKeyData() ) ).build();
             }
             else
             {
                 return Response.status( Response.Status.NOT_FOUND ).entity( "Key not found" ).build();
             }
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
             return Response.status( Response.Status.NOT_IMPLEMENTED ).entity( "Invalid input parameter" ).build();
         }
-    }
-
-
-    /* *******************************
-     *
-     */
-    private Response handleIndexOperation( String searchParam )
-    {
-        return null;
     }
 }

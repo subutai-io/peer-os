@@ -126,14 +126,7 @@ public class TaskUtil<T>
                 }
             }
 
-            try
-            {
-                Thread.sleep( 100 );
-            }
-            catch ( InterruptedException e )
-            {
-                break;
-            }
+            sleep( 100 );
         }
 
         return taskResults;
@@ -148,7 +141,7 @@ public class TaskUtil<T>
 
         TaskUtil.TaskResults<T> taskResults = taskUtil.executeParallel();
 
-        return taskResults.getTaskResults().iterator().next();
+        return taskResults.getResults().iterator().next();
     }
 
 
@@ -214,17 +207,17 @@ public class TaskUtil<T>
 
     public static class TaskResults<T>
     {
-        private final Set<TaskResult<T>> taskResults;
+        private final Set<TaskResult<T>> results;
         private boolean hasFailures = false;
 
 
-        protected TaskResults( final Set<TaskResult<T>> taskResults )
+        protected TaskResults( final Set<TaskResult<T>> results )
         {
-            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( taskResults ) );
+            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( results ) );
 
-            this.taskResults = taskResults;
+            this.results = results;
 
-            for ( TaskResult taskResult : taskResults )
+            for ( TaskResult taskResult : results )
             {
                 if ( !taskResult.hasSucceeded() )
                 {
@@ -242,23 +235,22 @@ public class TaskUtil<T>
         }
 
 
-        public Set<TaskResult<T>> getTaskResults()
+        public Set<TaskResult<T>> getResults()
         {
-            return taskResults;
+            return results;
         }
     }
 
 
     public static void sleep( long millis )
     {
-
         try
         {
             Thread.sleep( millis );
         }
         catch ( InterruptedException e )
         {
-            LOG.warn( e.getMessage() );
+            Thread.currentThread().interrupt();
         }
     }
 }

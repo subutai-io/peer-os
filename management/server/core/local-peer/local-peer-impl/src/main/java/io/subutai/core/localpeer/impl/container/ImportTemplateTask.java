@@ -5,22 +5,26 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.util.HostUtil;
 
 
 public class ImportTemplateTask extends HostUtil.Task<Object>
 {
-    private final String templateName;
+    private final Template template;
     private final ResourceHost resourceHost;
+    private final String environmentId;
 
 
-    public ImportTemplateTask( final String templateName, final ResourceHost resourceHost )
+    public ImportTemplateTask( final Template template, final ResourceHost resourceHost, final String environmentId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+        Preconditions.checkNotNull( template );
         Preconditions.checkNotNull( resourceHost );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
-        this.templateName = templateName;
+        this.template = template;
         this.resourceHost = resourceHost;
+        this.environmentId = environmentId;
     }
 
 
@@ -34,14 +38,14 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
     @Override
     public String name()
     {
-        return String.format( "Import %s", templateName );
+        return String.format( "Import %s", template.getName() );
     }
 
 
     @Override
     public Object call() throws Exception
     {
-        resourceHost.importTemplate( templateName );
+        resourceHost.importTemplate( template, environmentId );
 
         return null;
     }

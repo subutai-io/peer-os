@@ -25,7 +25,7 @@
 				</div>
 				<ul>
 					<li ng-repeat="template in environmentSimpleViewCtrl.templatesList | filter:{'name' : searchTemplate} | orderBy: 'name'">
-						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template.name, $event)">
+						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template.name, $event, null, null, template.id)">
 							<span class="b-cloud-item">
 								<img
 									ng-src="assets/templates/{{ template.name }}.jpg"
@@ -103,7 +103,8 @@
 								<div class="body">
 									<div class="b-form-group">
 										<div class="b-form-group__label">Container name</div>
-										<input type="text" 
+										<input type="text"
+										    ng-disabled="environmentSimpleViewCtrl.isEditing"
 											id="js-container-name" 
 											class="b-form-input b-form-input_full" 
 											ng-model="templateSettings.containerName" required>
@@ -184,13 +185,14 @@
 								</div>
 							</td>
 							<td class="b-word-break-all">
-								<span tooltips
+								<a tooltips
+								   ui-sref="containers({ environmentId: environment.id })"
 									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"
 									env-data-source="{{ environment.dataSource }}"
 								>
 									{{ environment.name }}
-								</span>
+								</a>
 							</td>
 							<td><a href ng-click = "environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/
 								<a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a></td>

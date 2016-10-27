@@ -1,8 +1,7 @@
 package io.subutai.common.command;
 
 
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandStatus;
+import com.google.common.base.MoreObjects;
 
 
 /**
@@ -34,44 +33,59 @@ public class CommandResultImpl implements CommandResult
     }
 
 
+    @Override
     public Integer getExitCode()
     {
         return exitCode;
     }
 
 
+    @Override
     public String getStdOut()
     {
         return stdOut;
     }
 
 
+    @Override
     public String getStdErr()
     {
         return stdErr;
     }
 
 
+    @Override
     public boolean hasSucceeded()
     {
         return status == CommandStatus.SUCCEEDED;
     }
 
 
+    @Override
     public boolean hasCompleted()
     {
         return status == CommandStatus.FAILED || status == CommandStatus.SUCCEEDED;
     }
 
 
+    @Override
     public boolean hasTimedOut()
     {
         return status == CommandStatus.TIMEOUT || status == CommandStatus.KILLED;
     }
 
 
+    @Override
     public CommandStatus getStatus()
     {
         return status;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return MoreObjects.toStringHelper( this ).add( "exitCode", exitCode ).add( "stdOut", stdOut )
+                          .add( "stdErr", stdErr ).add( "status", status ).toString();
     }
 }

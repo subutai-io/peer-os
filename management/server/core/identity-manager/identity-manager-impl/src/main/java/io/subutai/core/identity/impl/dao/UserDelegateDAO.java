@@ -6,6 +6,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -18,6 +21,8 @@ import io.subutai.core.identity.impl.model.UserDelegateEntity;
  */
 class UserDelegateDAO
 {
+    private static final Logger LOG = LoggerFactory.getLogger( UserDelegateDAO.class );
+
     private DaoManager daoManager = null;
 
 
@@ -47,6 +52,8 @@ class UserDelegateDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -70,8 +77,9 @@ class UserDelegateDAO
                     em.createQuery( "select h from UserDelegateEntity h", UserDelegateEntity.class );
             result.addAll( query.getResultList() );
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -91,12 +99,14 @@ class UserDelegateDAO
         {
             daoManager.startTransaction( em );
             em.persist( item );
-            //em.flush();
+
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -121,6 +131,8 @@ class UserDelegateDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -144,6 +156,8 @@ class UserDelegateDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -173,8 +187,9 @@ class UserDelegateDAO
                 tk = result.get( 0 );
             }
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {

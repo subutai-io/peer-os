@@ -1,33 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-    >
+>
 
-  <reference id="templateManager" availability="mandatory"
-             interface="io.subutai.core.kurjun.api.TemplateManager" />
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
-  <reference id="integration"
-             interface="io.subutai.core.hubmanager.api.HubManager" />
 
   <bean id="systemManagerImpl" scope="singleton"
-        class="io.subutai.core.systemmanager.impl.SystemManagerImpl" destroy-method="dispose">
-    <property name="templateManager" ref="templateManager" />
+        class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
     <property name="identityManager" ref="identityManager" />
     <property name="peerManager" ref="peerManager" />
-    <argument ref="integration" />
   </bean>
 
   <service ref="systemManagerImpl"
            interface="io.subutai.core.systemmanager.api.SystemManager" />
-
-  <reference-list id="listener"
-                  interface="io.subutai.common.settings.SettingsListener"
-                  availability="optional">
-    <reference-listener ref="systemManagerImpl"
-                        bind-method="addListener" unbind-method="removeListener" />
-  </reference-list>
 
 </blueprint>

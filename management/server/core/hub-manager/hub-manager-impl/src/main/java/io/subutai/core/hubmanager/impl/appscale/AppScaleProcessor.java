@@ -13,14 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.tunnel.TunnelHelper;
 import io.subutai.hub.share.dto.AppScaleConfigDto;
-import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -73,7 +71,9 @@ public class AppScaleProcessor implements StateLinkProcessor
 
         final AppScaleConfigDto config = getData( stateLink );
 
-        if ( config.getState() != null && config.getState().equals( "ENABLING_DOMAIN" ) )
+        Preconditions.checkNotNull( config );
+
+        if ( config.getState() != null && "ENABLING_DOMAIN".equals( config.getState() ) )
         {
             appScaleManager.createTunnel( stateLink, config, configManager );
         }
@@ -82,13 +82,10 @@ public class AppScaleProcessor implements StateLinkProcessor
 
             log.debug( "config: {}", config );
 
-            if ( config == null )
-            {
-                return;
-            }
 
             executor.execute( new Runnable()
             {
+                @Override
                 public void run()
                 {
                     processLinks.add( stateLink );

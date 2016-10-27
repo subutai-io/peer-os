@@ -3,8 +3,7 @@ package io.subutai.common.protocol;
 
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -54,11 +53,11 @@ public class P2PConfig
 
     public Set<RhP2pIp> getRhP2pIps()
     {
-        Set<RhP2pIp> rhP2pIps = Sets.newHashSet();
+        Set<RhP2pIp> rhP2pIpsSet = Sets.newHashSet();
 
-        rhP2pIps.addAll( this.rhP2pIps );
+        rhP2pIpsSet.addAll( this.rhP2pIps );
 
-        return rhP2pIps;
+        return rhP2pIpsSet;
     }
 
 

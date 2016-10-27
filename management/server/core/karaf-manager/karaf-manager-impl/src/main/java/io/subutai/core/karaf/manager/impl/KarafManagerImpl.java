@@ -17,10 +17,14 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.core.karaf.manager.api.KarafManager;
 
@@ -32,14 +36,19 @@ import io.subutai.core.karaf.manager.api.KarafManager;
 public class KarafManagerImpl implements KarafManager
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( KarafManagerImpl.class.getName() );
+
+
     private CommandProcessor commandProcessor = null;
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
 
 
     /* ***********************************************
      */
-    @RolesAllowed( {"Karaf-Server-Administration|Write","Karaf-Server-Administration|Read",
-            "System-Management|Write", "System-Management|Update" } )
+    @RolesAllowed( {
+            "Karaf-Server-Administration|Write", "Karaf-Server-Administration|Read", "System-Management|Write",
+            "System-Management|Update"
+    } )
     @Override
     public String executeShellCommand( final String commandStr )
     {
@@ -50,8 +59,9 @@ public class KarafManagerImpl implements KarafManager
 
 
         //************************************************
-        FutureTask<String> commandFuture = new FutureTask<String>( new Callable<String>()
+        FutureTask<String> commandFuture = new FutureTask<>( new Callable<String>()
         {
+            @Override
             public String call()
             {
                 try
@@ -60,6 +70,7 @@ public class KarafManagerImpl implements KarafManager
                 }
                 catch ( Exception e )
                 {
+                    LOG.error( e.getMessage() );
                 }
 
                 printStream.flush();
@@ -91,31 +102,35 @@ public class KarafManagerImpl implements KarafManager
 
     /* ***********************************************
      */
-    @RolesAllowed( {"Karaf-Server-Administration|Write","Karaf-Server-Administration|Read",
-                    "System-Management|Write", "System-Management|Update"
+    @RolesAllowed( {
+            "Karaf-Server-Administration|Write", "Karaf-Server-Administration|Read", "System-Management|Write",
+            "System-Management|Update"
     } )
     @Override
     public String executeJMXCommand( final String commandStr )
     {
         String result = "No Result";
 
+        JMXConnector connector = null;
         try
         {
-            HashMap environment = new HashMap();
+            HashMap<String, String[]> environment = new HashMap<>();
             String[] credentials = new String[] { "admin", "secret" };
             environment.put( JMXConnector.CREDENTIALS, credentials );
 
             JMXServiceURL url = new JMXServiceURL( "service:jmx:rmi:///jndi/rmi://localhost:1099/karaf-root" );
-            JMXConnector connector = null;
             connector = JMXConnectorFactory.connect( url, environment );
             MBeanServerConnection mbeanServer = connector.getMBeanServerConnection();
             ObjectName systemMBean = new ObjectName( "org.apache.karaf:type=bundle,name=root" );
             mbeanServer.invoke( systemMBean, commandStr, null, null );
-            connector.close();
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            LOG.warn( e.getMessage() );
+        }
+        finally
+        {
+            SafeCloseUtil.close( connector );
         }
 
         return result;

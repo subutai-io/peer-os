@@ -1,14 +1,10 @@
 package io.subutai.common.security.relation;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by ape-craft on 3/29/16.
- */
 public class RelationLinkDto implements RelationLink
 {
     @JsonProperty( "linkId" )

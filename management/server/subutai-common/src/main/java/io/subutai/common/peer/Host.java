@@ -1,8 +1,6 @@
 package io.subutai.common.peer;
 
 
-import java.io.Serializable;
-
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -15,28 +13,26 @@ import io.subutai.common.security.relation.RelationLink;
 /**
  * Base Host interface.
  */
-public interface Host extends HostInfo, Serializable, RelationLink
+public interface Host extends HostInfo, RelationLink
 {
     /**
      * Returns reference to parent peer
      *
      * @return returns Peer interface
      */
-    public Peer getPeer();
+    Peer getPeer();
 
-    public String getPeerId();
+    String getPeerId();
 
-    public String getHostname();
+    CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
-    public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
+    CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
-    public CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+    void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
-    public void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+    void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
 
-    public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
-
-    public boolean isConnected();
+    boolean isConnected();
 
 
     HostInterface getInterfaceByName( String interfaceName );

@@ -1,17 +1,23 @@
 package io.subutai.core.registration.rest;
 
 
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.rest.transitional.RequestedHostJson;
 import io.subutai.core.security.api.SecurityManager;
@@ -22,12 +28,12 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );
     private SecurityManager securityManager;
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
     private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
 
     public RegistrationRestServiceImpl( final SecurityManager securityManager,
-                                        final RegistrationManager registrationManager )
+                                        final HostRegistrationManager registrationManager )
     {
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( registrationManager );
@@ -77,7 +83,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 
 
     @Override
-    public Response unRegisterRequest( final String requestId )
+    public Response rejectRequest( final String requestId )
     {
         try
         {
@@ -139,7 +145,45 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     @Override
     public Response getRegistrationRequests()
     {
-        String result = gson.toJson( registrationManager.getRequests() );
-        return Response.ok( result ).build();
+        try
+        {
+            List<RequestedHost> requestedHosts = registrationManager.getRequests();
+
+            String result = gson.toJson( requestedHosts );
+
+            try
+            {
+                LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+
+                ResourceHost managementHost = localPeer.getManagementHost();
+
+                List<RequestedHostJson> requestedHostList = Lists.newArrayList();
+
+                for ( RequestedHost requestedHost : requestedHosts )
+                {
+                    RequestedHostJson requestedHostJson = new RequestedHostJson( requestedHost );
+
+                    if ( managementHost.getId().equalsIgnoreCase( requestedHost.getId() ) )
+                    {
+                        requestedHostJson.setManagement( true );
+                    }
+
+                    requestedHostList.add( requestedHostJson );
+                }
+
+                result = JsonUtil.toJson( requestedHostList );
+            }
+            catch ( Exception e )
+            {
+                LOGGER.warn( "Error in getRegistrationRequests {}", e.getMessage() );
+            }
+
+
+            return Response.ok( result ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
     }
 }

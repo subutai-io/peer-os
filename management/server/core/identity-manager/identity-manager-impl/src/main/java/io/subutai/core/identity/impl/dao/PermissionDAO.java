@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -17,6 +20,10 @@ import io.subutai.core.identity.impl.model.PermissionEntity;
  */
 class PermissionDAO
 {
+
+
+    private static final Logger LOG = LoggerFactory.getLogger( PermissionDAO.class.getName() );
+
     private DaoManager daoManager = null;
 
 
@@ -40,8 +47,9 @@ class PermissionDAO
         {
             result = em.find( PermissionEntity.class, id );
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -62,8 +70,9 @@ class PermissionDAO
         {
             result = em.createQuery( "select h from PermissionEntity h", Permission.class ).getResultList();
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -113,6 +122,8 @@ class PermissionDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {
@@ -136,6 +147,8 @@ class PermissionDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
         }
         finally
         {

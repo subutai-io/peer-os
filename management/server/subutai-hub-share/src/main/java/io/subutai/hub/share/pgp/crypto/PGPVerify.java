@@ -21,7 +21,13 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProv
 
 public class PGPVerify
 {
-    public static byte[] verify( byte signedData[], PGPPublicKey publicKey ) throws Exception
+    private PGPVerify()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
+    public static byte[] verify( byte signedData[], PGPPublicKey publicKey ) throws IOException, PGPException
     {
         JcaPGPObjectFactory objectFactory = getObjectFactory( signedData );
 
@@ -35,7 +41,8 @@ public class PGPVerify
     }
 
 
-    private static byte[] readSign( JcaPGPObjectFactory objectFactory, PGPOnePassSignature onePassSignature ) throws IOException
+    private static byte[] readSign( JcaPGPObjectFactory objectFactory, PGPOnePassSignature onePassSignature )
+            throws IOException
     {
         InputStream is = getInputStream( objectFactory );
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -51,7 +58,8 @@ public class PGPVerify
     }
 
 
-    private static void doVerify( JcaPGPObjectFactory objectFactory, PGPOnePassSignature onePassSignature ) throws IOException, PGPException
+    private static void doVerify( JcaPGPObjectFactory objectFactory, PGPOnePassSignature onePassSignature )
+            throws IOException, PGPException
     {
         PGPSignatureList signatures = ( PGPSignatureList ) objectFactory.nextObject();
 
@@ -70,7 +78,8 @@ public class PGPVerify
     }
 
 
-    private static PGPOnePassSignature getOnePassSignature( PGPPublicKey publicKey, JcaPGPObjectFactory pgpFact ) throws IOException, PGPException
+    private static PGPOnePassSignature getOnePassSignature( PGPPublicKey publicKey, JcaPGPObjectFactory pgpFact )
+            throws IOException, PGPException
     {
         PGPOnePassSignatureList p1 = ( PGPOnePassSignatureList ) pgpFact.nextObject();
 

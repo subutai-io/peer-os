@@ -33,48 +33,56 @@ public class PluginDetailsEntity implements PluginDetails
     private String kar;
 
 
+    @Override
     public Long getId()
     {
         return id;
     }
 
 
+    @Override
     public void setId( final Long id )
     {
         this.id = id;
     }
 
 
+    @Override
     public String getName()
     {
         return name;
     }
 
 
+    @Override
     public void setName( final String name )
     {
         this.name = name;
     }
 
 
+    @Override
     public String getKar()
     {
         return kar;
     }
 
 
+    @Override
     public void setKar( final String kar )
     {
         this.kar = kar;
     }
 
 
+    @Override
     public String getVersion()
     {
         return version;
     }
 
 
+    @Override
     public void setVersion( final String version )
     {
         this.version = version;

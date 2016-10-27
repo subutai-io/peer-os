@@ -5,10 +5,10 @@ angular.module('subutai.login.controller', [])
 	.controller('ChangePassCtrl', ChangePassCtrl)
 	.directive('pwCheck', pwCheck);
 
-LoginCtrl.$inject = ['loginSrv', '$http', '$location', '$rootScope', '$state'];
-ChangePassCtrl.$inject = ['$scope', 'loginSrv', '$http', '$location', '$rootScope', '$state', 'SweetAlert'];
+LoginCtrl.$inject = ['loginSrv', '$http', '$rootScope'];
+ChangePassCtrl.$inject = ['$scope', 'loginSrv', 'SweetAlert'];
 
-function ChangePassCtrl( $scope, loginSrv, $http, $location, $rootScope, $state, SweetAlert) {
+function ChangePassCtrl( $scope, loginSrv, SweetAlert) {
 	var vm = this;
 
 	vm.changePass = changePass;
@@ -41,14 +41,12 @@ function pwCheck() {
 	}
 };
 
-function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
+function LoginCtrl( loginSrv, $http, $rootScope )
 {
 	var vm = this;
 
 	vm.name = "";
 	vm.pass = "";
-	vm.fingerprint = "";
-	vm.sptoken = "";
 	vm.errorMessage = false;
 	vm.activeMode = 'username';
 
@@ -58,71 +56,74 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 
 	//functions
 	vm.login = login;
-	vm.changeMode = changeMode;
-
-	function changeMode(modeStatus) {
-		vm.name = "";
-		vm.pass = "";
-		vm.fingerprint = "";
-		vm.sptoken = "";
-
-		vm.passExpired = false;
-		vm.newPass = "";
-		vm.passConf = "";
-
-		if(modeStatus) {
-			vm.activeMode = 'sptoken';
-		} else {
-			vm.activeMode = 'username';
-		}
-	}
 
 	function login() {
 
-		var postData = '';
-		if(vm.activeMode == 'sptoken') {
-			postData =
-				'username=' + $("#subt-input__login").val() +
-				'&password=' + encodeURIComponent(vm.sptoken);
-		} else {
-			postData =
-				'username=' + vm.name +
-				'&password=' + vm.pass;
-		}
+		var postData = 'username=' + vm.name + '&password=' + vm.pass;
 
 		if( vm.newPass.length > 0 ) {
 			if( vm.newPass !== vm.passConf ) {
 				vm.errorMessage = "New password doesn't match the 'Confirm password' field";
-			}
-			else {
-				if(vm.activeMode == 'sptoken')
-					postData += '&newpassword=' + encodeURIComponent( vm.newPass );
-				else
-					postData += '&newpassword=' + vm.newPass;
+			} else {
+				postData += '&newpassword=' + vm.newPass;
 
 				loginSrv.login( postData ).success(function(data){
 					$rootScope.currentUser = vm.name;
 					$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 					//$state.go('home');
-					window.location = '/';
+					checkUserPermissions();
 				}).error(function(error){
 					vm.errorMessage = error;
 				});
 			}
-		}
-		else {
+		} else {
 			loginSrv.login( postData ).success(function(data){
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 				sessionStorage.removeItem('notifications');
 				//$state.go('home');
-				window.location = '/';
+				checkUserPermissions();
 			}).error(function(error, status){
 				vm.errorMessage = error;
 
 				if( status == 412 )
 					vm.passExpired = true;
 			});
+		}
+	}
+
+	function checkUserPermissions() {
+		if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null
+			|| localStorage.getItem('currentUserToken') != getCookie('sptoken')) && getCookie('sptoken')) {
+
+			LOADING_SCREEN();
+			$http.get(SERVER_URL + "rest/ui/identity/user", {
+				withCredentials: true,
+				headers: {'Content-Type': 'application/json'}
+			}).success(function (data) {
+
+				localStorage.removeItem('currentUser');
+				localStorage.removeItem('currentUserPermissions');
+				localStorage.removeItem('currentUserToken');
+
+				localStorage.setItem('currentUser', data.userName);
+				localStorage.setItem('currentUserToken', getCookie('sptoken'));
+
+				var perms = [];
+				for( var i = 0; i < data.roles.length; i++ ) {
+					for( var j = 0; j < data.roles[i].permissions.length; j++ ) {
+						perms.push(data.roles[i].permissions[j].object);
+					}
+				}
+
+				localStorage.setItem('currentUserPermissions', perms);
+
+				window.location = '/';
+			}).error(function(error) {
+				window.location = '/';
+			});
+		} else {
+			window.location = '/';
 		}
 	}
 }

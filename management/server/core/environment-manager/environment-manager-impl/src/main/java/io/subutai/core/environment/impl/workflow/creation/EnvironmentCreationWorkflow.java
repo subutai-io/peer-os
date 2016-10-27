@@ -170,8 +170,7 @@ public class EnvironmentCreationWorkflow
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
-                    operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, operationTracker ).execute();
 
             saveEnvironment();
 
@@ -188,7 +187,7 @@ public class EnvironmentCreationWorkflow
 
     public EnvironmentCreationPhase CONFIGURE_HOSTS()
     {
-        operationTracker.addLog( "Configuring /etc/hosts" );
+        operationTracker.addLog( "Configuring hosts" );
 
         try
         {

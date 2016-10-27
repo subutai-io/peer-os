@@ -31,32 +31,6 @@ public interface RestService
 
 
     @GET
-    @Path( "kurjun_settings" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getKurjunSettings() throws ConfigurationException;
-
-
-    @POST
-    @Path( "update_kurjun_settings_urls" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setKurjunSettingsUrls( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls,
-                                           @FormParam( "localKurjunUrls" ) String localKurjunUrls )
-            throws ConfigurationException;
-
-
-    @POST
-    @Path( "update_kurjun_settings_quotas" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setKurjunSettingsQuotas( @FormParam( "publicDiskQuota" ) String publicDiskQuota,
-                                             @FormParam( "publicThreshold" ) String publicThreshold,
-                                             @FormParam( "publicTimeFrame" ) String publicTimeFrame,
-                                             @FormParam( "trustDiskQuota" ) String trustDiskQuota,
-                                             @FormParam( "trustThreshold" ) String trustThreshold,
-                                             @FormParam( "trustTimeFrame" ) String trustTimeFrame )
-            throws ConfigurationException;
-
-
-    @GET
     @Path( "peer_policy" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getPeerPolicy();
@@ -80,13 +54,10 @@ public interface RestService
     @POST
     @Path( "update_network_settings" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setNetworkSettings( @FormParam( "securePortX1" ) String securePortX1,
-                                        @FormParam( "securePortX2" ) String securePortX2,
-                                        @FormParam( "securePortX3" ) String securePortX3,
-                                        @FormParam( "publicUrl" ) String publicUrl,
-                                        @FormParam( "agentPort" ) String agentPort,
+    public Response setNetworkSettings( @FormParam( "publicUrl" ) String publicUrl,
                                         @FormParam( "publicSecurePort" ) String publicSecurePort,
-                                        @FormParam( "keyServer" ) String keyServer) throws ConfigurationException;
+                                        @FormParam( "startRange" ) String startRange,
+                                        @FormParam( "endRange" ) String endRange ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )
@@ -104,6 +75,4 @@ public interface RestService
     @Path( "update_management" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response update();
-
-
 }

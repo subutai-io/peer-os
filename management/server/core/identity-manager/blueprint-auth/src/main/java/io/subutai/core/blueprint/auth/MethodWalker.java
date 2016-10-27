@@ -27,9 +27,6 @@ import io.subutai.common.security.relation.Trait;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 
 
-/**
- * Created by ape-craft on 5/2/16.
- */
 public class MethodWalker
 {
     private final Logger logger;
@@ -52,7 +49,6 @@ public class MethodWalker
 
     private RelationManager getRelationManager()
     {
-        //        return ServiceLocator.getServiceNoCache( RelationManager.class );
         return serviceTracker.getService();
     }
 
@@ -101,19 +97,6 @@ public class MethodWalker
                     //todo return new unmodifiable collection but with filtered content
                     throw new RelationVerificationException(
                             "Cannot filter items, correct return type or remove annotation." );
-                    //                    try
-                    //                    {
-                    //                        Collection filtered = ( Collection ) returnObject.getClass()
-                    // .newInstance();
-                    //                        for ( final Object obj : collection )
-                    //                        {
-                    //                            filtered.add( obj );
-                    //                        }
-                    //                    }
-                    //                    catch ( InstantiationException | IllegalAccessException e )
-                    //                    {
-                    //                        logger.warn( "Couldn't instantiate new collection", e );
-                    //                    }
                 }
                 else
                 {

@@ -14,7 +14,14 @@ import io.subutai.common.protocol.Tunnels;
  */
 public abstract class P2PUtil
 {
-    public static String P2P_SUBNET_MASK = "255.255.255.0";
+
+    private P2PUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
+    public static final String P2P_SUBNET_MASK = "255.255.255.0";
 
 
     public static String generateHash( final String envId )
@@ -87,7 +94,7 @@ public abstract class P2PUtil
     }
 
 
-    protected static int generateIntInRange( int from, int to )
+    private static int generateIntInRange( int from, int to )
     {
         Preconditions.checkArgument( from < to );
         Preconditions.checkArgument( to < Integer.MAX_VALUE );

@@ -33,7 +33,6 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyManager keyManager = null;
     private DaoManager daoManager = null;
     private EncryptionTool encryptionTool = null;
-    private SecurityDataService securityDataService = null;
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
     private KeyStoreManager keyStoreManager = null;
@@ -43,7 +42,7 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerImpl( Object provider ) throws Exception
+    public SecurityManagerImpl()
     {
         keyData = new SecurityKeyData();
 
@@ -51,30 +50,27 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /* *****************************
-     *
-     */
+    public void setKeyServer( final KeyServer keyServer )
+    {
+        this.keyServer = keyServer;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
+    }
+
+
     public void init()
     {
-        securityDataService = new SecurityDataServiceImpl( daoManager );
+        final SecurityDataService securityDataService = new SecurityDataServiceImpl( daoManager );
         keyManager = new KeyManagerImpl( securityDataService, keyServer, keyData );
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
         keyStoreManager = new KeyStoreManagerImpl();
     }
 
 
-    /* *****************************
-     *
-     */
-    public void destroy()
-    {
-
-    }
-
-
-    /**
-     * *****************************
-     */
     @Override
     public KeyManager getKeyManager()
     {
@@ -82,89 +78,13 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /* *****************************
-     */
-    public void setKeyManager( KeyManager keyManager )
-    {
-        this.keyManager = keyManager;
-    }
-
-
-    /* ****************************
-     *
-     */
-    public void setDaoManager( final DaoManager daoManager )
-    {
-        this.daoManager = daoManager;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public SecurityDataService getSecurityManagerDAO()
-    {
-        return securityDataService;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public void setSecurityManagerDAO( final SecurityDataService securityDataService )
-    {
-        this.securityDataService = securityDataService;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public KeyServer getKeyServer()
-    {
-        return keyServer;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public void setKeyServer( final KeyServer keyServer )
-    {
-        this.keyServer = keyServer;
-    }
-
-
-    /**
-     * *****************************
-     */
+    @Override
     public EncryptionTool getEncryptionTool()
     {
         return encryptionTool;
     }
 
 
-    /* *****************************
-     *
-     */
-    public void setEncryptionTool( final EncryptionTool encryptionTool )
-    {
-        this.encryptionTool = encryptionTool;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public SecurityKeyData getSecurityKeyData()
-    {
-        return keyData;
-    }
-
-
-    /* *****************************
-     *
-     */
     @Override
     public KeyStoreManager getKeyStoreManager()
     {
@@ -172,18 +92,6 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /* *****************************
-     *
-     */
-    public void setKeyStoreManager( final KeyStoreManager keyStoreManager )
-    {
-        this.keyStoreManager = keyStoreManager;
-    }
-
-
-    /* *****************************
-     *
-     */
     @Override
     public HttpContextManager getHttpContextManager()
     {

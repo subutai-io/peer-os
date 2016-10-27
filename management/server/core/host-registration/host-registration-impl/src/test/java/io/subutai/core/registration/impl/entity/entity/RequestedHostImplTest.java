@@ -11,7 +11,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -32,7 +32,7 @@ public class RequestedHostImplTest
     {
         requestedHost =
                 new RequestedHostImpl( uuid.toString(), "hostname", HostArchitecture.AMD64, "secret", "publicKey",
-                        "restHook", RegistrationStatus.REQUESTED, new HashSet<HostInterface>() );
+                        ResourceHostRegistrationStatus.REQUESTED, new HashSet<HostInterface>() );
     }
 
 
@@ -53,15 +53,15 @@ public class RequestedHostImplTest
     @Test
     public void testGetInterfaces() throws Exception
     {
-        assertArrayEquals( Sets.newHashSet().toArray(), requestedHost.getNetHostInterfaces().toArray() );
+        assertArrayEquals( Sets.newHashSet().toArray(), requestedHost.getInterfaces().toArray() );
     }
 
 
     @Test
     public void testSetInterfaces() throws Exception
     {
-        requestedHost.setNetHostInterfaces( Sets.newHashSet( mock( HostInterface.class ) ) );
-        assertEquals( 1, requestedHost.getNetHostInterfaces().size() );
+        requestedHost.setInterfaces( Sets.newHashSet( mock( HostInterface.class ) ) );
+        assertEquals( 1, requestedHost.getInterfaces().size() );
     }
 
 
@@ -80,24 +80,17 @@ public class RequestedHostImplTest
 
 
     @Test
-    public void testGetRestHook() throws Exception
-    {
-        assertEquals( "restHook", requestedHost.getRestHook() );
-    }
-
-
-    @Test
     public void testGetStatus() throws Exception
     {
-        assertEquals( RegistrationStatus.REQUESTED, requestedHost.getStatus() );
+        assertEquals( ResourceHostRegistrationStatus.REQUESTED, requestedHost.getStatus() );
     }
 
 
     @Test
     public void testSetStatus() throws Exception
     {
-        requestedHost.setStatus( RegistrationStatus.REJECTED );
-        assertNotEquals( RegistrationStatus.REQUESTED, requestedHost.getStatus() );
+        requestedHost.setStatus( ResourceHostRegistrationStatus.REJECTED );
+        assertNotEquals( ResourceHostRegistrationStatus.REQUESTED, requestedHost.getStatus() );
     }
 
 

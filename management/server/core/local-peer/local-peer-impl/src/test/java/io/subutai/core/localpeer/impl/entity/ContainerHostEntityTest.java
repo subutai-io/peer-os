@@ -1,11 +1,9 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -18,22 +16,26 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.protocol.Template;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-@Ignore
 public class ContainerHostEntityTest
 {
     private static final ContainerHostState CONTAINER_HOST_STATE = ContainerHostState.RUNNING;
@@ -42,11 +44,8 @@ public class ContainerHostEntityTest
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1";
-    private static final String TAG = "tag";
     private static final int PID = 123;
-    private static final Set<Integer> CPU_SET = Sets.newHashSet( 1, 3, 5 );
     private static final String TEMPLATE_NAME = "master";
-    private static final String TEMP_ARCH = "amd64";
 
 
     @Mock
@@ -54,19 +53,26 @@ public class ContainerHostEntityTest
 
     @Mock
     ContainerHostInfo containerHostInfo;
+
     @Mock
     Peer peer;
+
     @Mock
     HostInterfaceModel anHostInterface;
+
     @Mock
     ResourceHost resourceHost;
 
-    ContainerHostEntity containerHostEntity;
     @Mock
     private HostInterfaces hostInterfaces;
 
     @Mock
     HostRegistry hostRegistry;
+
+    @Mock
+    Template template;
+
+    private ContainerHostEntity containerHostEntity;
 
 
     @Before
@@ -83,6 +89,12 @@ public class ContainerHostEntityTest
         when( anHostInterface.getIp() ).thenReturn( IP );
         //        when( anHostInterface.getMac() ).thenReturn( MAC );
         when( hostRegistry.getHostInfoById( anyString() ) ).thenReturn( containerHostInfo );
+
+        containerHostEntity = spy( new ContainerHostEntity() );
+        doReturn( peer ).when( containerHostEntity ).getPeer();
+        doReturn( localPeer ).when( containerHostEntity ).getLocalPeer();
+        doReturn( template ).when( localPeer ).getTemplateById( anyString() );
+        doReturn( TEMPLATE_NAME ).when( template ).getName();
     }
 
 
@@ -93,17 +105,10 @@ public class ContainerHostEntityTest
     }
 
 
-    @Test()
-    public void testGetTemplateArch() throws Exception
-    {
-        assertEquals( TEMP_ARCH, containerHostEntity.getTemplateArch() );
-    }
-
-
-    @Test( expected = UnsupportedOperationException.class )
+    @Test
     public void testGetTemplate() throws Exception
     {
-        containerHostEntity.getTemplate();
+        assertEquals( template, containerHostEntity.getTemplate() );
     }
 
 
@@ -115,10 +120,9 @@ public class ContainerHostEntityTest
 
 
     @Test
-    @Ignore
     public void testGetState() throws Exception
     {
-        //        containerHostEntity.updateHostInfo( containerHostInfo );
+        doReturn( CONTAINER_HOST_STATE ).when( peer ).getContainerState( any( ContainerId.class ) );
 
         assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getState() );
     }
@@ -161,12 +165,11 @@ public class ContainerHostEntityTest
 
 
     @Test
-    @Ignore
     public void testUpdateHostInfo() throws Exception
     {
         containerHostEntity.updateHostInfo( containerHostInfo );
 
-        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getState() );
+        assertEquals( containerHostInfo.getContainerName(), containerHostEntity.getContainerName() );
     }
 
 

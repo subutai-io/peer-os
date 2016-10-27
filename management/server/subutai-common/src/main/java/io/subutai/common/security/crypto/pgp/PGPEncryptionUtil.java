@@ -3,7 +3,6 @@ package io.subutai.common.security.crypto.pgp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -83,6 +82,8 @@ import org.bouncycastle.util.io.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import com.google.common.base.Preconditions;
 
 
@@ -92,13 +93,19 @@ import com.google.common.base.Preconditions;
 public class PGPEncryptionUtil
 {
     private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtil.class );
-    public static final BouncyCastleProvider provider = new BouncyCastleProvider();
+    private static final BouncyCastleProvider provider = new BouncyCastleProvider();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
     static
     {
         Security.addProvider( provider );
     }
+
+    private PGPEncryptionUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
 
     public static byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored )
             throws PGPException
@@ -229,6 +236,7 @@ public class PGPEncryptionUtil
             for ( int safety = 0; ( safety++ < 1000 ) && !( object instanceof PGPLiteralData );
                   object = pgpFact.nextObject() )
             {
+                //ignore
             }
             return ( PGPLiteralData ) object;
         }
@@ -267,7 +275,7 @@ public class PGPEncryptionUtil
         {
             // Don't print the passphrase but do print null if thats what it was
             final String passphraseMessage = ( secretPwd == null ) ? "null" : "supplied";
-            System.err.println( "Unable to extract key " + id + " using " + passphraseMessage + " passphrase" );
+            logger.warn( "Unable to extract key " + id + " using " + passphraseMessage + " passphrase" );
         }
         return null;
     }
@@ -494,117 +502,6 @@ public class PGPEncryptionUtil
     }
 
 
-    public static byte[] decryptAndVerify( byte[] encryptedMessage, final InputStream secretKeyRing,
-                                           final String secretPwd, final PGPPublicKey publicKey ) throws PGPException
-    {
-
-        Preconditions.checkNotNull( encryptedMessage );
-        Preconditions.checkNotNull( secretKeyRing );
-        Preconditions.checkNotNull( secretPwd );
-        Preconditions.checkNotNull( publicKey );
-
-
-        try
-        {
-            Iterator<PGPPublicKeyEncryptedData> it = getEncryptedObjects( encryptedMessage );
-            PGPPrivateKey sKey = null;
-
-            PGPPublicKeyEncryptedData pbe = null;
-            final PGPSecretKeyRingCollection keys =
-                    new PGPSecretKeyRingCollection( secretKeyRing, new JcaKeyFingerprintCalculator() );
-            while ( sKey == null && it.hasNext() )
-            {
-                pbe = it.next();
-                sKey = getPrivateKey( keys, pbe.getKeyID(), secretPwd );
-            }
-            if ( sKey == null )
-            {
-                throw new IllegalArgumentException( "Unable to find secret key to decrypt the message" );
-            }
-
-            InputStream clear = pbe.getDataStream(
-                    new JcePublicKeyDataDecryptorFactoryBuilder().setProvider( provider ).build( sKey ) );
-
-            PGPObjectFactory plainFact = new PGPObjectFactory( clear, new JcaKeyFingerprintCalculator() );
-
-            Object message;
-
-            PGPOnePassSignatureList onePassSignatureList = null;
-            PGPSignatureList signatureList = null;
-            PGPCompressedData compressedData;
-
-            message = plainFact.nextObject();
-            ByteArrayOutputStream actualOutput = new ByteArrayOutputStream();
-
-            while ( message != null )
-            {
-                if ( message instanceof PGPCompressedData )
-                {
-                    compressedData = ( PGPCompressedData ) message;
-                    plainFact =
-                            new PGPObjectFactory( compressedData.getDataStream(), new JcaKeyFingerprintCalculator() );
-                    message = plainFact.nextObject();
-                }
-
-                if ( message instanceof PGPLiteralData )
-                {
-                    // have to read it and keep it somewhere.
-                    Streams.pipeAll( ( ( PGPLiteralData ) message ).getInputStream(), actualOutput );
-                }
-                else if ( message instanceof PGPOnePassSignatureList )
-                {
-                    onePassSignatureList = ( PGPOnePassSignatureList ) message;
-                }
-                else if ( message instanceof PGPSignatureList )
-                {
-                    signatureList = ( PGPSignatureList ) message;
-                }
-                else
-                {
-                    throw new PGPException( "message unknown message type." );
-                }
-                message = plainFact.nextObject();
-            }
-            actualOutput.close();
-            byte[] output = actualOutput.toByteArray();
-
-
-            if ( onePassSignatureList == null || signatureList == null )
-            {
-                throw new PGPException( "Poor PGP. Signatures not found." );
-            }
-            else
-            {
-
-                for ( int i = 0; i < onePassSignatureList.size(); i++ )
-                {
-                    PGPOnePassSignature ops = onePassSignatureList.get( 0 );
-
-
-                    ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
-                    ops.update( output );
-                    PGPSignature signature = signatureList.get( i );
-                    if ( !ops.verify( signature ) )
-                    {
-                        throw new SignatureException( "Signature verification failed" );
-                    }
-                }
-            }
-
-            if ( pbe.isIntegrityProtected() && !pbe.verify() )
-            {
-                throw new PGPException( "Data is integrity protected but integrity is lost." );
-            }
-
-            return actualOutput.toByteArray();
-        }
-        catch ( Exception e )
-        {
-            throw new PGPException( "Error in decryptAndVerify", e );
-        }
-    }
-
-
     public static byte[] signAndEncrypt( final byte[] message, final PGPSecretKey secretKey, final String secretPwd,
                                          final PGPPublicKey publicKey, final boolean armored ) throws PGPException
     {
@@ -699,7 +596,7 @@ public class PGPEncryptionUtil
 
 
     private static PGPKeyRingGenerator generateKeyRingGenerator( String userId, String secretPwd, KeyPair keyPair )
-            throws Exception
+            throws PGPException
     {
         return generateKeyRingGenerator( userId, secretPwd.toCharArray(), 0xc0, 2048, keyPair );
     }
@@ -718,7 +615,7 @@ public class PGPEncryptionUtil
     // 0xff, or about 2 million iterations.  I'll use 0xc0 as a
     // default -- about 130,000 iterations.
     private static PGPKeyRingGenerator generateKeyRingGenerator( String id, char[] pass, int s2kcount, int keySize,
-                                                                 KeyPair keyPair ) throws Exception
+                                                                 KeyPair keyPair ) throws PGPException
     {
         // This object generates individual key-pairs.
         RSAKeyPairGenerator kpg = new RSAKeyPairGenerator();
@@ -740,7 +637,6 @@ public class PGPEncryptionUtil
 
         // Add a self-signature on the id
         PGPSignatureSubpacketGenerator signhashgen = new PGPSignatureSubpacketGenerator();
-        //        signhashgen.setTrust(false, 0, 3);
 
         // Add signed metadata on the signature.
         // 1) Declare its purpose
@@ -767,15 +663,11 @@ public class PGPEncryptionUtil
         // Add metadata to declare its purpose
         enchashgen.setKeyFlags( false, KeyFlags.ENCRYPT_COMMS | KeyFlags.ENCRYPT_STORAGE );
 
-        //        enchashgen.setTrust(false, 0, 3);
         // Objects used to encrypt the secret key.
         PGPDigestCalculator sha1Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA1 );
-        //        PGPDigestCalculator sha256Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA256 );
 
         // bcpg 1.48 exposes this API that includes s2kcount. Earlier
         // versions use a default of 0x60.
-        //        PBESecretKeyEncryptor pske = ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.AES_256 ) )
-        // .build( pass );
         PBESecretKeyEncryptor pske =
                 ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.CAST5, sha1Calc, s2kcount ) ).build( pass );
         // Finally, create the keyring itself. The constructor
@@ -903,7 +795,6 @@ public class PGPEncryptionUtil
 
             sGen.generateOnePassVersion( false ).encode( bOut );
 
-            //        File file = new File( fileName );
             PGPLiteralDataGenerator lGen = new PGPLiteralDataGenerator();
             OutputStream lOut =
                     lGen.open( bOut, PGPLiteralData.BINARY, "filename", new Date(), new byte[4096] );         //
@@ -1034,7 +925,8 @@ public class PGPEncryptionUtil
     /*
      * verify a clear text signed file
      */
-    public static boolean verifyClearSign( byte[] message, PGPPublicKeyRing pgpRings ) throws Exception
+    public static boolean verifyClearSign( byte[] message, PGPPublicKeyRing pgpRings )
+            throws IOException, PGPException, SignatureException
     {
         ArmoredInputStream aIn = new ArmoredInputStream( new ByteArrayInputStream( message ) );
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -1139,23 +1031,23 @@ public class PGPEncryptionUtil
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int digest;
 
-        if ( digestName.equals( "SHA256" ) )
+        if ( "SHA256".equals( digestName ) )
         {
             digest = PGPUtil.SHA256;
         }
-        else if ( digestName.equals( "SHA384" ) )
+        else if ( "SHA384".equals( digestName ) )
         {
             digest = PGPUtil.SHA384;
         }
-        else if ( digestName.equals( "SHA512" ) )
+        else if ( "SHA512".equals( digestName ) )
         {
             digest = PGPUtil.SHA512;
         }
-        else if ( digestName.equals( "MD5" ) )
+        else if ( "MD5".equals( digestName ) )
         {
             digest = PGPUtil.MD5;
         }
-        else if ( digestName.equals( "RIPEMD160" ) )
+        else if ( "RIPEMD160".equals( digestName ) )
         {
             digest = PGPUtil.RIPEMD160;
         }
@@ -1235,19 +1127,6 @@ public class PGPEncryptionUtil
         }
 
         aOut.write( line, 0, line.length );
-    }
-
-
-    private static int getLengthWithoutSeparatorOrTrailingWhitespace( byte[] line )
-    {
-        int end = line.length - 1;
-
-        while ( end >= 0 && isWhiteSpace( line[end] ) )
-        {
-            end--;
-        }
-
-        return end + 1;
     }
 
 
@@ -1418,68 +1297,20 @@ public class PGPEncryptionUtil
      */
     public static PGPPrivateKey getPrivateKey( final PGPSecretKey secretKey, final String secretPwd )
     {
+        Preconditions.checkNotNull( secretKey );
+        Preconditions.checkNotNull( secretPwd );
+
         try
         {
-            if ( secretKey != null )
-            {
-                return secretKey.extractPrivateKey( new JcePBESecretKeyDecryptorBuilder().setProvider( provider )
-                                                                                         .build( secretPwd
-                                                                                                 .toCharArray() ) );
-            }
+            return secretKey.extractPrivateKey(
+                    new JcePBESecretKeyDecryptorBuilder().setProvider( provider ).build( secretPwd.toCharArray() ) );
         }
         catch ( final Exception e )
         {
-            // Don't print the passphrase but do print null if thats what it was
-            final String passphraseMessage = ( secretPwd == null ) ? "null" : "supplied";
-            System.err.println(
-                    "Unable to extract key " + secretKey.getKeyID() + " using " + passphraseMessage + " passphrase" );
+            logger.error( "Unable to extract key {}: {}", secretKey.getKeyID(), e.getMessage() );
         }
+
         return null;
-    }
-
-
-    private static PGPSecretKey findSecretKey( InputStream secretKeyRing ) throws IOException, PGPException
-    {
-        PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secretKeyRing ),
-                new JcaKeyFingerprintCalculator() );
-
-        Iterator<PGPSecretKeyRing> it = keyrings.getKeyRings();
-        while ( it.hasNext() )
-        {
-            PGPSecretKeyRing keyRing = it.next();
-
-            Iterator<PGPSecretKey> pkIt = keyRing.getSecretKeys();
-
-            while ( pkIt.hasNext() )
-            {
-                PGPSecretKey secretKey = pkIt.next();
-
-                if ( secretKey.isSigningKey() )
-                {
-                    return secretKey;
-                }
-            }
-        }
-
-        throw new PGPException( "Key not found" );
-    }
-
-
-    /* **********************************************************
-     * Load Keyring  file into InputStream.
-     */
-    public static InputStream getFileInputStream( String keyringFile )
-    {
-        try
-        {
-            FileInputStream keyIn = new FileInputStream( keyringFile );
-
-            return keyIn;
-        }
-        catch ( IOException ex )
-        {
-            return null;
-        }
     }
 
 
@@ -1585,46 +1416,6 @@ public class PGPEncryptionUtil
     }
 
 
-    /**
-     * Verifies that a public key is signed with another public key
-     *
-     * @param keyToVerify the public key to verify
-     * @param keyToVerifyWith the key to verify with
-     *
-     * @return true if verified, false otherwise
-     */
-    public static boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith ) throws PGPException
-    {
-        try
-        {
-            Iterator<PGPSignature> signIterator = keyToVerify.getSignatures();
-            while ( signIterator.hasNext() )
-            {
-                PGPSignature signature = signIterator.next();
-                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), keyToVerifyWith );
-                if ( signature.verifyCertification( keyToVerify ) )
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        catch ( Exception e )
-        {
-            //throw custom  exception
-            throw new PGPException( "Error verifying public key", e );
-        }
-    }
-
-
-    /**
-     * Verifies that a public key is signed with another public key
-     *
-     * @param keyToRemoveFrom the public key to verify
-     * @param id id of the sugnature
-     *
-     * @return true if verified, false otherwise
-     */
     public static PGPPublicKeyRing removeSignature( PGPPublicKeyRing keyToRemoveFrom, String id ) throws PGPException
     {
         try
@@ -1711,7 +1502,7 @@ public class PGPEncryptionUtil
         @Override
         public AlgorithmIdentifier getAlgorithmIdentifier()
         {
-            if ( signature.getAlgorithm().equals( "SHA256withRSA" ) )
+            if ( "SHA256withRSA".equals( signature.getAlgorithm() ) )
             {
                 return PKCS1_SHA256_WITH_RSA_OID;
             }
@@ -1739,8 +1530,7 @@ public class PGPEncryptionUtil
             }
             catch ( GeneralSecurityException gse )
             {
-                gse.printStackTrace();
-                return null;
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
         }
     }

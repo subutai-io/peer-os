@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl.environment.state;
 
 
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 
@@ -13,7 +14,7 @@ public class NotFoundStateHandler extends StateHandler
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
         logStart();
 

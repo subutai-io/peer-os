@@ -12,6 +12,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
@@ -23,13 +28,16 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 /**
@@ -39,7 +47,10 @@ import io.subutai.common.security.objects.PermissionObject;
 @Table( name = "peer_con" )
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
+
 {
+    private static final Logger logger = LoggerFactory.getLogger( ContainerHostEntity.class );
+
 
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
@@ -64,11 +75,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Transient
     private ContainerId containerId;
 
-    @Column( name = "template_name", nullable = false )
-    private String templateName;
-
-    @Column( name = "template_arch", nullable = true )
-    private String templateArch;
+    @Column( name = "template_id", nullable = false )
+    private String templateId;
 
 
     protected ContainerHostEntity()
@@ -92,14 +100,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public ContainerHostEntity( final String peerId, final String hostId, final String hostname,
                                 HostArchitecture architecture, HostInterfaces hostInterfaces,
-                                final String containerName, final String templateName, final String templateArch,
-                                final String environmentId, final String ownerId, final String initiatorPeerId,
-                                final ContainerSize containerSize )
+                                final String containerName, final String templateId, final String environmentId,
+                                final String ownerId, final String initiatorPeerId, final ContainerSize containerSize )
     {
         super( peerId, hostId, hostname, architecture, hostInterfaces );
         this.containerName = containerName;
-        this.templateName = templateName;
-        this.templateArch = templateArch;
+        this.templateId = templateId;
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
@@ -107,6 +113,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
     public EnvironmentId getEnvironmentId()
     {
         return new EnvironmentId( environmentId );
@@ -141,6 +148,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
     public ContainerHostState getState()
     {
         try
@@ -166,24 +174,43 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+    }
+
+
+    @Override
     public String getTemplateName()
     {
-        return this.templateName;
+        try
+        {
+            return getTemplate().getName();
+        }
+        catch ( PeerException e )
+        {
+            logger.error( "Failed to get template by id", e.getMessage() );
+        }
+
+        return null;
     }
 
 
-    public String getTemplateArch()
+    @Override
+    public String getTemplateId()
     {
-        return templateArch;
+        return templateId;
     }
 
 
-    public TemplateKurjun getTemplate() throws PeerException
+    @Override
+    public Template getTemplate() throws PeerException
     {
-        return getPeer().getTemplate( this.templateName );
+        return getLocalPeer().getTemplateById( templateId );
     }
 
 
+    @Override
     public void dispose() throws PeerException
     {
         getPeer().destroyContainer( getContainerId() );
@@ -244,6 +271,14 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    public void setContainerSize( final ContainerSize containerSize )
+    {
+        Preconditions.checkNotNull( containerSize );
+
+        this.containerSize = containerSize;
+    }
+
+
     @Override
     public boolean isConnected()
     {
@@ -251,6 +286,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
     public ContainerId getContainerId()
     {
         if ( containerId == null )
@@ -293,5 +329,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public String getKeyId()
     {
         return getId();
+    }
+
+
+    @Override
+    public String getIp()
+    {
+        return getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
     }
 }

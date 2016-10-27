@@ -1,6 +1,8 @@
 package io.subutai.core.hubmanager.rest;
 
 
+import java.security.AccessControlException;
+
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -22,6 +25,8 @@ public class RestServiceImpl implements RestService
     private CommandExecutor commandExecutor;
 
     private PeerManager peerManager;
+
+    private IdentityManager identityManager = null;
 
 
     public void setIntegration( HubManager hubManager )
@@ -58,15 +63,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response register( final String hubIp, final String email, final String password )
+    public Response register( final String hubIp, final String email, final String password, final String peerName )
     {
         try
         {
-            hubManager.registerPeer( hubIp, email, password );
+            hubManager.registerPeer( hubIp, email, password, peerName );
             return Response.ok().build();
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
@@ -116,6 +128,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
@@ -150,9 +169,10 @@ public class RestServiceImpl implements RestService
 
         Thread thread = new Thread()
         {
+            @Override
             public void run()
             {
-                VEHServiceImpl.upSite( peerManager );
+                VEHServiceUtil.upSite( peerManager, identityManager );
             }
         };
 
@@ -168,9 +188,10 @@ public class RestServiceImpl implements RestService
 
         Thread thread = new Thread()
         {
+            @Override
             public void run()
             {
-                VEHServiceImpl.downSite( peerManager );
+                VEHServiceUtil.downSite( peerManager, identityManager );
             }
         };
 
@@ -183,7 +204,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response checksum()
     {
-        return VEHServiceImpl.getChecksum( peerManager );
+        return VEHServiceUtil.getChecksum( peerManager );
     }
 
 
@@ -208,5 +229,17 @@ public class RestServiceImpl implements RestService
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+    }
+
+
+    public IdentityManager getIdentityManager()
+    {
+        return identityManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 }

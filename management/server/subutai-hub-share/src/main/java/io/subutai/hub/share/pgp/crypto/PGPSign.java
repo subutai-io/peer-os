@@ -24,7 +24,13 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 
 public class PGPSign
 {
-    public static byte[] sign( byte data[], PGPPrivateKey privateKey ) throws Exception
+    private PGPSign()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
+    public static byte[] sign( byte data[], PGPPrivateKey privateKey ) throws IOException, PGPException
     {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -46,7 +52,8 @@ public class PGPSign
     }
 
 
-    private static void produceSign( byte[] data, BCPGOutputStream bcOut, PGPSignatureGenerator signGen ) throws IOException, PGPException
+    private static void produceSign( byte[] data, BCPGOutputStream bcOut, PGPSignatureGenerator signGen )
+            throws IOException, PGPException
     {
         PGPLiteralDataGenerator literalGen = new PGPLiteralDataGenerator();
 
@@ -72,7 +79,8 @@ public class PGPSign
             throws PGPException, IOException
     {
         PGPSignatureGenerator signGen = new PGPSignatureGenerator(
-                new JcaPGPContentSignerBuilder( privateKey.getPublicKeyPacket().getAlgorithm(), PGPUtil.SHA1 ).setProvider( "BC" ) );
+                new JcaPGPContentSignerBuilder( privateKey.getPublicKeyPacket().getAlgorithm(), PGPUtil.SHA1 )
+                        .setProvider( "BC" ) );
 
         signGen.init( PGPSignature.BINARY_DOCUMENT, privateKey );
 
@@ -80,5 +88,4 @@ public class PGPSign
 
         return signGen;
     }
-
 }

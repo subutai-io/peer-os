@@ -4,17 +4,17 @@ package io.subutai.core.registration.cli;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.ContainerToken;
 
 
 @Command( scope = "node", name = "generate-token", description = "Generates container token" )
 public class GenerateContainerToken extends SubutaiShellCommandSupport
 {
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
 
 
-    public GenerateContainerToken( final RegistrationManager registrationManager )
+    public GenerateContainerToken( final HostRegistrationManager registrationManager )
     {
         this.registrationManager = registrationManager;
     }

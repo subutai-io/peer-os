@@ -2,9 +2,6 @@ package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,12 +17,15 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.VehsDto;
@@ -59,7 +59,7 @@ public class VehsProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         for ( String link : stateLinks )
         {
@@ -80,7 +80,7 @@ public class VehsProcessor implements StateLinkProcessor
     }
 
 
-    private EnvironmentPeerDto getEnvPeerDto( String link ) throws Exception
+    private EnvironmentPeerDto getEnvPeerDto( String link ) throws HubManagerException
     {
         try
         {
@@ -89,14 +89,12 @@ public class VehsProcessor implements StateLinkProcessor
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
 
-            return result;
+            return JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( PGPException | IOException e )
         {
-            throw new Exception( "Could not retrieve environment peer data", e );
+            throw new HubManagerException( "Could not retrieve environment peer data", e );
         }
     }
 
@@ -106,7 +104,7 @@ public class VehsProcessor implements StateLinkProcessor
         EnvironmentDto environmentDto = getEnvironmentDto( peerDto.getEnvironmentInfo().getId() );
         if ( environmentDto != null )
         {
-            VehsDto vehsDto = null;
+            VehsDto vehsDto;
             String containerDataURL = String.format( "/rest/v1/vehs/%s", peerDto.getEnvironmentInfo().getId() );
             try
             {
@@ -116,6 +114,8 @@ public class VehsProcessor implements StateLinkProcessor
                 byte[] encryptedContent = configManager.readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 vehsDto = JsonUtil.fromCbor( plainContent, VehsDto.class );
+
+                Preconditions.checkNotNull( vehsDto );
 
                 if ( vehsDto.getState() != null )
                 {
@@ -130,8 +130,8 @@ public class VehsProcessor implements StateLinkProcessor
                         case COLLECT_METRIC:
                             collectMetric( environmentDto, vehsDto, peerDto );
                             break;
-                        case DELETE:
-                            deleteHS( environmentDto, vehsDto, peerDto );
+                        default:
+                            log.info( "Requested {}", vehsDto.getState() );
                             break;
                     }
                 }
@@ -147,40 +147,40 @@ public class VehsProcessor implements StateLinkProcessor
 
     private void collectMetric( EnvironmentDto environmentDto, VehsDto vehsDto, EnvironmentPeerDto peerDto )
     {
-        List<ContainerHost> containerHosts = getContainers( environmentDto, vehsDto );
+        Preconditions.checkNotNull( vehsDto );
+
+        List<ContainerHost> containerHosts = getContainers( environmentDto );
         for ( ContainerHost containerHost : containerHosts )
         {
             CommandResult commandResult = execute( containerHost, "bash collectMetrics.sh /var/log/nginx/access.log" );
+
+            Preconditions.checkNotNull( commandResult );
+
             String verifyDataUrl = String.format( "/rest/v1/vehs/metric/%s", peerDto.getEnvironmentInfo().getId() );
             vehsDto.setData( commandResult.getStdOut() );
-            sendPutRequest( verifyDataUrl, vehsDto, peerDto, VehsDto.VehsState.READY );
+            sendPutRequest( verifyDataUrl, vehsDto, VehsDto.VehsState.READY );
         }
-    }
-
-
-    private void deleteHS( final EnvironmentDto environmentDto, final VehsDto vehsDto, EnvironmentPeerDto peerDto )
-    {
-
     }
 
 
     private void verifyChecksumHS( EnvironmentDto environmentDto, VehsDto vehsDto, EnvironmentPeerDto peerDto )
     {
-        List<ContainerHost> containerHosts = getContainers( environmentDto, vehsDto );
+        List<ContainerHost> containerHosts = getContainers( environmentDto );
 
         for ( ContainerHost containerHost : containerHosts )
         {
             CommandResult commandResult = execute( containerHost, "bash /checksum.sh /var/www/" );
+            Preconditions.checkNotNull( commandResult );
             String verifyDataUrl = String.format( "/rest/v1/vehs/verify/%s", peerDto.getEnvironmentInfo().getId() );
             vehsDto.setData( commandResult.getStdOut() );
-            sendPutRequest( verifyDataUrl, vehsDto, peerDto, VehsDto.VehsState.READY );
+            sendPutRequest( verifyDataUrl, vehsDto, VehsDto.VehsState.READY );
         }
     }
 
 
     private void deployHS( EnvironmentDto environmentDto, VehsDto vehsDto, EnvironmentPeerDto peerDto )
     {
-        List<ContainerHost> containerHosts = getContainers( environmentDto, vehsDto );
+        List<ContainerHost> containerHosts = getContainers( environmentDto );
 
         for ( ContainerHost containerHost : containerHosts )
         {
@@ -190,15 +190,16 @@ public class VehsProcessor implements StateLinkProcessor
                             vehsDto.getUserPassword() );
             CommandResult commandResult = execute( containerHost, cmd );
 
-            log.info( commandResult.getStdOut().toString() );
+            Preconditions.checkNotNull( commandResult );
+
+            log.info( commandResult.getStdOut() );
         }
         String vehsPeerDataUrl = String.format( "/rest/v1/vehs/%s", peerDto.getEnvironmentInfo().getId() );
-        sendPutRequest( vehsPeerDataUrl, vehsDto, peerDto, VehsDto.VehsState.READY );
+        sendPutRequest( vehsPeerDataUrl, vehsDto, VehsDto.VehsState.READY );
     }
 
 
-    private void sendPutRequest( final String url, final VehsDto vehsDto, final EnvironmentPeerDto peerDto,
-                                 final VehsDto.VehsState status )
+    private void sendPutRequest( final String url, final VehsDto vehsDto, final VehsDto.VehsState status )
     {
         try
         {
@@ -222,7 +223,7 @@ public class VehsProcessor implements StateLinkProcessor
     }
 
 
-    private List<ContainerHost> getContainers( EnvironmentDto environmentDto, VehsDto vehsDto )
+    private List<ContainerHost> getContainers( EnvironmentDto environmentDto )
     {
         List<ContainerHost> cs = new ArrayList<>();
         LocalPeer localPeer = peerManager.getLocalPeer();
@@ -255,12 +256,12 @@ public class VehsProcessor implements StateLinkProcessor
     {
         boolean exec = true;
         int tryCount = 0;
-        CommandResult result = null;
+        CommandResult result;
 
         while ( exec )
         {
             tryCount++;
-            exec = tryCount > 3 ? false : true;
+            exec = tryCount <= 3;
             try
             {
                 result = containerHost.execute( new RequestBuilder( cmd ) );
@@ -269,7 +270,7 @@ public class VehsProcessor implements StateLinkProcessor
             }
             catch ( CommandException e )
             {
-                e.printStackTrace();
+                log.warn( e.getMessage() );
             }
 
             try
@@ -278,7 +279,7 @@ public class VehsProcessor implements StateLinkProcessor
             }
             catch ( InterruptedException e )
             {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
 

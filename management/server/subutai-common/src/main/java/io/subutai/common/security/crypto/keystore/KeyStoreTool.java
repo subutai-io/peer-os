@@ -22,11 +22,11 @@ import java.security.cert.X509Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.common.security.crypto.certificate.CertificateTool;
 import io.subutai.common.security.crypto.key.KeyManager;
 import io.subutai.common.security.crypto.key.KeyPairType;
-import io.subutai.common.security.utils.io.SafeCloseUtil;
 import io.subutai.common.settings.SecuritySettings;
 
 
@@ -37,8 +37,6 @@ public class KeyStoreTool
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( KeyStoreTool.class );
-    private FileInputStream finStream = null;
-    private FileOutputStream foutStream = null;
     private CertificateTool certificateTool = new CertificateTool();
 
 
@@ -61,35 +59,43 @@ public class KeyStoreTool
      */
     public KeyStore load( KeyStoreData keyStoreData )
     {
+        if ( !keyStoreData.getKeyStoreType().isFileBased() )
+        {
+            LOGGER.error( "Keystore is not file-based" );
+
+            return null;
+        }
+
         KeyStore keyStore = null;
 
         try
         {
-            if ( !keyStoreData.getKeyStoreType().isFileBased() )
+            File file = new File( keyStoreData.getKeyStoreFile() );
+
+            if ( file.exists() )
             {
-                LOGGER.error( "NoCreateKeyStoreNotFile.exception.message" );
+                keyStore = KeyStore.getInstance( KeyStore.getDefaultType() );
+
+                try ( FileInputStream finStream = new FileInputStream( file ) )
+                {
+                    keyStore.load( finStream, keyStoreData.getPassword().toCharArray() );
+                }
             }
             else
             {
-                File file = new File( keyStoreData.getKeyStoreFile() );
+                File keyStoresFolder = new File( file.getParent() );
 
-                if ( file.exists() )
+                if ( keyStoresFolder.mkdirs() && file.createNewFile() )
                 {
-                    finStream = new FileInputStream( file );
-                    keyStore = KeyStore.getInstance( KeyStore.getDefaultType() );
-                    keyStore.load( finStream, keyStoreData.getPassword().toCharArray() );
+                    LOGGER.info( "Created keystore file" );
                 }
-                else
-                {
-                    File keyStoresFolder = new File( file.getParent() );
-                    if ( keyStoresFolder.mkdirs() )
-                    {
-                        file.createNewFile();
-                    }
 
-                    keyStore = KeyStore.getInstance( keyStoreData.getKeyStoreType().jce() );
-                    keyStore.load( null, null );
-                    foutStream = new FileOutputStream( file );
+                keyStore = KeyStore.getInstance( keyStoreData.getKeyStoreType().jce() );
+
+                keyStore.load( null, null );
+
+                try ( FileOutputStream foutStream = new FileOutputStream( file ) )
+                {
                     keyStore.store( foutStream, keyStoreData.getPassword().toCharArray() );
                 }
             }
@@ -114,11 +120,6 @@ public class KeyStoreTool
         {
             LOGGER.error( "Error accessing keyStore file", e );
         }
-        finally
-        {
-            SafeCloseUtil.close( finStream );
-            SafeCloseUtil.close( foutStream );
-        }
 
         return keyStore;
     }
@@ -132,26 +133,22 @@ public class KeyStoreTool
      */
     public void save( KeyStore keyStore, KeyStoreData keyStoreData )
     {
-        try
+        if ( !keyStoreData.getKeyStoreType().isFileBased() )
         {
-            if ( !keyStoreData.getKeyStoreType().isFileBased() )
-            {
-                LOGGER.error( "Keystore is not file-based" );
-            }
-            else
-            {
-                File file = new File( keyStoreData.getKeyStoreFile() );
-                foutStream = new FileOutputStream( file );
-                keyStore.store( foutStream, keyStoreData.getPassword().toCharArray() );
-            }
+            LOGGER.error( "Keystore is not file-based" );
+
+            return;
+        }
+
+        File file = new File( keyStoreData.getKeyStoreFile() );
+
+        try ( FileOutputStream foutStream = new FileOutputStream( file ) )
+        {
+            keyStore.store( foutStream, keyStoreData.getPassword().toCharArray() );
         }
         catch ( IOException | KeyStoreException | CertificateException | NoSuchAlgorithmException ex )
         {
             LOGGER.error( "Error saving keystore", ex );
-        }
-        finally
-        {
-            SafeCloseUtil.close( foutStream );
         }
     }
 
@@ -164,7 +161,7 @@ public class KeyStoreTool
      *
      * @return KeyPair
      */
-    public KeyPair getKeyPair( KeyStore keyStore, KeyStoreData keyStoreData )
+    KeyPair getKeyPair( KeyStore keyStore, KeyStoreData keyStoreData )
     {
         KeyPair keyPair = null;
 
@@ -230,7 +227,7 @@ public class KeyStoreTool
         }
         catch ( KeyStoreException e )
         {
-            throw new RuntimeException( "Error getting certificate", e );
+            throw new ActionFailedException( "Error getting certificate", e );
         }
     }
 
@@ -256,12 +253,13 @@ public class KeyStoreTool
         }
         catch ( Exception e )
         {
-            throw new RuntimeException( "Error importing certificate", e );
+            throw new ActionFailedException( "Error importing certificate", e );
         }
     }
 
 
-    public KeyStore createPeerCertKeystore( String alias, String cn ) throws Exception
+    public KeyStore createPeerCertKeystore( String alias, String cn )
+            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException
     {
 
         KeyManager sslkeyMan = new KeyManager();
@@ -273,8 +271,6 @@ public class KeyStoreTool
         CertificateData certificateData = new CertificateData();
 
         certificateData.setCommonName( cn );
-
-        CertificateTool certificateTool = new CertificateTool();
 
         X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
 

@@ -44,9 +44,9 @@ public class RoleEntity implements Role
 
     //*********************************************
     @ManyToMany( targetEntity = PermissionEntity.class, fetch = FetchType.EAGER )
-    @JoinTable( name = "role_permissions",
-            joinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) },
-            inverseJoinColumns = { @JoinColumn( name = "permission_id", referencedColumnName = "id" ) } )
+    @JoinTable( name = "role_permissions", joinColumns = {
+            @JoinColumn( name = "role_id", referencedColumnName = "id" )
+    }, inverseJoinColumns = { @JoinColumn( name = "permission_id", referencedColumnName = "id" ) } )
     private List<Permission> permissions = new ArrayList<>();
     //*********************************************
 

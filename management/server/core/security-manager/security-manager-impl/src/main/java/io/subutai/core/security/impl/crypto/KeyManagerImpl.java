@@ -4,7 +4,6 @@ package io.subutai.core.security.impl.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
@@ -272,35 +271,6 @@ public class KeyManagerImpl implements KeyManager
         PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( targetFingerprint );
 
         return setKeyTrust( sourceSecRing, targetPubRing, trustLevel );
-    }
-
-
-    @Override
-    public PGPPublicKeyRing setKeyTrust( final String sourceFingerprint, final String targetFingerprint,
-                                         final String encryptedMessage ) throws PGPException
-    {
-
-        byte[] decrypted = encryptionTool.decrypt( encryptedMessage.getBytes() );
-
-        try
-        {
-            String decryptedMessage = new String( decrypted, "UTF-8" );
-
-            // TODO trust message signature verification should be verified on message separately from signature
-            // since on client side primarily Object properties are set then serialized to JSON and signature is
-            // generated from this string and set as additional Object property. Finally Object serialized
-            // again to JSON with signature and encoded with recipient's (management's), and sent as trust message.
-            //
-            // trustMessage:
-            // { [ ( "I Fully trust myself to manage this Environment") signed by User] encrypted by Peer PubKey}
-
-            //            TrustMessage trustMessage = JsonUtil.fromJson( decryptedMessage, TrustMessage.class );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            LOG.error( "Error converting byte array to string with UTF-8 format.", e );
-        }
-        return null;
     }
 
 
@@ -640,9 +610,12 @@ public class KeyManagerImpl implements KeyManager
             {
                 String fingerprint = getFingerprint( identityId );
 
-                securityDataService.removeKeyData( identityId );
-                securityDataService.removeSecretKeyData( identityId );
-                securityDataService.removeKeyAllTrustData( fingerprint );
+                if ( fingerprint != null )
+                {
+                    securityDataService.removeKeyData( identityId );
+                    securityDataService.removeSecretKeyData( identityId );
+                    securityDataService.removeKeyAllTrustData( fingerprint );
+                }
             }
         }
         catch ( Exception ex )
@@ -689,11 +662,11 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            byte[] keyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
+            byte[] aKeyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
 
-            if ( keyData != null )
+            if ( aKeyData != null )
             {
-                return PGPKeyUtil.readPublicKeyRing( keyData );
+                return PGPKeyUtil.readPublicKeyRing( aKeyData );
             }
         }
         catch ( Exception e )
@@ -721,18 +694,19 @@ public class KeyManagerImpl implements KeyManager
 
             if ( keyIden == null )
             {
-                LOG.info( "********* Public key not found with identityId:" + identityId );
+                LOG.warn( "********* Public key not found with identityId:" + identityId );
+
                 return "";
             }
-            {
-                byte[] keyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
 
-                return PGPEncryptionUtil.armorByteArrayToString( keyData );
-            }
+            byte[] aKeyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
+
+            return PGPEncryptionUtil.armorByteArrayToString( aKeyData );
         }
         catch ( Exception ex )
         {
             LOG.error( " ***** Error getting Public keyRing:" + ex.toString(), ex );
+
             return "";
         }
     }
@@ -757,16 +731,16 @@ public class KeyManagerImpl implements KeyManager
 
             if ( keyIden == null )
             {
-                //throw new NullPointerException( "***** Error! Key Identity not found." );
                 LOG.warn( "*******  SecurityKey (getPublicKeyRing) not found for identityID:" + identityId );
+
                 return null;
             }
             else
             {
 
-                byte[] keyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
+                byte[] aKeyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
 
-                publicKeyRing = PGPKeyUtil.readPublicKeyRing( keyData );
+                publicKeyRing = PGPKeyUtil.readPublicKeyRing( aKeyData );
 
                 return publicKeyRing;
             }
@@ -921,7 +895,6 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public PGPPrivateKey getPrivateKey( String identityId )
     {
-        PGPPrivateKey privateKey;
 
         if ( Strings.isNullOrEmpty( identityId ) )
         {
@@ -934,9 +907,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( secretKey != null )
             {
-                privateKey = PGPEncryptionUtil.getPrivateKey( secretKey, keyData.getSecretKeyringPwd() );
-
-                return privateKey;
+                return PGPEncryptionUtil.getPrivateKey( secretKey, keyData.getSecretKeyringPwd() );
             }
             else
             {
@@ -1058,9 +1029,9 @@ public class KeyManagerImpl implements KeyManager
             saveSecretKeyRing( identityId, type, PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() ) );
             savePublicKeyRing( identityId, type, PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() ) );
         }
-        catch ( Exception ignored )
+        catch ( Exception e )
         {
-
+            LOG.error( e.getMessage() );
         }
     }
 
@@ -1083,9 +1054,9 @@ public class KeyManagerImpl implements KeyManager
                 LOG.info( identityId + " Cannot be removed (possibly ManagementHost):" );
             }
         }
-        catch ( Exception ignored )
+        catch ( Exception e )
         {
-
+            LOG.error( e.getMessage() );
         }
     }
 
@@ -1115,7 +1086,7 @@ public class KeyManagerImpl implements KeyManager
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
                 {
                     String publicKeyring = response.readEntity( String.class );
-                    savePublicKeyRing( peerInfo.getId(), ( short ) 3, publicKeyring );
+                    savePublicKeyRing( peerInfo.getId(), SecurityKeyType.PeerKey.getId(), publicKeyring );
                 }
 
                 RestUtil.close( response );

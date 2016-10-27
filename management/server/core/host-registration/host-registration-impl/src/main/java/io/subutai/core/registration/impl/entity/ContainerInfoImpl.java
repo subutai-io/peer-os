@@ -28,14 +28,14 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
 
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "node_container_host_model" )
-public class ContainerInfoImpl implements ContainerInfo, Serializable
+public class ContainerInfoImpl implements ContainerInfo
 {
     @Id
     @Column( name = "id" )
@@ -88,7 +88,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     @Column( name = "reg_status" )
     @Enumerated( EnumType.STRING )
     @Expose
-    private RegistrationStatus status = RegistrationStatus.REQUESTED;
+    private ResourceHostRegistrationStatus status = ResourceHostRegistrationStatus.REQUESTED;
 
     @Column( name = "state" )
     @Enumerated( EnumType.STRING )
@@ -132,22 +132,18 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
 
 
     @Override
-    public RegistrationStatus getStatus()
+    public ResourceHostRegistrationStatus getStatus()
     {
         return status;
     }
 
 
-    public void setStatus( final RegistrationStatus status )
+    public void setStatus( final ResourceHostRegistrationStatus status )
     {
         this.status = status;
     }
 
 
-    public RequestedHostImpl getRequestedHost()
-    {
-        return requestedHost;
-    }
 
 
     public void setRequestedHost( final RequestedHostImpl requestedHost )
@@ -204,10 +200,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     }
 
 
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
 
 
     @Override
@@ -217,10 +209,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     }
 
 
-    public void setPublicKey( final String publicKey )
-    {
-        this.publicKey = publicKey;
-    }
 
 
     @Override
@@ -237,10 +225,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     }
 
 
-    public void setGateway( final String gateway )
-    {
-        this.gateway = gateway;
-    }
 
 
     @Override
@@ -249,11 +233,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
         return hostname.compareTo( o.getHostname() );
     }
 
-
-    public void setVlan( final Integer vlan )
-    {
-        this.vlan = vlan;
-    }
 
 
     @Override

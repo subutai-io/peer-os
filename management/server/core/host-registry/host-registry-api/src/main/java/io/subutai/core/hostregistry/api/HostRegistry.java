@@ -19,7 +19,7 @@ public interface HostRegistry
      *
      * @param resourceHostId - id of resource host
      */
-    public void updateResourceHostEntryTimestamp( String resourceHostId );
+    void updateResourceHostEntryTimestamp( String resourceHostId );
 
     /**
      * Returns container host info by id
@@ -31,7 +31,7 @@ public interface HostRegistry
      * @throws HostDisconnectedException - thrown when container host is not present on any of connected resource hosts.
      * However if it is present but status is other then RUNNING this exception is not thrown
      */
-    public ContainerHostInfo getContainerHostInfoById( String id ) throws HostDisconnectedException;
+    ContainerHostInfo getContainerHostInfoById( String id ) throws HostDisconnectedException;
 
     /**
      * Returns container host info by name
@@ -43,13 +43,13 @@ public interface HostRegistry
      * @throws HostDisconnectedException - thrown when container host is not present on any of connected resource hosts.
      * However if it is present but status is other then RUNNING this exception is not thrown
      */
-    public ContainerHostInfo getContainerHostInfoByHostname( String hostname ) throws HostDisconnectedException;
+    ContainerHostInfo getContainerHostInfoByHostname( String hostname ) throws HostDisconnectedException;
 
 
     /**
      * Returns all present container hosts info on all connected resource hosts
      */
-    public Set<ContainerHostInfo> getContainerHostsInfo();
+    Set<ContainerHostInfo> getContainerHostsInfo();
 
     /**
      * Returns resource host info by id
@@ -60,7 +60,7 @@ public interface HostRegistry
      *
      * @throws HostDisconnectedException - thrown if resource host is not connected
      */
-    public ResourceHostInfo getResourceHostInfoById( String id ) throws HostDisconnectedException;
+    ResourceHostInfo getResourceHostInfoById( String id ) throws HostDisconnectedException;
 
 
     /**
@@ -72,22 +72,22 @@ public interface HostRegistry
      *
      * @throws HostDisconnectedException - thrown if resource host is not connected
      */
-    public ResourceHostInfo getResourceHostInfoByHostname( String hostname ) throws HostDisconnectedException;
+    ResourceHostInfo getResourceHostInfoByHostname( String hostname ) throws HostDisconnectedException;
 
     /**
      * Returns all currently connected resource hosts info
      */
-    public Set<ResourceHostInfo> getResourceHostsInfo();
+    Set<ResourceHostInfo> getResourceHostsInfo();
 
     /**
      * Adds host heartbeat listener
      */
-    public void addHostListener( HostListener listener );
+    void addHostListener( HostListener listener );
 
     /**
      * Removes host heartbeat listener
      */
-    public void removeHostListener( HostListener listener );
+    void removeHostListener( HostListener listener );
 
     /**
      * Returns resource host info by its hosted container host info
@@ -98,7 +98,7 @@ public interface HostRegistry
      *
      * @throws HostDisconnectedException - thrown if resource host is not connected
      */
-    public ResourceHostInfo getResourceHostByContainerHost( ContainerHostInfo containerHostInfo )
+    ResourceHostInfo getResourceHostByContainerHost( ContainerHostInfo containerHostInfo )
             throws HostDisconnectedException;
 
     /**
@@ -111,5 +111,9 @@ public interface HostRegistry
      * @throws HostDisconnectedException - thrown if container host is not present or resource host is not connected
      * (depending if this is a container or resource host info)
      */
-    public HostInfo getHostInfoById( String hostId ) throws HostDisconnectedException;
+    HostInfo getHostInfoById( String hostId ) throws HostDisconnectedException;
+
+    void removeResourceHost( String id );
+
+    String getResourceHostIp( ResourceHostInfo resourceHostInfo );
 }

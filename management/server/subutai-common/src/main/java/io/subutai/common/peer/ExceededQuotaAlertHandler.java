@@ -1,19 +1,14 @@
 package io.subutai.common.peer;
 
 
-import java.math.BigDecimal;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.quota.ContainerCpuResource;
-import io.subutai.common.quota.ContainerDiskResource;
-import io.subutai.common.quota.ContainerRamResource;
-import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.resource.NumericValueResource;
+import io.subutai.hub.share.quota.ContainerCpuResource;
+import io.subutai.hub.share.quota.ContainerDiskResource;
+import io.subutai.hub.share.quota.ContainerRamResource;
+import io.subutai.hub.share.resource.ContainerResourceType;
 
 
 /**
@@ -21,15 +16,10 @@ import io.subutai.common.resource.NumericValueResource;
  */
 public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<QuotaAlertValue>
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger( ExceededQuotaAlertHandler.class );
     private EnvironmentContainerHost sourceHost;
     protected ContainerCpuResource cpuResource;
     protected ContainerRamResource ramResource;
     protected ContainerDiskResource hddResource;
-
-
-    @Override
-    abstract public String getDescription();
 
 
     @Override
@@ -43,16 +33,10 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
     public void preProcess( final Environment environment, final QuotaAlertValue alert ) throws AlertHandlerException
     {
         findSourceHost( environment, alert.getValue().getHostId().getId() );
-        final NumericValueResource cpuValue = new NumericValueResource( new BigDecimal( 100 ) );
-        ByteValueResource ramValue =
-                new ByteValueResource( new BigDecimal( alert.getValue().getResourceHostMetric().getAvailableRam() ) );
-
-        ByteValueResource diskValue =
-                new ByteValueResource( new BigDecimal( alert.getValue().getResourceHostMetric().getAvailableSpace() ) );
-
-        cpuResource = new ContainerCpuResource( cpuValue );
-        ramResource = new ContainerRamResource( ramValue );
-        hddResource = new ContainerDiskResource( diskValue );
+        cpuResource = new ContainerCpuResource( "100%" );
+        ramResource = new ContainerRamResource( alert.getValue().getResourceHostMetric().getAvailableRam().toString() );
+        hddResource = new ContainerDiskResource( ContainerResourceType.ROOTFS,
+                alert.getValue().getResourceHostMetric().getAvailableSpace().toString() );
     }
 
 
@@ -63,12 +47,13 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
 
     @Override
     public void postProcess( final Environment environment, final QuotaAlertValue alert ) throws AlertHandlerException
-    {}
+    {
+    }
 
 
     protected void findSourceHost( Environment environment, final String sourceHostId ) throws AlertHandlerException
     {
-        EnvironmentContainerHost sourceHost = null;
+        EnvironmentContainerHost aSourceHost = null;
 
         //get environment containers and find alert's source host
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
@@ -77,17 +62,17 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
         {
             if ( containerHost.getId().equalsIgnoreCase( sourceHostId ) )
             {
-                sourceHost = containerHost;
+                aSourceHost = containerHost;
                 break;
             }
         }
 
-        if ( sourceHost == null )
+        if ( aSourceHost == null )
         {
             throw new AlertHandlerException( "Source host not found." );
         }
 
-        this.sourceHost = sourceHost;
+        this.sourceHost = aSourceHost;
     }
 
 

@@ -10,10 +10,10 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
-import io.subutai.common.resource.HostResources;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.resource.HostResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 @Command( scope = "peer", name = "limits", description = "Gets limits for specified peer" )

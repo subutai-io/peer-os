@@ -1,7 +1,7 @@
 package io.subutai.core.messenger.api;
 
 
-import io.subutai.common.util.StringUtil;
+import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -20,7 +20,7 @@ public abstract class MessageListener
     protected MessageListener( final String recipient )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "invalid recipient id" );
-        Preconditions.checkArgument( StringUtil.getLen( recipient ) <= MAX_RECIPIENT_ID_LEN,
+        Preconditions.checkArgument( StringUtils.length( recipient ) <= MAX_RECIPIENT_ID_LEN,
                 String.format( "Max recipient length must be %d", MAX_RECIPIENT_ID_LEN ) );
 
         this.recipient = recipient;

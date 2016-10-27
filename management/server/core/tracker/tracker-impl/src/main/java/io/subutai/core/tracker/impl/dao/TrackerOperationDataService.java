@@ -16,6 +16,8 @@ import javax.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.common.util.CollectionUtils;
+
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -88,7 +90,7 @@ public class TrackerOperationDataService
 
             List<TrackerOperationEntity> operations = query.getResultList();
 
-            if ( operations != null && operations.size() > 0 )
+            if ( !CollectionUtils.isEmpty( operations ) )
             {
                 result = operations.get( 0 );
             }
@@ -135,7 +137,7 @@ public class TrackerOperationDataService
 
             List<TrackerOperationEntity> operations = query.getResultList();
 
-            if ( operations != null && operations.size() > 0 )
+            if ( !CollectionUtils.isEmpty( operations ) )
             {
                 result = operations.get( 0 );
             }
@@ -349,7 +351,7 @@ public class TrackerOperationDataService
 
             List<TrackerOperationEntity> operations = query.getResultList();
 
-            if ( operations != null && operations.size() > 0 )
+            if ( !CollectionUtils.isEmpty( operations ) )
             {
                 result = operations.get( 0 );
                 result.setViewState( viewState );

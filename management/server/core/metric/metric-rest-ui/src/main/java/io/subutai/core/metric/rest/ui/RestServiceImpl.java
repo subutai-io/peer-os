@@ -15,6 +15,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.metric.api.Monitor;
+import io.subutai.core.metric.rest.ui.pojo.P2PInfoPojo;
 
 
 public class RestServiceImpl implements RestService
@@ -46,7 +47,7 @@ public class RestServiceImpl implements RestService
             Calendar calendar = Calendar.getInstance();
             Date current =
                     new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
-            calendar.add( Calendar.HOUR, ( -interval ) );
+            calendar.add( Calendar.HOUR, -interval );
             Date start = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
 
             Host host;
@@ -69,7 +70,9 @@ public class RestServiceImpl implements RestService
 
             if ( host instanceof EnvironmentContainerHost )
             {
-                return Response.ok( host.getPeer().getHistoricalMetrics( host.getHostname(), start, current ) ).build();
+                return Response.ok( host.getPeer()
+                                        .getHistoricalMetrics( ( ( EnvironmentContainerHost ) host ).getContainerId(),
+                                                start, current ) ).build();
             }
 
             return Response.ok( monitor.getHistoricalMetrics( host, start, current ) ).build();
@@ -92,5 +95,15 @@ public class RestServiceImpl implements RestService
     public Response getMetrics( final int interval )
     {
         return getMetrics( null, null, interval );
+    }
+
+
+    @Override
+    public Response getP2PStatus()
+    {
+        P2PInfoPojo pojo = new P2PInfoPojo();
+        pojo.setP2pList( monitor.getP2PStatus() );
+        String info = JsonUtil.GSON.toJson( pojo );
+        return Response.status( Response.Status.OK ).entity( info ).build();
     }
 }

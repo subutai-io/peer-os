@@ -9,31 +9,31 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.settings.Common;
 
 
-public class CloneRequest implements TaskRequest
+public class CloneRequest
 {
     private final String resourceHostId;
-    private final String hostname;
-    private final String containerName;
+    private String hostname;
+    private String containerName;
     private final String ip;
-    private final String templateName;
+    private final String templateId;
     private final HostArchitecture templateArch;
     private final ContainerSize containerSize;
 
 
     public CloneRequest( final String resourceHostId, final String hostname, final String containerName,
-                         final String ip, final String templateName, HostArchitecture templateArch,
+                         final String ip, final String templateId, HostArchitecture templateArch,
                          final ContainerSize containerSize )
     {
         Preconditions.checkNotNull( resourceHostId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
-        Preconditions.checkNotNull( templateName );
+        Preconditions.checkNotNull( templateId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
 
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
         this.containerName = containerName;
         this.ip = ip;
-        this.templateName = templateName;
+        this.templateId = templateId;
         this.templateArch = templateArch;
         this.containerSize = containerSize;
     }
@@ -51,9 +51,21 @@ public class CloneRequest implements TaskRequest
     }
 
 
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
+    }
+
+
     public String getContainerName()
     {
         return containerName;
+    }
+
+
+    public void setContainerName( final String containerName )
+    {
+        this.containerName = containerName;
     }
 
 
@@ -63,9 +75,9 @@ public class CloneRequest implements TaskRequest
     }
 
 
-    public String getTemplateName()
+    public String getTemplateId()
     {
-        return templateName;
+        return templateId;
     }
 
 
@@ -85,7 +97,7 @@ public class CloneRequest implements TaskRequest
     public String toString()
     {
         return "CloneRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
-                + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", templateName='" + templateName
+                + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", templateId='" + templateId
                 + '\'' + ", templateArch=" + templateArch + ", containerSize=" + containerSize + '}';
     }
 }

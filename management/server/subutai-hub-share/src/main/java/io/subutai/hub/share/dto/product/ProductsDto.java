@@ -9,11 +9,15 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 //Version 1.1
 public class ProductsDto
 {
+    private static final Logger LOG = LoggerFactory.getLogger( ProductsDto.class.getName() );
+
     private List<ProductDtoV1_2> productsDto = new ArrayList<>();
 
 
@@ -25,7 +29,7 @@ public class ProductsDto
     //JSON String to ProductsDto
     public ProductsDto( String prodString )
     {
-        JSONObject object= new JSONObject( prodString );
+        JSONObject object = new JSONObject( prodString );
         JSONArray products = object.getJSONArray( "productDtos" );
         for ( int i = 0; i < products.length(); i++ )
         {
@@ -37,7 +41,7 @@ public class ProductsDto
             }
             catch ( ParseException e )
             {
-                e.printStackTrace();
+                LOG.warn( e.getMessage() );
             }
         }
         Collections.sort( productsDto, new Comparator<ProductDtoV1_2>()
@@ -47,7 +51,7 @@ public class ProductsDto
             {
                 return o1.getName().compareTo( o2.getName() );
             }
-        });
+        } );
     }
 
 

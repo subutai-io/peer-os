@@ -1,16 +1,17 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
+//todo remove mutators from interface
 public interface PeerSettings
 {
-    public String getPeerOwnerId();
+    String getPeerOwnerId();
 
 
-    public void setPeerOwnerId( final String peerOwnerId );
+    void setPeerOwnerId( final String peerOwnerId );
 
 
-    public String getUserPeerOwnerName();
+    String getUserPeerOwnerName();
 
 
-    public void setUserPeerOwnerName( final String userPeerOwnerName );
+    void setUserPeerOwnerName( final String userPeerOwnerName );
 }

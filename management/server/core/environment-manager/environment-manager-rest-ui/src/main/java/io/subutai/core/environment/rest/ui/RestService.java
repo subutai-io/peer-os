@@ -27,12 +27,6 @@ public interface RestService
     Response listTemplates();
 
 
-    /** Domain **************************************************** */
-
-    @GET
-    @Path( "domains" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response getDefaultDomainName();
 
 
     /** Environments **************************************************** */
@@ -44,7 +38,7 @@ public interface RestService
     @POST
     @Path( "build" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response build(@FormParam( "name" ) String name, @FormParam( "topology" ) String topologyJson );
+    Response build( @FormParam( "name" ) String name, @FormParam( "topology" ) String topologyJson );
 
 
     @POST
@@ -56,16 +50,17 @@ public interface RestService
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
     @Path( "{environmentId}/modify" )
-    Response modify(@PathParam( "environmentId" ) String environmentId,
-                    @FormParam( "topology" ) String topologyJson,
-                    @FormParam( "removedContainers" ) String removedContainers );
+    Response modify( @PathParam( "environmentId" ) String environmentId, @FormParam( "topology" ) String topologyJson,
+                     @FormParam( "removedContainers" ) String removedContainers,
+                     @FormParam( "quotaContainers" ) String quotaContainers );
 
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
     @Path( "{environmentId}/modify/advanced" )
-    Response modifyAdvanced(@PathParam( "environmentId" ) String environmentId,
-                            @FormParam( "topology" ) String topologyJson,
-                            @FormParam( "removedContainers" ) String removedContainers );
+    Response modifyAdvanced( @PathParam( "environmentId" ) String environmentId,
+                             @FormParam( "topology" ) String topologyJson,
+                             @FormParam( "removedContainers" ) String removedContainers,
+                             @FormParam( "quotaContainers" ) String quotaContainers );
 
 
     @DELETE
@@ -78,7 +73,7 @@ public interface RestService
     @GET
     @Path( "{environmentId}/keys" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getSshKeys(@PathParam( "environmentId" ) String environmentId );
+    Response getSshKeys( @PathParam( "environmentId" ) String environmentId );
 
 
     @POST
@@ -127,8 +122,13 @@ public interface RestService
     @PUT
     @Path( "{environmentId}/containers/{containerId}/domain" )
     Response setContainerDomain( @PathParam( "environmentId" ) String environmentId,
-                                 @PathParam( "containerId" ) String containerId,
-                                 @QueryParam( "state" ) Boolean state );
+                                 @PathParam( "containerId" ) String containerId, @QueryParam( "state" ) Boolean state );
+
+    @PUT
+    @Path( "{environmentId}/containers/{containerId}/name" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response setContainerName( @PathParam( "environmentId" ) String environmentId,
+                               @PathParam( "containerId" ) String containerId, @QueryParam( "name" ) String name );
 
 
     /** Containers **************************************************** */
@@ -182,6 +182,13 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getPeers();
 
+    /** Peers **************************************************** */
+
+    @GET
+    @Path( "resourcehosts" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getResourceHosts();
+
 
     /** Tags **************************************************** */
 
@@ -212,5 +219,10 @@ public interface RestService
 
     @POST
     @Path( "{environmentId}/share" )
-    Response share(@FormParam( "users" ) String users, @PathParam( "environmentId" ) String environmentId );
+    Response share( @FormParam( "users" ) String users, @PathParam( "environmentId" ) String environmentId );
+
+
+    @GET
+    @Path( "{environmentId}/download" )
+    Response getDownloadProgress( @PathParam( "environmentId" ) String environmentId );
 }

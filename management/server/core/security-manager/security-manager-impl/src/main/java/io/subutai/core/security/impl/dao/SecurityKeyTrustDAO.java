@@ -1,6 +1,7 @@
 package io.subutai.core.security.impl.dao;
 
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -64,7 +65,7 @@ class SecurityKeyTrustDAO
         }
         catch ( Exception ex )
         {
-            return null;
+            return Collections.emptyList();
         }
         finally
         {

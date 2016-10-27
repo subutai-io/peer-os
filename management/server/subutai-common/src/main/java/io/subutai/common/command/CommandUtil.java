@@ -67,6 +67,24 @@ public class CommandUtil
     }
 
 
+    public CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback )
+            throws CommandException
+    {
+
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkNotNull( host );
+
+        CommandResult result = host.execute( requestBuilder, callback );
+
+        if ( !result.hasSucceeded() )
+        {
+            throw new CommandException( String.format( "Error executing command on host %s: %s", host.getHostname(),
+                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+        }
+        return result;
+    }
+
+
     /**
      * Execute request on host with callback. Allows to stop callback from being triggered by calling stop() from inside
      * a callback. Please make sure that the command is not a daemon command (command which forks a daemon process).
@@ -217,39 +235,8 @@ public class CommandUtil
         {
             final String hostCommandId = String.format( "%s-%s", host.getId(), hostCommandPrefix );
 
-            Future<CommandResult> commandFuture = taskCompletionService.submit( new Callable<CommandResult>()
-            {
-                @Override
-                public CommandResult call() throws Exception
-                {
-                    try
-                    {
-                        return execute( requestBuilder, host );
-                    }
-                    finally
-                    {
-                        if ( environmentId != null )
-                        {
-                            synchronized ( environmentCommandsFuturesMap )
-                            {
-                                Map<String, EnvironmentCommandFuture> environmentCommandFutures =
-                                        environmentCommandsFuturesMap.get( environmentId );
-
-                                if ( environmentCommandFutures != null )
-                                {
-                                    environmentCommandFutures.remove( hostCommandId );
-
-                                    if ( environmentCommandFutures.isEmpty() )
-                                    {
-                                        environmentCommandsFuturesMap.remove( environmentId );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } );
-
+            Future<CommandResult> commandFuture = taskCompletionService
+                    .submit( new HostCommandTask( requestBuilder, host, environmentId, hostCommandId ) );
 
             if ( environmentId != null )
             {
@@ -325,11 +312,61 @@ public class CommandUtil
             }
             catch ( InterruptedException e )
             {
-                break;
+                Thread.currentThread().interrupt();
             }
         }
 
         return new HostCommandResults( hostCommandResults );
+    }
+
+
+    private class HostCommandTask implements Callable<CommandResult>
+    {
+        private final RequestBuilder requestBuilder;
+        private final Host host;
+        private final String environmentId;
+        private final String hostCommandId;
+
+
+        HostCommandTask( final RequestBuilder requestBuilder, final Host host, final String environmentId,
+                         final String hostCommandId )
+        {
+            this.requestBuilder = requestBuilder;
+            this.host = host;
+            this.environmentId = environmentId;
+            this.hostCommandId = hostCommandId;
+        }
+
+
+        @Override
+        public CommandResult call() throws Exception
+        {
+            try
+            {
+                return execute( requestBuilder, host );
+            }
+            finally
+            {
+                if ( environmentId != null )
+                {
+                    synchronized ( environmentCommandsFuturesMap )
+                    {
+                        Map<String, EnvironmentCommandFuture> environmentCommandFutures =
+                                environmentCommandsFuturesMap.get( environmentId );
+
+                        if ( environmentCommandFutures != null )
+                        {
+                            environmentCommandFutures.remove( hostCommandId );
+
+                            if ( environmentCommandFutures.isEmpty() )
+                            {
+                                environmentCommandsFuturesMap.remove( environmentId );
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 

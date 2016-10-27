@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RequestListener;
 
@@ -28,9 +29,10 @@ public class PrepareTemplateRequestListener extends RequestListener
 
 
     @Override
-    public Object onRequest( final Payload payload ) throws Exception
+    public Object onRequest( final Payload payload ) throws PeerException
     {
         PrepareTemplatesRequest request = payload.getMessage( PrepareTemplatesRequest.class );
+
         if ( request != null )
         {
             return localPeer.prepareTemplates( request );

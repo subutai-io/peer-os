@@ -2,9 +2,6 @@ package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -40,19 +40,20 @@ public class SystemConfProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         for ( String link : stateLinks )
         {
             Matcher systemConfMatcher = SYSTEM_CONF_PATTERN.matcher( link );
             if ( systemConfMatcher.matches() )
             {
-                SystemConfDto systemConfDto = getSystemInfo( link );
+                getSystemInfo( link );
+
                 try
                 {
-                    processSystemConf( systemConfDto );
+                    processSystemConf();
                 }
-                catch ( UnrecoverableKeyException | IOException | KeyStoreException | NoSuchAlgorithmException e )
+                catch ( Exception e )
                 {
                     LOG.error( e.getMessage() );
                 }
@@ -63,7 +64,7 @@ public class SystemConfProcessor implements StateLinkProcessor
     }
 
 
-    private SystemConfDto getSystemInfo( final String link ) throws Exception
+    private SystemConfDto getSystemInfo( final String link ) throws HubManagerException
     {
         try
         {
@@ -71,7 +72,7 @@ public class SystemConfProcessor implements StateLinkProcessor
 
             LOG.debug( "Sending request for getting System Info DTO..." );
             Response r = client.get();
-            SystemConfDto result = null;
+            SystemConfDto result;
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
@@ -89,25 +90,21 @@ public class SystemConfProcessor implements StateLinkProcessor
 
             result = JsonUtil.fromCbor( plainContent, SystemConfDto.class );
 
+            Preconditions.checkNotNull( result );
+
             LOG.debug( "SystemConfDto: " + result.toString() );
 
             return result;
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( PGPException | IOException e )
         {
-            throw new Exception( "Could not retrieve system configurations", e );
+            throw new HubManagerException( "Could not retrieve system configurations", e );
         }
     }
 
 
-    private void processSystemConf( final SystemConfDto systemConfDto )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception,
-            IOException
+    private void processSystemConf() throws HubManagerException
     {
-        switch ( systemConfDto.getKey() )
-        {
-            //TODO write cases for System types
-        }
+        //todo implement
     }
 }

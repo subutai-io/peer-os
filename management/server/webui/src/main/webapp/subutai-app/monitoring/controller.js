@@ -3,9 +3,9 @@
 angular.module('subutai.monitoring.controller', [])
 	.controller('MonitoringCtrl', MonitoringCtrl);
 
-MonitoringCtrl.$inject = ['$scope', 'monitoringSrv', 'cfpLoadingBar'];
+MonitoringCtrl.$inject = ['$scope', 'monitoringSrv', 'cfpLoadingBar', '$http', '$sce', 'ngDialog'];
 
-function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar) {
+function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDialog) {
 
 	var vm = this;
 
@@ -22,6 +22,9 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar) {
 	vm.selectedEnvironment = '';
 	vm.currentHost = '';
 	vm.period = 1;
+	vm.info = {};
+	vm.p2pColor = false;
+	vm.currentError = '';
 	vm.parseOptions = {
 		1: {labelStep: 10, valueStep: 1},
 		6: {labelStep: 60, valueStep: 5},
@@ -30,14 +33,86 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar) {
 		48: {labelStep: 480, valueStep: 40}
 	};
 
+	vm.statusTable = {
+		"p2pStatuses": {
+			"healthy": 0,
+			"problems": 0,
+			"notWork": 0,
+		},
+		"p2pUpdates": {
+			"updated": 0,
+			"normal": 0,
+			"needUpdate": 0,
+		}
+	};
+
+	vm.statusColors = [
+		{"color": "#22b573", "text": "Already up-to-date", "status": "true", "statusText": "Healthy"},
+		{"color": "#efc94c", "text": "Need update soon", "status": "WAIT", "statusText": "Problems"},
+		{"color": "#c1272d", "text": "Update immediately", "status": "false", "statusText": "Not working"},
+	];
+
 	//functions
 	vm.showContainers = showContainers;
 	vm.setCurrentType = setCurrentType;
 	vm.getServerData = getServerData;
+	vm.initAccordeon = initAccordeon;
+	vm.viewError = viewError;
 
 	monitoringSrv.getEnvironments().success(function (data) {
 		vm.environments = data;
 	});
+
+	function viewError(errorText) {
+		vm.currentError = errorText;
+		ngDialog.open({
+			template: 'subutai-app/monitoring/partials/p2pErrorPopup.html',
+			scope: $scope
+		});
+	}
+	
+	function getP2Pstatus() {
+		monitoringSrv.getP2Pstatus().success (function (data) {
+			vm.info = data.p2pList;
+			for(var i = 0; i < vm.info.length; i++) {
+
+				switch(vm.info[i].p2pStatus) {
+					case 0:
+						vm.statusTable.p2pStatuses.healthy++;
+						break;
+					case 1:
+						vm.statusTable.p2pStatuses.problems++;
+						vm.p2pColor = '#efc94c';
+						break;
+					case 2:
+						vm.statusTable.p2pStatuses.notWork++;
+						if(!vm.p2pColor || vm.p2pColor == '#efc94c') {
+							vm.p2pColor = '#c1272d';
+						}
+						break;
+					default:
+						break;
+				}
+
+				switch(vm.info[i].p2pVersionCheck) {
+					case 0:
+						vm.statusTable.p2pUpdates.updated++;
+						break;
+					case 1:
+						vm.statusTable.p2pUpdates.normal++;
+						break;
+					case 2:
+						vm.statusTable.p2pUpdates.needUpdate++;
+						break;
+					default:
+						break;
+				}
+
+			}
+		});
+		
+	}
+	getP2Pstatus();
 
 	monitoringSrv.getResourceHosts().success(function (data) {
 		vm.hosts = data;
@@ -51,10 +126,13 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar) {
 		vm.currentHost = '';
 		vm.currentType = type;
 
-		if( type == 'management' )
-		{
+		if( type == 'management' ) {
 			getServerData();
 		}
+	}
+
+	function initAccordeon() {
+		accordionInit();
 	}
 
 	function showContainers(environmentId) {

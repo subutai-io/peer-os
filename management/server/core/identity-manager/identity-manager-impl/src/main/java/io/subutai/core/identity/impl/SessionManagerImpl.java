@@ -10,6 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.collect.Maps;
@@ -26,6 +29,8 @@ import io.subutai.core.identity.impl.model.SessionEntity;
  */
 public class SessionManagerImpl implements SessionManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SessionManagerImpl.class.getName() );
+
     //Session Expiration time in mins
     //****************************************
     private static int SESSION_TIMEOUT = 30;
@@ -38,7 +43,7 @@ public class SessionManagerImpl implements SessionManager
 
 
     //*****************************************
-    public SessionManagerImpl(IdentityDataService identityDataService)
+    public SessionManagerImpl( IdentityDataService identityDataService )
     {
         this.identityDataService = identityDataService;
     }
@@ -56,13 +61,14 @@ public class SessionManagerImpl implements SessionManager
                 try
                 {
                     removeInvalidTokens();
-                    invalidateSessions();
+                    invalidateSessions( null );
                 }
-                catch(Exception ignore)
+                catch ( Exception e )
                 {
+                    LOG.error( e.getMessage() );
                 }
             }
-        }, 10, 10, TimeUnit.MINUTES );
+        }, 5, 5, TimeUnit.MINUTES );
     }
 
 
@@ -86,10 +92,13 @@ public class SessionManagerImpl implements SessionManager
         {
             if ( userSession == null )
             {
+                Date currentDate = new Date( System.currentTimeMillis() );
+
                 userSession = new SessionEntity();
                 userSession.setUser( user );
                 userSession.setStatus( 1 );
-                userSession.setStartDate( new Date( System.currentTimeMillis() ) );
+                userSession.setStartDate( currentDate );
+                userSession.setEndDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
                 sessionContext.put( sessionId, userSession );
             }
             else
@@ -98,8 +107,9 @@ public class SessionManagerImpl implements SessionManager
             }
         }
 
-        catch ( Exception ex )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
 
         return userSession;
@@ -110,14 +120,18 @@ public class SessionManagerImpl implements SessionManager
      *
      */
     @Override
-    public Session getValidSession( String sessionId)
+    public Session getValidSession( String sessionId )
     {
         Session sc = sessionContext.get( sessionId );
 
         if ( sc != null )
+        {
             return sc;
+        }
         else
+        {
             return null;
+        }
     }
 
 
@@ -128,7 +142,7 @@ public class SessionManagerImpl implements SessionManager
     public void extendSessionTime( Session userSession )
     {
         Date currentDate = new Date( System.currentTimeMillis() );
-        userSession.setStartDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
+        userSession.setEndDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
     }
 
 
@@ -140,7 +154,7 @@ public class SessionManagerImpl implements SessionManager
     {
         Session sc = sessionContext.get( sessionId );
 
-        if(sc!=null)
+        if ( sc != null )
         {
             extendSessionTime( sc );
         }
@@ -157,24 +171,29 @@ public class SessionManagerImpl implements SessionManager
         {
             sessionContext.remove( sessionId );
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
         }
     }
 
 
-    /* *************************************************
+    /* ************************************************
+     *  Timeout and remove session
      */
     @PermitAll
     @Override
-    public void invalidateSessions()
+    public void invalidateSessions( Date currentDate )
     {
-        Date currentDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), -SESSION_TIMEOUT );
+        if ( currentDate == null )
+        {
+            currentDate = new Date( System.currentTimeMillis() );
+        }
 
         for ( Iterator<Session> iterator = sessionContext.values().iterator(); iterator.hasNext(); )
         {
             final Session session = iterator.next();
-            if ( session.getStartDate().before( currentDate ) )
+            if ( session.getEndDate().getTime() <= currentDate.getTime() )
             {
                 iterator.remove();
             }
@@ -205,4 +224,10 @@ public class SessionManagerImpl implements SessionManager
     }
 
 
+    //*****************************************
+    @Override
+    public Map getSessionContext()
+    {
+        return sessionContext;
+    }
 }

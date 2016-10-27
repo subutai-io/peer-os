@@ -19,6 +19,7 @@ public class AddSshKeyStep
     private final String sshKey;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> keyUtil = new PeerUtil<>();
 
 
     public AddSshKeyStep( final String sshKey, final EnvironmentImpl environment,
@@ -36,8 +37,6 @@ public class AddSshKeyStep
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
 
-            PeerUtil<Object> keyUtil = new PeerUtil<>();
-
             Set<Peer> peers = environment.getPeers();
 
             for ( final Peer peer : peers )
@@ -47,7 +46,7 @@ public class AddSshKeyStep
                     @Override
                     public Object call() throws Exception
                     {
-                        peer.addSshKey( environment.getEnvironmentId(), sshKey );
+                        peer.addToAuthorizedKeys( environment.getEnvironmentId(), sshKey );
 
                         return null;
                     }
@@ -56,7 +55,7 @@ public class AddSshKeyStep
 
             PeerUtil.PeerTaskResults<Object> keyResults = keyUtil.executeParallel();
 
-            for ( PeerUtil.PeerTaskResult keyResult : keyResults.getPeerTaskResults() )
+            for ( PeerUtil.PeerTaskResult keyResult : keyResults.getResults() )
             {
                 if ( keyResult.hasSucceeded() )
                 {

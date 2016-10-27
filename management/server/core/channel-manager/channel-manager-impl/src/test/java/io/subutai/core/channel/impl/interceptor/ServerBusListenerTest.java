@@ -1,53 +1,61 @@
 package io.subutai.core.channel.impl.interceptor;
 
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.core.channel.impl.ChannelManagerImpl;
-
-import org.slf4j.Logger;
 
 import org.apache.cxf.Bus;
-import org.junit.Ignore;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 
-import static org.junit.Assert.assertNotNull;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
+
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 
 @RunWith( MockitoJUnitRunner.class )
 public class ServerBusListenerTest
 {
-    private ServerBusListener cxfBusListener;
-    @Mock
-    ChannelManagerImpl channelManager;
     @Mock
     Bus bus;
     @Mock
-    Logger logger;
+    List<Interceptor<? extends Message>> inInterceptors;
+    @Mock
+    List<Interceptor<? extends Message>> outInterceptors;
+    @Mock
+    SecurityManager securityManager;
+    @Mock
+    IdentityManager identityManager;
+    @Mock
+    PeerManager peerManager;
+
+    ServerBusListener serverBusListener;
+
 
     @Before
     public void setUp() throws Exception
     {
-        cxfBusListener = new ServerBusListener();
-        cxfBusListener.setChannelManager( channelManager );
+        serverBusListener = new ServerBusListener( securityManager, identityManager, peerManager );
+        doReturn( inInterceptors ).when( bus ).getInInterceptors();
+        doReturn( outInterceptors ).when( bus ).getOutInterceptors();
     }
 
 
     @Test
-    @Ignore
     public void testBusRegistered() throws Exception
     {
-        //cxfBusListener.busRegistered( bus );
+        serverBusListener.busRegistered( bus );
+
+        verify( inInterceptors ).add( isA( AccessControlInterceptor.class ) );
+        verify( outInterceptors ).add( isA( ClientOutInterceptor.class ) );
     }
-
-
-    @Test
-    public void testGetChannelManagerImpl() throws Exception
-    {
-        assertNotNull(cxfBusListener.getChannelManagerImpl());
-    }
-
-
 }

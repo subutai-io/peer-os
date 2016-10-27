@@ -5,7 +5,7 @@
   <parent>
     <artifactId>environment-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC14-SNAPSHOT</version>
+    <version>4.0.4-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -33,7 +33,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>kurjun-api</artifactId>
+      <artifactId>template-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -75,7 +75,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>

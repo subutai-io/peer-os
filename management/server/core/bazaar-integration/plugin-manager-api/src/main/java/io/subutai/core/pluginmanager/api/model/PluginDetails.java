@@ -1,22 +1,22 @@
 package io.subutai.core.pluginmanager.api.model;
 
 
+//todo remove all mutators from interface
 public interface PluginDetails
 {
-    public Long getId();
+    Long getId();
 
-    public void setId( final Long id );
+    void setId( final Long id );
 
-    public String getName();
+    String getName();
 
-    public void setName( final String name );
+    void setName( final String name );
 
-    public String getKar();
+    String getKar();
 
-    public void setKar( final String kar );
+    void setKar( final String kar );
 
+    String getVersion();
 
-    public String getVersion();
-
-    public void setVersion( final String version );
+    void setVersion( final String version );
 }

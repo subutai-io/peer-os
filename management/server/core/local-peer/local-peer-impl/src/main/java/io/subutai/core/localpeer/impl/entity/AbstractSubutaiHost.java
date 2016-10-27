@@ -13,6 +13,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Transient;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -69,9 +70,9 @@ public abstract class AbstractSubutaiHost implements Host
     protected AbstractSubutaiHost( final String peerId, final String hostId, final String hostname,
                                    HostArchitecture architecture, HostInterfaces hostInterfaces )
     {
-        Preconditions.checkNotNull( peerId );
-        Preconditions.checkNotNull( hostId );
-        Preconditions.checkNotNull( hostname );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkNotNull( architecture );
         Preconditions.checkNotNull( hostInterfaces );
 
@@ -179,10 +180,6 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    @Override
-    public abstract boolean isConnected();
-
-
     public long getLastHeartbeat()
     {
         return lastHeartbeat;
@@ -246,10 +243,7 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public String toString()
     {
-        return "SubutaiHost{" +
-                "peerId=" + peerId +
-                ", lastHeartbeat=" + lastHeartbeat +
-                '}';
+        return "SubutaiHost{" + "peerId=" + peerId + ", lastHeartbeat=" + lastHeartbeat + '}';
     }
 
 

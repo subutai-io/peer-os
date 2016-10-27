@@ -18,7 +18,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -29,6 +29,7 @@ public class ReservationStep
     private final EnvironmentImpl environment;
     private final PeerManager peerManager;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public ReservationStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
@@ -55,50 +56,23 @@ public class ReservationStep
         }
 
         //obtain reserved net resources
-        final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
+        final Map<Peer, UsedNetworkResources> reservedNetResources = obtainReservedNetResources( newPeers );
 
-        PeerUtil<Object> netQueryUtil = new PeerUtil<>();
-
-        for ( final Peer peer : newPeers )
-        {
-            netQueryUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
-            {
-                @Override
-                public Object call() throws Exception
-                {
-                    reservedNetResources.put( peer, peer.getUsedNetworkResources() );
-
-                    return null;
-                }
-            } ) );
-        }
-
-        PeerUtil.PeerTaskResults<Object> netQueryResults = netQueryUtil.executeParallel();
-
-        for ( PeerUtil.PeerTaskResult netQueryResult : netQueryResults.getPeerTaskResults() )
-        {
-            if ( netQueryResult.hasSucceeded() )
-            {
-                trackerOperation.addLog( String.format( "Obtained reserved network resources from peer %s",
-                        netQueryResult.getPeer().getName() ) );
-            }
-            else
-            {
-                trackerOperation.addLog(
-                        String.format( "Failed to obtain reserved network resources from peer %s. Reason: %s",
-                                netQueryResult.getPeer().getName(), netQueryResult.getFailureReason() ) );
-            }
-        }
-
-        if ( netQueryResults.hasFailures() )
-        {
-            throw new EnvironmentModificationException( "Failed to obtain reserved network resources from all peers" );
-        }
 
         //check availability of network resources
         SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
         final String containerSubnet = subnetUtils.getInfo().getNetworkAddress();
 
+        checkResourceAvailablility( reservedNetResources, containerSubnet );
+
+        //reserve network resources
+        reserveNetworkResources( newPeers, containerSubnet );
+    }
+
+
+    protected void checkResourceAvailablility( Map<Peer, UsedNetworkResources> reservedNetResources,
+                                               String containerSubnet ) throws EnvironmentModificationException
+    {
         for ( Map.Entry<Peer, UsedNetworkResources> peerReservedNetResourcesEntry : reservedNetResources.entrySet() )
         {
             Peer peer = peerReservedNetResourcesEntry.getKey();
@@ -122,34 +96,38 @@ public class ReservationStep
                         String.format( "Vni %d is already used on peer %s", environment.getVni(), peer.getName() ) );
             }
         }
+    }
 
-        //reserve network resources
-        PeerUtil<Object> netReservationUtil = new PeerUtil<>();
+
+    protected void reserveNetworkResources( Set<Peer> newPeers, final String containerSubnet )
+            throws EnvironmentModificationException
+    {
 
         for ( final Peer peer : newPeers )
         {
-            netReservationUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
-                public Object call() throws Exception
+                public Integer call() throws Exception
                 {
-                    peer.reserveNetworkResource( new NetworkResourceImpl( environment.getId(), environment.getVni(),
-                            environment.getP2pSubnet(), containerSubnet ) );
-                    return null;
+                    return peer.reserveNetworkResource(
+                            new NetworkResourceImpl( environment.getId(), environment.getVni(),
+                                    environment.getP2pSubnet(), containerSubnet ) );
                 }
             } ) );
         }
 
-        PeerUtil.PeerTaskResults<Object> netReservationResults = netReservationUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> netReservationResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult netReservationResult : netReservationResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<Object> netReservationResult : netReservationResults.getResults() )
         {
             if ( netReservationResult.hasSucceeded() )
             {
                 trackerOperation.addLog( String.format( "Reserved network resources on peer %s",
                         netReservationResult.getPeer().getName() ) );
 
-                environment.addEnvironmentPeer( new PeerConfImpl( netReservationResult.getPeer().getId() ) );
+                environment.addEnvironmentPeer( new EnvironmentPeerImpl( netReservationResult.getPeer().getId(),
+                        ( Integer ) netReservationResult.getResult() ) );
             }
             else
             {
@@ -162,5 +140,51 @@ public class ReservationStep
         {
             throw new EnvironmentModificationException( "Failed to reserve network resources on all peers" );
         }
+    }
+
+
+    protected Map<Peer, UsedNetworkResources> obtainReservedNetResources( Set<Peer> newPeers )
+            throws EnvironmentModificationException
+    {
+        final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
+
+
+        for ( final Peer peer : newPeers )
+        {
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+            {
+                @Override
+                public Object call() throws Exception
+                {
+                    reservedNetResources.put( peer, peer.getUsedNetworkResources() );
+
+                    return null;
+                }
+            } ) );
+        }
+
+        PeerUtil.PeerTaskResults<Object> netQueryResults = peerUtil.executeParallel();
+
+        for ( PeerUtil.PeerTaskResult netQueryResult : netQueryResults.getResults() )
+        {
+            if ( netQueryResult.hasSucceeded() )
+            {
+                trackerOperation.addLog( String.format( "Obtained reserved network resources from peer %s",
+                        netQueryResult.getPeer().getName() ) );
+            }
+            else
+            {
+                trackerOperation.addLog(
+                        String.format( "Failed to obtain reserved network resources from peer %s. Reason: %s",
+                                netQueryResult.getPeer().getName(), netQueryResult.getFailureReason() ) );
+            }
+        }
+
+        if ( netQueryResults.hasFailures() )
+        {
+            throw new EnvironmentModificationException( "Failed to obtain reserved network resources from all peers" );
+        }
+
+        return reservedNetResources;
     }
 }

@@ -37,4 +37,10 @@ public class SecuritySettings
     public static final String TRUSTSTORE_PX2_ROOT_ALIAS = "";
     public static final String TRUSTSTORE_SPECIAL_PX1_ROOT_ALIAS = "";
     //*****************************************************************************************
+
+
+    private SecuritySettings()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
 }

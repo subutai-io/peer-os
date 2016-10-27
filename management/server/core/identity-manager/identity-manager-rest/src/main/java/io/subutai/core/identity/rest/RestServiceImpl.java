@@ -3,6 +3,9 @@ package io.subutai.core.identity.rest;
 
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.security.exception.IdentityExpiredException;
@@ -15,6 +18,9 @@ import io.subutai.core.identity.rest.model.AuthMessage;
 
 public class RestServiceImpl implements RestService
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
+
+
     private IdentityManager identityManager;
 
 
@@ -52,7 +58,6 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //password = URLDecoder.decode( password, "UTF-8" );
             String token = identityManager.getUserToken( userName, password );
 
             if ( !Strings.isNullOrEmpty( token ) )
@@ -69,12 +74,12 @@ public class RestServiceImpl implements RestService
         catch ( IdentityExpiredException e )
         {
 
-            User user = null;
+            User user;
 
             if ( userName.length() == 40 )
-                identityManager.getUserByFingerprint( userName );
+                user = identityManager.getUserByFingerprint( userName );
             else
-                identityManager.getUserByUsername( userName );
+                user = identityManager.getUserByUsername( userName );
 
             if ( user != null )
             {
@@ -118,12 +123,12 @@ public class RestServiceImpl implements RestService
         }
         catch ( IdentityExpiredException e )
         {
-            User user = null;
+            User user;
 
             if ( userName.length() == 40 )
-                identityManager.getUserByFingerprint( userName );
+                user = identityManager.getUserByFingerprint( userName );
             else
-                identityManager.getUserByUsername( userName );
+                user = identityManager.getUserByUsername( userName );
 
             if ( user != null )
             {
@@ -137,6 +142,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "***** Error, updating authID:" + e.toString(), e );
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
@@ -147,7 +154,6 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //password = URLDecoder.decode( password, "UTF-8" );
             User user = identityManager.authenticateByAuthSignature( userName, password );
 
             if ( user != null )
@@ -165,6 +171,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "***** Error, getting authID:" + e.toString(), e );
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }

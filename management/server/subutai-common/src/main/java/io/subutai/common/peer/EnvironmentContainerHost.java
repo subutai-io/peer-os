@@ -3,6 +3,8 @@ package io.subutai.common.peer;
 
 import java.util.Set;
 
+import io.subutai.common.security.SshKeys;
+
 
 public interface EnvironmentContainerHost extends ContainerHost
 {
@@ -12,5 +14,7 @@ public interface EnvironmentContainerHost extends ContainerHost
 
     Set<String> getTags();
 
-    EnvironmentContainerHost setHostname( String newHostname ) throws PeerException;
+    EnvironmentContainerHost setContainerSize( ContainerSize size ) throws PeerException;
+
+    SshKeys getAuthorizedKeys() throws PeerException;
 }

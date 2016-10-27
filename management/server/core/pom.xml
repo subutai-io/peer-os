@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC14-SNAPSHOT</version>
+    <version>4.0.4-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -33,17 +33,15 @@
     <module>key-server</module>
     <module>security-manager</module>
     <module>host-registration</module>
-    <module>hub-adapter</module>
     <module>environment-manager</module>
     <module>test</module>
-    <module>kurjun</module>
     <module>object-relation-manager</module>
     <module>system-manager</module>
     <module>bazaar-integration</module>
     <module>hub-manager</module>
     <module>common-plugin</module>
     <module>karaf-manager</module>
-    <module>kurjun-manager</module>
+    <module>template-manager</module>
   </modules>
 
 </project>

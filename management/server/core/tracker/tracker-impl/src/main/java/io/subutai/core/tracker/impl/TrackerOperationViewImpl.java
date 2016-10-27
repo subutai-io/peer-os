@@ -53,37 +53,37 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         source = po.getSource().toUpperCase();
     }
 
-
+    @Override
     public String getDescription()
     {
         return description;
     }
 
-
+    @Override
     public Date getCreateDate()
     {
         return ( Date ) createDate.clone();
     }
 
-
+    @Override
     public UUID getId()
     {
         return id;
     }
 
-
+    @Override
     public String getLog()
     {
         return log;
     }
 
-
+    @Override
     public OperationState getState()
     {
         return state;
     }
 
-
+    @Override
     public String getSource()
     {
         return source;

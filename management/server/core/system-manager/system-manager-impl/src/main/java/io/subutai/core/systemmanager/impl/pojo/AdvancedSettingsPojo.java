@@ -8,13 +8,13 @@ public class AdvancedSettingsPojo implements AdvancedSettings
 {
     private String karafLogs;
 
-
+    @Override
     public String getKarafLogs()
     {
         return karafLogs;
     }
 
-
+    @Override
     public void setKarafLogs( final String karafLogs )
     {
         this.karafLogs = karafLogs;

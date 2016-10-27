@@ -1,6 +1,7 @@
 package io.subutai.core.peer.rest.ui;
 
 
+import java.security.AccessControlException;
 import java.util.List;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -26,35 +27,41 @@ import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;
 
 
-public class RestServiceImpl implements RestService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestServiceImpl.class);
+public class RestServiceImpl implements RestService
+{
+    private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
 
     private PeerManager peerManager;
     private HostRegistry hostRegistry;
 
 
-    public RestServiceImpl(final PeerManager peerManager, final HostRegistry hostRegistry) {
-        Preconditions.checkNotNull(peerManager);
-        Preconditions.checkNotNull(hostRegistry);
+    public RestServiceImpl( final PeerManager peerManager, final HostRegistry hostRegistry )
+    {
+        Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( hostRegistry );
 
         this.peerManager = peerManager;
         this.hostRegistry = hostRegistry;
     }
 
+
     private class RegistrationDataDto
     {
-        public boolean isOnline = false;
-        public RegistrationData registrationData;
+        private boolean isOnline = false;
+        private RegistrationData registrationData;
+
 
         public RegistrationDataDto( RegistrationData registrationData )
         {
             this.registrationData = registrationData;
         }
 
+
         public void setOnline( boolean isOnline )
         {
             this.isOnline = isOnline;
         }
+
 
         public RegistrationData getRegistrationData()
         {
@@ -62,38 +69,46 @@ public class RestServiceImpl implements RestService {
         }
     }
 
+
     @Override
     public Response getRegisteredPeers()
     {
         try
         {
-            List<RegistrationDataDto> registrationDatas = peerManager.getRegistrationRequests().stream()
-                    .map( d -> new RegistrationDataDto( d ) )
-                    .collect(Collectors.toList());
+            List<RegistrationDataDto> registrationDatas =
+                    peerManager.getRegistrationRequests().stream().map( d -> new RegistrationDataDto( d ) )
+                               .collect( Collectors.toList() );
 
-            if( registrationDatas.size() > 0 )
+            if ( !registrationDatas.isEmpty() )
             {
                 ExecutorService taskExecutor = Executors.newFixedThreadPool( registrationDatas.size() );
 
                 CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
 
-                registrationDatas.forEach(d -> {
-                    taskCompletionService.submit( () -> {
-                        try {
-                            if (d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED) {
-                                d.setOnline(peerManager.getPeer(d.getRegistrationData().getPeerInfo().getId()).isOnline());
+                registrationDatas.forEach( d ->
+                {
+                    taskCompletionService.submit( () ->
+                    {
+                        try
+                        {
+                            if ( d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED )
+                            {
+                                d.setOnline( peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() )
+                                                        .isOnline() );
                             }
-                        } catch (PeerException e) {
-                            LOGGER.error("Exceptions getting peer status", e);
+                        }
+                        catch ( PeerException e )
+                        {
+                            LOGGER.error( "Exceptions getting peer status", e );
                         }
 
                         return true;
-                    });
-                });
+                    } );
+                } );
 
                 taskExecutor.shutdown();
 
-                for ( RegistrationDataDto registrationData : registrationDatas )
+                for ( int i = 0; i < registrationDatas.size(); i++ )
                 {
                     try
                     {
@@ -102,6 +117,7 @@ public class RestServiceImpl implements RestService {
                     }
                     catch ( ExecutionException | InterruptedException e )
                     {
+                        LOGGER.error( e.getMessage() );
                     }
                 }
             }
@@ -125,6 +141,13 @@ public class RestServiceImpl implements RestService {
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
 
@@ -142,10 +165,17 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doRejectRequest( data ,force );
+            peerManager.doRejectRequest( data, force );
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
 
@@ -167,6 +197,13 @@ public class RestServiceImpl implements RestService {
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
 
@@ -188,6 +225,36 @@ public class RestServiceImpl implements RestService {
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response renamePeer( final String peerId, final String name )
+    {
+        try
+        {
+            peerManager.setName( peerId, name );
+        }
+        catch ( Exception e )
+        {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
 
@@ -209,6 +276,13 @@ public class RestServiceImpl implements RestService {
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
 
@@ -222,10 +296,12 @@ public class RestServiceImpl implements RestService {
         return Response.ok().entity( JsonUtil.toJson( hostRegistry.getResourceHostsInfo() ) ).build();
     }
 
-    protected CompletionService<Boolean> getCompletionService(Executor executor )
+
+    protected CompletionService<Boolean> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
     }
+
 
     @Override
     public Response checkPeer( String destinationHost )
@@ -234,7 +310,7 @@ public class RestServiceImpl implements RestService {
         {
             peerManager.checkHostAvailability( destinationHost );
         }
-        catch (Exception e)
+        catch ( Exception e )
         {
             return Response.serverError().entity( JsonUtil.toJson( e.getMessage() ) ).build();
         }

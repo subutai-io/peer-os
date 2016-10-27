@@ -25,7 +25,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/hosts">
+    <command name="localpeer/hosts">
       <action class="io.subutai.core.localpeer.cli.HostsCommand">
         <argument ref="localPeer" />
       </action>
@@ -33,7 +33,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/start-container">
+    <command name="localpeer/start-container">
       <action class="io.subutai.core.localpeer.cli.StartContainerCommand">
         <argument ref="localPeer" />
       </action>
@@ -41,7 +41,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/stop-container">
+    <command name="localpeer/stop-container">
       <action class="io.subutai.core.localpeer.cli.StopContainerCommand">
         <argument ref="localPeer" />
       </action>

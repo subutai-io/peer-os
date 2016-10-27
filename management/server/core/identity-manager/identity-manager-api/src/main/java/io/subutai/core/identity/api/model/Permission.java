@@ -1,10 +1,11 @@
 package io.subutai.core.identity.api.model;
 
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public interface Permission
+public interface Permission extends Serializable
 {
 
     void setDelete( boolean delete );

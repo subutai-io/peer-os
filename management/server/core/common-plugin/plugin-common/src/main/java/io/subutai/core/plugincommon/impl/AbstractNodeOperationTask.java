@@ -34,6 +34,7 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
     }
 
 
+    @Override
     public void run()
     {
 
@@ -50,7 +51,7 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
                     }
                     catch ( InterruptedException ex )
                     {
-                        break;
+                        Thread.currentThread().interrupt();
                     }
                 }
                 else
@@ -62,12 +63,13 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
 
         if ( containerHost != null )
         {
-            UUID trackID = runTask();
-            waitUntilOperationFinish( trackID );
+            UUID theTrackID = runTask();
+            waitUntilOperationFinish( theTrackID );
         }
     }
 
 
+    @Override
     public void waitUntilOperationFinish( UUID trackID )
     {
         NodeState state = NodeState.UNKNOWN;
@@ -75,20 +77,20 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
         while ( !Thread.interrupted() )
         {
             TrackerOperationView po = tracker.getTrackerOperation( clusterConfig.getProductKey(), trackID );
-            if ( po != null )
+
+            if ( po != null && po.getState() != OperationState.RUNNING )
             {
-                if ( po.getState() != OperationState.RUNNING )
+
+                if ( po.getLog().toLowerCase().contains( getProductStoppedIdentifier().toLowerCase() ) )
                 {
-                    if ( po.getLog().toLowerCase().contains( getProductStoppedIdentifier().toLowerCase() ) )
-                    {
-                        state = NodeState.STOPPED;
-                    }
-                    else if ( po.getLog().toLowerCase().contains( getProductRunningIdentifier().toLowerCase() ) )
-                    {
-                        state = NodeState.RUNNING;
-                    }
-                    break;
+                    state = NodeState.STOPPED;
                 }
+                else if ( po.getLog().toLowerCase().contains( getProductRunningIdentifier().toLowerCase() ) )
+                {
+                    state = NodeState.RUNNING;
+                }
+
+                break;
             }
 
             try
@@ -97,7 +99,7 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
             }
             catch ( InterruptedException ex )
             {
-                break;
+                Thread.currentThread().interrupt();
             }
             if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
             {

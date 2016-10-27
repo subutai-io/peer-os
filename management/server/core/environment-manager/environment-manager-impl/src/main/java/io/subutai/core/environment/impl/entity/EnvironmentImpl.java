@@ -23,14 +23,14 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -39,9 +39,8 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.PeerConf;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -67,8 +66,7 @@ import io.subutai.core.identity.api.model.UserDelegate;
  * @see ContainerHost
  */
 @Entity
-@Table( name = "env",
-        uniqueConstraints = @UniqueConstraint( columnNames = { "name", "user_id" } ) )
+@Table( name = "env", uniqueConstraints = @UniqueConstraint( columnNames = { "name", "user_id" } ) )
 @Access( AccessType.FIELD )
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
         setterVisibility = JsonAutoDetect.Visibility.NONE )
@@ -78,7 +76,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Transient
     @JsonIgnore
-    private EnvironmentManagerImpl environmentManager;
+    private transient EnvironmentManagerImpl environmentManager;
 
     @Id
     @Column( name = "environment_id" )
@@ -118,10 +116,10 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonIgnore
     private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
-    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = true )
+    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentPeerImpl.class, cascade
+            = CascadeType.ALL, orphanRemoval = true )
     @JsonIgnore
-    private Set<PeerConf> peerConfs = Sets.newHashSet();
+    private Set<EnvironmentPeer> environmentPeers = Sets.newHashSet();
 
     @Enumerated( EnumType.STRING )
     @Column( name = "status", nullable = false )
@@ -173,13 +171,6 @@ public class EnvironmentImpl implements Environment, Serializable
         this.status = EnvironmentStatus.EMPTY;
         this.userId = userId;
         this.peerId = peerId;
-    }
-
-
-    @Override
-    public Set<PeerConf> getPeerConfs()
-    {
-        return peerConfs;
     }
 
 
@@ -261,10 +252,24 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    public void setUserId( final Long userId )
+    {
+        this.userId = userId;
+    }
+
+
     @Override
     public EnvironmentStatus getStatus()
     {
         return status;
+    }
+
+
+    public void setStatus( EnvironmentStatus status )
+    {
+        Preconditions.checkNotNull( status );
+
+        this.status = status;
     }
 
 
@@ -350,13 +355,13 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void addEnvironmentPeer( final PeerConf peerConf )
+    public void addEnvironmentPeer( final EnvironmentPeerImpl environmentPeer )
     {
 
-        Preconditions.checkNotNull( peerConf, "Environment peer could not be null." );
+        Preconditions.checkNotNull( environmentPeer, "Environment peer could not be null." );
 
-        peerConf.setEnvironment( this );
-        peerConfs.add( peerConf );
+        environmentPeer.setEnvironment( this );
+        environmentPeers.add( environmentPeer );
     }
 
 
@@ -366,29 +371,37 @@ public class EnvironmentImpl implements Environment, Serializable
 
         Preconditions.checkNotNull( peerId, "Environment peer id could not be null." );
 
-        for ( Iterator<PeerConf> i = peerConfs.iterator(); ; i.hasNext() )
+        for ( Iterator<EnvironmentPeer> iterator = environmentPeers.iterator(); iterator.hasNext(); )
         {
-            PeerConf c = i.next();
-            if ( c.getPeerId().equals( peerId ) )
+            final EnvironmentPeer environmentPeer = iterator.next();
+
+            if ( environmentPeer.getPeerId().equals( peerId ) )
             {
-                i.remove();
+                iterator.remove();
                 break;
             }
         }
     }
 
 
-    public PeerConf getPeerConf( String peerId )
+    public EnvironmentPeerImpl getEnvironmentPeer( String peerId )
     {
-        for ( PeerConf peerConf : peerConfs )
+        for ( EnvironmentPeer environmentPeer : environmentPeers )
         {
-            if ( peerConf.getPeerId().equalsIgnoreCase( peerId ) )
+            if ( environmentPeer.getPeerId().equalsIgnoreCase( peerId ) )
             {
-                return peerConf;
+                return ( EnvironmentPeerImpl ) environmentPeer;
             }
         }
 
         return null;
+    }
+
+
+    @Override
+    public Set<EnvironmentPeer> getEnvironmentPeers()
+    {
+        return environmentPeers;
     }
 
 
@@ -404,7 +417,7 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Set<EnvironmentContainerHost> containerHosts;
 
-        synchronized ( this.containers )
+        synchronized ( this )
         {
             containerHosts =
                     CollectionUtil.isCollectionEmpty( this.containers ) ? Sets.<EnvironmentContainerHost>newHashSet() :
@@ -446,56 +459,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    @Override
-    public void destroyContainer( EnvironmentContainerHost containerHost, boolean async )
-            throws EnvironmentNotFoundException, EnvironmentModificationException
-    {
-        environmentManager.destroyContainer( getId(), containerHost.getId(), async );
-    }
-
-
-    @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final Topology topology, boolean async )
-            throws EnvironmentModificationException
-    {
-        try
-        {
-            return environmentManager.growEnvironment( environmentId, topology, async );
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            //this should not happen
-            LOG.error( String.format( "Error growing environment %s", getName() ), e );
-            throw new EnvironmentModificationException( e );
-        }
-    }
-
-
-    @Override
-    public Set<Peer> getPeers() throws PeerException
-    {
-        Set<Peer> peers = Sets.newHashSet();
-
-        for ( PeerConf peerConf : peerConfs )
-        {
-            peers.add( environmentManager.resolvePeer( peerConf.getPeerId() ) );
-        }
-
-        return peers;
-    }
-
-
-    public void removeContainer( ContainerHost container )
-    {
-        Preconditions.checkNotNull( container );
-
-        synchronized ( this.containers )
-        {
-            this.containers.remove( container );
-        }
-    }
-
-
     public void addContainers( Set<EnvironmentContainerImpl> containers )
     {
         if ( CollectionUtil.isCollectionEmpty( containers ) )
@@ -508,18 +471,40 @@ public class EnvironmentImpl implements Environment, Serializable
             container.setEnvironment( this );
         }
 
-        synchronized ( this.containers )
+        synchronized ( this )
         {
             this.containers.addAll( containers );
         }
     }
 
 
-    public void setStatus( EnvironmentStatus status )
+    public synchronized void removeContainer( EnvironmentContainerHost container )
     {
-        Preconditions.checkNotNull( status );
+        Preconditions.checkNotNull( container );
 
-        this.status = status;
+        this.containers.remove( container );
+    }
+
+
+    @Override
+    public void destroyContainer( EnvironmentContainerHost containerHost, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        environmentManager.destroyContainer( getId(), containerHost.getId(), async );
+    }
+
+
+    @Override
+    public Set<Peer> getPeers() throws PeerException
+    {
+        Set<Peer> peers = Sets.newHashSet();
+
+        for ( EnvironmentPeer environmentPeer : environmentPeers )
+        {
+            peers.add( environmentManager.resolvePeer( environmentPeer.getPeerId() ) );
+        }
+
+        return peers;
     }
 
 
@@ -569,7 +554,7 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public void setSubnetCidr( final String cidr )
     {
-        SubnetUtils subnetUtils = new SubnetUtils( cidr );
+        new SubnetUtils( cidr );
 
         this.subnetCidr = cidr;
     }
@@ -605,9 +590,9 @@ public class EnvironmentImpl implements Environment, Serializable
     public P2pIps getP2pIps()
     {
         P2pIps result = new P2pIps();
-        for ( PeerConf peerConf : getPeerConfs() )
+        for ( EnvironmentPeer environmentPeer : getEnvironmentPeers() )
         {
-            result.addP2pIps( peerConf.getRhP2pIps() );
+            result.addP2pIps( environmentPeer.getRhP2pIps() );
         }
         return result;
     }
@@ -616,16 +601,15 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public boolean isMember( final Peer peer )
     {
-        boolean found = false;
-        for ( PeerConf f : peerConfs )
+        for ( EnvironmentPeer f : environmentPeers )
         {
             if ( f.getPeerId().equals( peer.getId() ) )
             {
-                found = true;
-                break;
+                return true;
             }
         }
-        return found;
+
+        return false;
     }
 
 
@@ -656,12 +640,6 @@ public class EnvironmentImpl implements Environment, Serializable
             envId = new EnvironmentId( environmentId );
         }
         return envId;
-    }
-
-
-    public void setUserId( final Long userId )
-    {
-        this.userId = userId;
     }
 
 
@@ -698,8 +676,8 @@ public class EnvironmentImpl implements Environment, Serializable
         return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
                 + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr + '\''
                 + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers
-                + ", peerConfs=" + peerConfs + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId="
-                + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
+                + ", peerConfs=" + environmentPeers + ", status=" + status + ", sshKeys='" + sshKeys + '\''
+                + ", userId=" + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
     }
 
 

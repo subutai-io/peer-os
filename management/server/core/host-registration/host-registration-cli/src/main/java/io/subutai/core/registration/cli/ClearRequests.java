@@ -6,17 +6,17 @@ import java.util.List;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
 @Command( scope = "node", name = "clear-requests", description = "clear all request" )
 public class ClearRequests extends SubutaiShellCommandSupport
 {
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
 
 
-    public ClearRequests( final RegistrationManager registrationManager )
+    public ClearRequests( final HostRegistrationManager registrationManager )
     {
         this.registrationManager = registrationManager;
     }
@@ -26,14 +26,22 @@ public class ClearRequests extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         List<RequestedHost> requestedHosts = registrationManager.getRequests();
+
         for ( final RequestedHost requestedHost : requestedHosts )
         {
             System.out.println( requestedHost.toString() );
             System.out.println( "==========" );
 
-            registrationManager.removeRequest(requestedHost.getId());
-
+            try
+            {
+                registrationManager.removeRequest( requestedHost.getId() );
+            }
+            catch ( Exception e )
+            {
+                System.err.format( "Error unregistering host %s: %s%n", requestedHost.getHostname(), e.getMessage() );
+            }
         }
+
         return null;
     }
 }

@@ -1,15 +1,26 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -24,24 +35,32 @@ public class ConfigureContainerStateHandler extends StateHandler
 {
     public ConfigureContainerStateHandler( Context ctx )
     {
-        super( ctx, "Containers configuration");
+        super( ctx, "Containers configuration" );
     }
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        logStart();
+        try
+        {
+            logStart();
 
-        EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
+            EnvironmentDto envDto =
+                    ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
-        peerDto = configureSsh( peerDto, envDto );
+            peerDto = configureSsh( peerDto, envDto );
 
-        configureHosts( envDto );
+            configureHosts( envDto );
 
-        logEnd();
+            logEnd();
 
-        return peerDto;
+            return peerDto;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
@@ -52,33 +71,153 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
-    public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws Exception
+    public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
+            throws HubManagerException
     {
-        SshKeys sshKeys = new SshKeys();
-
-        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+        try
         {
-            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+            final SshKeys sshKeys = new SshKeys();
+            String[] currentSshKeys;
+            Set<String> currentSshKeysSet;
+
+            EnvironmentId envId = new EnvironmentId( envDto.getId() );
+
+            currentSshKeys = getCurrentSshKeys( envDto.getId() );
+            currentSshKeysSet = new HashSet<>( Arrays.asList( currentSshKeys ) );
+
+            Set<String> keys = new HashSet<>();
+            Set<String> allKeys = new HashSet<>();
+            for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
             {
-                if ( nodeDto.getSshKeys() != null )
+                for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
                 {
-                    sshKeys.addStringKeys( nodeDto.getSshKeys() );
+                    if ( nodeDto.getSshKeys() != null )
+                    {
+                        Set<String> existingKeys = new HashSet<>();
+                        keys.addAll( nodeDto.getSshKeys() );
+                        allKeys.addAll( nodeDto.getSshKeys() );
+                        for ( String sshKey : nodeDto.getSshKeys() )
+                        {
+                            if ( currentSshKeysSet.contains( sshKey ) )
+                            {
+                                existingKeys.add( sshKey );
+                            }
+                        }
+                        keys.removeAll( existingKeys );
+                    }
                 }
             }
+
+            removeKeys( envId, allKeys, currentSshKeys );
+
+            if ( keys.isEmpty() )
+            {
+                return peerDto;
+            }
+            sshKeys.addStringKeys( keys );
+
+            Environment environment = null;
+            try
+            {
+                environment = ctx.envManager.loadEnvironment( envDto.getId() );
+            }
+            catch ( EnvironmentNotFoundException e )
+            {
+                log.info( e.getMessage() );
+            }
+
+            if ( environment != null && !"hub".equals( environment.getPeerId() ) )
+            {
+                Set<Peer> peers = environment.getPeers();
+                for ( final Peer peer : peers )
+                {
+                    if ( peer.isOnline() )
+                    {
+                        peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+                    }
+                }
+
+                for ( SshKey sshKey : sshKeys.getKeys() )
+                {
+                    ctx.envManager.addSshKeyToEnvironmentEntity( environment.getId(), sshKey.getPublicKey() );
+                }
+            }
+            else
+            {
+                ctx.localPeer.configureSshInEnvironment( envId, sshKeys );
+            }
+
+            for ( SSHKeyDto sshKeyDto : peerDto.getEnvironmentInfo().getSshKeys() )
+            {
+                sshKeyDto.addConfiguredPeer( ctx.localPeer.getId() );
+            }
+
+            return peerDto;
         }
-
-        ctx.localPeer.configureSshInEnvironment( new EnvironmentId( envDto.getId() ), sshKeys );
-
-        for ( SSHKeyDto sshKeyDto : peerDto.getEnvironmentInfo().getSshKeys() )
+        catch ( Exception e )
         {
-            sshKeyDto.addConfiguredPeer( ctx.localPeer.getId() );
+            throw new HubManagerException( e );
         }
-
-        return peerDto;
     }
 
 
-    public void configureHosts( EnvironmentDto envDto ) throws Exception
+    private void removeKeys( EnvironmentId envId, Set<String> sshKeys, String[] currentSshKeys )
+    {
+
+
+        try
+        {
+            Environment environment = ctx.envManager.loadEnvironment( envId.toString() );
+
+            for ( String sshKey : currentSshKeys )
+            {
+                if ( !sshKeys.contains( sshKey.trim() ) )
+                {
+                    environment.removeSshKey( sshKey, true );
+                }
+            }
+        }
+        catch ( EnvironmentModificationException | EnvironmentNotFoundException e )
+        {
+            log.info( e.getMessage() );
+        }
+    }
+
+
+    private String[] getCurrentSshKeys( String envId )
+    {
+        String currentKeys = "";
+        try
+        {
+            Environment environment = ctx.envManager.loadEnvironment( envId );
+
+            for ( EnvironmentContainerHost containerHost : environment.getContainerHosts() )
+            {
+                SshKeys sshKeys = containerHost.getAuthorizedKeys();
+                for ( SshKey sshKey : sshKeys.getKeys() )
+                {
+                    if ( !currentKeys.contains( sshKey.getPublicKey() ) )
+                    {
+                        currentKeys += sshKey.getPublicKey() + System.lineSeparator();
+                    }
+                }
+            }
+        }
+        catch ( EnvironmentNotFoundException | PeerException e )
+        {
+            log.info( e.getMessage() );
+        }
+
+        if ( !currentKeys.isEmpty() )
+        {
+            return currentKeys.split( System.getProperty( "line.separator" ) );
+        }
+
+        return new String[] {};
+    }
+
+
+    public void configureHosts( EnvironmentDto envDto )
     {
         log.info( "Configuring hosts:" );
 
@@ -90,7 +229,8 @@ public class ConfigureContainerStateHandler extends StateHandler
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
                 log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
-                        nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+                        nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(),
+                        nodeDto.getState() );
 
                 // Remove network mask "/24" in IP
                 String ip = StringUtils.substringBefore( nodeDto.getIp(), "/" );
@@ -99,6 +239,14 @@ public class ConfigureContainerStateHandler extends StateHandler
             }
         }
 
-        ctx.localPeer.configureHostsInEnvironment( new EnvironmentId( envDto.getId() ), new HostAddresses( hostAddresses ) );
+        try
+        {
+            ctx.localPeer.configureHostsInEnvironment( new EnvironmentId( envDto.getId() ),
+                    new HostAddresses( hostAddresses ) );
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
+        }
     }
 }

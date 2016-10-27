@@ -1,18 +1,8 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +12,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,18 +20,16 @@ import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Preconditions;
 
-import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
-import io.subutai.hub.share.dto.ProductDto;
 import io.subutai.hub.share.dto.product.ProductDtoV1_2;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -63,12 +50,12 @@ public class ProductProcessor implements StateLinkProcessor
     public ProductProcessor( final ConfigManager hConfigManager, final Set<HubEventListener> hubEventListeners )
     {
         this.configManager = hConfigManager;
-        this.hubEventListeners = hubEventListeners != null? hubEventListeners : new HashSet<HubEventListener>();
+        this.hubEventListeners = hubEventListeners != null ? hubEventListeners : new HashSet<HubEventListener>();
     }
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         for ( String link : stateLinks )
         {
@@ -82,9 +69,9 @@ public class ProductProcessor implements StateLinkProcessor
                 {
                     processPeerProductData( peerProductDataDTO );
                 }
-                catch ( UnrecoverableKeyException | IOException | KeyStoreException | NoSuchAlgorithmException e )
+                catch ( Exception e )
                 {
-                    e.printStackTrace();
+                    LOG.warn( e.getMessage() );
                 }
             }
         }
@@ -93,7 +80,7 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    private PeerProductDataDto getPeerProductDto( final String link ) throws Exception
+    private PeerProductDataDto getPeerProductDto( final String link ) throws HubManagerException
     {
         try
         {
@@ -119,20 +106,20 @@ public class ProductProcessor implements StateLinkProcessor
 
             result = JsonUtil.fromCbor( plainContent, PeerProductDataDto.class );
 
+            Preconditions.checkNotNull( result );
+
             LOG.debug( "PeerProductDataDTO: " + result.toString() );
 
             return result;
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( Exception e )
         {
-            throw new Exception( "Could not retrieve environment data", e );
+            throw new HubManagerException( "Could not retrieve environment data", e );
         }
     }
 
 
-    private void processPeerProductData( final PeerProductDataDto peerProductDataDTO )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception, IOException
+    private void processPeerProductData( final PeerProductDataDto peerProductDataDTO ) throws HubManagerException
     {
         switch ( peerProductDataDTO.getState() )
         {
@@ -143,17 +130,16 @@ public class ProductProcessor implements StateLinkProcessor
             case REMOVE:
                 removingProcess( peerProductDataDTO );
                 break;
-            case INSTALLED:
+            default:
+                LOG.info( "Requested {}", peerProductDataDTO.getState() );
                 break;
         }
     }
 
 
-    private void installingProcess( final PeerProductDataDto peerProductDataDTO )
-            throws IOException, Exception, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+    private void installingProcess( final PeerProductDataDto peerProductDataDTO ) throws HubManagerException
     {
         LOG.debug( "Installing Product to Local Peer..." );
-        boolean isSuccess = false;
         ProductDtoV1_2 productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
 
         // install dependencies first (if plugin has dependencies)
@@ -165,16 +151,28 @@ public class ProductProcessor implements StateLinkProcessor
                 installingProcess( _peerProductDataDto );
             }
         }
-
-        // downloading plugin files
-        for ( String url : productDTO.getMetadata() )
+        InputStream initialStream = null;
+        try
         {
-            WebClient webClient = RestUtil.createTrustedWebClient( url );
 
-            File product = webClient.get( File.class );
-            InputStream initialStream = FileUtils.openInputStream( product );
-            File targetFile = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
-            FileUtils.copyInputStreamToFile( initialStream, targetFile );
+            // downloading plugin files
+            for ( String url : productDTO.getMetadata() )
+            {
+                WebClient webClient = RestUtil.createTrustedWebClient( url );
+
+                File product = webClient.get( File.class );
+                initialStream = FileUtils.openInputStream( product );
+                File targetFile = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
+                FileUtils.copyInputStreamToFile( initialStream, targetFile );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
+        finally
+        {
+            SafeCloseUtil.close( initialStream );
         }
 
         LOG.debug( "Product installed successfully..." );
@@ -188,8 +186,7 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    private void removingProcess( final PeerProductDataDto peerProductDataDTO )
-            throws Exception, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+    private void removingProcess( final PeerProductDataDto peerProductDataDTO ) throws HubManagerException
     {
         // remove file from deploy package
         LOG.debug( "Removing product from Local Peer..." );
@@ -198,6 +195,7 @@ public class ProductProcessor implements StateLinkProcessor
 
         // TODO: check that there is no installed plugins, which depends on this plugin
 
+        //TODO check what we are deleting here!!!
         for ( String url : productDTO.getMetadata() )
         {
             File file = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
@@ -219,7 +217,7 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    private ProductDtoV1_2 getProductDataDTO( final String productId ) throws Exception
+    private ProductDtoV1_2 getProductDataDTO( final String productId ) throws HubManagerException
     {
         ProductDtoV1_2 result = null;
         String path = String.format( "/rest/v1.2/marketplace/products/%s", productId );
@@ -248,10 +246,9 @@ public class ProductProcessor implements StateLinkProcessor
             LOG.debug( "ProductDataDTO: " + result.toString() );
             return result;
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException
-                e )
+        catch ( Exception e )
         {
-            throw new Exception( "Could not retrieve product data", e );
+            throw new HubManagerException( "Could not retrieve product data", e );
         }
     }
 
@@ -261,8 +258,8 @@ public class ProductProcessor implements StateLinkProcessor
         return String.format( "/rest/v1/peers/%s/products/%s", configManager.getPeerId(), productId );
     }
 
-    public void updatePeerProductData( final PeerProductDataDto peerProductDataDTO )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception
+
+    public void updatePeerProductData( final PeerProductDataDto peerProductDataDTO ) throws HubManagerException
     {
         LOG.debug( "Sending update : " + peerProductDataDTO );
         String updatePath = getProductProcessUrl( peerProductDataDTO.getProductId() );
@@ -279,15 +276,14 @@ public class ProductProcessor implements StateLinkProcessor
                 LOG.warn( "Unexpected response: " + r.readEntity( String.class ) );
             }
         }
-        catch ( PGPException |
-                JsonProcessingException e )
+        catch ( Exception e )
         {
-            throw new Exception( "Could not send product data.", e );
+            throw new HubManagerException( "Could not send product data.", e );
         }
     }
 
-    public void deletePeerProductData( final PeerProductDataDto peerProductDataDto )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+
+    public void deletePeerProductData( final PeerProductDataDto peerProductDataDto ) throws HubManagerException
     {
         String removePath = getProductProcessUrl( peerProductDataDto.getProductId() );
 
@@ -300,6 +296,7 @@ public class ProductProcessor implements StateLinkProcessor
             LOG.debug( "Status: " + "no content" );
         }
     }
+
 
     public void notifyPluginEventListeners( final String pluginUid, final PeerProductDataDto.State state )
     {

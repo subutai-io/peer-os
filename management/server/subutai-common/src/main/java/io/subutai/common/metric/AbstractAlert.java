@@ -1,9 +1,8 @@
 package io.subutai.common.metric;
 
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.HostId;
@@ -28,17 +27,14 @@ public abstract class AbstractAlert<T extends AlertValue> implements Alert
     }
 
 
-    abstract public String getId();
-
-//    abstract public AlertType getType();
-
-
+    @Override
     public HostId getHostId()
     {
         return hostId;
     }
 
 
+    @Override
     public <T extends AlertValue> T getAlertValue( final Class<T> format )
     {
         try
@@ -60,6 +56,7 @@ public abstract class AbstractAlert<T extends AlertValue> implements Alert
     }
 
 
+    @Override
     @JsonIgnore
     public long getLiveTime()
     {

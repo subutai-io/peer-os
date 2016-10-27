@@ -27,6 +27,7 @@ public class Login extends HttpServlet
     private static final Logger logger = LoggerFactory.getLogger( Login.class );
 
 
+    @Override
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException
     {
@@ -43,7 +44,7 @@ public class Login extends HttpServlet
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
 
 
-            if( !Strings.isNullOrEmpty( newPassword ))
+            if ( !Strings.isNullOrEmpty( newPassword ) )
             {
                 identityManager.changeUserPassword( username, password, newPassword );
                 password = newPassword;
@@ -60,7 +61,7 @@ public class Login extends HttpServlet
                     }
                     else
                     {
-                        throw new Exception( "Karaf Auth Module is loading, please try again later" );
+                        throw new IllegalStateException( "Karaf Auth Module is loading, please try again later" );
                     }
                 }
                 else if ( !Strings.isNullOrEmpty( sptoken ) )
@@ -73,8 +74,8 @@ public class Login extends HttpServlet
                 else
                 {
                     request.setAttribute( "error", "Please enter username or password" );
-                    response.getWriter().write( "Error, Please enter username or password" );
-                    response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                    setResponse( response, "Error, Please enter username or password",
+                            HttpServletResponse.SC_UNAUTHORIZED );
                 }
 
                 authenticateUser( request, response, user, sptoken );
@@ -82,29 +83,42 @@ public class Login extends HttpServlet
             catch ( IdentityExpiredException e )
             {
                 request.setAttribute( "error", "Your credentials are expired  !!!" );
-                response.getWriter().write( "Auth Credentials are expired" );
-                response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
+                setResponse( response, "Please create a new password. The old one is expired",
+                        HttpServletResponse.SC_PRECONDITION_FAILED );
             }
             catch ( SessionBlockedException e )
             {
                 request.setAttribute( "error", "Account is blocked !!!" );
-                response.getWriter().write( "Account is blocked" );
-                response.setStatus( HttpServletResponse.SC_FORBIDDEN );
+                setResponse( response, "Account is blocked", HttpServletResponse.SC_FORBIDDEN );
             }
             catch ( InvalidLoginException e )
             {
                 request.setAttribute( "error", "Wrong Auth Credentials !!!" );
-                response.getWriter().write( "Wrong Auth Credentials" );
-                response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                setResponse( response, "Wrong Auth Credentials", HttpServletResponse.SC_UNAUTHORIZED );
             }
         }
         catch ( Exception e )
         {
             request.setAttribute( "error", "karaf exceptions !!!" );
-            response.getWriter().write( "Error: " + e.getMessage() );
-            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+            setResponse( response, "Error: " + e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
     }
+
+
+    private void setResponse( HttpServletResponse response, String status, int statusCode )
+    {
+
+        try
+        {
+            response.getWriter().write( status );
+            response.setStatus( statusCode );
+        }
+        catch ( IOException e )
+        {
+            logger.error( "Could not send response: {}", e.getMessage() );
+        }
+    }
+
 
     private void authenticateUser( HttpServletRequest request, HttpServletResponse response, User user, String sptoken )
             throws InvalidLoginException
@@ -115,7 +129,7 @@ public class Login extends HttpServlet
         }
         request.getSession().setAttribute( "userSessionData", sptoken );
         Cookie ctoken = new Cookie( "sptoken", sptoken );
-        //                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
+        ctoken.setSecure( true );
 
         logger.info( user.getFingerprint() );
         logger.info( user.getEmail() );
@@ -123,17 +137,39 @@ public class Login extends HttpServlet
         logger.info( user.getSecurityKeyId() );
         logger.info( user.getUserName() );
         Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
-        //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
+        fingerprint.setSecure( true );
+
+
+        if ( Strings.isNullOrEmpty( sptoken ) )
+        {
+            Cookie[] cookies = request.getCookies();
+            for ( final Cookie cookie : cookies )
+            {
+                if ( "sptoken".equals( cookie.getName() ) )
+                {
+                    cookie.setValue( "" );
+                    cookie.setPath( "/" );
+                }
+            }
+        }
 
         response.addCookie( ctoken );
         response.addCookie( fingerprint );
     }
 
+
     @Override
     protected void doGet( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
     {
-        doPost( req , resp );
-        resp.sendRedirect( "/" );
+        try
+        {
+            doPost( req, resp );
+            resp.sendRedirect( "/" );
+        }
+        catch ( Exception e )
+        {
+            logger.error( "Error in doGet: {}", e.getMessage() );
+        }
     }
 }

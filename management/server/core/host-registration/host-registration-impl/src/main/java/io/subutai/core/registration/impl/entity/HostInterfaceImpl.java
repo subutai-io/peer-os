@@ -20,7 +20,7 @@ import io.subutai.common.host.HostInterface;
 @Entity
 @Table( name = "node_net_interfaces" )
 @Access( AccessType.FIELD )
-public class HostInterfaceImpl implements HostInterface, Serializable
+public class HostInterfaceImpl implements HostInterface
 {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )

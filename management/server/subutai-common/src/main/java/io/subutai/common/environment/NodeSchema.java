@@ -1,7 +1,7 @@
 package io.subutai.common.environment;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.peer.ContainerSize;
 
@@ -20,24 +20,18 @@ public class NodeSchema
     @JsonProperty( "templateName" )
     private String templateName;
 
-    @JsonProperty( "sshGroupId" )
-    private int sshGroupId;
-
-    @JsonProperty( "hostGroupId" )
-    private int hostGroupId;
+    @JsonProperty( "templateId" )
+    private String templateId;
 
 
     public NodeSchema( @JsonProperty( "name" ) final String name, @JsonProperty( "size" ) final ContainerSize size,
                        @JsonProperty( "templateName" ) final String templateName,
-                       @JsonProperty( "sshGroupId" ) int sshGroupId,
-
-                       @JsonProperty( "hostGroupId" ) int hostGroupId )
+                       @JsonProperty( "templateId" ) final String templateId )
     {
         this.name = name;
         this.size = size;
         this.templateName = templateName;
-        this.sshGroupId = sshGroupId;
-        this.hostGroupId = hostGroupId;
+        this.templateId = templateId;
     }
 
 
@@ -59,14 +53,8 @@ public class NodeSchema
     }
 
 
-    public int getSshGroupId()
+    public String getTemplateId()
     {
-        return sshGroupId;
-    }
-
-
-    public int getHostGroupId()
-    {
-        return hostGroupId;
+        return templateId;
     }
 }

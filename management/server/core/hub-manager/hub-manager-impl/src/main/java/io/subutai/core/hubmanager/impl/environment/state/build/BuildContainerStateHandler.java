@@ -10,6 +10,8 @@ import org.bouncycastle.openpgp.PGPException;
 
 import org.apache.commons.lang3.EnumUtils;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
@@ -27,6 +29,7 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -52,21 +55,28 @@ public class BuildContainerStateHandler extends StateHandler
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        logStart();
+        try
+        {
+            logStart();
 
-        EnvironmentNodesDto nodesDto = ctx.restClient.getStrict( path( PATH, peerDto ), EnvironmentNodesDto.class );
+            EnvironmentNodesDto nodesDto = ctx.restClient.getStrict( path( PATH, peerDto ), EnvironmentNodesDto.class );
 
-        prepareTemplates( peerDto, nodesDto );
+            prepareTemplates( peerDto, nodesDto );
 
-        setupPeerEnvironmentKey( peerDto );
+            setupPeerEnvironmentKey( peerDto );
 
-        Object result = cloneContainers( peerDto, nodesDto );
+            Object result = cloneContainers( peerDto, nodesDto );
 
-        logEnd();
+            logEnd();
 
-        return result;
+            return result;
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
@@ -75,8 +85,9 @@ public class BuildContainerStateHandler extends StateHandler
      */
     private void setupPeerEnvironmentKey( EnvironmentPeerDto peerDto ) throws PeerException, PGPException
     {
-        RelationLinkDto envLink = new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
-                PermissionObject.EnvironmentManagement.getName(), peerDto.getEnvironmentInfo().getId() );
+        RelationLinkDto envLink =
+                new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
+                        PermissionObject.EnvironmentManagement.getName(), peerDto.getEnvironmentInfo().getId() );
 
         ctx.localPeer.createPeerEnvironmentKeyPair( envLink );
     }
@@ -89,7 +100,8 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private void prepareTemplates( final EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto ) throws Exception
+    private void prepareTemplates( final EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto )
+            throws HubManagerException
     {
         Set<Node> nodes = new HashSet<>();
 
@@ -99,11 +111,11 @@ public class BuildContainerStateHandler extends StateHandler
         {
             ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
-                    nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
+                    nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
-            Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0, 0,
-                    peerDto.getPeerId(), nodeDto.getHostId() );
+            Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), contSize, peerDto.getPeerId(),
+                    nodeDto.getHostId(), nodeDto.getTemplateId() );
 
             nodes.add( node );
         }
@@ -120,25 +132,41 @@ public class BuildContainerStateHandler extends StateHandler
                 rhTemplates.put( node.getHostId(), templates );
             }
 
-            templates.add( node.getTemplateName() );
+            templates.add( node.getTemplateId() );
         }
 
-        ctx.localPeer.prepareTemplates( new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
+        try
+        {
+            ctx.localPeer.prepareTemplates(
+                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
+        }
+        catch ( PeerException e )
+        {
+            throw new HubManagerException( e );
+        }
     }
 
 
-    private EnvironmentNodesDto cloneContainers( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes ) throws Exception
+    private EnvironmentNodesDto cloneContainers( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
+            throws HubManagerException
     {
         CreateEnvironmentContainersRequest cloneRequests = createCloneRequests( peerDto, envNodes );
 
         // Clone requests may be empty if all containers already exists. For example, in case of duplicated requests.
-        CreateEnvironmentContainersResponse cloneResponses = cloneRequests.getRequests().isEmpty()
-                                                             ? null
-                                                             : ctx.localPeer.createEnvironmentContainers( cloneRequests );
+        CreateEnvironmentContainersResponse cloneResponses;
+        try
+        {
+            cloneResponses = cloneRequests.getRequests().isEmpty() ? null :
+                             ctx.localPeer.createEnvironmentContainers( cloneRequests );
+        }
+        catch ( PeerException e )
+        {
+            throw new HubManagerException( e );
+        }
 
         if ( cloneResponses != null && !cloneResponses.hasSucceeded() )
         {
-            throw new Exception( cloneResponses.getMessages().toString() );
+            throw new HubManagerException( cloneResponses.getMessages().toString() );
         }
 
         populateResultNodes( peerDto, envNodes );
@@ -147,7 +175,8 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private void populateResultNodes( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes ) throws Exception
+    private void populateResultNodes( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
+            throws HubManagerException
     {
         String envId = peerDto.getEnvironmentInfo().getId();
 
@@ -164,9 +193,12 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private void updateNodeDto( EnvironmentNodeDto nodeDto, Set<ContainerHost> envContainers ) throws Exception
+    private void updateNodeDto( EnvironmentNodeDto nodeDto, Set<ContainerHost> envContainers )
+            throws HubManagerException
     {
         ContainerHost ch = findContainerByHostname( envContainers, nodeDto.getHostName() );
+
+        Preconditions.checkNotNull( ch );
 
         String contId = ch.getContainerId().getId();
 
@@ -178,22 +210,26 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private CreateEnvironmentContainersRequest createCloneRequests( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
+    private CreateEnvironmentContainersRequest createCloneRequests( EnvironmentPeerDto peerDto,
+                                                                    EnvironmentNodesDto envNodes )
+            throws HubManagerException
     {
         String envId = peerDto.getEnvironmentInfo().getId();
 
         Set<ContainerHost> envContainers = ctx.localPeer.findContainersByEnvironmentId( envId );
 
-        CreateEnvironmentContainersRequest createRequests = new CreateEnvironmentContainersRequest( envId, peerDto.getPeerId(), peerDto.getOwnerId() );
+        CreateEnvironmentContainersRequest createRequests =
+                new CreateEnvironmentContainersRequest( envId, peerDto.getPeerId(), peerDto.getOwnerId() );
 
         log.info( "Clone requests:" );
 
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
-            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
-                    nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
+                    nodeDto.getContainerName(), nodeDto.getContainerName(), nodeDto.getState() );
 
-            // Exclude existing containers. This may happen as a result of duplicated requests or adding a new container to existing peer in env.
+            // Exclude existing containers. This may happen as a result of duplicated requests or adding a new
+            // container to existing peer in env.
             if ( !containerExists( nodeDto.getHostName(), envContainers ) && nodeDto.getState() == BUILDING )
             {
                 createRequests.addRequest( createCloneRequest( nodeDto ) );
@@ -204,12 +240,13 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto )
+    private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws HubManagerException
     {
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-        return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                nodeDto.getIp(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
+        return new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
+                nodeDto.getContainerName(), nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64,
+                contSize );
     }
 
 
@@ -242,21 +279,29 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private String createSshKey( String containerId ) throws Exception
+    private String createSshKey( String containerId ) throws HubManagerException
     {
-        Host host = ctx.localPeer.getContainerHostById( containerId );
+        CommandResult result;
 
-        RequestBuilder rb = new RequestBuilder( String.format( "rm -rf %1$s && " +
-                        "mkdir -p %1$s && " +
-                        "chmod 700 %1$s && " +
-                        "ssh-keygen -t rsa -P '' -f %1$s/id_rsa -q && " + "cat %1$s/id_rsa.pub",
-                Common.CONTAINER_SSH_FOLDER ) );
+        try
+        {
+            Host host = ctx.localPeer.getContainerHostById( containerId );
 
-        CommandResult result = commandUtil.execute( rb, host );
+            RequestBuilder rb = new RequestBuilder( String.format(
+                    "rm -rf %1$s && " + "mkdir -p %1$s && " + "chmod 700 %1$s && "
+                            + "ssh-keygen -t rsa -P '' -f %1$s/id_rsa -q && " + "cat %1$s/id_rsa.pub",
+                    Common.CONTAINER_SSH_FOLDER ) );
+
+            result = commandUtil.execute( rb, host );
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
 
         if ( !result.hasSucceeded() )
         {
-            throw new Exception( "Failed to create SSH key: " + result.getStdErr() );
+            throw new HubManagerException( "Failed to create SSH key: " + result.getStdErr() );
         }
 
         return result.getStdOut();

@@ -6,10 +6,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.settings.Common;
 
 
 /**
@@ -33,7 +33,7 @@ public class PeerInfo implements Serializable
     private String name;
 
     @JsonProperty( "publicSecurePort" )
-    private int publicSecurePort = SystemSettings.getSecurePortX2();
+    private int publicSecurePort = Common.DEFAULT_PUBLIC_SECURE_PORT;
 
     @JsonProperty( "manualSetting" )
     private boolean manualSetting;
@@ -75,7 +75,7 @@ public class PeerInfo implements Serializable
 
     public String getName()
     {
-        return String.format( "Peer %s on %s ", id, ip );
+        return name;
     }
 
 
@@ -123,7 +123,7 @@ public class PeerInfo implements Serializable
             //ignore
         }
 
-        return SystemSettings.DEFAULT_PUBLIC_PORT;
+        return Common.DEFAULT_PUBLIC_PORT;
     }
 
 
@@ -138,7 +138,7 @@ public class PeerInfo implements Serializable
         catch ( MalformedURLException e )
         {
             // assume this is IP or domain name
-            final String u = String.format( "https://%s:%s/", publicUrl, SystemSettings.DEFAULT_PUBLIC_PORT );
+            final String u = String.format( "https://%s:%s/", publicUrl, Common.DEFAULT_PUBLIC_PORT );
             try
             {
                 URL url = new URL( u );

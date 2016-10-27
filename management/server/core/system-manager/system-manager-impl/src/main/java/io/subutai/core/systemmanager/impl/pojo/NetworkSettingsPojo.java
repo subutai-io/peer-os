@@ -6,82 +6,64 @@ import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 
 public class NetworkSettingsPojo implements NetworkSettings
 {
-    public int securePortX1;
-    public int securePortX2;
-    public String publicUrl;
-    public int agentPort;
-    public int publicSecurePort;
-    public String keyServer;
+    private String publicUrl;
+    private int publicSecurePort;
+    private int startRange;
+    private int endRange;
 
 
-    public String getKeyServer()
-    {
-        return keyServer;
-    }
-
-
-    public void setKeyServer( final String keyServer )
-    {
-        this.keyServer = keyServer;
-    }
-
-
-    public int getAgentPort()
-    {
-        return agentPort;
-    }
-
-
-    public void setAgentPort( final int agentPort )
-    {
-        this.agentPort = agentPort;
-    }
-
-
+    @Override
     public String getPublicUrl()
     {
         return publicUrl;
     }
 
 
+    @Override
     public void setPublicUrl( final String publicUrl )
     {
         this.publicUrl = publicUrl;
     }
 
 
-    public int getSecurePortX1()
-    {
-        return securePortX1;
-    }
-
-
-    public void setSecurePortX1( final int securePortX1 )
-    {
-        this.securePortX1 = securePortX1;
-    }
-
-
-    public int getSecurePortX2()
-    {
-        return securePortX2;
-    }
-
-
-    public void setSecurePortX2( final int securePortX2 )
-    {
-        this.securePortX2 = securePortX2;
-    }
-
-
+    @Override
     public int getPublicSecurePort()
     {
         return publicSecurePort;
     }
 
 
+    @Override
     public void setPublicSecurePort( final int publicSecurePort )
     {
         this.publicSecurePort = publicSecurePort;
+    }
+
+
+    @Override
+    public int getStartRange()
+    {
+        return startRange;
+    }
+
+
+    @Override
+    public void setStartRange( final int startRange )
+    {
+        this.startRange = startRange;
+    }
+
+
+    @Override
+    public int getEndRange()
+    {
+        return endRange;
+    }
+
+
+    @Override
+    public void setEndRange( final int endRange )
+    {
+        this.endRange = endRange;
     }
 }

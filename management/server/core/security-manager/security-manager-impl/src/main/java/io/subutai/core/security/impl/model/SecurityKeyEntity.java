@@ -30,31 +30,31 @@ public class SecurityKeyEntity implements SecurityKey
 
     /********* column names *******/
 
-    private static final String IDENTITY_ID = "identity_id";
-    private static final String HOST_IP = "host_ip";
-    private static final String PUBLIC_KEY_FINGERPRINT  = "pkfingerprint";
-    private static final String SECRET_KEY_FINGERPRINT  = "skfingerprint";
-    private static final String STATUS  = "status";
-    private static final String TYPE    = "type";
+    private static final String IDENTITY_ID_NAME = "identity_id";
+    private static final String HOST_IP_NAME = "host_ip";
+    private static final String PUBLIC_KEY_FINGERPRINT_NAME = "pkfingerprint";
+    private static final String SECRET_KEY_FINGERPRINT_NAME = "skfingerprint";
+    private static final String STATUS_NAME = "status";
+    private static final String TYPE_NAME = "type";
 
 
     @Id
-    @Column( name = IDENTITY_ID )
+    @Column( name = IDENTITY_ID_NAME )
     private String identityId;
 
-    @Column( name = HOST_IP )
+    @Column( name = HOST_IP_NAME )
     private String hostIP;
 
-    @Column( name = PUBLIC_KEY_FINGERPRINT )
+    @Column( name = PUBLIC_KEY_FINGERPRINT_NAME )
     private String publicKeyFingerprint;
 
-    @Column( name = SECRET_KEY_FINGERPRINT )
+    @Column( name = SECRET_KEY_FINGERPRINT_NAME )
     private String secretKeyFingerprint;
 
-    @Column( name = STATUS )
+    @Column( name = STATUS_NAME )
     private short status;
 
-    @Column( name = TYPE )
+    @Column( name = TYPE_NAME )
     private int type = 0;
 
 

@@ -1,14 +1,16 @@
 package lib
 
 import (
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
-	"gopkg.in/lxc/go-lxc.v2"
 	"io"
 	"os"
 	"sync"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
+	"gopkg.in/lxc/go-lxc.v2"
 )
 
+// LxcAttach connects user to the container shell.
 func LxcAttach(name string, clear, x86, regular bool) {
 	var wg sync.WaitGroup
 

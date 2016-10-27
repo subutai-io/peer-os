@@ -6,13 +6,11 @@ angular.module('subutai.console.controller', [])
 
 		terminalConfigurationProvider.config('modern').allowTypingWriteDisplaying = false;
 		terminalConfigurationProvider.config('modern').outputDelay = 80;
-		//terminalConfigurationProvider.config('vintage').typeSoundUrl ='example/content/type.wav';
-		//terminalConfigurationProvider.config('vintage').startSoundUrl ='example/content/start.wav';
 	}]);
 
-ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService', '$stateParams', 'ngDialog', 'cfpLoadingBar'];
+ConsoleViewCtrl.$inject = ['$scope', 'consoleService', '$stateParams', 'ngDialog', 'cfpLoadingBar'];
 
-function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $stateParams, ngDialog, cfpLoadingBar) {
+function ConsoleViewCtrl($scope, consoleService, $stateParams, ngDialog, cfpLoadingBar) {
 
 	var vm = this;
 
@@ -42,7 +40,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 		vm.selectedEnvironment = $stateParams.environmentId;
 	}
 
-	peerRegistrationService.getResourceHosts().success(function (data) {
+	consoleService.getResourceHosts().success(function (data) {
 		vm.hosts = data;
 		for(var i = 0; i < vm.hosts.length; i++) {
 			if(vm.hosts[i].hostname == 'management') {
@@ -226,6 +224,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 				LOADING_SCREEN('none');
 			}).error(function(error){
 				console.log(error);
+				SweetAlert.swal("ERROR!", error, "error");
 				LOADING_SCREEN('none');
 			});
 		}

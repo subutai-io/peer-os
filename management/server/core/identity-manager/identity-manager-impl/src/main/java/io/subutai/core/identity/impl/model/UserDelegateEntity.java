@@ -24,13 +24,13 @@ public class UserDelegateEntity implements UserDelegate
     @Column( name = "id" )
     private String id;
 
-    @Column( name = "user_id")
+    @Column( name = "user_id" )
     private long userId;
 
     @Column( name = "type" )
     private int type = 2; // System User
 
-    @Column(name = "relation_document", length = 3000)
+    @Column( name = "relation_document", length = 3000 )
     private String relationDocument;
 
 
@@ -76,6 +76,7 @@ public class UserDelegateEntity implements UserDelegate
     }
 
 
+    @Override
     public String getRelationDocument()
     {
         return relationDocument;
@@ -92,7 +93,7 @@ public class UserDelegateEntity implements UserDelegate
     @Override
     public String getLinkId()
     {
-        return String.format("%s|%s", getClassPath(), getUniqueIdentifier() );
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
     }
 
 

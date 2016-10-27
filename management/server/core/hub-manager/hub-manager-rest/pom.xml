@@ -5,7 +5,7 @@
   <parent>
     <artifactId>hub-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC14-SNAPSHOT</version>
+    <version>4.0.4-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -43,7 +43,6 @@
       <scope>test</scope>
     </dependency>
 
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
@@ -65,6 +64,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.apache.cxf</groupId>
@@ -78,7 +83,6 @@
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-transports-http-hc</artifactId>
     </dependency>
-
 
   </dependencies>
 
@@ -96,6 +100,16 @@
           </instructions>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 

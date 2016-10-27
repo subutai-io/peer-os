@@ -47,9 +47,7 @@ public class KeyManagerTest
 
         keyManager.setKeyGen( keyPairGenerator );
         keyManager.setKeyGen( keyGenerator );
-        keyManager.setKeypair( keyPair );
         keyManager.setKeyPairGen( keyPairGenerator );
-        keyManager.setKeypair( keyPair );
         keyManager.setPrivateKey( privateKey );
         keyManager.setPublicKey( publicKey );
         keyManager.setKeyPair( keyPair );
@@ -62,7 +60,6 @@ public class KeyManagerTest
     public void testProperties()
     {
         assertNotNull( keyManager.getKeyGen() );
-        assertNotNull( keyManager.getKeypair() );
         assertNotNull( keyManager.getKeyPair() );
         assertNotNull( keyManager.getPrivateKey() );
         assertNotNull( keyManager.getPublicKey() );
@@ -112,14 +109,14 @@ public class KeyManagerTest
     @Test
     public void testGeneratePrivateKeyPairBytes() throws Exception
     {
-        assertNotNull( keyManager.generatePrivateKeyPairBytes( keyPair ) );
+        assertNotNull( keyManager.generatePrivateKeyPairBytes() );
     }
 
 
     @Test
     public void testGeneratePublicKeyPairBytes() throws Exception
     {
-        assertNotNull( keyManager.generatePublicKeyPairBytes( keyPair ) );
+        assertNotNull( keyManager.generatePublicKeyPairBytes() );
     }
 
 
@@ -134,21 +131,5 @@ public class KeyManagerTest
     public void testGenerateSecretKey() throws Exception
     {
         keyManager.generateSecretKey( keyGenerator );
-    }
-
-
-    @Test
-    public void testSignData() throws Exception
-    {
-        keyManager.signData( SignatureType.SHA1_DSA, keyPair, "test" );
-    }
-
-
-    @Test
-    public void testVerifySignedData() throws Exception
-    {
-        byte[] sign = new byte[5];
-
-        keyManager.verifySignedData( SignatureType.SHA1_DSA, keyPair, "test", sign );
     }
 }

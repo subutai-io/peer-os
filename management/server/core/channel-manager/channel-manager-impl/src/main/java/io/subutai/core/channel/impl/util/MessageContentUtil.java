@@ -4,13 +4,10 @@ package io.subutai.core.channel.impl.util;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.AccessControlException;
 
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -19,13 +16,13 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -36,6 +33,13 @@ import io.subutai.core.security.api.crypto.KeyManager;
  */
 public class MessageContentUtil
 {
+
+    private MessageContentUtil()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
 
 
@@ -81,25 +85,6 @@ public class MessageContentUtil
     }
 
 
-    //***************************************************************************
-    public static int checkUrlAccessibility( HttpServletRequest req )
-    {
-        int inPort = req.getLocalPort();
-        String basePath = req.getRequestURI();
-
-
-        if ( inPort == SystemSettings.getSecurePortX1() )
-        {
-            if ( !ChannelSettings.checkURLAccess( basePath ) )
-            {
-                return 1;
-            }
-        }
-
-        return 0;
-    }
-
-
     /* ******************************************************
      *
      */
@@ -117,10 +102,10 @@ public class MessageContentUtil
             int copied = IOUtils.copyAndCloseInput( is, os );
             os.flush();
 
-            byte[] data = copied > 0 ? decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() ) : null;
+            byte[] data = copied > 0 ? decryptData( securityManager, hostIdSource, os.getBytes() ) : null;
             org.apache.commons.io.IOUtils.closeQuietly( os );
 
-            if ( data != null )
+            if ( !ArrayUtils.isEmpty( data ) )
             {
                 LOG.debug( String.format( "Decrypted payload: \"%s\"", new String( data ) ) );
                 message.setContent( InputStream.class, new ByteArrayInputStream( data ) );
@@ -140,21 +125,20 @@ public class MessageContentUtil
     /* ******************************************************
      *
      */
-    private static byte[] decryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                       byte[] data ) throws PGPException
+    private static byte[] decryptData( SecurityManager securityManager, String hostIdSource, byte[] data )
+            throws PGPException
     {
 
         try
         {
-            if ( data == null || data.length == 0 )
+            if ( ArrayUtils.isEmpty( data ) )
             {
-                return null;
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
             else
             {
                 EncryptionTool encTool = securityManager.getEncryptionTool();
 
-                //encTool.
 
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPSecretKeyRing secKey = keyMan.getSecretKeyRing( hostIdSource );
@@ -177,12 +161,6 @@ public class MessageContentUtil
         {
             throw new PGPException( ex.toString() );
         }
-    }
-
-
-    private static URL getURL( final Message message ) throws MalformedURLException
-    {
-        return new URL( ( String ) message.getExchange().getOutMessage().get( Message.ENDPOINT_ADDRESS ) );
     }
 
 
@@ -213,10 +191,10 @@ public class MessageContentUtil
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
             //do something with original message to produce finalMessage
-            byte[] finalMessage = originalMessage.length > 0 ?
-                                  encryptData( securityManager, hostIdSource, hostIdTarget, originalMessage ) : null;
+            byte[] finalMessage =
+                    originalMessage.length > 0 ? encryptData( securityManager, hostIdTarget, originalMessage ) : null;
 
-            if ( finalMessage != null )
+            if ( !ArrayUtils.isEmpty( finalMessage ) )
             {
 
                 InputStream replaceInStream = new ByteArrayInputStream( finalMessage );
@@ -234,7 +212,7 @@ public class MessageContentUtil
         }
         catch ( Exception ioe )
         {
-            throw new RuntimeException( ioe );
+            throw new ActionFailedException( "Error encrypting content", ioe );
         }
     }
 
@@ -244,14 +222,14 @@ public class MessageContentUtil
      */
 
 
-    private static byte[] encryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                       byte[] data ) throws PGPException
+    private static byte[] encryptData( SecurityManager securityManager, String hostIdTarget, byte[] data )
+            throws PGPException
     {
         try
         {
-            if ( data == null || data.length == 0 )
+            if ( ArrayUtils.isEmpty( data ) )
             {
-                return null;
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
             else
             {
