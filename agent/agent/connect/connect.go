@@ -53,7 +53,10 @@ func Request(user, pass string) {
 		gpg.ImportPk(pk)
 		config.Management.GpgUser = extractKeyID(pk)
 
-		client := &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
+		client := &http.Client{}
+		if config.Management.Allowinsecure {
+			client = &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
+		}
 		resp, err := client.Post("https://"+config.Management.Host+":"+config.Management.Port+"/rest/v1/registration/public-key", "text/plain",
 			bytes.NewBuffer([]byte(gpg.EncryptWrapper(user, config.Management.GpgUser, rh))))
 
@@ -64,8 +67,10 @@ func Request(user, pass string) {
 }
 
 func getKey() []byte {
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr, Timeout: time.Second * 5}
+	client := &http.Client{Timeout: time.Second * 5}
+	if config.Management.Allowinsecure {
+		client = &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}, Timeout: time.Second * 5}
+	}
 	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestPublicKey)
 	if log.Check(log.WarnLevel, "Getting Management host Public Key", err) {
 		return nil

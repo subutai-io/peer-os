@@ -164,11 +164,15 @@ func newTLSConfig() *tls.Config {
 		}
 	}
 
-	// Create tls.Config with desired tls properties
-	return &tls.Config{
-		ClientAuth:         tls.NoClientCert,
-		ClientCAs:          nil,
-		InsecureSkipVerify: true,
-		Certificates:       []tls.Certificate{cert},
+	if config.Management.Allowinsecure {
+		// Create tls.Config with desired tls properties
+		return &tls.Config{
+			ClientAuth:         tls.NoClientCert,
+			ClientCAs:          nil,
+			InsecureSkipVerify: true,
+			Certificates:       []tls.Certificate{cert},
+		}
+
 	}
+	return &tls.Config{ClientAuth: tls.NoClientCert, ClientCAs: nil, Certificates: []tls.Certificate{cert}}
 }

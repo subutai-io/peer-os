@@ -17,10 +17,11 @@ func IsRegistered(templateName string) bool {
 	returnValue := true
 	restTemplateURL := config.CDN.Kurjun + templateName
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	client := &http.Client{}
+	if config.Management.Allowinsecure {
+		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+		client = &http.Client{Transport: tr}
 	}
-	client := &http.Client{Transport: tr}
 
 	resp, err := client.Get(restTemplateURL)
 	if err != nil {
