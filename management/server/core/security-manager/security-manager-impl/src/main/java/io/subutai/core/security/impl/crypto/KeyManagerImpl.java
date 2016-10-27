@@ -694,18 +694,19 @@ public class KeyManagerImpl implements KeyManager
 
             if ( keyIden == null )
             {
-                LOG.info( "********* Public key not found with identityId:" + identityId );
+                LOG.warn( "********* Public key not found with identityId:" + identityId );
+
                 return "";
             }
-            {
-                byte[] aKeyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
 
-                return PGPEncryptionUtil.armorByteArrayToString( aKeyData );
-            }
+            byte[] aKeyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
+
+            return PGPEncryptionUtil.armorByteArrayToString( aKeyData );
         }
         catch ( Exception ex )
         {
             LOG.error( " ***** Error getting Public keyRing:" + ex.toString(), ex );
+
             return "";
         }
     }

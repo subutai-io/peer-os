@@ -3,10 +3,9 @@ package io.subutai.core.test.cli;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.karaf.shell.commands.Command;
+
+import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
@@ -20,7 +19,6 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 @Command( scope = "test", name = "do", description = "test command" )
 public class TestCommand extends SubutaiShellCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( TestCommand.class.getName() );
 
 
     @Override
@@ -30,6 +28,8 @@ public class TestCommand extends SubutaiShellCommandSupport
         try
         {
             EnvironmentManager environmentManager = ServiceLocator.getServiceNoCache( EnvironmentManager.class );
+
+            Preconditions.checkNotNull( environmentManager );
 
             for ( Environment environment : environmentManager.getEnvironments() )
             {
@@ -58,7 +58,7 @@ public class TestCommand extends SubutaiShellCommandSupport
         }
         catch ( Exception e )
         {
-            LOG.warn( e.getMessage() );
+            log.warn( e.getMessage() );
         }
         return null;
     }

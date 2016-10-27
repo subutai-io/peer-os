@@ -18,9 +18,9 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.parser.CpuResourceValueParser;
 import io.subutai.hub.share.parser.DiskValueResourceParser;
-import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.quota.ContainerCpuResource;
 import io.subutai.hub.share.quota.ContainerHomeResource;
 import io.subutai.hub.share.quota.ContainerRamResource;
@@ -131,7 +131,7 @@ public class QuotaManagerImplTest
         when( commandResultDisk.hasSucceeded() ).thenReturn( true );
         when( commandResultDisk.getStdOut() ).thenReturn( diskQuota.getWriteValue() );
 
-        quotaManager = new QuotaManagerImpl( peerManager, localPeer, null );
+        quotaManager = new QuotaManagerImpl( peerManager, localPeer );
     }
 
 
