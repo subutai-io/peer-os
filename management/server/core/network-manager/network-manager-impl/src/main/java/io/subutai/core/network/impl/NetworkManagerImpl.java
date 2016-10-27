@@ -152,11 +152,8 @@ public class NetworkManagerImpl implements NetworkManager
             {
                 String logLine = st.nextToken();
 
-                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) )
-                {
-                    p2pLogs.addLog( logLine );
-                }
-                else if ( logLine.contains( String.format( "[%s]", logLevel.name() ) ) )
+                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) || logLine
+                        .contains( String.format( "[%s]", logLevel.name() ) ) )
                 {
                     p2pLogs.addLog( logLine );
                 }

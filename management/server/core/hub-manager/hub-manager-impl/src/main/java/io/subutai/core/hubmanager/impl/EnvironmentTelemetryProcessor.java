@@ -159,11 +159,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
             {
                 res = sourceContainer.execute( new RequestBuilder( cmd ).withTimeout( timeout ) );
 
-                if ( res.getExitCode() == 0 && !res.getStdOut().isEmpty() )
-                {
-                    result.put( key + "status", "SUCCESS" );
-                }
-                else if ( res.getExitCode() == 0 && res.getStdOut().isEmpty() && res.getStdErr().isEmpty() )
+                if ( res.hasSucceeded())
                 {
                     result.put( key + "status", "SUCCESS" );
                 }
