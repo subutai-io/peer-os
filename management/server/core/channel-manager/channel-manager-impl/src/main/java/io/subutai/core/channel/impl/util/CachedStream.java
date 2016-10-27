@@ -14,17 +14,20 @@ public class CachedStream extends CachedOutputStream
     }
 
 
+    @Override
     protected void doFlush() throws IOException
     {
         currentStream.flush();
     }
 
 
+    @Override
     protected void doClose() throws IOException
     {
     }
 
 
+    @Override
     protected void onWrite() throws IOException
     {
     }

@@ -4,20 +4,17 @@ package io.subutai.common.security.relation.model;
 import java.io.Serializable;
 
 
-/**
- * Created by ape-craft on 3/19/16.
- */
 public interface RelationChallenge extends Serializable
 {
-    public String getToken();
+    String getToken();
 
-    public long getTimestamp();
+    long getTimestamp();
 
-    public long getTtl();
+    long getTtl();
 
-    public void setTtl( final long ttl );
+    void setTtl( final long ttl );
 
-    public RelationStatus getStatus();
+    RelationStatus getStatus();
 
-    public void setStatus( final RelationStatus status );
+    void setStatus( final RelationStatus status );
 }

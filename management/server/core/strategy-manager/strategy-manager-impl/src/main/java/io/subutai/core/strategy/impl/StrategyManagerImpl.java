@@ -52,6 +52,7 @@ public class StrategyManagerImpl implements StrategyManager
     }
 
 
+    @Override
     public List<ContainerPlacementStrategy> getPlacementStrategies()
     {
         return placementStrategies;
@@ -78,6 +79,7 @@ public class StrategyManagerImpl implements StrategyManager
     }
 
 
+    @Override
     public List<String> getPlacementStrategyTitles()
     {
         return this.getPlacementStrategies().stream().filter( n -> !Strings.isNullOrEmpty( n.getId() ) )

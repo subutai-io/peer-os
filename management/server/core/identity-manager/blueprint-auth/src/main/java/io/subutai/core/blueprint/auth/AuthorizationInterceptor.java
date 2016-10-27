@@ -58,23 +58,27 @@ public class AuthorizationInterceptor implements Interceptor
     }
 
 
+    @Override
     public int getRank()
     {
         return 0;
     }
 
 
+    @Override
     public void postCallWithException( ComponentMetadata cm, Method m, Throwable ex, Object preCallToken )
     {
     }
 
 
+    @Override
     public void postCallWithReturn( ComponentMetadata cm, Method method, Object returnType, Object preCallToken )
             throws Exception
     {
     }
 
 
+    @Override
     public Object preCall( ComponentMetadata cm, Method method, Object... parameters ) throws Throwable
     {
         Annotation ann = new SecurityAnnotationParser().getEffectiveAnnotation( beanClass, method );

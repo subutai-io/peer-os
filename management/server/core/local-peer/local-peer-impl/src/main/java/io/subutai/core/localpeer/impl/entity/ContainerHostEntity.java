@@ -78,9 +78,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "template_id", nullable = false )
     private String templateId;
 
-    @Column( name = "template_arch", nullable = true )
-    private String templateArch;
-
 
     protected ContainerHostEntity()
     {
@@ -103,14 +100,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public ContainerHostEntity( final String peerId, final String hostId, final String hostname,
                                 HostArchitecture architecture, HostInterfaces hostInterfaces,
-                                final String containerName, final String templateId, final String templateArch,
-                                final String environmentId, final String ownerId, final String initiatorPeerId,
-                                final ContainerSize containerSize )
+                                final String containerName, final String templateId, final String environmentId,
+                                final String ownerId, final String initiatorPeerId, final ContainerSize containerSize )
     {
         super( peerId, hostId, hostname, architecture, hostInterfaces );
         this.containerName = containerName;
         this.templateId = templateId;
-        this.templateArch = templateArch;
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
@@ -118,6 +113,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
     public EnvironmentId getEnvironmentId()
     {
         return new EnvironmentId( environmentId );
@@ -152,6 +148,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
     public ContainerHostState getState()
     {
         try
@@ -183,6 +180,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
     public String getTemplateName()
     {
         try
@@ -205,18 +203,14 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public String getTemplateArch()
-    {
-        return templateArch;
-    }
-
-
+    @Override
     public Template getTemplate() throws PeerException
     {
         return getLocalPeer().getTemplateById( templateId );
     }
 
 
+    @Override
     public void dispose() throws PeerException
     {
         getPeer().destroyContainer( getContainerId() );
@@ -292,6 +286,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
     public ContainerId getContainerId()
     {
         if ( containerId == null )

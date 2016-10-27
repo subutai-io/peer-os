@@ -552,6 +552,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
     public Response setContainerName( String environmentId, String containerId, String name )
     {
         try
@@ -933,6 +934,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
     public Response getDownloadProgress( String environmentId )
     {
         try

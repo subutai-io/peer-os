@@ -51,6 +51,7 @@ public class ContainerRamResource extends ContainerResource<ByteValueResource>
     /**
      * Usually used to write value to CLI
      */
+    @Override
     public String getWriteValue()
     {
         BigDecimal v = resource.convert( ByteUnit.MB );
@@ -61,6 +62,7 @@ public class ContainerRamResource extends ContainerResource<ByteValueResource>
     /**
      * Usually used to display resource value
      */
+    @Override
     public String getPrintValue()
     {
         return String.format( "%s%s", resource.convert( ByteUnit.MB ), ByteUnit.MB.getAcronym() );
@@ -73,6 +75,7 @@ public class ContainerRamResource extends ContainerResource<ByteValueResource>
     }
 
 
+    @Override
     protected ByteValueResource parse( final String value )
     {
         return RamResourceValueParser.getInstance().parse( value );

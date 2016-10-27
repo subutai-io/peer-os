@@ -57,78 +57,86 @@ public class PublicKeyStoreEntity implements PublicKeyStore, Serializable
     private short keyStatus = 1;
 
 
-    /********************************/
-
+    @Override
     public String getKeyId()
     {
         return keyId;
     }
 
 
+    @Override
     public void setKeyId( final String keyId )
     {
         this.keyId = keyId;
     }
 
 
+    @Override
     public String getShortKeyId()
     {
         return shortKeyId;
     }
 
 
+    @Override
     public void setShortKeyId( final String shortKeyId )
     {
         this.shortKeyId = shortKeyId;
     }
 
 
+    @Override
     public String getFingerprint()
     {
         return fingerprint;
     }
 
 
+    @Override
     public void setFingerprint( final String fingerprint )
     {
         this.fingerprint = fingerprint;
     }
 
 
+    @Override
     public byte[] getKeyData()
     {
         return keyData;
     }
 
 
+    @Override
     public void setKeyData( final byte[] keyData )
     {
         this.keyData = keyData;
     }
 
 
+    @Override
     public short getKeyType()
     {
         return keyType;
     }
 
 
+    @Override
     public void setKeyType( final short keyType )
     {
         this.keyType = keyType;
     }
 
 
+    @Override
     public short getKeyStatus()
     {
         return keyStatus;
     }
 
 
+    @Override
     public void setKeyStatus( final short keyStatus )
     {
         this.keyStatus = keyStatus;
     }
-
-
 }

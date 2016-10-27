@@ -121,6 +121,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
+    @Override
     public String getP2pVersion( final Host host ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );

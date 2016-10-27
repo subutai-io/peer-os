@@ -55,7 +55,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         setEnvironmentManager( environmentManager );
     }
 
-
+    @Override
     protected LocalPeer getLocalPeer()
     {
         return ServiceLocator.getServiceNoCache( LocalPeer.class );

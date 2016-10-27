@@ -7,10 +7,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotSame;
@@ -28,7 +28,7 @@ public class RenameContainerTaskTest
     private static final String NEW_HOSTNAME = "new";
     private static final Integer VLAN = 123;
     @Mock
-    EnvironmentPeer environmentPeer;
+    EnvironmentPeerImpl environmentPeer;
     EnvironmentContainerImpl environmentContainer = TestHelper.ENV_CONTAINER();
 
 

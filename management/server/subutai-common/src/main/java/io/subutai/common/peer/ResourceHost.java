@@ -23,7 +23,6 @@ import io.subutai.common.protocol.Tunnels;
  */
 public interface ResourceHost extends Host, ResourceHostInfo
 {
-
     /**
      * Returns hosts containers
      */

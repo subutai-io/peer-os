@@ -11,7 +11,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.EnvironmentAlertHandler;
@@ -45,7 +44,7 @@ public class EnvironmentImplTest
     @Mock
     IdentityManager identityManager;
     @Mock
-    EnvironmentPeer environmentPeer;
+    EnvironmentPeerImpl environmentPeer;
     @Mock
     Peer peer;
 

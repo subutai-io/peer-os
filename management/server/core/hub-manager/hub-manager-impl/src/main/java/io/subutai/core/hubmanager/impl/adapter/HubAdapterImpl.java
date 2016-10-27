@@ -69,6 +69,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     }
 
 
+    @Override
     public boolean isRegistered()
     {
         return daoHelper.isPeerRegisteredToHub( peerId );
@@ -118,6 +119,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     }
 
 
+    @Override
     public void uploadEnvironment( String json )
     {
         String userId = getUserIdWithCheck();

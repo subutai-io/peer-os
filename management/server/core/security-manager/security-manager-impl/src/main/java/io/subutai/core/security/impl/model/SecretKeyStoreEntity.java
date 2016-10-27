@@ -51,60 +51,70 @@ public class SecretKeyStoreEntity implements SecretKeyStore
     private byte[] data;
 
 
+    @Override
     public String getKeyFingerprint()
     {
         return keyFingerprint;
     }
 
 
+    @Override
     public void setKeyFingerprint( final String keyFingerprint )
     {
         this.keyFingerprint = keyFingerprint;
     }
 
 
+    @Override
     public short getStatus()
     {
         return status;
     }
 
 
+    @Override
     public void setStatus( final short status )
     {
         this.status = status;
     }
 
 
+    @Override
     public int getType()
     {
         return type;
     }
 
 
+    @Override
     public void setType( final int type )
     {
         this.type = type;
     }
 
 
+    @Override
     public String getPwd()
     {
         return pwd;
     }
 
 
+    @Override
     public void setPwd( final String pwd )
     {
         this.pwd = pwd;
     }
 
 
+    @Override
     public byte[] getData()
     {
         return data;
     }
 
 
+    @Override
     public void setData( final byte[] data )
     {
         this.data = data;

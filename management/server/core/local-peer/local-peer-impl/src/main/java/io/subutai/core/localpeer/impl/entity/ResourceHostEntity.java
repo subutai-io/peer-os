@@ -197,12 +197,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    @Override
     public void dispose()
     {
+        // no-op
     }
 
 
     //this method must be executed sequentially since other parallel executions can setup the same tunnel
+    @Override
     public synchronized void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException
     {
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
@@ -336,6 +339,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    @Override
     public Set<ContainerHost> getContainerHosts()
     {
         synchronized ( containersHosts )
@@ -346,6 +350,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    @Override
     public void startContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
@@ -395,6 +400,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    @Override
     public void stopContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
@@ -505,7 +511,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void removeContainerHost( final ContainerHost containerHost )
+    private void removeContainerHost( final ContainerHost containerHost )
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
@@ -520,6 +526,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    @Override
     public ContainerHost getContainerHostById( final String id ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( id ), "Invalid container id" );
@@ -912,8 +919,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                     new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
                                             info.getHostInterfaces(), info.getContainerName(),
                                             getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
-                                            info.getArch().name(), Common.MANAGEMENT_HOSTNAME, null, null,
-                                            ContainerSize.SMALL );
+                                            Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
 
                             addContainerHost( containerHost );
                         }
@@ -986,6 +992,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    @Override
     public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException
     {
         Preconditions.checkNotNull( logLevel, "Invalid log level" );

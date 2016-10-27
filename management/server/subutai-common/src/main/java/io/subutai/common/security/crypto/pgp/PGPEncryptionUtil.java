@@ -275,7 +275,7 @@ public class PGPEncryptionUtil
         {
             // Don't print the passphrase but do print null if thats what it was
             final String passphraseMessage = ( secretPwd == null ) ? "null" : "supplied";
-            System.err.println( "Unable to extract key " + id + " using " + passphraseMessage + " passphrase" );
+            logger.warn( "Unable to extract key " + id + " using " + passphraseMessage + " passphrase" );
         }
         return null;
     }

@@ -838,8 +838,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 ContainerHostEntity containerHostEntity =
                         new ContainerHostEntity( getId(), ( ( CloneContainerTask ) cloneTask ).getResult(),
                                 request.getHostname(), request.getTemplateArch(), interfaces, request.getHostname(),
-                                request.getTemplateId(), request.getTemplateArch().name(),
-                                requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
+                                request.getTemplateId(), requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
                                 requestGroup.getInitiatorPeerId(), request.getContainerSize() );
 
                 registerContainer( request.getResourceHostId(), containerHostEntity );
@@ -1187,6 +1186,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
     public void removeResourceHost( String rhId ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
@@ -2804,6 +2804,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
     public Set<HostUtil.Task> getTasks()
     {
         return hostUtil.getAllTasks();

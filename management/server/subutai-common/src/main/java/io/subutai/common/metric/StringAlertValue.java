@@ -14,7 +14,7 @@ public class StringAlertValue implements AlertValue
         this.value = value;
     }
 
-
+    @Override
     public String getValue()
     {
         return value;
