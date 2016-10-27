@@ -16,8 +16,10 @@ public enum PermissionObject
     KarafServerAdministration(6, "Karaf-Server-Administration" ),
     SystemManagement(7, "System-Management" );
 
-    private String name;
+
     private int id;
+    private String name;
+
 
 
     PermissionObject(  int id, String name)
