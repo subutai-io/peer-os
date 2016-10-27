@@ -614,25 +614,14 @@ public class IdentityManagerImpl implements IdentityManager
 
         UserToken userToken = identityDataService.getValidUserToken( subject );
 
-        if ( userToken != null )
+        if ( userToken != null && TokenUtil.verifySignature( token, userToken.getSecret() ) )
         {
-            if ( TokenType.Permanent.getId() == userToken.getType() && TokenUtil
-                    .verifySignature( token, userToken.getSecret() ) )
-            {
-                return getUser( userToken.getUserId() );
-            }
-            else if ( TokenType.Session.getId() == userToken.getType() && TokenUtil
-                    .verifySignatureAndDate( token, userToken.getSecret() ) )
-            {
-                return getUser( userToken.getUserId() );
-            }
+            return getUser( userToken.getUserId() );
         }
         else
         {
             throw new InvalidLoginException();
         }
-
-        return null;
     }
 
 
@@ -1492,7 +1481,6 @@ public class IdentityManagerImpl implements IdentityManager
                         default:
                             // no-op
                             break;
-
                     }
                 }
             }

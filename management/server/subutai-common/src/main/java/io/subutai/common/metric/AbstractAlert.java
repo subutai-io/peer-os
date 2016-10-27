@@ -27,9 +27,6 @@ public abstract class AbstractAlert<T extends AlertValue> implements Alert
     }
 
 
-    abstract public String getId();
-
-
     public HostId getHostId()
     {
         return hostId;

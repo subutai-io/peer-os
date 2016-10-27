@@ -17,17 +17,13 @@ public abstract class AbstractAlertHandler<T extends AlertValue> implements Aler
 
 
     @Override
-    abstract public String getDescription();
+    public void preProcess( final Environment environment, final T alert ) throws AlertHandlerException
+    {
+    }
 
 
     @Override
-    public void preProcess( final Environment environment, final T alert ) throws AlertHandlerException {}
-
-
-    @Override
-    abstract public void process( final Environment environment, final T alert ) throws AlertHandlerException;
-
-
-    @Override
-    public void postProcess( final Environment environment, final T alert ) throws AlertHandlerException {}
+    public void postProcess( final Environment environment, final T alert ) throws AlertHandlerException
+    {
+    }
 }

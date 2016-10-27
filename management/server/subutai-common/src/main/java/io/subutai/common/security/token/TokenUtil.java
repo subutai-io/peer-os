@@ -136,11 +136,7 @@ public class TokenUtil
             {
                 long date = getDate( jwsObject );
 
-                if ( date == 0 )
-                {
-                    return true;
-                }
-                else if ( System.currentTimeMillis() <= date )
+                if ( date == 0 || System.currentTimeMillis() <= date )
                 {
                     return true;
                 }
@@ -204,7 +200,7 @@ public class TokenUtil
 
 
     //************************************************
-    public static long getDate(  JWSObject jwsObject )
+    public static long getDate( JWSObject jwsObject )
     {
         try
         {
@@ -220,7 +216,7 @@ public class TokenUtil
 
 
     //************************************************
-    public static String createTokenRSA( PrivateKey privateKey,  String claimJson )
+    public static String createTokenRSA( PrivateKey privateKey, String claimJson )
     {
         try
         {
