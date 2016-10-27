@@ -33,19 +33,23 @@ public class SocketUtil
             s.connect( sa, timeout * 1000 );
             success = s.isConnected();
         }
+        catch ( SocketTimeoutException e )
+        {
+            reason = "timeout while attempting to reach node " + node + " on port " + port;
+        }
+        catch ( UnknownHostException e )
+        {
+            reason = "node " + node + " is unresolved.";
+        }
         catch ( IOException e )
         {
             if ( "Connection refused".equals( e.getMessage() ) )
             {
                 reason = "port " + port + " on " + node + " is closed.";
             }
-            if ( e instanceof UnknownHostException )
+            else
             {
-                reason = "node " + node + " is unresolved.";
-            }
-            if ( e instanceof SocketTimeoutException )
-            {
-                reason = "timeout while attempting to reach node " + node + " on port " + port;
+                reason = e.getMessage();
             }
         }
 
