@@ -25,6 +25,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -34,14 +35,13 @@ public class VEHServiceUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( VEHServiceUtil.class.getName() );
 
-
     private VEHServiceUtil()
     {
         throw new IllegalAccessError( "Utility class" );
     }
 
 
-    public static Response upSite( PeerManager peerManager )
+    public static Response upSite( PeerManager peerManager,IdentityManager identityManager )
     {
         String projectName = "";
         String ownerName = "";
@@ -52,7 +52,6 @@ public class VEHServiceUtil
         String url = "https://hub.subut.ai/vehs/rest/%s";
 
         String json = executeRequest( String.format( url, peerManager.getLocalPeer().getId() ) );
-
 
         LOG.error( json );
         try
@@ -70,14 +69,14 @@ public class VEHServiceUtil
         {
             LOG.warn( e.getMessage() );
         }
-        setupSite( peerManager, projectName, ownerName, userName, password, domain );
+        setupSite( peerManager, identityManager, projectName, ownerName, userName, password, domain );
 
         executeRequestPost( String.format( url, peerManager.getLocalPeer().getId() ), "" );
         return Response.status( Response.Status.OK ).build();
     }
 
 
-    public static Response downSite( PeerManager peerManager )
+    public static Response downSite( PeerManager peerManager, IdentityManager identityManager )
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
         Set<ContainerHost> containerHosts = resourceHost.getContainerHosts();
@@ -88,9 +87,12 @@ public class VEHServiceUtil
             containerHost = containerHost1;
             if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
+                /*
                 String sptoken = executeRequest(
                         String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
                                 Common.DEFAULT_PUBLIC_URL ) );
+                */
+                String sptoken = identityManager.getSystemUserToken();
                 String evnUrl = "%s/rest/ui/environments/%s?sptoken=%s";
 
                 executeRequestDelete(
@@ -104,13 +106,17 @@ public class VEHServiceUtil
     }
 
 
-    private static void setupSite( PeerManager peerManager, String projectName, String ownerName, String userName,
+    private static void setupSite( PeerManager peerManager,IdentityManager identityManager, String projectName, String ownerName, String userName,
                                    String password, String domain )
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
 
+        /*
         String sptoken = executeRequest( String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
                 Common.DEFAULT_PUBLIC_URL ) );
+        */
+
+        String sptoken = identityManager.getSystemUserToken();
 
         String evnUrl = "%s/rest/v1/environments?sptoken=%s";
 

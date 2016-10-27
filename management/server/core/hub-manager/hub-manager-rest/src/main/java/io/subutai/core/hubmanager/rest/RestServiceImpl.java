@@ -12,6 +12,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -24,6 +25,8 @@ public class RestServiceImpl implements RestService
     private CommandExecutor commandExecutor;
 
     private PeerManager peerManager;
+
+    private IdentityManager identityManager = null;
 
 
     public void setIntegration( HubManager hubManager )
@@ -168,7 +171,7 @@ public class RestServiceImpl implements RestService
         {
             public void run()
             {
-                VEHServiceUtil.upSite( peerManager );
+                VEHServiceUtil.upSite( peerManager, identityManager );
             }
         };
 
@@ -186,7 +189,7 @@ public class RestServiceImpl implements RestService
         {
             public void run()
             {
-                VEHServiceUtil.downSite( peerManager );
+                VEHServiceUtil.downSite( peerManager, identityManager );
             }
         };
 
@@ -224,5 +227,17 @@ public class RestServiceImpl implements RestService
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+    }
+
+
+    public IdentityManager getIdentityManager()
+    {
+        return identityManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 }
