@@ -324,6 +324,7 @@ public class HubManagerImpl implements HubManager
     {
         asyncHeartbeatExecutor.execute( new Runnable()
         {
+            @Override
             public void run()
             {
                 try

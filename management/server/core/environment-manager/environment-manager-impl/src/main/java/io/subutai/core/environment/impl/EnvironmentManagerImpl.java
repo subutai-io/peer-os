@@ -1472,6 +1472,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    @Override
     @PermitAll
     public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
     {
@@ -1489,6 +1490,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    @Override
     @PermitAll
     public void notifyOnEnvironmentDestroyed( final String environmentId )
     {

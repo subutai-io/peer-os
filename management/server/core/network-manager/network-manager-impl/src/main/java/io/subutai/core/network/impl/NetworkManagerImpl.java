@@ -121,6 +121,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
+    @Override
     public String getP2pVersion( final Host host ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
@@ -152,11 +153,8 @@ public class NetworkManagerImpl implements NetworkManager
             {
                 String logLine = st.nextToken();
 
-                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) )
-                {
-                    p2pLogs.addLog( logLine );
-                }
-                else if ( logLine.contains( String.format( "[%s]", logLevel.name() ) ) )
+                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) || logLine
+                        .contains( String.format( "[%s]", logLevel.name() ) ) )
                 {
                     p2pLogs.addLog( logLine );
                 }

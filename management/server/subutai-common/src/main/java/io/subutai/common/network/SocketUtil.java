@@ -16,22 +16,30 @@ public class SocketUtil
 
     private SocketUtil()
     {
-        throw new IllegalAccessError("Utility class");
+        throw new IllegalAccessError( "Utility class" );
     }
 
 
     public static void check( String node, int timeout, int port ) throws NetworkException
     {
-        Socket s = null;
         String reason = null;
+
         boolean success = false;
-        try
+
+        try ( Socket s = new Socket() )
         {
-            s = new Socket();
             s.setReuseAddress( true );
             SocketAddress sa = new InetSocketAddress( node, port );
             s.connect( sa, timeout * 1000 );
             success = s.isConnected();
+        }
+        catch ( SocketTimeoutException e )
+        {
+            reason = "timeout while attempting to reach node " + node + " on port " + port;
+        }
+        catch ( UnknownHostException e )
+        {
+            reason = "node " + node + " is unresolved.";
         }
         catch ( IOException e )
         {
@@ -39,28 +47,9 @@ public class SocketUtil
             {
                 reason = "port " + port + " on " + node + " is closed.";
             }
-            ;
-            if ( e instanceof UnknownHostException )
+            else
             {
-                reason = "node " + node + " is unresolved.";
-            }
-            if ( e instanceof SocketTimeoutException )
-            {
-                reason = "timeout while attempting to reach node " + node + " on port " + port;
-            }
-        }
-        finally
-        {
-            if ( s != null )
-            {
-                try
-                {
-                    s.close();
-                }
-                catch ( Exception e )
-                {
-                    // ignore
-                }
+                reason = e.getMessage();
             }
         }
 

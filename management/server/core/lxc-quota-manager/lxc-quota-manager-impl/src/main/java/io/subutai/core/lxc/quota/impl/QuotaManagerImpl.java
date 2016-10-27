@@ -4,7 +4,7 @@ package io.subutai.core.lxc.quota.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.dao.DaoManager;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -36,7 +35,6 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.lxc.quota.impl.dao.QuotaDataService;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerQuota;
@@ -57,37 +55,31 @@ import io.subutai.hub.share.resource.ResourceValueParser;
 public class QuotaManagerImpl implements QuotaManager
 {
 
-    public static final BigDecimal ONE_HUNDRED = new BigDecimal( 100 );
+    public static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf( 100 );
 
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
     private LocalPeer localPeer;
     private PeerManager peerManager;
     private CommandUtil commandUtil;
     protected Commands commands = new Commands();
-    private Map<ContainerResourceType, ResourceValueParser> valueParsers = new HashMap<>();
-    private HashMap<ContainerSize, ContainerQuota> containerQuotas = new HashMap<>();
+    private EnumMap<ContainerSize, ContainerQuota> containerQuotas = new EnumMap<>( ContainerSize.class );
     private String defaultQuota;
-    private DaoManager daoManager;
-    private QuotaDataService quotaDataService;
     private ObjectMapper mapper = new ObjectMapper();
 
 
-    public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer, DaoManager daoManager )
+    public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer )
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( localPeer );
-        Preconditions.checkNotNull( daoManager );
         this.peerManager = peerManager;
         this.localPeer = localPeer;
         this.commandUtil = new CommandUtil();
-        this.daoManager = daoManager;
     }
 
 
     public void init() throws QuotaException
     {
         initDefaultQuotas();
-        this.quotaDataService = new QuotaDataService( daoManager );
     }
 
 

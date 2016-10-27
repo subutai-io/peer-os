@@ -6,9 +6,6 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.security.relation.RelationManager;
 
 
-/**
- * Created by ape-craft on 3/19/16.
- */
 public class RelationManagerRestImpl implements RelationManagerRest
 {
     private RelationManager relationManager;

@@ -134,6 +134,7 @@ public class RelationImpl implements Relation
     }
 
 
+    @Override
     public void setRelationStatus( final RelationStatus relationStatus )
     {
         this.relationStatus = relationStatus;
@@ -184,15 +185,8 @@ public class RelationImpl implements Relation
     @Override
     public String toString()
     {
-        return "RelationImpl{" +
-                "id=" + id +
-                ", source=" + source +
-                ", target=" + target +
-                ", trustedObject=" + trustedObject +
-                ", relationInfo=" + relationInfo +
-                ", relationStatus=" + relationStatus +
-                ", keyId='" + keyId + '\'' +
-                ", linkType=" + linkType +
-                '}';
+        return "RelationImpl{" + "id=" + id + ", source=" + source + ", target=" + target + ", trustedObject="
+                + trustedObject + ", relationInfo=" + relationInfo + ", relationStatus=" + relationStatus + ", keyId='"
+                + keyId + '\'' + ", linkType=" + linkType + '}';
     }
 }

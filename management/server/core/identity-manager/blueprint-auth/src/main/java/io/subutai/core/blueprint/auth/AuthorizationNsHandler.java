@@ -69,6 +69,7 @@ public class AuthorizationNsHandler implements NamespaceHandler
     }
 
 
+    @Override
     public ComponentMetadata decorate( Node node, ComponentMetadata cm, ParserContext pc )
     {
         if ( node instanceof Element )
@@ -80,6 +81,7 @@ public class AuthorizationNsHandler implements NamespaceHandler
     }
 
 
+    @Override
     public Metadata parse( Element elt, ParserContext pc )
     {
         parseElement( elt, pc );
@@ -88,12 +90,14 @@ public class AuthorizationNsHandler implements NamespaceHandler
     }
 
 
+    @Override
     public URL getSchemaLocation( String namespace )
     {
         return this.getClass().getResource( "/authz10.xsd" );
     }
 
 
+    @Override
     @SuppressWarnings( "rawtypes" )
     public Set<Class> getManagedClasses()
     {

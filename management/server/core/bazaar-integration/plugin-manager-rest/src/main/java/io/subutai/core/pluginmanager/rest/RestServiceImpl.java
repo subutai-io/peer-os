@@ -52,7 +52,7 @@ public class RestServiceImpl implements RestService
         try
         {
             File karFile = new File( System.getProperty( "karaf.home" ) + "/deploy/" + name + ".kar" );
-            
+
             if ( !karFile.createNewFile() )
             {
                 LOG.info( "Plugin {} already exists. Overwriting", name );
@@ -107,6 +107,7 @@ public class RestServiceImpl implements RestService
 
 
     //todo implement or remove
+    @Override
     public Response setPermissions( final String pluginId, final String permissionJson )
     {
         return Response.status( Response.Status.OK ).build();

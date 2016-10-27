@@ -16,9 +16,6 @@ import io.subutai.common.security.relation.model.RelationChallenge;
 import io.subutai.common.security.relation.model.RelationStatus;
 
 
-/**
- * Created by ape-craft on 3/18/16.
- */
 @Entity
 @Table( name = "relation_challenge" )
 @Access( AccessType.FIELD )
@@ -55,36 +52,42 @@ public class RelationChallengeImpl implements RelationChallenge
     }
 
 
+    @Override
     public String getToken()
     {
         return token;
     }
 
 
+    @Override
     public long getTimestamp()
     {
         return timestamp;
     }
 
 
+    @Override
     public long getTtl()
     {
         return ttl;
     }
 
 
+    @Override
     public void setTtl( final long ttl )
     {
         this.ttl = ttl;
     }
 
 
+    @Override
     public RelationStatus getStatus()
     {
         return status;
     }
 
 
+    @Override
     public void setStatus( final RelationStatus status )
     {
         this.status = status;
@@ -130,11 +133,7 @@ public class RelationChallengeImpl implements RelationChallenge
     @Override
     public String toString()
     {
-        return "RelationChallengeImpl{" +
-                "token='" + token + '\'' +
-                ", timestamp=" + timestamp +
-                ", ttl=" + ttl +
-                ", status=" + status +
-                '}';
+        return "RelationChallengeImpl{" + "token='" + token + '\'' + ", timestamp=" + timestamp + ", ttl=" + ttl
+                + ", status=" + status + '}';
     }
 }

@@ -3,6 +3,8 @@ package io.subutai.core.security.api.model;
 
 /**
  * Interface for Secret Keyring store
+ *
+ * todo remove all mutators from interface
  */
 public interface SecretKeyStore
 {

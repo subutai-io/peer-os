@@ -140,6 +140,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     }
 
 
+    @Override
     public Set<HostInterface> getInterfaces()
     {
         return interfaces;

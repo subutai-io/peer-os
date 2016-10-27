@@ -56,6 +56,7 @@ public class EnvironmentAlertHandlerImpl implements EnvironmentAlertHandler, Com
     }
 
 
+    @Override
     public AlertHandlerPriority getAlertHandlerPriority()
     {
         return handlerPriority;

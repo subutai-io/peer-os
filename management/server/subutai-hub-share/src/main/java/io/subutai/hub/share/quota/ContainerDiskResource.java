@@ -3,17 +3,13 @@ package io.subutai.hub.share.quota;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import io.subutai.hub.share.parser.CpuResourceValueParser;
 import io.subutai.hub.share.parser.DiskValueResourceParser;
 import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
-import io.subutai.hub.share.resource.NumericValueResource;
 
 
 /**
@@ -62,6 +58,7 @@ public class ContainerDiskResource extends ContainerResource<ByteValueResource>
     }
 
 
+    @Override
     protected ByteValueResource parse( final String value )
     {
         return DiskValueResourceParser.getInstance().parse( value );

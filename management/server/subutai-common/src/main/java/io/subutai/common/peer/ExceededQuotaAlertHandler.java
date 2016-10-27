@@ -23,10 +23,6 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
 
 
     @Override
-    abstract public String getDescription();
-
-
-    @Override
     public Class<QuotaAlertValue> getSupportedAlertValue()
     {
         return QuotaAlertValue.class;

@@ -43,7 +43,6 @@
       <scope>test</scope>
     </dependency>
 
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
@@ -85,7 +84,6 @@
       <artifactId>cxf-rt-transports-http-hc</artifactId>
     </dependency>
 
-
   </dependencies>
 
   <build>
@@ -102,6 +100,16 @@
           </instructions>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 

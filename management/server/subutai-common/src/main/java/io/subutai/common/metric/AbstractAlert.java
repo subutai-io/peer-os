@@ -27,15 +27,14 @@ public abstract class AbstractAlert<T extends AlertValue> implements Alert
     }
 
 
-    abstract public String getId();
-
-
+    @Override
     public HostId getHostId()
     {
         return hostId;
     }
 
 
+    @Override
     public <T extends AlertValue> T getAlertValue( final Class<T> format )
     {
         try
@@ -57,6 +56,7 @@ public abstract class AbstractAlert<T extends AlertValue> implements Alert
     }
 
 
+    @Override
     @JsonIgnore
     public long getLiveTime()
     {

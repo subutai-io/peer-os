@@ -9,7 +9,7 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.settings.Common;
 
 
-public class CloneRequest implements TaskRequest
+public class CloneRequest
 {
     private final String resourceHostId;
     private String hostname;

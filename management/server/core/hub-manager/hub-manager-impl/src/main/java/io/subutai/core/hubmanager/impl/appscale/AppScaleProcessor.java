@@ -85,6 +85,7 @@ public class AppScaleProcessor implements StateLinkProcessor
 
             executor.execute( new Runnable()
             {
+                @Override
                 public void run()
                 {
                     processLinks.add( stateLink );

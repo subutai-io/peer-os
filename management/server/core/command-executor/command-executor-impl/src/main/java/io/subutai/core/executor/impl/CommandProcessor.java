@@ -123,6 +123,7 @@ public class CommandProcessor implements RestProcessor
 
         notifier.scheduleWithFixedDelay( new Runnable()
         {
+            @Override
             public void run()
             {
                 try

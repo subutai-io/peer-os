@@ -169,6 +169,7 @@ public class RestServiceImpl implements RestService
 
         Thread thread = new Thread()
         {
+            @Override
             public void run()
             {
                 VEHServiceUtil.upSite( peerManager, identityManager );
@@ -187,6 +188,7 @@ public class RestServiceImpl implements RestService
 
         Thread thread = new Thread()
         {
+            @Override
             public void run()
             {
                 VEHServiceUtil.downSite( peerManager, identityManager );

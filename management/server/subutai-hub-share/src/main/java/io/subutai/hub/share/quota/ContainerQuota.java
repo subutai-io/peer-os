@@ -2,8 +2,7 @@ package io.subutai.hub.share.quota;
 
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.EnumMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +17,7 @@ import io.subutai.hub.share.resource.ContainerResourceType;
 public class ContainerQuota
 {
     @JsonProperty
-    private Map<ContainerResourceType, Quota> resources = new HashMap<>();
+    private EnumMap<ContainerResourceType, Quota> resources = new EnumMap<>( ContainerResourceType.class );
 
 
     public ContainerQuota()
@@ -34,9 +33,9 @@ public class ContainerQuota
 
     public ContainerQuota( Quota... quotas )
     {
-        for ( int i = 0; i < quotas.length; i++ )
+        for ( final Quota quota : quotas )
         {
-            add( quotas[i] );
+            add( quota );
         }
     }
 
