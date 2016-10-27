@@ -12,48 +12,56 @@ public class NetworkSettingsPojo implements NetworkSettings
     private int endRange;
 
 
+    @Override
     public String getPublicUrl()
     {
         return publicUrl;
     }
 
 
+    @Override
     public void setPublicUrl( final String publicUrl )
     {
         this.publicUrl = publicUrl;
     }
 
 
+    @Override
     public int getPublicSecurePort()
     {
         return publicSecurePort;
     }
 
 
+    @Override
     public void setPublicSecurePort( final int publicSecurePort )
     {
         this.publicSecurePort = publicSecurePort;
     }
 
 
+    @Override
     public int getStartRange()
     {
         return startRange;
     }
 
 
+    @Override
     public void setStartRange( final int startRange )
     {
         this.startRange = startRange;
     }
 
 
+    @Override
     public int getEndRange()
     {
         return endRange;
     }
 
 
+    @Override
     public void setEndRange( final int endRange )
     {
         this.endRange = endRange;

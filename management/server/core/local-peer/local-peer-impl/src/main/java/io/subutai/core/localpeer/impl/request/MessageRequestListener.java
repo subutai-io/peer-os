@@ -30,6 +30,7 @@ public class MessageRequestListener extends MessageListener implements Disposabl
     }
 
 
+    @Override
     public void dispose()
     {
         notifier.shutdown();

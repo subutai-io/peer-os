@@ -1,8 +1,7 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
-import java.util.Map;
-
+//todo remove mutators from interface
 public interface SystemInfo
 {
     String getProjectVersion();

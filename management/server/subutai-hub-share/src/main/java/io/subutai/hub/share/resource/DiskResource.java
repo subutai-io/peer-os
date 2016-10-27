@@ -64,6 +64,7 @@ public class DiskResource extends Resource<ByteValueResource>
      * Usually used to write value to CLI
      */
     @JsonIgnore
+    @Override
     public String getWriteValue()
     {
         BigDecimal v = resourceValue.convert( ByteUnit.MB );
@@ -75,6 +76,7 @@ public class DiskResource extends Resource<ByteValueResource>
      * Usually used to display resource value
      */
     @JsonIgnore
+    @Override
     public String getPrintValue()
     {
         return String.format( "%s%s", resourceValue.convert( ByteUnit.MB ), ByteUnit.MB.getAcronym() );

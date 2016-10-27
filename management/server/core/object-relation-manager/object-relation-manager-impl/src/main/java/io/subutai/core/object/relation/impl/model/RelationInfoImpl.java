@@ -113,24 +113,28 @@ public class RelationInfoImpl implements RelationInfo
     }
 
 
+    @Override
     public boolean isReadPermission()
     {
         return readPermission;
     }
 
 
+    @Override
     public boolean isWritePermission()
     {
         return writePermission;
     }
 
 
+    @Override
     public boolean isUpdatePermission()
     {
         return updatePermission;
     }
 
 
+    @Override
     public boolean isDeletePermission()
     {
         return deletePermission;

@@ -121,7 +121,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
             }
             else
             {
-                identityManager.getSecurityController().logEvent( user ,password , "Invalid Login" );
+                identityManager.getSecurityController().logEvent( user, password, "Invalid Login" );
                 throw new LoginException( "Invalid Login" );
             }
         }
@@ -176,6 +176,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
     }
 
 
+    @Override
     public String getEncryptedPassword( final String password )
     {
         LOGGER.debug( "Invoking getEncryptedPassword." );
@@ -183,6 +184,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
     }
 
 
+    @Override
     public boolean checkPassword( final String plain, final String encrypted )
     {
         LOGGER.debug( "Invoking checkPassword." );

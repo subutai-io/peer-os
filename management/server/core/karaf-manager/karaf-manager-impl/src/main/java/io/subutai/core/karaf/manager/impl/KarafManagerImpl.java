@@ -61,6 +61,7 @@ public class KarafManagerImpl implements KarafManager
         //************************************************
         FutureTask<String> commandFuture = new FutureTask<>( new Callable<String>()
         {
+            @Override
             public String call()
             {
                 try

@@ -243,6 +243,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         return new CallbackHandler()
         {
+            @Override
             public void handle( Callback[] callbacks ) throws IOException, UnsupportedCallbackException
             {
                 for ( Callback callback : callbacks )
@@ -465,16 +466,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
-     */
+    @Override
     public UserToken getUserToken( long userId )
     {
         return identityDataService.getUserToken( userId );
     }
 
 
-    /* *************************************************
-     */
     @PermitAll
     @Override
     public String getSystemUserToken()

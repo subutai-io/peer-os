@@ -52,6 +52,7 @@ public class TrackerImpl implements Tracker
      *
      * @return - tracker operation view
      */
+    @Override
     public TrackerOperationView getTrackerOperation( String source, UUID operationTrackId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
@@ -118,6 +119,7 @@ public class TrackerImpl implements Tracker
      *
      * @return - returns created tracker operation
      */
+    @Override
     public TrackerOperation createTrackerOperation( String source, String description )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
@@ -142,6 +144,7 @@ public class TrackerImpl implements Tracker
      *
      * @return - list of tracker operation views
      */
+    @Override
     public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit )
     {
         Preconditions.checkArgument( limit > 0, "Limit must be greater than 0" );
@@ -178,6 +181,7 @@ public class TrackerImpl implements Tracker
      *
      * @return list of tracker operation sources
      */
+    @Override
     public List<String> getTrackerOperationSources()
     {
         List<String> sources = new ArrayList<>();

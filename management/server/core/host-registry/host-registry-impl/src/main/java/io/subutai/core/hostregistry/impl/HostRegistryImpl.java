@@ -251,6 +251,7 @@ public class HostRegistryImpl implements HostRegistry
 
         hostUpdater.scheduleWithFixedDelay( new Runnable()
         {
+            @Override
             public void run()
             {
                 updateHosts();

@@ -23,6 +23,7 @@ public class P2PInfoPojo implements P2Pinfo
     private List<String> p2pErrorLogs;
 
 
+    @Override
     public String getRhName()
     {
         return rhName;
@@ -35,6 +36,7 @@ public class P2PInfoPojo implements P2Pinfo
     }
 
 
+    @Override
     public String getRhId()
     {
         return rhId;
@@ -47,6 +49,7 @@ public class P2PInfoPojo implements P2Pinfo
     }
 
 
+    @Override
     public String getRhVersion()
     {
         return rhVersion;
@@ -59,6 +62,7 @@ public class P2PInfoPojo implements P2Pinfo
     }
 
 
+    @Override
     public int getP2pStatus()
     {
         return p2pStatus;
@@ -71,6 +75,7 @@ public class P2PInfoPojo implements P2Pinfo
     }
 
 
+    @Override
     public String getP2pVersion()
     {
         return p2pVersion;
@@ -109,6 +114,7 @@ public class P2PInfoPojo implements P2Pinfo
     }
 
 
+    @Override
     public int getRhVersionCheck()
     {
         return rhVersionCheck;
@@ -121,6 +127,7 @@ public class P2PInfoPojo implements P2Pinfo
     }
 
 
+    @Override
     public int getP2pVersionCheck()
     {
         return p2pVersionCheck;

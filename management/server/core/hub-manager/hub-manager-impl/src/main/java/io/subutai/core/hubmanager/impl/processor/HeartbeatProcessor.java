@@ -65,6 +65,7 @@ public class HeartbeatProcessor implements Runnable
     {
         Runtime.getRuntime().addShutdownHook( new Thread()
         {
+            @Override
             public void run()
             {
                 try

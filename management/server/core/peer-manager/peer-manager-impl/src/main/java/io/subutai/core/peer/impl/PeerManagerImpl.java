@@ -795,6 +795,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @Override
     public void checkHostAvailability( final String destinationHost ) throws PeerException
     {
         URL url = checkDestinationHostConstraints( destinationHost );

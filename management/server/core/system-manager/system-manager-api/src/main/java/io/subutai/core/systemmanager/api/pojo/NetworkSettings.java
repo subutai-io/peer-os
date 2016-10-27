@@ -1,6 +1,7 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
+//todo remove mutators from interface
 public interface NetworkSettings
 {
     int getPublicSecurePort();
@@ -11,11 +12,11 @@ public interface NetworkSettings
 
     void setPublicUrl( final String publicUrl );
 
-    public int getStartRange();
+    int getStartRange();
 
-    public void setStartRange( final int startRange );
+    void setStartRange( final int startRange );
 
-    public int getEndRange();
+    int getEndRange();
 
-    public void setEndRange( final int endRange );
+    void setEndRange( final int endRange );
 }
