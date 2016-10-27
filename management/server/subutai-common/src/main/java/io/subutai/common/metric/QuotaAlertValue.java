@@ -1,6 +1,9 @@
 package io.subutai.common.metric;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
@@ -10,6 +13,7 @@ import com.google.common.base.Preconditions;
  */
 public class QuotaAlertValue implements AlertValue<ExceededQuota>
 {
+    protected static final Logger LOG = LoggerFactory.getLogger( QuotaAlertValue.class );
 
     private final ExceededQuota value;
 
@@ -42,6 +46,8 @@ public class QuotaAlertValue implements AlertValue<ExceededQuota>
         }
         catch ( Exception e )
         {
+            LOG.warn( e.getMessage() );
+
             return false;
         }
         return true;
