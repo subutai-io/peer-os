@@ -284,14 +284,11 @@ public class VEHServiceUtil
     private static String getStringFromInputStream( InputStream is )
     {
 
-        BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
 
-        String line;
-        try
+        try ( BufferedReader br = new BufferedReader( new InputStreamReader( is ) ) )
         {
-
-            br = new BufferedReader( new InputStreamReader( is ) );
+            String line;
             while ( ( line = br.readLine() ) != null )
             {
                 sb.append( line );
@@ -300,20 +297,6 @@ public class VEHServiceUtil
         catch ( IOException e )
         {
             LOG.error( e.getMessage() );
-        }
-        finally
-        {
-            if ( br != null )
-            {
-                try
-                {
-                    br.close();
-                }
-                catch ( IOException e )
-                {
-                    LOG.error( e.getMessage() );
-                }
-            }
         }
 
         return sb.toString();
