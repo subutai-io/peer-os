@@ -13,13 +13,13 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentModificationException;
-import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Matchers.anyLong;
@@ -67,7 +67,7 @@ public class ReservationStepTest
 
         step.execute();
 
-        verify( environment ).addEnvironmentPeer( isA( EnvironmentPeer.class ) );
+        verify( environment ).addEnvironmentPeer( isA( EnvironmentPeerImpl.class ) );
 
         doReturn( false ).when( peerTaskResult ).hasSucceeded();
         doReturn( true ).when( peerTaskResults ).hasFailures();

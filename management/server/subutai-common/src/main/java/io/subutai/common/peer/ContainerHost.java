@@ -29,8 +29,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     void stop() throws PeerException;
 
-    Peer getPeer();
-
     Template getTemplate() throws PeerException;
 
     String getTemplateName();
@@ -46,14 +44,8 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - resource usage
      */
-    public ProcessResourceUsage getProcessResourceUsage( int processPid ) throws PeerException;
+    ProcessResourceUsage getProcessResourceUsage( int processPid ) throws PeerException;
 
-
-    /**
-     * Returns available quota values
-     *
-     * @return quota value
-     */
 
     /**
      * Returns current quota values

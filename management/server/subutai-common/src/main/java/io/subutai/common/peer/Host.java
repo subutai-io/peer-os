@@ -20,21 +20,19 @@ public interface Host extends HostInfo, RelationLink
      *
      * @return returns Peer interface
      */
-    public Peer getPeer();
+    Peer getPeer();
 
-    public String getPeerId();
+    String getPeerId();
 
-    public String getHostname();
+    CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
-    public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
+    CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
-    public CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+    void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
-    public void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+    void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
 
-    public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
-
-    public boolean isConnected();
+    boolean isConnected();
 
 
     HostInterface getInterfaceByName( String interfaceName );

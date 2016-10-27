@@ -355,7 +355,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void addEnvironmentPeer( final EnvironmentPeer environmentPeer )
+    public void addEnvironmentPeer( final EnvironmentPeerImpl environmentPeer )
     {
 
         Preconditions.checkNotNull( environmentPeer, "Environment peer could not be null." );
@@ -384,13 +384,13 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentPeer getEnvironmentPeer( String peerId )
+    public EnvironmentPeerImpl getEnvironmentPeer( String peerId )
     {
         for ( EnvironmentPeer environmentPeer : environmentPeers )
         {
             if ( environmentPeer.getPeerId().equalsIgnoreCase( peerId ) )
             {
-                return environmentPeer;
+                return ( EnvironmentPeerImpl ) environmentPeer;
             }
         }
 

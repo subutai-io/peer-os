@@ -13,9 +13,5 @@ public interface EnvironmentPeer extends Serializable
 
     Environment getEnvironment();
 
-    void setEnvironment( Environment environment );
-
-    void addRhP2pIps( Set<RhP2pIp> rhP2pIps );
-
     Set<RhP2pIp> getRhP2pIps();
 }
