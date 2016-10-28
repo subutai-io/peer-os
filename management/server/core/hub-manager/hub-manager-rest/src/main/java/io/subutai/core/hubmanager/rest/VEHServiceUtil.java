@@ -46,7 +46,7 @@ public class VEHServiceUtil
         String projectName = "";
         String ownerName = "";
         String userName = "";
-        String password = "";
+        String password = null;
         String domain = null;
 
         String url = "https://hub.subut.ai/vehs/rest/%s";
