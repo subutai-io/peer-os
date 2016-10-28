@@ -51,7 +51,9 @@ node() {
 	"""
 
 	// create management template
-	sh """ssh root@gw.intra.lan <<- EOF
+	sh """
+		set +x
+		ssh root@gw.intra.lan <<- EOF
 		set -e
 		
 		/apps/bin/subutai destroy management
@@ -75,7 +77,9 @@ node() {
 	// Deploy builded template to remore test-server
 
 	// destroy existing management template on test node
-	sh """ssh root@${env.SS_TEST_NODE} <<- EOF
+	sh """
+		set +x
+		ssh root@${env.SS_TEST_NODE} <<- EOF
 		set -e
 		subutai destroy management
 		rm /mnt/lib/lxc/tmpdir/management-subutai-template_*
@@ -83,11 +87,14 @@ node() {
 
 	// copy generated management template on test node
 	sh """
+		set +x
 		scp ${artifactDir}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE}:/mnt/lib/lxc/tmpdir
 	"""
 
 	// install genetared management template
-	sh """ssh root@${env.SS_TEST_NODE} <<- EOF
+	sh """
+		set +x
+		ssh root@${env.SS_TEST_NODE} <<- EOF
 		set -e
 		echo -e '[template]\nbranch = ${env.BRANCH_NAME}' > /var/lib/apps/subutai/current/agent.gcfg
 		echo -e '[cdn]\nbranch = cdn.local' >> /var/lib/apps/subutai/current/agent.gcfg
@@ -110,6 +117,7 @@ node() {
 
 	git url: "https://github.com/subutai-io/playbooks.git"
 	sh """
+		set +x
 		./run_tests_qa.sh -m ${env.SS_TEST_NODE}
 		./run_tests_qa.sh -s all
 		./run_tests_qa.sh -r
