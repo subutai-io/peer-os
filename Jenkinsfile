@@ -103,13 +103,13 @@ node() {
 	EOF"""
 
 	// wait until SS starts
-	sh '''
+	sh """
 		set +x
 		echo "Waiting SS"
-		while [ $(curl -k -s -o /dev/null -w %{http_code} "https://${env.SS_TEST_NODE}:8443/rest/v1/peer/ready") != "200" ]; do
+		while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE}:8443/rest/v1/peer/ready') != "200" ]; do
 			sleep 5
 		done
-	'''
+	"""
 
 
 	stage("Integration tests")
