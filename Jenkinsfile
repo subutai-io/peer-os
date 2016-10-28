@@ -12,9 +12,7 @@
 // in build job log you will see 
 // Scripts not permitted to use new <method>
 // Goto http://jenkins.domain/scriptApproval/
-// and approve methods:
-// method groovy.json.JsonSlurperClassic parseText java.lang.String
-// new groovy.json.JsonSlurperClassic
+// and approve methods denied methods
 //
 // TODO:
 // - refactor getVersion function on native groovy
@@ -23,6 +21,10 @@
 import groovy.json.JsonSlurperClassic
 
 node() {
+	// Send job started notifications
+	try {
+	notifyBuild('STARTED')
+
 	def mvnHome = tool 'M3'
 	def workspace = pwd() 
 	def artifactVersion = getVersion("${workspace}@script/management/pom.xml")
@@ -145,7 +147,13 @@ node() {
 		def jsonTemplate = jsonParse(responseTemplate)
 		sh "curl -s -k -X DELETE ${url}/template/delete?id=${jsonTemplate["id"]}'&'token=${token}"
 	}
-
+	} catch (e) { 
+		currentBuild.result = "FAILED"
+		throw e
+	} finally {
+		// Success or failure, always send notifications
+		notifyBuild(currentBuild.result)
+	}
 }
 
 def getVersionFromPom(pom) {
@@ -162,4 +170,51 @@ def String getVersion(pom) {
 @NonCPS
 def jsonParse(def json) {
     new groovy.json.JsonSlurperClassic().parseText(json)
+}
+
+// https://jenkins.io/blog/2016/07/18/pipline-notifications/
+def notifyBuild(String buildStatus = 'STARTED') {
+  // build status of null means successful
+  buildStatus =  buildStatus ?: 'SUCCESSFUL'
+
+  // Default values
+  def colorName = 'RED'
+  def colorCode = '#FF0000'
+  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+  def summary = "${subject} (${env.BUILD_URL})"
+  def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""
+
+  // Override default values based on build status
+  if (buildStatus == 'STARTED') {
+    color = 'YELLOW'
+    colorCode = '#FFFF00'
+  } else if (buildStatus == 'SUCCESSFUL') {
+    color = 'GREEN'
+    colorCode = '#00FF00'
+  } else {
+    color = 'RED'
+    colorCode = '#FF0000'
+  }
+  // Get token
+  def slackToken = getSlackToken('slack-test-bots')
+  // Send notifications
+  slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
+}
+
+// get slack token from global jenkins credentials store
+@NonCPS
+def getSlackToken(id){
+	// id is ID of creadentials
+	String slackCredentialsId = 'slack-test-bots'
+	def jenkins_creds = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
+
+	String found_slack_token = jenkins_creds.getStore().getDomains().findResult { domain ->
+	  jenkins_creds.getCredentials(domain).findResult { credential ->
+	    if(slackCredentialsId.equals(credential.id)) {
+	      credential.getSecret()
+	    }
+	  }
+	}
+	return found_slack_token
 }
