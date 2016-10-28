@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 public class SafeCloseUtil
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SafeCloseUtil.class );
-    private static final String LOG_FORMAT = "Error closing %s";
+    private static final String LOG_FORMAT = "Error closing {}: {}";
 
 
     private SafeCloseUtil()
@@ -44,7 +44,7 @@ public class SafeCloseUtil
             }
             catch ( IOException e )
             {
-                LOGGER.warn( String.format( LOG_FORMAT, "file stream" ) );
+                LOGGER.warn( LOG_FORMAT, "file stream", e.getMessage() );
             }
         }
     }
@@ -64,9 +64,9 @@ public class SafeCloseUtil
                 inputStream.close();
             }
         }
-        catch ( IOException ex )
+        catch ( IOException e )
         {
-            LOGGER.warn( String.format( LOG_FORMAT, " stream" ) );
+            LOGGER.warn( LOG_FORMAT, "inout stream", e.getMessage() );
         }
     }
 
@@ -85,9 +85,9 @@ public class SafeCloseUtil
                 outputStream.close();
             }
         }
-        catch ( IOException ex )
+        catch ( IOException e )
         {
-            LOGGER.warn( String.format( LOG_FORMAT, "output stream" ) );
+            LOGGER.warn( LOG_FORMAT, "output stream", e.getMessage() );
         }
     }
 
@@ -106,9 +106,9 @@ public class SafeCloseUtil
                 reader.close();
             }
         }
-        catch ( IOException ex )
+        catch ( IOException e )
         {
-            LOGGER.warn( String.format( LOG_FORMAT, "reader" ) );
+            LOGGER.warn( LOG_FORMAT, "reader", e.getMessage() );
         }
     }
 
@@ -127,9 +127,9 @@ public class SafeCloseUtil
                 writer.close();
             }
         }
-        catch ( IOException ex )
+        catch ( IOException e )
         {
-            LOGGER.warn( String.format( LOG_FORMAT, "writer" ) );
+            LOGGER.warn( LOG_FORMAT, "writer", e.getMessage() );
         }
     }
 
@@ -148,9 +148,9 @@ public class SafeCloseUtil
                 zipFile.close();
             }
         }
-        catch ( IOException ex )
+        catch ( IOException e )
         {
-            LOGGER.warn( String.format( LOG_FORMAT, "closeable" ) );
+            LOGGER.warn( LOG_FORMAT, "zip file", e.getMessage() );
         }
     }
 
@@ -164,9 +164,9 @@ public class SafeCloseUtil
                 closeable.close();
             }
         }
-        catch ( IOException ex )
+        catch ( IOException e )
         {
-            LOGGER.warn( String.format( LOG_FORMAT, "zipFile" ) );
+            LOGGER.warn( LOG_FORMAT, "closeable stream", e.getMessage() );
         }
     }
 }

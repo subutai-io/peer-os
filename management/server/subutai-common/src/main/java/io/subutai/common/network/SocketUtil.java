@@ -8,11 +8,16 @@ import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.subutai.common.exception.NetworkException;
 
 
 public class SocketUtil
 {
+    protected static final Logger LOG = LoggerFactory.getLogger( SocketUtil.class );
+
 
     private SocketUtil()
     {
@@ -35,14 +40,20 @@ public class SocketUtil
         }
         catch ( SocketTimeoutException e )
         {
+            LOG.warn( e.getMessage() );
+
             reason = "timeout while attempting to reach node " + node + " on port " + port;
         }
         catch ( UnknownHostException e )
         {
+            LOG.warn( e.getMessage() );
+
             reason = "node " + node + " is unresolved.";
         }
         catch ( IOException e )
         {
+            LOG.warn( e.getMessage() );
+
             if ( "Connection refused".equals( e.getMessage() ) )
             {
                 reason = "port " + port + " on " + node + " is closed.";

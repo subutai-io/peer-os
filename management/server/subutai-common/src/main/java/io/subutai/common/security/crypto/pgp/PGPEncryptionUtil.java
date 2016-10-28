@@ -92,7 +92,7 @@ import com.google.common.base.Preconditions;
  */
 public class PGPEncryptionUtil
 {
-    private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( PGPEncryptionUtil.class );
     private static final BouncyCastleProvider provider = new BouncyCastleProvider();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
@@ -152,7 +152,7 @@ public class PGPEncryptionUtil
         }
         catch ( IOException e )
         {
-            throw new PGPException( e.getMessage() );
+            throw new PGPException( "Error in encrypt", e );
         }
     }
 
@@ -212,8 +212,6 @@ public class PGPEncryptionUtil
         }
         catch ( IOException e )
         {
-            logger.error( "Error getting encrypted objects", e );
-
             throw new IOException( e );
         }
     }
@@ -275,7 +273,8 @@ public class PGPEncryptionUtil
         {
             // Don't print the passphrase but do print null if thats what it was
             final String passphraseMessage = ( secretPwd == null ) ? "null" : "supplied";
-            logger.warn( "Unable to extract key " + id + " using " + passphraseMessage + " passphrase" );
+            LOG.warn( "Unable to extract key " + id + " using " + passphraseMessage + " passphrase: {}",
+                    e.getMessage() );
         }
         return null;
     }
@@ -1305,9 +1304,9 @@ public class PGPEncryptionUtil
             return secretKey.extractPrivateKey(
                     new JcePBESecretKeyDecryptorBuilder().setProvider( provider ).build( secretPwd.toCharArray() ) );
         }
-        catch ( final Exception e )
+        catch ( Exception e )
         {
-            logger.error( "Unable to extract key {}: {}", secretKey.getKeyID(), e.getMessage() );
+            LOG.error( "Unable to extract key {}: {}", secretKey.getKeyID(), e.getMessage() );
         }
 
         return null;
@@ -1530,6 +1529,8 @@ public class PGPEncryptionUtil
             }
             catch ( GeneralSecurityException gse )
             {
+                LOG.error( gse.getMessage() );
+                
                 return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
         }

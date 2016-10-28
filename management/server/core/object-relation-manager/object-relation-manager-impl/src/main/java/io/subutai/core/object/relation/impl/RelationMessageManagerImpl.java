@@ -5,8 +5,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.subutai.common.security.relation.RelationMessageManager;
 import io.subutai.common.security.relation.RelationVerificationException;
@@ -20,7 +18,6 @@ import io.subutai.core.security.api.crypto.KeyManager;
 
 public class RelationMessageManagerImpl implements RelationMessageManager
 {
-    private static final Logger logger = LoggerFactory.getLogger( RelationMessageManagerImpl.class );
     private SecurityManager securityManager;
 
 

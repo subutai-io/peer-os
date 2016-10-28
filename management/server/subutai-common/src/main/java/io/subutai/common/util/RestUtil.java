@@ -5,9 +5,6 @@ import java.util.Arrays;
 
 import javax.ws.rs.core.Response;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -19,7 +16,6 @@ import io.subutai.common.settings.Common;
 
 public class RestUtil
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RestUtil.class );
     private static long defaultReceiveTimeout = Common.DEFAULT_RECEIVE_TIMEOUT;
     private static long defaultConnectionTimeout = Common.DEFAULT_CONNECTION_TIMEOUT;
     private static int defaultMaxRetransmits = Common.DEFAULT_MAX_RETRANSMITS;

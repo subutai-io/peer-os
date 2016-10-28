@@ -4,6 +4,9 @@ package io.subutai.common.dao;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * DAO Manager. Manages, controls entityManagerFactory instances
@@ -11,6 +14,8 @@ import javax.persistence.EntityManagerFactory;
 
 public class DaoManager
 {
+    protected static final Logger LOG = LoggerFactory.getLogger( DaoManager.class );
+
     private EntityManager entityManager;
     private EntityManagerFactory entityManagerFactory;
     private boolean autoCommit = true;
@@ -165,8 +170,10 @@ public class DaoManager
                 return 0;
             }
         }
-        catch ( Exception Ex )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
+
             return 0;
         }
 
@@ -195,8 +202,10 @@ public class DaoManager
                 return 0;
             }
         }
-        catch ( Exception Ex )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
+
             return 0;
         }
 
@@ -225,8 +234,10 @@ public class DaoManager
                 return 0;
             }
         }
-        catch ( Exception Ex )
+        catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
+
             return 0;
         }
 
