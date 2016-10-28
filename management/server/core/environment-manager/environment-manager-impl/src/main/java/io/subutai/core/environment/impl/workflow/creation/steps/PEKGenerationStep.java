@@ -75,7 +75,9 @@ public class PEKGenerationStep
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Could not create PEK for: " + peerManager.getLocalPeer().getId() );
+            throw new PeerException(
+                    String.format( "Could not create PEK for %s: %s", peerManager.getLocalPeer().getId(),
+                            e.getMessage() ) );
         }
 
         if ( peers.isEmpty() )

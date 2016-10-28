@@ -94,7 +94,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @JsonProperty( "hostname" )
     private String hostname;
 
-    @Column( name = "containerName", nullable = true )
+    @Column( name = "containerName" )
     @JsonProperty( "containerName" )
     private String containerName;
 
@@ -245,7 +245,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         }
         catch ( PeerException e )
         {
-            logger.warn( "Error getting container state #getState" );
+            logger.warn( "Error getting container state: {}", e.getMessage() );
+
             return ContainerHostState.UNKNOWN;
         }
     }
