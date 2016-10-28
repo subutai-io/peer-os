@@ -7,7 +7,6 @@ import java.util.List;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.User;
 import io.subutai.core.pluginmanager.api.PluginManager;
 import io.subutai.core.pluginmanager.api.dao.ConfigDataService;
 import io.subutai.core.pluginmanager.api.model.PermissionJson;
@@ -22,7 +21,6 @@ public class PluginManagerImpl implements PluginManager
 
 
     private ConfigDataService configDataService;
-    private User user;
 
 
     public PluginManagerImpl( final DaoManager daoManager )
@@ -33,7 +31,7 @@ public class PluginManagerImpl implements PluginManager
 
     public void init()
     {
-        configDataService = new ConfigDataServiceImpl( daoManager, identityManager );
+        configDataService = new ConfigDataServiceImpl( daoManager );
     }
 
 
@@ -84,12 +82,6 @@ public class PluginManagerImpl implements PluginManager
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
-    }
-
-
-    public IdentityManager getIdentityManager()
-    {
-        return identityManager;
     }
 
 

@@ -1,9 +1,6 @@
 package io.subutai.core.peer.cli;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -19,9 +16,7 @@ import io.subutai.hub.share.resource.PeerResources;
 @Command( scope = "peer", name = "limits", description = "Gets limits for specified peer" )
 public class GetResourceLimits extends SubutaiShellCommandSupport
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( GetResourceLimits.class );
-    @Argument( index = 0, name = "peer id", required = true, multiValued = false,
-            description = "peer identifier" )
+    @Argument( name = "peer id", required = true, description = "peer identifier" )
     private String peerId;
 
     private PeerManager peerManager;
@@ -30,12 +25,6 @@ public class GetResourceLimits extends SubutaiShellCommandSupport
     public GetResourceLimits( PeerManager peerManager )
     {
         this.peerManager = peerManager;
-    }
-
-
-    public void setPeerId( final String peerId )
-    {
-        this.peerId = peerId;
     }
 
 

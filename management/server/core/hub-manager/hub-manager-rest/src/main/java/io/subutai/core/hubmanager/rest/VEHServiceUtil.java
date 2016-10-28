@@ -87,11 +87,6 @@ public class VEHServiceUtil
             containerHost = containerHost1;
             if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
-                /*
-                String sptoken = executeRequest(
-                        String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
-                                Common.DEFAULT_PUBLIC_URL ) );
-                */
                 String sptoken = identityManager.getSystemUserToken();
                 String evnUrl = "%s/rest/ui/environments/%s?sptoken=%s";
 
@@ -110,11 +105,6 @@ public class VEHServiceUtil
                                    String password, String domain )
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
-
-        /*
-        String sptoken = executeRequest( String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
-                Common.DEFAULT_PUBLIC_URL ) );
-        */
 
         String sptoken = identityManager.getSystemUserToken();
 

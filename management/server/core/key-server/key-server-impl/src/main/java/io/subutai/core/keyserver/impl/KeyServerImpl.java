@@ -1,6 +1,13 @@
 package io.subutai.core.keyserver.impl;
 
 
+import java.io.IOException;
+import java.util.List;
+
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.core.keyserver.api.KeyServer;
@@ -10,23 +17,12 @@ import io.subutai.core.keyserver.impl.dao.KeyServerDAOImpl;
 import io.subutai.core.keyserver.impl.model.PublicKeyStoreEntity;
 import io.subutai.core.keyserver.impl.utils.SecurityKeyUtil;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * Manages Security key.
  */
 public class KeyServerImpl implements KeyServer
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger( KeyServerImpl.class );
     private DaoManager daoManager = null;
     private KeyServerDAO keyServerDAO = null;
 
@@ -123,7 +119,7 @@ public class KeyServerImpl implements KeyServer
     @Override
     public void addPublicKey( String key ) throws PGPException, IOException
     {
-        PGPPublicKey publicKey  = PGPKeyUtil.readPublicKey( key );
+        PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( key );
         PublicKeyStore securityKey = SecurityKeyUtil.convert( publicKey );
 
         keyServerDAO.save( securityKey );
@@ -161,7 +157,7 @@ public class KeyServerImpl implements KeyServer
     public PGPPublicKeyRing addPublicKeyRing( String keyRing ) throws PGPException, IOException
     {
         PGPPublicKeyRing publicKeyRing = PGPKeyUtil.readPublicKeyRing( keyRing );
-        PublicKeyStore publicKeyStore  = SecurityKeyUtil.convert( publicKeyRing );
+        PublicKeyStore publicKeyStore = SecurityKeyUtil.convert( publicKeyRing );
 
         keyServerDAO.save( publicKeyStore );
 
@@ -233,5 +229,4 @@ public class KeyServerImpl implements KeyServer
     {
         this.keyServerDAO = keyServerDAO;
     }
-
 }

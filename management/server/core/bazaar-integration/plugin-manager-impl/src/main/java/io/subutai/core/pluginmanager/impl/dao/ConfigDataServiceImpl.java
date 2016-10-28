@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.pluginmanager.api.dao.ConfigDataService;
 import io.subutai.core.pluginmanager.api.model.PluginDetails;
 import io.subutai.core.pluginmanager.impl.model.PluginDetailsEntity;
@@ -23,13 +22,11 @@ public class ConfigDataServiceImpl implements ConfigDataService
 {
     private static final Logger LOG = LoggerFactory.getLogger( ConfigDataServiceImpl.class );
     private DaoManager daoManager;
-    private IdentityManager identityManager;
 
 
-    public ConfigDataServiceImpl( final DaoManager daoManager, final IdentityManager identityManager )
+    public ConfigDataServiceImpl( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
-        this.identityManager = identityManager;
     }
 
 

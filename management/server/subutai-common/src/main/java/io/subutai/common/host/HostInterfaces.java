@@ -7,9 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
@@ -22,7 +19,6 @@ import com.google.common.collect.Sets;
  */
 public class HostInterfaces implements Serializable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HostInterfaces.class );
 
     @JsonProperty( "hostId" )
     private String hostId;
