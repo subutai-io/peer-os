@@ -121,31 +121,58 @@ node() {
 	// cdn auth creadentials 
 	String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 	String user = "jenkins"
-	def authID = sh (script: "curl -s -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty", returnStdout: true)
-	def token = sh (script: "curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} ${url}/auth/token", returnStdout: true)
+	def authID = sh (script: """
+		set +x
+		curl -s -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
+		""", returnStdout: true)
+	def token = sh (script: """
+		set +x
+		curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} ${url}/auth/token
+		""", returnStdout: true)
 
 	// upload artifacts on cdn
 	// upload deb
-	String responseDeb = sh (script: "curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/apt/info?name=${debFileName}", returnStdout: true)
-	sh "curl -s -k -Ffile=@${artifactDir}/${debFileName} -Ftoken=${token} ${url}/apt/upload"
+	String responseDeb = sh (script: """
+		set +x
+		curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/apt/info?name=${debFileName}
+		""", returnStdout: true)
+	sh """
+		set +x
+		curl -s -k -Ffile=@${artifactDir}/${debFileName} -Ftoken=${token} ${url}/apt/upload
+	"""
 	// def signatureDeb = sh (script: "curl -s -k -Ffile=@${artifactDir}/${debFileName} -Ftoken=${token} ${url}/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
 	// sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" ${url}/auth/sign"
 
 	// delete old deb
 	if (responseDeb != "Not found") {
 		def jsonDeb = jsonParse(responseDeb)	
-		sh "curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb["id"]}'&'token=${token}"
+		sh """
+			set +x
+			curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb["id"]}'&'token=${token}
+		"""
 	}
 
 	// upload template
-	String responseTemplate = sh (script: "curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=${templateFileName}", returnStdout: true)
-	def signatureTemplate = sh (script: "curl -s -k -Ffile=@${artifactDir}/${templateFileName} -Ftoken=${token} ${url}/template/upload | gpg --clearsign --no-tty", returnStdout: true)
-	sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" ${url}/auth/sign"
+	String responseTemplate = sh (script: """
+		set +x
+		curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=${templateFileName}
+		""", returnStdout: true)
+	def signatureTemplate = sh (script: """
+		set +x
+		curl -s -k -Ffile=@${artifactDir}/${templateFileName} -Ftoken=${token} ${url}/template/upload | gpg --clearsign --no-tty
+		""", returnStdout: true)
+	sh """
+		set +x
+		curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" ${url}/auth/sign
+	"""
 
 	// delete old template
 	if (responseTemplate != "Not found") {
 		def jsonTemplate = jsonParse(responseTemplate)
-		sh "curl -s -k -X DELETE ${url}/template/delete?id=${jsonTemplate["id"]}'&'token=${token}"
+		sh """
+			set +x
+			curl -s -k -X DELETE ${url}/template/delete?id=${jsonTemplate["id"]}'&'token=${token}
+		"""
 	}
 	} catch (e) { 
 		currentBuild.result = "FAILED"
