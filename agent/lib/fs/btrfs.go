@@ -15,13 +15,15 @@ import (
 // IsSubvolumeReadonly checks if BTRFS subvolume have "readonly" property.
 // It's used in Subutai to check if LXC container template or not.
 func IsSubvolumeReadonly(path string) bool {
-	out, _ := exec.Command("btrfs", "property", "get", "-ts", path).Output()
+	out, err := exec.Command("btrfs", "property", "get", "-ts", path).Output()
+	log.Check(log.DebugLevel, "Getting BTRFS subvolume readonly property", err)
 	return strings.Contains(string(out), "true")
 }
 
 // IsSubvolume checks if path BTRFS subvolume.
 func IsSubvolume(path string) bool {
-	out, _ := exec.Command("btrfs", "subvolume", "show", path).CombinedOutput()
+	out, err := exec.Command("btrfs", "subvolume", "show", path).CombinedOutput()
+	log.Check(log.DebugLevel, "Checking is path BTRFS subvolume", err)
 	return strings.Contains(string(out), "Subvolume ID")
 }
 
@@ -69,7 +71,8 @@ func qgroupDestroy(path string) {
 // NEED REFACTORING
 func id(path string) string {
 	path = strings.Replace(path, config.Agent.LxcPrefix, "", -1)
-	out, _ := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
+	out, err := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
+	log.Check(log.DebugLevel, "Getting BTRFS subvolume list", err)
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
@@ -155,14 +158,20 @@ func Stat(path, index string, raw bool) string {
 // If size argument is set, it sets new quota value.
 func DiskQuota(path string, size ...string) string {
 	parent := id(path)
-	exec.Command("btrfs", "qgroup", "create", "1/"+parent, config.Agent.LxcPrefix+path).Run()
+	if err := exec.Command("btrfs", "qgroup", "create", "1/"+parent, config.Agent.LxcPrefix+path).Run(); err != nil {
+		return err.Error()
+	}
 
 	for _, subvol := range []string{"/rootfs", "/opt", "/var", "/home"} {
 		index := id(path + subvol)
-		exec.Command("btrfs", "qgroup", "assign", "0/"+index, "1/"+parent, config.Agent.LxcPrefix+path).Run()
+		if err := exec.Command("btrfs", "qgroup", "assign", "0/"+index, "1/"+parent, config.Agent.LxcPrefix+path).Run(); err != nil {
+			return err.Error()
+		}
 	}
 	if size != nil {
-		exec.Command("btrfs", "qgroup", "limit", size[0]+"G", "1/"+parent, config.Agent.LxcPrefix+path).Run()
+		if err := exec.Command("btrfs", "qgroup", "limit", size[0]+"G", "1/"+parent, config.Agent.LxcPrefix+path).Run(); err != nil {
+			return err.Error()
+		}
 	}
 	return Stat(path, "quota", false)
 }
@@ -171,7 +180,9 @@ func DiskQuota(path string, size ...string) string {
 // If size argument is set, it sets new quota value.
 func Quota(path string, size ...string) string {
 	if size != nil {
-		exec.Command("btrfs", "qgroup", "limit", size[0]+"G", config.Agent.LxcPrefix+path).Run()
+		if err := exec.Command("btrfs", "qgroup", "limit", size[0]+"G", config.Agent.LxcPrefix+path).Run(); err != nil {
+			return err.Error()
+		}
 	}
 	return Stat(path, "quota", false)
 }

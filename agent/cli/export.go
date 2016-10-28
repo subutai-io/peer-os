@@ -1,13 +1,14 @@
-package lib
+package cli
 
 import (
+	"os"
+	"runtime"
+
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/fs"
 	"github.com/subutai-io/base/agent/lib/template"
 	"github.com/subutai-io/base/agent/log"
-	"os"
-	"runtime"
 )
 
 var (
@@ -15,7 +16,17 @@ var (
 )
 
 // cfg declared in promote.go
-// LxcExport exports the given name if it suits the needs.
+
+// LxcExport sub command prepares an archive from a template in the `/mnt/lib/lxc/tmpdir/` path.
+// This archive can be moved to another Subutai peer and deployed as ready-to-use template or uploaded to Subutai's global template repository to make it
+// widely available for others to use.
+//
+// Export consist of two steps if the target is a container:
+// container promotion to template (see "promote" command) and packing the template into the archive.
+// If already a template just the packing of the archive takes place.
+//
+// Configuration values for template metadata parameters can be overridden on export, like the recommended container size when the template is cloned using `-s` option.
+// The template's version can also specified on export so the import command can use it to request specific versions.
 func LxcExport(name, version, prefsize string) {
 	size := "tiny"
 	for _, s := range allsizes {

@@ -1,4 +1,4 @@
-package lib
+package cli
 
 import (
 	"os"
@@ -18,6 +18,7 @@ import (
 	"github.com/pivotal-golang/archiver/extractor"
 )
 
+// RestoreContainer restores a Subutai container to a snapshot at a specified timestamp if such a backup archive is available.
 func RestoreContainer(container, date, newContainer string) {
 	const backupDir = "/mnt/backups/"
 
@@ -47,8 +48,8 @@ func RestoreContainer(container, date, newContainer string) {
 
 	if !strings.Contains(tarball[0], "Full") {
 		// get files for unpack
-		flist = append(flist[:Position(flist, tarball[0])+1])
-		flist = append(flist[Position(flist, "Full"):])
+		flist = append(flist[:position(flist, tarball[0])+1])
+		flist = append(flist[position(flist, "Full"):])
 	} else {
 		flist = tarball
 	}
@@ -63,7 +64,7 @@ func RestoreContainer(container, date, newContainer string) {
 			os.RemoveAll(tmpUnpackDir+container))
 
 		log.Debug("unpacking " + file)
-		Unpack(file, tmpUnpackDir+container)
+		unpack(file, tmpUnpackDir+container)
 		deltas, _ := filepath.Glob(tmpUnpackDir + container + "/*.delta")
 
 		// install deltas
@@ -126,7 +127,8 @@ func RestoreContainer(container, date, newContainer string) {
 
 }
 
-func Position(slice []string, value string) int {
+// position returns index of string from "slice" which contains "value"
+func position(slice []string, value string) int {
 	for p, v := range slice {
 		if strings.Contains(v, value) {
 			return p
@@ -135,7 +137,8 @@ func Position(slice []string, value string) int {
 	return -1
 }
 
-func Unpack(archive, dir string) {
+// Unpack extract passed archive to directory
+func unpack(archive, dir string) {
 	tgz := extractor.NewTgz()
 	tgz.Extract(archive, dir)
 }

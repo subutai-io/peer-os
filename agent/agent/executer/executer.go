@@ -74,8 +74,14 @@ func ExecHost(req RequestOptions, outCh chan<- ResponseOptions) {
 		close(outCh)
 		return
 	}
-	rop, wop, _ := os.Pipe()
-	rep, wep, _ := os.Pipe()
+	rop, wop, err := os.Pipe()
+	if err != nil {
+		return
+	}
+	rep, wep, err := os.Pipe()
+	if err != nil {
+		return
+	}
 	defer rop.Close()
 	defer rep.Close()
 
@@ -86,11 +92,11 @@ func ExecHost(req RequestOptions, outCh chan<- ResponseOptions) {
 		cmd.SysProcAttr.Setpgid = true
 		cmd.SysProcAttr.Credential = &syscall.Credential{Uid: 0, Gid: 0}
 	}
-	err := cmd.Start()
+	err = cmd.Start()
 	log.Check(log.WarnLevel, "Executing command: "+req.CommandID+" "+req.Command+" "+strings.Join(req.Args, " "), err)
 
-	wop.Close()
-	wep.Close()
+	log.Check(log.DebugLevel, "Closing standard output", wop.Close())
+	log.Check(log.DebugLevel, "Closing error output", wep.Close())
 
 	stdout := make(chan string)
 	stderr := make(chan string)
@@ -121,9 +127,10 @@ func ExecHost(req RequestOptions, outCh chan<- ResponseOptions) {
 			outCh <- response
 			<-done
 		} else {
-			cmd.Process.Kill()
+			log.Check(log.DebugLevel, "Killing process by timeout", cmd.Process.Kill())
 			response.Type = "EXECUTE_TIMEOUT"
-			cmd.Process.Wait()
+			_, err = cmd.Process.Wait()
+			log.Check(log.DebugLevel, "Killing process to finish", err)
 			if cmd.ProcessState != nil {
 				response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
 			} else {
@@ -189,9 +196,15 @@ func buildCmd(r *RequestOptions) *exec.Cmd {
 	uid32 := *(*uint32)(unsafe.Pointer(&uid))
 
 	var buff bytes.Buffer
-	buff.WriteString(r.Command + " ")
+	_, err = buff.WriteString(r.Command + " ")
+	if err != nil {
+		return nil
+	}
 	for _, arg := range r.Args {
-		buff.WriteString(arg + " ")
+		_, err = buff.WriteString(arg + " ")
+		if err != nil {
+			return nil
+		}
 	}
 	cmd := exec.Command("/bin/bash", "-c", buff.String())
 	cmd.Dir = r.WorkingDir
@@ -213,11 +226,20 @@ func genericResponse(req RequestOptions) ResponseOptions {
 
 // AttachContainer executes request inside Container host
 // and sends output as response.
-func AttachContainer(name string, req RequestOptions, outCh chan<- ResponseOptions) {
-	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
+func AttachContainer(name string, req RequestOptions, outCh chan<- ResponseOptions) error {
+	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	if err != nil {
+		return err
+	}
 
-	rop, wop, _ := os.Pipe()
-	rep, wep, _ := os.Pipe()
+	rop, wop, err := os.Pipe()
+	if err != nil {
+		return err
+	}
+	rep, wep, err := os.Pipe()
+	if err != nil {
+		return err
+	}
 	defer rop.Close()
 	defer rep.Close()
 
@@ -230,16 +252,23 @@ func AttachContainer(name string, req RequestOptions, outCh chan<- ResponseOptio
 	var exitCode int
 	var cmd bytes.Buffer
 
-	cmd.WriteString(req.Command)
+	_, err = cmd.WriteString(req.Command)
+	if err != nil {
+		return err
+	}
 	for _, a := range req.Args {
-		cmd.WriteString(a + " ")
+		_, err = cmd.WriteString(a + " ")
+		if err != nil {
+			return err
+		}
 	}
 
 	log.Debug("Executing command in container " + name + ":" + cmd.String())
 	go func() {
-		exitCode, _ = c.RunCommandStatus([]string{"timeout", strconv.Itoa(req.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
-		wop.Close()
-		wep.Close()
+		exitCode, err = c.RunCommandStatus([]string{"timeout", strconv.Itoa(req.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
+		log.Check(log.DebugLevel, "Executing command inside container", err)
+		log.Check(log.DebugLevel, "Closing standard output", wop.Close())
+		log.Check(log.DebugLevel, "Closing error output", wep.Close())
 	}()
 
 	stdout := make(chan string)
@@ -261,4 +290,5 @@ func AttachContainer(name string, req RequestOptions, outCh chan<- ResponseOptio
 	outCh <- response
 	lxc.Release(c)
 	close(outCh)
+	return nil
 }

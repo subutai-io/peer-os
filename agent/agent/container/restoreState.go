@@ -53,16 +53,15 @@ func StateRestore() {
 				switch {
 				case start && cont.Status != "RUNNING":
 					{
-						log.Debug("Trying start " + cont.Name)
-						exec.Command("subutai", "start", cont.Name).Run()
+						err := exec.Command("subutai", "start", cont.Name).Run()
+						log.Check(log.DebugLevel, "Trying to start "+cont.Name, err)
 						contsStatus[cont.Name]++
 					}
 				case stop && cont.Status != "STOPPED":
 					{
-						log.Debug("Trying stop " + cont.Name)
-						exec.Command("subutai", "stop", cont.Name).Run()
+						err := exec.Command("subutai", "stop", cont.Name).Run()
+						log.Check(log.DebugLevel, "Trying to stop "+cont.Name, err)
 						contsStatus[cont.Name]--
-
 					}
 				default:
 					contsStatus[cont.Name] = 0

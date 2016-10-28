@@ -1,4 +1,7 @@
-package lib
+// Subutai CLI is a set of commands which are meant to provide a control interface
+// for different system components such as LXC, BTRFS, OVS, etc.
+// The CLI is an abstraction layer between the system and the SS Management application, but may also be used manually.
+package cli
 
 import (
 	"io"
@@ -10,7 +13,12 @@ import (
 	"gopkg.in/lxc/go-lxc.v2"
 )
 
-// LxcAttach connects user to the container shell.
+// LxcAttach allows user to use container's TTY.
+//
+// `name` should be available running Subutai container,
+// otherwise command will return error message and non-zero exit code.
+//
+// This command is not fully implemented, please use lxc-attach `container` command instead.
 func LxcAttach(name string, clear, x86, regular bool) {
 	var wg sync.WaitGroup
 

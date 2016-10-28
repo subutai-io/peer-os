@@ -39,15 +39,21 @@ var (
 	stats = make(map[string]Load)
 )
 
-func read(path string) (i int) {
-	out, _ := ioutil.ReadFile(path)
-	i, _ = strconv.Atoi(strings.TrimSpace(string(out)))
-	return
+func read(path string) (int, error) {
+	out, err := ioutil.ReadFile(path)
+	if err != nil {
+		return -1, err
+	}
+	return strconv.Atoi(strings.TrimSpace(string(out)))
 }
 
 func id() (list map[string]string) {
 	list = map[string]string{}
-	out, _ := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
+	out, err := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
+	if err != nil {
+		return
+	}
+
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
@@ -59,13 +65,24 @@ func id() (list map[string]string) {
 }
 
 func stat() string {
-	out, _ := exec.Command("btrfs", "qgroup", "show", "-r", "--raw", config.Agent.LxcPrefix).Output()
+	out, err := exec.Command("btrfs", "qgroup", "show", "-r", "--raw", config.Agent.LxcPrefix).Output()
+	if err != nil {
+		return ""
+	}
+
 	return string(out)
 }
 
 func ramQuota(cont string) []int {
-	u := read("/sys/fs/cgroup/memory/lxc/" + cont + "/memory.usage_in_bytes")
-	l := read("/sys/fs/cgroup/memory/lxc/" + cont + "/memory.limit_in_bytes")
+	u, err := read("/sys/fs/cgroup/memory/lxc/" + cont + "/memory.usage_in_bytes")
+	if err != nil {
+		return nil
+	}
+
+	l, err := read("/sys/fs/cgroup/memory/lxc/" + cont + "/memory.limit_in_bytes")
+	if err != nil {
+		return nil
+	}
 
 	var ramUsage = []int{0, l / 1024 / 1024}
 	if l != 0 {
@@ -81,7 +98,12 @@ func quotaCPU(name string) int {
 	if err != nil {
 		return -1
 	}
-	quota, _ := strconv.Atoi(strings.TrimSpace(string(cfsQuotaUs)))
+
+	quota, err := strconv.Atoi(strings.TrimSpace(string(cfsQuotaUs)))
+	if err != nil {
+		return -1
+	}
+
 	return quota * 100 / cfsPeriod / runtime.NumCPU()
 }
 
@@ -100,8 +122,16 @@ func cpuLoad(cont string) []int {
 		return avgload
 	}
 
-	usertick, _ := strconv.Atoi(tick[1])
-	systick, _ := strconv.Atoi(tick[3])
+	usertick, err := strconv.Atoi(tick[1])
+	if err != nil {
+		return avgload
+	}
+
+	systick, err := strconv.Atoi(tick[3])
+	if err != nil {
+		return avgload
+	}
+
 	cpu[cont] = append([]int{usertick + systick}, cpu[cont][0:4]...)
 
 	if cpu[cont][4] == 0 {
@@ -161,7 +191,10 @@ func alertLoad() (load map[string]Load) {
 	diskMap := stat()
 	diskIDs := id()
 
-	files, _ := ioutil.ReadDir("/sys/fs/cgroup/cpu/lxc/")
+	files, err := ioutil.ReadDir("/sys/fs/cgroup/cpu/lxc/")
+	if err != nil {
+		return
+	}
 	for _, cont := range files {
 		if !cont.IsDir() {
 			continue
@@ -191,19 +224,19 @@ func Current(list []container.Container) []Load {
 	for _, v := range list {
 		var item Load
 
-		threshold, _ := strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.cpu"))
-		if threshold > 0 && stats[v.Name].CPU != nil && stats[v.Name].CPU.Current > threshold {
+		threshold, err := strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.cpu"))
+		if threshold > 0 && stats[v.Name].CPU != nil && stats[v.Name].CPU.Current > threshold && err == nil {
 			item.CPU = &values{Current: stats[v.Name].CPU.Current, Quota: stats[v.Name].CPU.Quota}
 		}
 
-		threshold, _ = strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.ram"))
-		if threshold > 0 && stats[v.Name].RAM != nil && stats[v.Name].RAM.Current > threshold {
+		threshold, err = strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.ram"))
+		if threshold > 0 && stats[v.Name].RAM != nil && stats[v.Name].RAM.Current > threshold && err == nil {
 			item.RAM = &values{Current: stats[v.Name].RAM.Current, Quota: stats[v.Name].RAM.Quota}
 		}
 
 		for _, value := range stats[v.Name].Disk {
-			threshold, _ = strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.disk."+value.Partition))
-			if threshold > 0 && value.Current > threshold {
+			threshold, err = strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.disk."+value.Partition))
+			if threshold > 0 && value.Current > threshold && err == nil {
 				item.Disk = append(item.Disk, hdd{Current: value.Current, Quota: value.Quota, Partition: value.Partition})
 			}
 		}
