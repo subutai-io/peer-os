@@ -1090,7 +1090,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public String getRemotePeerIdByIp( final String ip ) throws PeerException
+    public String getRemotePeerIdByIp( final String ip ) throws PeerNotRegisteredException
     {
         Preconditions.checkNotNull( ip );
 
@@ -1110,8 +1110,9 @@ public class PeerManagerImpl implements PeerManager
 
         if ( result == null )
         {
-            throw new PeerException( "Peer not found by IP: " + ip );
+            throw new PeerNotRegisteredException( "Peer not found by IP: " + ip );
         }
+
         return result;
     }
 

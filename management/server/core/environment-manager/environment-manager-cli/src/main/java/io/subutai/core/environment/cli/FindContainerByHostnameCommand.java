@@ -22,8 +22,7 @@ public class FindContainerByHostnameCommand extends SubutaiShellCommandSupport
 
     private final EnvironmentManager environmentManager;
 
-    @Argument( name = "container hostname", description = "Container hostname",
-            index = 0, multiValued = false, required = true )
+    @Argument( name = "container hostname", description = "Container hostname", required = true )
     String containerHostname;
 
 

@@ -145,8 +145,10 @@ public class ExceededQuota
         {
             return ( T ) currentValue;
         }
-        catch ( ClassCastException cce )
+        catch ( ClassCastException e )
         {
+            LOG.warn( e.getMessage() );
+
             return null;
         }
     }

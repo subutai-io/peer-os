@@ -28,11 +28,10 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
-/**
- *
- */
 public class MessageContentUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
+
 
     private MessageContentUtil()
     {
@@ -40,10 +39,6 @@ public class MessageContentUtil
     }
 
 
-    private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
-
-
-    //***************************************************************************
     public static void abortChain( Message message, Throwable ex )
     {
         if ( ex.getClass() == AccessControlException.class )
@@ -77,7 +72,6 @@ public class MessageContentUtil
         }
         catch ( Exception e )
         {
-            //ignore
             LOG.error( "Error writing to response: " + e.toString(), e );
         }
 
@@ -85,9 +79,6 @@ public class MessageContentUtil
     }
 
 
-    /* ******************************************************
-     *
-     */
     public static void decryptContent( SecurityManager securityManager, Message message, String hostIdSource,
                                        String hostIdTarget )
     {
@@ -122,9 +113,6 @@ public class MessageContentUtil
     }
 
 
-    /* ******************************************************
-     *
-     */
     private static byte[] decryptData( SecurityManager securityManager, String hostIdSource, byte[] data )
             throws PGPException
     {
@@ -159,14 +147,11 @@ public class MessageContentUtil
         }
         catch ( Exception ex )
         {
-            throw new PGPException( ex.toString() );
+            throw new PGPException( "Error in decryptData", ex );
         }
     }
 
 
-    /* ******************************************************
-    *
-    */
     public static void encryptContent( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
                                        Message message )
     {
@@ -217,11 +202,6 @@ public class MessageContentUtil
     }
 
 
-    /* ******************************************************
-     *
-     */
-
-
     private static byte[] encryptData( SecurityManager securityManager, String hostIdTarget, byte[] data )
             throws PGPException
     {
@@ -253,7 +233,7 @@ public class MessageContentUtil
         }
         catch ( Exception ex )
         {
-            throw new PGPException( ex.toString() );
+            throw new PGPException( "Error in encryptData", ex );
         }
     }
 }
