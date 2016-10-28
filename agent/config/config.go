@@ -29,6 +29,7 @@ type managementConfig struct {
 	GpgUser       string
 	RestVerify    string
 	RestPublicKey string
+	Allowinsecure bool
 }
 
 type influxdbConfig struct {
@@ -71,6 +72,7 @@ const defaultConfig = `
 	host = 10.10.10.1
 	secret = secret
 	restPublicKey = /rest/v1/security/keyman/getpublickeyring	
+	allowinsecure = true
 
     [cdn]
     url = cdn.subut.ai
@@ -135,8 +137,11 @@ func InitAgentDebug() {
 // CheckKurjun checks if the Kurjun node available.
 func CheckKurjun() (*http.Client, error) {
 	// _, err := net.DialTimeout("tcp", Management.Host+":8339", time.Duration(2)*time.Second)
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client = &http.Client{Transport: tr}
+	client := &http.Client{}
+	if config.CDN.Allowinsecure {
+		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+		client = &http.Client{Transport: tr}
+	}
 	// if !log.Check(log.InfoLevel, "Trying local repo", err) {
 	// Cdn.Kurjun = "https://" + Management.Host + ":8339/rest/kurjun"
 	// } else {
