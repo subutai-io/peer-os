@@ -47,7 +47,7 @@ public class TunnelHelper
             {
                 CommandResult result = resourceHost.execute( new RequestBuilder( cmd ) );
 
-                if ( result.getExitCode() == 0 )
+                if ( result.hasSucceeded() )
                 {
                     exec = false;
                 }
