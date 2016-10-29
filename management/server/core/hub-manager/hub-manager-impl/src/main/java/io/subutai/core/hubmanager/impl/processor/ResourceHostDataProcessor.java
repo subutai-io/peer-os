@@ -40,9 +40,9 @@ import io.subutai.hub.share.dto.HostInterfaceDto;
 import io.subutai.hub.share.dto.P2PDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.dto.host.ResourceHostMetricDto;
-import io.subutai.hub.share.resource.HistoricalMetrics;
-import io.subutai.hub.share.resource.Series;
-import io.subutai.hub.share.resource.SeriesBatch;
+import io.subutai.common.metric.HistoricalMetrics;
+import io.subutai.common.metric.Series;
+import io.subutai.common.metric.SeriesBatch;
 
 import static java.lang.String.format;
 
@@ -221,12 +221,12 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
     }
 
 
-    private double parseTagValues( List<List<Double>> values )
+    private double parseTagValues( List<Double[]> values )
     {
         double sum = 0;
-        for ( List<Double> list : values )
+        for ( Double[] list : values )
         {
-            sum += list.get( 1 );
+            sum += list[1];
         }
         return sum / values.size();
     }

@@ -147,7 +147,7 @@ import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.CpuResource;
 import io.subutai.hub.share.resource.DiskResource;
-import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
 import io.subutai.hub.share.resource.RamResource;
