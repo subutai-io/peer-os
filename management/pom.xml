@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.4-SNAPSHOT</version>
+  <version>4.0.5-SNAPSHOT</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -127,6 +127,10 @@
 
     <!-- JWT lib -->
     <nimbus.jwt.version>4.3.1</nimbus.jwt.version>
+
+    <!-- HTML Parser -->
+    <jsoup.version>1.10.1</jsoup.version>
+
     <!-- Jackson JSON lib lib -->
     <jackson.version>2.6.3</jackson.version>
 
