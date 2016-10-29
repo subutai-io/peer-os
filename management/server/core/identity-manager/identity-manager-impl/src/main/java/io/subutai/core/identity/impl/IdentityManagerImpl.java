@@ -57,6 +57,7 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.token.TokenUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.SecurityController;
 import io.subutai.core.identity.api.SessionManager;
@@ -1173,10 +1174,16 @@ public class IdentityManagerImpl implements IdentityManager
         {
             password = UUID.randomUUID().toString();
         }
+
+        //*********************************
+        // Remove XSS vulnerability code
+        userName = validateInput( userName );
+        fullName = validateInput( fullName );
         //*********************************
 
         isValidUserName( userName );
         isValidPassword( userName, password );
+        isValidEmail( email );
 
         try
         {
@@ -1245,11 +1252,20 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
+            //*********************************
+            // Remove XSS vulnerability code
+            user.setUserName( validateInput( user.getUserName() ));
+            user.setFullName( validateInput( user.getFullName() ));
+
+            //*********************************
+            //**************************************
+            isValidUserName( user.getUserName() );
+            isValidEmail( user.getEmail());
+            //**************************************
 
             if ( !Strings.isNullOrEmpty( password ) )
             {
                 isValidPassword( user.getUserName(), password );
-
                 String salt = user.getSalt();
                 password = SecurityUtil.generateSecurePassword( password, salt );
 
@@ -1452,6 +1468,25 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    private void isValidEmail( String email)
+    {
+        if ( !StringUtil.isValidEmail( email ))
+        {
+            throw new IllegalArgumentException( "Invalid Email specified" );
+        }
+    }
+
+
+    /* *************************************************
+     */
+    private String validateInput( String inputStr )
+    {
+        return StringUtil.removeHtmlAndSpecialChars( inputStr );
+    }
+
+
+    /* *************************************************
+     */
     @PermitAll
     @Override
     public boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
@@ -1494,6 +1529,11 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public Role createRole( String roleName, int roleType )
     {
+        //*********************************
+        // Remove XSS vulnerability code
+        roleName = validateInput( roleName );
+        //*********************************
+
         Role role = new RoleEntity();
         role.setName( roleName );
         role.setType( roleType );
@@ -1536,6 +1576,11 @@ public class IdentityManagerImpl implements IdentityManager
             throw new AccessControlException( "Internal Role cannot be updated" );
         }
         //***********************************************
+
+        //*********************************
+        // Remove XSS vulnerability code
+        role.setName( validateInput( role.getName()));
+        //*********************************
 
         identityDataService.updateRole( role );
     }

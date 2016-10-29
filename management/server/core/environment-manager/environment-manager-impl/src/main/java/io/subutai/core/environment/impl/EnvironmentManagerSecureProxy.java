@@ -48,6 +48,7 @@ import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -222,6 +223,11 @@ public class EnvironmentManagerSecureProxy
     public EnvironmentCreationRef createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
+        //*********************************
+        // Remove XSS vulnerability code
+        topology.setEnvironmentName ( validateInput( topology.getEnvironmentName()));
+        //*********************************
+
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
@@ -838,4 +844,13 @@ public class EnvironmentManagerSecureProxy
     {
         environmentManager.addSshKeyToEnvironmentEntity( environmentId, sshKey );
     }
+
+
+    /* *************************************************
+     */
+    private String validateInput( String inputStr )
+    {
+        return StringUtil.removeHtmlAndSpecialChars( inputStr );
+    }
+
 }
