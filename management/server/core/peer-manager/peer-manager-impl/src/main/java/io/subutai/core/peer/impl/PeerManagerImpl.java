@@ -31,7 +31,6 @@ import com.google.common.base.Strings;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.NetworkException;
 import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.network.SocketUtil;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.HostNotFoundException;
@@ -54,6 +53,7 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -1384,13 +1384,6 @@ public class PeerManagerImpl implements PeerManager
     {
 
 
-        private boolean isIpValid( HostInterface hostInterface )
-        {
-            return hostInterface != null && !( hostInterface instanceof NullHostInterface ) && !Strings
-                    .isNullOrEmpty( hostInterface.getIp().trim() );
-        }
-
-
         @Override
         public void run()
         {
@@ -1405,11 +1398,11 @@ public class PeerManagerImpl implements PeerManager
 
                         HostInterface eth1 = localPeer.getManagementHost().getInterfaceByName( "eth1" );
 
-                        if ( isIpValid( eth1 ) )
+                        if ( IPUtil.isIpValid( eth1 ) )
                         {
                             HostInterface wan = localPeer.getManagementHost().getInterfaceByName( "wan" );
 
-                            if ( !wan.getIp().equals( localPeer.getPeerInfo().getIp() ) )
+                            if ( IPUtil.isIpValid( wan ) && !wan.getIp().equals( localPeer.getPeerInfo().getIp() ) )
 
                             {
                                 setPublicUrl( localPeerId, wan.getIp(), localPeer.getPeerInfo().getPublicSecurePort(),
