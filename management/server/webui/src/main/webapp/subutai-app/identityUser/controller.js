@@ -37,7 +37,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	var vm = this;
 
-	vm.user2Add = {"trustLevel": 2};
+	vm.user2Add = {"trustLevel": 3};
 	vm.users = [];
 	vm.roles = [];
 	vm.currentUserRoles = [];
@@ -151,7 +151,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		} else {
 			vm.editUser = false;
 			vm.loginPatern = '(?=^.{4,}$)(^(?!(admin|sys|token)).*)';
-			vm.user2Add = {"trustLevel": 2};
+			vm.user2Add = {"trustLevel": 3};
 		}
 
 		ngDialog.open({
@@ -182,7 +182,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 				LOADING_SCREEN('none');
 				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
 			});
-			vm.user2Add = {"trustLevel": 2};
+			vm.user2Add = {"trustLevel": 3};
 			vm.addUserForm.$setPristine();
 			vm.addUserForm.$setUntouched();
 		}
