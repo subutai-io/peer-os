@@ -55,6 +55,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         setEnvironmentManager( environmentManager );
     }
 
+
     @Override
     protected LocalPeer getLocalPeer()
     {
@@ -82,9 +83,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         {
             CommandResult result = execute( WHOAMI );
 
-            return result.getExitCode() == 0 && StringUtils.isNotBlank( result.getStdOut() ) && result.getStdOut()
-                                                                                                      .contains(
-                                                                                                              "root" );
+            return result.hasSucceeded() && StringUtils.isNotBlank( result.getStdOut() ) && result.getStdOut()
+                                                                                                  .contains( "root" );
         }
         catch ( CommandException e )
         {
