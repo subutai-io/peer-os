@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
@@ -43,6 +44,8 @@ import io.subutai.hub.share.dto.host.ResourceHostMetricDto;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.Series;
 import io.subutai.common.metric.SeriesBatch;
+import io.subutai.hub.share.dto.metrics.HostMetricsDto;
+import io.subutai.hub.share.dto.metrics.PeerMetricsDto;
 
 import static java.lang.String.format;
 
@@ -101,134 +104,53 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
     {
         if ( hubManager.isRegistered() )
         {
+            // TODO: 10/31/16 we need combine processConfigs and processPeerMetrics methods
             processConfigs();
 
             processP2PLogs();
 
             if ( sendMetrics )
             {
-                processMetrics();
+                processPeerMetrics();
             }
         }
     }
 
 
-    private void processMetrics()
+    private void processPeerMetrics()
     {
-
-        Date currentDate = new Date();
         Calendar cal = Calendar.getInstance();
-        cal.setTime( currentDate );
+        Date endTime = cal.getTime();
         cal.add( Calendar.MINUTE, -15 );
+        Date startTime = cal.getTime();
 
-        JSONObject metrics = new JSONObject();
-        JSONArray rhMetrics = new JSONArray();
-        JSONArray chMetrics = new JSONArray();
-
-        for ( Host host : localPeer.getResourceHosts() )
-        {
-            rhMetrics.put( collectMetrics( host, "RESOURCE_HOST", cal.getTime(), currentDate ) );
-        }
-
-        for ( Host host : localPeer.getPeerContainers( localPeer.getId() ) )
-        {
-            chMetrics.put( collectMetrics( host, "CONTAINER_HOST", cal.getTime(), currentDate ) );
-        }
-
-        metrics.put( "startDate", cal.getTime().getTime() );
-        metrics.put( "endDate", currentDate.getTime() );
-        metrics.put( "peer_id", localPeer.getId() );
-        metrics.put( "rh_metrics", rhMetrics );
-        metrics.put( "ch_metrics", chMetrics );
-
+        PeerMetricsDto peerMetricsDto = new PeerMetricsDto();
+        peerMetricsDto.setPeerId( localPeer.getId() );
+        peerMetricsDto.setStartTime( startTime.getTime() );
+        peerMetricsDto.setEndTime( endTime.getTime() );
         try
         {
-            metrics.put( "peer_resources", objectMapper.writeValueAsString( localPeer.getResources() ) );
-        }
-        catch ( IOException e )
-        {
-            log.error( e.getMessage(), e );
-        }
-
-        String path = format( "/rest/v1/peers/%s/metrics/save", localPeer.getId() );
-
-        RestResult<Object> restResult = restClient.post( path, metrics.toString() );
-
-        if ( restResult.isSuccess() )
-        {
-            log.info( "Resource host metrics processed successfully" );
-        }
-    }
-
-
-    private JSONObject collectMetrics( Host host, String hostType, Date startDate, Date endDate )
-    {
-        HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startDate, endDate );
-
-        JSONObject hostMetrics = aggregateMetrics( historicalMetrics );
-
-        JSONObject metrics = new JSONObject();
-
-        metrics.put( "host_id", host.getId() );
-        metrics.put( "metrics", hostMetrics );
-        metrics.put( "type", hostType );
-
-        return metrics;
-    }
-
-
-    private JSONObject aggregateMetrics( HistoricalMetrics historicalMetrics )
-    {
-        JSONObject seriesJson = new JSONObject();
-
-
-        for ( SeriesBatch seriesBatch : historicalMetrics.getMetrics() )
-        {
-            for ( Series series : seriesBatch.getSeries() )
+            for ( Host host : localPeer.getResourceHosts() )
             {
+                final HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startTime, endTime );
+                final HostMetricsDto hostMetrics = historicalMetrics.getHostMetrics();
+                hostMetrics.setHostId( host.getId() );
+                peerMetricsDto.addHostMetrics( hostMetrics );
+            }
+            String path = format( "/rest/v1/peers/%s/metrics/save", localPeer.getId() );
 
-                JSONObject tempJson = parseSeries( series );
-
-                if ( seriesJson.isNull( series.getName() ) )
-                {
-                    seriesJson.put( series.getName(), tempJson );
-                }
-                else
-                {
-                    JSONObject old = seriesJson.getJSONObject( series.getName() );
-                    for ( String tag : tempJson.keySet() )
-                    {
-                        old.put( tag, tempJson.getDouble( tag ) );
-                    }
-                    seriesJson.put( series.getName(), old );
-                }
+            String body = objectMapper.writeValueAsString( peerMetricsDto );
+            log.debug( "Peer metrics JSON: {}", body );
+            RestResult<Object> restResult = restClient.post( path, body );
+            if ( restResult.isSuccess() )
+            {
+                log.debug( "Peer metrics successfully sent to HUB." );
             }
         }
-        return seriesJson;
-    }
-
-
-    private JSONObject parseSeries( Series series )
-    {
-        JSONObject seriesJson = new JSONObject();
-
-        for ( String tag : series.getTags().values() )
+        catch ( Exception e )
         {
-            seriesJson.put( tag, parseTagValues( series.getValues() ) );
+            log.error( "Error on sending peer metrics to HUB", e );
         }
-
-        return seriesJson;
-    }
-
-
-    private double parseTagValues( List<Double[]> values )
-    {
-        double sum = 0;
-        for ( Double[] list : values )
-        {
-            sum += list[1];
-        }
-        return sum / values.size();
     }
 
 
