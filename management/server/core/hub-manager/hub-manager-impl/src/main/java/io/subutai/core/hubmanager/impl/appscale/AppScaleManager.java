@@ -164,7 +164,7 @@ public class AppScaleManager
         {
             CommandResult result = ch.execute( new RequestBuilder( command ).withTimeout( 10000 ) );
 
-            if ( result.getExitCode() != 0 )
+            if ( !result.hasSucceeded() )
             {
                 throw new CommandException( format( "Error to execute command: %s. %s", command, result.getStdErr() ) );
             }

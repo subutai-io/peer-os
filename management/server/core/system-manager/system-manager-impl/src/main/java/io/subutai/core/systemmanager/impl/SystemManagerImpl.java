@@ -173,7 +173,7 @@ public class SystemManagerImpl implements SystemManager
 
             CommandResult result = host.execute( new RequestBuilder( "subutai update management -c" ) );
 
-            if ( result.getExitCode() == 0 )
+            if ( result.hasSucceeded() )
             {
                 info.setUpdatesAvailable( true );
             }
