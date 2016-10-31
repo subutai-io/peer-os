@@ -54,7 +54,7 @@ public class MessageContentUtil
             abortChain( message, 500, "Internal system Error 500" );
         }
 
-        LOG.error( "****** Error !! Error in doIntercept:" + ex.toString(), ex );
+        LOG.error( "****** Error !!! Error in AccessInterceptor:" + ex.toString(), ex );
     }
 
 
@@ -68,7 +68,10 @@ public class MessageContentUtil
             response.setStatus( errorStatus );
             response.getOutputStream().write( errorMessage.getBytes( Charset.forName( "UTF-8" ) ) );
             response.getOutputStream().flush();
-            LOG.error( "****** Error !! Error in doIntercept:" + errorMessage );
+
+            LOG.error( "****** Error !!! Error in AccessInterceptor:" + " "+ errorMessage
+                        +"\n * Blocked URL:" + message.get(Message.REQUEST_URL));
+
         }
         catch ( Exception e )
         {
@@ -79,6 +82,7 @@ public class MessageContentUtil
     }
 
 
+    //***************************************************************************
     public static void decryptContent( SecurityManager securityManager, Message message, String hostIdSource,
                                        String hostIdTarget )
     {
@@ -113,6 +117,7 @@ public class MessageContentUtil
     }
 
 
+    //***************************************************************************
     private static byte[] decryptData( SecurityManager securityManager, String hostIdSource, byte[] data )
             throws PGPException
     {
