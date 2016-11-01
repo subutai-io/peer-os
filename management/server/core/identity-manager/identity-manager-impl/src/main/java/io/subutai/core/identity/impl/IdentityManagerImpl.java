@@ -869,6 +869,7 @@ public class IdentityManagerImpl implements IdentityManager
     public Session getActiveSession()
     {
         Session session = null;
+
         try
         {
             Subject subject = getActiveSubject();
@@ -889,12 +890,36 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( Exception ex )
         {
-            LOGGER.error( "*** Error! Cannot find active User. Session is not started" );
+            LOGGER.error( "*** Error! Cannot find active User (no session):" + ex.toString());
         }
 
         return session;
     }
 
+
+    /* *************************************************
+     */
+    private Subject getActiveSubject() throws Exception
+    {
+
+        Subject subject = null;
+
+        AccessControlContext acc = AccessController.getContext();
+
+        if ( acc == null )
+        {
+            throw new IllegalStateException( "AccessControlCntext is null" );
+        }
+
+        subject = Subject.getSubject( acc );
+
+        if ( subject == null )
+        {
+            throw new IllegalStateException( "Subject is null" );
+        }
+
+        return subject;
+    }
 
     /* *************************************************
      */
@@ -950,39 +975,6 @@ public class IdentityManagerImpl implements IdentityManager
             } );
         }
     }
-
-
-    /* *************************************************
-     */
-    private Subject getActiveSubject()
-    {
-
-        Subject subject = null;
-
-        try
-        {
-            AccessControlContext acc = AccessController.getContext();
-
-            if ( acc == null )
-            {
-                throw new IllegalStateException( "access control context is null" );
-            }
-
-            subject = Subject.getSubject( acc );
-
-            if ( subject == null )
-            {
-                throw new IllegalStateException( "subject is null" );
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOGGER.error( "*** Error! Error getting ActiveSubject, cannot get auth.subject:" + ex.getMessage() );
-        }
-
-        return subject;
-    }
-
 
     /* *************************************************
      */
