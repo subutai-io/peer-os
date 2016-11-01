@@ -149,40 +149,32 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         {
             List<RequestedHost> requestedHosts = registrationManager.getRequests();
 
-            String result = gson.toJson( requestedHosts );
+            LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
 
-            try
+            ResourceHost managementHost = localPeer.getManagementHost();
+
+            List<RequestedHostJson> requestedHostList = Lists.newArrayList();
+
+            for ( RequestedHost requestedHost : requestedHosts )
             {
-                LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+                RequestedHostJson requestedHostJson = new RequestedHostJson( requestedHost );
 
-                ResourceHost managementHost = localPeer.getManagementHost();
-
-                List<RequestedHostJson> requestedHostList = Lists.newArrayList();
-
-                for ( RequestedHost requestedHost : requestedHosts )
+                if ( managementHost.getId().equalsIgnoreCase( requestedHost.getId() ) )
                 {
-                    RequestedHostJson requestedHostJson = new RequestedHostJson( requestedHost );
-
-                    if ( managementHost.getId().equalsIgnoreCase( requestedHost.getId() ) )
-                    {
-                        requestedHostJson.setManagement( true );
-                    }
-
-                    requestedHostList.add( requestedHostJson );
+                    requestedHostJson.setManagement( true );
                 }
 
-                result = JsonUtil.toJson( requestedHostList );
-            }
-            catch ( Exception e )
-            {
-                LOGGER.warn( "Error in getRegistrationRequests {}", e.getMessage() );
+                requestedHostList.add( requestedHostJson );
             }
 
+            String result = JsonUtil.toJson( requestedHostList );
 
             return Response.ok( result ).build();
         }
         catch ( Exception e )
         {
+            LOGGER.warn( "Error in getRegistrationRequests {}", e.getMessage() );
+
             return Response.serverError().entity( e.getMessage() ).build();
         }
     }
