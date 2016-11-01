@@ -234,7 +234,7 @@ def notifyBuild(String buildStatus = 'STARTED') {
     colorCode = '#FF0000'
   }
   // Get token
-  def slackToken = getSlackToken('slack-test-bots')
+  def slackToken = getSlackToken('ss-bots-slack-token')
   // Send notifications
   slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
 }
