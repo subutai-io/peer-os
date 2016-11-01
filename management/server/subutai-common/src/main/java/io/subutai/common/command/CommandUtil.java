@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.Host;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.TaskUtil;
 
 
 /**
@@ -306,14 +307,7 @@ public class CommandUtil
                 }
             }
 
-            try
-            {
-                Thread.sleep( 100 );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 100 );
         }
 
         return new HostCommandResults( hostCommandResults );

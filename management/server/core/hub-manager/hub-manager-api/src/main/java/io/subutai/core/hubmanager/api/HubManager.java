@@ -39,4 +39,6 @@ public interface HubManager
     void sendSystemConfiguration( SystemConfDto dto );
 
     String getCurrentUserEmail();
+
+    boolean isHubReachable();
 }

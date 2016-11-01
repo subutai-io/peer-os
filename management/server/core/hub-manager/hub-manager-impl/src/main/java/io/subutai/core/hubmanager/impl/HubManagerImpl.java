@@ -221,7 +221,7 @@ public class HubManagerImpl implements HubManager
                     new RegistrationRequestProcessor( this, peerManager, hostRegistrationManager, restClient );
 
             registrationRequestExecutor
-                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 30, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 60, TimeUnit.SECONDS );
 
             EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                     new EnvironmentTelemetryProcessor( this, peerManager, configManager );
@@ -248,6 +248,18 @@ public class HubManagerImpl implements HubManager
         {
             log.error( e.getMessage() );
         }
+    }
+
+
+    @Override
+    public boolean isHubReachable()
+    {
+        if ( heartbeatProcessor != null )
+        {
+            return heartbeatProcessor.isHubReachable();
+        }
+
+        return false;
     }
 
 
@@ -294,7 +306,7 @@ public class HubManagerImpl implements HubManager
                                                                                      resourceHostCommandProcessor );
 
         heartbeatExecutorService
-                .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
+                .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
                         TimeUnit.SECONDS );
     }
 
