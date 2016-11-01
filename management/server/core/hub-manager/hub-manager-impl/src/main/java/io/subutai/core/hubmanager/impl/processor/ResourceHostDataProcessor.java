@@ -124,10 +124,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
         cal.add( Calendar.MINUTE, -15 );
         Date startTime = cal.getTime();
 
-        PeerMetricsDto peerMetricsDto = new PeerMetricsDto();
-        peerMetricsDto.setPeerId( localPeer.getId() );
-        peerMetricsDto.setStartTime( startTime.getTime() );
-        peerMetricsDto.setEndTime( endTime.getTime() );
+        PeerMetricsDto peerMetricsDto = new PeerMetricsDto( localPeer.getId(), startTime.getTime(), endTime.getTime() );
         try
         {
             for ( Host host : localPeer.getResourceHosts() )

@@ -69,7 +69,7 @@ public class HistoricalMetricsTest
     {
         final HostMetricsDto metrics = rhMetrics.getHostMetrics();
 
-        CpuDto cpuDto = metrics.getCpuDto();
+        CpuDto cpuDto = metrics.getCpu();
 
         assertNotNull( cpuDto );
 

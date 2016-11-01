@@ -13,6 +13,7 @@ import io.subutai.hub.share.dto.metrics.CpuDto;
 import io.subutai.hub.share.dto.metrics.DiskDto;
 import io.subutai.hub.share.dto.metrics.HostMetricsDto;
 import io.subutai.hub.share.dto.metrics.MemoryDto;
+import io.subutai.hub.share.dto.metrics.NetDto;
 
 
 /**
@@ -20,6 +21,7 @@ import io.subutai.hub.share.dto.metrics.MemoryDto;
  */
 public class HistoricalMetrics
 {
+
     @JsonProperty( "Metrics" )
     List<SeriesBatch> metrics = new ArrayList<>();
     private Map<SeriesBatch.SeriesType, List<Series>> seriesMap = new HashMap<>();
@@ -128,18 +130,34 @@ public class HistoricalMetrics
     private Map<String, DiskDto> getDiskDto( final List<Series> series )
     {
         Map<String, DiskDto> result = new HashMap<>();
-        DiskDto root = new DiskDto();
-        root.setAvailable( SeriesHelper.getAvg( series, new Tag( "type", "available" ), new Tag( "mount", "/" ) ) );
-        root.setTotal( SeriesHelper.getAvg( series, new Tag( "type", "total" ), new Tag( "mount", "/" ) ) );
-        root.setUsed( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", "/" ) ) );
 
-        DiskDto mnt = new DiskDto();
-        mnt.setAvailable( SeriesHelper.getAvg( series, new Tag( "type", "available" ), new Tag( "mount", "/mnt" ) ) );
-        mnt.setTotal( SeriesHelper.getAvg( series, new Tag( "type", "total" ), new Tag( "mount", "/mnt" ) ) );
-        mnt.setUsed( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", "/mnt" ) ) );
+        for ( String mount : HostMetricsDto.RESOURCE_HOST_PARTITIONS )
+        {
+            DiskDto dto = new DiskDto();
+            dto.setAvailable(
+                    SeriesHelper.getAvg( series, new Tag( "type", "available" ), new Tag( "mount", mount ) ) );
+            dto.setTotal( SeriesHelper.getAvg( series, new Tag( "type", "total" ), new Tag( "mount", mount ) ) );
+            dto.setUsed( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", mount ) ) );
+            result.put( mount, dto );
+        }
 
-        result.put( "/", root );
-        result.put( "/mnt", mnt );
+        return result;
+    }
+
+
+    @JsonIgnore
+    private Map<String, NetDto> getNetDto( final List<Series> series )
+    {
+        Map<String, NetDto> result = new HashMap<>();
+
+        for ( String iface : HostMetricsDto.RESOURCE_HOST_INTERFACES )
+        {
+            NetDto dto = new NetDto( iface,
+                    SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "in" ) ),
+                    SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "out" ) ) );
+
+            result.put( iface, dto );
+        }
         return result;
     }
 
@@ -153,9 +171,10 @@ public class HistoricalMetrics
         result.setType( hostType );
         splitSeries();
 
-        result.setCpuDto( getCpuDto( seriesMap.get( SeriesBatch.SeriesType.CPU ) ) );
+        result.setCpu( getCpuDto( seriesMap.get( SeriesBatch.SeriesType.CPU ) ) );
         result.setMemory( getMemoryDto( seriesMap.get( SeriesBatch.SeriesType.MEMORY ) ) );
         result.setDisk( getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ) );
+        result.setNet( getNetDto( seriesMap.get( SeriesBatch.SeriesType.NET ) ) );
 
         return result;
     }

@@ -1,7 +1,6 @@
 package io.subutai.hub.share.dto.metrics;
 
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,28 +9,36 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HostMetricsDto
 {
+    public static final String ROOT_PARTITION = "/";
+    public static final String MNT_PARTITION = "/mnt";
+    public static String[] RESOURCE_HOST_PARTITIONS = { ROOT_PARTITION, MNT_PARTITION };
+
+    public static final String WAN_INTERFACE = "wan";
+    public static String[] RESOURCE_HOST_INTERFACES = { WAN_INTERFACE };
+
+
     public enum HostType
     {
         RESOURCE_HOST, CONTAINER_HOST
     }
 
 
-    @JsonProperty( "host_id" )
+    @JsonProperty( "hostId" )
     private String hostId;
 
     @JsonProperty( "type" )
     private HostType type;
 
-    @JsonProperty( "host_memory" )
+    @JsonProperty( "hostMemory" )
     private MemoryDto memory = new MemoryDto();
 
-    @JsonProperty( "host_cpu" )
-    private CpuDto cpuDto = new CpuDto();
+    @JsonProperty( "hostCpu" )
+    private CpuDto cpu = new CpuDto();
 
-    @JsonProperty( "host_net" )
-    private Map<String, BigDecimal> net = new HashMap<>();
+    @JsonProperty( "hostNet" )
+    private Map<String, NetDto> net = new HashMap<>();
 
-    @JsonProperty( "host_disk" )
+    @JsonProperty( "hostDisk" )
     private Map<String, DiskDto> disk = new HashMap<>();
 
 
@@ -71,25 +78,25 @@ public class HostMetricsDto
     }
 
 
-    public CpuDto getCpuDto()
+    public CpuDto getCpu()
     {
-        return cpuDto;
+        return cpu;
     }
 
 
-    public void setCpuDto( final CpuDto cpuDto )
+    public void setCpu( final CpuDto cpuDto )
     {
-        this.cpuDto = cpuDto;
+        this.cpu = cpuDto;
     }
 
 
-    public Map<String, BigDecimal> getNet()
+    public Map<String, NetDto> getNet()
     {
         return net;
     }
 
 
-    public void setNet( final Map<String, BigDecimal> net )
+    public void setNet( final Map<String, NetDto> net )
     {
         this.net = net;
     }

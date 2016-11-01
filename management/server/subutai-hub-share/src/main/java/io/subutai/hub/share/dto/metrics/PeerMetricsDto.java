@@ -4,6 +4,7 @@ package io.subutai.hub.share.dto.metrics;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties( ignoreUnknown = true )
 public class PeerMetricsDto
 {
-    @JsonProperty( "peer_id" )
+    @JsonProperty( "peerId" )
     private String peerId;
 
     @JsonProperty( "startTime" )
@@ -23,6 +24,27 @@ public class PeerMetricsDto
 
     @JsonProperty( "metrics" )
     private Set<HostMetricsDto> metrics = new HashSet<>();
+
+
+    @JsonCreator
+    public PeerMetricsDto( @JsonProperty( value = "peerId", required = true ) final String peerId,
+                           @JsonProperty( value = "startTime", required = true ) final Long startTime,
+                           @JsonProperty( value = "endTime", required = true ) final Long endTime,
+                           @JsonProperty( value = "metrics", required = true ) final Set<HostMetricsDto> metrics )
+    {
+        this.peerId = peerId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.metrics = metrics;
+    }
+
+
+    public PeerMetricsDto( final String peerId, final Long startTime, final Long endTime )
+    {
+        this.peerId = peerId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
 
 
     public String getPeerId()
