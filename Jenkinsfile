@@ -77,7 +77,7 @@ node() {
 	// Deploy builded template to remore test-server
 
 	// update rh on test node
-	def rhUpdateStatus = sh (script: "root@${env.SS_TEST_NODE} subutai update rh -c | cut -d ' ' -f3,4,5,6", returnStdout: true)
+	def rhUpdateStatus = sh (script: "ssh root@${env.SS_TEST_NODE} subutai update rh -c | cut -d ' ' -f3,4,5,6", returnStdout: true)
 	if (rhUpdateStatus == "[Update is available]") {
 		sh """
 			ssh root@gw.intra.lan <<- EOF
