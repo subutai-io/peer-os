@@ -241,9 +241,8 @@ def notifyBuild(String buildStatus = 'STARTED') {
 
 // get slack token from global jenkins credentials store
 @NonCPS
-def getSlackToken(id){
+def getSlackToken(String slackCredentialsId){
 	// id is ID of creadentials
-	String slackCredentialsId = 'slack-test-bots'
 	def jenkins_creds = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
 
 	String found_slack_token = jenkins_creds.getStore().getDomains().findResult { domain ->
