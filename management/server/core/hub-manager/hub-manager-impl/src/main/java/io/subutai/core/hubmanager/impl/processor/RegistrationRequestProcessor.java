@@ -55,9 +55,7 @@ public class RegistrationRequestProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            log.debug( "Sending host requests failed." );
-
-            log.error( e.getMessage(), e );
+            log.error( "Sending host requests failed.", e.getMessage() );
         }
     }
 
@@ -73,7 +71,7 @@ public class RegistrationRequestProcessor implements Runnable
             requestedHostsDto.setPeerId( localPeer.getId() );
 
             List<RequestedHost> requestedHosts = registrationManager.getRequests();
-            ResourceHost managementHost ;
+            ResourceHost managementHost;
             try
             {
                 managementHost = localPeer.getManagementHost();

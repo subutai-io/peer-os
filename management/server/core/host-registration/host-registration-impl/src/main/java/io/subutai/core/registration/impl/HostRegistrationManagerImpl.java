@@ -243,43 +243,32 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager
     public ContainerToken verifyToken( final String token, String containerHostId, String publicKey )
             throws HostRegistrationException
     {
+
+        ContainerTokenImpl containerToken = containerTokenDataService.find( token );
+
+        if ( containerToken == null )
+        {
+            throw new HostRegistrationException( "Couldn't verify container token" );
+        }
+
+        if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
+        {
+            throw new HostRegistrationException( "Container token expired" );
+        }
+
         try
         {
-            ContainerTokenImpl containerToken = containerTokenDataService.find( token );
-
-            if ( containerToken == null )
-            {
-                throw new HostRegistrationException( "Couldn't verify container token" );
-            }
-
-            if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
-            {
-                throw new HostRegistrationException( "Container token expired" );
-            }
-
-            try
-            {
-                securityManager.getKeyManager()
-                               .savePublicKeyRing( containerHostId, SecurityKeyType.ContainerHostKey.getId(),
-                                       publicKey );
-            }
-            catch ( Exception ex )
-            {
-                throw new HostRegistrationException( "Failed to store container pubkey", ex );
-            }
-
-            return containerToken;
-        }
-        catch ( HostRegistrationException e )
-        {
-            throw e;
+            securityManager.getKeyManager()
+                           .savePublicKeyRing( containerHostId, SecurityKeyType.ContainerHostKey.getId(), publicKey );
         }
         catch ( Exception e )
         {
             LOG.error( "Error verifying token", e );
 
-            throw new HostRegistrationException( e );
+            throw new HostRegistrationException( "Failed to store container pubkey", e );
         }
+
+        return containerToken;
     }
 
 
@@ -309,8 +298,8 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager
 
                 for ( RequestedHostImpl requestedHostImpl : requestDataService.getAll() )
                 {
-                    if ( requestedHostImpl.getStatus() == ResourceHostRegistrationStatus.APPROVED && containsManagementContainer(
-                            requestedHostImpl.getHostInfos() ) )
+                    if ( requestedHostImpl.getStatus() == ResourceHostRegistrationStatus.APPROVED
+                            && containsManagementContainer( requestedHostImpl.getHostInfos() ) )
                     {
                         managementAlreadyApproved = true;
                         break;

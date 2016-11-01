@@ -13,6 +13,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -59,14 +60,7 @@ public class TunnelHelper
                 LOG.error( e.getMessage() );
             }
 
-            try
-            {
-                Thread.sleep( 5000 );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 5000 );
         }
 
         return null;

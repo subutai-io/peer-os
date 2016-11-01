@@ -95,7 +95,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
         }
         catch ( Exception e )
         {
-            log.error( "Error to process resource host data: ", e );
+            log.error( "Error to process resource host data: {}", e.getMessage() );
         }
     }
 
@@ -253,7 +253,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
             }
             catch ( Exception e )
             {
-                log.error( "Error to process p2p logs: ", e );
+                log.error( "Error to process p2p logs: {} ", e.getMessage() );
             }
         }
     }

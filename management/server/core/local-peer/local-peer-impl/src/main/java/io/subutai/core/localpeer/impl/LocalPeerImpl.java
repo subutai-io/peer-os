@@ -2407,44 +2407,41 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         int containerLimit = 200;
         int networkLimit = 100;
 
+        ResourceHostMetrics metrics = getResourceHostMetrics();
+
         List<HostResources> resources = new ArrayList<>();
-        try
+
+        for ( ResourceHostMetric resourceHostMetric : metrics.getResources() )
         {
-            for ( ResourceHostMetric resourceHostMetric : getResourceHostMetrics().getResources() )
+            try
             {
-                try
-                {
-                    ResourceHost resourceHost = getResourceHostByName( resourceHostMetric.getHostName() );
+                ResourceHost resourceHost = getResourceHostByName( resourceHostMetric.getHostName() );
 
-                    BigDecimal cpuLimit = new BigDecimal( "100.00" );
+                BigDecimal cpuLimit = new BigDecimal( "100.00" );
 
-                    BigDecimal ramLimit = new BigDecimal( resourceHostMetric.getTotalRam() );
+                BigDecimal ramLimit = new BigDecimal( resourceHostMetric.getTotalRam() );
 
-                    BigDecimal diskLimit = new BigDecimal( resourceHostMetric.getTotalSpace() );
+                BigDecimal diskLimit = new BigDecimal( resourceHostMetric.getTotalSpace() );
 
-                    CpuResource cpuResource =
-                            new CpuResource( cpuLimit, 0.0, "UNKNOWN", resourceHostMetric.getCpuCore(), 0, 0, 0,
-                                    resourceHostMetric.getCpuFrequency(), 0 );
+                CpuResource cpuResource =
+                        new CpuResource( cpuLimit, 0.0, "UNKNOWN", resourceHostMetric.getCpuCore(), 0, 0, 0,
+                                resourceHostMetric.getCpuFrequency(), 0 );
 
-                    RamResource ramResource = new RamResource( ramLimit, 0.0 );
+                RamResource ramResource = new RamResource( ramLimit, 0.0 );
 
-                    DiskResource diskResource = new DiskResource( diskLimit, 0.0, "UNKNOWN", 0.0, 0.0, false );
+                DiskResource diskResource = new DiskResource( diskLimit, 0.0, "UNKNOWN", 0.0, 0.0, false );
 
 
-                    HostResources hostResources =
-                            new HostResources( resourceHost.getId(), cpuResource, ramResource, diskResource );
-                    resources.add( hostResources );
-                }
-                catch ( HostNotFoundException e )
-                {
-                    // ignore
-                }
+                HostResources hostResources =
+                        new HostResources( resourceHost.getId(), cpuResource, ramResource, diskResource );
+                resources.add( hostResources );
+            }
+            catch ( HostNotFoundException e )
+            {
+                // ignore
             }
         }
-        catch ( Exception e )
-        {
-            LOG.debug( e.getMessage(), e );
-        }
+
 
         return new PeerResources( getId(), environmentLimit, containerLimit, networkLimit, resources );
     }
