@@ -96,7 +96,7 @@ node() {
 		set +x
 		ssh root@${env.SS_TEST_NODE} <<- EOF
 		set -e
-		subutai update rh
+		if [[ "\$(subutai update rh -c || true)" == '*No update is available*' ]]; then subutai update rh; fi
 		echo -e '[template]\nbranch = ${env.BRANCH_NAME}' > /var/lib/apps/subutai/current/agent.gcfg
 		echo -e '[cdn]\nbranch = cdn.local' >> /var/lib/apps/subutai/current/agent.gcfg
 		echo y | subutai import management
