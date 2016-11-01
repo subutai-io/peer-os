@@ -251,6 +251,18 @@ public class HubManagerImpl implements HubManager
     }
 
 
+    @Override
+    public boolean isHubReachable()
+    {
+        if ( heartbeatProcessor != null )
+        {
+            return heartbeatProcessor.isHubReachable();
+        }
+
+        return false;
+    }
+
+
     private void initHeartbeatProcessor()
     {
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
@@ -294,7 +306,7 @@ public class HubManagerImpl implements HubManager
                                                                                      resourceHostCommandProcessor );
 
         heartbeatExecutorService
-                .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
+                .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
                         TimeUnit.SECONDS );
     }
 

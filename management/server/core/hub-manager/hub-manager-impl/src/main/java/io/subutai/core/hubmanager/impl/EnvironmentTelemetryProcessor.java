@@ -20,6 +20,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.peer.api.PeerManager;
@@ -159,7 +160,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
             {
                 res = sourceContainer.execute( new RequestBuilder( cmd ).withTimeout( timeout ) );
 
-                if ( res.hasSucceeded())
+                if ( res.hasSucceeded() )
                 {
                     result.put( key + "status", "SUCCESS" );
                 }
@@ -192,14 +193,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
                 return true;
             }
 
-            try
-            {
-                Thread.sleep( 5000 );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 5000 );
         }
 
         return true;

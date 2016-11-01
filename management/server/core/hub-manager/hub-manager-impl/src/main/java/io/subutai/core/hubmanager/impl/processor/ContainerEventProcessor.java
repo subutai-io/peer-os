@@ -49,7 +49,7 @@ public class ContainerEventProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            log.error( "Error to process container event: {}", e );
+            log.error( "Error to process container event: {}", e.getMessage() );
         }
     }
 
@@ -70,7 +70,7 @@ public class ContainerEventProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            log.error( "Oops error: ", e );
+            log.error( "Oops error: ", e.getMessage() );
         }
     }
 

@@ -24,6 +24,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
@@ -273,14 +274,7 @@ public class VehsProcessor implements StateLinkProcessor
                 log.warn( e.getMessage() );
             }
 
-            try
-            {
-                Thread.sleep( 1000 );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 1000 );
         }
 
         return null;

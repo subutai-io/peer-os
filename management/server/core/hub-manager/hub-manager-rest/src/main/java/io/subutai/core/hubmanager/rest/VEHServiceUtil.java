@@ -132,15 +132,7 @@ public class VEHServiceUtil
                     String.format( body, UUID.randomUUID(), projectName, peerId, peerId, resourceHost.getId() ) );
         }
 
-        try
-        {
-            Thread.sleep( 20 * 1000L );
-        }
-        catch ( InterruptedException e )
-        {
-            Thread.currentThread().interrupt();
-        }
-
+        TaskUtil.sleep( 20 * 1000L );
 
         String ip = deployStaticSite( peerManager, projectName, ownerName, userName, password );
 
