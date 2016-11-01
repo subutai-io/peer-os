@@ -120,7 +120,8 @@ node() {
 		set +x
 		./run_tests_qa.sh -m ${env.SS_TEST_NODE}
 		./run_tests_qa.sh -s all
-		./run_tests_qa.sh -r
+		${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
+		${mvnHome}/bin/mvn serenity:aggregate
 	"""
 
 	stage("Deploy artifacts on kurjun")
