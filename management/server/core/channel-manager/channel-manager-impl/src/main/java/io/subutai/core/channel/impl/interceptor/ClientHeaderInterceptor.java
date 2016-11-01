@@ -40,15 +40,9 @@ public class ClientHeaderInterceptor extends AbstractPhaseInterceptor<Message>
             if ( InterceptorState.CLIENT_OUT.isActive( message ) )
             {
                 Map<String, List> headers = ( Map<String, List> ) message.get( Message.PROTOCOL_HEADERS );
-                try
-                {
-                    headers.put( Common.SUBUTAI_HTTP_HEADER,
-                            Collections.singletonList( peerManager.getLocalPeer().getId() ) );
-                }
-                catch ( Exception ce )
-                {
-                    throw new Fault( ce );
-                }
+
+                headers.put( Common.SUBUTAI_HTTP_HEADER,
+                        Collections.singletonList( peerManager.getLocalPeer().getId() ) );
             }
         }
         catch ( Exception ex )

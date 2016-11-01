@@ -25,6 +25,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
@@ -182,10 +183,22 @@ public class QuotaManagerImpl implements QuotaManager
         environmentLimit -= environments.size();
         containerLimit -= peerContainers.size();
 
-        List<HostResources> resources = new ArrayList<>();
+        ResourceHostMetrics metrics = null;
+
         try
         {
-            for ( ResourceHostMetric resourceHostMetric : localPeer.getResourceHostMetrics().getResources() )
+            metrics = localPeer.getResourceHostMetrics();
+        }
+        catch ( PeerException e )
+        {
+            LOGGER.error( e.getMessage() );
+        }
+
+        List<HostResources> resources = new ArrayList<>();
+
+        if ( metrics != null )
+        {
+            for ( ResourceHostMetric resourceHostMetric : metrics.getResources() )
             {
                 try
                 {
@@ -211,15 +224,12 @@ public class QuotaManagerImpl implements QuotaManager
                             new HostResources( resourceHost.getId(), cpuResource, ramResource, diskResource );
                     resources.add( hostResources );
                 }
-                catch ( HostNotFoundException | QuotaException e )
+                catch ( Exception e )
                 {
                     // ignore
+                    LOGGER.warn( e.getMessage() );
                 }
             }
-        }
-        catch ( PeerException e )
-        {
-            LOGGER.debug( e.getMessage(), e );
         }
 
         return new PeerResources( localPeer.getId(), environmentLimit, containerLimit, networkLimit, resources );

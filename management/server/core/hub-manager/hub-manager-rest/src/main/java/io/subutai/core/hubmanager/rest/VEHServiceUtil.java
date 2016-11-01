@@ -25,6 +25,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -35,13 +36,14 @@ public class VEHServiceUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( VEHServiceUtil.class.getName() );
 
+
     private VEHServiceUtil()
     {
         throw new IllegalAccessError( "Utility class" );
     }
 
 
-    public static Response upSite( PeerManager peerManager,IdentityManager identityManager )
+    public static Response upSite( PeerManager peerManager, IdentityManager identityManager )
     {
         String projectName = "";
         String ownerName = "";
@@ -101,8 +103,8 @@ public class VEHServiceUtil
     }
 
 
-    private static void setupSite( PeerManager peerManager,IdentityManager identityManager, String projectName, String ownerName, String userName,
-                                   String password, String domain )
+    private static void setupSite( PeerManager peerManager, IdentityManager identityManager, String projectName,
+                                   String ownerName, String userName, String password, String domain )
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
 
@@ -158,14 +160,7 @@ public class VEHServiceUtil
 
             resourceHost.execute( new RequestBuilder( String.format( conf, domain, ip, domain, domain ) ) );
 
-            try
-            {
-                Thread.sleep( 5 * 1000L );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 5 * 1000L );
 
             resourceHost.execute( new RequestBuilder( "systemctl restart *nginx*" ) );
         }
