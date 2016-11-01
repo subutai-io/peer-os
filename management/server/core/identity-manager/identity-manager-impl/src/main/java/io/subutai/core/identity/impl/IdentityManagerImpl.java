@@ -977,7 +977,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( Exception ex )
         {
-            LOGGER.error( "*** Error! Cannot get auth.subject." );
+            LOGGER.error( "*** Error! Error getting ActiveSubject, cannot get auth.subject:" + ex.getMessage() );
         }
 
         return subject;
