@@ -76,6 +76,16 @@ node() {
 	stage("Update management on test node")
 	// Deploy builded template to remore test-server
 
+	// update rh on test node
+	def rhUpdateStatus = sh (script: "root@${env.SS_TEST_NODE} subutai update rh -c | cut -d ' ' -f3,4,5,6", returnStdout: true)
+	if (rhUpdateStatus == "[Update is available]") {
+		sh """
+			ssh root@gw.intra.lan <<- EOF
+			set -e
+			subutai update rh
+		"""
+	}
+
 	// destroy existing management template on test node
 	sh """
 		set +x
@@ -96,7 +106,6 @@ node() {
 		set +x
 		ssh root@${env.SS_TEST_NODE} <<- EOF
 		set -e
-		if [[ "\$(subutai update rh -c || true)" == '*No update is available*' ]]; then subutai update rh; fi
 		echo -e '[template]\nbranch = ${env.BRANCH_NAME}' > /var/lib/apps/subutai/current/agent.gcfg
 		echo -e '[cdn]\nbranch = cdn.local' >> /var/lib/apps/subutai/current/agent.gcfg
 		echo y | subutai import management
