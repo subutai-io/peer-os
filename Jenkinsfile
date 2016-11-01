@@ -107,7 +107,7 @@ node() {
 		ssh root@${env.SS_TEST_NODE} <<- EOF
 		set -e
 		echo -e '[template]\nbranch = ${env.BRANCH_NAME}' > /var/lib/apps/subutai/current/agent.gcfg
-		echo -e '[cdn]\nbranch = cdn.local' >> /var/lib/apps/subutai/current/agent.gcfg
+		echo -e '[cdn]\nurl = cdn.local' >> /var/lib/apps/subutai/current/agent.gcfg
 		echo y | subutai import management
 		sed -i -e 's/cdn.local/cdn.subut.ai/g' /mnt/lib/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
 	EOF"""
