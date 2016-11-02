@@ -195,11 +195,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public void init()
-    {
-    }
-
-
     public void dispose()
     {
         executor.shutdown();
@@ -1781,6 +1776,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
     {
+        LOG.info( "Plugin event, id: {}, state: {}", pluginUid, state );
     }
 
 

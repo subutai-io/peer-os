@@ -39,15 +39,6 @@ public class KeyServerImpl implements KeyServer
     /********************************
      *
      */
-    public void destroy()
-    {
-
-    }
-
-
-    /********************************
-     *
-     */
     public DaoManager getDaoManager()
     {
         return daoManager;
