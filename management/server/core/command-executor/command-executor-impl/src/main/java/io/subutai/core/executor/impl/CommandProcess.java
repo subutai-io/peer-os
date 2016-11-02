@@ -136,6 +136,7 @@ public class CommandProcess
     protected void processNextResponse( final Response response )
     {
         final CommandProcess THIS = this;
+
         if ( userSession != null )
         {
 
@@ -158,7 +159,10 @@ public class CommandProcess
         }
         else
         {
-            //TODO: check user
+            //****************************************
+            //LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges." );
+            //****************************************
+
             executor.execute( new ResponseProcessor( response, THIS, commandProcessor, request ) );
         }
     }

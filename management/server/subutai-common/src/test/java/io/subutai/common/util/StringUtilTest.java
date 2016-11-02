@@ -61,17 +61,21 @@ public class StringUtilTest
     @Test
     public void testRemoveSpecialChars()
     {
-        String result = StringUtil.removeSpecialChars ( htmlString );
+        String resultSpace = StringUtil.removeSpecialChars ( htmlString, false );
+        String resultNoSpace = StringUtil.removeSpecialChars ( htmlString, true );
 
-        assertFalse (result.contains( "<" ));
-        assertTrue (result.contains( "script" ));
+        assertFalse (resultSpace.contains( "<" ));
+        assertTrue (resultSpace.contains( "script" ));
+
+        assertTrue (resultSpace.contains( " " ));
+        assertFalse (resultNoSpace.contains( " " ));
     }
 
 
     @Test
     public void testRemoveHtmlAndSpecialChars()
     {
-        String result = StringUtil.removeHtmlAndSpecialChars( htmlString );
+        String result = StringUtil.removeHtmlAndSpecialChars( htmlString, true );
 
         assertFalse (result.contains( "<" ));
         assertFalse (result.contains( "script" ));

@@ -869,6 +869,7 @@ public class IdentityManagerImpl implements IdentityManager
     public Session getActiveSession()
     {
         Session session = null;
+
         try
         {
             Subject subject = getActiveSubject();
@@ -889,12 +890,36 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( Exception ex )
         {
-            LOGGER.error( "*** Error! Cannot find active User. Session is not started" );
+            LOGGER.warn( "*** Cannot find active User (no session): " + ex.toString());
         }
 
         return session;
     }
 
+
+    /* *************************************************
+     */
+    private Subject getActiveSubject() throws Exception
+    {
+
+        Subject subject = null;
+
+        AccessControlContext acc = AccessController.getContext();
+
+        if ( acc == null )
+        {
+            throw new IllegalStateException( "AccessControlContext is null" );
+        }
+
+        subject = Subject.getSubject( acc );
+
+        if ( subject == null )
+        {
+            throw new IllegalStateException( "Subject is null" );
+        }
+
+        return subject;
+    }
 
     /* *************************************************
      */
@@ -950,39 +975,6 @@ public class IdentityManagerImpl implements IdentityManager
             } );
         }
     }
-
-
-    /* *************************************************
-     */
-    private Subject getActiveSubject()
-    {
-
-        Subject subject = null;
-
-        try
-        {
-            AccessControlContext acc = AccessController.getContext();
-
-            if ( acc == null )
-            {
-                throw new IllegalStateException( "access control context is null" );
-            }
-
-            subject = Subject.getSubject( acc );
-
-            if ( subject == null )
-            {
-                throw new IllegalStateException( "subject is null" );
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOGGER.error( "*** Error! Error getting ActiveSubject, cannot get auth.subject:" + ex.getMessage() );
-        }
-
-        return subject;
-    }
-
 
     /* *************************************************
      */
@@ -1177,8 +1169,8 @@ public class IdentityManagerImpl implements IdentityManager
 
         //*********************************
         // Remove XSS vulnerability code
-        userName = validateInput( userName );
-        fullName = validateInput( fullName );
+        userName = validateInput( userName , true );
+        fullName = validateInput( fullName , false );
         //*********************************
 
         isValidUserName( userName );
@@ -1254,8 +1246,8 @@ public class IdentityManagerImpl implements IdentityManager
         {
             //*********************************
             // Remove XSS vulnerability code
-            user.setUserName( validateInput( user.getUserName() ));
-            user.setFullName( validateInput( user.getFullName() ));
+            user.setUserName( validateInput( user.getUserName(), true ));
+            user.setFullName( validateInput( user.getFullName(), false ));
 
             //*********************************
             //**************************************
@@ -1479,9 +1471,9 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private String validateInput( String inputStr )
+    private String validateInput( String inputStr, boolean removeSpaces )
     {
-        return StringUtil.removeHtmlAndSpecialChars( inputStr );
+        return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
     }
 
 
@@ -1531,7 +1523,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         //*********************************
         // Remove XSS vulnerability code
-        roleName = validateInput( roleName );
+        roleName = validateInput( roleName , true );
         //*********************************
 
         Role role = new RoleEntity();
@@ -1579,7 +1571,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         //*********************************
         // Remove XSS vulnerability code
-        role.setName( validateInput( role.getName()));
+        role.setName( validateInput( role.getName(), true));
         //*********************************
 
         identityDataService.updateRole( role );
