@@ -11,10 +11,10 @@ public class HostMetricsDto
 {
     public static final String ROOT_PARTITION = "/";
     public static final String MNT_PARTITION = "/mnt";
-    public static String[] RESOURCE_HOST_PARTITIONS = { ROOT_PARTITION, MNT_PARTITION };
+    public static final String[] RESOURCE_HOST_PARTITIONS = { ROOT_PARTITION, MNT_PARTITION };
 
     public static final String WAN_INTERFACE = "wan";
-    public static String[] RESOURCE_HOST_INTERFACES = { WAN_INTERFACE };
+    public static final String[] RESOURCE_HOST_INTERFACES = { WAN_INTERFACE };
 
 
     public enum HostType

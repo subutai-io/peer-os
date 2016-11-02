@@ -42,15 +42,14 @@ public class SeriesHelperTest
     public void testGetAvg()
     {
         final List<Series> cpuSeries = rhMetrics.getSeriesByType( SeriesBatch.SeriesType.CPU );
-        SeriesHelper seriesHelper = new SeriesHelper();
 
-        assertEquals( 0.9345833333, seriesHelper.getAvg( cpuSeries, new Tag( "type", "system" ) ), 0.0000001 );
-        assertEquals( 3.005, seriesHelper.getAvg( cpuSeries, new Tag( "type", "user" ) ), 0.0000001 );
+        assertEquals( 0.9345833333, SeriesHelper.getAvg( cpuSeries, new Tag( "type", "system" ) ), 0.0000001 );
+        assertEquals( 3.005, SeriesHelper.getAvg( cpuSeries, new Tag( "type", "user" ) ), 0.0000001 );
 
         final List<Series> netSeries = rhMetrics.getSeriesByType( SeriesBatch.SeriesType.NET );
 
         assertEquals( 853730.013333333,
-                seriesHelper.getAvg( netSeries, new Tag( "iface", "eth0" ), new Tag( "type", "in" ) ), 0.0000001 );
+                SeriesHelper.getAvg( netSeries, new Tag( "iface", "eth0" ), new Tag( "type", "in" ) ), 0.0000001 );
     }
 
 
