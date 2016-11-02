@@ -159,10 +159,6 @@ public class CommandProcess
         }
         else
         {
-            //****************************************
-            //LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges." );
-            //****************************************
-
             executor.execute( new ResponseProcessor( response, THIS, commandProcessor, request ) );
         }
     }

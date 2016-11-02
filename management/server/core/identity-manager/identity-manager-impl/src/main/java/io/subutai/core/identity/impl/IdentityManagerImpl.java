@@ -890,7 +890,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( Exception ex )
         {
-            LOGGER.warn( "*** Cannot find active User (no session): " + ex.toString());
+            LOGGER.warn( "*** Cannot find active User (no session): {}", ex.getMessage() );
         }
 
         return session;
@@ -920,6 +920,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         return subject;
     }
+
 
     /* *************************************************
      */
@@ -975,6 +976,7 @@ public class IdentityManagerImpl implements IdentityManager
             } );
         }
     }
+
 
     /* *************************************************
      */
@@ -1169,8 +1171,8 @@ public class IdentityManagerImpl implements IdentityManager
 
         //*********************************
         // Remove XSS vulnerability code
-        userName = validateInput( userName , true );
-        fullName = validateInput( fullName , false );
+        userName = validateInput( userName, true );
+        fullName = validateInput( fullName, false );
         //*********************************
 
         isValidUserName( userName );
@@ -1246,13 +1248,13 @@ public class IdentityManagerImpl implements IdentityManager
         {
             //*********************************
             // Remove XSS vulnerability code
-            user.setUserName( validateInput( user.getUserName(), true ));
-            user.setFullName( validateInput( user.getFullName(), false ));
+            user.setUserName( validateInput( user.getUserName(), true ) );
+            user.setFullName( validateInput( user.getFullName(), false ) );
 
             //*********************************
             //**************************************
             isValidUserName( user.getUserName() );
-            isValidEmail( user.getEmail());
+            isValidEmail( user.getEmail() );
             //**************************************
 
             if ( !Strings.isNullOrEmpty( password ) )
@@ -1460,9 +1462,9 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private void isValidEmail( String email)
+    private void isValidEmail( String email )
     {
-        if ( !StringUtil.isValidEmail( email ))
+        if ( !StringUtil.isValidEmail( email ) )
         {
             throw new IllegalArgumentException( "Invalid Email specified" );
         }
@@ -1523,7 +1525,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         //*********************************
         // Remove XSS vulnerability code
-        roleName = validateInput( roleName , true );
+        roleName = validateInput( roleName, true );
         //*********************************
 
         Role role = new RoleEntity();
@@ -1571,7 +1573,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         //*********************************
         // Remove XSS vulnerability code
-        role.setName( validateInput( role.getName(), true));
+        role.setName( validateInput( role.getName(), true ) );
         //*********************************
 
         identityDataService.updateRole( role );
