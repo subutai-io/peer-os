@@ -47,7 +47,7 @@ node() {
 	sh """
 		cd management
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
-			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
+			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
