@@ -15,7 +15,7 @@
 
   <!-- ************************************************************************************************** -->
 
-  <bean id="keyServer" scope="singleton" init-method="init" destroy-method="destroy"
+  <bean id="keyServer" scope="singleton" init-method="init"
         class="io.subutai.core.keyserver.impl.KeyServerImpl">
     <property name="daoManager" ref="daoKeyServer" />
   </bean>

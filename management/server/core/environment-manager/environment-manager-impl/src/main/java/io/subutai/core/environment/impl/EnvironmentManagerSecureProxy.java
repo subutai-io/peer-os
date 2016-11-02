@@ -109,12 +109,6 @@ public class EnvironmentManagerSecureProxy
     }
 
 
-    public void init()
-    {
-        environmentManager.init();
-    }
-
-
     public void dispose()
     {
         environmentManager.dispose();
@@ -852,5 +846,4 @@ public class EnvironmentManagerSecureProxy
     {
         return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
     }
-
 }

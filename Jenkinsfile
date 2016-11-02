@@ -46,7 +46,11 @@ node() {
 	// build deb
 	sh """
 		cd management
-		${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
+		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
+			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
+		else 
+			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
+		fi		
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${artifactDir}/${debFileName}
 	"""
 
@@ -110,6 +114,7 @@ node() {
 		echo -e '[cdn]\nurl = cdn.local' >> /var/lib/apps/subutai/current/agent.gcfg
 		echo y | subutai import management
 		sed -i -e 's/cdn.local/cdn.subut.ai/g' /mnt/lib/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
+		rm /var/lib/apps/subutai/current/agent.gcfg
 	EOF"""
 
 	// wait until SS starts

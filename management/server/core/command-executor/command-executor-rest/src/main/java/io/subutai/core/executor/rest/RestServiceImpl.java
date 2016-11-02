@@ -54,6 +54,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOG.error( "Error processing heartbeat from agent", e );
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
@@ -78,6 +80,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOG.error( "Error processing command response from agent", e );
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
@@ -107,6 +111,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOG.error( "Error feeding commands to agent", e );
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }

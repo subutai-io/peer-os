@@ -74,7 +74,7 @@
                         bind-method="registerListener" unbind-method="unregisterListener" />
   </reference-list>
 
-  <bean id="environmentManager" scope="singleton" init-method="init" destroy-method="dispose"
+  <bean id="environmentManager" scope="singleton" destroy-method="dispose"
         class="io.subutai.core.environment.impl.EnvironmentManagerSecureProxy">
     <argument ref="peerManager" />
     <argument ref="securityManager" />
