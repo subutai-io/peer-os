@@ -335,7 +335,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticates user and returns Session
+     *
+     * @param login Login name  or "token" keyword
+     * @param password  Password or JWT
+     *
+     * @return Session object
      */
     @PermitAll
     @Override
@@ -374,7 +381,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Create JSON Web Token and save in DB
+     *
+     * @param user input String
+     *
+     * @return  JSON Token
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
@@ -432,7 +445,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Checks username and password (authenticates), on success returns full token
+     *
+     * @param userName Login name
+     * @param password  Password
+     *
+     * @return Full JWT
      */
     @PermitAll
     @Override
@@ -486,7 +506,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Update (renew) Authorization ID of the User (Which is used by RSA keys to authenticate)
+     *
+     * @param user User
+     * @param authId  Authorization ID
+     *
+     * @return Newly assigned Authorization ID (random string, if authId param is NULL)
      */
     @PermitAll
     @Override
@@ -521,7 +548,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Encrypt with user's PGP private key and return encrypted Authorization id
+     *
+     * @param user User
+     *
+     * @return Encrypted authorization id
      */
     @PermitAll
     @Override
@@ -559,7 +592,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user by Authorization id
+     *
+     * @param fingerprint fingerprint of the key
+     * @param signedAuth Signed Authorization id (signedMessage)
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -603,7 +643,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user by JWT
+     *
+     * @param token Token to be checked
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -624,7 +670,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user with Username and password
+     *
+     * @param userName Username
+     * @param password Password
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -670,7 +723,12 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Sets the Owner of the Peer
+     *
+     * @param user User that will be set as an owner
+     *
      */
     @PermitAll
     @Override
@@ -680,7 +738,12 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Sets the Owner of the Peer
+     *
+     * @return Id of the PeerOwner
+     *
      */
     @PermitAll
     @Override
@@ -899,23 +962,23 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private Subject getActiveSubject() throws Exception
+    private Subject getActiveSubject() throws AccessControlException
     {
 
-        Subject subject = null;
+        Subject subject;
 
         AccessControlContext acc = AccessController.getContext();
 
         if ( acc == null )
         {
-            throw new IllegalStateException( "AccessControlContext is null" );
+            throw new AccessControlException( "AccessControlContext is null" );
         }
 
         subject = Subject.getSubject( acc );
 
         if ( subject == null )
         {
-            throw new IllegalStateException( "Subject is null" );
+            throw new AccessControlException( "Subject is null" );
         }
 
         return subject;
