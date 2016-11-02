@@ -117,15 +117,6 @@ public class EnvironmentManagerSecureProxyTest
 
 
     @Test
-    public void testInit() throws Exception
-    {
-        proxy.init();
-
-        verify( environmentManager ).init();
-    }
-
-
-    @Test
     public void testDispose() throws Exception
     {
         proxy.dispose();

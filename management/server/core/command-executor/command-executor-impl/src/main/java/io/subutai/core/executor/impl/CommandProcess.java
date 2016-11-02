@@ -54,6 +54,7 @@ public class CommandProcess
     {
         Preconditions.checkNotNull( commandProcessor );
         Preconditions.checkNotNull( callback );
+        Preconditions.checkNotNull( request );
 
         this.commandProcessor = commandProcessor;
         this.callback = callback;

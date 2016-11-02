@@ -396,7 +396,7 @@ public class HubManagerImpl implements HubManager
                         }
                         catch ( Exception e )
                         {
-                            //ignore
+                            log.error( "Error notifying hub event listener", e );
                         }
                     }
                 } );
