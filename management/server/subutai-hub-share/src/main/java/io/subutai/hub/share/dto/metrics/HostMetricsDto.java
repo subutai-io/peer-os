@@ -1,7 +1,10 @@
 package io.subutai.hub.share.dto.metrics;
 
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,10 +14,12 @@ public class HostMetricsDto
 {
     public static final String ROOT_PARTITION = "/";
     public static final String MNT_PARTITION = "/mnt";
-    public static final String[] RESOURCE_HOST_PARTITIONS = { ROOT_PARTITION, MNT_PARTITION };
+    public static final List<String> RESOURCE_HOST_PARTITIONS =
+            Collections.unmodifiableList( Arrays.asList( ROOT_PARTITION, MNT_PARTITION ) );
 
     public static final String WAN_INTERFACE = "wan";
-    public static final String[] RESOURCE_HOST_INTERFACES = { WAN_INTERFACE };
+    public static final List<String> RESOURCE_HOST_INTERFACES =
+            Collections.unmodifiableList( Collections.singletonList( WAN_INTERFACE ) );
 
 
     public enum HostType
