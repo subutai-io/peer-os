@@ -35,8 +35,8 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response executeCommand( final String hostId, final String command, String environmentId,
-                                    final String path, final Boolean daemon, final Integer timeOut )
+    public Response executeCommand( final String hostId, final String command, String environmentId, final String path,
+                                    final Boolean daemon, final Integer timeOut )
     {
         try
         {
@@ -65,7 +65,9 @@ public class RestServiceImpl implements RestService
                     try
                     {
                         environment.getContainerHostById( hostId );
+
                         environmentId = environment.getId();
+
                         break;
                     }
                     catch ( ContainerHostNotFoundException ex )
@@ -81,12 +83,15 @@ public class RestServiceImpl implements RestService
                 {
                     ContainerHost containerHost =
                             environmentManager.loadEnvironment( environmentId ).getContainerHostById( hostId );
+
                     result = containerHost.execute( request );
                 }
                 catch ( Exception e )
                 {
-                    return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) )
-                                   .build();
+                    LOG.error( "Error executing command", e );
+
+                    return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+                                   .entity( JsonUtil.toJson( e.getMessage() ) ).build();
                 }
             }
             else
@@ -100,6 +105,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOG.error( "Error on execute command #executeCommand", e );
+
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
