@@ -1,11 +1,8 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.io.IOException;
-
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +52,7 @@ public class ResourceHostMonitorProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            log.debug( "Sending resource hosts monitoring data failed." );
-
-            log.error( e.getMessage(), e );
+            log.error( "Sending resource hosts monitoring data failed.", e.getMessage() );
         }
     }
 
@@ -157,9 +152,9 @@ public class ResourceHostMonitorProcessor implements Runnable
                     }
                 }
             }
-            catch ( PGPException | IOException e )
+            catch ( Exception e )
             {
-                log.error( "Could not send resource hosts monitoring data.", e );
+                log.error( "Could not send resource hosts monitoring data: {}", e.getMessage() );
             }
         }
     }

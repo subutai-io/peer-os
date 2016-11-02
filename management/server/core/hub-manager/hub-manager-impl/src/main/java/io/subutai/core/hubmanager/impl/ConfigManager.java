@@ -33,6 +33,7 @@ import io.subutai.hub.share.pgp.message.PGPMessenger;
 public class ConfigManager
 {
     private static final int HUB_PORT = 444;
+    private static final String HUB_URL = "hub.subut.ai";
 
     private IdentityManager identityManager;
     private PeerManager peerManager;
@@ -124,7 +125,7 @@ public class ConfigManager
 
     public String getHubIp()
     {
-        return "hub.subut.ai";
+        return HUB_URL;
     }
 
 

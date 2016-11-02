@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.security.exception.IdentityExpiredException;
@@ -31,18 +32,17 @@ public class Login extends HttpServlet
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException
     {
-
-        String username = request.getParameter( "username" );
-        String password = request.getParameter( "password" );
-        String sptoken = request.getParameter( "sptoken" );
-        String newPassword = request.getParameter( "newpassword" );
-        User user = null;
-
-
         try
         {
+            String username = request.getParameter( "username" );
+            String password = request.getParameter( "password" );
+            String sptoken = request.getParameter( "sptoken" );
+            String newPassword = request.getParameter( "newpassword" );
+            User user;
+
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
 
+            Preconditions.checkNotNull( identityManager, "Karaf Auth Module is loading, please try again later" );
 
             if ( !Strings.isNullOrEmpty( newPassword ) )
             {
@@ -50,53 +50,44 @@ public class Login extends HttpServlet
                 password = newPassword;
             }
 
-            try
+            if ( !Strings.isNullOrEmpty( username ) )
             {
-                if ( !Strings.isNullOrEmpty( username ) )
-                {
-                    if ( identityManager != null )
-                    {
-                        sptoken = identityManager.getUserToken( username, password );
-                        user = identityManager.authenticateByToken( sptoken );
-                    }
-                    else
-                    {
-                        throw new IllegalStateException( "Karaf Auth Module is loading, please try again later" );
-                    }
-                }
-                else if ( !Strings.isNullOrEmpty( sptoken ) )
-                {
-                    if ( identityManager != null )
-                    {
-                        user = identityManager.authenticateByToken( sptoken );
-                    }
-                }
-                else
-                {
-                    request.setAttribute( "error", "Please enter username or password" );
-                    setResponse( response, "Error, Please enter username or password",
-                            HttpServletResponse.SC_UNAUTHORIZED );
-                }
+                sptoken = identityManager.getUserToken( username, password );
+                user = identityManager.authenticateByToken( sptoken );
+            }
+            else if ( !Strings.isNullOrEmpty( sptoken ) )
+            {
 
-                authenticateUser( request, response, user, sptoken );
+                user = identityManager.authenticateByToken( sptoken );
             }
-            catch ( IdentityExpiredException e )
+            else
             {
-                request.setAttribute( "error", "Your credentials are expired  !!!" );
-                setResponse( response, "Please create a new password. The old one is expired",
-                        HttpServletResponse.SC_PRECONDITION_FAILED );
+                request.setAttribute( "error", "Please enter username or password" );
+                setResponse( response, "Error, Please enter username or password",
+                        HttpServletResponse.SC_UNAUTHORIZED );
+
+                return;
             }
-            catch ( SessionBlockedException e )
-            {
-                request.setAttribute( "error", "Account is blocked !!!" );
-                setResponse( response, "Account is blocked", HttpServletResponse.SC_FORBIDDEN );
-            }
-            catch ( InvalidLoginException e )
-            {
-                request.setAttribute( "error", "Wrong Auth Credentials !!!" );
-                setResponse( response, "Wrong Auth Credentials", HttpServletResponse.SC_UNAUTHORIZED );
-            }
+
+            authenticateUser( request, response, user, sptoken );
         }
+        catch ( IdentityExpiredException e )
+        {
+            request.setAttribute( "error", "Your credentials are expired  !!!" );
+            setResponse( response, "Please create a new password. The old one is expired",
+                    HttpServletResponse.SC_PRECONDITION_FAILED );
+        }
+        catch ( SessionBlockedException e )
+        {
+            request.setAttribute( "error", "Account is blocked !!!" );
+            setResponse( response, "Account is blocked", HttpServletResponse.SC_FORBIDDEN );
+        }
+        catch ( InvalidLoginException e )
+        {
+            request.setAttribute( "error", "Wrong Auth Credentials !!!" );
+            setResponse( response, "Wrong Auth Credentials", HttpServletResponse.SC_UNAUTHORIZED );
+        }
+
         catch ( Exception e )
         {
             request.setAttribute( "error", "karaf exceptions !!!" );

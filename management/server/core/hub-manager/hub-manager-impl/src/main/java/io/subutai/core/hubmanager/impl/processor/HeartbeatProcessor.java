@@ -4,14 +4,15 @@ package io.subutai.core.hubmanager.impl.processor;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.util.LimitedCachedExecutor;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -46,7 +47,9 @@ public class HeartbeatProcessor implements Runnable
 
     private String peerId;
 
-    private Executor processorPool = Executors.newCachedThreadPool();
+    private Executor processorPool = new LimitedCachedExecutor( 10, 10 );
+
+    private volatile boolean isHubReachable = false;
 
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
@@ -58,6 +61,12 @@ public class HeartbeatProcessor implements Runnable
         path = String.format( "/rest/v1.3/peers/%s/heartbeat/", peerId );
 
         addShutDownHook();
+    }
+
+
+    public boolean isHubReachable()
+    {
+        return isHubReachable;
     }
 
 
@@ -106,10 +115,17 @@ public class HeartbeatProcessor implements Runnable
         try
         {
             sendHeartbeat( false );
+
+            isHubReachable = true;
         }
         catch ( Exception e )
         {
-            log.error( "Error to process heartbeat: ", e );
+            log.error( "Error to process heartbeat: ", e.getMessage() );
+
+            if ( ExceptionUtils.getStackTrace( e ).contains( "ConnectException" ) )
+            {
+                isHubReachable = false;
+            }
         }
     }
 

@@ -22,6 +22,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelHelper;
 import io.subutai.core.peer.api.PeerManager;
@@ -187,14 +188,7 @@ public class AppScaleManager
                 return true;
             }
 
-            try
-            {
-                Thread.sleep( 5000 );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 5000 );
         }
 
         return true;
