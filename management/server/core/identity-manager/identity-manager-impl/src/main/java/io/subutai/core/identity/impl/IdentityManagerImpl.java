@@ -335,7 +335,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticates user and returns Session
+     *
+     * @param login Login name  or "token" keyword
+     * @param password  Password or JWT
+     *
+     * @return Session object
      */
     @PermitAll
     @Override
@@ -374,7 +381,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Create JSON Web Token and save in DB
+     *
+     * @param user input String
+     *
+     * @return  JSON Token
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
@@ -432,7 +445,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Checks username and password (authenticates), on success returns full token
+     *
+     * @param userName Login name
+     * @param password  Password
+     *
+     * @return Full JWT
      */
     @PermitAll
     @Override
@@ -486,7 +506,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Update (renew) Authentication ID of the User (Which is used by RSA keys to authenticate)
+     *
+     * @param user User
+     * @param authId  Authentication ID
+     *
+     * @return Newly assigned authentication ID (random string, if authId param is NULL)
      */
     @PermitAll
     @Override
@@ -899,10 +926,10 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private Subject getActiveSubject() throws Exception
+    private Subject getActiveSubject() throws IllegalStateException, AccessControlException
     {
 
-        Subject subject = null;
+        Subject subject;
 
         AccessControlContext acc = AccessController.getContext();
 
