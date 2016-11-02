@@ -109,12 +109,6 @@ public class EnvironmentManagerSecureProxy
     }
 
 
-    public void init()
-    {
-        environmentManager.init();
-    }
-
-
     public void dispose()
     {
         environmentManager.dispose();
@@ -225,7 +219,7 @@ public class EnvironmentManagerSecureProxy
     {
         //*********************************
         // Remove XSS vulnerability code
-        topology.setEnvironmentName ( validateInput( topology.getEnvironmentName()));
+        topology.setEnvironmentName( validateInput( topology.getEnvironmentName() ) );
         //*********************************
 
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -852,5 +846,4 @@ public class EnvironmentManagerSecureProxy
     {
         return StringUtil.removeHtmlAndSpecialChars( inputStr );
     }
-
 }
