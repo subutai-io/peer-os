@@ -508,12 +508,12 @@ public class IdentityManagerImpl implements IdentityManager
 
     /**
      * ***********************************************************************************
-     * Update (renew) Authentication ID of the User (Which is used by RSA keys to authenticate)
+     * Update (renew) Authorization ID of the User (Which is used by RSA keys to authenticate)
      *
      * @param user User
-     * @param authId  Authentication ID
+     * @param authId  Authorization ID
      *
-     * @return Newly assigned authentication ID (random string, if authId param is NULL)
+     * @return Newly assigned Authorization ID (random string, if authId param is NULL)
      */
     @PermitAll
     @Override
@@ -548,7 +548,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Encrypt with user's PGP private key and return encrypted Authorization id
+     *
+     * @param user User
+     *
+     * @return Encrypted authorization id
      */
     @PermitAll
     @Override
@@ -586,7 +592,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user by Authorization id
+     *
+     * @param fingerprint fingerprint of the key
+     * @param signedAuth Signed Authorization id (signedMessage)
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -630,7 +643,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user by JWT
+     *
+     * @param token Token to be checked
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -651,7 +670,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user with Username and password
+     *
+     * @param userName Username
+     * @param password Password
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -697,7 +723,12 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Sets the Owner of the Peer
+     *
+     * @param user User that will be set as an owner
+     *
      */
     @PermitAll
     @Override
@@ -707,7 +738,12 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Sets the Owner of the Peer
+     *
+     * @return Id of the PeerOwner
+     *
      */
     @PermitAll
     @Override
@@ -926,7 +962,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private Subject getActiveSubject() throws IllegalStateException, AccessControlException
+    private Subject getActiveSubject() throws AccessControlException
     {
 
         Subject subject;
@@ -935,14 +971,14 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( acc == null )
         {
-            throw new IllegalStateException( "AccessControlContext is null" );
+            throw new AccessControlException( "AccessControlContext is null" );
         }
 
         subject = Subject.getSubject( acc );
 
         if ( subject == null )
         {
-            throw new IllegalStateException( "Subject is null" );
+            throw new AccessControlException( "Subject is null" );
         }
 
         return subject;
