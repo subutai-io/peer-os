@@ -153,8 +153,17 @@ public class CommandProcessor implements RestProcessor
             throw new CommandException( e );
         }
 
+        //*******Check Usersession *************************
+        Session session = getActiveSession();
+
+        if(session == null)
+        {
+            LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges" );
+        }
+        //**************************************************
+
         //create command process
-        CommandProcess commandProcess = new CommandProcess( this, callback, request, getActiveSession() );
+        CommandProcess commandProcess = new CommandProcess( this, callback, request, session );
         boolean queued = commands.put( request.getCommandId(), commandProcess, COMMAND_ENTRY_TIMEOUT,
                 new CommandProcessExpiryCallback() );
         if ( !queued )

@@ -50,6 +50,14 @@ public class StringUtil
     }
 
 
+    /**
+     * ***********************************************************************************
+     * Checks if Input contains any HTML or CSS tags
+     *
+     * @param str input String
+     *
+     * @return Validated String
+     */
     public static boolean containsHtml( String str )
     {
         if ( Strings.isNullOrEmpty( str ) )
@@ -63,6 +71,14 @@ public class StringUtil
     }
 
 
+    /**
+     * ***********************************************************************************
+     * Removes Special HTML Tags
+     *
+     * @param str input String
+     *
+     * @return Validated String
+     */
     public static String removeHtml( String str )
     {
         if ( Strings.isNullOrEmpty( str ) )
@@ -76,15 +92,33 @@ public class StringUtil
     }
 
 
-    public static String removeHtmlAndSpecialChars( String str )
+    /**
+     * ***********************************************************************************
+     * Removes Special HTML Tags and Non-AlfaNumeric Chars
+     *
+     * @param str input String
+     * @param removeSpaces if TRUE removes whitespaces
+     *
+     * @return Validated String
+     */
+    public static String removeHtmlAndSpecialChars( String str , boolean removeSpaces )
     {
         String noHTML = removeHtml( str );
 
-        return removeSpecialChars( noHTML );
+        return removeSpecialChars( noHTML, removeSpaces );
     }
 
 
-    public static String removeSpecialChars( String str )
+    /**
+     * ***********************************************************************************
+     * Removes Special Non-AlfaNumeric Chars
+     *
+     * @param str input String
+     * @param removeSpaces if TRUE removes whitespaces
+     *
+     * @return Validated String
+     */
+    public static String removeSpecialChars( String str, boolean removeSpaces )
     {
         if ( Strings.isNullOrEmpty( str ) )
         {
@@ -92,11 +126,22 @@ public class StringUtil
         }
         else
         {
-            return str.replaceAll( "[^a-zA-Z0-9._-]", "" );
+            if(removeSpaces)
+                return str.replaceAll( "[^a-zA-Z0-9._-]", "" ).trim();
+            else
+                return str.replaceAll( "[^a-zA-Z0-9\\s._-]", "" ).trim();
         }
     }
 
 
+    /**
+     * ***********************************************************************************
+     * Removes Special HTML Tags and Non-AlfaNumeric Chars
+     *
+     * @param email Email to be validated
+     *
+     * @return Is valid mail
+     */
     public static boolean isValidEmail( String email )
     {
         EmailValidator emailvalidator = EmailValidator.getInstance();
