@@ -39,7 +39,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
         catch ( Exception ex )
         {
             daoManager.rollBackTransaction( em );
-            LOG.error( "ConfigDataService saveConfig:" + ex.toString() );
+            LOG.error( "ConfigDataService saveConfig: {}", ex.getMessage() );
         }
         finally
         {
@@ -60,7 +60,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
         }
         catch ( Exception ex )
         {
-            LOG.error( "ConfigDataService getConfig:" + ex.toString() );
+            LOG.error( "ConfigDataService getConfig: {}", ex.getMessage() );
             return null;
         }
         finally
@@ -86,7 +86,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
         catch ( Exception ex )
         {
             daoManager.rollBackTransaction( em );
-            LOG.error( "ConfigDataService deleteOperation:" + ex.toString() );
+            LOG.error( "ConfigDataService deleteOperation: {}", ex.getMessage() );
         }
         finally
         {
