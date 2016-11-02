@@ -32,7 +32,7 @@ import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.util.DateTimeParam;
-import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.hub.share.resource.PeerResources;
 
 

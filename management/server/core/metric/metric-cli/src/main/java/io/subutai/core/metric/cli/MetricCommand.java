@@ -14,9 +14,9 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.hub.share.resource.HistoricalMetrics;
-import io.subutai.hub.share.resource.Series;
-import io.subutai.hub.share.resource.SeriesBatch;
+import io.subutai.common.metric.HistoricalMetrics;
+import io.subutai.common.metric.Series;
+import io.subutai.common.metric.SeriesBatch;
 
 
 /**

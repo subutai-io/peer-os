@@ -1,4 +1,4 @@
-package io.subutai.hub.share.resource;
+package io.subutai.common.metric;
 
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class Series
     List<String> columns;
 
     @JsonProperty( "values" )
-    private List<List<Double>> values;
+    private List<Double[]> values;
 
 
     public Series()
@@ -35,7 +35,7 @@ public class Series
 
     public Series( @JsonProperty( "name" ) final String name, @JsonProperty( "tags" ) Map<String, String> tags,
                    @JsonProperty( "columns" ) List<String> columns,
-                   @JsonProperty( "values" ) final List<List<Double>> values )
+                   @JsonProperty( "values" ) final List<Double[]> values )
     {
         this.name = name;
         this.tags = tags;
@@ -62,7 +62,7 @@ public class Series
     }
 
 
-    public List<List<Double>> getValues()
+    public List<Double[]> getValues()
     {
         return values;
     }

@@ -64,7 +64,7 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.common.metric.HistoricalMetrics;
 
 
 /**
