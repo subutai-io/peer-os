@@ -110,6 +110,7 @@ node() {
 		echo -e '[cdn]\nurl = cdn.local' >> /var/lib/apps/subutai/current/agent.gcfg
 		echo y | subutai import management
 		sed -i -e 's/cdn.local/cdn.subut.ai/g' /mnt/lib/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
+		rm /var/lib/apps/subutai/current/agent.gcfg
 	EOF"""
 
 	// wait until SS starts
