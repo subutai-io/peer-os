@@ -890,7 +890,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( Exception ex )
         {
-            LOGGER.error( "*** Error! Cannot find active User (no session):" + ex.toString());
+            LOGGER.warn( "*** Cannot find active User (no session): " + ex.toString());
         }
 
         return session;
@@ -908,7 +908,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( acc == null )
         {
-            throw new IllegalStateException( "AccessControlCntext is null" );
+            throw new IllegalStateException( "AccessControlContext is null" );
         }
 
         subject = Subject.getSubject( acc );
@@ -1169,8 +1169,8 @@ public class IdentityManagerImpl implements IdentityManager
 
         //*********************************
         // Remove XSS vulnerability code
-        userName = validateInput( userName );
-        fullName = validateInput( fullName );
+        userName = validateInput( userName , true );
+        fullName = validateInput( fullName , false );
         //*********************************
 
         isValidUserName( userName );
@@ -1246,8 +1246,8 @@ public class IdentityManagerImpl implements IdentityManager
         {
             //*********************************
             // Remove XSS vulnerability code
-            user.setUserName( validateInput( user.getUserName() ));
-            user.setFullName( validateInput( user.getFullName() ));
+            user.setUserName( validateInput( user.getUserName(), true ));
+            user.setFullName( validateInput( user.getFullName(), false ));
 
             //*********************************
             //**************************************
@@ -1471,9 +1471,9 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private String validateInput( String inputStr )
+    private String validateInput( String inputStr, boolean removeSpaces )
     {
-        return StringUtil.removeHtmlAndSpecialChars( inputStr );
+        return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
     }
 
 
@@ -1523,7 +1523,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         //*********************************
         // Remove XSS vulnerability code
-        roleName = validateInput( roleName );
+        roleName = validateInput( roleName , true );
         //*********************************
 
         Role role = new RoleEntity();
@@ -1571,7 +1571,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         //*********************************
         // Remove XSS vulnerability code
-        role.setName( validateInput( role.getName()));
+        role.setName( validateInput( role.getName(), true));
         //*********************************
 
         identityDataService.updateRole( role );

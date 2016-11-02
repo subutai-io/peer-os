@@ -158,7 +158,7 @@ public class CommandProcessor implements RestProcessor
 
         if(session == null)
         {
-            LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges." );
+            LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges" );
         }
         //**************************************************
 

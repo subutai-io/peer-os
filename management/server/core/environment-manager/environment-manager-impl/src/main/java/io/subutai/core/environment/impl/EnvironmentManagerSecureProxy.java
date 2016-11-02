@@ -225,7 +225,7 @@ public class EnvironmentManagerSecureProxy
     {
         //*********************************
         // Remove XSS vulnerability code
-        topology.setEnvironmentName ( validateInput( topology.getEnvironmentName()));
+        topology.setEnvironmentName ( validateInput( topology.getEnvironmentName(), true));
         //*********************************
 
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -848,9 +848,9 @@ public class EnvironmentManagerSecureProxy
 
     /* *************************************************
      */
-    private String validateInput( String inputStr )
+    private String validateInput( String inputStr, boolean removeSpaces )
     {
-        return StringUtil.removeHtmlAndSpecialChars( inputStr );
+        return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
     }
 
 }
