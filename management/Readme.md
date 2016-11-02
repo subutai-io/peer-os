@@ -211,3 +211,18 @@ which contains custom Karaf distribution of SS Console application.
 Untar it to some directory and execute `{distr}/bin/karaf`.
 
 After that go to `https://your_host_ip:8443` in your browser.
+
+
+###Development
+
+For development purposes, access to management container can be opened
+by executing the following commands on RH-with-MH:
+
+```
+sudo iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
+sudo iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 5005 -j DNAT --to-destination 10.10.10.1:5005
+```
+
+This would open ports **2222** for ssh access and **5005** for debugger.
+
+**CAUTION**: this must be used for development only. Highly dangerous to do this in production!
