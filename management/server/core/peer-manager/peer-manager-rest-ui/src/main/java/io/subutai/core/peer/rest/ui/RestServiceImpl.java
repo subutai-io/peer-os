@@ -100,38 +100,6 @@ public class RestServiceImpl implements RestService
                 }, taskExecutor ) ).collect( Collectors.toList() );
 
                 CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
-
-                //                CompletionService<Boolean> taskCompletionService = getCompletionService(
-                // taskExecutor );
-
-                //                registrationDatas.forEach( d ->
-                //                {
-                //                    taskCompletionService.submit( () ->
-                //                    {
-                //                        try
-                //                        {
-                //                            if ( d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED )
-                //                            {
-                //                                d.setOnline( peerManager.getPeer( d.getRegistrationData()
-                // .getPeerInfo().getId() )
-                //                                                        .isOnline() );
-                //                            }
-                //                        }
-                //                        catch ( PeerException e )
-                //                        {
-                //                        }
-                //
-                //                        return true;
-                //                    } );
-                //                } );
-                //
-                //                taskExecutor.shutdown();
-
-                //                for ( int i = 0; i < registrationDatas.size(); i++ )
-                //                {
-                //                    Future<Boolean> future = taskCompletionService.take();
-                //                    future.get();
-                //                }
             }
 
             return Response.ok( JsonUtil.toJson( registrationDatas ) ).build();

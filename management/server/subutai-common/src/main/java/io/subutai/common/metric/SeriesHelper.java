@@ -7,6 +7,12 @@ import java.util.List;
 public class SeriesHelper
 {
 
+    private SeriesHelper()
+    {
+        throw new IllegalAccessError( "Utility class" );
+    }
+
+
     public static double getAvg( final List<Series> series, final Tag... tags )
     {
         double result = 0;

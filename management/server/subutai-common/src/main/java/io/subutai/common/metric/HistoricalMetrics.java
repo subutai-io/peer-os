@@ -49,7 +49,7 @@ public class HistoricalMetrics
     public HostMetricsDto.HostType getHostType()
     {
         HostMetricsDto.HostType result = null;
-        if ( metrics.size() > 0 && metrics.get( 0 ).getSeries().size() > 0 )
+        if ( !metrics.isEmpty() && !metrics.get( 0 ).getSeries().isEmpty() )
         {
             if ( metrics.get( 0 ).getSeries().get( 0 ).getName().startsWith( "host_" ) )
             {
