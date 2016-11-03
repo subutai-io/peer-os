@@ -69,6 +69,7 @@ node() {
 		/apps/bin/lxc-attach -n management -- sync
 		/apps/bin/lxc-attach -n management -- apt-get -y --force-yes install --only-upgrade procps
 		/apps/bin/lxc-attach -n management -- apt-get -y --force-yes install --only-upgrade udev
+		/apps/bin/lxc-attach -n management -- apt-get -y --force-yes install --only-upgrade libdbus-1-3
 		/apps/bin/lxc-attach -n management -- apt-get -y --force-yes install subutai-dnsmasq subutai-influxdb curl gorjun
 		/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
 		/apps/bin/lxc-attach -n management -- sync
