@@ -1,17 +1,17 @@
-package io.subutai.hub.share.dto.environment.container;
+package io.subutai.hub.share.dto.host;
 
 
-public class ContainerCommandResponseDto
+public class CommandResponseDto
 {
 
-    // id of target container
-    private String containerId;
+    // id of target host
+    private String hostId;
 
     // id of corresponding command request
     private String commandId;
 
     // can be null if command timed out, 0 indicates successful completion of command,
-    // no-zero indicates  failure
+    // non-zero indicates  failure
     private Integer exitCode;
 
     // standard output of command
@@ -27,10 +27,10 @@ public class ContainerCommandResponseDto
     private String exception;
 
 
-    public ContainerCommandResponseDto( final String containerId, final String commandId, final Integer exitCode,
-                                        final String stdOut, final String stdErr, final boolean hasTimedOut )
+    public CommandResponseDto( final String hostId, final String commandId, final Integer exitCode, final String stdOut,
+                               final String stdErr, final boolean hasTimedOut )
     {
-        this.containerId = containerId;
+        this.hostId = hostId;
         this.commandId = commandId;
         this.exitCode = exitCode;
         this.stdOut = stdOut;
@@ -39,14 +39,14 @@ public class ContainerCommandResponseDto
     }
 
 
-    protected ContainerCommandResponseDto()
+    protected CommandResponseDto()
     {
     }
 
 
-    public ContainerCommandResponseDto( final String containerId, final String commandId, final String exception )
+    public CommandResponseDto( final String hostId, final String commandId, final String exception )
     {
-        this.containerId = containerId;
+        this.hostId = hostId;
         this.commandId = commandId;
         this.exception = exception;
     }
@@ -88,17 +88,17 @@ public class ContainerCommandResponseDto
     }
 
 
-    public String getContainerId()
+    public String getHostId()
     {
-        return containerId;
+        return hostId;
     }
 
 
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "ContainerCommandResponseDto{" );
-        sb.append( "containerId='" ).append( containerId ).append( '\'' );
+        final StringBuffer sb = new StringBuffer( "CommandResponseDto{" );
+        sb.append( "hostId='" ).append( hostId ).append( '\'' );
         sb.append( ", commandId='" ).append( commandId ).append( '\'' );
         sb.append( ", exitCode=" ).append( exitCode );
         sb.append( ", stdOut='" ).append( stdOut ).append( '\'' );

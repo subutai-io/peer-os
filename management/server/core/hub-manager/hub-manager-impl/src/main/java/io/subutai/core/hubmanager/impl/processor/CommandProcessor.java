@@ -13,34 +13,33 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.Host;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
-import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
-import io.subutai.hub.share.dto.host.ResourceHostCommandBatchDto;
-import io.subutai.hub.share.dto.host.ResourceHostCommandRequestDto;
-import io.subutai.hub.share.dto.host.ResourceHostCommandResponseDto;
+import io.subutai.hub.share.dto.host.CommandBatchDto;
+import io.subutai.hub.share.dto.host.CommandRequestDto;
+import io.subutai.hub.share.dto.host.CommandResponseDto;
 
 
-public class ResourceHostCommandProcessor implements StateLinkProcessor
+public class CommandProcessor implements StateLinkProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ResourceHostCommandProcessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
 
-    private static final String STATE_LINK_PATTERN = "/rest/v2/peers/.*/resourcehosts/execute";
+    private static final String STATE_LINK_PATTERN = "/rest/v2/peers/.*/hosts/execute";
     private static final Pattern PATTERN = Pattern.compile( STATE_LINK_PATTERN );
 
     private final Context context;
     private ExecutorService pool = Executors.newCachedThreadPool();
 
 
-    public ResourceHostCommandProcessor( final Context context )
+    public CommandProcessor( final Context context )
     {
         this.context = context;
     }
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
+    public boolean processStateLinks( final Set<String> stateLinks )
     {
         boolean fastMode = false;
 
@@ -64,16 +63,14 @@ public class ResourceHostCommandProcessor implements StateLinkProcessor
     {
         try
         {
-            ResourceHostCommandBatchDto commandBatchDto =
-                    context.restClient.getStrict( link, ResourceHostCommandBatchDto.class );
+            CommandBatchDto commandBatchDto = context.restClient.getStrict( link, CommandBatchDto.class );
 
             if ( commandBatchDto != null )
             {
-                for ( ResourceHostCommandRequestDto commandRequestDto : commandBatchDto
-                        .getResourceHostCommandRequestDtos() )
+                for ( CommandRequestDto commandRequestDto : commandBatchDto.getCommandRequestDtos() )
                 {
 
-                    pool.execute( new ResourceHostCommandTask( link, commandRequestDto ) );
+                    pool.execute( new CommandTask( link, commandRequestDto ) );
                 }
             }
         }
@@ -84,13 +81,13 @@ public class ResourceHostCommandProcessor implements StateLinkProcessor
     }
 
 
-    private class ResourceHostCommandTask implements Runnable
+    private class CommandTask implements Runnable
     {
         private final String link;
-        private final ResourceHostCommandRequestDto commandRequestDto;
+        private final CommandRequestDto commandRequestDto;
 
 
-        ResourceHostCommandTask( final String link, final ResourceHostCommandRequestDto commandRequestDto )
+        CommandTask( final String link, final CommandRequestDto commandRequestDto )
         {
             this.link = link;
             this.commandRequestDto = commandRequestDto;
@@ -100,27 +97,28 @@ public class ResourceHostCommandProcessor implements StateLinkProcessor
         @Override
         public void run()
         {
-            ResourceHostCommandResponseDto commandResponseDto;
+            CommandResponseDto commandResponseDto;
 
             try
             {
-                ResourceHost resourceHost =
-                        context.localPeer.getResourceHostById( commandRequestDto.getResourceHostId() );
+                Host host = context.localPeer.bindHost( commandRequestDto.getHostId() );
 
-                CommandResult commandResult = resourceHost.execute( new RequestBuilder( commandRequestDto.getCommand() )
+                CommandResult commandResult = host.execute( new RequestBuilder( commandRequestDto.getCommand() )
                         .withTimeout( commandRequestDto.getTimeout() ).withStdOutRedirection(
                                 commandRequestDto.grabOutput() ? OutputRedirection.RETURN : OutputRedirection.NO ) );
 
-                commandResponseDto = new ResourceHostCommandResponseDto( commandRequestDto.getResourceHostId(),
-                        commandRequestDto.getCommandId(), commandResult.getExitCode(), commandResult.getStdOut(),
-                        commandResult.getStdErr(), commandResult.hasTimedOut() );
+                commandResponseDto =
+                        new CommandResponseDto( commandRequestDto.getHostId(), commandRequestDto.getCommandId(),
+                                commandResult.getExitCode(), commandResult.getStdOut(), commandResult.getStdErr(),
+                                commandResult.hasTimedOut() );
             }
             catch ( Exception e )
             {
                 LOG.error( "Error executing Hub command {}: {}", commandRequestDto, e.getMessage() );
 
-                commandResponseDto = new ResourceHostCommandResponseDto( commandRequestDto.getResourceHostId(),
-                        commandRequestDto.getCommandId(), e.getMessage() );
+                commandResponseDto =
+                        new CommandResponseDto( commandRequestDto.getHostId(), commandRequestDto.getCommandId(),
+                                e.getMessage() );
             }
 
             //send response
@@ -128,7 +126,7 @@ public class ResourceHostCommandProcessor implements StateLinkProcessor
         }
 
 
-        void sendResponse( final String link, final ResourceHostCommandResponseDto commandResponseDto )
+        void sendResponse( final String link, final CommandResponseDto commandResponseDto )
         {
             if ( commandResponseDto != null )
             {
