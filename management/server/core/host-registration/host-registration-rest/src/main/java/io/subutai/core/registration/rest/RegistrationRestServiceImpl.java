@@ -60,7 +60,8 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error registering public key", e );
+            LOGGER.error( "Error registering public key: {}", e.getMessage() );
+
             return Response.serverError().build();
         }
     }

@@ -5,10 +5,10 @@ import java.util.UUID;
 
 
 /**
- * Command DTO obtained from Hub to execute on a resource host. Currently has a bare minimum of options but can be
- * extended to accommodate all command options of io.subutai.common.command.RequestBuilder
+ * Command DTO obtained from Hub to execute on a host. Currently has a bare minimum of options but can be extended
+ * to accommodate all command options of io.subutai.common.command.RequestBuilder
  */
-public class ResourceHostCommandRequestDto
+public class CommandRequestDto
 {
     // id of target peer
     private String peerId;
@@ -16,8 +16,8 @@ public class ResourceHostCommandRequestDto
     // id of command on Hub to be able to match command with its response
     private String commandId;
 
-    // resource host id
-    private String resourceHostId;
+    // SS host id
+    private String hostId;
 
     // command to execute
     private String command;
@@ -29,21 +29,21 @@ public class ResourceHostCommandRequestDto
     private boolean grabOutput = true;
 
 
-    protected ResourceHostCommandRequestDto()
+    protected CommandRequestDto()
     {
     }
 
 
-    public ResourceHostCommandRequestDto( final String peerId, final String resourceHostId, final String command )
+    public CommandRequestDto( final String peerId, final String hostId, final String command )
     {
         this.commandId = UUID.randomUUID().toString();
         this.peerId = peerId;
-        this.resourceHostId = resourceHostId;
+        this.hostId = hostId;
         this.command = command;
     }
 
 
-    public ResourceHostCommandRequestDto setTimeout( final int timeout )
+    public CommandRequestDto setTimeout( final int timeout )
     {
         this.timeout = timeout;
 
@@ -51,7 +51,7 @@ public class ResourceHostCommandRequestDto
     }
 
 
-    public ResourceHostCommandRequestDto setGrabOutput( final boolean grabOutput )
+    public CommandRequestDto setGrabOutput( final boolean grabOutput )
     {
         this.grabOutput = grabOutput;
 
@@ -77,9 +77,9 @@ public class ResourceHostCommandRequestDto
     }
 
 
-    public String getResourceHostId()
+    public String getHostId()
     {
-        return resourceHostId;
+        return hostId;
     }
 
 
@@ -98,10 +98,10 @@ public class ResourceHostCommandRequestDto
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "ResourceHostCommandRequestDto{" );
+        final StringBuffer sb = new StringBuffer( "CommandRequestDto{" );
         sb.append( "peerId='" ).append( peerId ).append( '\'' );
         sb.append( ", commandId='" ).append( commandId ).append( '\'' );
-        sb.append( ", resourceHostId='" ).append( resourceHostId ).append( '\'' );
+        sb.append( ", hostId='" ).append( hostId ).append( '\'' );
         sb.append( ", command='" ).append( command ).append( '\'' );
         sb.append( ", timeout=" ).append( timeout );
         sb.append( ", grabOutput=" ).append( grabOutput );
