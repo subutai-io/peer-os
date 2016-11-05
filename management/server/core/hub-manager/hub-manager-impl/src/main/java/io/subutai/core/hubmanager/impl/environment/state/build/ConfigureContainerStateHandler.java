@@ -163,17 +163,13 @@ public class ConfigureContainerStateHandler extends StateHandler
 
     private void removeKeys( EnvironmentId envId, Set<String> sshKeys, String[] currentSshKeys )
     {
-
-
         try
         {
-            Environment environment = ctx.envManager.loadEnvironment( envId.toString() );
-
             for ( String sshKey : currentSshKeys )
             {
                 if ( !sshKeys.contains( sshKey.trim() ) )
                 {
-                    environment.removeSshKey( sshKey, true );
+                    ctx.envManager.removeSshKey( envId.getId(), sshKey, false );
                 }
             }
         }
