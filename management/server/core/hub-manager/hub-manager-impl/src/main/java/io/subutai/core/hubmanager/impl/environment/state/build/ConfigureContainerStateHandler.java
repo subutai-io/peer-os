@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -94,9 +93,10 @@ public class ConfigureContainerStateHandler extends StateHandler
                     if ( nodeDto.getSshKeys() != null )
                     {
                         Set<String> existingKeys = new HashSet<>();
-                        keys.addAll( nodeDto.getSshKeys() );
-                        allKeys.addAll( nodeDto.getSshKeys() );
-                        for ( String sshKey : nodeDto.getSshKeys() )
+                        Set<String> hubSshKeys = trim( nodeDto.getSshKeys() );
+                        keys.addAll( hubSshKeys );
+                        allKeys.addAll( hubSshKeys );
+                        for ( String sshKey : hubSshKeys )
                         {
                             if ( currentSshKeysSet.contains( sshKey ) )
                             {
@@ -108,15 +108,8 @@ public class ConfigureContainerStateHandler extends StateHandler
                 }
             }
 
-            removeKeys( envId, allKeys, currentSshKeys );
-
-            if ( keys.isEmpty() )
-            {
-                return peerDto;
-            }
-            sshKeys.addStringKeys( keys );
-
             Environment environment = null;
+
             try
             {
                 environment = ctx.envManager.loadEnvironment( envDto.getId() );
@@ -126,7 +119,18 @@ public class ConfigureContainerStateHandler extends StateHandler
                 log.info( e.getMessage() );
             }
 
-            if ( environment != null && !"hub".equals( environment.getPeerId() ) )
+            boolean isSsEnv = environment != null && !"hub".equals( environment.getPeerId() );
+
+            removeKeys( envId, allKeys, currentSshKeys, isSsEnv );
+
+            if ( keys.isEmpty() )
+            {
+                return peerDto;
+            }
+
+            sshKeys.addStringKeys( keys );
+
+            if ( isSsEnv )
             {
                 Set<Peer> peers = environment.getPeers();
                 for ( final Peer peer : peers )
@@ -161,23 +165,42 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
-    private void removeKeys( EnvironmentId envId, Set<String> sshKeys, String[] currentSshKeys )
+    private Set<String> trim( final Set<String> sshKeys )
     {
+        Set<String> trimmed = new HashSet<>();
+
+        if ( sshKeys != null && !sshKeys.isEmpty() )
+        {
+            for ( String sshKey : sshKeys )
+            {
+                trimmed.add( sshKey.trim() );
+            }
+        }
+
+        return trimmed;
+    }
 
 
+    private void removeKeys( EnvironmentId envId, Set<String> sshKeys, String[] currentSshKeys, boolean isSsEnv )
+    {
         try
         {
-            Environment environment = ctx.envManager.loadEnvironment( envId.toString() );
-
             for ( String sshKey : currentSshKeys )
             {
-                if ( !sshKeys.contains( sshKey.trim() ) )
+                if ( !sshKeys.contains( sshKey ) )
                 {
-                    environment.removeSshKey( sshKey, true );
+                    if ( isSsEnv )
+                    {
+                        ctx.envManager.removeSshKey( envId.getId(), sshKey, false );
+                    }
+                    else
+                    {
+                        ctx.localPeer.removeFromAuthorizedKeys( envId, sshKey );
+                    }
                 }
             }
         }
-        catch ( EnvironmentModificationException | EnvironmentNotFoundException e )
+        catch ( Exception e )
         {
             log.info( e.getMessage() );
         }
