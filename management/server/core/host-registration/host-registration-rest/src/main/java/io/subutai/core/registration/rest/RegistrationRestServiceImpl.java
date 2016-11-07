@@ -13,10 +13,10 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.rest.transitional.RequestedHostJson;
@@ -29,17 +29,20 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );
     private SecurityManager securityManager;
     private HostRegistrationManager registrationManager;
+    private LocalPeer localPeer;
     private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
 
     public RegistrationRestServiceImpl( final SecurityManager securityManager,
-                                        final HostRegistrationManager registrationManager )
+                                        final HostRegistrationManager registrationManager, final LocalPeer localPeer )
     {
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( registrationManager );
+        Preconditions.checkNotNull( localPeer );
 
         this.securityManager = securityManager;
         this.registrationManager = registrationManager;
+        this.localPeer = localPeer;
     }
 
 
@@ -150,8 +153,6 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         {
             List<RequestedHost> requestedHosts = registrationManager.getRequests();
 
-            LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
-
             ResourceHost managementHost = localPeer.getManagementHost();
 
             List<RequestedHostJson> requestedHostList = Lists.newArrayList();
@@ -163,6 +164,17 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
                 if ( managementHost.getId().equalsIgnoreCase( requestedHost.getId() ) )
                 {
                     requestedHostJson.setManagement( true );
+                }
+
+                try
+                {
+                    ResourceHost resourceHost = localPeer.getResourceHostById( requestedHost.getId() );
+
+                    requestedHostJson.setConnected( resourceHost.isConnected() );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    //ignore
                 }
 
                 requestedHostList.add( requestedHostJson );
