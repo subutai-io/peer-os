@@ -23,9 +23,13 @@
   <reference id="registrationManagerRef" availability="mandatory"
              interface="io.subutai.core.registration.api.HostRegistrationManager" />
 
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
+
   <bean id="nodeRegistrationRest" class="io.subutai.core.registration.rest.RegistrationRestServiceImpl">
     <argument ref="securityManagerRef" />
     <argument ref="registrationManagerRef" />
+    <argument ref="localPeer" />
   </bean>
 
 </blueprint>

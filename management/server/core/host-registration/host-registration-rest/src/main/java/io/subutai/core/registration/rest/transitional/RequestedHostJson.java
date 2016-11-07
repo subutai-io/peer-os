@@ -34,6 +34,8 @@ public class RequestedHostJson implements RequestedHost
     @Expose
     private boolean isManagement = false;
     @Expose
+    private boolean isConnected = false;
+    @Expose
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
 
 
@@ -118,6 +120,12 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
+    public void setConnected( final boolean connected )
+    {
+        isConnected = connected;
+    }
+
+
     @Override
     public ResourceHostRegistrationStatus getStatus()
     {
@@ -162,7 +170,7 @@ public class RequestedHostJson implements RequestedHost
     {
         return "RequestedHostJson{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", interfaces="
                 + interfaces + ", hostInfos=" + hostInfos + ", arch=" + arch + ", secret='" + secret + '\''
-                + ", publicKey='" + publicKey + '\'' + ", status=" + status + ", hostInfos=" + hostInfos + ", cert="
-                + cert + '}';
+                + ", publicKey='" + publicKey + '\'' + ", status=" + status + ", connected=" + isConnected
+                + ", hostInfos=" + hostInfos + ", cert=" + cert + '}';
     }
 }
