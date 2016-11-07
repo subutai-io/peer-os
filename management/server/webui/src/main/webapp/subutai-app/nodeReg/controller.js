@@ -20,7 +20,6 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 	vm.approve = approve;
 	vm.reject = reject;
 	vm.remove = remove;
-	vm.checkManagement = checkManagement;
 
 	vm.dtOptions = DTOptionsBuilder
 			.newOptions()
@@ -96,16 +95,6 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 			SweetAlert.swal("ERROR!", error, "error");
 			LOADING_SCREEN('none');
 		});
-	}
-
-	function checkManagement( hostInfo ) {
-		console.log( hostInfo );
-		for( var i = 0; i < hostInfo.length; i++ )
-		{
-			if( hostInfo[i].hostname == "management" )
-				return true;
-		}
-		return false;
 	}
 };
 
