@@ -84,6 +84,17 @@ node() {
 	stage("Update management on test node")
 	// Deploy builded template to remore test-server
 
+	// destroy existing management template on test node
+	sh """
+		set +x
+		ssh root@${env.SS_TEST_NODE} <<- EOF
+		set -e
+		subutai destroy everything
+		if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
+		systemctl restart subutai_p2p_*.service
+		rm /mnt/lib/lxc/tmpdir/management-subutai-template_*
+	EOF"""
+
 	// update rh on test node
 	def rhUpdateStatus = sh (script: "ssh root@${env.SS_TEST_NODE} /apps/subutai/current/bin/subutai update rh -c | cut -d '=' -f4 | tr -d '\"' | tr -d '\n'", returnStdout: true)
 	if (rhUpdateStatus == '[Update is available] ') {
@@ -93,15 +104,6 @@ node() {
 			subutai update rh
 		"""
 	}
-
-	// destroy existing management template on test node
-	sh """
-		set +x
-		ssh root@${env.SS_TEST_NODE} <<- EOF
-		set -e
-		subutai destroy management
-		rm /mnt/lib/lxc/tmpdir/management-subutai-template_*
-	EOF"""
 
 	// copy generated management template on test node
 	sh """
