@@ -31,9 +31,11 @@ node() {
 	String artifactDir = "/tmp/jenkins/${env.JOB_NAME}"
 	String debFileName = "management-${env.BRANCH_NAME}.deb"
 	String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
+	notifyBuildDetails = ""
 	
 	stage("Build management deb/template")
 	// Use maven to to build deb and template files of management
+	notifyBuildDetails = "\nFailed Step - Build management deb/template"
 
 	checkout scm
 
@@ -83,6 +85,7 @@ node() {
 
 	stage("Update management on test node")
 	// Deploy builded template to remore test-server
+	notifyBuildDetails = "\nFailed on Stage - Update management on test node"
 
 	// destroy existing management template on test node
 	sh """
@@ -135,6 +138,7 @@ node() {
 
 	stage("Integration tests")
 	// Run Serenity Tests
+	notifyBuildDetails = "\nFailed on Stage - Integration tests\nSerenity Tests Results:\n${env.JENKINS_URL}serenity/${commitId}"
 
 	git url: "https://github.com/subutai-io/playbooks.git"
 	sh """
@@ -152,6 +156,7 @@ node() {
 
 	stage("Deploy artifacts on kurjun")
 	// Deploy builded and tested artifacts to cdn
+	notifyBuildDetails = "\nFailed on Stage - Deploy artifacts on kurjun"
 
 	// cdn auth creadentials 
 	String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
@@ -214,7 +219,7 @@ node() {
 		throw e
 	} finally {
 		// Success or failure, always send notifications
-		notifyBuild(currentBuild.result, commitId)
+		notifyBuild(currentBuild.result, notifyBuildDetails)
 	}
 }
 
@@ -235,7 +240,7 @@ def jsonParse(def json) {
 }
 
 // https://jenkins.io/blog/2016/07/18/pipline-notifications/
-def notifyBuild(String buildStatus = 'STARTED', String commitId = '') {
+def notifyBuild(String buildStatus = 'STARTED', String details = '') {
   // build status of null means successful
   buildStatus = buildStatus ?: 'SUCCESSFUL'
 
@@ -244,8 +249,6 @@ def notifyBuild(String buildStatus = 'STARTED', String commitId = '') {
   def colorCode = '#FF0000'
   def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"  	
   def summary = "${subject} (${env.BUILD_URL})"
-  def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""
 
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
@@ -257,8 +260,7 @@ def notifyBuild(String buildStatus = 'STARTED', String commitId = '') {
   } else {
     color = 'RED'
     colorCode = '#FF0000'
-	summary = """${subject} (${env.BUILD_URL})
-Serenity Tests Results - ${env.JENKINS_URL}serenity/${commitId}"""
+	summary = "${subject} (${env.BUILD_URL})${details}"
   }
   // Get token
   def slackToken = getSlackToken('ss-bots-slack-token')
