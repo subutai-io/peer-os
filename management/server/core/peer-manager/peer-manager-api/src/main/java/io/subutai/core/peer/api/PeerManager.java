@@ -7,6 +7,7 @@ import java.util.Set;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
@@ -61,7 +62,7 @@ public interface PeerManager
 
     void processRejectRequest( RegistrationData registrationData ) throws PeerException;
 
-    String getRemotePeerIdByIp( String ip ) throws PeerException;
+    String getRemotePeerIdByIp( String ip ) throws PeerNotRegisteredException;
 
     PeerGroupResources getPeerGroupResources() throws PeerException;
 

@@ -14,6 +14,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.util.ServiceLocator;
@@ -23,6 +26,8 @@ import io.subutai.core.identity.api.model.User;
 
 public class IndexFilter implements Filter
 {
+
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
 
     @Override
@@ -77,7 +82,7 @@ public class IndexFilter implements Filter
                 }
                 catch ( Exception e )
                 {
-                    // precation to possible exceptions
+                    log.error( "Error redirecting {}", e.getMessage() );
                 }
             }
             else

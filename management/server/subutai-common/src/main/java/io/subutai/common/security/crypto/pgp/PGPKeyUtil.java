@@ -40,7 +40,7 @@ public class PGPKeyUtil
     public static final int HEX_V3_FINGERPRINT_LENGTH = 32;
     public static final int HEX_V4_FINGERPRINT_LENGTH = 40;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( PGPKeyUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( PGPKeyUtil.class );
 
     /**************************************************************************************
      *
@@ -194,7 +194,7 @@ public class PGPKeyUtil
         }
         catch ( DecoderException ex )
         {
-            LOGGER.info( "Invalid hex formatted key id", ex );
+            LOG.info( "Invalid hex formatted key id", ex );
         }
         return false;
     }
@@ -410,9 +410,9 @@ public class PGPKeyUtil
                 }
             }
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            return null;
+            LOG.error( e.getMessage() );
         }
 
         return null;
@@ -438,9 +438,9 @@ public class PGPKeyUtil
                 }
             }
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            return null;
+            LOG.error( e.getMessage() );
         }
 
         return null;

@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>strategy-manager-parent</artifactId>
-    <version>4.0.4-SNAPSHOT</version>
+    <version>4.0.7-SNAPSHOT</version>
   </parent>
 
   <artifactId>strategy-manager-impl</artifactId>

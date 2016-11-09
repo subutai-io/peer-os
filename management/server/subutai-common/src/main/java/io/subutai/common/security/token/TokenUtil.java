@@ -9,6 +9,9 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -35,6 +38,8 @@ import io.subutai.common.security.exception.SystemSecurityException;
  */
 public class TokenUtil
 {
+    protected static final Logger LOG = LoggerFactory.getLogger( TokenUtil.class );
+
 
     private TokenUtil()
     {
@@ -56,8 +61,10 @@ public class TokenUtil
 
             return signedJWT.serialize();
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
+            LOG.error( "Error creating token", e.getMessage() );
+
             return "";
         }
     }
@@ -74,9 +81,9 @@ public class TokenUtil
             JWSVerifier verifier = new MACVerifier( sharedKey.getBytes() );
             verifiedSignature = jwsObject.verify( verifier );
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
-            //ignore
+            LOG.warn( e.getMessage() );
         }
 
         return verifiedSignature;
@@ -84,36 +91,21 @@ public class TokenUtil
 
 
     //************************************************
-    public static Payload parseToken( String token )
-    {
-        Payload payload = null;
-        try
-        {
-            JWSObject jwsObject = JWSObject.parse( token );
-            payload = jwsObject.getPayload();
-        }
-        catch ( Exception ex )
-        {
-            return null;
-        }
-
-        return payload;
-    }
-
-
-    //************************************************
     public static String getSubject( String token )
     {
+        String subject = null;
         try
         {
             Payload payload = parseToken( token );
             JSONObject obj = payload.toJSONObject();
-            return obj.get( "sub" ).toString();
+            subject = obj.get( "sub" ).toString();
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            return null;
+            LOG.error( "Error parsing token", e.getMessage() );
         }
+
+        return subject;
     }
 
 
@@ -152,6 +144,8 @@ public class TokenUtil
         }
         catch ( JOSEException | ParseException ex )
         {
+            LOG.warn( ex.getMessage() );
+
             throw new InvalidLoginException();
         }
     }
@@ -174,9 +168,27 @@ public class TokenUtil
         {
             payload = jwsObject.getPayload();
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
-            //ignore
+            LOG.error( "Error parsing token", e.getMessage() );
+        }
+
+        return payload;
+    }
+
+
+    //************************************************
+    public static Payload parseToken( String token )
+    {
+        Payload payload = null;
+        try
+        {
+            JWSObject jwsObject = JWSObject.parse( token );
+            payload = jwsObject.getPayload();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error parsing token", e.getMessage() );
         }
 
         return payload;
@@ -192,8 +204,9 @@ public class TokenUtil
             JSONObject obj = payload.toJSONObject();
             return ( long ) obj.get( "exp" );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
+            LOG.warn( e.getMessage() );
             return 0;
         }
     }
@@ -208,8 +221,9 @@ public class TokenUtil
             JSONObject obj = payload.toJSONObject();
             return ( long ) obj.get( "exp" );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
+            LOG.warn( e.getMessage() );
             return 0;
         }
     }
@@ -229,8 +243,10 @@ public class TokenUtil
 
             return jwsObject.serialize();
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
+            LOG.error( "Error creating RSA token", e.getMessage() );
+
             return "";
         }
     }
@@ -249,6 +265,8 @@ public class TokenUtil
         }
         catch ( JOSEException e )
         {
+            LOG.warn( "Error verifying RSA token", e.getMessage() );
+
             return false;
         }
     }
@@ -263,8 +281,10 @@ public class TokenUtil
             keyGenerator.initialize( 1024 );
             return keyGenerator.genKeyPair();
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
+            LOG.error( "Error generating RSA keypair", e.getMessage() );
+
             return null;
         }
     }

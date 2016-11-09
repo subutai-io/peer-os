@@ -6,6 +6,7 @@ import java.util.UUID;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.plugincommon.api.CompleteEvent;
 import io.subutai.core.plugincommon.api.ConfigBase;
 import io.subutai.core.plugincommon.api.NodeOperationTaskInterface;
@@ -45,14 +46,7 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
                 TrackerOperationView prevPo = tracker.getTrackerOperation( clusterConfig.getProductKey(), trackID );
                 if ( prevPo.getState() == OperationState.RUNNING )
                 {
-                    try
-                    {
-                        Thread.sleep( 1000 );
-                    }
-                    catch ( InterruptedException ex )
-                    {
-                        Thread.currentThread().interrupt();
-                    }
+                    TaskUtil.sleep( 1000 );
                 }
                 else
                 {
@@ -93,14 +87,8 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
                 break;
             }
 
-            try
-            {
-                Thread.sleep( 1000 );
-            }
-            catch ( InterruptedException ex )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 1000 );
+
             if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
             {
                 break;

@@ -13,13 +13,9 @@
 
   <reference id="pluginManager" availability="mandatory"
              interface="io.subutai.core.pluginmanager.api.PluginManager" />
-  <reference id="identityManager" availability="mandatory"
-             interface="io.subutai.core.identity.api.IdentityManager" />
-
 
   <bean id="plugininjectorRestServiceImpl" class="io.subutai.core.pluginmanager.rest.RestServiceImpl">
     <property name="pluginManager" ref="pluginManager" />
-    <property name="identityManager" ref="identityManager" />
   </bean>
 
   <jaxrs:server address="/v1/plugin-integrator" id="plugininjectorRestService">

@@ -335,13 +335,22 @@ input[type=checkbox] {
     background-color: #d23561;
 }
 
-.b-btn_dark {
+.b-btn_dark:hover {
     background-color: #2C1112;
 }
 
-.b-btn_dark:hover {
-    background-color: #1C0A0B;
+.b-btn_dark {
+    background-color: #511F22;
 }
+
+.b-btn_grey:hover {
+    background-color: #8F8F8F;
+}
+
+.b-btn_grey {
+    background-color: #9C9C9C;
+}
+
 
 .b-btn_light-grey {
     background-color: #f8fbfd;
@@ -685,6 +694,7 @@ input[type=checkbox] {
 .b-status-icon_WAIT,
 .b-status-icon_REQUESTED,
 .b-status-icon_STOPPING,
+.b-status-icon_UKNOWN,
 .b-status-icon_STARTING {
     background-color: #efc94c;
 }
@@ -698,6 +708,14 @@ input[type=checkbox] {
 .b-status-icon_FROZEN,
 .b-status-icon_false {
     background-color: #c1272d;
+}
+
+.b-status-icon_OFFLINE {
+    background-color: #B0B0B0;
+}
+
+.b-status-icon_ONLINE {
+    background-color: #3DCFFF;
 }
 
 .b-status-icon_HEALTHY,

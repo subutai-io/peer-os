@@ -13,63 +13,70 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 
+
 public class SSLManager
 {
-	private static final Logger LOGGER = LoggerFactory.getLogger( SSLManager.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( SSLManager.class );
 
-	private KeyStore     keyStore = null;
-	private KeyStore     trustStore = null;
+    private KeyStore keyStore = null;
+    private KeyStore trustStore = null;
     private KeyStoreData keyStoreData = null;
-	private KeyStoreData trustStoreData = null;
-	
-	public SSLManager(KeyStore keyStore,KeyStoreData keyStoreData,KeyStore trustStore,KeyStoreData trustStoreData)
-	{
-		this.keyStore   = keyStore;
-		this.trustStore = trustStore;
-		this.keyStoreData = keyStoreData;
-		this.trustStoreData = trustStoreData;
-	}
-	
-	public KeyManager[] getClientKeyManagers()
-	{
+    private KeyStoreData trustStoreData = null;
 
-		KeyManager[] keyManagers = null;
-		KeyManagerFactory keyManagerFactory = null;
-        
-		try
+
+    public SSLManager( KeyStore keyStore, KeyStoreData keyStoreData, KeyStore trustStore, KeyStoreData trustStoreData )
+    {
+        this.keyStore = keyStore;
+        this.trustStore = trustStore;
+        this.keyStoreData = keyStoreData;
+        this.trustStoreData = trustStoreData;
+    }
+
+
+    public KeyManager[] getClientKeyManagers()
+    {
+
+        KeyManager[] keyManagers = null;
+        KeyManagerFactory keyManagerFactory;
+
+        try
         {
-	        keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
-			keyManagerFactory.init(keyStore,keyStoreData.getPassword().toCharArray());	
-			keyManagers = keyManagerFactory.getKeyManagers();
+            keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+            keyManagerFactory.init( keyStore, keyStoreData.getPassword().toCharArray() );
+            keyManagers = keyManagerFactory.getKeyManagers();
         }
         catch ( Exception e )
         {
-			LOGGER.error( "Error getting array of client key managers" );
+            LOGGER.error( "Error getting array of client key managers: {}", e.getMessage() );
         }
-		
-		return keyManagers;
-	}
-	public TrustManager[] getClientTrustManagers()
-	{
-		TrustManager[] trustManagers = null;
-		TrustManagerFactory trustManagerFactory = null;
-        
-		try
+
+        return keyManagers;
+    }
+
+
+    public TrustManager[] getClientTrustManagers()
+    {
+        TrustManager[] trustManagers = null;
+        TrustManagerFactory trustManagerFactory;
+
+        try
         {
-			trustManagerFactory  = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
-			trustManagerFactory.init(trustStore );
-			trustManagers = trustManagerFactory.getTrustManagers();
-			trustStoreData.getPassword();
+            trustManagerFactory = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
+            trustManagerFactory.init( trustStore );
+            trustManagers = trustManagerFactory.getTrustManagers();
+            trustStoreData.getPassword();
         }
         catch ( Exception e )
         {
-			LOGGER.error( "Error getting array of trust managers" );
+            LOGGER.error( "Error getting array of trust managers: {}", e.getMessage() );
         }
-		
-		return trustManagers;
-	}
-	public TrustManager[] getClientFullTrustManagers()
-	{
-		return new TrustManager[] {new NaiveTrustManager()};
-	}
+
+        return trustManagers;
+    }
+
+
+    public TrustManager[] getClientFullTrustManagers()
+    {
+        return new TrustManager[] { new NaiveTrustManager() };
+    }
 }

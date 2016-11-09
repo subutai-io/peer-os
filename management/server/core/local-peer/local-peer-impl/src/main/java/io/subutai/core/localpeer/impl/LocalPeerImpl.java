@@ -50,6 +50,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -147,7 +148,6 @@ import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.CpuResource;
 import io.subutai.hub.share.resource.DiskResource;
-import io.subutai.hub.share.resource.HistoricalMetrics;
 import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
 import io.subutai.hub.share.resource.RamResource;
@@ -157,6 +157,7 @@ import io.subutai.hub.share.resource.RamResource;
  * Local peer implementation
  *
  * TODO externalize security specific operations to LocalPeerSecureProxy
+ * TODO add proper security annotations
  */
 @PermitAll
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
@@ -2407,44 +2408,41 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         int containerLimit = 200;
         int networkLimit = 100;
 
+        ResourceHostMetrics metrics = getResourceHostMetrics();
+
         List<HostResources> resources = new ArrayList<>();
-        try
+
+        for ( ResourceHostMetric resourceHostMetric : metrics.getResources() )
         {
-            for ( ResourceHostMetric resourceHostMetric : getResourceHostMetrics().getResources() )
+            try
             {
-                try
-                {
-                    ResourceHost resourceHost = getResourceHostByName( resourceHostMetric.getHostName() );
+                ResourceHost resourceHost = getResourceHostByName( resourceHostMetric.getHostName() );
 
-                    BigDecimal cpuLimit = new BigDecimal( "100.00" );
+                BigDecimal cpuLimit = new BigDecimal( "100.00" );
 
-                    BigDecimal ramLimit = new BigDecimal( resourceHostMetric.getTotalRam() );
+                BigDecimal ramLimit = new BigDecimal( resourceHostMetric.getTotalRam() );
 
-                    BigDecimal diskLimit = new BigDecimal( resourceHostMetric.getTotalSpace() );
+                BigDecimal diskLimit = new BigDecimal( resourceHostMetric.getTotalSpace() );
 
-                    CpuResource cpuResource =
-                            new CpuResource( cpuLimit, 0.0, "UNKNOWN", resourceHostMetric.getCpuCore(), 0, 0, 0,
-                                    resourceHostMetric.getCpuFrequency(), 0 );
+                CpuResource cpuResource =
+                        new CpuResource( cpuLimit, 0.0, "UNKNOWN", resourceHostMetric.getCpuCore(), 0, 0, 0,
+                                resourceHostMetric.getCpuFrequency(), 0 );
 
-                    RamResource ramResource = new RamResource( ramLimit, 0.0 );
+                RamResource ramResource = new RamResource( ramLimit, 0.0 );
 
-                    DiskResource diskResource = new DiskResource( diskLimit, 0.0, "UNKNOWN", 0.0, 0.0, false );
+                DiskResource diskResource = new DiskResource( diskLimit, 0.0, "UNKNOWN", 0.0, 0.0, false );
 
 
-                    HostResources hostResources =
-                            new HostResources( resourceHost.getId(), cpuResource, ramResource, diskResource );
-                    resources.add( hostResources );
-                }
-                catch ( HostNotFoundException e )
-                {
-                    // ignore
-                }
+                HostResources hostResources =
+                        new HostResources( resourceHost.getId(), cpuResource, ramResource, diskResource );
+                resources.add( hostResources );
+            }
+            catch ( HostNotFoundException e )
+            {
+                // ignore
             }
         }
-        catch ( Exception e )
-        {
-            LOG.debug( e.getMessage(), e );
-        }
+
 
         return new PeerResources( getId(), environmentLimit, containerLimit, networkLimit, resources );
     }

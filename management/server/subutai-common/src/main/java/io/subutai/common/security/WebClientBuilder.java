@@ -267,9 +267,9 @@ public class WebClientBuilder
             {
                 response.close();
             }
-            catch ( Exception ignore )
+            catch ( Exception e )
             {
-                //ignore
+                LOG.warn( e.getMessage() );
             }
         }
     }
@@ -283,9 +283,9 @@ public class WebClientBuilder
             {
                 webClient.close();
             }
-            catch ( Exception ignore )
+            catch ( Exception e )
             {
-                //ignore
+                LOG.warn( e.getMessage() );
             }
         }
     }

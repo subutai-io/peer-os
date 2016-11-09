@@ -901,7 +901,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
         }
     }
 
@@ -962,7 +962,7 @@ public class RestServiceImpl implements RestService
 
         catch ( Exception e )
         {
-            return Response.serverError().entity( e.toString() ).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 

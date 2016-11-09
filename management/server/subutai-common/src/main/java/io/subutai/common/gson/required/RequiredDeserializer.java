@@ -97,6 +97,8 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
+
             throw new JsonParseException( "Json parse error, expected int for the field: " + field.getName() );
         }
     }

@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.tracker.impl.TrackerOperationImpl;
 import io.subutai.core.tracker.impl.TrackerOperationViewImpl;
@@ -488,7 +487,7 @@ public class TrackerOperationDataService
             long operationDaysOld =
                     TimeUnit.MILLISECONDS.toDays( new Date().getTime() - operationView.getCreateDate().getTime() );
 
-            if ( operationView.getState() != OperationState.RUNNING && operationDaysOld >= daysOld )
+            if ( operationDaysOld >= daysOld )
             {
                 deleteTrackerOperation(
                         new TrackerOperationPK( operationView.getSource(), operationView.getId().toString() ) );

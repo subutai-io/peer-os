@@ -123,6 +123,13 @@ public class IPUtil
     }
 
 
+    public static boolean isIpValid( HostInterface hostInterface )
+    {
+        return hostInterface != null && !( hostInterface instanceof NullHostInterface ) && !Strings
+                .isNullOrEmpty( hostInterface.getIp() ) && !hostInterface.getIp().trim().isEmpty();
+    }
+
+
     public static HostInterface findAddressableInterface( Set<HostInterface> allInterfaces, String hostId )
     {
         LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );

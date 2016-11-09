@@ -133,14 +133,7 @@ public class PeerUtil<T>
                 }
             }
 
-            try
-            {
-                Thread.sleep( 100 );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 100 );
         }
 
         return peerTaskResults;

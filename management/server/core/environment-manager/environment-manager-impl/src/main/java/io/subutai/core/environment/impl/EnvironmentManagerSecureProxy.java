@@ -48,6 +48,7 @@ import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -105,12 +106,6 @@ public class EnvironmentManagerSecureProxy
     {
         return new EnvironmentManagerImpl( peerManager, securityManager, identityManager, tracker, relationManager,
                 hubAdapter, environmentService );
-    }
-
-
-    public void init()
-    {
-        environmentManager.init();
     }
 
 
@@ -222,6 +217,11 @@ public class EnvironmentManagerSecureProxy
     public EnvironmentCreationRef createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
+        //*********************************
+        // Remove XSS vulnerability code
+        topology.setEnvironmentName ( validateInput( topology.getEnvironmentName(), true));
+        //*********************************
+
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
@@ -837,5 +837,13 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentNotFoundException
     {
         environmentManager.addSshKeyToEnvironmentEntity( environmentId, sshKey );
+    }
+
+
+    /* *************************************************
+     */
+    private String validateInput( String inputStr, boolean removeSpaces )
+    {
+        return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
     }
 }

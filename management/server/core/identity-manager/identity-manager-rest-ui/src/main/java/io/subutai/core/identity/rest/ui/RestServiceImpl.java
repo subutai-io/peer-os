@@ -59,9 +59,17 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllUsers().stream()
-                                                            .filter( user -> user.getType() != UserType.System.getId() )
-                                                            .collect( Collectors.toList() ) ) ).build();
+            List<User> users = identityManager.getAllUsers();
+
+            /*
+            for(User user:users)
+            {
+                user.setUserName( StringUtil.escapeHTML( user.getUserName() ));
+                user.setFullName( StringUtil.escapeHTML( user.getFullName() ));
+            }*/
+
+            return Response.ok( jsonUtil.to( users.stream().filter( user -> user.getType() != UserType.System.getId() )
+                                                           .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -92,6 +100,7 @@ public class RestServiceImpl implements RestService
     public Response getActiveUser()
     {
         User activeUser = identityManager.getActiveUser();
+
         try
         {
             return Response.ok( jsonUtil.to( activeUser ) ).build();
@@ -364,9 +373,17 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllRoles().stream()
-                                                            .filter( role -> role.getType() != UserType.System.getId() )
-                                                            .collect( Collectors.toList() ) ) ).build();
+            List<Role> roles = identityManager.getAllRoles();
+
+            /*
+            for(Role role:roles)
+            {
+                role.setName( StringUtil.escapeHtml( role.getName() ));
+            }
+            */
+
+            return Response.ok( jsonUtil.to( roles.stream().filter( role -> role.getType() != UserType.System.getId() )
+                                                           .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {

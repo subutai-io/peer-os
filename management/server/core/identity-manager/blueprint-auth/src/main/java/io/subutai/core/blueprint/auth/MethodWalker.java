@@ -206,7 +206,7 @@ public class MethodWalker
         }
         catch ( Exception ex )
         {
-            logger.error( "Error getting link" );
+            logger.error( "Error getting link: {}", ex.getMessage() );
             return null;
         }
     }
@@ -237,8 +237,7 @@ public class MethodWalker
         }
         catch ( NoSuchFieldException | IllegalAccessException e )
         {
-            logger.error( "Failed to get field with name: {} got NoSuchFieldException | IllegalAccessException",
-                    varName );
+            logger.error( "Failed to get field with name {}: {}", varName, e.getMessage() );
         }
         return null;
     }

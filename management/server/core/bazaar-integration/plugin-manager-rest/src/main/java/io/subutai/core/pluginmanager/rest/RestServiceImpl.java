@@ -17,7 +17,6 @@ import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.pluginmanager.api.PluginManager;
 import io.subutai.core.pluginmanager.api.model.PermissionJson;
 import io.subutai.core.pluginmanager.api.model.PluginDetails;
@@ -29,7 +28,6 @@ public class RestServiceImpl implements RestService
 
     private static final String ERROR_KEY = "ERROR";
     private PluginManager pluginManager;
-    private IdentityManager identityManager;
 
 
     @Override
@@ -111,12 +109,6 @@ public class RestServiceImpl implements RestService
     public Response setPermissions( final String pluginId, final String permissionJson )
     {
         return Response.status( Response.Status.OK ).build();
-    }
-
-
-    public void setIdentityManager( final IdentityManager identityManager )
-    {
-        this.identityManager = identityManager;
     }
 
 

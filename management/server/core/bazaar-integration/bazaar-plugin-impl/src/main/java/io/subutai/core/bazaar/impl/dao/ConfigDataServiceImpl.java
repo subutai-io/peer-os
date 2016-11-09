@@ -49,7 +49,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
-            LOG.error( "ConfigDataService savePlugin:" + e.toString() );
+            LOG.error( "ConfigDataService savePlugin: {}", e.getMessage() );
         }
         finally
         {
@@ -71,10 +71,10 @@ public class ConfigDataServiceImpl implements ConfigDataService
             em.flush();
             daoManager.commitTransaction( em );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
-            LOG.error( "ConfigDataService deletePlugin:" + ex.toString() );
+            LOG.error( "ConfigDataService deletePlugin: {}", e.getMessage() );
         }
         finally
         {
@@ -95,7 +95,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
         }
         catch ( Exception e )
         {
-            LOG.error( e.toString(), e );
+            LOG.error( e.getMessage(), e );
         }
         finally
         {
@@ -118,7 +118,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
         }
         catch ( Exception e )
         {
-            LOG.error( e.toString(), e );
+            LOG.error( e.getMessage(), e );
         }
         finally
         {
@@ -141,7 +141,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
         }
         catch ( Exception e )
         {
-            LOG.error( e.toString(), e );
+            LOG.error( e.getMessage(), e );
         }
         finally
         {

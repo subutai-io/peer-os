@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.4-SNAPSHOT</version>
+  <version>4.0.7-SNAPSHOT</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -127,6 +127,10 @@
 
     <!-- JWT lib -->
     <nimbus.jwt.version>4.3.1</nimbus.jwt.version>
+
+    <!-- HTML Parser -->
+    <jsoup.version>1.10.1</jsoup.version>
+
     <!-- Jackson JSON lib lib -->
     <jackson.version>2.6.3</jackson.version>
 
@@ -610,11 +614,6 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>strategy-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>strategy-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1020,6 +1019,16 @@
 
   <build>
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>

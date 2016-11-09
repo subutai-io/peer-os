@@ -26,9 +26,11 @@ import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.json.JsonUtil;
@@ -60,6 +62,14 @@ public class EnvironmentAdapter
     }
 
 
+    private boolean isHubReachable()
+    {
+        HubManager hubManager = ServiceLocator.getServiceNoCache( HubManager.class );
+
+        return hubManager != null && hubManager.isHubReachable();
+    }
+
+
     public ProxyEnvironment get( String id )
     {
         for ( ProxyEnvironment e : getEnvironments() )
@@ -76,6 +86,11 @@ public class EnvironmentAdapter
 
     public Set<ProxyEnvironment> getEnvironments()
     {
+        if ( !isHubReachable() )
+        {
+            return Collections.emptySet();
+        }
+
         String json = hubAdapter.getUserEnvironmentsForPeer();
 
         if ( json == null )
@@ -125,6 +140,11 @@ public class EnvironmentAdapter
 
     public void destroyContainer( ProxyEnvironment env, String containerId )
     {
+        if ( !isHubReachable() )
+        {
+            return;
+        }
+
         try
         {
             EnvironmentContainerHost ch = env.getContainerHostById( containerId );
@@ -142,6 +162,10 @@ public class EnvironmentAdapter
 
     public void removeEnvironment( EnvironmentImpl env )
     {
+        if ( !isHubReachable() )
+        {
+            return;
+        }
 
         try
         {
@@ -156,6 +180,11 @@ public class EnvironmentAdapter
 
     public void uploadEnvironments( Collection<Environment> envs )
     {
+        if ( !isHubReachable() )
+        {
+            return;
+        }
+
         for ( Environment env : envs )
         {
             uploadEnvironment( ( EnvironmentImpl ) env );
@@ -165,6 +194,11 @@ public class EnvironmentAdapter
 
     public void uploadEnvironment( EnvironmentImpl env )
     {
+        if ( !isHubReachable() )
+        {
+            return;
+        }
+
         if ( env.getStatus() != EnvironmentStatus.HEALTHY )
         {
             return;
@@ -280,24 +314,44 @@ public class EnvironmentAdapter
 
     public void onContainerStart( String envId, String contId )
     {
+        if ( !isHubReachable() )
+        {
+            return;
+        }
+
         hubAdapter.onContainerStart( envId, contId );
     }
 
 
     public void onContainerStop( String envId, String contId )
     {
+        if ( !isHubReachable() )
+        {
+            return;
+        }
+
         hubAdapter.onContainerStop( envId, contId );
     }
 
 
     public void removeSshKey( String envId, String sshKey )
     {
+        if ( !isHubReachable() )
+        {
+            return;
+        }
+
         hubAdapter.removeSshKey( envId, sshKey );
     }
 
 
     public void addSshKey( String envId, String sshKey )
     {
+        if ( !isHubReachable() )
+        {
+            return;
+        }
+
         hubAdapter.addSshKey( envId, sshKey );
     }
 }

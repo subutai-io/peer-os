@@ -34,6 +34,8 @@ public class RequestedHostJson implements RequestedHost
     @Expose
     private boolean isManagement = false;
     @Expose
+    private boolean isConnected = false;
+    @Expose
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
 
 
@@ -59,12 +61,14 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
+    @Override
     public String getId()
     {
         return id;
     }
 
 
+    @Override
     public String getHostname()
     {
         return hostname;
@@ -78,6 +82,7 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
+    @Override
     public Set<HostInterface> getInterfaces()
     {
         Set<HostInterface> temp = Sets.newHashSet();
@@ -115,6 +120,12 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
+    public void setConnected( final boolean connected )
+    {
+        isConnected = connected;
+    }
+
+
     @Override
     public ResourceHostRegistrationStatus getStatus()
     {
@@ -122,6 +133,7 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
+    @Override
     public String getSecret()
     {
         return secret;
@@ -156,17 +168,9 @@ public class RequestedHostJson implements RequestedHost
     @Override
     public String toString()
     {
-        return "RequestedHostJson{" +
-                "id='" + id + '\'' +
-                ", hostname='" + hostname + '\'' +
-                ", interfaces=" + interfaces +
-                ", hostInfos=" + hostInfos +
-                ", arch=" + arch +
-                ", secret='" + secret + '\'' +
-                ", publicKey='" + publicKey + '\'' +
-                ", status=" + status +
-                ", hostInfos=" + hostInfos +
-                ", cert=" + cert +
-                '}';
+        return "RequestedHostJson{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", interfaces="
+                + interfaces + ", hostInfos=" + hostInfos + ", arch=" + arch + ", secret='" + secret + '\''
+                + ", publicKey='" + publicKey + '\'' + ", status=" + status + ", connected=" + isConnected
+                + ", hostInfos=" + hostInfos + ", cert=" + cert + '}';
     }
 }

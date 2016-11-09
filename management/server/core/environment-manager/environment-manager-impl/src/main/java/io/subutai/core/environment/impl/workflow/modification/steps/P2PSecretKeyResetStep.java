@@ -3,9 +3,6 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PCredentials;
@@ -17,7 +14,6 @@ import io.subutai.core.environment.impl.workflow.modification.steps.helpers.Rese
 
 public class P2PSecretKeyResetStep
 {
-    private static final Logger LOG = LoggerFactory.getLogger( P2PSecretKeyResetStep.class );
 
     private final EnvironmentImpl environment;
     private final P2PCredentials p2PCredentials;

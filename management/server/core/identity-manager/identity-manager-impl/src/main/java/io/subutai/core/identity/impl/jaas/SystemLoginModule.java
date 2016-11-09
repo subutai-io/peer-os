@@ -49,7 +49,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error loading class JaasRealm", e );
+            LOGGER.error( "*** System Error !!! Error loading class JaasRealm", e );
         }
     }
 
@@ -122,7 +122,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
             else
             {
                 identityManager.getSecurityController().logEvent( user, password, "Invalid Login" );
-                throw new LoginException( "Invalid Login" );
+                throw new LoginException( "Invalid Login");
             }
         }
         catch ( IOException ioException )

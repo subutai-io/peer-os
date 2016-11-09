@@ -4,9 +4,6 @@ package io.subutai.core.environment.impl.adapter;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
@@ -16,7 +13,6 @@ import io.subutai.core.peer.api.PeerManager;
 
 class ProxyContainerHelper
 {
-    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final PeerManager peerManager;
 

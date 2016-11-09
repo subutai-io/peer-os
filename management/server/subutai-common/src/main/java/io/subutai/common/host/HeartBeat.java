@@ -69,7 +69,7 @@ public class HeartBeat
             }
             catch ( Exception e )
             {
-                LOG.warn( String.format( "CPU alert parse error: %s. %s", e.getMessage(), a.getCpu() ) );
+                LOG.warn( "CPU alert parse error: {}. {}", e.getMessage(), a.getCpu() );
             }
         }
     }
@@ -90,7 +90,7 @@ public class HeartBeat
             }
             catch ( Exception e )
             {
-                LOG.warn( String.format( "RAM alert parse error: %s. %s", e.getMessage(), a.getRam() ) );
+                LOG.warn( "RAM alert parse error: {}. {}", e.getMessage(), a.getRam() );
             }
         }
     }
@@ -113,7 +113,7 @@ public class HeartBeat
                 }
                 catch ( Exception e )
                 {
-                    LOG.warn( String.format( "HDD alert parse error: %s. %s", e.getMessage(), hdd ) );
+                    LOG.warn( "HDD alert parse error: {}. {}", e.getMessage(), hdd );
                 }
             }
         }

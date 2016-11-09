@@ -143,7 +143,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
         Preconditions.checkNotNull( result );
 
-        if ( result.getExitCode() != 0 )
+        if ( !result.hasSucceeded() )
         {
             return null;
         }

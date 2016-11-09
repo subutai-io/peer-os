@@ -3,13 +3,12 @@ package io.subutai.core.peer.rest.ui;
 
 import java.security.AccessControlException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -76,50 +75,31 @@ public class RestServiceImpl implements RestService
         try
         {
             List<RegistrationDataDto> registrationDatas =
-                    peerManager.getRegistrationRequests().stream().map( d -> new RegistrationDataDto( d ) )
+                    peerManager.getRegistrationRequests().stream().map( RegistrationDataDto::new )
                                .collect( Collectors.toList() );
 
             if ( !registrationDatas.isEmpty() )
             {
                 ExecutorService taskExecutor = Executors.newFixedThreadPool( registrationDatas.size() );
 
-                CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
-
-                registrationDatas.forEach( d ->
+                List<CompletableFuture> futures = registrationDatas.stream().map( d -> CompletableFuture.runAsync( () ->
                 {
-                    taskCompletionService.submit( () ->
+
+                    if ( d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED )
                     {
                         try
                         {
-                            if ( d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED )
-                            {
-                                d.setOnline( peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() )
-                                                        .isOnline() );
-                            }
+                            d.setOnline(
+                                    peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() ).isOnline() );
                         }
                         catch ( PeerException e )
                         {
                             LOGGER.error( "Exceptions getting peer status", e );
                         }
-
-                        return true;
-                    } );
-                } );
-
-                taskExecutor.shutdown();
-
-                for ( int i = 0; i < registrationDatas.size(); i++ )
-                {
-                    try
-                    {
-                        Future<Boolean> future = taskCompletionService.take();
-                        future.get();
                     }
-                    catch ( ExecutionException | InterruptedException e )
-                    {
-                        LOGGER.error( e.getMessage() );
-                    }
-                }
+                }, taskExecutor ) ).collect( Collectors.toList() );
+
+                CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
             }
 
             return Response.ok( JsonUtil.toJson( registrationDatas ) ).build();

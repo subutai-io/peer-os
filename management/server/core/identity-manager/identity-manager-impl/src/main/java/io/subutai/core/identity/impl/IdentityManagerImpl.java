@@ -57,6 +57,7 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.token.TokenUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.SecurityController;
 import io.subutai.core.identity.api.SessionManager;
@@ -334,7 +335,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticates user and returns Session
+     *
+     * @param login Login name  or "token" keyword
+     * @param password  Password or JWT
+     *
+     * @return Session object
      */
     @PermitAll
     @Override
@@ -373,7 +381,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Create JSON Web Token and save in DB
+     *
+     * @param user input String
+     *
+     * @return  JSON Token
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
@@ -431,7 +445,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Checks username and password (authenticates), on success returns full token
+     *
+     * @param userName Login name
+     * @param password  Password
+     *
+     * @return Full JWT
      */
     @PermitAll
     @Override
@@ -485,7 +506,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Update (renew) Authorization ID of the User (Which is used by RSA keys to authenticate)
+     *
+     * @param user User
+     * @param authId  Authorization ID
+     *
+     * @return Newly assigned Authorization ID (random string, if authId param is NULL)
      */
     @PermitAll
     @Override
@@ -520,7 +548,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Encrypt with user's PGP private key and return encrypted Authorization id
+     *
+     * @param user User
+     *
+     * @return Encrypted authorization id
      */
     @PermitAll
     @Override
@@ -558,7 +592,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user by Authorization id
+     *
+     * @param fingerprint fingerprint of the key
+     * @param signedAuth Signed Authorization id (signedMessage)
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -602,7 +643,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user by JWT
+     *
+     * @param token Token to be checked
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -623,7 +670,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Authenticate user with Username and password
+     *
+     * @param userName Username
+     * @param password Password
+     *
+     * @return authenticated user
      */
     @PermitAll
     @Override
@@ -669,7 +723,12 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Sets the Owner of the Peer
+     *
+     * @param user User that will be set as an owner
+     *
      */
     @PermitAll
     @Override
@@ -679,7 +738,12 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * ***********************************************************************************
+     * Sets the Owner of the Peer
+     *
+     * @return Id of the PeerOwner
+     *
      */
     @PermitAll
     @Override
@@ -868,6 +932,7 @@ public class IdentityManagerImpl implements IdentityManager
     public Session getActiveSession()
     {
         Session session = null;
+
         try
         {
             Subject subject = getActiveSubject();
@@ -888,10 +953,35 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( Exception ex )
         {
-            LOGGER.error( "*** Error! Cannot find active User. Session is not started" );
+            LOGGER.warn( "*** Cannot find active User (no session): {}", ex.getMessage() );
         }
 
         return session;
+    }
+
+
+    /* *************************************************
+     */
+    private Subject getActiveSubject() throws AccessControlException
+    {
+
+        Subject subject;
+
+        AccessControlContext acc = AccessController.getContext();
+
+        if ( acc == null )
+        {
+            throw new AccessControlException( "AccessControlContext is null" );
+        }
+
+        subject = Subject.getSubject( acc );
+
+        if ( subject == null )
+        {
+            throw new AccessControlException( "Subject is null" );
+        }
+
+        return subject;
     }
 
 
@@ -948,38 +1038,6 @@ public class IdentityManagerImpl implements IdentityManager
                 }
             } );
         }
-    }
-
-
-    /* *************************************************
-     */
-    private Subject getActiveSubject()
-    {
-
-        Subject subject = null;
-
-        try
-        {
-            AccessControlContext acc = AccessController.getContext();
-
-            if ( acc == null )
-            {
-                throw new IllegalStateException( "access control context is null" );
-            }
-
-            subject = Subject.getSubject( acc );
-
-            if ( subject == null )
-            {
-                throw new IllegalStateException( "subject is null" );
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOGGER.error( "*** Error! Cannot get auth.subject." );
-        }
-
-        return subject;
     }
 
 
@@ -1173,10 +1231,16 @@ public class IdentityManagerImpl implements IdentityManager
         {
             password = UUID.randomUUID().toString();
         }
+
+        //*********************************
+        // Remove XSS vulnerability code
+        userName = validateInput( userName, true );
+        fullName = validateInput( fullName, false );
         //*********************************
 
         isValidUserName( userName );
         isValidPassword( userName, password );
+        isValidEmail( email );
 
         try
         {
@@ -1245,11 +1309,20 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
+            //*********************************
+            // Remove XSS vulnerability code
+            user.setUserName( validateInput( user.getUserName(), true ) );
+            user.setFullName( validateInput( user.getFullName(), false ) );
+
+            //*********************************
+            //**************************************
+            isValidUserName( user.getUserName() );
+            isValidEmail( user.getEmail() );
+            //**************************************
 
             if ( !Strings.isNullOrEmpty( password ) )
             {
                 isValidPassword( user.getUserName(), password );
-
                 String salt = user.getSalt();
                 password = SecurityUtil.generateSecurePassword( password, salt );
 
@@ -1452,6 +1525,25 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    private void isValidEmail( String email )
+    {
+        if ( !StringUtil.isValidEmail( email ) )
+        {
+            throw new IllegalArgumentException( "Invalid Email specified" );
+        }
+    }
+
+
+    /* *************************************************
+     */
+    private String validateInput( String inputStr, boolean removeSpaces )
+    {
+        return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
+    }
+
+
+    /* *************************************************
+     */
     @PermitAll
     @Override
     public boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
@@ -1494,6 +1586,11 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public Role createRole( String roleName, int roleType )
     {
+        //*********************************
+        // Remove XSS vulnerability code
+        roleName = validateInput( roleName, true );
+        //*********************************
+
         Role role = new RoleEntity();
         role.setName( roleName );
         role.setType( roleType );
@@ -1536,6 +1633,11 @@ public class IdentityManagerImpl implements IdentityManager
             throw new AccessControlException( "Internal Role cannot be updated" );
         }
         //***********************************************
+
+        //*********************************
+        // Remove XSS vulnerability code
+        role.setName( validateInput( role.getName(), true ) );
+        //*********************************
 
         identityDataService.updateRole( role );
     }

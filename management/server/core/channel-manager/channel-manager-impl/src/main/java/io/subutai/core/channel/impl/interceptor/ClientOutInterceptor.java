@@ -8,7 +8,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
-import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.peer.api.PeerManager;
@@ -82,7 +82,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
         {
             return peerManager.getRemotePeerIdByIp( ip );
         }
-        catch ( PeerException e )
+        catch ( PeerNotRegisteredException e )
         {
             return null;
         }

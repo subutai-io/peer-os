@@ -25,6 +25,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -35,18 +36,19 @@ public class VEHServiceUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( VEHServiceUtil.class.getName() );
 
+
     private VEHServiceUtil()
     {
         throw new IllegalAccessError( "Utility class" );
     }
 
 
-    public static Response upSite( PeerManager peerManager,IdentityManager identityManager )
+    public static Response upSite( PeerManager peerManager, IdentityManager identityManager )
     {
         String projectName = "";
         String ownerName = "";
         String userName = "";
-        String password = "";
+        String password = null;
         String domain = null;
 
         String url = "https://hub.subut.ai/vehs/rest/%s";
@@ -87,11 +89,6 @@ public class VEHServiceUtil
             containerHost = containerHost1;
             if ( "Container_12".equals( containerHost.getContainerName() ) )
             {
-                /*
-                String sptoken = executeRequest(
-                        String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
-                                Common.DEFAULT_PUBLIC_URL ) );
-                */
                 String sptoken = identityManager.getSystemUserToken();
                 String evnUrl = "%s/rest/ui/environments/%s?sptoken=%s";
 
@@ -106,15 +103,10 @@ public class VEHServiceUtil
     }
 
 
-    private static void setupSite( PeerManager peerManager,IdentityManager identityManager, String projectName, String ownerName, String userName,
-                                   String password, String domain )
+    private static void setupSite( PeerManager peerManager, IdentityManager identityManager, String projectName,
+                                   String ownerName, String userName, String password, String domain )
     {
         ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
-
-        /*
-        String sptoken = executeRequest( String.format( "%s/rest/v1/identity/gettoken?username=admin&password=secret",
-                Common.DEFAULT_PUBLIC_URL ) );
-        */
 
         String sptoken = identityManager.getSystemUserToken();
 
@@ -140,15 +132,7 @@ public class VEHServiceUtil
                     String.format( body, UUID.randomUUID(), projectName, peerId, peerId, resourceHost.getId() ) );
         }
 
-        try
-        {
-            Thread.sleep( 20 * 1000L );
-        }
-        catch ( InterruptedException e )
-        {
-            Thread.currentThread().interrupt();
-        }
-
+        TaskUtil.sleep( 20 * 1000L );
 
         String ip = deployStaticSite( peerManager, projectName, ownerName, userName, password );
 
@@ -168,14 +152,7 @@ public class VEHServiceUtil
 
             resourceHost.execute( new RequestBuilder( String.format( conf, domain, ip, domain, domain ) ) );
 
-            try
-            {
-                Thread.sleep( 5 * 1000L );
-            }
-            catch ( InterruptedException e )
-            {
-                Thread.currentThread().interrupt();
-            }
+            TaskUtil.sleep( 5 * 1000L );
 
             resourceHost.execute( new RequestBuilder( "systemctl restart *nginx*" ) );
         }

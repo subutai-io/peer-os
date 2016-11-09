@@ -82,6 +82,11 @@ public class Topology
         return environmentName;
     }
 
+    public void setEnvironmentName(String environmentName)
+    {
+        this.environmentName = environmentName;
+    }
+
 
     public Map<String, Set<Node>> getNodeGroupPlacement()
     {

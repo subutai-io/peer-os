@@ -49,14 +49,13 @@ import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.processor.ContainerCommandProcessor;
+import io.subutai.core.hubmanager.impl.processor.CommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
-import io.subutai.core.hubmanager.impl.processor.ResourceHostCommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
@@ -221,7 +220,7 @@ public class HubManagerImpl implements HubManager
                     new RegistrationRequestProcessor( this, peerManager, hostRegistrationManager, restClient );
 
             registrationRequestExecutor
-                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 30, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 60, TimeUnit.SECONDS );
 
             EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                     new EnvironmentTelemetryProcessor( this, peerManager, configManager );
@@ -251,6 +250,18 @@ public class HubManagerImpl implements HubManager
     }
 
 
+    @Override
+    public boolean isHubReachable()
+    {
+        if ( heartbeatProcessor != null )
+        {
+            return heartbeatProcessor.isHubReachable();
+        }
+
+        return false;
+    }
+
+
     private void initHeartbeatProcessor()
     {
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
@@ -274,9 +285,8 @@ public class HubManagerImpl implements HubManager
         StateLinkProcessor resourceHostRegisterProcessor =
                 new ResourceHostRegisterProcessor( hostRegistrationManager, peerManager, restClient );
 
-        StateLinkProcessor containerCommandProcessor = new ContainerCommandProcessor( ctx );
+        StateLinkProcessor commandProcessor = new CommandProcessor( ctx );
 
-        StateLinkProcessor resourceHostCommandProcessor = new ResourceHostCommandProcessor( ctx );
 
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
@@ -289,12 +299,10 @@ public class HubManagerImpl implements HubManager
                                                                                      environmentTelemetryProcessor )
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
-                                                                             .addProcessor( containerCommandProcessor )
-                                                                             .addProcessor(
-                                                                                     resourceHostCommandProcessor );
+                                                                             .addProcessor( commandProcessor );
 
         heartbeatExecutorService
-                .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
+                .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
                         TimeUnit.SECONDS );
     }
 
@@ -384,7 +392,7 @@ public class HubManagerImpl implements HubManager
                         }
                         catch ( Exception e )
                         {
-                            //ignore
+                            log.error( "Error notifying hub event listener", e );
                         }
                     }
                 } );

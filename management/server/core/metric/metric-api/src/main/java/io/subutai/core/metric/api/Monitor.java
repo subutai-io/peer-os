@@ -14,7 +14,7 @@ import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
-import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.common.metric.HistoricalMetrics;
 
 
 /**

@@ -21,6 +21,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.tracker.api.Tracker;
@@ -85,7 +86,7 @@ public class TrackerImpl implements Tracker
         try
         {
             //*********************************
-            long userId ;
+            long userId;
             User user = identityManager.getActiveUser();
 
             if ( user != null )
@@ -228,14 +229,7 @@ public class TrackerImpl implements Tracker
                     return;
                 }
 
-                try
-                {
-                    Thread.sleep( 100 );
-                }
-                catch ( InterruptedException e )
-                {
-                    Thread.currentThread().interrupt();
-                }
+                TaskUtil.sleep( 100 );
             }
             else
             {
