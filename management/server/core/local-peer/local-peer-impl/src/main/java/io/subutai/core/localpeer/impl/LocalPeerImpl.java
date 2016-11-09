@@ -50,6 +50,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -147,7 +148,6 @@ import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.CpuResource;
 import io.subutai.hub.share.resource.DiskResource;
-import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
 import io.subutai.hub.share.resource.RamResource;
@@ -157,6 +157,7 @@ import io.subutai.hub.share.resource.RamResource;
  * Local peer implementation
  *
  * TODO externalize security specific operations to LocalPeerSecureProxy
+ * TODO add proper security annotations
  */
 @PermitAll
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
