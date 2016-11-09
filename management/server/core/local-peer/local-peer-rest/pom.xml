@@ -6,7 +6,7 @@
   <parent>
     <artifactId>local-peer-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.6-SNAPSHOT</version>
+    <version>4.0.6</version>
   </parent>
 
   <artifactId>local-peer-rest</artifactId>
