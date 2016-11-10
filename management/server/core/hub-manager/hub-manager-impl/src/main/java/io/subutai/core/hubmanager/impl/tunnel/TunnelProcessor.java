@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl.tunnel;
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
@@ -29,11 +30,16 @@ import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.READY;
 // TODO: Replace WebClient with HubRestClient.
 public class TunnelProcessor implements StateLinkProcessor
 {
-    private final Logger LOG = LoggerFactory.getLogger( getClass() );
     static final String CREATE_TUNNEL_COMMAND = "subutai tunnel add %s:%s %s -g";
+
     private static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s:%s";
 
+    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
+
+    private final Logger log = LoggerFactory.getLogger( getClass() );
+
     private PeerManager peerManager;
+
     private ConfigManager configManager;
 
 
@@ -45,7 +51,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
+    public synchronized boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         for ( String stateLink : stateLinks )
         {
@@ -59,25 +65,49 @@ public class TunnelProcessor implements StateLinkProcessor
     }
 
 
-    private void processLink( String stateLink )
+    private void processLink( String stateLink ) throws HubManagerException
     {
-        TunnelInfoDto tunnelInfoDto = getData( stateLink );
+        log.info( "Link process - START: {}", stateLink );
 
-        if ( tunnelInfoDto != null )
+        if ( LINKS_IN_PROGRESS.contains( stateLink ) )
         {
-            switch ( tunnelInfoDto.getTunnelStatus() )
-            {
-                case PENDING:
-                    createTunnel( stateLink, tunnelInfoDto );
-                    break;
+            log.info( "This link is in progress: {}", stateLink );
 
-                case DELETE:
-                    deleteTunnel( stateLink, tunnelInfoDto );
-                    break;
-                default:
-                    LOG.info( "Requested {}", tunnelInfoDto.getTunnelStatus() );
-                    break;
+            return;
+        }
+
+        LINKS_IN_PROGRESS.add( stateLink );
+
+        try
+        {
+            TunnelInfoDto tunnelInfoDto = getData( stateLink );
+
+            if ( tunnelInfoDto != null )
+            {
+                switch ( tunnelInfoDto.getTunnelStatus() )
+                {
+                    case PENDING:
+                        createTunnel( stateLink, tunnelInfoDto );
+                        break;
+
+                    case DELETE:
+                        deleteTunnel( stateLink, tunnelInfoDto );
+                        break;
+                    default:
+                        log.info( "Requested {}", tunnelInfoDto.getTunnelStatus() );
+                        break;
+                }
             }
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
+        finally
+        {
+            log.info( "Link process - END: {}", stateLink );
+
+            LINKS_IN_PROGRESS.remove( stateLink );
         }
     }
 
@@ -92,7 +122,7 @@ public class TunnelProcessor implements StateLinkProcessor
         catch ( HostNotFoundException e )
         {
             TunnelHelper.sendError( stateLink, e.getMessage(), configManager );
-            LOG.error( e.getMessage() );
+            log.error( e.getMessage() );
         }
 
         CommandResult result = TunnelHelper.execute( resourceHost,
@@ -131,7 +161,7 @@ public class TunnelProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage() );
+            log.error( e.getMessage() );
             TunnelHelper.sendError( stateLink, e.getMessage(), configManager );
         }
     }
@@ -169,11 +199,11 @@ public class TunnelProcessor implements StateLinkProcessor
 
                 if ( response.getStatus() == HttpStatus.SC_OK || response.getStatus() == 204 )
                 {
-                    LOG.info( "Tunnel peer data successfully sent to hub" );
+                    log.info( "Tunnel peer data successfully sent to hub" );
                 }
                 else
                 {
-                    LOG.error( "Tunnel peer data was not successfully sent to hub" );
+                    log.error( "Tunnel peer data was not successfully sent to hub" );
                 }
             }
         }
@@ -201,11 +231,11 @@ public class TunnelProcessor implements StateLinkProcessor
             WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
             Response res = client.get();
 
-            LOG.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
+            log.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
 
             if ( res.getStatus() != HttpStatus.SC_OK )
             {
-                LOG.error( "Error to get tunnel  data from Hub: HTTP {} - {}", res.getStatus(),
+                log.error( "Error to get tunnel  data from Hub: HTTP {} - {}", res.getStatus(),
                         res.getStatusInfo().getReasonPhrase() );
 
                 return null;
@@ -220,7 +250,7 @@ public class TunnelProcessor implements StateLinkProcessor
         catch ( Exception e )
         {
             TunnelHelper.sendError( link, e.getMessage(), configManager );
-            LOG.error( e.getMessage() );
+            log.error( e.getMessage() );
             return null;
         }
     }

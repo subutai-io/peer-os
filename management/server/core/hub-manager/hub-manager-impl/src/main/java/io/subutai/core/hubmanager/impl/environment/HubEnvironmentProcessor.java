@@ -39,7 +39,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
 
     @Override
-    public boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
+    public synchronized boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
     {
         boolean fastMode = false;
 
@@ -59,6 +59,8 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
     private void processStateLink( String link ) throws HubManagerException
     {
+        log.info( "Link process - START: {}", link );
+
         if ( LINKS_IN_PROGRESS.contains( link ) )
         {
             log.info( "This link is in progress: {}", link );
@@ -82,6 +84,8 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         }
         finally
         {
+            log.info( "Link process - END: {}", link );
+
             LINKS_IN_PROGRESS.remove( link );
         }
     }
