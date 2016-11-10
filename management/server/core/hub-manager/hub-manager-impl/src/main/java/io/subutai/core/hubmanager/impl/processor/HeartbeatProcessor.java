@@ -150,7 +150,7 @@ public class HeartbeatProcessor implements Runnable
 
         if ( canSend )
         {
-            log.info( "Sending heartbeat: interval={}, force={}, fastModeLeft={}", interval, force, fastModeLeft );
+            log.info( "Sending heartbeat to HUB: interval={}, force={}, fastModeLeft={}", interval, force, fastModeLeft );
 
             doHeartbeat();
         }
