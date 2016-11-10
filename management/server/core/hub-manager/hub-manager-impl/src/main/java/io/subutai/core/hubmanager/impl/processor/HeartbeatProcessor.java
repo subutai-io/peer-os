@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -151,7 +152,8 @@ public class HeartbeatProcessor implements Runnable
 
         if ( canSend )
         {
-            log.info( "Sending heartbeat to HUB: interval={}, force={}, fastModeLeft={}", interval, force, fastModeLeft );
+            log.info( "Sending heartbeat to HUB: interval={}, force={}, fastModeLeft={}", interval, force,
+                    fastModeLeft );
 
             doHeartbeat();
         }
@@ -207,6 +209,8 @@ public class HeartbeatProcessor implements Runnable
     {
         log.info( "stateLinks: {}", stateLinks );
 
+        final Set<String> unmodifiableSet = Collections.unmodifiableSet( stateLinks );
+
         for ( final StateLinkProcessor processor : processors )
         {
             processorPool.execute( new Runnable()
@@ -216,7 +220,7 @@ public class HeartbeatProcessor implements Runnable
                 {
                     try
                     {
-                        boolean fastModeAsked = processor.processStateLinks( stateLinks );
+                        boolean fastModeAsked = processor.processStateLinks( unmodifiableSet );
 
                         if ( fastModeAsked )
                         {
