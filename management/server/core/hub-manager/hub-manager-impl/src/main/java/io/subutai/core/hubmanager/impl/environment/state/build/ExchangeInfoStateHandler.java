@@ -1,10 +1,7 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -29,7 +26,6 @@ public class ExchangeInfoStateHandler extends StateHandler
         {
             logStart();
 
-            dirtyFixToRestartP2P();
 
             EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
 
@@ -54,7 +50,7 @@ public class ExchangeInfoStateHandler extends StateHandler
     }
 
 
-    public EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto ) throws HubManagerException
+    private EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
         try
         {
@@ -73,28 +69,4 @@ public class ExchangeInfoStateHandler extends StateHandler
             throw new HubManagerException( e );
         }
     }
-
-
-    //
-    // Dirty fix - START
-    //
-
-    private void dirtyFixToRestartP2P() throws CommandException
-    {
-        RequestBuilder command = new RequestBuilder( "systemctl restart subutai_p2p_*.service" );
-
-        log.info( "Resource hosts: " );
-
-        for ( ResourceHost rh : ctx.localPeer.getResourceHosts() )
-        {
-            log.info( "- {}", rh );
-
-            rh.execute( command );
-        }
-    }
-
-    //
-    // Dirty fix - END
-    //
-
 }
