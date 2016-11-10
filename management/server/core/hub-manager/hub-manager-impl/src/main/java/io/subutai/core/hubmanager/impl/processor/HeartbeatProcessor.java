@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -208,7 +209,7 @@ public class HeartbeatProcessor implements Runnable
     {
         log.info( "stateLinks: {}", stateLinks );
 
-        final Set<String> threadSafeSet = new CopyOnWriteArraySet<>( stateLinks );
+        final Set<String> unmodifiableSet = Collections.unmodifiableSet( stateLinks );
 
         for ( final StateLinkProcessor processor : processors )
         {
@@ -219,7 +220,7 @@ public class HeartbeatProcessor implements Runnable
                 {
                     try
                     {
-                        boolean fastModeAsked = processor.processStateLinks( threadSafeSet );
+                        boolean fastModeAsked = processor.processStateLinks( unmodifiableSet );
 
                         if ( fastModeAsked )
                         {
