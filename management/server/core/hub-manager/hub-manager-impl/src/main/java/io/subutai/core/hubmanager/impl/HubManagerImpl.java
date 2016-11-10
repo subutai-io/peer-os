@@ -287,19 +287,16 @@ public class HubManagerImpl implements HubManager
 
         StateLinkProcessor commandProcessor = new CommandProcessor( ctx );
 
-
-        heartbeatProcessor =
-                new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
-                                                                             .addProcessor( hubEnvironmentProcessor )
-                                                                             .addProcessor( systemConfProcessor )
-                                                                             .addProcessor( productProcessor )
-                                                                             .addProcessor( vehsProccessor )
-                                                                             .addProcessor( appScaleProcessor )
-                                                                             .addProcessor(
-                                                                                     environmentTelemetryProcessor )
-                                                                             .addProcessor(
-                                                                                     resourceHostRegisterProcessor )
-                                                                             .addProcessor( commandProcessor );
+        heartbeatProcessor = new HeartbeatProcessor( this, restClient, localPeer.getId() )
+                .addProcessor( hubEnvironmentProcessor )
+                .addProcessor( tunnelProcessor )
+                .addProcessor( environmentTelemetryProcessor )
+                .addProcessor( systemConfProcessor )
+                .addProcessor( productProcessor )
+                .addProcessor( vehsProccessor )
+                .addProcessor( appScaleProcessor )
+                .addProcessor( resourceHostRegisterProcessor )
+                .addProcessor( commandProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,

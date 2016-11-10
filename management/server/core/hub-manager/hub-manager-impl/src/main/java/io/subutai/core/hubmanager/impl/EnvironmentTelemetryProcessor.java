@@ -2,6 +2,7 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
@@ -35,8 +37,6 @@ import static java.lang.String.format;
 
 public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcessor
 {
-    private final Logger log = LoggerFactory.getLogger( getClass() );
-
     private static final String GET_ENV_URL = "/rest/v1/peers/%s/environments";
     private static final String GET_ENV_CONTAINERS_URL = "/rest/v1/environments/%s";
     private static final String PUT_ENV_TELEMETRY_URL = "/rest/v1/environments/%s/telemetry";
@@ -46,6 +46,10 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     private static final String PREPARE_FILE = "MD5=`dd bs=1024 count=2 </dev/urandom | tee /tmp/tmpfile`";
     private static final String SCP_FILE_COMMAND = "scp /tmp/tmpfile root@%s:/tmp";
     private static final String DELETE_PREPARED_FILE = "rm /tmp/tmpfile";
+
+    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
+
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private PeerManager peerManager;
     private ConfigManager configManager;
@@ -327,25 +331,53 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
 
 
     @Override
-    public boolean processStateLinks( Set<String> stateLinks )
+    public synchronized boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
     {
-
-        if ( hubManager.isRegistered() )
+        if ( !hubManager.isRegistered() )
         {
-            for ( String link : stateLinks )
-            {
-                processStateLink( link );
-            }
+            return false;
         }
+
+        for ( String link : stateLinks )
+        {
+            processStateLink( link );
+        }
+
         return false;
     }
 
 
-    private void processStateLink( String link )
+    private void processStateLink( String link ) throws HubManagerException
     {
-        if ( link.contains( "telemetry" ) )
+        if ( !link.contains( "telemetry" ) )
+        {
+            return;
+        }
+
+        log.info( "Link process - START: {}", link );
+
+        if ( LINKS_IN_PROGRESS.contains( link ) )
+        {
+            log.info( "This link is in progress: {}", link );
+
+            return;
+        }
+
+        LINKS_IN_PROGRESS.add( link );
+
+        try
         {
             process( link );
+        }
+        catch ( Exception e )
+        {
+            throw new HubManagerException( e );
+        }
+        finally
+        {
+            log.info( "Link process - END: {}", link );
+
+            LINKS_IN_PROGRESS.remove( link );
         }
     }
 
@@ -353,6 +385,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     private void process( String link )
     {
         JSONObject result = getTelemetry( link, configManager );
+
         checkEnvironmentHealth( result.getString( "envId" ), result.getString( "tools" ) );
     }
 }
