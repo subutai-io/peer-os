@@ -128,7 +128,8 @@ public class TrackerOperationDataService
             em.getTransaction().begin();
 
             TypedQuery<TrackerOperationEntity> query =
-                    em.createNamedQuery( TrackerOperationEntity.QUERY_GET_OPERATION, TrackerOperationEntity.class );
+                    em.createNamedQuery( TrackerOperationEntity.QUERY_GET_USER_OPERATION,
+                            TrackerOperationEntity.class );
             query.setParameter( "source", source );
             query.setParameter( "operationTrackId", operationTrackId.toString() );
             query.setParameter( "userId", userId );

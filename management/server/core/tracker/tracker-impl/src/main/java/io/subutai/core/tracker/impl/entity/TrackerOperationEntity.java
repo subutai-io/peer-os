@@ -20,13 +20,15 @@ import javax.persistence.Table;
 @NamedQueries( {
         @NamedQuery( name = "getTrackerOperation", query = "SELECT to FROM TrackerOperationEntity to WHERE to.source "
                 + "= :source AND to.operationTrackId = :operationTrackId" ),
-        @NamedQuery(name = "getTrackerUserOperation", query = "SELECT to FROM TrackerOperationEntity to WHERE to.source "
-                + "= :source AND to.operationTrackId = :operationTrackId AND to.userId = :userId")
-})
+        @NamedQuery( name = "getTrackerUserOperation", query =
+                "SELECT to FROM TrackerOperationEntity to WHERE to.source "
+                        + "= :source AND to.operationTrackId = :operationTrackId AND to.userId = :userId" )
+} )
 public class TrackerOperationEntity
 {
 
     public static final String QUERY_GET_OPERATION = "getTrackerOperation";
+    public static final String QUERY_GET_USER_OPERATION = "getTrackerUserOperation";
 
     @Id
     @Column( name = "source_id" )
@@ -48,7 +50,9 @@ public class TrackerOperationEntity
     @Column( name = "viewed" )
     private boolean viewState = true;
 
-    public TrackerOperationEntity( final String source, final String id, final Long ts, final String info, final long userId )
+
+    public TrackerOperationEntity( final String source, final String id, final Long ts, final String info,
+                                   final long userId )
     {
         this.source = source;
         this.operationTrackId = id;
@@ -58,7 +62,9 @@ public class TrackerOperationEntity
     }
 
 
-    public TrackerOperationEntity() {}
+    public TrackerOperationEntity()
+    {
+    }
 
 
     public String getInfo()
@@ -66,15 +72,18 @@ public class TrackerOperationEntity
         return info;
     }
 
+
     public long getUserId()
     {
         return userId;
     }
 
+
     public boolean isviewState()
     {
         return viewState;
     }
+
 
     public void setViewState( boolean viewState )
     {
