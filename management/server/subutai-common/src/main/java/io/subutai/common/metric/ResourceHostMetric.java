@@ -1,6 +1,8 @@
 package io.subutai.common.metric;
 
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.Expose;
@@ -46,6 +48,10 @@ public class ResourceHostMetric extends BaseMetric
     @Expose
     @JsonProperty
     private boolean management;
+
+    @Expose
+    @JsonProperty
+    private Date createdTime = new Date();
 
 
     public ResourceHostMetric()
@@ -141,6 +147,18 @@ public class ResourceHostMetric extends BaseMetric
     public double getCpuFrequency()
     {
         return cpu.getFrequency();
+    }
+
+
+    public Date getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public void setCreatedTime( final Date createdTime )
+    {
+        this.createdTime = createdTime;
     }
 
 
