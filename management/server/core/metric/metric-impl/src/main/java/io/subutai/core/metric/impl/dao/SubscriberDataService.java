@@ -6,16 +6,16 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import io.subutai.common.exception.DaoException;
-import io.subutai.core.metric.impl.model.Subscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+
+import io.subutai.common.exception.DaoException;
+import io.subutai.core.metric.impl.model.Subscriber;
 
 
 public class SubscriberDataService
@@ -32,7 +32,7 @@ public class SubscriberDataService
         {
             this.emf.createEntityManager().close();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             LOGGER.error( "Couldn't initialize EntityManager in SubscriberDataService." );
             throw new DaoException( e );
@@ -59,7 +59,7 @@ public class SubscriberDataService
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             LOGGER.error( "Instance is not an entity or command invoked on a container-managed entity manager." );
             if ( em.getTransaction().isActive() )
@@ -91,7 +91,7 @@ public class SubscriberDataService
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             if ( em.getTransaction().isActive() )
             {
@@ -123,7 +123,7 @@ public class SubscriberDataService
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             if ( em.getTransaction().isActive() )
             {
