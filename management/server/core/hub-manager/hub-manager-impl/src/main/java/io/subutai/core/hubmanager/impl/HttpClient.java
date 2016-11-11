@@ -17,11 +17,11 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 
 public class HttpClient
 {
-    private static long SECONDS_30 = 1000 * 60;
+    private static final long SECONDS_15 = 15 * 1000;
 
-    private static long ONE_MINUTE = 1000 * 60;
+    private static final long SECONDS_30 = 30 * 1000;
 
-    private static int defaultMaxRetransmits = 3;
+    private static final int DEFAULT_MAX_RETRANSMITS = 3;
 
 
     private HttpClient()
@@ -46,11 +46,11 @@ public class HttpClient
 
             HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
 
-            httpClientPolicy.setConnectionTimeout( SECONDS_30 );
+            httpClientPolicy.setConnectionTimeout( SECONDS_15 );
 
-            httpClientPolicy.setReceiveTimeout( ONE_MINUTE );
+            httpClientPolicy.setReceiveTimeout( SECONDS_30 );
 
-            httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+            httpClientPolicy.setMaxRetransmits( DEFAULT_MAX_RETRANSMITS );
 
             httpConduit.setClient( httpClientPolicy );
 
