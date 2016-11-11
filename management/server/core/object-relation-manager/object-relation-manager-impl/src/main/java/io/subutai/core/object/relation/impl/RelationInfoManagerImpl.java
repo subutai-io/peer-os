@@ -395,7 +395,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 }
             }
         }
-        logger.error( "No relation exist.", new RuntimeException( "No relation exists" ) );
+        logger.error( "No relation exist." );
         throw new RelationVerificationException( "No relation exist." );
     }
 }
