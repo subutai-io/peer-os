@@ -13,8 +13,6 @@ public class ResourceHostMonitorDto
 
     private Double availableRam;
 
-    private Double freeRam;
-
     private Double totalSpace;
 
     private Double availableSpace;
@@ -28,15 +26,14 @@ public class ResourceHostMonitorDto
 
 
     public ResourceHostMonitorDto( final String peerId, final String hostId, final String name, final Double totalRam,
-                                   final Double availableRam, final Double freeRam, final Double totalSpace,
-                                   final Double availableSpace, final Double usedCpu )
+                                   final Double availableRam, final Double totalSpace, final Double availableSpace,
+                                   final Double usedCpu )
     {
         this.peerId = peerId;
         this.hostId = hostId;
         this.name = name;
         this.totalRam = totalRam;
         this.availableRam = availableRam;
-        this.freeRam = freeRam;
         this.totalSpace = totalSpace;
         this.availableSpace = availableSpace;
         this.usedCpu = usedCpu;
@@ -100,18 +97,6 @@ public class ResourceHostMonitorDto
     public void setAvailableRam( final Double availableRam )
     {
         this.availableRam = availableRam;
-    }
-
-
-    public Double getFreeRam()
-    {
-        return freeRam;
-    }
-
-
-    public void setFreeRam( final Double freeRam )
-    {
-        this.freeRam = freeRam;
     }
 
 

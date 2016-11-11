@@ -117,13 +117,6 @@ public class ResourceHostMetric extends BaseMetric
 
 
     @JsonIgnore
-    public Double getFreeRam()
-    {
-        return ram != null && ram.free != null ? ram.free : 0;
-    }
-
-
-    @JsonIgnore
     public Double getTotalSpace()
     {
         return disk != null && disk.total != null ? disk.total : 0;
@@ -169,7 +162,7 @@ public class ResourceHostMetric extends BaseMetric
     {
         return String
                 .format( "%s %s, CPU used:%f, Free ram: %f, Available disk space: %f", super.toString(), getCpuModel(),
-                        getUsedCpu(), getFreeRam(), getAvailableSpace() );
+                        getUsedCpu(), getAvailableRam(), getAvailableSpace() );
     }
 
 

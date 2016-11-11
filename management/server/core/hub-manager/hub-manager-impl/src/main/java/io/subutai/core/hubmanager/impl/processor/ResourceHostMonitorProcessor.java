@@ -93,16 +93,6 @@ public class ResourceHostMonitorProcessor implements Runnable
 
                     try
                     {
-                        resourceHostMonitorDto.setFreeRam( resourceHostMetric.getFreeRam() );
-                    }
-                    catch ( Exception e )
-                    {
-                        resourceHostMonitorDto.setFreeRam( 0.0 );
-                        log.info( e.getMessage(), "No info about free RAM" );
-                    }
-
-                    try
-                    {
                         resourceHostMonitorDto.setTotalRam( resourceHostMetric.getTotalRam() );
                     }
                     catch ( Exception e )
