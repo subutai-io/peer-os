@@ -4,6 +4,8 @@ package io.subutai.hub.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 public class EnvironmentNodeDto
 {
@@ -35,13 +37,25 @@ public class EnvironmentNodeDto
 
     private int ipAddressOffset;
 
+//    @JsonIgnore
+    private String containerListenPort;
+
+//    @JsonIgnore
+    private String hostListenPort;
+
+//    @JsonIgnore
+    private String protocol;
+
+//    @JsonIgnore
+    private String domain;
+
+
     private Set<String> sshKeys = new HashSet<>();
 
 
     public EnvironmentNodeDto()
     {
     }
-
 
 
     public void setHostId( final String hostId )
@@ -235,5 +249,53 @@ public class EnvironmentNodeDto
     public void setIpAddressOffset( final int ipAddressOffset )
     {
         this.ipAddressOffset = ipAddressOffset;
+    }
+
+
+    public String getContainerListenPort()
+    {
+        return containerListenPort;
+    }
+
+
+    public void setContainerListenPort( final String containerListenPort )
+    {
+        this.containerListenPort = containerListenPort;
+    }
+
+
+    public String getHostListenPort()
+    {
+        return hostListenPort;
+    }
+
+
+    public void setHostListenPort( final String hostListenPort )
+    {
+        this.hostListenPort = hostListenPort;
+    }
+
+
+    public String getProtocol()
+    {
+        return protocol;
+    }
+
+
+    public void setProtocol( final String protocol )
+    {
+        this.protocol = protocol;
+    }
+
+
+    public String getDomain()
+    {
+        return domain;
+    }
+
+
+    public void setDomain( final String domain )
+    {
+        this.domain = domain;
     }
 }

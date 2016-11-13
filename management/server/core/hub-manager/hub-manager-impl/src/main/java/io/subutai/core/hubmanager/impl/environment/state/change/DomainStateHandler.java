@@ -3,7 +3,10 @@ package io.subutai.core.hubmanager.impl.environment.state.change;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
@@ -14,6 +17,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
+import static java.lang.String.format;
+
 
 // TODO refactor
 public class DomainStateHandler extends StateHandler
@@ -22,6 +27,13 @@ public class DomainStateHandler extends StateHandler
     {
         super( ctx, "Domain configuration" );
     }
+
+
+    private final static String REVERSE_PROXY_PORT_MAPPING_CMD =
+            "echo 'server { listen    %s; server_name  %s ; location / { proxy_pass "
+                    + "http://%s:%s; proxy_set_header   X-Real-IP $remote_addr; proxy_set_header   Host "
+                    + "$http_host; proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;}}' > "
+                    + "/var/lib/apps/subutai/current/nginx-includes/%s.conf";
 
 
     /**
@@ -60,6 +72,8 @@ public class DomainStateHandler extends StateHandler
                             .setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
                 }
 
+                ResourceHost resourceHost = ctx.localPeer.getResourceHosts().iterator().next();
+
                 for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
                 {
                     if ( nodesDto.getPeerId().equals( ctx.localPeer.getId() ) )
@@ -69,11 +83,27 @@ public class DomainStateHandler extends StateHandler
                             try
                             {
                                 String ip = nodeDto.getIp().replace( "/24", "" );
+                                int vlan =
+                                        ctx.localPeer.getReservedNetworkResources().findByVni( env.getVni() ).getVlan();
 
-                                if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
-                                {
-                                    ctx.localPeer.addIpToVniDomain( ip, env.getVni() );
-                                }
+                                String hostListenPort = nodeDto.getHostListenPort();
+                                String containerListenPort = nodeDto.getContainerListenPort();
+                                String domain = nodeDto.getDomain();
+
+                                String cmd = format( REVERSE_PROXY_PORT_MAPPING_CMD, hostListenPort, domain, ip,
+                                        containerListenPort, vlan );
+
+                                CommandResult commandResult = resourceHost.execute( new RequestBuilder( cmd ) );
+
+                                resourceHost.execute( new RequestBuilder( "systemctl restart *nginx*" ) );
+
+                                log.info( commandResult.getStdOut() );
+                                //                                if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni
+                                // () ) )
+                                //                                {
+                                //                                    ctx.localPeer.addIpToVniDomain( ip, env.getVni
+                                // () );
+                                //                                }
                             }
                             catch ( Exception e )
                             {
@@ -85,6 +115,7 @@ public class DomainStateHandler extends StateHandler
             }
             else
             {
+
                 ctx.localPeer.removeVniDomain( env.getVni() );
             }
 
