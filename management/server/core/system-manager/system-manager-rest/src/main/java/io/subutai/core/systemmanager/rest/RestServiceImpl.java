@@ -1,6 +1,8 @@
 package io.subutai.core.systemmanager.rest;
 
 
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
+import io.subutai.core.systemmanager.api.pojo.UpdateDto;
 
 
 public class RestServiceImpl implements RestService
@@ -157,6 +160,15 @@ public class RestServiceImpl implements RestService
         String subutaiInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( subutaiInfo ).build();
+    }
+
+
+    @Override
+    public Response getUpdatesHistory()
+    {
+        List<UpdateDto> updateDtoList = systemManager.getUpdates();
+
+        return Response.status( Response.Status.OK ).encoding( JsonUtil.toJson( updateDtoList ) ).build();
     }
 
 

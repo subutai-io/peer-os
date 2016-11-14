@@ -214,13 +214,15 @@ public class SystemManagerImpl implements SystemManager
         {
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
-            UpdateEntity updateEntity = new UpdateEntity( SubutaiInfo.getVersion() );
+            UpdateEntity updateEntity = new UpdateEntity( SubutaiInfo.getVersion(), SubutaiInfo.getCommitId() );
 
             updateDao.persist( updateEntity );
 
             host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
 
             updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
+
+            updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
 
             updateDao.update( updateEntity );
 
@@ -245,6 +247,8 @@ public class SystemManagerImpl implements SystemManager
         {
             updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
 
+            updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
+
             updateDao.update( updateEntity );
         }
     }
@@ -260,7 +264,8 @@ public class SystemManagerImpl implements SystemManager
         for ( UpdateEntity updateEntity : updateEntities )
         {
             updateDtos.add( new UpdateDto( updateEntity.getUpdateDate(), updateEntity.getPrevVersion(),
-                    updateEntity.getCurrentVersion() ) );
+                    updateEntity.getCurrentVersion(), updateEntity.getPrevCommitId(),
+                    updateEntity.getCurrentCommitId() ) );
         }
 
 

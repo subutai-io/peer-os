@@ -9,12 +9,19 @@ public class UpdateDto
 
     private String currentVersion;
 
+    private String prevCommitId;
 
-    public UpdateDto( final Long updateDate, final String prevVersion, final String currentVersion )
+    private String currentCommitId;
+
+
+    public UpdateDto( final Long updateDate, final String prevVersion, final String currentVersion,
+                      final String prevCommitId, final String currentCommitId )
     {
         this.updateDate = updateDate;
         this.prevVersion = prevVersion;
         this.currentVersion = currentVersion;
+        this.prevCommitId = prevCommitId;
+        this.currentCommitId = currentCommitId;
     }
 
 
@@ -33,5 +40,17 @@ public class UpdateDto
     public String getCurrentVersion()
     {
         return currentVersion;
+    }
+
+
+    public String getPrevCommitId()
+    {
+        return prevCommitId;
+    }
+
+
+    public String getCurrentCommitId()
+    {
+        return currentCommitId;
     }
 }
