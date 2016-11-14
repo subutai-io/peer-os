@@ -31,15 +31,22 @@ public class UpdateEntity
     @Column
     private String currentVersion;
 
+    @Column
+    private String prevCommitId;
+
+    @Column
+    private String currentCommitId;
+
 
     public UpdateEntity()
     {
     }
 
 
-    public UpdateEntity( final String prevVersion )
+    public UpdateEntity( final String prevVersion, final String prevCommitId )
     {
         this.prevVersion = prevVersion;
+        this.prevCommitId = prevCommitId;
         this.updateDate = System.currentTimeMillis();
     }
 
@@ -56,9 +63,21 @@ public class UpdateEntity
     }
 
 
+    public String getPrevCommitId()
+    {
+        return prevCommitId;
+    }
+
+
     public String getCurrentVersion()
     {
         return currentVersion;
+    }
+
+
+    public String getCurrentCommitId()
+    {
+        return currentCommitId;
     }
 
 
@@ -67,5 +86,11 @@ public class UpdateEntity
         Preconditions.checkArgument( !Strings.isNullOrEmpty( currentVersion ) );
 
         this.currentVersion = currentVersion;
+    }
+
+
+    public void setCurrentCommitId( final String currentCommitId )
+    {
+        this.currentCommitId = currentCommitId;
     }
 }
