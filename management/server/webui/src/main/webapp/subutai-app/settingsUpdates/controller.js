@@ -38,7 +38,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 		})
 		.withPaginationType('full_numbers')
 		.withOption('stateSave', true)
-		.withOption('order', [[ 0, "asc" ]])
+		//.withOption('order', [[ 0, "desc" ]])
 		.withOption('createdRow', createdRow);
 
 	vm.dtColumns = [
