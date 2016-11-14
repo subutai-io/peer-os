@@ -168,7 +168,7 @@ public class RestServiceImpl implements RestService
     {
         List<UpdateDto> updateDtoList = systemManager.getUpdates();
 
-        return Response.status( Response.Status.OK ).encoding( JsonUtil.toJson( updateDtoList ) ).build();
+        return Response.status( Response.Status.OK ).entity( JsonUtil.toJson( updateDtoList ) ).build();
     }
 
 
