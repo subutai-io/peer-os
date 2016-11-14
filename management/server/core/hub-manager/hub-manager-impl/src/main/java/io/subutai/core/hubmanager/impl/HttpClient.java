@@ -17,9 +17,9 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 
 public class HttpClient
 {
-    private static final long SECONDS_15 = 15 * 1000;
+    private static final long SECONDS_15 = 15 * 1000L;
 
-    private static final long SECONDS_30 = 30 * 1000;
+    private static final long SECONDS_30 = 30 * 1000L;
 
     private static final int DEFAULT_MAX_RETRANSMITS = 3;
 
