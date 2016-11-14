@@ -9,11 +9,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.core.messenger.impl.Envelope;
-import io.subutai.core.messenger.impl.LocalPeerMessageSender;
-import io.subutai.core.messenger.impl.MessengerDao;
-import io.subutai.core.messenger.impl.MessengerImpl;
-
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.times;
@@ -26,7 +21,7 @@ public class LocalPeerMessageSenderTest
     @Mock
     MessengerImpl messenger;
     @Mock
-    MessengerDao messengerDao;
+    MessengerDataService messengerDataService;
     @Mock
     Envelope envelope1;
     @Mock
@@ -39,7 +34,7 @@ public class LocalPeerMessageSenderTest
     public void setUp() throws Exception
     {
         localPeerMessageSender =
-                new LocalPeerMessageSender( messenger, messengerDao, Sets.newHashSet( envelope1, envelope2 ) );
+                new LocalPeerMessageSender( messenger, messengerDataService, Sets.newHashSet( envelope1, envelope2 ) );
     }
 
 
@@ -50,6 +45,6 @@ public class LocalPeerMessageSenderTest
 
         assertTrue( result );
         verify( messenger, times( 2 ) ).notifyListeners( isA( Envelope.class ) );
-        verify( messengerDao, times( 2 ) ).markAsSent( isA( Envelope.class ) );
+        verify( messengerDataService, times( 2 ) ).markAsSent( isA( Envelope.class ) );
     }
 }
