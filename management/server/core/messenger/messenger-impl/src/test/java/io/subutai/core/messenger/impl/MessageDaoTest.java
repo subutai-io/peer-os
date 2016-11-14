@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.core.messenger.impl.dao.MessageDataService;
+import io.subutai.core.messenger.impl.dao.MessageDao;
 import io.subutai.core.messenger.impl.entity.MessageEntity;
 
 import static org.mockito.Matchers.any;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class MessageDataServiceTest
+public class MessageDaoTest
 {
     private static final String ID = "id";
     @Mock
@@ -46,7 +46,7 @@ public class MessageDataServiceTest
     @Mock
     MessageEntity messageEntity;
 
-    MessageDataService messageDataService;
+    MessageDao messageDao;
 
 
     @Before
@@ -59,7 +59,7 @@ public class MessageDataServiceTest
         when( entityManager.createQuery( anyString(), eq( String.class ) ) ).thenReturn( typedQuery );
         when( entityManager.createQuery( anyString(), eq( MessageEntity.class ) ) ).thenReturn( typedQuery );
 
-        messageDataService = new MessageDataService( entityManagerFactory );
+        messageDao = new MessageDao( entityManagerFactory );
 
         reset( exception );
     }
@@ -80,14 +80,14 @@ public class MessageDataServiceTest
     @Test
     public void testFind() throws Exception
     {
-        messageDataService.find( ID );
+        messageDao.find( ID );
 
         verify( entityManager ).find( MessageEntity.class, ID );
 
 
         throwException();
 
-        messageDataService.find( ID );
+        messageDao.find( ID );
 
         verifyException();
     }
@@ -96,12 +96,12 @@ public class MessageDataServiceTest
     @Test
     public void testGetAll() throws Exception
     {
-        messageDataService.getAll();
+        messageDao.getAll();
 
         verify( entityManager ).createQuery( anyString(), eq( MessageEntity.class ) );
 
         throwException();
-        messageDataService.getAll();
+        messageDao.getAll();
 
         verifyException();
     }
@@ -110,14 +110,14 @@ public class MessageDataServiceTest
     @Test
     public void testPersist() throws Exception
     {
-        messageDataService.persist( messageEntity );
+        messageDao.persist( messageEntity );
 
         verify( entityManager ).persist( messageEntity );
 
 
         throwException();
 
-        messageDataService.persist( messageEntity );
+        messageDao.persist( messageEntity );
 
         verifyException();
     }
@@ -126,14 +126,14 @@ public class MessageDataServiceTest
     @Test
     public void testUpdate() throws Exception
     {
-        messageDataService.update( messageEntity );
+        messageDao.update( messageEntity );
 
         verify( entityManager ).merge( messageEntity );
 
 
         throwException();
 
-        messageDataService.update( messageEntity );
+        messageDao.update( messageEntity );
 
         verifyException();
     }
@@ -142,14 +142,14 @@ public class MessageDataServiceTest
     @Test
     public void testRemove() throws Exception
     {
-        messageDataService.remove( ID );
+        messageDao.remove( ID );
 
         verify( entityManager ).remove( anyObject() );
 
 
         throwException();
 
-        messageDataService.remove( ID );
+        messageDao.remove( ID );
 
         verifyException();
     }
@@ -158,14 +158,14 @@ public class MessageDataServiceTest
     @Test
     public void testGetTargetPeers() throws Exception
     {
-        messageDataService.getTargetPeers();
+        messageDao.getTargetPeers();
 
         verify( entityManager ).createQuery( anyString(), eq( String.class ) );
 
 
         throwException();
 
-        messageDataService.getTargetPeers();
+        messageDao.getTargetPeers();
 
         verifyException();
     }
@@ -174,14 +174,14 @@ public class MessageDataServiceTest
     @Test
     public void testGetMessages() throws Exception
     {
-        messageDataService.getMessages( ID, 1, 1 );
+        messageDao.getMessages( ID, 1, 1 );
 
         verify( entityManager ).createQuery( anyString(), eq( MessageEntity.class ) );
 
 
         throwException();
 
-        messageDataService.getMessages( ID, 1, 1 );
+        messageDao.getMessages( ID, 1, 1 );
 
         verifyException();
     }
@@ -190,14 +190,14 @@ public class MessageDataServiceTest
     @Test
     public void testPurgeMessages() throws Exception
     {
-        messageDataService.purgeMessages();
+        messageDao.purgeMessages();
 
         verify( entityManager ).createQuery( anyString() );
 
 
         throwException();
 
-        messageDataService.purgeMessages();
+        messageDao.purgeMessages();
 
         verifyException();
     }
@@ -206,14 +206,14 @@ public class MessageDataServiceTest
     @Test
     public void testMarkAsSent() throws Exception
     {
-        messageDataService.markAsSent( ID );
+        messageDao.markAsSent( ID );
 
         verify( entityManager ).createQuery( anyString() );
 
 
         throwException();
 
-        messageDataService.markAsSent( ID );
+        messageDao.markAsSent( ID );
 
         verifyException();
     }
@@ -222,14 +222,14 @@ public class MessageDataServiceTest
     @Test
     public void testIncrementDeliveryAttempts() throws Exception
     {
-        messageDataService.incrementDeliveryAttempts( ID );
+        messageDao.incrementDeliveryAttempts( ID );
 
         verify( entityManager ).createQuery( anyString() );
 
 
         throwException();
 
-        messageDataService.incrementDeliveryAttempts( ID );
+        messageDao.incrementDeliveryAttempts( ID );
 
         verifyException();
     }

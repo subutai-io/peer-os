@@ -35,24 +35,24 @@ import static org.mockito.Mockito.when;
  */
 @Ignore
 @RunWith( MockitoJUnitRunner.class )
-public class MonitorDaoTest
+public class MonitorDataServiceTest
 {
 
     private final static String SUBSCRIBER_ID = "subscriber";
     private final static String ENVIRONMENT_ID = UUID.randomUUID().toString();
 
-    MonitorDaoExt monitorDao;
+    MonitorDataServiceExt monitorDao;
 
     private EntityManagerFactory emf;
     @Mock
     private EnvironmentId environmentId;
 
 
-    static class MonitorDaoExt extends MonitorDao
+    static class MonitorDataServiceExt extends MonitorDataService
     {
 
 
-        public MonitorDaoExt( final EntityManagerFactory emf ) throws DaoException
+        public MonitorDataServiceExt( final EntityManagerFactory emf ) throws DaoException
         {
             super( emf );
         }
@@ -70,7 +70,7 @@ public class MonitorDaoTest
         when( emf.createEntityManager() ).thenReturn( em1 ).thenReturn( em );
         try
         {
-            monitorDao = new MonitorDaoExt( emf );
+            monitorDao = new MonitorDataServiceExt( emf );
         }
         catch ( DaoException e )
         {
@@ -85,7 +85,7 @@ public class MonitorDaoTest
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         emf = Persistence.createEntityManagerFactory( "default" );
 
-        monitorDao = new MonitorDaoExt( emf );
+        monitorDao = new MonitorDataServiceExt( emf );
     }
 
 

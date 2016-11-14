@@ -19,13 +19,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 
-public class MessageDataService implements DataService<String, MessageEntity>
+public class MessageDao implements DataService<String, MessageEntity>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessageDataService.class );
+    private static final Logger LOG = LoggerFactory.getLogger( MessageDao.class );
     EntityManagerFactory emf;
 
 
-    public MessageDataService( EntityManagerFactory entityManagerFactory )
+    public MessageDao( EntityManagerFactory entityManagerFactory )
     {
         Preconditions.checkNotNull( entityManagerFactory );
 

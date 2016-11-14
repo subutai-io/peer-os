@@ -18,13 +18,13 @@ import io.subutai.common.exception.DaoException;
 import io.subutai.core.metric.impl.model.Subscriber;
 
 
-public class SubscriberDataService
+public class SubscriberDao
 {
     private EntityManagerFactory emf;
-    private Logger LOGGER = LoggerFactory.getLogger( SubscriberDataService.class );
+    private Logger LOGGER = LoggerFactory.getLogger( SubscriberDao.class );
 
 
-    public SubscriberDataService( final EntityManagerFactory emf ) throws DaoException
+    public SubscriberDao( final EntityManagerFactory emf ) throws DaoException
     {
         Preconditions.checkNotNull( emf, "EntityManagerFactory cannot be null." );
         this.emf = emf;

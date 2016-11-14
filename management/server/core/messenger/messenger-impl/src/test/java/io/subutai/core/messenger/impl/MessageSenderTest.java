@@ -40,7 +40,7 @@ public class MessageSenderTest
     @Mock
     PeerManager peerManager;
     @Mock
-    MessengerDao messengerDao;
+    MessengerDataService messengerDataService;
     @Mock
     MessengerImpl messenger;
     @Mock
@@ -68,7 +68,7 @@ public class MessageSenderTest
     @Before
     public void setUp() throws Exception
     {
-        messageSender = new MessageSender( messengerDao, messenger );
+        messageSender = new MessageSender( messengerDataService, messenger );
         messageSender.mainLoopExecutor = mainLoopExecutor;
         messageSender.restExecutor = restExecutor;
         messageSender.LOG = logger;
@@ -101,14 +101,14 @@ public class MessageSenderTest
     {
         messageSender.purgeExpiredMessages();
 
-        verify( messengerDao ).purgeExpiredMessages();
+        verify( messengerDataService ).purgeExpiredMessages();
     }
 
 
     @Test
     public void testDeliverMessages() throws Exception
     {
-        when( messengerDao.getEnvelopes() ).thenReturn( Sets.newHashSet( envelope ) );
+        when( messengerDataService.getEnvelopes() ).thenReturn( Sets.newHashSet( envelope ) );
         when( envelope.getTimeToLive() ).thenReturn( TIME_TO_LIVE );
         when( envelope.getTargetPeerId() ).thenReturn( TARGET_PEER_ID );
         when( envelope.getCreateDate() ).thenReturn( CREATE_DATE );

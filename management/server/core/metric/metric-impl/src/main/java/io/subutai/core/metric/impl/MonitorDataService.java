@@ -9,21 +9,21 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.exception.DaoException;
-import io.subutai.core.metric.impl.dao.SubscriberDataService;
+import io.subutai.core.metric.impl.dao.SubscriberDao;
 
 
 /**
  * Monitor DAO
  */
-public class MonitorDao
+public class MonitorDataService
 {
     private static final String INVALID_ENV_ID = "Invalid environment id";
-    private SubscriberDataService dataService;
+    private SubscriberDao subscriberDao;
 
 
-    public MonitorDao( EntityManagerFactory emf ) throws DaoException
+    public MonitorDataService( EntityManagerFactory emf ) throws DaoException
     {
-        this.dataService = new SubscriberDataService( emf );
+        this.subscriberDao = new SubscriberDao( emf );
     }
 
 
@@ -34,7 +34,7 @@ public class MonitorDao
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
 
-        dataService.update( environmentId, subscriberId );
+        subscriberDao.update( environmentId, subscriberId );
     }
 
 
@@ -45,13 +45,13 @@ public class MonitorDao
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
 
-        dataService.remove( environmentId, subscriberId );
+        subscriberDao.remove( environmentId, subscriberId );
     }
 
 
     public Set<String> findHandlersByEnvironment( String environmentId ) throws DaoException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), INVALID_ENV_ID );
-        return dataService.findHandlersByEnvironment( environmentId );
+        return subscriberDao.findHandlersByEnvironment( environmentId );
     }
 }

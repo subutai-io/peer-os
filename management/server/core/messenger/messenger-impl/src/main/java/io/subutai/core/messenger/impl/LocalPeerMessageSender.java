@@ -8,15 +8,15 @@ import java.util.concurrent.Callable;
 public class LocalPeerMessageSender implements Callable<Boolean>
 {
     private MessengerImpl messenger;
-    private MessengerDao messengerDao;
+    private MessengerDataService messengerDataService;
     private Set<Envelope> envelopes;
 
 
-    public LocalPeerMessageSender( final MessengerImpl messenger, final MessengerDao messengerDao,
+    public LocalPeerMessageSender( final MessengerImpl messenger, final MessengerDataService messengerDataService,
                                    final Set<Envelope> envelopes )
     {
         this.messenger = messenger;
-        this.messengerDao = messengerDao;
+        this.messengerDataService = messengerDataService;
         this.envelopes = envelopes;
     }
 
@@ -27,7 +27,7 @@ public class LocalPeerMessageSender implements Callable<Boolean>
         for ( Envelope envelope : envelopes )
         {
             messenger.notifyListeners( envelope );
-            messengerDao.markAsSent( envelope );
+            messengerDataService.markAsSent( envelope );
         }
         return true;
     }
