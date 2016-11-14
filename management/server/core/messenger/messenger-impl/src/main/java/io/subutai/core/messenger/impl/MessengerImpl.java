@@ -39,7 +39,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
-    protected MessengerDao messengerDao;
+    protected MessengerDataService messengerDataService;
     protected MessageSender messageSender;
     private DaoManager daoManager;
 
@@ -50,8 +50,8 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
         try
         {
-            this.messengerDao = new MessengerDao( daoManager.getEntityManagerFactory() );
-            this.messageSender = new MessageSender( messengerDao, this );
+            this.messengerDataService = new MessengerDataService( daoManager.getEntityManagerFactory() );
+            this.messageSender = new MessageSender( messengerDataService, this );
 
             messageSender.init();
         }
@@ -104,7 +104,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
         {
             Envelope envelope = new Envelope( message, peer.getId(), recipient, timeToLive, headers );
 
-            messengerDao.saveEnvelope( envelope );
+            messengerDataService.saveEnvelope( envelope );
         }
         catch ( Exception e )
         {
@@ -121,7 +121,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
         try
         {
-            Envelope envelope = messengerDao.getEnvelope( messageId );
+            Envelope envelope = messengerDataService.getEnvelope( messageId );
             if ( envelope != null )
             {
                 if ( envelope.isSent() )

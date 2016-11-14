@@ -47,7 +47,7 @@ public class RemotePeerMessageSenderTest
     Peer localPeer;
 
     @Mock
-    MessengerDao messengerDao;
+    MessengerDataService messengerDataService;
     @Mock
     PeerInfo peerInfo;
     @Mock
@@ -68,7 +68,8 @@ public class RemotePeerMessageSenderTest
         when( peerInfo.getId() ).thenReturn( uuid );
 
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
-        remotePeerMessageSender = spy( new RemotePeerMessageSender( messengerDao, peer, Sets.newHashSet( envelope ) ) );
+        remotePeerMessageSender = spy( new RemotePeerMessageSender(
+                messengerDataService, peer, Sets.newHashSet( envelope ) ) );
 
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getIp() ).thenReturn( IP );
@@ -85,7 +86,7 @@ public class RemotePeerMessageSenderTest
         remotePeerMessageSender.call();
 
         verify( webClient ).post( anyString() );
-        verify( messengerDao ).markAsSent( envelope );
+        verify( messengerDataService ).markAsSent( envelope );
     }
 
 
@@ -96,6 +97,6 @@ public class RemotePeerMessageSenderTest
 
         remotePeerMessageSender.call();
 
-        verify( messengerDao ).incrementDeliveryAttempts( envelope );
+        verify( messengerDataService ).incrementDeliveryAttempts( envelope );
     }
 }

@@ -80,7 +80,7 @@ public class MonitorImpl implements Monitor, HostListener
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
 
     private final Commands commands = new Commands();
-    protected MonitorDao monitorDao;
+    protected MonitorDataService monitorDataService;
     protected DaoManager daoManager;
 
     protected ScheduledExecutorService backgroundTasksExecutorService;
@@ -104,7 +104,7 @@ public class MonitorImpl implements Monitor, HostListener
         try
         {
             this.daoManager = daoManager;
-            this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
+            this.monitorDataService = new MonitorDataService( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
             this.hostRegistry = hostRegistry;
         }

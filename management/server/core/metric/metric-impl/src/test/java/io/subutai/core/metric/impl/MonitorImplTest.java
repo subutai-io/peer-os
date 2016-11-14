@@ -73,7 +73,7 @@ public class MonitorImplTest
     @Mock
     EnvironmentManager environmentManager;
     @Mock
-    MonitorDao monitorDao;
+    MonitorDataService monitorDataService;
     @Mock
     DaoManager daoManager;
     @Mock
@@ -125,9 +125,9 @@ public class MonitorImplTest
         }
 
 
-        public void setMonitorDao( MonitorDao monitorDao )
+        public void setMonitorDao( MonitorDataService monitorDataService )
         {
-            this.monitorDao = monitorDao;
+            this.monitorDataService = monitorDataService;
         }
 
 
@@ -148,14 +148,15 @@ public class MonitorImplTest
 
 
         monitor = new MonitorImplExt( peerManager, daoManager, environmentManager, hostRegistry );
-        monitor.setMonitorDao( monitorDao );
+        monitor.setMonitorDao( monitorDataService );
 
 
         alert = mock( AlertEvent.class );
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         when( alertListener.getId() ).thenReturn( SUBSCRIBER_ID );
         monitor.setAlertListeners( Sets.newHashSet( alertListener ) );
-        when( monitorDao.findHandlersByEnvironment( ENVIRONMENT_ID ) ).thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
+        when( monitorDataService
+                .findHandlersByEnvironment( ENVIRONMENT_ID ) ).thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
         when( environment.getId() ).thenReturn( ENVIRONMENT_ID );
         when( environment.getUserId() ).thenReturn( USER_ID );
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
