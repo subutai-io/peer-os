@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint default-activation="eager"
-           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
->
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.1.0"
+           xsi:schemaLocation="http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
 
+  <!-- Data Access object to get EntityManager -->
+  <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager"
+        scope="prototype">
+    <jpa:unit unitname="systemPUnit" property="entityManagerFactory" />
+  </bean>
+
   <bean id="systemManagerImpl" scope="singleton"
-        class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
+        class="io.subutai.core.systemmanager.impl.SystemManagerImpl" init-method="init">
     <property name="identityManager" ref="identityManager" />
     <property name="peerManager" ref="peerManager" />
+    <property name="daoManager" ref="daoManager" />
   </bean>
 
   <service ref="systemManagerImpl"
