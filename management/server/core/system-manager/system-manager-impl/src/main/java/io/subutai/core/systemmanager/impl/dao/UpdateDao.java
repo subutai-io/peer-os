@@ -37,17 +37,21 @@ public class UpdateDao
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from UpdateEntity h order by h.updateDate desc fetch first row only",
-                    UpdateEntity.class ).getSingleResult();
+            result = em.createQuery( "select h from UpdateEntity h order by h.updateDate desc", UpdateEntity.class )
+                       .setMaxResults( 1 ).getSingleResult();
             em.getTransaction().commit();
-        }
-        catch ( NoResultException ne )
-        {
-            LOG.warn( "No update record found" );
         }
         catch ( Exception e )
         {
-            LOG.error( e.toString(), e );
+            if ( e instanceof NoResultException )
+            {
+                LOG.warn( "No update record found" );
+            }
+            else
+            {
+                LOG.error( e.toString(), e );
+            }
+
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -64,14 +68,15 @@ public class UpdateDao
 
     public List<UpdateEntity> getLast( int lastN )
     {
+        Preconditions.checkArgument( lastN > 0 );
+
         List<UpdateEntity> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery(
-                    "select h from UpdateEntity h order by h.updateDate desc fetch first :lastN rows only",
-                    UpdateEntity.class ).setParameter( "lastN", lastN ).getResultList();
+            result = em.createQuery( "select h from UpdateEntity h order by h.updateDate desc", UpdateEntity.class )
+                       .setMaxResults( lastN ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
