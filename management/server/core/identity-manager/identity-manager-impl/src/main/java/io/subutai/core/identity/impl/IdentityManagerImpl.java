@@ -85,6 +85,8 @@ import io.subutai.core.security.api.model.SecurityKey;
 
 /**
  * Overall Subutai Identity Management
+ *
+ * TODO check for duplicate names of new users and roles
  */
 @PermitAll
 public class IdentityManagerImpl implements IdentityManager
@@ -161,7 +163,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             // create admin user
             User admin = createUser( ADMIN_USERNAME, ADMIN_DEFAULT_PWD, ADMIN_USER_FULL_NAME, ADMIN_EMAIL,
-                    UserType.REGULAR.getId(), KeyTrustLevel.FULL.getId(), true, true );
+                    UserType.SYSTEM.getId(), KeyTrustLevel.FULL.getId(), true, true );
 
             // create system token
             createUserToken( internal, "", "", "", TokenType.PERMANENT.getId(), null );
@@ -1415,7 +1417,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.SYSTEM.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() && !ADMIN_USERNAME.equals( user.getUserName() ) )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1488,18 +1490,13 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void removeUser( long userId )
     {
-        //TODO !!!!!
-        // 2) add check before removing a user if there is at least one more user with Administrator role
-        //    if no such user then throw exception
-        //TODO !!!!!
-
         //******Cannot remove Internal User *************
         User user = identityDataService.getUser( userId );
+
         if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be removed" );
         }
-        //***********************************************
 
         identityDataService.removeUser( userId );
     }
