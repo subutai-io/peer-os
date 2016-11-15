@@ -93,14 +93,16 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
     private static final int IDENTITY_LIFETIME = 240; //days
-    private static final String ADMIN_FULL_NAME = "Administrator";
     private static final String SYSTEM_USER_FULL_NAME = "System User";
     private static final String ADMIN_EMAIL = "admin@subutai.io";
     private static final String SYSTEM_USER_EMAIL = "system@subutai.io";
+    private static final String ADMIN_USER_FULL_NAME = "Admin User";
+    private static final String ADMIN_ROLE = "Administrator";
     private static final String KARAF_MANAGER_ROLE = "Karaf-Manager";
     private static final String PEER_MANAGER_ROLE = "Peer-Manager";
     private static final String ENV_MANAGER_ROLE = "Environment-Manager";
     private static final String SYSTEM_ROLE = "Internal-System";
+    private static final String ENV_OWNER_ROLE = "Environment-Owner";
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -158,7 +160,7 @@ public class IdentityManagerImpl implements IdentityManager
                             KeyTrustLevel.FULL.getId(), false, false );
 
             // create admin user
-            User admin = createUser( ADMIN_USERNAME, ADMIN_DEFAULT_PWD, ADMIN_FULL_NAME, ADMIN_EMAIL,
+            User admin = createUser( ADMIN_USERNAME, ADMIN_DEFAULT_PWD, ADMIN_USER_FULL_NAME, ADMIN_EMAIL,
                     UserType.REGULAR.getId(), KeyTrustLevel.FULL.getId(), true, true );
 
             // create system token
@@ -176,7 +178,7 @@ public class IdentityManagerImpl implements IdentityManager
             assignRolePermission( role, per );
 
             // create admin role
-            role = createRole( ADMIN_FULL_NAME, UserType.SYSTEM.getId() );
+            role = createRole( ADMIN_ROLE, UserType.SYSTEM.getId() );
 
             // assign to admin user
             assignUserRole( admin, role );
@@ -224,7 +226,13 @@ public class IdentityManagerImpl implements IdentityManager
                 }
             }
 
-            //TODO precreate env-owner role for regular users
+            // pre-create env-owner role for regular users
+            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
+
+            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
+                    true, true, true, true );
+
+            assignRolePermission( role, per );
 
 
             //***** setPeer Owner By Default ***************
@@ -1480,6 +1488,11 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void removeUser( long userId )
     {
+        //TODO !!!!!
+        // 2) add check before removing a user if there is at least one more user with Administrator role
+        //    if no such user then throw exception
+        //TODO !!!!!
+
         //******Cannot remove Internal User *************
         User user = identityDataService.getUser( userId );
         if ( user.getType() == UserType.SYSTEM.getId() )
