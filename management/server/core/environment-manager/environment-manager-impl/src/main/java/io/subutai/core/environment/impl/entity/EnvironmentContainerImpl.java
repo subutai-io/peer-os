@@ -243,7 +243,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         {
             return getPeer().getContainerState( getContainerId() );
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             logger.warn( "Error getting container state: {}", e.getMessage() );
 
@@ -362,9 +362,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         {
             return getTemplate().getName();
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
-            logger.error( "Failed to get template by id", e.getMessage() );
+            logger.error( "Failed to get template by id: {}", e.getMessage() );
         }
 
         return null;

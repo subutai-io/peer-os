@@ -33,6 +33,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
+import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
@@ -52,6 +53,7 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.ReverseProxyConfig;
@@ -70,8 +72,6 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.dto.ContainerDto;
-import io.subutai.core.environment.api.dto.EnvironmentDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -1832,7 +1832,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToDtos( environment ), environment.getClass().getName() );
+                            environment.getContainerDtos(), environment.getClass().getName() );
 
             environmentDtos.add( environmentDto );
         }
@@ -1841,19 +1841,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    private Set<ContainerDto> convertContainersToDtos( Environment environment )
+    public LocalPeer getLocalPeer()
     {
-        Set<ContainerDto> containerDtos = Sets.newHashSet();
-
-        for ( EnvironmentContainerHost host : environment.getContainerHosts() )
-        {
-            containerDtos.add( new ContainerDto( host.getId(), environment.getId(), host.getHostname(),
-                    host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), host.getTemplateName(),
-                    host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
-                    host.getResourceHostId().getId(), host.isLocal(), "subutai", host.getState(),
-                    host.getTemplateId() ) );
-        }
-
-        return containerDtos;
+        return peerManager.getLocalPeer();
     }
 }

@@ -10,15 +10,15 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.dto.ContainerDto;
-import io.subutai.core.environment.api.dto.EnvironmentDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 
 

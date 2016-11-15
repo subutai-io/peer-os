@@ -1,4 +1,4 @@
-package io.subutai.core.environment.api.dto;
+package io.subutai.common.environment;
 
 
 import java.util.Set;

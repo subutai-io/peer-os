@@ -129,4 +129,6 @@ public interface Environment extends RelationLink
     EnvironmentId getEnvironmentId();
 
     Set<EnvironmentAlertHandler> getAlertHandlers();
+
+    Set<ContainerDto> getContainerDtos();
 }

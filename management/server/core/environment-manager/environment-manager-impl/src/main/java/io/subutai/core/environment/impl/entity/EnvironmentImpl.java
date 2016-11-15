@@ -35,22 +35,27 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
@@ -412,6 +417,61 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
+    public Set<ContainerDto> getContainerDtos()
+    {
+        Set<ContainerDto> containerDtos = Sets.newHashSet();
+
+        Set<EnvironmentContainerHost> containerHosts;
+
+        synchronized ( this )
+        {
+            containerHosts =
+                    CollectionUtil.isCollectionEmpty( this.containers ) ? Sets.<EnvironmentContainerHost>newHashSet() :
+                    Sets.newConcurrentHashSet( this.containers );
+        }
+
+        for ( EnvironmentContainerHost host : containerHosts )
+        {
+            ( ( EnvironmentContainerImpl ) host ).setEnvironment( this );
+
+            ContainerHostState containerHostState = ContainerHostState.UNKNOWN;
+            LocalPeer localPeer = environmentManager.getLocalPeer();
+            boolean isLocalContainer = localPeer.getId().equals( host.getPeerId() );
+
+            try
+            {
+                // can not use host.getState() b/c proxyContainer throws error due to unset Env
+                // Manager dependency
+                ContainerId containerId = new ContainerId( host.getId() );
+
+                if ( isLocalContainer )
+                {
+                    containerHostState = localPeer.getContainerState( containerId );
+                }
+                else
+                {
+                    // in case of proxy container, exception will be thrown and state will be UNKNOWN
+                    containerHostState =
+                            environmentManager.resolvePeer( host.getPeerId() ).getContainerState( containerId );
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Error getting container state: {}", e.getMessage() );
+            }
+
+            containerDtos.add( new ContainerDto( host.getId(), getId(), host.getHostname(),
+                    host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), host.getTemplateName(),
+                    host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
+                    host.getResourceHostId().getId(), isLocalContainer, "subutai", containerHostState,
+                    host.getTemplateId() ) );
+        }
+
+        return containerDtos;
+    }
+
+
+    @Override
     public Set<EnvironmentContainerHost> getContainerHosts()
     {
         Set<EnvironmentContainerHost> containerHosts;
@@ -659,6 +719,7 @@ public class EnvironmentImpl implements Environment, Serializable
         handlerId.setEnvironment( this );
         alertHandlers.add( handlerId );
     }
+
 
     public void removeAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
     {

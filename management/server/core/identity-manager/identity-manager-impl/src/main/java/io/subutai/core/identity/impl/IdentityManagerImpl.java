@@ -198,17 +198,6 @@ public class IdentityManagerImpl implements IdentityManager
                     true, true, true, true );
 
             assignRolePermission( role, per );
-            //            for ( final PermissionObject aPermsp : permsp )
-            //            {
-            //                if ( aPermsp == PermissionObject.PEER_MANAGEMENT || aPermsp == PermissionObject
-            // .RESOURCE_MANAGEMENT )
-            //                {
-            //                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true,
-            // true, true,
-            //                            true );
-            //                    assignRolePermission( role, per );
-            //                }
-            //            }
 
             // Create Env Mgr Role
             role = createRole( ENV_MANAGER_ROLE, UserType.SYSTEM.getId() );
@@ -218,18 +207,6 @@ public class IdentityManagerImpl implements IdentityManager
 
             assignRolePermission( role, per );
 
-            //            for ( final PermissionObject aPermsp : permsp )
-            //            {
-            //                if ( aPermsp != PermissionObject.IDENTITY_MANAGEMENT
-            //                        && aPermsp != PermissionObject.KARAF_SERVER_ADMINISTRATION
-            //                        && aPermsp != PermissionObject.PEER_MANAGEMENT
-            //                        && aPermsp != PermissionObject.RESOURCE_MANAGEMENT )
-            //                {
-            //                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true,
-            // true, true, true );
-            //                    assignRolePermission( role, per );
-            //                }
-            //            }
 
             // Create System Role
             role = createRole( SYSTEM_ROLE, UserType.SYSTEM.getId() );
@@ -246,6 +223,9 @@ public class IdentityManagerImpl implements IdentityManager
                     assignRolePermission( role, per );
                 }
             }
+
+            //TODO precreate env-owner role for regular users
+
 
             //***** setPeer Owner By Default ***************
             setPeerOwner( admin );
