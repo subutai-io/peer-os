@@ -176,7 +176,7 @@ public class IdentityManagerImpl implements IdentityManager
             assignRolePermission( role, per );
 
             // create admin role
-            role = createRole( ADMIN_FULL_NAME, UserType.Regular.getId() );
+            role = createRole( ADMIN_FULL_NAME, UserType.System.getId() );
 
             // assign to admin user
             assignUserRole( admin, role );
@@ -262,7 +262,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private CallbackHandler getCalbackHandler( final String userName, final String password )
+    private CallbackHandler getCallbackHandler( final String userName, final String password )
     {
 
         return new CallbackHandler()
@@ -322,7 +322,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
             Session userSession = null;
 
-            CallbackHandler ch = getCalbackHandler( userName, password );
+            CallbackHandler ch = getCallbackHandler( userName, password );
             Subject subject = new Subject();
             LoginContext loginContext = new LoginContext( "karaf", subject, ch );
             loginContext.login();
@@ -1519,8 +1519,8 @@ public class IdentityManagerImpl implements IdentityManager
             throw new IllegalArgumentException( "User name cannot be shorter than 4 characters." );
         }
 
-        if ( TOKEN_ID.equalsIgnoreCase( userName ) || ADMIN_USERNAME.equalsIgnoreCase( userName ) || "authmessage"
-                .equalsIgnoreCase( userName ) || SYSTEM_USERNAME.equalsIgnoreCase( userName ) )
+        if ( TOKEN_ID.equalsIgnoreCase( userName ) || "administrator".equalsIgnoreCase( userName ) || "authmessage"
+                .equalsIgnoreCase( userName ) || "system".equalsIgnoreCase( userName ) )
         {
             throw new IllegalArgumentException( "User name is reserved by the system." );
         }
