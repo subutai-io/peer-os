@@ -893,7 +893,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         PGPPublicKeyRing containerPub = securityManager.getKeyManager().getPublicKeyRing( containerId );
 
         PGPPublicKeyRing signedKey =
-                securityManager.getKeyManager().setKeyTrust( pekSecKeyRing, containerPub, KeyTrustLevel.Full.getId() );
+                securityManager.getKeyManager().setKeyTrust( pekSecKeyRing, containerPub, KeyTrustLevel.FULL.getId() );
 
         securityManager.getKeyManager().updatePublicKeyRing( signedKey );
     }
@@ -1730,10 +1730,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
 
                 //***************Save Keys *********************************************************
-                keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
-                keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
+                keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PEER_ENVIRONMENT_KEY.getId(), secRing );
+                keyManager.savePublicKeyRing( pairId, SecurityKeyType.PEER_ENVIRONMENT_KEY.getId(), pubRing );
 
-                pubRing = keyManager.setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+                pubRing = keyManager.setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.FULL.getId() );
 
                 return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
                         encTool.armorByteArrayToString( pubRing.getEncoded() ) );
@@ -1771,7 +1771,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         RelationLink source;
         User activeUser = identityManager.getActiveUser();
-        if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
+        if ( activeUser == null || activeUser.getType() == UserType.SYSTEM.getId() )
         {
             // Most probably it is remote container, so owner will be localPeer
             source = this;
@@ -1810,7 +1810,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             @Override
             public String getContext()
             {
-                return PermissionObject.EnvironmentManagement.getName();
+                return PermissionObject.ENVIRONMENT_MANAGEMENT.getName();
             }
 
 
@@ -1907,7 +1907,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             RelationLink source;
             String keyId;
             User activeUser = identityManager.getActiveUser();
-            if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
+            if ( activeUser == null || activeUser.getType() == UserType.SYSTEM.getId() )
             {
                 // Most probably it is cross peer environment
                 source = this;
@@ -1959,7 +1959,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( keyId );
         Preconditions.checkNotNull( pubRing );
 
-        securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
+        securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.PEER_ENVIRONMENT_KEY
+                .getId(), pubRing );
 
         // Build relation between LocalPeer => RemotePeer => Environment
         // for message encryption/decryption mechanism described in relation traits
@@ -2981,7 +2982,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public String getContext()
     {
-        return PermissionObject.PeerManagement.getName();
+        return PermissionObject.PEER_MANAGEMENT.getName();
     }
 
 

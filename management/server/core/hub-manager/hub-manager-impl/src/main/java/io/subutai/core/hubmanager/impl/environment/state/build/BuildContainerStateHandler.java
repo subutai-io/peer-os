@@ -87,7 +87,7 @@ public class BuildContainerStateHandler extends StateHandler
     {
         RelationLinkDto envLink =
                 new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
-                        PermissionObject.EnvironmentManagement.getName(), peerDto.getEnvironmentInfo().getId() );
+                        PermissionObject.ENVIRONMENT_MANAGEMENT.getName(), peerDto.getEnvironmentInfo().getId() );
 
         ctx.localPeer.createPeerEnvironmentKeyPair( envLink );
     }

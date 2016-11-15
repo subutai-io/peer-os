@@ -114,7 +114,7 @@ public class UserDelegateEntity implements UserDelegate
     @Override
     public String getContext()
     {
-        return PermissionObject.IdentityManagement.getName();
+        return PermissionObject.IDENTITY_MANAGEMENT.getName();
     }
 
 

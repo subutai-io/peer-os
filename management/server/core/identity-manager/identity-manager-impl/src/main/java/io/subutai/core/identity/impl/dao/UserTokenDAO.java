@@ -76,7 +76,7 @@ class UserTokenDAO
             {
                 Date curDate = new Date( System.currentTimeMillis() );
 
-                if ( result.getType() == TokenType.Session.getId() && !result.getValidDate().after( curDate ) )
+                if ( result.getType() == TokenType.SESSION.getId() && !result.getValidDate().after( curDate ) )
                 {
                     return null;
                 }
@@ -102,7 +102,7 @@ class UserTokenDAO
             daoManager.startTransaction( em );
             Query query = em.createQuery(
                     "delete from UserTokenEntity ut where ut.type=:Type and ut.validDate<:CurrentDate" );
-            query.setParameter( "Type", TokenType.Session.getId() );
+            query.setParameter( "Type", TokenType.SESSION.getId() );
             query.setParameter( "CurrentDate", new Date( System.currentTimeMillis() ) );
             query.executeUpdate();
             daoManager.commitTransaction( em );
@@ -198,7 +198,7 @@ class UserTokenDAO
     /* *************************************************
      *
      */
-    public void update( final UserToken item )
+    void update( final UserToken item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try

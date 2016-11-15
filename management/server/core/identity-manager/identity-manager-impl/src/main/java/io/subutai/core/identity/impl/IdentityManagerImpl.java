@@ -154,29 +154,29 @@ public class IdentityManagerImpl implements IdentityManager
 
             // create system user
             User internal =
-                    createUser( SYSTEM_USERNAME, "", SYSTEM_USER_FULL_NAME, SYSTEM_USER_EMAIL, UserType.System.getId(),
-                            KeyTrustLevel.Full.getId(), false, false );
+                    createUser( SYSTEM_USERNAME, "", SYSTEM_USER_FULL_NAME, SYSTEM_USER_EMAIL, UserType.SYSTEM.getId(),
+                            KeyTrustLevel.FULL.getId(), false, false );
 
             // create admin user
             User admin = createUser( ADMIN_USERNAME, ADMIN_DEFAULT_PWD, ADMIN_FULL_NAME, ADMIN_EMAIL,
-                    UserType.Regular.getId(), KeyTrustLevel.Full.getId(), true, true );
+                    UserType.REGULAR.getId(), KeyTrustLevel.FULL.getId(), true, true );
 
             // create system token
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), null );
+            createUserToken( internal, "", "", "", TokenType.PERMANENT.getId(), null );
 
             // create karaf mgr role
-            role = createRole( KARAF_MANAGER_ROLE, UserType.System.getId() );
+            role = createRole( KARAF_MANAGER_ROLE, UserType.SYSTEM.getId() );
 
             // assign to admin user
             assignUserRole( admin, role );
 
-            per = createPermission( PermissionObject.KarafServerAdministration.getId(),
+            per = createPermission( PermissionObject.KARAF_SERVER_ADMINISTRATION.getId(),
                     PermissionScope.ALL_SCOPE.getId(), true, true, true, true );
 
             assignRolePermission( role, per );
 
             // create admin role
-            role = createRole( ADMIN_FULL_NAME, UserType.System.getId() );
+            role = createRole( ADMIN_FULL_NAME, UserType.SYSTEM.getId() );
 
             // assign to admin user
             assignUserRole( admin, role );
@@ -188,20 +188,20 @@ public class IdentityManagerImpl implements IdentityManager
             }
 
             // Create Peer Mgr role
-            role = createRole( PEER_MANAGER_ROLE, UserType.System.getId() );
+            role = createRole( PEER_MANAGER_ROLE, UserType.SYSTEM.getId() );
 
-            per = createPermission( PermissionObject.PeerManagement.getId(), PermissionScope.ALL_SCOPE.getId(), true,
+            per = createPermission( PermissionObject.PEER_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(), true,
                     true, true, true );
             assignRolePermission( role, per );
 
-            per = createPermission( PermissionObject.ResourceManagement.getId(), PermissionScope.ALL_SCOPE.getId(),
+            per = createPermission( PermissionObject.RESOURCE_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
                     true, true, true, true );
 
             assignRolePermission( role, per );
             //            for ( final PermissionObject aPermsp : permsp )
             //            {
-            //                if ( aPermsp == PermissionObject.PeerManagement || aPermsp == PermissionObject
-            // .ResourceManagement )
+            //                if ( aPermsp == PermissionObject.PEER_MANAGEMENT || aPermsp == PermissionObject
+            // .RESOURCE_MANAGEMENT )
             //                {
             //                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true,
             // true, true,
@@ -211,19 +211,19 @@ public class IdentityManagerImpl implements IdentityManager
             //            }
 
             // Create Env Mgr Role
-            role = createRole( ENV_MANAGER_ROLE, UserType.System.getId() );
+            role = createRole( ENV_MANAGER_ROLE, UserType.SYSTEM.getId() );
 
-            per = createPermission( PermissionObject.EnvironmentManagement.getId(), PermissionScope.ALL_SCOPE.getId(),
+            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
                     true, true, true, true );
 
             assignRolePermission( role, per );
 
             //            for ( final PermissionObject aPermsp : permsp )
             //            {
-            //                if ( aPermsp != PermissionObject.IdentityManagement
-            //                        && aPermsp != PermissionObject.KarafServerAdministration
-            //                        && aPermsp != PermissionObject.PeerManagement
-            //                        && aPermsp != PermissionObject.ResourceManagement )
+            //                if ( aPermsp != PermissionObject.IDENTITY_MANAGEMENT
+            //                        && aPermsp != PermissionObject.KARAF_SERVER_ADMINISTRATION
+            //                        && aPermsp != PermissionObject.PEER_MANAGEMENT
+            //                        && aPermsp != PermissionObject.RESOURCE_MANAGEMENT )
             //                {
             //                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true,
             // true, true, true );
@@ -232,13 +232,13 @@ public class IdentityManagerImpl implements IdentityManager
             //            }
 
             // Create System Role
-            role = createRole( SYSTEM_ROLE, UserType.System.getId() );
+            role = createRole( SYSTEM_ROLE, UserType.SYSTEM.getId() );
             assignUserRole( internal, role );
 
             for ( final PermissionObject aPermsp : permsp )
             {
-                if ( aPermsp != PermissionObject.IdentityManagement
-                        && aPermsp != PermissionObject.KarafServerAdministration )
+                if ( aPermsp != PermissionObject.IDENTITY_MANAGEMENT
+                        && aPermsp != PermissionObject.KARAF_SERVER_ADMINISTRATION )
                 {
                     per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true, true, true,
                             true );
@@ -491,15 +491,15 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( userToken == null )
             {
-                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                userToken = createUserToken( user, "", "", "", TokenType.SESSION.getId(), null );
             }
             else
             {
-                if ( userToken.getType() == TokenType.Session.getId() )
+                if ( userToken.getType() == TokenType.SESSION.getId() )
                 {
                     removeUserToken( userToken.getTokenId() );
 
-                    userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                    userToken = createUserToken( user, "", "", "", TokenType.SESSION.getId(), null );
                 }
             }
 
@@ -724,7 +724,7 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 String pswHash = SecurityUtil.generateSecurePassword( password, user.getSalt() );
 
-                if ( !pswHash.equals( user.getPassword() ) || user.getStatus() == UserStatus.Disabled.getId() )
+                if ( !pswHash.equals( user.getPassword() ) || user.getStatus() == UserStatus.DISABLED.getId() )
                 {
                     throw new InvalidLoginException( "***** Invalid Login for user:" + userName );
                 }
@@ -868,7 +868,7 @@ public class IdentityManagerImpl implements IdentityManager
                 user.setSecurityKeyId( secId );
             }
             publicKeyASCII = publicKeyASCII.trim();
-            securityManager.getKeyManager().savePublicKeyRing( secId, SecurityKeyType.UserKey.getId(), publicKeyASCII );
+            securityManager.getKeyManager().savePublicKeyRing( secId, SecurityKeyType.USER_KEY.getId(), publicKeyASCII );
             user.setFingerprint( securityManager.getKeyManager().getFingerprint( secId ) );
             identityDataService.updateUser( user );
         }
@@ -1140,7 +1140,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( genKeyPair )
         {
-            generateKeyPair( id, SecurityKeyType.UserKey.getId() );
+            generateKeyPair( id, SecurityKeyType.USER_KEY.getId() );
         }
 
         return userDelegate;
@@ -1189,7 +1189,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( keyManager.getPrivateKey( delegatedUser.getId() ) == null )
             {
-                generateKeyPair( delegatedUser.getId(), SecurityKeyType.UserKey.getId() );
+                generateKeyPair( delegatedUser.getId(), SecurityKeyType.USER_KEY.getId() );
             }
 
             assert relationManager != null;
@@ -1285,7 +1285,7 @@ public class IdentityManagerImpl implements IdentityManager
             if ( generateKeyPair )
             {
                 String securityKeyId = user.getId() + "-" + UUID.randomUUID();
-                generateKeyPair( securityKeyId, SecurityKeyType.UserKey.getId() );
+                generateKeyPair( securityKeyId, SecurityKeyType.USER_KEY.getId() );
                 user.setSecurityKeyId( securityKeyId );
                 identityDataService.updateUser( user );
             }
@@ -1323,7 +1323,7 @@ public class IdentityManagerImpl implements IdentityManager
     public User modifyUser( User user, String password ) throws SystemSecurityException
     {
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1425,7 +1425,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1465,7 +1465,7 @@ public class IdentityManagerImpl implements IdentityManager
     public void updateUser( User user )
     {
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1482,7 +1482,7 @@ public class IdentityManagerImpl implements IdentityManager
     public void updateUser( User user, String publicKey )
     {
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1500,7 +1500,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         //******Cannot remove Internal User *************
         User user = identityDataService.getUser( userId );
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be removed" );
         }
@@ -1581,13 +1581,13 @@ public class IdentityManagerImpl implements IdentityManager
                 {
                     switch ( permOp )
                     {
-                        case Read:
+                        case READ:
                             return permission.isRead();
-                        case Write:
+                        case WRITE:
                             return permission.isWrite();
-                        case Update:
+                        case UPDATE:
                             return permission.isUpdate();
-                        case Delete:
+                        case DELETE:
                             return permission.isDelete();
                         default:
                             // no-op
@@ -1649,7 +1649,7 @@ public class IdentityManagerImpl implements IdentityManager
     public void updateRole( Role role )
     {
         //******Cannot update Internal Role *************
-        if ( role.getType() == UserType.System.getId() )
+        if ( role.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal Role cannot be updated" );
         }
@@ -1673,7 +1673,7 @@ public class IdentityManagerImpl implements IdentityManager
         //******Cannot remove Internal Role *************
         Role role = identityDataService.getRole( roleId );
 
-        if ( role.getType() == UserType.System.getId() )
+        if ( role.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal Role cannot be removed" );
         }

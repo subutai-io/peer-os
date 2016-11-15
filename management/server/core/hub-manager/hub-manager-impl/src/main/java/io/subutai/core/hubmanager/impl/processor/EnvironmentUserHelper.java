@@ -164,7 +164,7 @@ public class EnvironmentUserHelper
         try
         {
             User user = identityManager.createUser( userDto.getFingerprint(), null, "[Hub] " + userDto.getName(), email,
-                    UserType.Regular.getId(), KeyTrustLevel.Marginal.getId(), false, true );
+                    UserType.REGULAR.getId(), KeyTrustLevel.MARGINAL.getId(), false, true );
 
             identityManager.setUserPublicKey( user.getId(), userDto.getPublicKey() );
             identityManager.assignUserRole( user, getRole( "Environment-Manager" ) );

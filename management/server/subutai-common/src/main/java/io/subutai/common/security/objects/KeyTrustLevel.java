@@ -6,10 +6,10 @@ package io.subutai.common.security.objects;
  */
 public enum KeyTrustLevel
 {
-    Never( 1, "Never Trust" ),
-    Marginal( 2, "Marginal" ),
-    Full( 3, "Full" ),
-    Ultimate( 4, "Ultimate Trust" );
+    NEVER( 1, "Never Trust" ),
+    MARGINAL( 2, "Marginal" ),
+    FULL( 3, "Full" ),
+    ULTIMATE( 4, "Ultimate Trust" );
 
     private String name;
     private int id;

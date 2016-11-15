@@ -70,8 +70,8 @@ public class PluginDataService
     //**********************************************
     private boolean checkActiveUser( User user )
     {
-        return identityManager.isUserPermitted( user, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
-                PermissionOperation.Read );
+        return identityManager.isUserPermitted( user, PermissionObject.ENVIRONMENT_MANAGEMENT, PermissionScope.ALL_SCOPE,
+                PermissionOperation.READ );
     }
     //**********************************************
 

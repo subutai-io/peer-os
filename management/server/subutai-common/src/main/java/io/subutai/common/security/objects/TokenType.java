@@ -6,8 +6,8 @@ package io.subutai.common.security.objects;
  */
 public enum TokenType
 {
-    Session(1,"Session"),
-    Permanent(2,"Permanent");
+    SESSION(1,"Session"),
+    PERMANENT(2,"Permanent");
 
     private String name;
     private int id;

@@ -159,7 +159,7 @@ public class PermissionEntity implements Permission
     {
         List<String> perms = new ArrayList<>();
 
-        if ( PermissionObject.values()[object - 1] == PermissionObject.KarafServerAdministration )
+        if ( PermissionObject.values()[object - 1] == PermissionObject.KARAF_SERVER_ADMINISTRATION )
         {
             perms.add( "admin" );
             perms.add( "manager" );

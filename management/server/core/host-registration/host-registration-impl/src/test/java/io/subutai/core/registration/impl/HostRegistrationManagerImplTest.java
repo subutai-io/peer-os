@@ -216,12 +216,12 @@ public class HostRegistrationManagerImplTest
         registrationManager.verifyToken( "token", "id", TestHelper.PGP_PUBLIC_KEY );
 
         verify( keyManager )
-                .savePublicKeyRing( "id", SecurityKeyType.ContainerHostKey.getId(), TestHelper.PGP_PUBLIC_KEY );
+                .savePublicKeyRing( "id", SecurityKeyType.CONTAINER_HOST_KEY.getId(), TestHelper.PGP_PUBLIC_KEY );
 
         //-----
 
         doThrow( new RuntimeException() ).when( keyManager )
-                                         .savePublicKeyRing( "id", SecurityKeyType.ContainerHostKey.getId(),
+                                         .savePublicKeyRing( "id", SecurityKeyType.CONTAINER_HOST_KEY.getId(),
                                                  TestHelper.PGP_PUBLIC_KEY );
 
         try
@@ -278,7 +278,7 @@ public class HostRegistrationManagerImplTest
     {
         registrationManager.importHostPublicKey( "id", "key", false );
 
-        verify( keyManager ).savePublicKeyRing( "id", SecurityKeyType.ContainerHostKey.getId(), "key" );
+        verify( keyManager ).savePublicKeyRing( "id", SecurityKeyType.CONTAINER_HOST_KEY.getId(), "key" );
     }
 
 

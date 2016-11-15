@@ -1320,8 +1320,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             PGPPublicKeyRing pubRing = pgpKeyUtil.getPublicKeyRing( keyPair.getPubKeyring() );
 
             //***************Save Keys *********************************************************
-            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), secRing );
-            keyManager.savePublicKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), pubRing );
+            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.ENVIRONMENT_KEY.getId(), secRing );
+            keyManager.savePublicKeyRing( pairId, SecurityKeyType.ENVIRONMENT_KEY.getId(), pubRing );
 
 
             return secRing;

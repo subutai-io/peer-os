@@ -698,7 +698,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public String getContext()
     {
-        return PermissionObject.EnvironmentManagement.getName();
+        return PermissionObject.ENVIRONMENT_MANAGEMENT.getName();
     }
 
 

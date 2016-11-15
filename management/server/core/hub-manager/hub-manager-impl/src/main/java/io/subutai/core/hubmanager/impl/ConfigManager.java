@@ -150,7 +150,7 @@ public class ConfigManager
 
         User user = identityManager.getActiveUser();
 
-        return identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), null );
+        return identityManager.createUserToken( user, null, null, null, TokenType.PERMANENT.getId(), null );
     }
 
 

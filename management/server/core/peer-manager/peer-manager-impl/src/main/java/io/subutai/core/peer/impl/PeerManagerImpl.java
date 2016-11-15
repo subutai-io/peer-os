@@ -271,7 +271,7 @@ public class PeerManagerImpl implements PeerManager
             Encrypted encryptedPublicKey = registrationData.getPublicKey();
             String publicKey = encryptedPublicKey.decrypt( key, String.class );
             securityManager.getKeyManager()
-                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), SecurityKeyType.PeerKey.getId(),
+                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), SecurityKeyType.PEER_KEY.getId(),
                                    publicKey );
         }
         catch ( GeneralSecurityException e )
@@ -298,7 +298,7 @@ public class PeerManagerImpl implements PeerManager
             User user = identityManager.getActiveUser();
 
             UserToken userToken =
-                    identityManager.createUserToken( user, "", "", "", TokenType.Permanent.getId(), null );
+                    identityManager.createUserToken( user, "", "", "", TokenType.PERMANENT.getId(), null );
 
             return userToken.getFullToken();
         }
