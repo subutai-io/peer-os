@@ -61,15 +61,9 @@ public class RestServiceImpl implements RestService
         {
             List<User> users = identityManager.getAllUsers();
 
-            /*
-            for(User user:users)
-            {
-                user.setUserName( StringUtil.escapeHTML( user.getUserName() ));
-                user.setFullName( StringUtil.escapeHTML( user.getFullName() ));
-            }*/
-
-            return Response.ok( jsonUtil.to( users.stream().filter( user -> user.getType() != UserType.SYSTEM.getId() )
-                                                  .collect( Collectors.toList() ) ) ).build();
+            return Response.ok( jsonUtil.to( users.stream().filter(
+                    user -> user.getType() != UserType.SYSTEM.getId() && !IdentityManager.ADMIN_USERNAME
+                            .equals( user.getUserName() ) ).collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -375,13 +369,6 @@ public class RestServiceImpl implements RestService
         try
         {
             List<Role> roles = identityManager.getAllRoles();
-
-            /*
-            for(Role role:roles)
-            {
-                role.setName( StringUtil.escapeHtml( role.getName() ));
-            }
-            */
 
             return Response.ok( jsonUtil.to( roles.stream().filter( role -> role.getType() != UserType.SYSTEM.getId() )
                                                   .collect( Collectors.toList() ) ) ).build();

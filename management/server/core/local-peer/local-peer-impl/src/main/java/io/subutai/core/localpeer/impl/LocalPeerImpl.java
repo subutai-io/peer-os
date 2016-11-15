@@ -1959,8 +1959,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( keyId );
         Preconditions.checkNotNull( pubRing );
 
-        securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.PEER_ENVIRONMENT_KEY
-                .getId(), pubRing );
+        securityManager.getKeyManager()
+                       .savePublicKeyRing( keyId, SecurityKeyType.PEER_ENVIRONMENT_KEY.getId(), pubRing );
 
         // Build relation between LocalPeer => RemotePeer => Environment
         // for message encryption/decryption mechanism described in relation traits

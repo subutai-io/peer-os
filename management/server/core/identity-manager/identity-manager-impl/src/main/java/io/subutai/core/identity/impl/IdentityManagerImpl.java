@@ -163,7 +163,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             // create admin user
             User admin = createUser( ADMIN_USERNAME, ADMIN_DEFAULT_PWD, ADMIN_USER_FULL_NAME, ADMIN_EMAIL,
-                    UserType.SYSTEM.getId(), KeyTrustLevel.FULL.getId(), true, true );
+                    UserType.REGULAR.getId(), KeyTrustLevel.FULL.getId(), true, true );
 
             // create system token
             createUserToken( internal, "", "", "", TokenType.PERMANENT.getId(), null );
@@ -1417,7 +1417,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.SYSTEM.getId() && !ADMIN_USERNAME.equals( user.getUserName() ) )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
