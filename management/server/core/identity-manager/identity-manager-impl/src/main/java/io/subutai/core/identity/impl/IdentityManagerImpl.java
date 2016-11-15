@@ -238,7 +238,8 @@ public class IdentityManagerImpl implements IdentityManager
             for ( final PermissionObject aPermsp : permsp )
             {
                 if ( aPermsp != PermissionObject.IDENTITY_MANAGEMENT
-                        && aPermsp != PermissionObject.KARAF_SERVER_ADMINISTRATION )
+                        && aPermsp != PermissionObject.KARAF_SERVER_ADMINISTRATION
+                        && aPermsp != PermissionObject.TENANT_MANAGEMENT )
                 {
                     per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true, true, true,
                             true );
@@ -868,7 +869,8 @@ public class IdentityManagerImpl implements IdentityManager
                 user.setSecurityKeyId( secId );
             }
             publicKeyASCII = publicKeyASCII.trim();
-            securityManager.getKeyManager().savePublicKeyRing( secId, SecurityKeyType.USER_KEY.getId(), publicKeyASCII );
+            securityManager.getKeyManager()
+                           .savePublicKeyRing( secId, SecurityKeyType.USER_KEY.getId(), publicKeyASCII );
             user.setFingerprint( securityManager.getKeyManager().getFingerprint( secId ) );
             identityDataService.updateUser( user );
         }

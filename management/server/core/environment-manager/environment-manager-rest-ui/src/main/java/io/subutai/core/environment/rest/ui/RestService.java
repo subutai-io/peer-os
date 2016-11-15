@@ -27,13 +27,16 @@ public interface RestService
     Response listTemplates();
 
 
-
-
     /** Environments **************************************************** */
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listEnvironments();
+
+    @GET
+    @Path( "tenants" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response listTenantEnvironments();
 
     @POST
     @Path( "build" )

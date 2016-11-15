@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
-
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
@@ -26,6 +24,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
+import io.subutai.core.environment.api.dto.EnvironmentDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -33,6 +32,13 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 
 public interface EnvironmentManager
 {
+
+    /**
+     * Returns a set of DTO objects of all local environments
+     * Used by users with Tenant-Management role
+     */
+    Set<EnvironmentDto> getTenantEnvironments();
+
 
     /**
      * Returns all existing environments
@@ -44,7 +50,6 @@ public interface EnvironmentManager
     Set<Environment> getEnvironmentsByOwnerId( long userId );
 
 
-    @RolesAllowed( "Environment-Management|Write" )
     EnvironmentCreationRef createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
     //used in plugins, kept for backward compatibility
@@ -52,7 +57,6 @@ public interface EnvironmentManager
                                                    final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
-    @RolesAllowed( "Environment-Management|Write" )
     EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology, List<String> removedContainers,
                                               Map<String, ContainerSize> changedContainers, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;

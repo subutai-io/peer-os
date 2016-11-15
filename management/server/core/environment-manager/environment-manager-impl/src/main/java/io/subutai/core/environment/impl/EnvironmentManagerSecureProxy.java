@@ -54,6 +54,7 @@ import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
+import io.subutai.core.environment.api.dto.EnvironmentDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -73,6 +74,7 @@ import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
+@PermitAll
 public class EnvironmentManagerSecureProxy
         implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, HubEventListener
 {
@@ -254,6 +256,7 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Write" )
     public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
@@ -361,7 +364,7 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    @RolesAllowed( "Environment-Management|Delete" )
+    @RolesAllowed( { "Environment-Management|Delete", "Tenant-Management|Delete" } )
     public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
@@ -840,8 +843,16 @@ public class EnvironmentManagerSecureProxy
     }
 
 
+    @Override
+    @RolesAllowed( "Tenant-Management|Read" )
+    public Set<EnvironmentDto> getTenantEnvironments()
+    {
+        return environmentManager.getTenantEnvironments();
+    }
+
+
     /* *************************************************
-     */
+         */
     private String validateInput( String inputStr, boolean removeSpaces )
     {
         return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
