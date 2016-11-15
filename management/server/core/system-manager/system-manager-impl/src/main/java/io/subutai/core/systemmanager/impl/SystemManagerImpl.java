@@ -4,6 +4,8 @@ package io.subutai.core.systemmanager.impl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -26,6 +29,9 @@ import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
+import io.subutai.core.systemmanager.api.pojo.UpdateDto;
+import io.subutai.core.systemmanager.impl.dao.UpdateDao;
+import io.subutai.core.systemmanager.impl.entity.UpdateEntity;
 import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
@@ -38,8 +44,10 @@ public class SystemManagerImpl implements SystemManager
 
     private IdentityManager identityManager;
     private PeerManager peerManager;
+    private DaoManager daoManager;
+    private UpdateDao updateDao;
 
-    protected SystemSettings systemSettings;
+    private SystemSettings systemSettings;
 
 
     public SystemManagerImpl()
@@ -48,7 +56,7 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    protected SystemSettings getSystemSettings()
+    private SystemSettings getSystemSettings()
     {
         return new SystemSettings();
     }
@@ -206,16 +214,68 @@ public class SystemManagerImpl implements SystemManager
         {
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
+            UpdateEntity updateEntity = new UpdateEntity( SubutaiInfo.getVersion(), SubutaiInfo.getCommitId() );
+
+            updateDao.persist( updateEntity );
+
             host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
+
+            updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
+
+            updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
+
+            updateDao.update( updateEntity );
 
             return true;
         }
-        catch ( HostNotFoundException | CommandException e )
+        catch ( Exception e )
         {
             LOG.warn( e.getMessage() );
 
             return false;
         }
+    }
+
+
+    public void init()
+    {
+        this.updateDao = new UpdateDao( daoManager.getEntityManagerFactory() );
+
+        UpdateEntity updateEntity = updateDao.getLast();
+
+        if ( updateEntity != null && updateEntity.getCurrentVersion() == null )
+        {
+            updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
+
+            updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
+
+            updateDao.update( updateEntity );
+        }
+    }
+
+
+    @Override
+    public List<UpdateDto> getUpdates()
+    {
+        List<UpdateDto> updateDtos = new ArrayList<>();
+
+        List<UpdateEntity> updateEntities = updateDao.getLast( 20 );
+
+        for ( UpdateEntity updateEntity : updateEntities )
+        {
+            updateDtos.add( new UpdateDto( updateEntity.getUpdateDate(), updateEntity.getPrevVersion(),
+                    updateEntity.getCurrentVersion(), updateEntity.getPrevCommitId(),
+                    updateEntity.getCurrentCommitId() ) );
+        }
+
+
+        return updateDtos;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
     }
 
 
