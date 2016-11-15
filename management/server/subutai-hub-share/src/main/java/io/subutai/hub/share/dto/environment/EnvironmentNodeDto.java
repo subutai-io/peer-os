@@ -4,9 +4,10 @@ package io.subutai.hub.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EnvironmentNodeDto
 {
     private String hostId;
@@ -37,16 +38,16 @@ public class EnvironmentNodeDto
 
     private int ipAddressOffset;
 
-//    @JsonIgnore
+
     private String containerListenPort;
 
-//    @JsonIgnore
+
     private String hostListenPort;
 
-//    @JsonIgnore
+
     private String protocol;
 
-//    @JsonIgnore
+
     private String domain;
 
 

@@ -1,8 +1,11 @@
 package io.subutai.core.hubmanager.impl.environment.state.change;
 
 
+import org.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
@@ -11,6 +14,8 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.impl.tunnel.TunnelHelper;
+import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
@@ -46,10 +51,24 @@ public class DomainStateHandler extends StateHandler
         {
             logStart();
 
+            boolean isAddedToDmain = false;
+
+            ResourceHost resourceHost = ctx.localPeer.getResourceHosts().iterator().next();
+
             EnvironmentDto envDto =
                     ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
             EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+
+
+            resourceHost.execute( new RequestBuilder( "systemctl restart *nginx*" ) );
+
+            if ( env.getVEHS() != null && !env.getVEHS().isEmpty() )
+            {
+                resourceHost = ctx.localPeer.getResourceHosts().iterator().next();
+                createTunnel( resourceHost, env );
+                return peerDto;
+            }
 
             if ( StringUtils.isNotEmpty( env.getDomainName() ) )
             {
@@ -72,7 +91,6 @@ public class DomainStateHandler extends StateHandler
                             .setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
                 }
 
-                ResourceHost resourceHost = ctx.localPeer.getResourceHosts().iterator().next();
 
                 for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
                 {
@@ -80,34 +98,40 @@ public class DomainStateHandler extends StateHandler
                     {
                         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
                         {
-                            try
+
+                            if ( !isAddedToDmain )
                             {
-                                String ip = nodeDto.getIp().replace( "/24", "" );
-                                int vlan =
-                                        ctx.localPeer.getReservedNetworkResources().findByVni( env.getVni() ).getVlan();
+                                try
+                                {
+                                    String ip = nodeDto.getIp().replace( "/24", "" );
+                                    int vlan = ctx.localPeer.getReservedNetworkResources().findByVni( env.getVni() )
+                                                            .getVlan();
 
-                                String hostListenPort = nodeDto.getHostListenPort();
-                                String containerListenPort = nodeDto.getContainerListenPort();
-                                String domain = nodeDto.getDomain();
+                                    String hostListenPort = nodeDto.getHostListenPort();
+                                    String containerListenPort = nodeDto.getContainerListenPort();
+                                    String domain = nodeDto.getDomain();
 
-                                String cmd = format( REVERSE_PROXY_PORT_MAPPING_CMD, hostListenPort, domain, ip,
-                                        containerListenPort, vlan );
+                                    String cmd = format( REVERSE_PROXY_PORT_MAPPING_CMD, hostListenPort, domain, ip,
+                                            containerListenPort, vlan );
 
-                                CommandResult commandResult = resourceHost.execute( new RequestBuilder( cmd ) );
+                                    CommandResult commandResult = resourceHost.execute( new RequestBuilder( cmd ) );
 
-                                resourceHost.execute( new RequestBuilder( "systemctl restart *nginx*" ) );
 
-                                log.info( commandResult.getStdOut() );
-                                //                                if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni
-                                // () ) )
-                                //                                {
-                                //                                    ctx.localPeer.addIpToVniDomain( ip, env.getVni
-                                // () );
-                                //                                }
-                            }
-                            catch ( Exception e )
-                            {
-                                log.error( "Could not add container IP to domain: " + nodeDto.getContainerName() );
+                                    resourceHost.execute( new RequestBuilder( "systemctl restart *nginx*" ) );
+
+                                    isAddedToDmain = true;
+                                    //                                if ( !ctx.localPeer.isIpInVniDomain( ip, env
+                                    // .getVni
+                                    // () ) )
+                                    //                                {
+                                    //                                    ctx.localPeer.addIpToVniDomain( ip, env.getVni
+                                    // () );
+                                    //                                }
+                                }
+                                catch ( Exception e )
+                                {
+                                    log.error( "Could not add container IP to domain: " + nodeDto.getContainerName() );
+                                }
                             }
                         }
                     }
@@ -126,6 +150,32 @@ public class DomainStateHandler extends StateHandler
         catch ( Exception e )
         {
             throw new HubManagerException( e );
+        }
+    }
+
+
+    private void createTunnel( final ResourceHost resourceHost, EnvironmentInfoDto env )
+    {
+
+        JSONObject dnsData = new JSONObject( env.getVEHS() );
+
+        dnsData.get( "ip" );
+        dnsData.get( "port" );
+
+        if ( resourceHost.isConnected() )
+        {
+            try
+            {
+                CommandResult commandResult = resourceHost.execute( new RequestBuilder(
+                        format( TunnelProcessor.CREATE_TUNNEL_COMMAND, dnsData.get( "ip" ), dnsData.get( "port" ),
+                                "" ) ) );
+
+                env.setVEHS( commandResult.getStdOut() );
+            }
+            catch ( CommandException e )
+            {
+                e.printStackTrace();
+            }
         }
     }
 
