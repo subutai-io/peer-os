@@ -1114,7 +1114,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public String getContext()
     {
-        return PermissionObject.ResourceManagement.getName();
+        return PermissionObject.RESOURCE_MANAGEMENT.getName();
     }
 
 

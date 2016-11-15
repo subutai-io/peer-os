@@ -150,7 +150,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
             else
             {
-                return identityManager.login( "token", sptoken );
+                return identityManager.login( IdentityManager.TOKEN_ID, sptoken );
             }
         }
     }

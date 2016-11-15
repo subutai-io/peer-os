@@ -1130,6 +1130,15 @@ var permissionsDefault = [
         'write': true,
         'update': true,
         'delete': true,
+    },
+    {
+     'object': 8,
+     'name': 'Tenant-Management',
+     'scope': 1,
+     'read': true,
+     'write': true,
+     'update': true,
+     'delete': true,
     }
 ];
 

@@ -259,7 +259,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager
         try
         {
             securityManager.getKeyManager()
-                           .savePublicKeyRing( containerHostId, SecurityKeyType.ContainerHostKey.getId(), publicKey );
+                           .savePublicKeyRing( containerHostId, SecurityKeyType.CONTAINER_HOST_KEY.getId(), publicKey );
         }
         catch ( Exception e )
         {
@@ -283,7 +283,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager
     {
         KeyManager keyManager = securityManager.getKeyManager();
         keyManager.savePublicKeyRing( hostId,
-                rh ? SecurityKeyType.ResourceHostKey.getId() : SecurityKeyType.ContainerHostKey.getId(), publicKey );
+                rh ? SecurityKeyType.RESOURCE_HOST_KEY.getId() : SecurityKeyType.CONTAINER_HOST_KEY.getId(), publicKey );
     }
 
 

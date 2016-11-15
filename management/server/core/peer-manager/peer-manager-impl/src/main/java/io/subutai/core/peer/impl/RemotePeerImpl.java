@@ -645,7 +645,7 @@ public class RemotePeerImpl implements RemotePeer
 
         // TODO: 6/23/16 it is not clear is relation built between container and real owner (user)
         // or container <> peer that hosts it.
-        if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
+        if ( activeUser == null || activeUser.getType() == UserType.SYSTEM.getId() )
         {
             // Since this container is hosted on remote peer owner will be remotePeer
             source = this;
@@ -684,7 +684,7 @@ public class RemotePeerImpl implements RemotePeer
             @Override
             public String getContext()
             {
-                return PermissionObject.EnvironmentManagement.getName();
+                return PermissionObject.ENVIRONMENT_MANAGEMENT.getName();
             }
 
 
@@ -721,7 +721,7 @@ public class RemotePeerImpl implements RemotePeer
             @Override
             public String getContext()
             {
-                return PermissionObject.PeerManagement.getName();
+                return PermissionObject.PEER_MANAGEMENT.getName();
             }
 
 
@@ -1071,7 +1071,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public String getContext()
     {
-        return PermissionObject.PeerManagement.getName();
+        return PermissionObject.PEER_MANAGEMENT.getName();
     }
 
 

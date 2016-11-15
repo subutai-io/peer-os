@@ -48,7 +48,7 @@ public class PeerEnvironmentKeyTask implements Callable<Object>
 
         PGPPublicKeyRing pubRing = getPublicKey( publicKeyContainer );
 
-        PGPPublicKeyRing signedPEK = keyManager.setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+        PGPPublicKeyRing signedPEK = keyManager.setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.FULL.getId() );
 
         peer.updatePeerEnvironmentPubKey( environment.getEnvironmentId(), signedPEK );
         peer.addPeerEnvironmentPubKey( localPeer.getId() + "_" + environment.getEnvironmentId().getId(),

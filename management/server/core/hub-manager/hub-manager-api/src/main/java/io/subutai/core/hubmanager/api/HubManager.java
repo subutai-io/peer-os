@@ -10,6 +10,8 @@ import io.subutai.hub.share.dto.SystemConfDto;
 
 public interface HubManager
 {
+    String HUB_EMAIL_SUFFIX = "@hub.subut.ai";
+
     void registerPeer( String hupIp, String email, String password, String peerName ) throws HubManagerException;
 
     void unregisterPeer() throws HubManagerException;

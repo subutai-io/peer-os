@@ -23,7 +23,6 @@ public interface Environment extends RelationLink
      */
     Long getUserId();
 
-    void removeEnvironmentPeer( String peerId );
 
     /**
      * Returns id of environment
@@ -131,7 +130,5 @@ public interface Environment extends RelationLink
 
     Set<EnvironmentAlertHandler> getAlertHandlers();
 
-    void addAlertHandler( EnvironmentAlertHandler environmentAlertHandler );
-
-    void removeAlertHandler( EnvironmentAlertHandler environmentAlertHandler );
+    Set<ContainerDto> getContainerDtos();
 }

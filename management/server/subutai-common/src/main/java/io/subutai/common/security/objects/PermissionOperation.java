@@ -6,10 +6,10 @@ package io.subutai.common.security.objects;
  */
 public enum PermissionOperation
 {
-    Read( 1, "Read" ),
-    Write( 2, "Write" ),
-    Update( 3, "Update" ),
-    Delete( 4, "Delete" );
+    READ( 1, "Read" ),
+    WRITE( 2, "Write" ),
+    UPDATE( 3, "Update" ),
+    DELETE( 4, "Delete" );
 
     private String name;
     private int id;
@@ -36,21 +36,21 @@ public enum PermissionOperation
 
     public static PermissionOperation getByName( String name )
     {
-        if ( PermissionOperation.Delete.getName().equals( name ) )
+        if ( PermissionOperation.DELETE.getName().equals( name ) )
         {
-            return PermissionOperation.Delete;
+            return PermissionOperation.DELETE;
         }
-        else if ( PermissionOperation.Read.getName().equals( name ) )
+        else if ( PermissionOperation.READ.getName().equals( name ) )
         {
-            return PermissionOperation.Read;
+            return PermissionOperation.READ;
         }
-        else if ( PermissionOperation.Update.getName().equals( name ) )
+        else if ( PermissionOperation.UPDATE.getName().equals( name ) )
         {
-            return PermissionOperation.Update;
+            return PermissionOperation.UPDATE;
         }
         else
         {
-            return PermissionOperation.Write;
+            return PermissionOperation.WRITE;
         }
     }
 }

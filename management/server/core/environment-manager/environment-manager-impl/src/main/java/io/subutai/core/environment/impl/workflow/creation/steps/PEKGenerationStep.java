@@ -66,7 +66,7 @@ public class PEKGenerationStep
             PGPPublicKeyRing pubRing = readPublicKeyRing( publicKeyContainer );
 
             localPeerSignedPEK =
-                    securityManager.getKeyManager().setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+                    securityManager.getKeyManager().setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.FULL.getId() );
 
             peerManager.getLocalPeer()
                        .updatePeerEnvironmentPubKey( environment.getEnvironmentId(), localPeerSignedPEK );

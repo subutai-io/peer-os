@@ -34,7 +34,7 @@ public class ExchangeInfoStateHandler extends StateHandler
             if ( token == null )
             {
                 token = ctx.identityManager
-                        .createUserToken( user, null, null, null, TokenType.Permanent.getId(), null );
+                        .createUserToken( user, null, null, null, TokenType.PERMANENT.getId(), null );
             }
             resultDto.setEnvOwnerToken( token.getFullToken() );
             resultDto.setEnvOwnerTokenId( user.getAuthId() );

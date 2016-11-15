@@ -23,6 +23,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -108,7 +109,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         String ip = json.get( "ipAddress" ).asText();
         String id = json.get( "id" ).asText();
 
-        HostInterfaceModel him = new HostInterfaceModel( "eth0", ip );
+        HostInterfaceModel him = new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, ip );
 
         Set<HostInterfaceModel> set = Sets.newHashSet();
         set.add( him );

@@ -967,6 +967,15 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response listTenantEnvironments()
+    {
+        Set<io.subutai.common.environment.EnvironmentDto> tenantEnvs = environmentManager.getTenantEnvironments();
+
+        return Response.ok( JsonUtil.toJson( tenantEnvs ) ).build();
+    }
+
+
     /** AUX **************************************************** */
 
     private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )

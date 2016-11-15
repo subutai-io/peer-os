@@ -87,7 +87,7 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            List<SecurityKey> peerKeyList = securityDataService.getKeyDataByType( SecurityKeyType.PeerKey.getId() );
+            List<SecurityKey> peerKeyList = securityDataService.getKeyDataByType( SecurityKeyType.PEER_KEY.getId() );
 
             if ( !CollectionUtil.isCollectionEmpty( peerKeyList ) )
             {
@@ -115,8 +115,8 @@ public class KeyManagerImpl implements KeyManager
                 keyData.setManHostId( peerId );
                 keyData.setSecretKeyringPwd( secretPwd );
 
-                saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerSecRing );
-                savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );
+                saveSecretKeyRing( peerId, SecurityKeyType.PEER_KEY.getId(), peerSecRing );
+                savePublicKeyRing( peerId, SecurityKeyType.PEER_KEY.getId(), peerPubRing );
             }
         }
         catch ( Exception ex )
@@ -230,10 +230,10 @@ public class KeyManagerImpl implements KeyManager
         {
             if ( keyTrust == null )
             {
-                keyTrust = saveKeyTrustData( sFingerprint, tFingerprint, KeyTrustLevel.Never.getId() );
+                keyTrust = saveKeyTrustData( sFingerprint, tFingerprint, KeyTrustLevel.NEVER.getId() );
             }
 
-            if ( trustLevel == KeyTrustLevel.Never.getId() )
+            if ( trustLevel == KeyTrustLevel.NEVER.getId() )
             {
                 //******************************************
                 targetPubRing = removeSignature( sourceSecRing.getPublicKey(), targetPubRing );
@@ -242,7 +242,7 @@ public class KeyManagerImpl implements KeyManager
             }
             else
             {
-                if ( keyTrust.getLevel() == KeyTrustLevel.Never.getId() )
+                if ( keyTrust.getLevel() == KeyTrustLevel.NEVER.getId() )
                 {
                     targetPubRing = signKey( sourceSecRing, targetPubRing, trustLevel );
                     updatePublicKeyRing( targetPubRing );
@@ -1086,7 +1086,7 @@ public class KeyManagerImpl implements KeyManager
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
                 {
                     String publicKeyring = response.readEntity( String.class );
-                    savePublicKeyRing( peerInfo.getId(), SecurityKeyType.PeerKey.getId(), publicKeyring );
+                    savePublicKeyRing( peerInfo.getId(), SecurityKeyType.PEER_KEY.getId(), publicKeyring );
                 }
 
                 RestUtil.close( response );
@@ -1211,7 +1211,7 @@ public class KeyManagerImpl implements KeyManager
         {
             return trustLevel;
         }
-        return KeyTrustLevel.Never.getId();
+        return KeyTrustLevel.NEVER.getId();
     }
 
 
@@ -1228,14 +1228,14 @@ public class KeyManagerImpl implements KeyManager
             // Before getting deeper into trust chain, check that next trust step is valid, otherwise stop looking
             // for any further connections. Another condition to eliminate infinite recursion by each next step
             // register id into simple fingerprints registry chainFingerprints
-            if ( sourceTrust.getLevel() != KeyTrustLevel.Never.getId() )
+            if ( sourceTrust.getLevel() != KeyTrustLevel.NEVER.getId() )
             {
                 // When looking for second iteration for chained trusts, concurrently pay attention to marginal trust
                 if ( chainFingerprints.contains( sourceTrust.getTargetFingerprint() ) )
                 {
                     if ( repeated )
                     {
-                        return KeyTrustLevel.Marginal.getId();
+                        return KeyTrustLevel.MARGINAL.getId();
                     }
                     continue;
                 }

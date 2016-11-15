@@ -1071,8 +1071,8 @@ public class EnvironmentManagerImplTest
 
         environmentManager.createEnvironmentKeyPair( TestHelper.ENVIRONMENT_ID );
 
-        verify( keyManager ).saveSecretKeyRing( TestHelper.ENV_ID, SecurityKeyType.EnvironmentKey.getId(), secRing );
-        verify( keyManager ).savePublicKeyRing( TestHelper.ENV_ID, SecurityKeyType.EnvironmentKey.getId(), pubRing );
+        verify( keyManager ).saveSecretKeyRing( TestHelper.ENV_ID, SecurityKeyType.ENVIRONMENT_KEY.getId(), secRing );
+        verify( keyManager ).savePublicKeyRing( TestHelper.ENV_ID, SecurityKeyType.ENVIRONMENT_KEY.getId(), pubRing );
     }
 
 

@@ -1,12 +1,10 @@
-package io.subutai.core.environment.api.dto;
+package io.subutai.common.environment;
 
 
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.subutai.common.environment.EnvironmentStatus;
 
 
 public class EnvironmentDto

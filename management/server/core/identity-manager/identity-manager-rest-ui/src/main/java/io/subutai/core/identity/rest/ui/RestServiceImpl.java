@@ -61,15 +61,9 @@ public class RestServiceImpl implements RestService
         {
             List<User> users = identityManager.getAllUsers();
 
-            /*
-            for(User user:users)
-            {
-                user.setUserName( StringUtil.escapeHTML( user.getUserName() ));
-                user.setFullName( StringUtil.escapeHTML( user.getFullName() ));
-            }*/
-
-            return Response.ok( jsonUtil.to( users.stream().filter( user -> user.getType() != UserType.System.getId() )
-                                                           .collect( Collectors.toList() ) ) ).build();
+            return Response.ok( jsonUtil.to( users.stream().filter(
+                    user -> user.getType() != UserType.SYSTEM.getId() && !IdentityManager.ADMIN_USERNAME
+                            .equals( user.getUserName() ) ).collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -201,14 +195,15 @@ public class RestServiceImpl implements RestService
             {
 
 
-                if ( username.toLowerCase().indexOf( "sys" ) == 0 || username.toLowerCase().indexOf( "admin" ) == 0 )
+                if ( username.toLowerCase().indexOf( IdentityManager.SYSTEM_USERNAME ) == 0
+                        || username.toLowerCase().indexOf( IdentityManager.ADMIN_USERNAME ) == 0 )
                 {
                     LOGGER.warn( "#saveUser forbidden, username is reserved" );
                     return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
                                    .entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();
                 }
 
-                newUser = identityManager.createUser( username, password, fullName, email, UserType.Regular.getId(),
+                newUser = identityManager.createUser( username, password, fullName, email, UserType.REGULAR.getId(),
                         Integer.parseInt( trustLevel ), false, true );
 
                 if ( !Strings.isNullOrEmpty( rolesJson ) )
@@ -375,15 +370,8 @@ public class RestServiceImpl implements RestService
         {
             List<Role> roles = identityManager.getAllRoles();
 
-            /*
-            for(Role role:roles)
-            {
-                role.setName( StringUtil.escapeHtml( role.getName() ));
-            }
-            */
-
-            return Response.ok( jsonUtil.to( roles.stream().filter( role -> role.getType() != UserType.System.getId() )
-                                                           .collect( Collectors.toList() ) ) ).build();
+            return Response.ok( jsonUtil.to( roles.stream().filter( role -> role.getType() != UserType.SYSTEM.getId() )
+                                                  .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -405,7 +393,7 @@ public class RestServiceImpl implements RestService
 
             if ( roleId == null || roleId <= 0 )
             {
-                role = identityManager.createRole( rolename, UserType.Regular.getId() );
+                role = identityManager.createRole( rolename, UserType.REGULAR.getId() );
             }
             else
             {

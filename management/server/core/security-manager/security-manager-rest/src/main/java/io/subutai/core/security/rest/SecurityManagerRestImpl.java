@@ -50,7 +50,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response addPublicKeyRing( final String identityId, final String keyText )
     {
-        securityManager.getKeyManager().savePublicKeyRing( identityId, SecurityKeyType.PeerKey.getId(), keyText );
+        securityManager.getKeyManager().savePublicKeyRing( identityId, SecurityKeyType.PEER_KEY.getId(), keyText );
 
         return Response.ok().build();
     }
@@ -230,7 +230,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.setKeyTrust( sourceFingerprint, targetFingerprint, KeyTrustLevel.Never.getId() );
+            keyManager.setKeyTrust( sourceFingerprint, targetFingerprint, KeyTrustLevel.NEVER.getId() );
         }
         catch ( Exception e )
         {
@@ -268,7 +268,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.setKeyTrust( source, target, KeyTrustLevel.Full.getId() );
+            keyManager.setKeyTrust( source, target, KeyTrustLevel.FULL.getId() );
         }
         catch ( Exception e )
         {

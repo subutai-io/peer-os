@@ -299,7 +299,7 @@ public class UserEntity implements User
     @Override
     public String getContext()
     {
-        return PermissionObject.IdentityManagement.getName();
+        return PermissionObject.IDENTITY_MANAGEMENT.getName();
     }
 
 
