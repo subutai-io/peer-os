@@ -58,10 +58,12 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -430,12 +432,21 @@ public class EnvironmentImpl implements Environment, Serializable
                     Sets.newConcurrentHashSet( this.containers );
         }
 
+        PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+
+        if ( peerManager == null )
+        {
+            throw new IllegalStateException( "Failed to obtain Peer manager service" );
+        }
+
         for ( EnvironmentContainerHost host : containerHosts )
         {
             ( ( EnvironmentContainerImpl ) host ).setEnvironment( this );
 
             ContainerHostState containerHostState = ContainerHostState.UNKNOWN;
-            LocalPeer localPeer = environmentManager.getLocalPeer();
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+
             boolean isLocalContainer = localPeer.getId().equals( host.getPeerId() );
 
             try
@@ -451,8 +462,7 @@ public class EnvironmentImpl implements Environment, Serializable
                 else
                 {
                     // in case of proxy container, exception will be thrown and state will be UNKNOWN
-                    containerHostState =
-                            environmentManager.resolvePeer( host.getPeerId() ).getContainerState( containerId );
+                    containerHostState = peerManager.getPeer( host.getPeerId() ).getContainerState( containerId );
                 }
             }
             catch ( Exception e )

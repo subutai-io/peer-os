@@ -53,7 +53,6 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.ReverseProxyConfig;
@@ -1838,11 +1837,5 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         return environmentDtos;
-    }
-
-
-    public LocalPeer getLocalPeer()
-    {
-        return peerManager.getLocalPeer();
     }
 }
