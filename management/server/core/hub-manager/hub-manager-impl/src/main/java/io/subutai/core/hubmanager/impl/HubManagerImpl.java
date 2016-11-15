@@ -729,7 +729,7 @@ public class HubManagerImpl implements HubManager
 
         log.info( "currentUser: id={}, username={}, email={}", currentUser.getId(), currentUser.getUserName(), email );
 
-        if ( !email.contains( "@hub.subut.ai" ) )
+        if ( !email.contains( HUB_EMAIL_SUFFIX ) )
         {
             return getHubConfiguration().getOwnerEmail();
         }

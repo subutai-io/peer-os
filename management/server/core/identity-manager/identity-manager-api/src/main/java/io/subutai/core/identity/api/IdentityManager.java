@@ -25,6 +25,11 @@ import io.subutai.core.identity.api.model.UserToken;
  */
 public interface IdentityManager
 {
+    String SYSTEM_USERNAME = "internal";
+    String ADMIN_USERNAME = "admin";
+    String TOKEN_ID = "token";
+    String ADMIN_DEFAULT_PWD = "secret";
+
     /* *************************************************
      */
     void removeRolePermission( long roleId, Permission permission );
@@ -224,7 +229,8 @@ public interface IdentityManager
     /* *************************************************
      */
     @PermitAll
-    boolean changeUserPassword( String userName, String oldPassword, String newPassword ) throws SystemSecurityException;
+    boolean changeUserPassword( String userName, String oldPassword, String newPassword )
+            throws SystemSecurityException;
 
     /* *************************************************
          */

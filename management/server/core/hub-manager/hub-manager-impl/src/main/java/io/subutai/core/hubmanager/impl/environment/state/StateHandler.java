@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState;
@@ -45,7 +46,7 @@ public abstract class StateHandler
     {
         String token = getToken( peerDto );
 
-        Session session = ctx.identityManager.login( "token", token );
+        Session session = ctx.identityManager.login( IdentityManager.TOKEN_ID, token );
 
         Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
         {

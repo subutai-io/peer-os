@@ -41,6 +41,7 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
 import io.subutai.common.security.exception.SystemSecurityException;
+import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -91,8 +92,15 @@ public class IdentityManagerImpl implements IdentityManager
 
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
-    private static final String SYSTEM_USERNAME = "internal";
     private static final int IDENTITY_LIFETIME = 240; //days
+    private static final String ADMIN_FULL_NAME = "Administrator";
+    private static final String SYSTEM_USER_FULL_NAME = "System User";
+    private static final String ADMIN_EMAIL = "admin@subutai.io";
+    private static final String SYSTEM_USER_EMAIL = "system@subutai.io";
+    private static final String KARAF_MANAGER_ROLE = "Karaf-Manager";
+    private static final String PEER_MANAGER_ROLE = "Peer-Manager";
+    private static final String ENV_MANAGER_ROLE = "Environment-Manager";
+    private static final String SYSTEM_ROLE = "Internal-System";
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -144,81 +152,96 @@ public class IdentityManagerImpl implements IdentityManager
             Role role;
             Permission per;
 
-            //***Create User ********************************************
-
+            // create system user
             User internal =
-                    createUser( SYSTEM_USERNAME, "", "System User", "internal@subutai.io", UserType.System.getId(), 3,
-                            false, false );
-            User admin =
-                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", UserType.Regular.getId(), 3,
-                            true, true );
-            //***********************************************************
+                    createUser( SYSTEM_USERNAME, "", SYSTEM_USER_FULL_NAME, SYSTEM_USER_EMAIL, UserType.System.getId(),
+                            KeyTrustLevel.Full.getId(), false, false );
 
-            //***Create Token *******************************************
+            // create admin user
+            User admin = createUser( ADMIN_USERNAME, ADMIN_DEFAULT_PWD, ADMIN_FULL_NAME, ADMIN_EMAIL,
+                    UserType.Regular.getId(), KeyTrustLevel.Full.getId(), true, true );
+
+            // create system token
             createUserToken( internal, "", "", "", TokenType.Permanent.getId(), null );
-            //***********************************************************
 
-            //****Create Roles ******************************************
-            role = createRole( "Karaf-Manager", UserType.System.getId() );
+            // create karaf mgr role
+            role = createRole( KARAF_MANAGER_ROLE, UserType.System.getId() );
+
+            // assign to admin user
             assignUserRole( admin, role );
 
-            per = createPermission( PermissionObject.KarafServerAdministration.getId(), 1, true, true, true, true );
-            assignRolePermission( role, per );
-            //*********************************************
+            per = createPermission( PermissionObject.KarafServerAdministration.getId(),
+                    PermissionScope.ALL_SCOPE.getId(), true, true, true, true );
 
-            //*********************************************
-            role = createRole( "Administrator", UserType.Regular.getId() );
-            assignUserRole( admin.getId(), role );
+            assignRolePermission( role, per );
+
+            // create admin role
+            role = createRole( ADMIN_FULL_NAME, UserType.Regular.getId() );
+
+            // assign to admin user
+            assignUserRole( admin, role );
 
             for ( final PermissionObject aPermsp : permsp )
             {
-                per = createPermission( aPermsp.getId(), 1, true, true, true, true );
+                per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true, true, true, true );
                 assignRolePermission( role, per );
             }
-            //*********************************************
 
-            //*********************************************
-            role = createRole( "Peer-Manager", UserType.System.getId() );
+            // Create Peer Mgr role
+            role = createRole( PEER_MANAGER_ROLE, UserType.System.getId() );
 
-            //*********************************************
-            for ( final PermissionObject aPermsp : permsp )
-            {
-                if ( aPermsp == PermissionObject.PeerManagement || aPermsp == PermissionObject.ResourceManagement )
-                {
-                    per = createPermission( aPermsp.getId(), 3, true, true, true, true );
-                    assignRolePermission( role, per );
-                }
-            }
-            //*********************************************
+            per = createPermission( PermissionObject.PeerManagement.getId(), PermissionScope.ALL_SCOPE.getId(), true,
+                    true, true, true );
+            assignRolePermission( role, per );
 
-            //*********************************************
-            role = createRole( "Environment-Manager", UserType.System.getId() );
+            per = createPermission( PermissionObject.ResourceManagement.getId(), PermissionScope.ALL_SCOPE.getId(),
+                    true, true, true, true );
 
-            //*********************************************
-            for ( final PermissionObject aPermsp : permsp )
-            {
-                if ( aPermsp != PermissionObject.IdentityManagement
-                        && aPermsp != PermissionObject.KarafServerAdministration
-                        && aPermsp != PermissionObject.PeerManagement
-                        && aPermsp != PermissionObject.ResourceManagement )
-                {
-                    per = createPermission( aPermsp.getId(), 3, true, true, true, true );
-                    assignRolePermission( role, per );
-                }
-            }
-            //*********************************************
+            assignRolePermission( role, per );
+            //            for ( final PermissionObject aPermsp : permsp )
+            //            {
+            //                if ( aPermsp == PermissionObject.PeerManagement || aPermsp == PermissionObject
+            // .ResourceManagement )
+            //                {
+            //                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true,
+            // true, true,
+            //                            true );
+            //                    assignRolePermission( role, per );
+            //                }
+            //            }
 
-            //*********************************************
-            role = createRole( "Internal-System", UserType.System.getId() );
+            // Create Env Mgr Role
+            role = createRole( ENV_MANAGER_ROLE, UserType.System.getId() );
+
+            per = createPermission( PermissionObject.EnvironmentManagement.getId(), PermissionScope.ALL_SCOPE.getId(),
+                    true, true, true, true );
+
+            assignRolePermission( role, per );
+
+            //            for ( final PermissionObject aPermsp : permsp )
+            //            {
+            //                if ( aPermsp != PermissionObject.IdentityManagement
+            //                        && aPermsp != PermissionObject.KarafServerAdministration
+            //                        && aPermsp != PermissionObject.PeerManagement
+            //                        && aPermsp != PermissionObject.ResourceManagement )
+            //                {
+            //                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true,
+            // true, true, true );
+            //                    assignRolePermission( role, per );
+            //                }
+            //            }
+
+            // Create System Role
+            role = createRole( SYSTEM_ROLE, UserType.System.getId() );
             assignUserRole( internal, role );
 
-            //*********************************************
             for ( final PermissionObject aPermsp : permsp )
             {
                 if ( aPermsp != PermissionObject.IdentityManagement
                         && aPermsp != PermissionObject.KarafServerAdministration )
                 {
-                    per = createPermission( aPermsp.getId(), 1, true, true, true, true );
+                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true, true, true,
+                            true );
                     assignRolePermission( role, per );
                 }
             }
@@ -229,7 +252,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else
         {
-            User admin = identityDataService.getUserByUsername( "admin" );
+            User admin = identityDataService.getUserByUsername( ADMIN_USERNAME );
             //***** setPeer Owner By Default ***************
             setPeerOwner( admin );
             //**********************************************
@@ -275,7 +298,7 @@ public class IdentityManagerImpl implements IdentityManager
     public Session loginSystemUser()
     {
         String sptoken = getSystemUserToken();
-        Session session = login( "token", sptoken );
+        Session session = login( TOKEN_ID, sptoken );
 
         if ( session != null )
         {
@@ -340,7 +363,7 @@ public class IdentityManagerImpl implements IdentityManager
      * Authenticates user and returns Session
      *
      * @param login Login name  or "token" keyword
-     * @param password  Password or JWT
+     * @param password Password or JWT
      *
      * @return Session object
      */
@@ -353,7 +376,7 @@ public class IdentityManagerImpl implements IdentityManager
         User user = null;
 
         //-------------------------------------
-        if ( "token".equalsIgnoreCase( login ) )
+        if ( TOKEN_ID.equalsIgnoreCase( login ) )
         {
             sessionId = password;
         }
@@ -387,7 +410,7 @@ public class IdentityManagerImpl implements IdentityManager
      *
      * @param user input String
      *
-     * @return  JSON Token
+     * @return JSON Token
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
@@ -450,7 +473,7 @@ public class IdentityManagerImpl implements IdentityManager
      * Checks username and password (authenticates), on success returns full token
      *
      * @param userName Login name
-     * @param password  Password
+     * @param password Password
      *
      * @return Full JWT
      */
@@ -511,7 +534,7 @@ public class IdentityManagerImpl implements IdentityManager
      * Update (renew) Authorization ID of the User (Which is used by RSA keys to authenticate)
      *
      * @param user User
-     * @param authId  Authorization ID
+     * @param authId Authorization ID
      *
      * @return Newly assigned Authorization ID (random string, if authId param is NULL)
      */
@@ -685,7 +708,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         User user;
 
-        if ( "token".equalsIgnoreCase( userName ) )
+        if ( TOKEN_ID.equalsIgnoreCase( userName ) )
         {
             user = authenticateByToken( password );
         }
@@ -728,7 +751,6 @@ public class IdentityManagerImpl implements IdentityManager
      * Sets the Owner of the Peer
      *
      * @param user User that will be set as an owner
-     *
      */
     @PermitAll
     @Override
@@ -743,7 +765,6 @@ public class IdentityManagerImpl implements IdentityManager
      * Sets the Owner of the Peer
      *
      * @return Id of the PeerOwner
-     *
      */
     @PermitAll
     @Override
@@ -1053,7 +1074,7 @@ public class IdentityManagerImpl implements IdentityManager
         try
         {
             //***************Cannot use TOKEN keyword *******
-            if ( "token".equalsIgnoreCase( userName ) )
+            if ( TOKEN_ID.equalsIgnoreCase( userName ) )
             {
                 throw new IllegalArgumentException( "Cannot use TOKEN keyword." );
             }
@@ -1498,8 +1519,8 @@ public class IdentityManagerImpl implements IdentityManager
             throw new IllegalArgumentException( "User name cannot be shorter than 4 characters." );
         }
 
-        if ( "token".equalsIgnoreCase( userName ) || "administrator".equalsIgnoreCase( userName ) || "authmessage"
-                .equalsIgnoreCase( userName ) || "system".equalsIgnoreCase( userName ) )
+        if ( TOKEN_ID.equalsIgnoreCase( userName ) || ADMIN_USERNAME.equalsIgnoreCase( userName ) || "authmessage"
+                .equalsIgnoreCase( userName ) || SYSTEM_USERNAME.equalsIgnoreCase( userName ) )
         {
             throw new IllegalArgumentException( "User name is reserved by the system." );
         }

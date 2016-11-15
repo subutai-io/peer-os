@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
@@ -158,7 +159,7 @@ public class EnvironmentUserHelper
         log.info( "Creating new user: {}", userDto.getEmail() );
 
         // Trick to get later the user id in Hub
-        String email = userDto.getId() + "@hub.subut.ai";
+        String email = userDto.getId() + HubManager.HUB_EMAIL_SUFFIX;
 
         try
         {

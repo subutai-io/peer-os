@@ -26,6 +26,7 @@ import org.apache.felix.service.command.CommandSession;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.settings.Common;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.karaf.manager.api.KarafManager;
 
 
@@ -115,7 +116,7 @@ public class KarafManagerImpl implements KarafManager
         try
         {
             HashMap<String, String[]> environment = new HashMap<>();
-            String[] credentials = new String[] { "admin", "secret" };
+            String[] credentials = new String[] { IdentityManager.ADMIN_USERNAME, IdentityManager.ADMIN_DEFAULT_PWD };
             environment.put( JMXConnector.CREDENTIALS, credentials );
 
             JMXServiceURL url = new JMXServiceURL( "service:jmx:rmi:///jndi/rmi://localhost:1099/karaf-root" );

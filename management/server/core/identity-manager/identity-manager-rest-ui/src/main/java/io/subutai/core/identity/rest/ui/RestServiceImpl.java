@@ -69,7 +69,7 @@ public class RestServiceImpl implements RestService
             }*/
 
             return Response.ok( jsonUtil.to( users.stream().filter( user -> user.getType() != UserType.System.getId() )
-                                                           .collect( Collectors.toList() ) ) ).build();
+                                                  .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -201,7 +201,8 @@ public class RestServiceImpl implements RestService
             {
 
 
-                if ( username.toLowerCase().indexOf( "sys" ) == 0 || username.toLowerCase().indexOf( "admin" ) == 0 )
+                if ( username.toLowerCase().indexOf( IdentityManager.SYSTEM_USERNAME ) == 0
+                        || username.toLowerCase().indexOf( IdentityManager.ADMIN_USERNAME ) == 0 )
                 {
                     LOGGER.warn( "#saveUser forbidden, username is reserved" );
                     return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
@@ -383,7 +384,7 @@ public class RestServiceImpl implements RestService
             */
 
             return Response.ok( jsonUtil.to( roles.stream().filter( role -> role.getType() != UserType.System.getId() )
-                                                           .collect( Collectors.toList() ) ) ).build();
+                                                  .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
