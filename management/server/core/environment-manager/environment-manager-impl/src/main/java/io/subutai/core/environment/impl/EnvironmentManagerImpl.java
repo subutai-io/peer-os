@@ -1697,11 +1697,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
         try
         {
-            Environment environment = loadEnvironment( environmentId );
+            EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
             environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
 
-            update( ( EnvironmentImpl ) environment );
+            update( environment );
         }
         catch ( Exception e )
         {
@@ -1721,9 +1721,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //remove subscription from database
         try
         {
-            Environment environment = environmentService.find( environmentId );
+            EnvironmentImpl environment = environmentService.find( environmentId );
             environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
-            update( ( EnvironmentImpl ) environment );
+            update( environment );
         }
         catch ( Exception e )
         {

@@ -290,7 +290,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
             if ( parent.getContainerHostsByPeerId( getPeerId() ).isEmpty() )
             {
-                parent.removeEnvironmentPeer( getPeerId() );
+                ( ( EnvironmentImpl ) parent ).removeEnvironmentPeer( getPeerId() );
             }
         }
         catch ( Exception e )

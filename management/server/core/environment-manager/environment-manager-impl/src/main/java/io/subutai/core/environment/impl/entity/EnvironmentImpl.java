@@ -273,7 +273,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public String getRawTopology()
+    String getRawTopology()
     {
         return rawBlueprint;
     }
@@ -365,8 +365,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    @Override
-    public void removeEnvironmentPeer( final String peerId )
+    void removeEnvironmentPeer( final String peerId )
     {
 
         Preconditions.checkNotNull( peerId, "Environment peer id could not be null." );
@@ -650,7 +649,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    @Override
     public void addAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
     {
         Preconditions.checkNotNull( environmentAlertHandler, "Invalid alert handler id." );
@@ -662,8 +660,6 @@ public class EnvironmentImpl implements Environment, Serializable
         alertHandlers.add( handlerId );
     }
 
-
-    @Override
     public void removeAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
     {
         alertHandlers.remove( environmentAlertHandler );
