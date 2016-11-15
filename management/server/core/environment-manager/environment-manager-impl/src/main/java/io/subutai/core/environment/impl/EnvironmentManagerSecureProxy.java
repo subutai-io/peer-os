@@ -219,7 +219,7 @@ public class EnvironmentManagerSecureProxy
     {
         //*********************************
         // Remove XSS vulnerability code
-        topology.setEnvironmentName ( validateInput( topology.getEnvironmentName(), true));
+        topology.setEnvironmentName( validateInput( topology.getEnvironmentName(), true ) );
         //*********************************
 
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -238,7 +238,7 @@ public class EnvironmentManagerSecureProxy
                                                      final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=Group;update=true" ) );
@@ -258,7 +258,7 @@ public class EnvironmentManagerSecureProxy
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
 
         try
         {
@@ -278,7 +278,7 @@ public class EnvironmentManagerSecureProxy
     public void addSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
@@ -296,7 +296,7 @@ public class EnvironmentManagerSecureProxy
     public void removeSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
@@ -314,7 +314,7 @@ public class EnvironmentManagerSecureProxy
     {
         try
         {
-            Environment environment = environmentManager.loadEnvironment( environmentId );
+            Environment environment = loadEnvironment( environmentId );
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
         }
         catch ( RelationVerificationException | EnvironmentNotFoundException e )
@@ -330,8 +330,8 @@ public class EnvironmentManagerSecureProxy
     {
         try
         {
-            Environment environment = environmentManager.loadEnvironment( environmentId );
-            check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
+            Environment environment = loadEnvironment( environmentId );
+            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
         }
         catch ( RelationVerificationException | EnvironmentNotFoundException e )
         {
@@ -347,7 +347,7 @@ public class EnvironmentManagerSecureProxy
                                    final long p2pSecretKeyTtlSec, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
@@ -365,7 +365,7 @@ public class EnvironmentManagerSecureProxy
     public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
 
         try
         {
@@ -390,7 +390,7 @@ public class EnvironmentManagerSecureProxy
     public void destroyContainer( final String environmentId, final String containerId, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
 
         // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
         // Meantime, we just bypass the relation check.
@@ -468,7 +468,7 @@ public class EnvironmentManagerSecureProxy
     public void removeEnvironmentDomain( final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
 
         try
         {
@@ -490,7 +490,7 @@ public class EnvironmentManagerSecureProxy
                                          final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
@@ -508,7 +508,7 @@ public class EnvironmentManagerSecureProxy
     public String getEnvironmentDomain( final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
@@ -526,7 +526,7 @@ public class EnvironmentManagerSecureProxy
     public boolean isContainerInEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
@@ -553,7 +553,7 @@ public class EnvironmentManagerSecureProxy
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
@@ -580,7 +580,7 @@ public class EnvironmentManagerSecureProxy
     public SshTunnel setupSshTunnelForContainer( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
@@ -607,7 +607,7 @@ public class EnvironmentManagerSecureProxy
     public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Environment environment = loadEnvironment( environmentId );
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
@@ -711,7 +711,7 @@ public class EnvironmentManagerSecureProxy
     {
         try
         {
-            Environment environment = environmentManager.loadEnvironment( environmentId );
+            Environment environment = loadEnvironment( environmentId );
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
 
             List<Relation> relations = relationManager.getRelationsByObject( environment );
