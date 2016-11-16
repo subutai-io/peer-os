@@ -25,6 +25,7 @@ function environmentService($http, $q) {
 
 	var RH_URL = ENVIRONMENTS_URL + 'resourcehosts/';
 
+	var TENANTS_URL = ENVIRONMENTS_URL + 'tenants';
 
 	// @todo workaround for kurjun to return categorized templates
 	var categories = {
@@ -90,7 +91,8 @@ function environmentService($http, $q) {
 
 		getInstalledPlugins: getInstalledPlugins,
 
-		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
+		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; },
+		getTenantsUrl : function getTenantsUrl() { return TENANTS_URL; }
 	};
 
 	return environmentService;

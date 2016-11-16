@@ -348,31 +348,39 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 }
 
 
-function SubutaiController($rootScope) {
+function SubutaiController($rootScope, $http) {
     var vm = this;
     vm.bodyClass = '';
     vm.activeState = '';
     vm.adminMenus = false;
+    vm.isTenantManager = false;
 
-    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-        vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
-        if (angular.isDefined(toState.data.bodyClass)) {
-            vm.bodyClass = toState.data.bodyClass;
-            vm.activeState = toState.name;
+	$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+		vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
+		if (angular.isDefined(toState.data.bodyClass)) {
+			vm.bodyClass = toState.data.bodyClass;
+			vm.activeState = toState.name;
 
-            vm.adminMenus = false;
-            if( localStorage.getItem("currentUserPermissions") )
-                for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
-                    if (localStorage.getItem("currentUserPermissions")[i] == 6) {
-                        vm.adminMenus = true;
-                    }
-                }
+			vm.adminMenus = false;
+			if( localStorage.getItem("currentUserPermissions") )
+				for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
+					if (localStorage.getItem("currentUserPermissions")[i] == 6) {
+						vm.adminMenus = true;
+					}
+				}
 
-            return;
-        }
+			$http.get(SERVER_URL + "rest/ui/identity/is-tenant-manager", {
+				withCredentials: true,
+				headers: {'Content-Type': 'application/json'}
+			}).success(function (data) {
+				vm.isTenantManager = data;
+			});
 
-        vm.bodyClass = '';
-    });
+			return;
+		}
+
+		vm.bodyClass = '';
+	});
 }
 
 var $stateProviderRef = null;
