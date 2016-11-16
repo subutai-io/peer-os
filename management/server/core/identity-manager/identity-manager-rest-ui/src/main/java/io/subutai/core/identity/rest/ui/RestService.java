@@ -31,11 +31,6 @@ public interface RestService
     Response getActiveUser();
 
     @GET
-    @Path( "/is-tenant-manager" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response isTenantManager();
-
-    @GET
     @Path( "/key-data/{userId}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getPublicKeyData( @PathParam( "userId" ) Long userId );
