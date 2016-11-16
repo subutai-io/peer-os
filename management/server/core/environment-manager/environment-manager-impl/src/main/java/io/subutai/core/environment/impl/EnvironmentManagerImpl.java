@@ -1829,11 +1829,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         for ( Environment environment : environments )
         {
-            EnvironmentDto environmentDto =
-                    new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            environment.getContainerDtos(), environment.getClass().getName() );
+            // exclude own environments
+            if ( !identityManager.getActiveUser().getId().equals( environment.getUserId() ) )
+            {
+                EnvironmentDto environmentDto =
+                        new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                                environment.getContainerDtos(), environment.getClass().getName() );
 
-            environmentDtos.add( environmentDto );
+                environmentDtos.add( environmentDto );
+            }
         }
 
         return environmentDtos;
