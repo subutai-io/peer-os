@@ -31,6 +31,7 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.json.JsonUtil;
@@ -47,10 +48,11 @@ public class EnvironmentAdapter
     private final PeerManager peerManager;
 
     private final HubAdapter hubAdapter;
+    private final IdentityManager identityManager;
 
 
     public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager,
-                               HubAdapter hubAdapter )
+                               HubAdapter hubAdapter, IdentityManager identityManager )
     {
         this.environmentManager = environmentManager;
 
@@ -59,6 +61,8 @@ public class EnvironmentAdapter
         this.peerManager = peerManager;
 
         this.hubAdapter = hubAdapter;
+
+        this.identityManager = identityManager;
     }
 
 
@@ -72,7 +76,8 @@ public class EnvironmentAdapter
 
     public ProxyEnvironment get( String id )
     {
-        for ( ProxyEnvironment e : getEnvironments( false ) )
+
+        for ( ProxyEnvironment e : getEnvironments( identityManager.isTenantManager() ) )
         {
             if ( e.getId().equals( id ) )
             {

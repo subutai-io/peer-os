@@ -18,9 +18,6 @@ import com.google.gson.GsonBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.security.objects.PermissionOperation;
-import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -137,20 +134,13 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     }
 
 
-    private boolean isTenantManager()
-    {
-        return identityManager.isUserPermitted( identityManager.getActiveUser(), PermissionObject.TENANT_MANAGEMENT,
-                PermissionScope.ALL_SCOPE, PermissionOperation.READ );
-    }
-
-
     @Override
     public void removeEnvironment( String envId )
     {
         String userId = getUserIdWithCheck();
 
         // in case user is tenant manager we pass 0 as user id to Hub
-        if ( userId == null && isTenantManager() && isRegistered() )
+        if ( userId == null && identityManager.isTenantManager() && isRegistered() )
         {
             userId = "0";
         }

@@ -189,7 +189,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     protected EnvironmentAdapter getEnvironmentAdapter( HubAdapter hubAdapter )
     {
-        return new EnvironmentAdapter( this, peerManager, hubAdapter );
+        return new EnvironmentAdapter( this, peerManager, hubAdapter, identityManager );
     }
 
 

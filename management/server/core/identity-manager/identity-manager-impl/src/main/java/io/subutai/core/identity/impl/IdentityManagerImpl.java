@@ -1555,8 +1555,16 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @Override
+    public boolean isTenantManager()
+    {
+        return isUserPermitted( getActiveUser(), PermissionObject.TENANT_MANAGEMENT, PermissionScope.ALL_SCOPE,
+                PermissionOperation.READ );
+    }
+
+
     /* *************************************************
-     */
+         */
     @PermitAll
     @Override
     public boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,

@@ -40,9 +40,6 @@ import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.security.objects.PermissionOperation;
-import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationManager;
@@ -377,7 +374,7 @@ public class EnvironmentManagerSecureProxy
         {
             // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
             // Meantime, we just bypass the relation check.
-            if ( !isTenantManager() && !( environment instanceof ProxyEnvironment ) )
+            if ( !identityManager.isTenantManager() && !( environment instanceof ProxyEnvironment ) )
             {
                 check( null, environment, traitsBuilder( "ownership=All;delete=true" ) );
             }
@@ -457,7 +454,7 @@ public class EnvironmentManagerSecureProxy
         }
 
         // tenant manager can view any environment
-        if ( !isTenantManager() )
+        if ( !identityManager.isTenantManager() )
         {
             try
             {
@@ -470,13 +467,6 @@ public class EnvironmentManagerSecureProxy
         }
 
         return environment;
-    }
-
-
-    private boolean isTenantManager()
-    {
-        return identityManager.isUserPermitted( identityManager.getActiveUser(), PermissionObject.TENANT_MANAGEMENT,
-                PermissionScope.ALL_SCOPE, PermissionOperation.READ );
     }
 
 
