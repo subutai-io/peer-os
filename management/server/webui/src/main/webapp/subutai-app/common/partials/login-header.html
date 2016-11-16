@@ -7,8 +7,8 @@
 			</a>
 		</span>
 		<a href ui-sref="login"
-			class="b-header-userbar-name"
-			ng-if="!currentUserCtrl.currentUser">
+			 class="b-header-userbar-name"
+			 ng-if="!currentUserCtrl.currentUser">
 			Login
 		</a>
 	</div>
@@ -17,12 +17,12 @@
 		$('.js-notifications-scrollbar').perfectScrollbar();
 	</script>
 	<div class="b-hub-status b-notification js-header-dropdown g-right"
-		ng-class="{'b-notification_active' : currentUserCtrl.notificationNew }"
-		>
+			 ng-class="{'b-notification_active' : currentUserCtrl.notificationNew }"
+	>
 		<div class="b-notification-count">{{ currentUserCtrl.notificationsCount }}</div>
 		<a href="#"
-		class="b-icon b-icon_bell js-notification"
-		ng-click="currentUserCtrl.notificationNew = false">
+			 class="b-icon b-icon_bell js-notification"
+			 ng-click="currentUserCtrl.notificationNew = false">
 		</a>
 
 		<div class="b-hub-status__dropdown">
@@ -52,23 +52,23 @@
 					<li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
 						<span>No logs</span>
 					</li>
-						<!--<li><a href="#">Your SS version is obsolete, please update
-						it to X version</a>
-						<div class="date">8 February at 22:25</div>
-						<div class="buttons">
-						<a href="#" class="b-btn b-btn_green">Register</a>
-						<a href="#" class="b-btn b-btn_white">Ignore</a>
-						</div>
-						</li>-->
+					<!--<li><a href="#">Your SS version is obsolete, please update
+          it to X version</a>
+          <div class="date">8 February at 22:25</div>
+          <div class="buttons">
+          <a href="#" class="b-btn b-btn_green">Register</a>
+          <a href="#" class="b-btn b-btn_white">Ignore</a>
+          </div>
+          </li>-->
 				</ul>
 			</div>
 			<a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
 		</div>
 	</div>
-{{isRegistrationForVisible}}
+	{{isRegistrationForVisible}}
 	<div class="b-hub-status js-header-dropdown g-right"
-		 ng-click="currentUserCtrl.isRegistrationFormVisible = !currentUserCtrl.isRegistrationFormVisible"
-		 ng-class="{'b-hub-status_active' : currentUserCtrl.hubStatus }">
+			 ng-click="currentUserCtrl.isRegistrationFormVisible = !currentUserCtrl.isRegistrationFormVisible"
+			 ng-class="{'b-hub-status_active' : currentUserCtrl.hubStatus }">
 		<div class="b-hub-menu js-notification">
 			<svg class="b-hub-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
 				<path fill="#E6EAF5" d="M6.1,7H0.9C0.5,7,0.1,6.6,0.1,6.2V0.8C0.1,0.4,0.5,0,0.9,0h5.1c0.5,0,0.8,0.4,0.8,0.8v5.3
@@ -100,11 +100,14 @@
 			<div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
 				Online
 			</div>
-			<span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus">
+			<span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus && subutaiController.adminMenus">
 				Register Peer
 			</span>
+			<div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus == false && subutaiController.adminMenus == false">
+				Offline
+			</div>
 		</div>
-		<div class="b-hub-status__dropdown">
+		<div class="b-hub-status__dropdown" ng-if="subutaiController.adminMenus">
 			<div ng-if="!currentUserCtrl.hubStatus">
 				<div class="header">
 					Register Peer
@@ -120,17 +123,17 @@
 						<div class="b-form-group g-margin-bottom">
 							<div class="g-text g-margin-bottom-half">Login</div>
 							<input type="text"
-								   class="b-form-input b-form-input_full"
-								   focus-input="currentUserCtrl.getRegistrationFormVisibilityStatus()"
-								   tabindex=1
-								   ng-model="currentUserCtrl.hub.login">
+										 class="b-form-input b-form-input_full"
+										 focus-input="currentUserCtrl.getRegistrationFormVisibilityStatus()"
+										 tabindex=1
+										 ng-model="currentUserCtrl.hub.login">
 						</div>
 						<div class="b-form-group">
 							<div class="g-text g-margin-bottom-half">Password</div>
 							<input type="password"
-								   class="b-form-input b-form-input_full"
-								   tabindex=2
-								   ng-model="currentUserCtrl.hub.password">
+										 class="b-form-input b-form-input_full"
+										 tabindex=2
+										 ng-model="currentUserCtrl.hub.password">
 						</div>
 						<div class="b-form-group">
 							<div class="g-text g-margin-bottom-half">Peer name</div>
@@ -143,7 +146,7 @@
 					<div class="footer">
 						<a href="https://hub.subut.ai" target="_blank" tabindex=3 class="b-form-label">Sign Up</a>
 						<button type="submit" class="b-btn b-btn_green g-right" tabindex=4
-								ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
+										ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
 							Register
 						</button>
 					</div>
