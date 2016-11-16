@@ -182,6 +182,13 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
 
     @Override
+    public String getAllEnvironmentsForPeer()
+    {
+        return httpClient.doGet( format( ENVIRONMENTS_URL, 0 ) );
+    }
+
+
+    @Override
     public void destroyContainer( String envId, String containerId )
     {
         httpClient.doDelete( format( CONTAINERS_URL, envId, containerId ) );

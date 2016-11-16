@@ -72,7 +72,7 @@ public class EnvironmentAdapter
 
     public ProxyEnvironment get( String id )
     {
-        for ( ProxyEnvironment e : getEnvironments() )
+        for ( ProxyEnvironment e : getEnvironments( false ) )
         {
             if ( e.getId().equals( id ) )
             {
@@ -84,14 +84,14 @@ public class EnvironmentAdapter
     }
 
 
-    public Set<ProxyEnvironment> getEnvironments()
+    public Set<ProxyEnvironment> getEnvironments( boolean all )
     {
         if ( !isHubReachable() )
         {
             return Collections.emptySet();
         }
 
-        String json = hubAdapter.getUserEnvironmentsForPeer();
+        String json = all ? hubAdapter.getAllEnvironmentsForPeer() : hubAdapter.getUserEnvironmentsForPeer();
 
         if ( json == null )
         {

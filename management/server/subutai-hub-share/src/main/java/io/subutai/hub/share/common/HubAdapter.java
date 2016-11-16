@@ -38,4 +38,6 @@ public interface HubAdapter
     void onContainerStart( String envId, String contId );
 
     void onContainerStop( String envId, String contId );
+
+    String getAllEnvironmentsForPeer();
 }
