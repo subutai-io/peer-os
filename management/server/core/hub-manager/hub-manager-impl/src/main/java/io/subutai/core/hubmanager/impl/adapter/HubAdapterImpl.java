@@ -139,6 +139,12 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     {
         String userId = getUserIdWithCheck();
 
+        // in case user is tenant manager we pass 0 as user id to Hub
+        if ( userId == null && identityManager.isTenantManager() && isRegistered() )
+        {
+            userId = "0";
+        }
+
         if ( userId != null )
         {
             String path = format( ENVIRONMENTS_URL, getUserId() ) + "/" + envId;
@@ -178,6 +184,13 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         }
 
         return null;
+    }
+
+
+    @Override
+    public String getAllEnvironmentsForPeer()
+    {
+        return httpClient.doGet( format( ENVIRONMENTS_URL, 0 ) );
     }
 
 

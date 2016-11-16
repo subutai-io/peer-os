@@ -263,6 +263,11 @@ public interface IdentityManager
                              PermissionOperation permOp );
 
 
+    /**
+     * Returns true if user is tenant manager
+     */
+    boolean isTenantManager();
+
     /* *************************************************
      *
      */

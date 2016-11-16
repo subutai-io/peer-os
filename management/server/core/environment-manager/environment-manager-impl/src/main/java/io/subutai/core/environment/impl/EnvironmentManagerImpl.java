@@ -189,7 +189,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     protected EnvironmentAdapter getEnvironmentAdapter( HubAdapter hubAdapter )
     {
-        return new EnvironmentAdapter( this, peerManager, hubAdapter );
+        return new EnvironmentAdapter( this, peerManager, hubAdapter, identityManager );
     }
 
 
@@ -288,7 +288,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         envs.addAll( environmentService.getAll() );
 
-        envs.addAll( environmentAdapter.getEnvironments() );
+        envs.addAll( environmentAdapter.getEnvironments( false ) );
 
         setTransientFields( envs );
 
@@ -1820,10 +1820,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    private Set<Environment> getAllEnvironments()
+    {
+        Set<Environment> envs = new HashSet<>();
+
+        envs.addAll( environmentService.getAll() );
+
+        envs.addAll( environmentAdapter.getEnvironments( true ) );
+
+        setTransientFields( envs );
+
+        return envs;
+    }
+
+
     @Override
     public Set<EnvironmentDto> getTenantEnvironments()
     {
-        Set<Environment> environments = getEnvironments();
+        Set<Environment> environments = getAllEnvironments();
 
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
