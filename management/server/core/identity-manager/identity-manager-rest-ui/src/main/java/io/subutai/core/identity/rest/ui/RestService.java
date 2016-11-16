@@ -150,4 +150,8 @@ public interface RestService
     Response getTokenTypes();
 
 
+    @GET
+    @Path( "/is-tenant-manager" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response isTenantManager();
 }
