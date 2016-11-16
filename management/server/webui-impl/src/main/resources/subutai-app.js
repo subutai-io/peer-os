@@ -513,6 +513,28 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
+		.state('tenants', {
+			url: '/tenants',
+			templateUrl: 'subutai-app/tenants/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+							{
+								name: 'subutai.tenants',
+								files: [
+									'subutai-app/tenants/tenants.js',
+									'subutai-app/tenants/controller.js',
+									'subutai-app/environment/service.js'
+								]
+							}
+					]);
+				}]
+			}
+		})
         .state('kurjun', {
             url: '/kurjun',
             templateUrl: 'subutai-app/kurjun/partials/view.html',
