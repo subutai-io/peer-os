@@ -460,19 +460,27 @@ public class RestServiceImpl implements RestService
         try
         {
             String path = null;
+
             ProxyLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, ProxyLoadBalanceStrategy.class );
 
             try
             {
+                // will throw exception if no attachment
                 attr.getDataHandler().getContent();
-                File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+
+                String certPath = System.getProperty( "java.io.tmpdir" ) + "/" + environmentId;
+
+                File file = new File( certPath );
+
                 if ( !file.createNewFile() )
                 {
-                    LOG.info( "Domain ssl cert exists, overwriting..." );
+                    LOG.warn( "Domain ssl cert exists, overwriting..." );
                 }
+
                 attr.transferTo( file );
 
-                path = System.getProperty( "java.io.tmpdir" ) + "/" + environmentId;
+                // prefix path to get full container path from RH
+                path = "/mnt/lib/lxc/management/" + certPath;
             }
             catch ( Exception e )
             {
