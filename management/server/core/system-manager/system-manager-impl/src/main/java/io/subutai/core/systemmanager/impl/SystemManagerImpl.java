@@ -223,9 +223,9 @@ public class SystemManagerImpl implements SystemManager
 
             if ( result.hasSucceeded() )
             {
-                updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
+                updateEntity.setCurrentVersion( "No change" );
 
-                updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
+                updateEntity.setCurrentCommitId( "Other (system) components updated" );
 
                 updateDao.update( updateEntity );
             }
