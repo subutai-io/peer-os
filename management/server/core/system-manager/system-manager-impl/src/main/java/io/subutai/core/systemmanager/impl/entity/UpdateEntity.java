@@ -51,6 +51,12 @@ public class UpdateEntity
     }
 
 
+    public Long getId()
+    {
+        return id;
+    }
+
+
     public Long getUpdateDate()
     {
         return updateDate;
