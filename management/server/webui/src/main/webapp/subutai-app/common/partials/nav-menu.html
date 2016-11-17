@@ -18,7 +18,7 @@
       </a>
     </li>
     <li class="b-nav-menu"
-        ng-class="subutaiController.activeState == 'environments' || subutaiController.activeState == 'containers' ? 'b-nav-menu_active' : ''">
+        ng-class="subutaiController.activeState == 'environments' || subutaiController.activeState == 'containers' || subutaiController.activeState == 'tenants' ? 'b-nav-menu_active' : ''">
       <a class="b-nav-menu-link" href id="subt-link__environment">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -41,6 +41,13 @@
             ng-class="subutaiController.activeState == 'containers' ? 'b-nav-menu-sub_active' : ''">
           <a ui-sref="containers" id="subt-link__containers">Containers</a>
         </li>
+
+        <li class="b-nav-menu-sub b-nav-menu-sub_disabled" 
+			ng-if="subutaiController.isTenantManager" 
+            ng-class="subutaiController.activeState == 'tenants' ? 'b-nav-menu-sub_active' : ''">
+          <a ui-sref="tenants" id="subt-link__containers">Tenants</a>
+        </li>
+
       </ul>
     </li>
     <li class="b-nav-menu" ng-class="subutaiController.activeState == 'console' ? 'b-nav-menu_active' : ''">

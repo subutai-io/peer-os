@@ -599,4 +599,11 @@ public class RestServiceImpl implements RestService
 
         return Response.ok( JsonUtil.toJson( map ) ).build();
     }
+
+
+    @Override
+    public Response isTenantManager()
+    {
+        return Response.status( Response.Status.OK ).entity( identityManager.isTenantManager() ).build();
+    }
 }
