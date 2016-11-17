@@ -35,6 +35,8 @@ public class EnvironmentNodeDto
 
     private int ipAddressOffset;
 
+    private String port;
+
     private Set<String> sshKeys = new HashSet<>();
 
 
@@ -235,5 +237,16 @@ public class EnvironmentNodeDto
     public void setIpAddressOffset( final int ipAddressOffset )
     {
         this.ipAddressOffset = ipAddressOffset;
+    }
+
+    public String getPort()
+    {
+        return port;
+    }
+
+
+    public void setPort( final String port )
+    {
+        this.port = port;
     }
 }
