@@ -1563,8 +1563,23 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @Override
+    public boolean isAdmin()
+    {
+        for ( Role role : getActiveUser().getRoles() )
+        {
+            if ( ADMIN_ROLE.equals( role.getName() ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     /* *************************************************
-         */
+             */
     @PermitAll
     @Override
     public boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
