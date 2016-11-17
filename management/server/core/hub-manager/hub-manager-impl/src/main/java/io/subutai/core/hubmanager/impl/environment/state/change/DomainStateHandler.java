@@ -53,14 +53,12 @@ public class DomainStateHandler extends StateHandler
 
                 if ( existingDomain != null )
                 {
-                    if ( !existingDomain.trim().equalsIgnoreCase( env.getDomainName().trim() ) )
-                    {
-                        ctx.localPeer.removeVniDomain( env.getVni() );
+                    ctx.localPeer.removeVniDomain( env.getVni() );
 
-                        ctx.localPeer
-                                .setVniDomain( env.getVni(), env.getDomainName().trim(), balanceStrategy, sslCertPath );
-                    }
+                    ctx.localPeer
+                            .setVniDomain( env.getVni(), env.getDomainName().trim(), balanceStrategy, sslCertPath );
                 }
+
                 else
                 {
                     ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, sslCertPath );
@@ -74,14 +72,17 @@ public class DomainStateHandler extends StateHandler
                         {
                             try
                             {
-                                String ip = nodeDto.getIp().replace( "/24", "" );
-
-                                String port = nodeDto.getPort() == null || nodeDto.getPort().isEmpty() ? "" :
-                                              ":" + nodeDto.getPort();
-
-                                if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
+                                if ( nodeDto.isHasDomain() )
                                 {
-                                    ctx.localPeer.addIpToVniDomain( ip + port, env.getVni() );
+                                    String ip = nodeDto.getIp().replace( "/24", "" );
+
+                                    String port = nodeDto.getPort() == null || nodeDto.getPort().isEmpty() ? "" :
+                                                  ":" + nodeDto.getPort();
+
+                                    if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
+                                    {
+                                        ctx.localPeer.addIpToVniDomain( ip + port, env.getVni() );
+                                    }
                                 }
                             }
                             catch ( Exception e )

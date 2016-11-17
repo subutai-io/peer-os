@@ -12,12 +12,18 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
+import static java.lang.String.format;
+
+import static io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor.DELETE_TUNNEL_COMMAND;
 import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.ERROR;
 
 
@@ -134,9 +140,9 @@ public class TunnelHelper
     }
 
 
-    public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager )
+    public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager,
+                                             TunnelInfoDto tunnelInfoDto )
     {
-        TunnelInfoDto tunnelInfoDto = new TunnelInfoDto();
         String[] data = result.split( ":" );
 
         try

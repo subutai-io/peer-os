@@ -24,6 +24,8 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
+import static java.lang.String.format;
+
 import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.READY;
 
 
@@ -32,7 +34,7 @@ public class TunnelProcessor implements StateLinkProcessor
 {
     static final String CREATE_TUNNEL_COMMAND = "subutai tunnel add %s:%s %s -g";
 
-    private static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s:%s";
+    public static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s:%s";
 
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
 
@@ -125,15 +127,14 @@ public class TunnelProcessor implements StateLinkProcessor
             log.error( e.getMessage() );
         }
 
-        CommandResult result = TunnelHelper.execute( resourceHost,
-                String.format( DELETE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen() ) );
+        CommandResult result = TunnelHelper.execute( resourceHost, format( DELETE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen() ) );
 
         Preconditions.checkNotNull( result );
 
         if ( !result.hasSucceeded() )
         {
-            String errorLog = "Executed: " + String
-                    .format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
+            String errorLog = "Executed: " +
+                    format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
                             getTunnelLifetime( tunnelInfoDto ) ) + " |  Result: " + result.getStdErr();
 
             TunnelHelper.sendError( stateLink, errorLog, configManager );
@@ -146,14 +147,16 @@ public class TunnelProcessor implements StateLinkProcessor
         try
         {
             ResourceHost resourceHost = peerManager.getLocalPeer().getManagementHost();
+
             String tunnelLifeTime = getTunnelLifetime( tunnelInfoDto );
 
-            CommandResult result = getOpenedTunnelData( resourceHost );
+            CommandResult result =
+                    getOpenedTunnelData( resourceHost, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen() );
 
             if ( result == null )
             {
                 result = TunnelHelper.execute( resourceHost,
-                        String.format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
+                        format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
                                 tunnelLifeTime ) );
             }
 
@@ -167,9 +170,10 @@ public class TunnelProcessor implements StateLinkProcessor
     }
 
 
-    private CommandResult getOpenedTunnelData( ResourceHost resourceHost )
+    private CommandResult getOpenedTunnelData( ResourceHost resourceHost, String ip, String port )
     {
-        CommandResult result = TunnelHelper.execute( resourceHost, TunnelEventProcessor.TUNNEL_LIST_CMD );
+        CommandResult result =
+                TunnelHelper.execute( resourceHost, format( TunnelEventProcessor.TUNNEL_LIST_CMD, ip, port ) );
 
         Preconditions.checkNotNull( result );
 
@@ -187,7 +191,7 @@ public class TunnelProcessor implements StateLinkProcessor
     {
         if ( result.hasSucceeded() )
         {
-            tunnelInfoDto = TunnelHelper.parseResult( stateLink, result.getStdOut(), configManager );
+            tunnelInfoDto = TunnelHelper.parseResult( stateLink, result.getStdOut(), configManager, tunnelInfoDto );
 
             if ( tunnelInfoDto != null )
             {
@@ -209,8 +213,8 @@ public class TunnelProcessor implements StateLinkProcessor
         }
         else
         {
-            String errorLog = "Executed: " + String
-                    .format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
+            String errorLog = "Executed: " +
+                    format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
                             tunnelLifeTime ) + " |  Result: " + result.getStdErr();
 
             TunnelHelper.sendError( stateLink, errorLog, configManager );

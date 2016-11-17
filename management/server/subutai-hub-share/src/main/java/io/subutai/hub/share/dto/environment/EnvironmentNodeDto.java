@@ -37,6 +37,8 @@ public class EnvironmentNodeDto
 
     private String port;
 
+    private boolean hasDomain;
+
     private Set<String> sshKeys = new HashSet<>();
 
 
@@ -249,4 +251,16 @@ public class EnvironmentNodeDto
     {
         this.port = port;
     }
+
+    public boolean isHasDomain()
+    {
+        return hasDomain;
+    }
+
+
+    public void setHasDomain( final boolean hasDomain )
+    {
+        this.hasDomain = hasDomain;
+    }
+
 }
