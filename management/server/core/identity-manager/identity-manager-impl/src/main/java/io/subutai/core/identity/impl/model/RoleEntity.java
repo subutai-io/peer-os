@@ -17,6 +17,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
@@ -35,11 +38,11 @@ public class RoleEntity implements Role
     @Column( name = "id" )
     private long id;
 
-    @Column( name = "name" )
+    @Column( name = "name", unique = true, nullable = false )
     private String name;
 
-    @Column( name = "type" )
-    private int type = 1;
+    @Column( name = "type", nullable = false )
+    private int type = UserType.SYSTEM.getId();
 
 
     //*********************************************
@@ -75,7 +78,9 @@ public class RoleEntity implements Role
     @Override
     public void setName( final String name )
     {
-        this.name = name;
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+
+        this.name = name.toLowerCase();
     }
 
 

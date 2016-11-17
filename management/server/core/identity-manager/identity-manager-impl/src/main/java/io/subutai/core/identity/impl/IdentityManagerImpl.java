@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.time.DateUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
@@ -85,8 +86,6 @@ import io.subutai.core.security.api.model.SecurityKey;
 
 /**
  * Overall Subutai Identity Management
- *
- * TODO check for duplicate names of new users and roles
  */
 @PermitAll
 public class IdentityManagerImpl implements IdentityManager
@@ -1255,6 +1254,11 @@ public class IdentityManagerImpl implements IdentityManager
         isValidPassword( userName, password );
         isValidEmail( email );
 
+        if ( identityDataService.getUserByUsername( userName ) != null )
+        {
+            throw new IllegalArgumentException( String.format( "User with name %s already exists", userName ) );
+        }
+
         try
         {
             String salt = SecurityUtil.generateSecureRandom();
@@ -1563,8 +1567,23 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @Override
+    public boolean isAdmin()
+    {
+        for ( Role role : getActiveUser().getRoles() )
+        {
+            if ( ADMIN_ROLE.equals( role.getName() ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     /* *************************************************
-         */
+             */
     @PermitAll
     @Override
     public boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
@@ -1607,6 +1626,13 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public Role createRole( String roleName, int roleType )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( roleName ), "Invalid role name" );
+
+        if ( identityDataService.findRoleByName( roleName ) != null )
+        {
+            throw new IllegalArgumentException( String.format( "Role with name %s already exists", roleName ) );
+        }
+
         //*********************************
         // Remove XSS vulnerability code
         roleName = validateInput( roleName, true );

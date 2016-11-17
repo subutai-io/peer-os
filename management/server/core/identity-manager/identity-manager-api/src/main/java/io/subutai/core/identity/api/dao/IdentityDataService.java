@@ -83,6 +83,8 @@ public interface IdentityDataService
      */
     Role getRole( long roleId );
 
+    Role findRoleByName( String name );
+
     /* *************************************************
      *
      */

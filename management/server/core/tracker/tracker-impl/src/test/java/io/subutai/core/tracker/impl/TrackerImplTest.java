@@ -95,8 +95,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
     @Test
     public void testGetProductOperation() throws Exception
     {
-        doReturn( 2 ).when( user ).getType();
-        doReturn( 3 ).when( user ).getTrustLevel();
+        doReturn( true ).when( identityManager ).isAdmin();
         tracker.getTrackerOperation( SOURCE, OPERATION_ID );
 
         verify( dataService ).getTrackerOperation( SOURCE, OPERATION_ID );
@@ -127,8 +126,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
 
         verify( dataService ).getRecentUserOperations( eq( SOURCE ), isA( Date.class ), isA( Date.class ), anyInt(), anyInt() );
 
-        doReturn( 2 ).when( user ).getType();
-        doReturn( 3 ).when( user ).getTrustLevel();
+        doReturn( true ).when( identityManager ).isAdmin();
 
         tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
 

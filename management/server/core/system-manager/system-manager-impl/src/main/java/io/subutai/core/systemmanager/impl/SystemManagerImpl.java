@@ -218,22 +218,30 @@ public class SystemManagerImpl implements SystemManager
 
             updateDao.persist( updateEntity );
 
-            host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
+            CommandResult result =
+                    host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
 
-            updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
+            if ( result.hasSucceeded() )
+            {
+                updateEntity.setCurrentVersion( "No change" );
 
-            updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
+                updateEntity.setCurrentCommitId( "Other (system) components updated" );
 
-            updateDao.update( updateEntity );
-
-            return true;
+                updateDao.update( updateEntity );
+            }
+            else
+            {
+                updateDao.remove( updateEntity.getId() );
+            }
         }
         catch ( Exception e )
         {
-            LOG.warn( e.getMessage() );
+            LOG.error( "Error updating Management: {}", e.getMessage() );
 
             return false;
         }
+
+        return true;
     }
 
 

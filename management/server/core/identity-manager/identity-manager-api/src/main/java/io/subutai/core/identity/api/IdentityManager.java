@@ -264,9 +264,15 @@ public interface IdentityManager
 
 
     /**
-     * Returns true if user is tenant manager
+     * Returns true if user is tenant manager, false otherwise
      */
     boolean isTenantManager();
+
+
+    /**
+     * Returns true if user has admin role, false otherwise
+     */
+    boolean isAdmin();
 
     /* *************************************************
      *

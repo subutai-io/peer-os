@@ -59,12 +59,10 @@ public class TrackerImpl implements Tracker
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( operationTrackId, "Operation track id is null" );
 
-        // @todo add enums instead of values (check for admin)
-        if ( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+        if ( identityManager.isAdmin() )
         {
             return dataService.getTrackerOperation( source, operationTrackId );
         }
-
 
         return dataService.getTrackerUserOperation( source, operationTrackId, identityManager.getActiveUser().getId() );
     }
@@ -157,9 +155,7 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            // @todo add enums instead of values (check for admin)
-            if ( identityManager.getActiveUser().getType() == 2
-                    && identityManager.getActiveUser().getTrustLevel() == 3 )
+            if ( identityManager.isAdmin() )
             {
                 list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
             }

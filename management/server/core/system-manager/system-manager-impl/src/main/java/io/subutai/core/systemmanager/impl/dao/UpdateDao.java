@@ -143,4 +143,29 @@ public class UpdateDao
             em.close();
         }
     }
+
+
+    public void remove( final Long id )
+    {
+        EntityManager em = emf.createEntityManager();
+        try
+        {
+            em.getTransaction().begin();
+            UpdateEntity item = em.getReference( UpdateEntity.class, id );
+            em.remove( item );
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+        }
+        finally
+        {
+            em.close();
+        }
+    }
 }
