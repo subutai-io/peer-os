@@ -714,10 +714,7 @@ input[type=checkbox] {
     background-color: #B0B0B0;
 }
 
-.b-status-icon_ONLINE {
-    background-color: #3DCFFF;
-}
-
+.b-status-icon_ONLINE,
 .b-status-icon_HEALTHY,
 .b-status-icon_APPROVED,
 .b-status-icon_RUNNING,

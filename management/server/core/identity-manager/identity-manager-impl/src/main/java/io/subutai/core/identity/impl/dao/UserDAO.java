@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.impl.model.UserEntity;
 
@@ -106,6 +107,8 @@ class UserDAO
             daoManager.rollBackTransaction( em );
 
             LOG.error( e.getMessage() );
+
+            throw new ActionFailedException( e.getMessage() );
         }
         finally
         {
@@ -176,7 +179,7 @@ class UserDAO
         {
             TypedQuery<UserEntity> query =
                     em.createQuery( "select u from UserEntity u where u.userName = :userName", UserEntity.class );
-            query.setParameter( "userName", userName );
+            query.setParameter( "userName", userName.toLowerCase() );
 
             List<UserEntity> users = query.getResultList();
             if ( !users.isEmpty() )

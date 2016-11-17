@@ -18,6 +18,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
@@ -38,33 +42,33 @@ public class UserEntity implements User
     @Column( name = "id" )
     private long id;
 
-    @Column( name = "user_name", unique = true )
+    @Column( name = "user_name", unique = true, nullable = false )
     private String userName;
 
     @Column( name = "full_name" )
     private String fullName;
 
-    @Column( name = "password" )
+    @Column( name = "password", nullable = false )
     private String password;
 
     @Column( name = "salt" )
     private String salt;
 
-    @Column( name = "email" )
+    @Column( name = "email", unique = true )
     private String email;
 
-    @Column( name = "type" )
-    private int type = 2; // System User
+    @Column( name = "type", nullable = false )
+    private int type = UserType.REGULAR.getId();
 
     @Column( name = "status" )
-    private int status = 1; // Active
+    private int status = UserStatus.ACTIVE.getId(); // Active
 
     @Column( name = "security_key_id" )
     private String securityKeyId = ""; // PGP KeyID
 
 
     @Column( name = "trust_level" )
-    private int trustLevel = 3; //Default Full Trust
+    private int trustLevel = KeyTrustLevel.FULL.getId(); //Default Full Trust
 
 
     @Column( name = "fingerprint" )
@@ -80,9 +84,9 @@ public class UserEntity implements User
 
     //*********************************************
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
-    @JoinTable( name = "user_roles",
-            joinColumns = { @JoinColumn( name = "user_id", referencedColumnName = "id" ) },
-            inverseJoinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) } )
+    @JoinTable( name = "user_roles", joinColumns = {
+            @JoinColumn( name = "user_id", referencedColumnName = "id" )
+    }, inverseJoinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) } )
     private List<Role> roles = new ArrayList<>();
     //*********************************************
 
@@ -125,7 +129,9 @@ public class UserEntity implements User
     @Override
     public void setUserName( final String userName )
     {
-        this.userName = userName;
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( userName ) );
+
+        this.userName = userName.toLowerCase();
     }
 
 
@@ -278,7 +284,7 @@ public class UserEntity implements User
     @Override
     public String getLinkId()
     {
-        return String.format("%s|%s", getClassPath(), getUniqueIdentifier() );
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
     }
 
 
@@ -343,5 +349,4 @@ public class UserEntity implements User
     {
         return validDate == null || System.currentTimeMillis() <= validDate.getTime();
     }
-
 }

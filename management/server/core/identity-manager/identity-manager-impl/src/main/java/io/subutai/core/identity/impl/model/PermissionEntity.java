@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.core.identity.api.model.Permission;
 
 
@@ -34,7 +35,7 @@ public class PermissionEntity implements Permission
     private int object;
 
     @Column( name = "scope" )
-    private int scope = 1;
+    private int scope = PermissionScope.ALL_SCOPE.getId();
 
     @Column( name = "read" )
     private boolean read = false;
