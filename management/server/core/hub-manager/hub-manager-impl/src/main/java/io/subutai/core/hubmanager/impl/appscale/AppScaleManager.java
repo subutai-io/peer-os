@@ -209,7 +209,7 @@ public class AppScaleManager
 
         Preconditions.checkNotNull( commandResult );
 
-        tunnelInfoDto = TunnelHelper.parseResult( link, commandResult.getStdOut(), configManager );
+        tunnelInfoDto = TunnelHelper.parseResult( link, commandResult.getStdOut(), configManager, tunnelInfoDto );
 
         Preconditions.checkNotNull( tunnelInfoDto );
 
@@ -242,8 +242,7 @@ public class AppScaleManager
 
     private String getVlan( final AppScaleConfigDto config, ResourceHost resourceHost )
     {
-        CommandResult res =
-                TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" );
+        CommandResult res = TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" );
 
         Preconditions.checkNotNull( res );
 

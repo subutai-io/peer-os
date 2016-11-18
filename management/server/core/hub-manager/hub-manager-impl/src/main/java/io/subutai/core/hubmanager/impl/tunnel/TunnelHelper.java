@@ -134,9 +134,9 @@ public class TunnelHelper
     }
 
 
-    public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager )
+    public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager,
+                                             TunnelInfoDto tunnelInfoDto )
     {
-        TunnelInfoDto tunnelInfoDto = new TunnelInfoDto();
         String[] data = result.split( ":" );
 
         try

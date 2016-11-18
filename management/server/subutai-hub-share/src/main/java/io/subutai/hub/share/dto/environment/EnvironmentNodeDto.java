@@ -35,6 +35,10 @@ public class EnvironmentNodeDto
 
     private int ipAddressOffset;
 
+    private String port;
+
+    private boolean hasDomain;
+
     private Set<String> sshKeys = new HashSet<>();
 
 
@@ -236,4 +240,27 @@ public class EnvironmentNodeDto
     {
         this.ipAddressOffset = ipAddressOffset;
     }
+
+    public String getPort()
+    {
+        return port;
+    }
+
+
+    public void setPort( final String port )
+    {
+        this.port = port;
+    }
+
+    public boolean isHasDomain()
+    {
+        return hasDomain;
+    }
+
+
+    public void setHasDomain( final boolean hasDomain )
+    {
+        this.hasDomain = hasDomain;
+    }
+
 }

@@ -1,6 +1,9 @@
 package io.subutai.core.hubmanager.impl.environment.state.change;
 
 
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
@@ -39,6 +42,8 @@ public class DomainStateHandler extends StateHandler
 
             EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
+            String sslCertPath = createSSLTempFile( env );
+
             if ( StringUtils.isNotEmpty( env.getDomainName() ) )
             {
                 ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
@@ -47,17 +52,15 @@ public class DomainStateHandler extends StateHandler
 
                 if ( existingDomain != null )
                 {
-                    if ( !existingDomain.trim().equalsIgnoreCase( env.getDomainName().trim() ) )
-                    {
-                        ctx.localPeer.removeVniDomain( env.getVni() );
-                        ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName().trim(), balanceStrategy,
-                                env.getSslCertPath() );
-                    }
+                    ctx.localPeer.removeVniDomain( env.getVni() );
+
+                    ctx.localPeer
+                            .setVniDomain( env.getVni(), env.getDomainName().trim(), balanceStrategy, sslCertPath );
                 }
+
                 else
                 {
-                    ctx.localPeer
-                            .setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
+                    ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, sslCertPath );
                 }
 
                 for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
@@ -68,11 +71,17 @@ public class DomainStateHandler extends StateHandler
                         {
                             try
                             {
-                                String ip = nodeDto.getIp().replace( "/24", "" );
-
-                                if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
+                                if ( nodeDto.isHasDomain() )
                                 {
-                                    ctx.localPeer.addIpToVniDomain( ip, env.getVni() );
+                                    String ip = nodeDto.getIp().replace( "/24", "" );
+
+                                    String port = nodeDto.getPort() == null || nodeDto.getPort().isEmpty() ? "" :
+                                                  ":" + nodeDto.getPort();
+
+                                    if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
+                                    {
+                                        ctx.localPeer.addIpToVniDomain( ip + port, env.getVni() );
+                                    }
                                 }
                             }
                             catch ( Exception e )
@@ -96,6 +105,35 @@ public class DomainStateHandler extends StateHandler
         {
             throw new HubManagerException( e );
         }
+    }
+
+
+    private String createSSLTempFile( EnvironmentInfoDto env )
+    {
+
+        if ( env.getSslCertPath() == null || env.getSslCertPath().isEmpty() )
+        {
+            return "";
+        }
+
+        try
+        {
+            File file = new File( "/opt/subutai-mng/data/tmp/" + env.getId() );
+            if ( !file.createNewFile() )
+            {
+                log.info( "Domain ssl cert exists, overwriting..." );
+            }
+
+            FileUtils.writeStringToFile( file, env.getSslCertPath() );
+
+            return "/mnt/lib/lxc/management/opt/subutai-mng/data/tmp/" + env.getId();
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
+        }
+
+        return "";
     }
 
 
