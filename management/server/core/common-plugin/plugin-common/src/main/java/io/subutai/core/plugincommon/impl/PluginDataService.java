@@ -25,7 +25,8 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.plugincommon.model.ClusterDataEntity;
 
-//TODO refactor this class esp secuirty related places
+
+//TODO refactor this class esp security related places
 public class PluginDataService
 {
     private EntityManagerFactory emf;
@@ -70,8 +71,9 @@ public class PluginDataService
     //**********************************************
     private boolean checkActiveUser( User user )
     {
-        return identityManager.isUserPermitted( user, PermissionObject.ENVIRONMENT_MANAGEMENT, PermissionScope.ALL_SCOPE,
-                PermissionOperation.READ );
+        return identityManager
+                .isUserPermitted( user, PermissionObject.ENVIRONMENT_MANAGEMENT, PermissionScope.ALL_SCOPE,
+                        PermissionOperation.READ );
     }
     //**********************************************
 
@@ -174,14 +176,10 @@ public class PluginDataService
 
         List<T> result = new ArrayList<>();
 
-        boolean isAdmin = false;
-
         long userId = getActiveUserId();
 
-        if ( userId == 2 )
-        {
-            isAdmin = true;
-        }
+        boolean noUserLimit = identityManager.isAdmin() || userId == 0;
+
 
         try
         {
@@ -189,12 +187,12 @@ public class PluginDataService
             em.getTransaction().begin();
 
             TypedQuery<String> typedQuery = em.createQuery(
-                    "select cd.info from ClusterDataEntity cd where cd.source = :source" + ( isAdmin ? "" :
+                    "select cd.info from ClusterDataEntity cd where cd.source = :source" + ( noUserLimit ? "" :
                                                                                              " and cd.userId = "
                                                                                                      + ":userId" ),
                     String.class );
             typedQuery.setParameter( "source", source );
-            if ( !isAdmin )
+            if ( !noUserLimit )
             {
                 typedQuery.setParameter( "userId", userId );
             }
@@ -229,14 +227,10 @@ public class PluginDataService
         EntityManager em = emf.createEntityManager();
         T result = null;
 
-        boolean isAdmin = false;
-
         long userId = getActiveUserId();
 
-        if ( userId == 2 )
-        {
-            isAdmin = true;
-        }
+        boolean noUserLimit = identityManager.isAdmin() || userId == 0;
+
 
         try
         {
@@ -244,11 +238,9 @@ public class PluginDataService
             key = key.toUpperCase();
             em.getTransaction().begin();
             TypedQuery<String> query = em.createQuery(
-                    "select cd.info from ClusterDataEntity cd where cd.source = :source and cd.id = :id" + ( isAdmin ?
-                                                                                                             "" :
-                                                                                                             " and cd.userId = :userId" ),
-                    String.class );
-            if ( !isAdmin )
+                    "select cd.info from ClusterDataEntity cd where cd.source = :source and cd.id = :id" + (
+                            noUserLimit ? "" : " and cd.userId = :userId" ), String.class );
+            if ( !noUserLimit )
             {
                 query.setParameter( "userId", userId );
             }
@@ -283,14 +275,10 @@ public class PluginDataService
         EntityManager em = emf.createEntityManager();
         List<String> result = new ArrayList<>();
 
-        boolean isAdmin = false;
-
         long userId = getActiveUserId();
 
-        if ( userId == 2 )
-        {
-            isAdmin = true;
-        }
+        boolean noUserLimit = identityManager.isAdmin() || userId == 0;
+
 
         try
         {
@@ -298,13 +286,13 @@ public class PluginDataService
             em.getTransaction().begin();
 
             TypedQuery<String> query = em.createQuery(
-                    "select cd.info from ClusterDataEntity cd where cd.source = :source" + ( isAdmin ? "" :
+                    "select cd.info from ClusterDataEntity cd where cd.source = :source" + ( noUserLimit ? "" :
                                                                                              " and cd.userId = "
                                                                                                      + ":userId" ),
                     String.class );
 
             query.setParameter( "source", source );
-            if ( !isAdmin )
+            if ( !noUserLimit )
             {
                 query.setParameter( "userId", userId );
             }
@@ -333,14 +321,10 @@ public class PluginDataService
 
         String result = null;
 
-        boolean isAdmin = false;
-
         long userId = getActiveUserId();
 
-        if ( userId == 2 )
-        {
-            isAdmin = true;
-        }
+        boolean noUserLimit = identityManager.isAdmin() || userId == 0;
+
 
         try
         {
@@ -348,13 +332,11 @@ public class PluginDataService
             key = key.toUpperCase();
             em.getTransaction().begin();
             TypedQuery<String> query = em.createQuery(
-                    "select cd.info from ClusterDataEntity cd where cd.source = :source and cd.id = :id" + ( isAdmin ?
-                                                                                                             "" :
-                                                                                                             " and cd.userId = :userId" ),
-                    String.class );
+                    "select cd.info from ClusterDataEntity cd where cd.source = :source and cd.id = :id" + (
+                            noUserLimit ? "" : " and cd.userId = :userId" ), String.class );
             query.setParameter( "source", source );
             query.setParameter( "id", key );
-            if ( !isAdmin )
+            if ( !noUserLimit )
             {
                 query.setParameter( "userId", userId );
             }
