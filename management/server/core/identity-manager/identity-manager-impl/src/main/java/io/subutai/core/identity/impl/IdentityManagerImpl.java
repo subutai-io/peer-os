@@ -1570,7 +1570,14 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public boolean isAdmin()
     {
-        for ( Role role : getActiveUser().getRoles() )
+        User user = getActiveUser();
+
+        if ( user == null )
+        {
+            return false;
+        }
+
+        for ( Role role : user.getRoles() )
         {
             if ( ADMIN_ROLE.equals( role.getName() ) )
             {
@@ -1589,6 +1596,10 @@ public class IdentityManagerImpl implements IdentityManager
     public boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
                                     PermissionOperation permOp )
     {
+        if ( user == null )
+        {
+            return false;
+        }
 
         List<Role> roles = user.getRoles();
 
