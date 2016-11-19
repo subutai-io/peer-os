@@ -48,6 +48,14 @@ import io.subutai.core.security.api.SecurityManager;
 
 /**
  * Executes commands and processes responses
+ *
+ * TODO >>>
+ * commands map must have a bigger ttl than requests map
+ * requests map should have ttl = agent interval + command interval + some constant
+ * commands ttl = request map interval + time for response to arrive
+ * command on expiry should try to purge entry from requests map
+ * just in case check messenger timeouts
+ * <<< TODO
  */
 public class CommandProcessor implements RestProcessor
 {
@@ -156,7 +164,7 @@ public class CommandProcessor implements RestProcessor
         //*******Check Usersession *************************
         Session session = getActiveSession();
 
-        if(session == null)
+        if ( session == null )
         {
             LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges" );
         }
