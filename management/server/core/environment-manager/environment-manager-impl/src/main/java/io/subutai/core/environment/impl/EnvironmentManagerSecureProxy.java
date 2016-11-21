@@ -58,7 +58,7 @@ import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
+import io.subutai.core.environment.impl.adapter.HubEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -192,7 +192,7 @@ public class EnvironmentManagerSecureProxy
 
         for ( Environment env : result )
         {
-            if ( env instanceof ProxyEnvironment )
+            if ( env instanceof HubEnvironment )
             {
                 hubEnvs.add( env );
             }
@@ -374,7 +374,7 @@ public class EnvironmentManagerSecureProxy
         {
             // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
             // Meantime, we just bypass the relation check.
-            if ( !identityManager.isTenantManager() && !( environment instanceof ProxyEnvironment ) )
+            if ( !identityManager.isTenantManager() && !( environment instanceof HubEnvironment ) )
             {
                 check( null, environment, traitsBuilder( "ownership=All;delete=true" ) );
             }
@@ -397,7 +397,7 @@ public class EnvironmentManagerSecureProxy
 
         // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
         // Meantime, we just bypass the relation check.
-        if ( environment instanceof ProxyEnvironment )
+        if ( environment instanceof HubEnvironment )
         {
             environmentManager.destroyContainer( environmentId, containerId, async );
 
@@ -448,7 +448,7 @@ public class EnvironmentManagerSecureProxy
         Environment environment = environmentManager.loadEnvironment( environmentId );
 
         // Environment is from Hub
-        if ( environment instanceof ProxyEnvironment )
+        if ( environment instanceof HubEnvironment )
         {
             return environment;
         }

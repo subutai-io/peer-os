@@ -74,10 +74,10 @@ public class EnvironmentAdapter
     }
 
 
-    public ProxyEnvironment get( String id )
+    public HubEnvironment get( String id )
     {
 
-        for ( ProxyEnvironment e : getEnvironments( identityManager.isTenantManager() ) )
+        for ( HubEnvironment e : getEnvironments( identityManager.isTenantManager() ) )
         {
             if ( e.getId().equals( id ) )
             {
@@ -89,7 +89,7 @@ public class EnvironmentAdapter
     }
 
 
-    public Set<ProxyEnvironment> getEnvironments( boolean all )
+    public Set<HubEnvironment> getEnvironments( boolean all )
     {
         if ( !isHubReachable() )
         {
@@ -105,7 +105,7 @@ public class EnvironmentAdapter
 
         log.debug( "Json with environments: {}", json );
 
-        HashSet<ProxyEnvironment> envs = new HashSet<>();
+        HashSet<HubEnvironment> envs = new HashSet<>();
 
         try
         {
@@ -113,7 +113,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
+                envs.add( new HubEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
@@ -143,7 +143,7 @@ public class EnvironmentAdapter
     }
 
 
-    public void destroyContainer( ProxyEnvironment env, String containerId )
+    public void destroyContainer( HubEnvironment env, String containerId )
     {
         if ( !isHubReachable() )
         {

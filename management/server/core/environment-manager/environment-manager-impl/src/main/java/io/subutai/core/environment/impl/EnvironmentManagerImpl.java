@@ -40,7 +40,9 @@ import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.metric.AlertValue;
+import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
@@ -75,7 +77,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
-import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
+import io.subutai.core.environment.impl.adapter.HubEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -88,6 +90,7 @@ import io.subutai.core.environment.impl.workflow.modification.HostnameModificati
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
+import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -310,7 +313,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     void setEnvironmentTransientFields( final Environment environment )
     {
         // Using environmentManager for ProxyEnvironment may give side effects. For example, empty container list.
-        if ( !( environment instanceof ProxyEnvironment ) )
+        if ( !( environment instanceof HubEnvironment ) )
         {
             ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
         }
@@ -811,11 +814,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         // If environment from Hub, send destroy request to Hub
-        if ( environment instanceof ProxyEnvironment )
+        if ( environment instanceof HubEnvironment )
         {
             environmentAdapter.removeEnvironment( environment );
 
             return;
+        }
+        else if ( environment instanceof RemoteEnvironment )
+        {
+            try
+            {
+                peerManager.getLocalPeer().cleanupEnvironment( environment.getEnvironmentId() );
+
+                return;
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentDestructionException( e );
+            }
         }
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
@@ -876,9 +892,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
-        if ( environment instanceof ProxyEnvironment )
+        if ( environment instanceof HubEnvironment )
         {
-            environmentAdapter.destroyContainer( ( ProxyEnvironment ) environment, containerId );
+            environmentAdapter.destroyContainer( ( HubEnvironment ) environment, containerId );
 
             return;
         }
@@ -1032,7 +1048,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
         catch ( Exception e )
         {
-            LOG.error( "Error cancelling environment workflow {}", e.getMessage(), e );
+            LOG.error( "Error cancelling environment workflow: {}", e.getMessage() );
 
             throw new EnvironmentManagerException(
                     String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
@@ -1060,16 +1076,44 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             return environment;
         }
 
+        // try to get local environment
         environment = environmentService.find( environmentId );
 
-        if ( environment == null )
+        if ( environment != null )
         {
-            throw new EnvironmentNotFoundException();
+            setTransientFields( Sets.<Environment>newHashSet( environment ) );
+
+            return environment;
         }
 
-        setTransientFields( Sets.<Environment>newHashSet( environment ) );
+        // try to get remote environment
+        environment = findRemoteEnvironment( environmentId );
 
-        return environment;
+        if ( environment != null )
+        {
+            return environment;
+        }
+
+        throw new EnvironmentNotFoundException();
+    }
+
+
+    protected EnvironmentImpl findRemoteEnvironment( String environmentId )
+    {
+        try
+        {
+            NetworkResource networkResource =
+                    peerManager.getLocalPeer().getReservedNetworkResources().findByEnvironmentId( environmentId );
+
+            return new RemoteEnvironment( networkResource,
+                    peerManager.getLocalPeer().findContainersByEnvironmentId( environmentId ) );
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error finding remote environment: {}", e.getMessage() );
+        }
+
+        return null;
     }
 
 
@@ -1499,7 +1543,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public synchronized EnvironmentImpl update( EnvironmentImpl environment )
     {
-        if ( environment instanceof ProxyEnvironment )
+        if ( environment instanceof HubEnvironment )
         {
             // Environment from Hub
             return environment;
@@ -1820,24 +1864,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    private Set<Environment> getAllEnvironments()
-    {
-        Set<Environment> envs = new HashSet<>();
-
-        envs.addAll( environmentService.getAll() );
-
-        envs.addAll( environmentAdapter.getEnvironments( true ) );
-
-        setTransientFields( envs );
-
-        return envs;
-    }
-
-
     @Override
     public Set<EnvironmentDto> getTenantEnvironments()
     {
-        Set<Environment> environments = getAllEnvironments();
+        Set<Environment> environments = Sets.newHashSet();
+
+        environments.addAll( environmentService.getAll() );
+
+        environments.addAll( environmentAdapter.getEnvironments( true ) );
+
+        environments.addAll( getRemoteEnvironments() );
 
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
@@ -1851,5 +1887,36 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         return environmentDtos;
+    }
+
+
+    private Set<RemoteEnvironment> getRemoteEnvironments()
+    {
+        Set<RemoteEnvironment> remoteEnvironments = Sets.newHashSet();
+
+        try
+        {
+            ReservedNetworkResources networkResources = peerManager.getLocalPeer().getReservedNetworkResources();
+
+            for ( NetworkResource networkResource : networkResources.getNetworkResources() )
+            {
+                // exclude hub reservations and local reservations
+                if ( !Common.HUB_PEER_ID.equals( networkResource.getInitiatorPeerId() ) && !peerManager.getLocalPeer()
+                                                                                                       .getId().equals(
+                                networkResource.getInitiatorPeerId() ) )
+                {
+                    remoteEnvironments.add( new RemoteEnvironment( networkResource, peerManager.getLocalPeer()
+                                                                                               .findContainersByEnvironmentId(
+                                                                                                       networkResource
+                                                                                                               .getEnvironmentId() ) ) );
+                }
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error getting remote environments: {}", e.getMessage() );
+        }
+
+        return remoteEnvironments;
     }
 }

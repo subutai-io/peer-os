@@ -34,6 +34,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -62,7 +63,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
-import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
+import io.subutai.core.environment.impl.adapter.HubEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -74,6 +75,7 @@ import io.subutai.core.environment.impl.workflow.modification.HostnameModificati
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
+import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -170,7 +172,7 @@ public class EnvironmentManagerImplTest
     @Mock
     Map<String, CancellableWorkflow> activeWorkflows;
     @Mock
-    ProxyEnvironment proxyEnvironment;
+    HubEnvironment hubEnvironment;
     @Mock
     KeyManager keyManager;
     @Mock
@@ -731,11 +733,11 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        doReturn( proxyEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+        doReturn( hubEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         environmentManager.destroyEnvironment( TestHelper.ENV_ID, false );
 
-        verify( environmentAdapter ).removeEnvironment( proxyEnvironment );
+        verify( environmentAdapter ).removeEnvironment( hubEnvironment );
     }
 
 
@@ -803,11 +805,11 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        doReturn( proxyEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+        doReturn( hubEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         environmentManager.destroyContainer( TestHelper.ENV_ID, TestHelper.CONTAINER_ID, false );
 
-        verify( environmentAdapter ).destroyContainer( proxyEnvironment, TestHelper.CONTAINER_ID );
+        verify( environmentAdapter ).destroyContainer( hubEnvironment, TestHelper.CONTAINER_ID );
     }
 
 
@@ -895,6 +897,8 @@ public class EnvironmentManagerImplTest
     @Test
     public void testLoadEnvironment() throws Exception
     {
+        ReservedNetworkResources networkResource = mock( ReservedNetworkResources.class );
+        doReturn( networkResource ).when( localPeer ).getReservedNetworkResources();
         doCallRealMethod().when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         assertNotNull( environmentManager.loadEnvironment( TestHelper.ENV_ID ) );
@@ -902,6 +906,8 @@ public class EnvironmentManagerImplTest
         //-----
 
         doReturn( null ).when( environmentService ).find( TestHelper.ENV_ID );
+
+        doReturn( null ).when( environmentManager ).findRemoteEnvironment( TestHelper.ENV_ID );
 
         try
         {
@@ -914,12 +920,18 @@ public class EnvironmentManagerImplTest
         }
 
 
-        doReturn( proxyEnvironment ).when( environmentAdapter ).get( TestHelper.ENV_ID );
+        doReturn( hubEnvironment ).when( environmentAdapter ).get( TestHelper.ENV_ID );
         reset( environmentService );
 
         environmentManager.loadEnvironment( TestHelper.ENV_ID );
 
         verify( environmentService, never() ).find( TestHelper.ENV_ID );
+
+        RemoteEnvironment remoteEnv = mock( RemoteEnvironment.class );
+        doReturn( null ).when( environmentAdapter ).get( TestHelper.ENV_ID );
+        doReturn( remoteEnv ).when( environmentManager ).findRemoteEnvironment( anyString() );
+
+        assertEquals( remoteEnv, environmentManager.loadEnvironment( TestHelper.ENV_ID ) );
     }
 
 
@@ -1187,10 +1199,10 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        ProxyEnvironment proxyEnvironment = mock( ProxyEnvironment.class );
+        HubEnvironment hubEnvironment = mock( HubEnvironment.class );
         reset( environmentService );
 
-        environmentManager.update( proxyEnvironment );
+        environmentManager.update( hubEnvironment );
 
         verify( environmentService, never() ).merge( environment );
     }

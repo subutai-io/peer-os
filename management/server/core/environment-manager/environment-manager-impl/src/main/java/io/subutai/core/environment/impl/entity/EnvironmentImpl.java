@@ -252,6 +252,14 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    protected void setName( String name )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+
+        this.name = name;
+    }
+
+
     @Override
     public Long getUserId()
     {

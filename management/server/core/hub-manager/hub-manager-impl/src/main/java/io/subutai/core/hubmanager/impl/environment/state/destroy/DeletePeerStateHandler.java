@@ -5,6 +5,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -32,7 +33,7 @@ public class DeletePeerStateHandler extends StateHandler
 
             log.info( "env: {}", env );
 
-            boolean isHubEnvironment = env == null || "hub".equals( env.getPeerId() );
+            boolean isHubEnvironment = env == null || Common.HUB_PEER_ID.equals( env.getPeerId() );
 
             if ( isHubEnvironment )
             {
