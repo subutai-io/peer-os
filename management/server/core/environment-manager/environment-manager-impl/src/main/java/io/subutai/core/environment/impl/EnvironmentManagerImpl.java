@@ -811,7 +811,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        EnvironmentImpl environment;
+
+        try
+        {
+            environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            // try to get remote environment
+            environment = findRemoteEnvironment( environmentId );
+
+            if ( environment == null )
+            {
+                throw e;
+            }
+        }
 
         // If environment from Hub, send destroy request to Hub
         if ( environment instanceof HubEnvironment )
@@ -864,7 +879,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     notifyOnEnvironmentDestroyed( environmentId );
                 }
 
-                removeActiveWorkflow( environment.getId() );
+                removeActiveWorkflow( environmentId );
             }
         } );
 
@@ -1086,19 +1101,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             return environment;
         }
 
-        // try to get remote environment
-        environment = findRemoteEnvironment( environmentId );
-
-        if ( environment != null )
-        {
-            return environment;
-        }
-
         throw new EnvironmentNotFoundException();
     }
 
 
-    protected EnvironmentImpl findRemoteEnvironment( String environmentId )
+    EnvironmentImpl findRemoteEnvironment( String environmentId )
     {
         try
         {

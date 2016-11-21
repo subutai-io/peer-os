@@ -75,7 +75,6 @@ import io.subutai.core.environment.impl.workflow.modification.HostnameModificati
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
-import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -926,12 +925,6 @@ public class EnvironmentManagerImplTest
         environmentManager.loadEnvironment( TestHelper.ENV_ID );
 
         verify( environmentService, never() ).find( TestHelper.ENV_ID );
-
-        RemoteEnvironment remoteEnv = mock( RemoteEnvironment.class );
-        doReturn( null ).when( environmentAdapter ).get( TestHelper.ENV_ID );
-        doReturn( remoteEnv ).when( environmentManager ).findRemoteEnvironment( anyString() );
-
-        assertEquals( remoteEnv, environmentManager.loadEnvironment( TestHelper.ENV_ID ) );
     }
 
 
