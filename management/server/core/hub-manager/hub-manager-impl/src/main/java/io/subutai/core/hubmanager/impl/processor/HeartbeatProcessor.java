@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
@@ -48,7 +47,7 @@ public class HeartbeatProcessor implements Runnable
 
     private String peerId;
 
-//    private Executor processorPool = new LimitedCachedExecutor( 10, 10 );
+    //    private Executor processorPool = new LimitedCachedExecutor( 10, 10 );
     private ExecutorService processorPool = Executors.newFixedThreadPool( 25 );
 
     private volatile boolean isHubReachable = false;
@@ -116,15 +115,16 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            sendHeartbeat( false );
-
-            isHubReachable = true;
+            if ( sendHeartbeat( false ) )
+            {
+                isHubReachable = true;
+            }
         }
         catch ( Exception e )
         {
             log.error( "Error to process heartbeat: ", e.getMessage() );
 
-            if ( ExceptionUtils.getStackTrace( e ).contains( "ConnectException" ) )
+            if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( e.getMessage() ) )
             {
                 isHubReachable = false;
             }
@@ -138,12 +138,14 @@ public class HeartbeatProcessor implements Runnable
      * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option is used
      * to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor sets this option.
      * See HubEnvironmentProcessor for example.
+     *
+     * return true if an attempt to send HB was actually taken, false otherwise
      */
-    public void sendHeartbeat( boolean force ) throws HubManagerException
+    public boolean sendHeartbeat( boolean force ) throws HubManagerException
     {
         if ( !hubManager.isRegistered() )
         {
-            return;
+            return false;
         }
 
         long interval = ( System.currentTimeMillis() - lastSentMillis ) / 1000;
@@ -156,7 +158,11 @@ public class HeartbeatProcessor implements Runnable
                     fastModeLeft );
 
             doHeartbeat();
+
+            return true;
         }
+
+        return false;
     }
 
 
@@ -175,6 +181,11 @@ public class HeartbeatProcessor implements Runnable
             String url = path + RandomStringUtils.randomNumeric( 7 );
 
             RestResult<HeartbeatResponseDto> restResult = restClient.post( url, null, HeartbeatResponseDto.class );
+
+            if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( restResult.getError() ) )
+            {
+                throw new IllegalStateException( HubRestClient.CONNECTION_EXCEPTION_MARKER );
+            }
 
             if ( !restResult.isSuccess() )
             {
