@@ -368,10 +368,12 @@ public class EnvironmentManagerSecureProxy
     public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
+        Environment environment;
 
         try
         {
+            environment = loadEnvironment( environmentId );
+
             // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
             // Meantime, we just bypass the relation check.
             if ( !identityManager.isTenantManager() && !( environment instanceof HubEnvironment ) )
@@ -382,6 +384,16 @@ public class EnvironmentManagerSecureProxy
         catch ( RelationVerificationException e )
         {
             throw new EnvironmentNotFoundException();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            //check if this is a remote environment
+            environment = environmentManager.findRemoteEnvironment( environmentId );
+
+            if ( environment == null )
+            {
+                throw e;
+            }
         }
 
         environmentManager.destroyEnvironment( environmentId, async );

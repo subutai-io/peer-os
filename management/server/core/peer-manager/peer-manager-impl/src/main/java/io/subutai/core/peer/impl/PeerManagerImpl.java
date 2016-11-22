@@ -521,6 +521,13 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public Peer findPeer( final String peerId )
+    {
+        return peers.get( peerId );
+    }
+
+
+    @Override
     public LocalPeer getLocalPeer()
     {
         return localPeer;

@@ -18,11 +18,12 @@ public class RemoteEnvironment extends EnvironmentImpl
 
     private String containerSubnet;
     private int vlan;
-    private Set<ContainerHost> containers;
     private String initiatorPeerId;
+    private Set<ContainerHost> containers;
 
 
-    public RemoteEnvironment( final NetworkResource networkResource, final Set<ContainerHost> containers )
+    public RemoteEnvironment( final NetworkResource networkResource, final String name,
+                              final Set<ContainerHost> containers )
     {
         this.environmentId = networkResource.getEnvironmentId();
         this.containerSubnet = networkResource.getContainerSubnet();
@@ -32,13 +33,7 @@ public class RemoteEnvironment extends EnvironmentImpl
         setP2PSubnet( networkResource.getP2pSubnet() );
         setVni( networkResource.getVni() );
         setStatus( EnvironmentStatus.UNKNOWN );
-        setName( String.format( "Of peer %s", getInitiatorPeerId() ) );
-    }
-
-
-    public String getInitiatorPeerId()
-    {
-        return initiatorPeerId;
+        setName( name );
     }
 
 
