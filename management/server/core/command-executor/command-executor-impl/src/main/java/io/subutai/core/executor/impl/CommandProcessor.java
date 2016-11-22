@@ -1,8 +1,8 @@
 package io.subutai.core.executor.impl;
 
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,16 +13,15 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Form;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.cache.CacheEntry;
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -37,13 +36,11 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.RestProcessor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -57,7 +54,6 @@ public class CommandProcessor implements RestProcessor
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
     ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
-    private final ExpiringCache<String, Map<String, String>> requests = new ExpiringCache<>();
     private ScheduledExecutorService notifier = Executors.newSingleThreadScheduledExecutor();
     ExecutorService notifierPool = Executors.newCachedThreadPool();
     Set<HeartbeatListener> listeners = Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
@@ -136,11 +132,11 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    public void execute( final Request request, CommandCallback callback ) throws CommandException
+    void execute( final Request request, CommandCallback callback ) throws CommandException
     {
-
         //find target host
         ResourceHostInfo resourceHostInfo;
+
         try
         {
             resourceHostInfo = getResourceHostInfo( request.getId() );
@@ -160,12 +156,11 @@ public class CommandProcessor implements RestProcessor
         //**************************************************
 
         //create command process
-        CommandProcess commandProcess = new CommandProcess( this, callback, request, session );
+        CommandProcess commandProcess =
+                new CommandProcess( this, callback, request, resourceHostInfo.getId(), session );
 
         boolean queued = commands.put( request.getCommandId(), commandProcess,
-                ( request.getTimeout() + EXTRA_TIMEOUT_SEC ) * 1000L,
-                new CommandProcessExpiryCallback( requests, resourceHostInfo.getId(),
-                        request.getCommandId().toString() ) );
+                ( request.getTimeout() + EXTRA_TIMEOUT_SEC ) * 1000L, new CommandProcessExpiryCallback() );
 
         if ( !queued )
         {
@@ -180,9 +175,6 @@ public class CommandProcessor implements RestProcessor
             String command = jsonUtil.to( new RequestWrapper( request ) );
 
             LOG.debug( String.format( "Sending:%n%s", command ) );
-
-            //queue request
-            queueRequest( resourceHostInfo, request );
         }
         catch ( Exception e )
         {
@@ -197,72 +189,62 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    void queueRequest( ResourceHostInfo resourceHostInfo, Request request ) throws PGPException
-    {
-        //add request to outgoing agent queue
-        synchronized ( requests )
-        {
-            Map<String, String> hostRequests = requests.get( resourceHostInfo.getId() );
-
-            if ( hostRequests == null )
-            {
-                hostRequests = Maps.newHashMap();
-
-                requests.put( resourceHostInfo.getId(), hostRequests,
-                        Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000L );
-            }
-
-            String encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
-
-            hostRequests.put( request.getCommandId().toString(), encryptedRequest );
-        }
-    }
-
-
     @Override
-    public Set<String> getRequests( final String hostId )
+    public synchronized Set<String> getRequests( final String hostId )
     {
-        Map<String, String> hostRequests;
+        Set<String> hostRequests = Sets.newHashSet();
 
-        synchronized ( requests )
+        Collection<CacheEntry<CommandProcess>> commandProcessEntries = commands.getEntries().values();
+
+        for ( CacheEntry<CommandProcess> commandProcessEntry : commandProcessEntries )
         {
-            hostRequests = requests.remove( hostId );
+            CommandProcess commandProcess = commandProcessEntry.getValue();
+
+            if ( commandProcess.getRhId().equals( hostId ) && !commandProcess.isSent() )
+            {
+                commandProcess.setSent( true );
+
+                hostRequests.add( commandProcess.getEncryptedRequest() );
+            }
         }
 
-        return hostRequests == null ? Sets.<String>newHashSet() : Sets.newHashSet( hostRequests.values() );
+        return hostRequests;
     }
 
 
     private void notifyAgents()
     {
-        Set<String> resourceHostIds = requests.getEntries().keySet();
+        Collection<CacheEntry<CommandProcess>> commandProcessEntries = commands.getEntries().values();
 
-        for ( final String resourceHostId : resourceHostIds )
+        Set<String> notifiedRhIds = Sets.newHashSet();
+
+        for ( CacheEntry<CommandProcess> commandProcessEntry : commandProcessEntries )
         {
-            notifierPool.execute( new Runnable()
+            final CommandProcess commandProcess = commandProcessEntry.getValue();
+
+            if ( !notifiedRhIds.contains( commandProcess.getRhId() ) && !commandProcess.isSent() )
             {
-                @Override
-                public void run()
+                notifiedRhIds.add( commandProcess.getRhId() );
+
+                notifierPool.execute( new Runnable()
                 {
-                    try
+                    @Override
+                    public void run()
                     {
-                        ResourceHostInfo resourceHostInfo = getResourceHostInfo( resourceHostId );
+                        try
+                        {
+                            ResourceHostInfo resourceHostInfo = getResourceHostInfo( commandProcess.getRhId() );
 
-                        notifyAgent( resourceHostInfo );
+                            notifyAgent( resourceHostInfo );
+                        }
+                        catch ( Exception e )
+                        {
+                            //ignore
+                        }
                     }
-                    catch ( Exception e )
-                    {
-                        //ignore
-                    }
-                }
-            } );
+                } );
+            }
         }
-    }
-
-
-    String encrypt( String message, String hostId ) throws PGPException
-    {
-        return getSecurityManager().signNEncryptRequestToHost( message, hostId );
     }
 
 
@@ -310,12 +292,6 @@ public class CommandProcessor implements RestProcessor
 
             return hostRegistry.getResourceHostByContainerHost( containerHostInfo );
         }
-    }
-
-
-    SecurityManager getSecurityManager()
-    {
-        return ServiceLocator.lookup( SecurityManager.class );
     }
 
 
@@ -386,8 +362,6 @@ public class CommandProcessor implements RestProcessor
     public void dispose()
     {
         commands.dispose();
-
-        requests.dispose();
 
         notifier.shutdown();
 
