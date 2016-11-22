@@ -53,7 +53,7 @@ public class CommandProcessor implements RestProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
     private static final int NOTIFIER_INTERVAL_MS = 300;
-    private static final int EXTRA_TIMEOUT_SEC = 10;
+    private static final int EXTRA_TIMEOUT_SEC = 20;
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
     ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
@@ -163,7 +163,7 @@ public class CommandProcessor implements RestProcessor
         CommandProcess commandProcess = new CommandProcess( this, callback, request, session );
 
         boolean queued = commands.put( request.getCommandId(), commandProcess,
-                ( request.getTimeout() + EXTRA_TIMEOUT_SEC * 2 ) * 1000L,
+                ( request.getTimeout() + EXTRA_TIMEOUT_SEC ) * 1000L,
                 new CommandProcessExpiryCallback( requests, resourceHostInfo.getId(),
                         request.getCommandId().toString() ) );
 
@@ -209,7 +209,7 @@ public class CommandProcessor implements RestProcessor
                 hostRequests = Maps.newHashMap();
 
                 requests.put( resourceHostInfo.getId(), hostRequests,
-                        ( request.getTimeout() + EXTRA_TIMEOUT_SEC ) * 1000L );
+                        Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000L );
             }
 
             String encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
