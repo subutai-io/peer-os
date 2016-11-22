@@ -9,7 +9,6 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -55,12 +54,6 @@ public class CommandProcessorTest
 {
     private static final String HOST_ID = UUID.randomUUID().toString();
     private static final UUID COMMAND_ID = UUID.randomUUID();
-    private static final String RESPONSE_JSON = String.format(
-            " { response: {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\","
-                    + "      \"commandId\":\"%s\"," + "      \"pid\":123," + "      \"responseNumber\":2,"
-                    + "      \"stdOut\":\"output\"," + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  } }",
-            HOST_ID, COMMAND_ID.toString() );
-    private static final String MSG = "MSG";
 
     @Mock
     HostRegistry hostRegistry;
@@ -98,6 +91,8 @@ public class CommandProcessorTest
     IPUtil ipUtil;
 
     CommandProcessor commandProcessor;
+    @Mock
+    CommandProcess commandProcess;
 
 
     @Before
@@ -206,10 +201,10 @@ public class CommandProcessorTest
     }
 
 
-    @Ignore
     @Test
     public void testExecute() throws Exception
     {
+        doReturn( commandProcess ).when( commandProcessor ).createCommandProcess( callback, request, HOST_ID );
 
         doThrow( new HostDisconnectedException( "" ) ).when( commandProcessor ).getResourceHostInfo( HOST_ID );
 

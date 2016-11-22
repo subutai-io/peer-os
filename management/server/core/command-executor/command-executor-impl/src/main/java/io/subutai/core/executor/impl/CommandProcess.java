@@ -56,7 +56,6 @@ class CommandProcess
     private String rhId;
     private AtomicBoolean isSent = new AtomicBoolean( false );
     private String encryptedRequest;
-    private JsonUtil jsonUtil = new JsonUtil();
 
 
     CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback, final Request request,
@@ -89,17 +88,17 @@ class CommandProcess
             }
         } );
 
-        this.encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
+        this.encryptedRequest = encrypt( request );
     }
 
 
-    private String encrypt( String message, String hostId )
+    protected String encrypt( Request request )
     {
         SecurityManager securityManager = ServiceLocator.lookup( SecurityManager.class );
 
         try
         {
-            return securityManager.signNEncryptRequestToHost( message, hostId );
+            return securityManager.signNEncryptRequestToHost( JsonUtil.toJsonMinified( request ), request.getId() );
         }
         catch ( PGPException e )
         {

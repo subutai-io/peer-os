@@ -80,29 +80,13 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    @Override
-    public void handleHeartbeat( final HeartBeat heartBeat )
+    public void dispose()
     {
-        LOG.debug( String.format( "Heartbeat:%n%s", jsonUtil.to( heartBeat ) ) );
+        commands.dispose();
 
-        for ( final HeartbeatListener listener : listeners )
-        {
-            notifierPool.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        listener.onHeartbeat( heartBeat );
-                    }
-                    catch ( Exception e )
-                    {
-                        LOG.error( "Error in handleHeartbeat", e );
-                    }
-                }
-            } );
-        }
+        notifier.shutdown();
+
+        notifierPool.shutdown();
     }
 
 
@@ -132,6 +116,32 @@ public class CommandProcessor implements RestProcessor
     }
 
 
+    @Override
+    public void handleHeartbeat( final HeartBeat heartBeat )
+    {
+        LOG.debug( String.format( "Heartbeat:%n%s", jsonUtil.to( heartBeat ) ) );
+
+        for ( final HeartbeatListener listener : listeners )
+        {
+            notifierPool.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        listener.onHeartbeat( heartBeat );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Error in handleHeartbeat", e );
+                    }
+                }
+            } );
+        }
+    }
+
+
     void execute( final Request request, CommandCallback callback ) throws CommandException
     {
         //find target host
@@ -146,18 +156,9 @@ public class CommandProcessor implements RestProcessor
             throw new CommandException( e );
         }
 
-        //*******Check Usersession *************************
-        Session session = getActiveSession();
-
-        if ( session == null )
-        {
-            LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges" );
-        }
-        //**************************************************
 
         //create command process
-        CommandProcess commandProcess =
-                new CommandProcess( this, callback, request, resourceHostInfo.getId(), session );
+        CommandProcess commandProcess = createCommandProcess( callback, request, resourceHostInfo.getId() );
 
         boolean queued = commands.put( request.getCommandId(), commandProcess,
                 ( request.getTimeout() + EXTRA_TIMEOUT_SEC ) * 1000L, new CommandProcessExpiryCallback() );
@@ -186,6 +187,19 @@ public class CommandProcessor implements RestProcessor
 
             throw new CommandException( e );
         }
+    }
+
+
+    CommandProcess createCommandProcess( CommandCallback callback, Request request, String rhId )
+    {
+        Session session = getActiveSession();
+
+        if ( session == null )
+        {
+            LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges" );
+        }
+
+        return new CommandProcess( this, callback, request, rhId, session );
     }
 
 
@@ -354,15 +368,5 @@ public class CommandProcessor implements RestProcessor
         Preconditions.checkNotNull( request );
 
         commands.remove( request.getCommandId() );
-    }
-
-
-    public void dispose()
-    {
-        commands.dispose();
-
-        notifier.shutdown();
-
-        notifierPool.shutdown();
     }
 }

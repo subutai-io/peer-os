@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -41,15 +40,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-//import static junit.framework.Assert.assertEquals;
 
-
-@Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class CommandProcessTest
 {
     private static final String OUTPUT = "output";
     private static final String RH_ID = "RH_ID";
+    private static final String ENC_CMD = "CMD";
     private static final Integer EXIT_CODE = 0;
     @Mock
     CommandProcessor commandProcessor;
@@ -72,10 +69,27 @@ public class CommandProcessTest
     CommandProcess commandProcess;
 
 
+    class CommandProcessSUT extends CommandProcess
+    {
+        CommandProcessSUT( final CommandProcessor commandProcessor, final CommandCallback callback,
+                           final Request request, final String rhId, final Session userSession )
+        {
+            super( commandProcessor, callback, request, rhId, userSession );
+        }
+
+
+        protected String encrypt( Request request )
+        {
+            return ENC_CMD;
+        }
+    }
+
+
     @Before
     public void setUp() throws Exception
     {
-        commandProcess = new CommandProcess( commandProcessor, callback, request, RH_ID, session );
+        commandProcess = new CommandProcessSUT( commandProcessor, callback, request, RH_ID, session );
+
         commandProcess.executor = executor;
         commandProcess.semaphore = semaphore;
         queuedResponses = spy( Sets.newTreeSet( new Comparator<Response>()
