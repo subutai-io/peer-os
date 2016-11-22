@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -19,18 +20,17 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 /**
  * NOTE: Using environmentManager from parent EnvironmentImpl gives side effects. For example, empty container list.
  */
-public class ProxyEnvironment extends EnvironmentImpl
+public class HubEnvironment extends EnvironmentImpl
 {
-    private final static Logger log = LoggerFactory.getLogger( ProxyEnvironment.class );
+    private final static Logger log = LoggerFactory.getLogger( HubEnvironment.class );
 
     private transient final EnvironmentAdapter environmentAdapter;
 
 
-    ProxyEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
-                      ProxyContainerHelper proxyContainerHelper )
+    HubEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
+                    ProxyContainerHelper proxyContainerHelper )
     {
-        super( json.get( "name" ).asText(), json.get( "subnetCidr" ).asText(), 0L, "hub" // peerId
-             );
+        super( json.get( "name" ).asText(), null, 0L, Common.HUB_PEER_ID );
 
         init( json );
 

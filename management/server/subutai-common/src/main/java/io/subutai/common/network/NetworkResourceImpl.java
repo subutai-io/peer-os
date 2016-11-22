@@ -15,17 +15,21 @@ public class NetworkResourceImpl implements NetworkResource
     private String p2pSubnet;
     @JsonProperty( "containerSubnet" )
     private String containerSubnet;
+    @JsonProperty( "initiatorPeerId" )
+    private String initiatorPeerId;
 
 
     public NetworkResourceImpl( @JsonProperty( "environmentId" ) final String environmentId,
                                 @JsonProperty( "vni" ) final long vni,
                                 @JsonProperty( "p2pSubnet" ) final String p2pSubnet,
-                                @JsonProperty( "containerSubnet" ) final String containerSubnet )
+                                @JsonProperty( "containerSubnet" ) final String containerSubnet,
+                                @JsonProperty( "initiatorPeerId" ) final String initiatorPeerId )
     {
         this.environmentId = environmentId;
         this.vni = vni;
         this.p2pSubnet = p2pSubnet;
         this.containerSubnet = containerSubnet;
+        this.initiatorPeerId = initiatorPeerId;
     }
 
 
@@ -63,5 +67,11 @@ public class NetworkResourceImpl implements NetworkResource
     {
         //vlan is calculated on target peer
         return -1;
+    }
+
+
+    public String getInitiatorPeerId()
+    {
+        return initiatorPeerId;
     }
 }

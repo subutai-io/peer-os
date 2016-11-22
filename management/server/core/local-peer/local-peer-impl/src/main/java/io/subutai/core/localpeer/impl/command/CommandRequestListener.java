@@ -30,7 +30,7 @@ public class CommandRequestListener extends RequestListener
 
     protected PeerManager getPeerManager()
     {
-        return ServiceLocator.getServiceNoCache( PeerManager.class );
+        return ServiceLocator.lookup( PeerManager.class );
     }
 
 

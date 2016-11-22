@@ -25,6 +25,8 @@ import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.hub.share.quota.ContainerQuota;
 
 
@@ -491,6 +493,28 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( proxyConfig );
 
             localPeer.removeCustomProxy( proxyConfig );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response excludePeerFromEnvironment( final String environmentId, final String peerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
+            EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
+
+            environmentManager.excludePeerFromEnvironment( environmentId, peerId );
 
             return Response.ok().build();
         }

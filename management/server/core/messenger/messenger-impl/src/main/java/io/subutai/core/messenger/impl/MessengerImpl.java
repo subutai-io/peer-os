@@ -87,7 +87,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
     protected PeerManager getPeerManager()
     {
-        return ServiceLocator.getServiceNoCache( PeerManager.class );
+        return ServiceLocator.lookup( PeerManager.class );
     }
 
 

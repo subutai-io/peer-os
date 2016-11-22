@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class Common
 {
+    public static final String HUB_PEER_ID = "hub";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
     public static final int DEFAULT_PUBLIC_PORT = 8443;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;

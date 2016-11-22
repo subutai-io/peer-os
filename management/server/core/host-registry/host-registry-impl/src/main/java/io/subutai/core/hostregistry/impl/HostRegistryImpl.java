@@ -413,7 +413,7 @@ public class HostRegistryImpl implements HostRegistry
 
     protected LocalPeer getLocalPeer()
     {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+        return ServiceLocator.getServiceOrNull( LocalPeer.class );
     }
 
 

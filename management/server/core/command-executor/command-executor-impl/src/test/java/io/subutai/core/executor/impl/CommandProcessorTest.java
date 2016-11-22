@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -244,7 +245,7 @@ public class CommandProcessorTest
 
         verify( commandProcessor ).queueRequest( eq( resourceHostInfo ), eq( request ) );
 
-        doThrow( new NamingException() ).when( commandProcessor ).queueRequest( resourceHostInfo, request );
+        doThrow( new PGPException("") ).when( commandProcessor ).queueRequest( resourceHostInfo, request );
 
         try
         {

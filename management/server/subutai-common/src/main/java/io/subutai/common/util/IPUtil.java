@@ -132,7 +132,7 @@ public class IPUtil
 
     public static HostInterface findAddressableInterface( Set<HostInterface> allInterfaces, String hostId )
     {
-        LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+        LocalPeer localPeer = ServiceLocator.getServiceOrNull( LocalPeer.class );
 
         HostInterface result = NullHostInterface.getInstance();
 

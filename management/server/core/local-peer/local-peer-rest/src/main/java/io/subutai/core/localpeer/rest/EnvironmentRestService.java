@@ -168,4 +168,11 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response removeCustomProxy( CustomProxyConfig proxyConfig );
+
+    @POST
+    @Path( "{environmentId}/peers/{peerId}/exclude" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response excludePeerFromEnvironment( @PathParam( "environmentId" ) String environmentId,
+                                         @PathParam( "peerId" ) String peerId );
 }

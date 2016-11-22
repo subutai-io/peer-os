@@ -265,31 +265,31 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     protected NetworkManager getNetworkManager()
     {
-        return ServiceLocator.getServiceNoCache( NetworkManager.class );
+        return ServiceLocator.lookup( NetworkManager.class );
     }
 
 
     protected HostRegistrationManager getRegistrationManager()
     {
-        return ServiceLocator.getServiceNoCache( HostRegistrationManager.class );
+        return ServiceLocator.lookup( HostRegistrationManager.class );
     }
 
 
     protected QuotaManager getQuotaManager()
     {
-        return ServiceLocator.getServiceNoCache( QuotaManager.class );
+        return ServiceLocator.lookup( QuotaManager.class );
     }
 
 
     protected HostRegistry getHostRegistry()
     {
-        return ServiceLocator.getServiceNoCache( HostRegistry.class );
+        return ServiceLocator.lookup( HostRegistry.class );
     }
 
 
     protected LocalPeer getLocalPeer()
     {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+        return ServiceLocator.lookup( LocalPeer.class );
     }
 
 
@@ -893,47 +893,43 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             catch ( HostNotFoundException e )
             {
 
-                LocalPeer localPeer = getLocalPeer();
-
                 //check that MH container is already registered
                 boolean mhAlreadyRegistered = false;
 
-                if ( localPeer != null )
+                try
+                {
+                    LocalPeer localPeer = getLocalPeer();
+
+                    localPeer.getManagementHost();
+
+                    mhAlreadyRegistered = true;
+                }
+                catch ( Exception ex )
+                {
+                    //ignore
+                }
+
+                if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
                 {
                     try
                     {
-                        localPeer.getManagementHost();
+                        containerHost =
+                                new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
+                                        info.getHostInterfaces(), info.getContainerName(),
+                                        getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
+                                        Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
 
-                        mhAlreadyRegistered = true;
+                        addContainerHost( containerHost );
                     }
-                    catch ( HostNotFoundException ex )
+                    catch ( PeerException e1 )
                     {
-                        //ignore
+                        LOG.warn( "Could not register management host, error obtaining management template info", e );
                     }
-
-                    if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
-                    {
-                        try
-                        {
-                            containerHost =
-                                    new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                                            info.getHostInterfaces(), info.getContainerName(),
-                                            getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
-                                            Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
-
-                            addContainerHost( containerHost );
-                        }
-                        catch ( PeerException e1 )
-                        {
-                            LOG.warn( "Could not register management host, error obtaining management template info",
-                                    e );
-                        }
-                    }
-                    else
-                    {
-                        LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
-                                info.getHostname() ) );
-                    }
+                }
+                else
+                {
+                    LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
+                            info.getHostname() ) );
                 }
             }
             catch ( Exception e )

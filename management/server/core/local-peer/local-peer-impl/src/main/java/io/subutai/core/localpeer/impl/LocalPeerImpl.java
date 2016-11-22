@@ -1424,9 +1424,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws PeerException
     {
-        HostRegistrationManager registrationManager = ServiceLocator.getServiceNoCache( HostRegistrationManager.class );
-
-        Preconditions.checkNotNull( registrationManager );
+        HostRegistrationManager registrationManager = ServiceLocator.lookup( HostRegistrationManager.class );
 
         try
         {
@@ -2877,7 +2875,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     protected PeerManager getPeerManager()
     {
-        return ServiceLocator.getServiceNoCache( PeerManager.class );
+        return ServiceLocator.lookup( PeerManager.class );
     }
 
 

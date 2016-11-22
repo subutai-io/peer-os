@@ -176,7 +176,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     protected LocalPeer getLocalPeer()
     {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+        return ServiceLocator.lookup( LocalPeer.class );
     }
 
 

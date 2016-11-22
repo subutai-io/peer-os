@@ -32,7 +32,7 @@ public class AngularAppFilter implements Filter
                           final FilterChain filterChain ) throws IOException, ServletException
     {
 
-        webuiModuleService = ServiceLocator.getServiceNoCache( WebuiModuleService.class );
+        webuiModuleService = ServiceLocator.lookup( WebuiModuleService.class );
 
         servletResponse.getWriter().write( webuiModuleService.getModulesListLazyLoadConfig() );
     }

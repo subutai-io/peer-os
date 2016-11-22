@@ -136,8 +136,8 @@ public class ReservationStep
                 public Integer call() throws Exception
                 {
                     return peer.reserveNetworkResource(
-                            new NetworkResourceImpl( environment.getId(), freeVni, freeP2pSubnet,
-                                    freeContainerSubnet ) );
+                            new NetworkResourceImpl( environment.getId(), freeVni, freeP2pSubnet, freeContainerSubnet,
+                                    peerManager.getLocalPeer().getId() ) );
                 }
             } ) );
         }

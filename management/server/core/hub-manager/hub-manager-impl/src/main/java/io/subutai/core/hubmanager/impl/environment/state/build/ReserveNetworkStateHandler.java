@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -61,7 +62,7 @@ public class ReserveNetworkStateHandler extends StateHandler
 
             NetworkResourceImpl networkResource =
                     new NetworkResourceImpl( envInfo.getId(), envInfo.getVni(), envInfo.getP2pSubnet(),
-                            subnetWithoutMask );
+                            subnetWithoutMask, Common.HUB_PEER_ID );
 
             peerDto.setVlan( ctx.localPeer.reserveNetworkResource( networkResource ) );
         }

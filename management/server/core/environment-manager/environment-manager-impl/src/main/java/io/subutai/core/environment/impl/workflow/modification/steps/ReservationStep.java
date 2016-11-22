@@ -112,7 +112,7 @@ public class ReservationStep
                 {
                     return peer.reserveNetworkResource(
                             new NetworkResourceImpl( environment.getId(), environment.getVni(),
-                                    environment.getP2pSubnet(), containerSubnet ) );
+                                    environment.getP2pSubnet(), containerSubnet, peerManager.getLocalPeer().getId() ) );
                 }
             } ) );
         }

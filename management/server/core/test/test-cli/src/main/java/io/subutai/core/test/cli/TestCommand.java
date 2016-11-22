@@ -27,9 +27,7 @@ public class TestCommand extends SubutaiShellCommandSupport
 
         try
         {
-            EnvironmentManager environmentManager = ServiceLocator.getServiceNoCache( EnvironmentManager.class );
-
-            Preconditions.checkNotNull( environmentManager );
+            EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 
             for ( Environment environment : environmentManager.getEnvironments() )
             {
