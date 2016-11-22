@@ -53,7 +53,7 @@ public class CommandProcessor implements RestProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
     private static final int NOTIFIER_INTERVAL_MS = 300;
-    private static final int EXTRA_TIMEOUT_SEC = 20;
+    private static final int EXTRA_TIMEOUT_SEC = 60;
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
     ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
