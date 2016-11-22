@@ -190,7 +190,7 @@ public class CommandProcessor implements RestProcessor
 
 
     @Override
-    public synchronized Set<String> getRequests( final String hostId )
+    public Set<String> getRequests( final String hostId )
     {
         Set<String> hostRequests = Sets.newHashSet();
 
@@ -200,10 +200,8 @@ public class CommandProcessor implements RestProcessor
         {
             CommandProcess commandProcess = commandProcessEntry.getValue();
 
-            if ( commandProcess.getRhId().equals( hostId ) && !commandProcess.isSent() )
+            if ( commandProcess.getRhId().equals( hostId ) && commandProcess.markAsSent() )
             {
-                commandProcess.setSent( true );
-
                 hostRequests.add( commandProcess.getEncryptedRequest() );
             }
         }
@@ -222,7 +220,7 @@ public class CommandProcessor implements RestProcessor
         {
             final CommandProcess commandProcess = commandProcessEntry.getValue();
 
-            if ( !notifiedRhIds.contains( commandProcess.getRhId() ) && !commandProcess.isSent() )
+            if ( !commandProcess.isSent() && !notifiedRhIds.contains( commandProcess.getRhId() ) )
             {
                 notifiedRhIds.add( commandProcess.getRhId() );
 

@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.security.auth.Subject;
 
@@ -53,9 +54,9 @@ class CommandProcess
     private int expectedResponseNumber = 1;
     Set<Response> queuedResponses;
     private String rhId;
-    private boolean isSent = false;
+    private AtomicBoolean isSent = new AtomicBoolean( false );
     private String encryptedRequest;
-    JsonUtil jsonUtil = new JsonUtil();
+    private JsonUtil jsonUtil = new JsonUtil();
 
 
     CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback, final Request request,
@@ -250,15 +251,15 @@ class CommandProcess
     }
 
 
-    boolean isSent()
+    boolean markAsSent()
     {
-        return isSent;
+        return isSent.compareAndSet( false, true );
     }
 
 
-    void setSent( final boolean sent )
+    boolean isSent()
     {
-        isSent = sent;
+        return isSent.get();
     }
 
 
@@ -268,7 +269,7 @@ class CommandProcess
     }
 
 
-    public String getEncryptedRequest()
+    String getEncryptedRequest()
     {
         return encryptedRequest;
     }
