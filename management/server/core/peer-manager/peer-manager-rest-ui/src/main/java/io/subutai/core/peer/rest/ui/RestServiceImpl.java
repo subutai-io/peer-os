@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;
@@ -80,7 +81,8 @@ public class RestServiceImpl implements RestService
 
             if ( !registrationDatas.isEmpty() )
             {
-                ExecutorService taskExecutor = Executors.newFixedThreadPool( registrationDatas.size() );
+                ExecutorService taskExecutor =
+                        Executors.newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, registrationDatas.size() ) );
 
                 List<CompletableFuture> futures = registrationDatas.stream().map( d -> CompletableFuture.runAsync( () ->
                 {

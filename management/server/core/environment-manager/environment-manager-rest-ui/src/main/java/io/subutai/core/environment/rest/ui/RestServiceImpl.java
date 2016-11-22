@@ -751,7 +751,8 @@ public class RestServiceImpl implements RestService
     {
         List<Peer> peers = peerManager.getPeers();
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
+        ExecutorService taskExecutor =
+                Executors.newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, peers.size() ) );
 
         CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
 

@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.Host;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.TaskUtil;
 
@@ -32,8 +33,6 @@ import io.subutai.common.util.TaskUtil;
  */
 public class CommandUtil
 {
-    private static final int MAX_EXECUTOR_SIZE = 10;
-
     private static final Logger LOG = LoggerFactory.getLogger( CommandUtil.class );
 
     private final Map<String, Map<String, EnvironmentCommandFuture>> environmentCommandsFuturesMap =
@@ -224,7 +223,8 @@ public class CommandUtil
 
         final Set<HostCommandResult> hostCommandResults = Sets.newHashSet();
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( Math.min( MAX_EXECUTOR_SIZE, hosts.size() ) );
+        ExecutorService taskExecutor =
+                Executors.newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, hosts.size() ) );
 
         CompletionService<CommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
 

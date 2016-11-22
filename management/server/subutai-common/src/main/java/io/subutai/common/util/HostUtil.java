@@ -22,12 +22,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.Host;
+import io.subutai.common.settings.Common;
 
 
 public class HostUtil
 {
-    private static final int MAX_EXECUTOR_SIZE = 10;
-
     private static final Logger LOG = LoggerFactory.getLogger( HostUtil.class );
 
     private final Set<Task> allTasks = Sets.newConcurrentHashSet();
@@ -420,8 +419,8 @@ public class HostUtil
 
         if ( executorService == null )
         {
-            executorService = task.maxParallelTasks() > 0 ?
-                              Executors.newFixedThreadPool( Math.min( MAX_EXECUTOR_SIZE, task.maxParallelTasks() ) ) :
+            executorService = task.maxParallelTasks() > 0 ? Executors
+                    .newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, task.maxParallelTasks() ) ) :
                               Executors.newCachedThreadPool();
 
             taskExecutors.put( executorId, executorService );
