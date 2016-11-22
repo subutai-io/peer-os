@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
@@ -26,6 +27,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 public class HubRestClient
 {
+    public static final String CONNECTION_EXCEPTION_MARKER = "ConnectException";
     private static final String ERROR = "Error to execute request to Hub: ";
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -116,7 +118,14 @@ public class HubRestClient
         }
         catch ( Exception e )
         {
-            restResult.setError( ERROR + e.getMessage() );
+            if ( ExceptionUtils.getStackTrace( e ).contains( CONNECTION_EXCEPTION_MARKER ) )
+            {
+                restResult.setError( CONNECTION_EXCEPTION_MARKER );
+            }
+            else
+            {
+                restResult.setError( ERROR + e.getMessage() );
+            }
 
             log.error( ERROR, e );
         }
