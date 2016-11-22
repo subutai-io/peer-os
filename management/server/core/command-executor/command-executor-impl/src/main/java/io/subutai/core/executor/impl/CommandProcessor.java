@@ -2,6 +2,7 @@ package io.subutai.core.executor.impl;
 
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.cache.ExpiringCache;
@@ -46,30 +48,19 @@ import io.subutai.core.security.api.SecurityManager;
 
 /**
  * Executes commands and processes responses
- *
- * TODO >>>
- * commands map must have a bigger ttl than requests map
- * requests map should have ttl = agent interval + command interval + some constant
- * commands ttl = request map interval + time for response to arrive
- * command on expiry should try to purge entry from requests map
- * just in case check messenger timeouts
- * <<< TODO
  */
 public class CommandProcessor implements RestProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
     private static final int NOTIFIER_INTERVAL_MS = 300;
-    private static final long COMMAND_ENTRY_TIMEOUT =
-            ( Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC + Common.DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL ) * 1000
-                    + NOTIFIER_INTERVAL_MS + 1000L;
+    private static final int EXTRA_TIMEOUT_SEC = 60;
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
-    protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
-    protected final ExpiringCache<String, Set<String>> requests = new ExpiringCache<>();
-    protected ScheduledExecutorService notifier = Executors.newSingleThreadScheduledExecutor();
-    protected ExecutorService notifierPool = Executors.newCachedThreadPool();
-    protected Set<HeartbeatListener> listeners =
-            Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
+    ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
+    private final ExpiringCache<String, Map<String, String>> requests = new ExpiringCache<>();
+    private ScheduledExecutorService notifier = Executors.newSingleThreadScheduledExecutor();
+    ExecutorService notifierPool = Executors.newCachedThreadPool();
+    Set<HeartbeatListener> listeners = Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
 
     JsonUtil jsonUtil = new JsonUtil();
     IPUtil ipUtil = new IPUtil();
@@ -170,8 +161,12 @@ public class CommandProcessor implements RestProcessor
 
         //create command process
         CommandProcess commandProcess = new CommandProcess( this, callback, request, session );
-        boolean queued = commands.put( request.getCommandId(), commandProcess, COMMAND_ENTRY_TIMEOUT,
-                new CommandProcessExpiryCallback() );
+
+        boolean queued = commands.put( request.getCommandId(), commandProcess,
+                ( request.getTimeout() + EXTRA_TIMEOUT_SEC ) * 1000L,
+                new CommandProcessExpiryCallback( requests, resourceHostInfo.getId(),
+                        request.getCommandId().toString() ) );
+
         if ( !queued )
         {
             throw new CommandException( "Command id is null " );
@@ -202,20 +197,24 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected void queueRequest( ResourceHostInfo resourceHostInfo, Request request ) throws PGPException
+    void queueRequest( ResourceHostInfo resourceHostInfo, Request request ) throws PGPException
     {
         //add request to outgoing agent queue
         synchronized ( requests )
         {
-            Set<String> hostRequests = requests.get( resourceHostInfo.getId() );
+            Map<String, String> hostRequests = requests.get( resourceHostInfo.getId() );
+
             if ( hostRequests == null )
             {
-                hostRequests = Sets.newLinkedHashSet();
+                hostRequests = Maps.newHashMap();
+
                 requests.put( resourceHostInfo.getId(), hostRequests,
                         Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000L );
             }
+
             String encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
-            hostRequests.add( encryptedRequest );
+
+            hostRequests.put( request.getCommandId().toString(), encryptedRequest );
         }
     }
 
@@ -223,16 +222,18 @@ public class CommandProcessor implements RestProcessor
     @Override
     public Set<String> getRequests( final String hostId )
     {
-        Set<String> hostRequests;
+        Map<String, String> hostRequests;
+
         synchronized ( requests )
         {
             hostRequests = requests.remove( hostId );
         }
-        return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
+
+        return hostRequests == null ? Sets.<String>newHashSet() : Sets.newHashSet( hostRequests.values() );
     }
 
 
-    protected void notifyAgents()
+    private void notifyAgents()
     {
         Set<String> resourceHostIds = requests.getEntries().keySet();
 
@@ -259,13 +260,13 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected String encrypt( String message, String hostId ) throws PGPException
+    String encrypt( String message, String hostId ) throws PGPException
     {
         return getSecurityManager().signNEncryptRequestToHost( message, hostId );
     }
 
 
-    protected void notifyAgent( ResourceHostInfo resourceHostInfo )
+    void notifyAgent( ResourceHostInfo resourceHostInfo )
     {
         WebClient webClient = null;
         javax.ws.rs.core.Response response = null;
@@ -289,7 +290,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected WebClient getWebClient( ResourceHostInfo resourceHostInfo )
+    WebClient getWebClient( ResourceHostInfo resourceHostInfo )
     {
         return RestUtil.createWebClient(
                 String.format( "http://%s:%d/trigger", hostRegistry.getResourceHostIp( resourceHostInfo ),
@@ -297,7 +298,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected ResourceHostInfo getResourceHostInfo( String requestHostId ) throws HostDisconnectedException
+    ResourceHostInfo getResourceHostInfo( String requestHostId ) throws HostDisconnectedException
     {
         try
         {
@@ -312,23 +313,24 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected SecurityManager getSecurityManager()
+    SecurityManager getSecurityManager()
     {
         return ServiceLocator.lookup( SecurityManager.class );
     }
 
 
-    protected Session getActiveSession()
+    Session getActiveSession()
     {
         return identityManager.getActiveSession();
     }
 
 
-    public CommandResult getResult( UUID commandId ) throws CommandException
+    CommandResult getResult( UUID commandId ) throws CommandException
     {
         Preconditions.checkNotNull( commandId );
 
         CommandProcess commandProcess = commands.get( commandId );
+
         if ( commandProcess != null )
         {
             //wait until process completes  & return result
@@ -373,7 +375,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected void remove( Request request )
+    void remove( Request request )
     {
         Preconditions.checkNotNull( request );
 
