@@ -859,6 +859,15 @@ public class EnvironmentManagerSecureProxy
     }
 
 
+    @RolesAllowed( "Environment-Management|Delete" )
+    @Override
+    public void excludePeerFromEnvironment( final String environmentId, final String peerId )
+            throws EnvironmentNotFoundException, EnvironmentManagerException
+    {
+        environmentManager.excludePeerFromEnvironment( environmentId, peerId );
+    }
+
+
     @Override
     @RolesAllowed( "Tenant-Management|Read" )
     public Set<EnvironmentDto> getTenantEnvironments()

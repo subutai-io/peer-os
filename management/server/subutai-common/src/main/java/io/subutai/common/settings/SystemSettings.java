@@ -40,7 +40,7 @@ public class SystemSettings
 
     private LocalPeer getLocalPeer()
     {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+        return ServiceLocator.getServiceOrNull( LocalPeer.class );
     }
 
 

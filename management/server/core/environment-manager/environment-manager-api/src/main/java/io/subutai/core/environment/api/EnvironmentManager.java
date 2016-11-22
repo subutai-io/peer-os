@@ -9,6 +9,7 @@ import java.util.Set;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
+import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
@@ -24,7 +25,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
-import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -252,4 +252,7 @@ public interface EnvironmentManager
      * should reload environment using EnvironmentManager@loadEnvironment
      */
     void addSshKeyToEnvironmentEntity( String environmentId, String sshKey ) throws EnvironmentNotFoundException;
+
+    void excludePeerFromEnvironment( String environmentId, String peerId )
+            throws EnvironmentNotFoundException, EnvironmentManagerException;
 }

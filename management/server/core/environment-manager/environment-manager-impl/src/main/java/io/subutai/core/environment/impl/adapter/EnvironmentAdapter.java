@@ -68,7 +68,7 @@ public class EnvironmentAdapter
 
     private boolean isHubReachable()
     {
-        HubManager hubManager = ServiceLocator.getServiceNoCache( HubManager.class );
+        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
 
         return hubManager != null && hubManager.isHubReachable();
     }

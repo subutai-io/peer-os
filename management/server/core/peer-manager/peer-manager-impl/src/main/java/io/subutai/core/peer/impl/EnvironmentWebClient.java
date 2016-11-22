@@ -32,6 +32,8 @@ import io.subutai.hub.share.quota.ContainerQuota;
 
 /**
  * Environment REST client
+ *
+ * TODO accept environment id as ctr argument rather than part of path
  */
 public class EnvironmentWebClient
 {
@@ -742,6 +744,34 @@ public class EnvironmentWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Error on removing custom proxy: %s", e.getMessage() ) );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void excludePeerFromEnvironment( final String environmentId, final String peerId ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/peers/%s/exclude", environmentId, peerId );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error excluding peer from environment: " + e.getMessage() );
         }
         finally
         {

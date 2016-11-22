@@ -50,7 +50,7 @@ public class IndexFilter implements Filter
                 HttpServletResponse response = ( HttpServletResponse ) servletResponse;
                 try
                 {
-                    IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    IdentityManager identityManager = ServiceLocator.getServiceOrNull( IdentityManager.class );
                     if ( identityManager != null )
                     {
                         User user = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );

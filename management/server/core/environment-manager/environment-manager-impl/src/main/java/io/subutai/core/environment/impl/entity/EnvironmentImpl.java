@@ -398,6 +398,26 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    public void excludePeerFromEnvironment( String peerId )
+    {
+        removeEnvironmentPeer( peerId );
+
+        removePeerContainers( peerId );
+    }
+
+
+    private void removePeerContainers( final String peerId )
+    {
+        for ( EnvironmentContainerHost containerHost : getContainerHosts() )
+        {
+            if ( peerId.equals( containerHost.getPeerId() ) )
+            {
+                removeContainer( containerHost );
+            }
+        }
+    }
+
+
     public EnvironmentPeerImpl getEnvironmentPeer( String peerId )
     {
         for ( EnvironmentPeer environmentPeer : environmentPeers )
@@ -440,12 +460,7 @@ public class EnvironmentImpl implements Environment, Serializable
                     Sets.newConcurrentHashSet( this.containers );
         }
 
-        PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
-
-        if ( peerManager == null )
-        {
-            throw new IllegalStateException( "Failed to obtain Peer manager service" );
-        }
+        PeerManager peerManager = ServiceLocator.lookup( PeerManager.class );
 
         for ( EnvironmentContainerHost host : containerHosts )
         {

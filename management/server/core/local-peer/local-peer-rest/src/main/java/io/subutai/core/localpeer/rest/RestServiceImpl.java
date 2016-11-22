@@ -76,7 +76,7 @@ public class RestServiceImpl implements RestService
 
         BundleContext ctx = FrameworkUtil.getBundle( RestServiceImpl.class ).getBundleContext();
 
-        BundleStateService bundleStateService = ServiceLocator.getServiceNoCache( BundleStateService.class );
+        BundleStateService bundleStateService = ServiceLocator.getServiceOrNull( BundleStateService.class );
 
         Bundle[] bundles = ctx.getBundles();
 

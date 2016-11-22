@@ -57,6 +57,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -840,15 +841,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             try
             {
                 peerManager.getLocalPeer().cleanupEnvironment( environment.getEnvironmentId() );
-
-                //todo notify remote peers to excude this peer from the env
-
-                return;
             }
             catch ( PeerException e )
             {
                 throw new EnvironmentDestructionException( e );
             }
+
+            // notify initiator peer to exclude this peer from the environment
+            RemotePeer initiatorPeer =
+                    peerManager.findPeer( ( ( RemoteEnvironment ) environment ).getInitiatorPeerId() );
+
+            if ( initiatorPeer != null )
+            {
+                try
+                {
+                    initiatorPeer.excludePeerFromEnvironment( environment.getId(), peerManager.getLocalPeer().getId() );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error excluding local peer from remote environment: {}", e.getMessage() );
+                }
+            }
+
+            return;
         }
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
@@ -1114,7 +1129,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             NetworkResource networkResource =
                     peerManager.getLocalPeer().getReservedNetworkResources().findByEnvironmentId( environmentId );
 
-            Peer initiatorPeer = peerManager.findPeer( networkResource.getInitiatorPeerId() );
+            RemotePeer initiatorPeer = peerManager.findPeer( networkResource.getInitiatorPeerId() );
 
             return new RemoteEnvironment( networkResource, String.format( "Of peer %s",
                     initiatorPeer == null ? networkResource.getInitiatorPeerId() : initiatorPeer.getName() ),
@@ -1877,6 +1892,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @Override
+    public void excludePeerFromEnvironment( final String environmentId, final String peerId )
+            throws EnvironmentNotFoundException, EnvironmentManagerException
+    {
+        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        environment.excludePeerFromEnvironment( peerId );
+
+        update( environment );
+    }
+
+
+    @Override
     public Set<EnvironmentDto> getTenantEnvironments()
     {
         Set<Environment> environments = Sets.newHashSet();
@@ -1917,8 +1944,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                                                        .getId().equals(
                                 networkResource.getInitiatorPeerId() ) )
                 {
-                    Peer initiatorPeer = networkResource.getInitiatorPeerId() == null ? null :
-                                         peerManager.findPeer( networkResource.getInitiatorPeerId() );
+                    RemotePeer initiatorPeer = networkResource.getInitiatorPeerId() == null ? null :
+                                               peerManager.findPeer( networkResource.getInitiatorPeerId() );
 
                     remoteEnvironments.add( new RemoteEnvironment( networkResource, String.format( "Of peer %s",
                             initiatorPeer == null ? networkResource.getInitiatorPeerId() : initiatorPeer.getName() ),

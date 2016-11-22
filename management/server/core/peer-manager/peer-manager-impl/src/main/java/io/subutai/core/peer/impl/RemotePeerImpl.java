@@ -183,6 +183,16 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void excludePeerFromEnvironment( final String environmentId, final String peerId ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+
+        environmentWebClient.excludePeerFromEnvironment( environmentId, peerId );
+    }
+
+
+    @Override
     public boolean isOnline()
     {
         return peerWebClient.ping();

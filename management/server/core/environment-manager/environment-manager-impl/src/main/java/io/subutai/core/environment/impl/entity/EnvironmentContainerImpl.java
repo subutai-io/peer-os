@@ -344,7 +344,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
     protected LocalPeer getLocalPeer()
     {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+        return ServiceLocator.lookup( LocalPeer.class );
     }
 
 

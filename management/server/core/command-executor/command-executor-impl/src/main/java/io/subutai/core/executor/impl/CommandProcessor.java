@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.NamingException;
 import javax.ws.rs.core.Form;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -32,7 +31,6 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
@@ -204,8 +202,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected void queueRequest( ResourceHostInfo resourceHostInfo, Request request )
-            throws NamingException, PGPException
+    protected void queueRequest( ResourceHostInfo resourceHostInfo, Request request ) throws PGPException
     {
         //add request to outgoing agent queue
         synchronized ( requests )
@@ -262,7 +259,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected String encrypt( String message, String hostId ) throws NamingException, PGPException
+    protected String encrypt( String message, String hostId ) throws PGPException
     {
         return getSecurityManager().signNEncryptRequestToHost( message, hostId );
     }
@@ -317,13 +314,7 @@ public class CommandProcessor implements RestProcessor
 
     protected SecurityManager getSecurityManager()
     {
-        return ServiceLocator.getServiceNoCache( SecurityManager.class );
-    }
-
-
-    protected LocalPeer getLocalPeer()
-    {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+        return ServiceLocator.lookup( SecurityManager.class );
     }
 
 

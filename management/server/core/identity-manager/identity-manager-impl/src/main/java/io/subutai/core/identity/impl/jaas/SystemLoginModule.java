@@ -45,7 +45,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         try
         {
             Class.forName( "org.apache.karaf.jaas.config.JaasRealm", true, JaasRealm.class.getClassLoader() );
-            identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            identityManager = ServiceLocator.lookup( IdentityManager.class );
         }
         catch ( Exception e )
         {
@@ -122,7 +122,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
             else
             {
                 identityManager.getSecurityController().logEvent( user, password, "Invalid Login" );
-                throw new LoginException( "Invalid Login");
+                throw new LoginException( "Invalid Login" );
             }
         }
         catch ( IOException ioException )

@@ -16,8 +16,6 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 public class RemoteEnvironment extends EnvironmentImpl
 {
 
-    private String containerSubnet;
-    private int vlan;
     private String initiatorPeerId;
     private Set<ContainerHost> containers;
 
@@ -26,14 +24,18 @@ public class RemoteEnvironment extends EnvironmentImpl
                               final Set<ContainerHost> containers )
     {
         this.environmentId = networkResource.getEnvironmentId();
-        this.containerSubnet = networkResource.getContainerSubnet();
-        this.vlan = networkResource.getVlan();
         this.containers = containers;
         this.initiatorPeerId = networkResource.getInitiatorPeerId();
         setP2PSubnet( networkResource.getP2pSubnet() );
         setVni( networkResource.getVni() );
         setStatus( EnvironmentStatus.UNKNOWN );
         setName( name );
+    }
+
+
+    public String getInitiatorPeerId()
+    {
+        return initiatorPeerId;
     }
 
 

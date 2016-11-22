@@ -11,6 +11,7 @@ import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
+import io.subutai.common.peer.RemotePeer;
 import io.subutai.hub.share.resource.PeerGroupResources;
 
 
@@ -35,9 +36,9 @@ public interface PeerManager
     Peer getPeer( String peerId ) throws PeerException;
 
     /**
-     * Returns peer instance by peer id or null if not found
+     * Returns remote peer instance by peer id or null if not found
      */
-    Peer findPeer( String peerId );
+    RemotePeer findPeer( String peerId );
 
     /**
      * Returns all peer instances

@@ -1145,13 +1145,10 @@ public class IdentityManagerImpl implements IdentityManager
     {
         try
         {
-            RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
-            if ( relationManager != null )
-            {
-                User activeUser = getActiveUser();
-                UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
-                relationManager.processTrustMessage( trustMessage, delegatedUser.getId() );
-            }
+            RelationManager relationManager = ServiceLocator.lookup( RelationManager.class );
+            User activeUser = getActiveUser();
+            UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
+            relationManager.processTrustMessage( trustMessage, delegatedUser.getId() );
         }
         catch ( RelationVerificationException e )
         {
@@ -1167,7 +1164,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         try
         {
-            RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
+            RelationManager relationManager = ServiceLocator.lookup( RelationManager.class );
             KeyManager keyManager = securityManager.getKeyManager();
             EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 

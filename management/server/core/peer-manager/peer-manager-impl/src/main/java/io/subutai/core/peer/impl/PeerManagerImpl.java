@@ -521,9 +521,16 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Peer findPeer( final String peerId )
+    public RemotePeer findPeer( final String peerId )
     {
-        return peers.get( peerId );
+        Peer peer = peers.get( peerId );
+
+        if ( peer != null && peer instanceof RemotePeer )
+        {
+            return ( RemotePeer ) peer;
+        }
+
+        return null;
     }
 
 

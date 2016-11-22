@@ -46,7 +46,7 @@ public class RequestNotifier implements Runnable
 
     protected PeerManager getPeerManager()
     {
-        return ServiceLocator.getServiceNoCache( PeerManager.class );
+        return ServiceLocator.lookup( PeerManager.class );
     }
 
 

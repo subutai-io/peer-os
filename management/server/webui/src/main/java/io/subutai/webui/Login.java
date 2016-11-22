@@ -40,7 +40,7 @@ public class Login extends HttpServlet
             String newPassword = request.getParameter( "newpassword" );
             User user;
 
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            IdentityManager identityManager = ServiceLocator.getServiceOrNull( IdentityManager.class );
 
             Preconditions.checkNotNull( identityManager, "Karaf Auth Module is loading, please try again later" );
 
