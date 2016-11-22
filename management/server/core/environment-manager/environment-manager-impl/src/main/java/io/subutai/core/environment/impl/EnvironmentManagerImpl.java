@@ -1129,11 +1129,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             NetworkResource networkResource =
                     peerManager.getLocalPeer().getReservedNetworkResources().findByEnvironmentId( environmentId );
 
-            RemotePeer initiatorPeer = peerManager.findPeer( networkResource.getInitiatorPeerId() );
+            if ( networkResource != null && !peerManager.getLocalPeer().getId()
+                                                        .equals( networkResource.getInitiatorPeerId() ) )
+            {
+                RemotePeer initiatorPeer = peerManager.findPeer( networkResource.getInitiatorPeerId() );
 
-            return new RemoteEnvironment( networkResource, String.format( "Of peer %s",
-                    initiatorPeer == null ? networkResource.getInitiatorPeerId() : initiatorPeer.getName() ),
-                    peerManager.getLocalPeer().findContainersByEnvironmentId( environmentId ) );
+                return new RemoteEnvironment( networkResource, String.format( "Of %s",
+                        initiatorPeer == null ? networkResource.getInitiatorPeerId() : initiatorPeer.getName() ),
+                        peerManager.getLocalPeer().findContainersByEnvironmentId( environmentId ) );
+            }
         }
         catch ( PeerException e )
         {
@@ -1899,7 +1903,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         environment.excludePeerFromEnvironment( peerId );
 
-        update( environment );
+        if ( environment.getEnvironmentPeers().isEmpty() )
+        {
+            remove( environment );
+        }
+        else
+        {
+            update( environment );
+        }
     }
 
 
@@ -1908,11 +1919,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Set<Environment> environments = Sets.newHashSet();
 
+        // add local env-s
         environments.addAll( environmentService.getAll() );
 
-        environments.addAll( environmentAdapter.getEnvironments( true ) );
+        if ( environmentAdapter.isHubReachable() && environmentAdapter.isRegisteredWithHub() )
+        {
+            // add hub envs
+            environments.addAll( environmentAdapter.getEnvironments( true ) );
 
-        environments.addAll( getRemoteEnvironments() );
+            // add remote env-s
+            environments.addAll( getRemoteEnvironments( false ) );
+        }
+        else
+        {
+            // add all remote env-s including hub envs
+            environments.addAll( getRemoteEnvironments( true ) );
+        }
+
 
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
@@ -1929,7 +1952,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    private Set<RemoteEnvironment> getRemoteEnvironments()
+    private Set<RemoteEnvironment> getRemoteEnvironments( boolean includeHubEnvironments )
     {
         Set<RemoteEnvironment> remoteEnvironments = Sets.newHashSet();
 
@@ -1939,15 +1962,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             for ( NetworkResource networkResource : networkResources.getNetworkResources() )
             {
-                // exclude hub reservations and local reservations
-                if ( !Common.HUB_PEER_ID.equals( networkResource.getInitiatorPeerId() ) && !peerManager.getLocalPeer()
-                                                                                                       .getId().equals(
-                                networkResource.getInitiatorPeerId() ) )
+                // exclude local reservations
+                if ( !peerManager.getLocalPeer().getId().equals( networkResource.getInitiatorPeerId() ) )
                 {
+                    if ( !includeHubEnvironments && Common.HUB_PEER_ID.equals( networkResource.getInitiatorPeerId() ) )
+                    {
+                        continue;
+                    }
+
                     RemotePeer initiatorPeer = networkResource.getInitiatorPeerId() == null ? null :
                                                peerManager.findPeer( networkResource.getInitiatorPeerId() );
 
-                    remoteEnvironments.add( new RemoteEnvironment( networkResource, String.format( "Of peer %s",
+                    remoteEnvironments.add( new RemoteEnvironment( networkResource, String.format( "Of %s",
                             initiatorPeer == null ? networkResource.getInitiatorPeerId() : initiatorPeer.getName() ),
                             peerManager.getLocalPeer()
                                        .findContainersByEnvironmentId( networkResource.getEnvironmentId() ) ) );

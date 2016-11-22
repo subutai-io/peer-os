@@ -66,11 +66,19 @@ public class EnvironmentAdapter
     }
 
 
-    private boolean isHubReachable()
+    public boolean isHubReachable()
     {
         HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
 
         return hubManager != null && hubManager.isHubReachable();
+    }
+
+
+    public boolean isRegisteredWithHub()
+    {
+        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
+
+        return hubManager != null && hubManager.isRegistered();
     }
 
 
