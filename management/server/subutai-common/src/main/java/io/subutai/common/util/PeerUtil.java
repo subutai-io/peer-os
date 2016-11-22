@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.Peer;
+import io.subutai.common.settings.Common;
 
 
 public class PeerUtil<T>
@@ -85,7 +86,9 @@ public class PeerUtil<T>
 
         Set<PeerTaskResult<T>> peerTaskResults = Sets.newHashSet();
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( peerTasks.size() );
+        ExecutorService taskExecutor =
+                Executors.newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, peerTasks.size() ) );
+
         CompletionService<T> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
 
         Map<Peer, Future<T>> peerFutures = Maps.newHashMap();

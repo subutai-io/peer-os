@@ -11,6 +11,7 @@ public class Common
     public static final int DEFAULT_PUBLIC_PORT = 8443;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
     public static final int DEFAULT_AGENT_PORT = 7070;
+    public static final int MAX_EXECUTOR_SIZE = 10;
 
     public static final String GATEWAY_INTERFACE_NAME_REGEX = "^gw-(\\d+)$";
     public static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );

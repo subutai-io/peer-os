@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -47,8 +48,7 @@ public class HeartbeatProcessor implements Runnable
 
     private String peerId;
 
-    //    private Executor processorPool = new LimitedCachedExecutor( 10, 10 );
-    private ExecutorService processorPool = Executors.newFixedThreadPool( 25 );
+    private ExecutorService processorPool = Executors.newFixedThreadPool( Common.MAX_EXECUTOR_SIZE );
 
     private volatile boolean isHubReachable = false;
 

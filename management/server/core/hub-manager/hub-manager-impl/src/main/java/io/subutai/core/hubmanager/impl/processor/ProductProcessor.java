@@ -23,6 +23,7 @@ import org.apache.http.HttpStatus;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.security.utils.SafeCloseUtil;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
@@ -302,7 +303,8 @@ public class ProductProcessor implements StateLinkProcessor
     {
         if ( !CollectionUtil.isCollectionEmpty( hubEventListeners ) )
         {
-            ExecutorService notifier = Executors.newFixedThreadPool( hubEventListeners.size() );
+            ExecutorService notifier =
+                    Executors.newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, hubEventListeners.size() ) );
 
             for ( final HubEventListener hubEventListener : hubEventListeners )
             {
