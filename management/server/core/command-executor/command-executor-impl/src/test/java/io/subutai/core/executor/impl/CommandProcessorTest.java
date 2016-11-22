@@ -5,11 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import javax.naming.NamingException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +18,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.cache.EntryExpiryCallback;
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -41,10 +38,7 @@ import io.subutai.core.security.api.SecurityManager;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -60,12 +54,6 @@ public class CommandProcessorTest
 {
     private static final String HOST_ID = UUID.randomUUID().toString();
     private static final UUID COMMAND_ID = UUID.randomUUID();
-    private static final String RESPONSE_JSON = String.format(
-            " { response: {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\","
-                    + "      \"commandId\":\"%s\"," + "      \"pid\":123," + "      \"responseNumber\":2,"
-                    + "      \"stdOut\":\"output\"," + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  } }",
-            HOST_ID, COMMAND_ID.toString() );
-    private static final String MSG = "MSG";
 
     @Mock
     HostRegistry hostRegistry;
@@ -103,6 +91,8 @@ public class CommandProcessorTest
     IPUtil ipUtil;
 
     CommandProcessor commandProcessor;
+    @Mock
+    CommandProcess commandProcess;
 
 
     @Before
@@ -214,6 +204,7 @@ public class CommandProcessorTest
     @Test
     public void testExecute() throws Exception
     {
+        doReturn( commandProcess ).when( commandProcessor ).createCommandProcess( callback, request, HOST_ID );
 
         doThrow( new HostDisconnectedException( "" ) ).when( commandProcessor ).getResourceHostInfo( HOST_ID );
 
@@ -236,25 +227,6 @@ public class CommandProcessorTest
         catch ( CommandException e )
         {
         }
-
-        doReturn( resourceHostInfo ).when( commandProcessor ).getResourceHostInfo( HOST_ID );
-        doReturn( true ).when( commands ).put( anyObject(), anyObject(), anyLong(), any( EntryExpiryCallback.class ) );
-        doReturn( "" ).when( commandProcessor ).encrypt( anyString(), anyString() );
-
-        commandProcessor.execute( request, callback );
-
-        verify( commandProcessor ).queueRequest( eq( resourceHostInfo ), eq( request ) );
-
-        doThrow( new PGPException("") ).when( commandProcessor ).queueRequest( resourceHostInfo, request );
-
-        try
-        {
-            commandProcessor.execute( request, callback );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
     }
 
 
@@ -264,18 +236,6 @@ public class CommandProcessorTest
         Set<String> requests = commandProcessor.getRequests( HOST_ID );
 
         assertNotNull( requests );
-    }
-
-
-    @Test
-    public void testEncrypt() throws Exception
-    {
-
-        doReturn( securityManager ).when( commandProcessor ).getSecurityManager();
-
-        commandProcessor.encrypt( MSG, HOST_ID );
-
-        verify( securityManager ).signNEncryptRequestToHost( MSG, HOST_ID );
     }
 
 
