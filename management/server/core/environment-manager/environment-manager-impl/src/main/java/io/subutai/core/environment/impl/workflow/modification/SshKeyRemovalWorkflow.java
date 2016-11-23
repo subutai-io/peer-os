@@ -4,14 +4,14 @@ package io.subutai.core.environment.impl.workflow.modification;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.steps.RemoveSshKeyStep;
 
 
 public class SshKeyRemovalWorkflow extends CancellableWorkflow<SshKeyRemovalWorkflow.SshKeyAdditionPhase>
 {
-    private EnvironmentImpl environment;
+    private LocalEnvironment environment;
     private final String sshKey;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
@@ -23,7 +23,7 @@ public class SshKeyRemovalWorkflow extends CancellableWorkflow<SshKeyRemovalWork
     }
 
 
-    public SshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
+    public SshKeyRemovalWorkflow( final LocalEnvironment environment, final String sshKey,
                                   final TrackerOperation operationTracker,
                                   final EnvironmentManagerImpl environmentManager )
     {

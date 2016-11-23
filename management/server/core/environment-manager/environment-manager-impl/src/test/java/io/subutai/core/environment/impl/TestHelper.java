@@ -25,7 +25,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 import static org.mockito.Mockito.doCallRealMethod;
@@ -59,9 +59,9 @@ public class TestHelper
     public static final String P2P_SUBNET = "10.10.10.1";
 
 
-    public static EnvironmentImpl ENVIRONMENT()
+    public static LocalEnvironment ENVIRONMENT()
     {
-        EnvironmentImpl ENVIRONMENT = mock( EnvironmentImpl.class );
+        LocalEnvironment ENVIRONMENT = mock( LocalEnvironment.class );
         doReturn( new EnvironmentId( ENV_ID ) ).when( ENVIRONMENT ).getEnvironmentId();
         doReturn( ENV_ID ).when( ENVIRONMENT ).getId();
         doReturn( SUBNET_CIDR ).when( ENVIRONMENT ).getSubnetCidr();

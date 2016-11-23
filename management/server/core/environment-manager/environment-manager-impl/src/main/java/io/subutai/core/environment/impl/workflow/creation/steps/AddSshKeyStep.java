@@ -11,18 +11,18 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public class AddSshKeyStep
 {
     private final String sshKey;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> keyUtil = new PeerUtil<>();
 
 
-    public AddSshKeyStep( final String sshKey, final EnvironmentImpl environment,
+    public AddSshKeyStep( final String sshKey, final LocalEnvironment environment,
                           final TrackerOperation trackerOperation )
     {
         this.sshKey = sshKey;

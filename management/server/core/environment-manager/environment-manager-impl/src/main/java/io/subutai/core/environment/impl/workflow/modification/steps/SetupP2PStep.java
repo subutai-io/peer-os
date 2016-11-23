@@ -24,7 +24,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.PeerUtil;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTunnelTask;
 import io.subutai.core.environment.impl.workflow.modification.steps.helpers.SetupP2PConnectionTask;
@@ -33,12 +33,12 @@ import io.subutai.core.environment.impl.workflow.modification.steps.helpers.Setu
 public class SetupP2PStep
 {
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
-    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment,
+    public SetupP2PStep( final Topology topology, final LocalEnvironment environment,
                          final TrackerOperation trackerOperation )
     {
         this.topology = topology;
@@ -96,7 +96,7 @@ public class SetupP2PStep
     }
 
 
-    protected void setupP2p( EnvironmentImpl environment, Map<String, Set<String>> peerRhIds, Set<String> p2pAddresses )
+    protected void setupP2p( LocalEnvironment environment, Map<String, Set<String>> peerRhIds, Set<String> p2pAddresses )
             throws EnvironmentModificationException, PeerException
     {
         //generate p2p secret key

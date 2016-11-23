@@ -31,7 +31,7 @@ public class EnvironmentAlertHandlerImpl implements EnvironmentAlertHandler, Com
     @Enumerated( EnumType.STRING )
     private AlertHandlerPriority handlerPriority;
 
-    @ManyToOne( targetEntity = EnvironmentImpl.class )
+    @ManyToOne( targetEntity = LocalEnvironment.class )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
 

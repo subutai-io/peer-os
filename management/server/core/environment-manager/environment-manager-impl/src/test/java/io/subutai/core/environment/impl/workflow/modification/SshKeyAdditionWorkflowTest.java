@@ -10,7 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -25,7 +25,7 @@ public class SshKeyAdditionWorkflowTest
 
     class SshKeyAdditionWorkflowSUT extends SshKeyAdditionWorkflow
     {
-        public SshKeyAdditionWorkflowSUT( final EnvironmentImpl environment, final String sshKey,
+        public SshKeyAdditionWorkflowSUT( final LocalEnvironment environment, final String sshKey,
                                           final TrackerOperation operationTracker,
                                           final EnvironmentManagerImpl environmentManager )
         {
@@ -41,7 +41,7 @@ public class SshKeyAdditionWorkflowTest
 
 
     SshKeyAdditionWorkflow workflow;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     EnvironmentManagerImpl environmentManager;
     TrackerOperation trackerOperation = TestHelper.TRACKER_OPERATION();

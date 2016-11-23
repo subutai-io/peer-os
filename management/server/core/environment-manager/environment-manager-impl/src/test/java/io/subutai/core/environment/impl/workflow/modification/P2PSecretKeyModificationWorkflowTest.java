@@ -10,7 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -24,7 +24,7 @@ public class P2PSecretKeyModificationWorkflowTest
 
     class P2PSecretKeyModificationWorkflowSUT extends P2PSecretKeyModificationWorkflow
     {
-        public P2PSecretKeyModificationWorkflowSUT( final EnvironmentImpl environment, final String p2pSecretKey,
+        public P2PSecretKeyModificationWorkflowSUT( final LocalEnvironment environment, final String p2pSecretKey,
                                                     final long p2pSecretKeyTtlSeconds,
                                                     final TrackerOperation operationTracker,
                                                     final EnvironmentManagerImpl environmentManager )
@@ -41,7 +41,7 @@ public class P2PSecretKeyModificationWorkflowTest
 
 
     P2PSecretKeyModificationWorkflow workflow;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     EnvironmentManagerImpl environmentManager;
     TrackerOperation trackerOperation = TestHelper.TRACKER_OPERATION();

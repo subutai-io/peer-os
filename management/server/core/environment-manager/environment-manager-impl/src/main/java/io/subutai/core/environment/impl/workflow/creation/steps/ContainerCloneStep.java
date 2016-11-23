@@ -29,7 +29,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerEnvironmentContainersTask;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -42,14 +42,14 @@ public class ContainerCloneStep
     private static final Logger LOGGER = LoggerFactory.getLogger( ContainerCloneStep.class );
     private final String defaultDomain;
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final TrackerOperation operationTracker;
     private final String localPeerId;
     private PeerManager peerManager;
     protected PeerUtil<CreateEnvironmentContainersResponse> cloneUtil = new PeerUtil<>();
 
 
-    public ContainerCloneStep( final String defaultDomain, final Topology topology, final EnvironmentImpl environment,
+    public ContainerCloneStep( final String defaultDomain, final Topology topology, final LocalEnvironment environment,
                                final PeerManager peerManager, final TrackerOperation operationTracker )
     {
         this.defaultDomain = defaultDomain;

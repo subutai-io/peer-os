@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class EnvironmentImplTest
+public class LocalEnvironmentTest
 {
     private static final String ENV_NAME = "env";
     private static final String SSH_KEY = "key";
@@ -48,13 +48,13 @@ public class EnvironmentImplTest
     @Mock
     Peer peer;
 
-    EnvironmentImpl environment;
+    LocalEnvironment environment;
 
 
     @Before
     public void setUp() throws Exception
     {
-        environment = new EnvironmentImpl( ENV_NAME, SSH_KEY, USER_ID, PEER_ID );
+        environment = new LocalEnvironment( ENV_NAME, SSH_KEY, USER_ID, PEER_ID );
 
         environment.setEnvironmentManager( environmentManager );
 

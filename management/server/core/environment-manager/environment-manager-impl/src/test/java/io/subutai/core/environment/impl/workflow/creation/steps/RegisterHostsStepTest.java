@@ -15,7 +15,7 @@ import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Mockito.doReturn;
@@ -31,7 +31,7 @@ public class RegisterHostsStepTest
 
     @Mock
     Topology topology;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     EnvironmentContainerImpl environmentContainer = TestHelper.ENV_CONTAINER();
     @Mock
     PeerUtil<Object> peerUtil;

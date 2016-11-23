@@ -29,7 +29,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -173,7 +173,7 @@ public class EnvironmentAdapter
     }
 
 
-    public void removeEnvironment( EnvironmentImpl env )
+    public void removeEnvironment( LocalEnvironment env )
     {
         if ( !isHubReachable() )
         {
@@ -200,12 +200,12 @@ public class EnvironmentAdapter
 
         for ( Environment env : envs )
         {
-            uploadEnvironment( ( EnvironmentImpl ) env );
+            uploadEnvironment( ( LocalEnvironment ) env );
         }
     }
 
 
-    public void uploadEnvironment( EnvironmentImpl env )
+    public void uploadEnvironment( LocalEnvironment env )
     {
         if ( !isHubReachable() )
         {
@@ -234,7 +234,7 @@ public class EnvironmentAdapter
     }
 
 
-    private void environmentContainersToJson( EnvironmentImpl env, ObjectNode json ) throws PeerException
+    private void environmentContainersToJson( LocalEnvironment env, ObjectNode json ) throws PeerException
     {
         ArrayNode contNode = json.putArray( "containers" );
 
@@ -275,7 +275,7 @@ public class EnvironmentAdapter
     }
 
 
-    private ObjectNode environmentToJson( EnvironmentImpl env )
+    private ObjectNode environmentToJson( LocalEnvironment env )
     {
         ObjectNode json = JsonUtil.createNode( "id", env.getEnvironmentId().getId() );
 
@@ -293,7 +293,7 @@ public class EnvironmentAdapter
     }
 
 
-    private void environmentPeersToJson( EnvironmentImpl env, ObjectNode json ) throws PeerException
+    private void environmentPeersToJson( LocalEnvironment env, ObjectNode json ) throws PeerException
     {
         ArrayNode peers = json.putArray( "peers" );
 

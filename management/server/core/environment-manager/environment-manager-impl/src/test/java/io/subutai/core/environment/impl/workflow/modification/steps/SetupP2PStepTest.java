@@ -19,7 +19,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Mockito.doReturn;
@@ -33,7 +33,7 @@ public class SetupP2PStepTest
     SetupP2PStep step;
     @Mock
     Topology topology;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     PeerUtil<Object> peerUtil;
     @Mock

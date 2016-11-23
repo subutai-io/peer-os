@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public class EnvironmentServiceImpl implements EnvironmentService
@@ -23,16 +23,16 @@ public class EnvironmentServiceImpl implements EnvironmentService
 
 
     @Override
-    public EnvironmentImpl find( final String id )
+    public LocalEnvironment find( final String id )
     {
-        return em.find( EnvironmentImpl.class, id );
+        return em.find( LocalEnvironment.class, id );
     }
 
 
     @Override
-    public List<EnvironmentImpl> getAll()
+    public List<LocalEnvironment> getAll()
     {
-        return em.createQuery( "select e from EnvironmentImpl e", EnvironmentImpl.class ).getResultList();
+        return em.createQuery( "select e from LocalEnvironment e", LocalEnvironment.class ).getResultList();
     }
 
 
@@ -50,15 +50,15 @@ public class EnvironmentServiceImpl implements EnvironmentService
     @Override
     public void remove( final String id )
     {
-        em.remove( em.getReference( EnvironmentImpl.class, id ) );
+        em.remove( em.getReference( LocalEnvironment.class, id ) );
     }
 
 
     @Override
-    public EnvironmentImpl merge( final EnvironmentImpl item )
+    public LocalEnvironment merge( final LocalEnvironment item )
     {
 
-        EnvironmentImpl environment = em.merge( item );
+        LocalEnvironment environment = em.merge( item );
 
         em.flush();
 

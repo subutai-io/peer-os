@@ -25,7 +25,7 @@ import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -46,7 +46,7 @@ public class ContainerCloneStepTest
     @Mock
     PeerManager peerManager;
 
-    EnvironmentImpl ENVIRONMENT = TestHelper.ENVIRONMENT();
+    LocalEnvironment ENVIRONMENT = TestHelper.ENVIRONMENT();
     LocalPeer LOCAL_PEER = TestHelper.LOCAL_PEER();
     Peer PEER = TestHelper.PEER();
 

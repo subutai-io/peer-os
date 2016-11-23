@@ -60,7 +60,7 @@ public class EnvironmentContainerImplTest
     private EnvironmentContainerImpl environmentContainer;
 
     @Mock
-    EnvironmentImpl environment;
+    LocalEnvironment environment;
     @Mock
     EnvironmentManagerImpl environmentManager;
     @Mock
