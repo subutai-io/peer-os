@@ -53,6 +53,8 @@ public class RestServiceImpl implements RestService
 
             Preconditions.checkNotNull( heartBeat, "Invalid heartbeat" );
 
+            Preconditions.checkNotNull( heartBeat.getHostInfo(), "Invalid heartbeat" );
+
             restProcessor.handleHeartbeat( heartBeat );
 
             return Response.accepted().build();
@@ -75,7 +77,14 @@ public class RestServiceImpl implements RestService
         {
             String decryptedResponse = decrypt( response );
 
+            Preconditions.checkArgument( decryptedResponse != null && !decryptedResponse.trim().isEmpty(),
+                    "Empty response" );
+
             ResponseWrapper responseWrapper = JsonUtil.fromJson( decryptedResponse, ResponseWrapper.class );
+
+            Preconditions.checkNotNull( responseWrapper, "Invalid response" );
+
+            Preconditions.checkNotNull( responseWrapper.getResponse(), "Invalid response" );
 
             final ResponseImpl responseImpl = responseWrapper.getResponse();
 
