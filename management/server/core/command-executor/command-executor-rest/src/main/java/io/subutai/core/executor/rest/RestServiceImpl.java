@@ -46,7 +46,12 @@ public class RestServiceImpl implements RestService
         {
             String decryptedHeartbeat = decrypt( heartbeat );
 
+            Preconditions.checkArgument( decryptedHeartbeat != null && !decryptedHeartbeat.trim().isEmpty(),
+                    "Empty heartbeat" );
+
             final HeartBeat heartBeat = JsonUtil.fromJson( decryptedHeartbeat, HeartBeat.class );
+
+            Preconditions.checkNotNull( heartBeat, "Invalid heartbeat" );
 
             restProcessor.handleHeartbeat( heartBeat );
 
