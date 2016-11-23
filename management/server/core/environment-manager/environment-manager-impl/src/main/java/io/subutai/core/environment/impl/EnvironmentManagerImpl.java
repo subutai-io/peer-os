@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,7 +83,7 @@ import io.subutai.core.environment.impl.adapter.HubEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
@@ -254,7 +255,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     protected boolean isPeerInUse( String peerId )
     {
-        for ( EnvironmentImpl e : environmentService.getAll() )
+        for ( LocalEnvironment e : environmentService.getAll() )
         {
             if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
             {
@@ -292,7 +293,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         envs.addAll( environmentService.getAll() );
 
-        envs.addAll( environmentAdapter.getEnvironments( false ) );
+        Set<HubEnvironment> hubEnvironments = environmentAdapter.getEnvironments( false );
+
+        // remove environments that exist on Hub but don't exist on peer
+        // workaround for https://github.com/subutai-io/base/issues/1464
+        removeStaleHubEnvironments( hubEnvironments );
+
+        envs.addAll( hubEnvironments );
 
         setTransientFields( envs );
 
@@ -316,7 +323,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         // Using environmentManager for ProxyEnvironment may give side effects. For example, empty container list.
         if ( !( environment instanceof HubEnvironment ) )
         {
-            ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
+            ( ( LocalEnvironment ) environment ).setEnvironmentManager( this );
         }
     }
 
@@ -386,7 +393,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( topology );
+        final LocalEnvironment environment = createEmptyEnvironment( topology );
         // TODO add additional step for receiving trust message
 
 
@@ -445,10 +452,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    EnvironmentImpl createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
+    LocalEnvironment createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
     {
-        EnvironmentImpl environment =
-                new EnvironmentImpl( topology.getEnvironmentName(), topology.getSshKey(), getUserId(),
+        LocalEnvironment environment =
+                new LocalEnvironment( topology.getEnvironmentName(), topology.getSshKey(), getUserId(),
                         peerManager.getLocalPeer().getId() );
 
         User activeUser = identityManager.getActiveUser();
@@ -475,7 +482,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         final Set<EnvironmentContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
 
@@ -509,7 +516,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 "No environment modification task found" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Modifying environment %s", environment.getId() ) );
@@ -614,7 +621,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Adding ssh key %s to environment %s ", sshKey, environmentId ) );
@@ -666,7 +673,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing ssh key %s from environment %s ", sshKey, environmentId ) );
@@ -763,7 +770,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newP2pSecretKey ), "Invalid p2p secret key" );
         Preconditions.checkArgument( p2pSecretKeyTtlSec > 0, "Invalid p2p secret key time-to-live" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Resetting p2p secret key for environment %s ", environmentId ) );
@@ -812,11 +819,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        EnvironmentImpl environment;
+        LocalEnvironment environment;
 
         try
         {
-            environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+            environment = ( LocalEnvironment ) loadEnvironment( environmentId );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -922,7 +929,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         if ( environment instanceof HubEnvironment )
         {
@@ -991,8 +998,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkNotNull( containerId, "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
 
-        final EnvironmentImpl environment =
-                ( EnvironmentImpl ) loadEnvironment( containerId.getEnvironmentId().getId() );
+        final LocalEnvironment environment =
+                ( LocalEnvironment ) loadEnvironment( containerId.getEnvironmentId().getId() );
 
         //check that container exists in the environment
         environment.getContainerHostById( containerId.getId() );
@@ -1068,7 +1075,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
             else
             {
-                EnvironmentImpl environment = environmentService.find( environmentId );
+                LocalEnvironment environment = environmentService.find( environmentId );
 
                 if ( environment != null )
                 {
@@ -1101,7 +1108,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         // First get from Hub
-        EnvironmentImpl environment = environmentAdapter.get( environmentId );
+        LocalEnvironment environment = environmentAdapter.get( environmentId );
 
         if ( environment != null )
         {
@@ -1122,7 +1129,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    EnvironmentImpl findRemoteEnvironment( String environmentId )
+    LocalEnvironment findRemoteEnvironment( String environmentId )
     {
         try
         {
@@ -1179,7 +1186,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         boolean assign = !Strings.isNullOrEmpty( domain );
 
@@ -1222,7 +1229,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         try
         {
@@ -1242,7 +1249,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         try
         {
@@ -1284,7 +1291,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         ContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
@@ -1334,7 +1341,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
 
@@ -1389,7 +1396,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     //-- workflow factories start
 
 
-    protected P2PSecretKeyModificationWorkflow getP2PSecretKeyModificationWorkflow( final EnvironmentImpl environment,
+    protected P2PSecretKeyModificationWorkflow getP2PSecretKeyModificationWorkflow( final LocalEnvironment environment,
                                                                                     final String p2pSecretKey,
                                                                                     final long p2pSecretKeyTtlSec,
                                                                                     final TrackerOperation
@@ -1400,7 +1407,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected SshKeyAdditionWorkflow getSshKeyAdditionWorkflow( final EnvironmentImpl environment, final String sshKey,
+    protected SshKeyAdditionWorkflow getSshKeyAdditionWorkflow( final LocalEnvironment environment, final String sshKey,
 
                                                                 final TrackerOperation operationTracker )
     {
@@ -1408,14 +1415,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected SshKeyRemovalWorkflow getSshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
+    protected SshKeyRemovalWorkflow getSshKeyRemovalWorkflow( final LocalEnvironment environment, final String sshKey,
                                                               final TrackerOperation operationTracker )
     {
         return new SshKeyRemovalWorkflow( environment, sshKey, operationTracker, this );
     }
 
 
-    protected ContainerDestructionWorkflow getContainerDestructionWorkflow( final EnvironmentImpl environment,
+    protected ContainerDestructionWorkflow getContainerDestructionWorkflow( final LocalEnvironment environment,
                                                                             final ContainerHost containerHost,
                                                                             final TrackerOperation operationTracker )
     {
@@ -1423,7 +1430,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
+    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final LocalEnvironment environment,
                                                                           final Topology topology, final String sshKey,
                                                                           final TrackerOperation operationTracker )
     {
@@ -1432,7 +1439,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final EnvironmentImpl environment,
+    protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final LocalEnvironment environment,
                                                                          final Topology topology,
                                                                          final TrackerOperation operationTracker,
                                                                          final List<String> removedContainers,
@@ -1445,7 +1452,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final EnvironmentImpl environment,
+    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final LocalEnvironment environment,
                                                                                 final TrackerOperation
                                                                                         operationTracker )
     {
@@ -1453,7 +1460,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected HostnameModificationWorkflow getHostnameModificationWorkflow( final EnvironmentImpl environment,
+    protected HostnameModificationWorkflow getHostnameModificationWorkflow( final LocalEnvironment environment,
                                                                             final ContainerId containerId,
                                                                             final String newHostname,
                                                                             final TrackerOperation operationTracker )
@@ -1564,7 +1571,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public void save( final EnvironmentImpl environment )
+    public void save( final LocalEnvironment environment )
     {
         environmentService.persist( environment );
 
@@ -1572,7 +1579,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public synchronized EnvironmentImpl update( EnvironmentImpl environment )
+    public synchronized LocalEnvironment update( LocalEnvironment environment )
     {
         if ( environment instanceof HubEnvironment )
         {
@@ -1590,7 +1597,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public void remove( final EnvironmentImpl environment )
+    public void remove( final LocalEnvironment environment )
     {
         environmentService.remove( environment.getId() );
 
@@ -1607,8 +1614,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         envContainer.setEnvironmentManager( this );
 
         //update cache
-        ( ( EnvironmentImpl ) environment ).removeContainer( envContainer );
-        ( ( EnvironmentImpl ) environment ).addContainers( Sets.newHashSet( envContainer ) );
+        ( ( LocalEnvironment ) environment ).removeContainer( envContainer );
+        ( ( LocalEnvironment ) environment ).addContainers( Sets.newHashSet( envContainer ) );
 
         return envContainer;
     }
@@ -1746,7 +1753,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
         try
         {
-            EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+            LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
             environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
 
@@ -1770,7 +1777,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //remove subscription from database
         try
         {
-            EnvironmentImpl environment = environmentService.find( environmentId );
+            LocalEnvironment environment = environmentService.find( environmentId );
             environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
             update( environment );
         }
@@ -1887,7 +1894,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
 
-        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         environment.addSshKey( sshKey );
 
@@ -1899,7 +1906,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void excludePeerFromEnvironment( final String environmentId, final String peerId )
             throws EnvironmentNotFoundException, EnvironmentManagerException
     {
-        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         environment.excludePeerFromEnvironment( peerId );
 
@@ -1924,15 +1931,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         if ( environmentAdapter.isHubReachable() && environmentAdapter.isRegisteredWithHub() )
         {
-            // add hub envs
-            environments.addAll( environmentAdapter.getEnvironments( true ) );
+            // add hub env-s
+            Set<HubEnvironment> hubEnvironments = environmentAdapter.getEnvironments( true );
+
+            // remove environments that exist on Hub but don't exist on peer
+            // workaround for https://github.com/subutai-io/base/issues/1464
+            removeStaleHubEnvironments( hubEnvironments );
+
+            environments.addAll( hubEnvironments );
 
             // add remote env-s
             environments.addAll( getRemoteEnvironments( false ) );
         }
         else
         {
-            // add all remote env-s including hub envs
+            // add all remote env-s including hub env-s
             environments.addAll( getRemoteEnvironments( true ) );
         }
 
@@ -1949,6 +1962,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         return environmentDtos;
+    }
+
+
+    // remove environments that exist on Hub but don't exist on peer
+    // workaround for https://github.com/subutai-io/base/issues/1464
+    private void removeStaleHubEnvironments( Set<HubEnvironment> hubEnvironments )
+    {
+        try
+        {
+            ReservedNetworkResources networkResources = peerManager.getLocalPeer().getReservedNetworkResources();
+
+            for ( Iterator<HubEnvironment> iterator = hubEnvironments.iterator(); iterator.hasNext(); )
+            {
+                final HubEnvironment environment = iterator.next();
+
+                if ( networkResources.findByEnvironmentId( environment.getId() ) == null )
+                {
+                    iterator.remove();
+                }
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error removing stale Hub environments: {}", e.getMessage() );
+        }
     }
 
 

@@ -8,13 +8,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -34,7 +32,7 @@ public class EnvironmentCreationWorkflowTest
     PeerManager peerManager;
     @Mock
     SecurityManager securityManager;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     Topology topology;
 
@@ -48,7 +46,7 @@ public class EnvironmentCreationWorkflowTest
         public EnvironmentCreationWorkflowSUT( final String defaultDomain,
                                                final EnvironmentManagerImpl environmentManager,
                                                final PeerManager peerManager, final SecurityManager securityManager,
-                                               final EnvironmentImpl environment, final Topology topology,
+                                               final LocalEnvironment environment, final Topology topology,
                                                final String sshKey, final TrackerOperation operationTracker )
         {
             super( defaultDomain, environmentManager, peerManager, securityManager, environment, topology, sshKey,

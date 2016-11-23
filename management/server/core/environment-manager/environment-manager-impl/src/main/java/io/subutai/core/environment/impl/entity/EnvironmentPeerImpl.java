@@ -46,7 +46,7 @@ public class EnvironmentPeerImpl implements EnvironmentPeer
     @CollectionTable( name = "RH_P2P_IP", joinColumns = @JoinColumn( name = "PEER_ID" ) )
     private Set<RhP2pIp> rhP2pIps;
 
-    @ManyToOne( targetEntity = EnvironmentImpl.class )
+    @ManyToOne( targetEntity = LocalEnvironment.class )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
 

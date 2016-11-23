@@ -7,7 +7,7 @@ import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
 
 
@@ -15,7 +15,7 @@ public class ContainerDestructionWorkflow
         extends CancellableWorkflow<ContainerDestructionWorkflow.ContainerDestructionPhase>
 {
     private final EnvironmentManagerImpl environmentManager;
-    private EnvironmentImpl environment;
+    private LocalEnvironment environment;
     private final ContainerHost containerHost;
     private final TrackerOperation operationTracker;
 
@@ -27,7 +27,7 @@ public class ContainerDestructionWorkflow
 
 
     public ContainerDestructionWorkflow( final EnvironmentManagerImpl environmentManager,
-                                         final EnvironmentImpl environment, final ContainerHost containerHost,
+                                         final LocalEnvironment environment, final ContainerHost containerHost,
                                          final TrackerOperation operationTracker )
     {
         super( ContainerDestructionPhase.INIT );
@@ -85,7 +85,7 @@ public class ContainerDestructionWorkflow
 
         try
         {
-            environment = ( EnvironmentImpl ) new DestroyContainerStep( containerHost ).execute();
+            environment = ( LocalEnvironment ) new DestroyContainerStep( containerHost ).execute();
 
             RelationManager relationManager = environmentManager.getRelationManager();
             relationManager.removeRelation( containerHost );

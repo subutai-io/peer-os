@@ -8,20 +8,20 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.modification.steps.helpers.ResetP2pKeyTask;
 
 
 public class P2PSecretKeyResetStep
 {
 
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final P2PCredentials p2PCredentials;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> resetUtil = new PeerUtil<>();
 
 
-    public P2PSecretKeyResetStep( final EnvironmentImpl environment, final P2PCredentials p2PCredentials,
+    public P2PSecretKeyResetStep( final LocalEnvironment environment, final P2PCredentials p2PCredentials,
                                   final TrackerOperation trackerOperation )
     {
         this.environment = environment;

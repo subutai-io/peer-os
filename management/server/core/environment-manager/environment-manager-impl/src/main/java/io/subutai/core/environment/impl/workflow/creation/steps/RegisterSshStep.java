@@ -16,18 +16,18 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public class RegisterSshStep
 {
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
-    public RegisterSshStep( final Topology topology, final EnvironmentImpl environment,
+    public RegisterSshStep( final Topology topology, final LocalEnvironment environment,
                             final TrackerOperation trackerOperation )
     {
         this.topology = topology;

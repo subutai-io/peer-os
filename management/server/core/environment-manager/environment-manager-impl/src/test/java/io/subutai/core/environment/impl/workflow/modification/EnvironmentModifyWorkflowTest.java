@@ -22,7 +22,7 @@ import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -41,7 +41,7 @@ public class EnvironmentModifyWorkflowTest
     class EnvironmentModifyWorkflowSUT extends EnvironmentModifyWorkflow
     {
         public EnvironmentModifyWorkflowSUT( final String defaultDomain, final PeerManager peerManager,
-                                             final SecurityManager securityManager, final EnvironmentImpl environment,
+                                             final SecurityManager securityManager, final LocalEnvironment environment,
                                              final Topology topology, final List<String> removedContainers,
                                              final Map<String, ContainerSize> changedContainers,
                                              final TrackerOperation operationTracker,
@@ -65,7 +65,7 @@ public class EnvironmentModifyWorkflowTest
     PeerManager peerManager;
     @Mock
     SecurityManager securityManager;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     Topology topology;
 

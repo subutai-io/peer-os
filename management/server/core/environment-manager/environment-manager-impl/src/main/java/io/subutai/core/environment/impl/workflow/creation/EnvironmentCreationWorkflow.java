@@ -6,7 +6,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
@@ -23,7 +23,7 @@ public class EnvironmentCreationWorkflow
 {
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
-    private EnvironmentImpl environment;
+    private LocalEnvironment environment;
     private final Topology topology;
     private final String sshKey;
     private final String defaultDomain;
@@ -49,7 +49,7 @@ public class EnvironmentCreationWorkflow
 
     public EnvironmentCreationWorkflow( String defaultDomain, EnvironmentManagerImpl environmentManager,
                                         PeerManager peerManager, SecurityManager securityManager,
-                                        EnvironmentImpl environment, Topology topology, String sshKey,
+                                        LocalEnvironment environment, Topology topology, String sshKey,
                                         TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );

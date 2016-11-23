@@ -10,10 +10,10 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.settings.Common;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
-public class RemoteEnvironment extends EnvironmentImpl
+public class RemoteEnvironment extends LocalEnvironment
 {
 
     private String initiatorPeerId;

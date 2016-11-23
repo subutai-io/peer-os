@@ -6,12 +6,12 @@ import org.apache.commons.lang3.StringUtils;
 import io.subutai.common.host.HostId;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public class RenameContainerTask extends TaskUtil.Task<Object>
 {
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final HostId containerId;
     private final String newHostname;
 
@@ -19,7 +19,7 @@ public class RenameContainerTask extends TaskUtil.Task<Object>
     private String newFullHostname;
 
 
-    public RenameContainerTask( final EnvironmentImpl environment, final HostId containerId, final String newHostname )
+    public RenameContainerTask( final LocalEnvironment environment, final HostId containerId, final String newHostname )
     {
         this.environment = environment;
         this.containerId = containerId;

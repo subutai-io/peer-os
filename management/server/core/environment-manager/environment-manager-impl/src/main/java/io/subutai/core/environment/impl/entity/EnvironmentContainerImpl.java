@@ -116,7 +116,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @JsonIgnore
     private Set<String> tags = new HashSet<>();
 
-    @ManyToOne( targetEntity = EnvironmentImpl.class, fetch = FetchType.EAGER )
+    @ManyToOne( targetEntity = LocalEnvironment.class, fetch = FetchType.EAGER )
     @JoinColumn( name = "environment_id" )
     @JsonIgnore
     protected Environment environment;
@@ -290,7 +290,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
             if ( parent.getContainerHostsByPeerId( getPeerId() ).isEmpty() )
             {
-                ( ( EnvironmentImpl ) parent ).removeEnvironmentPeer( getPeerId() );
+                ( ( LocalEnvironment ) parent ).removeEnvironmentPeer( getPeerId() );
             }
         }
         catch ( Exception e )
@@ -298,9 +298,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
             logger.warn( e.getMessage() );
         }
 
-        ( ( EnvironmentImpl ) parent ).removeContainer( this );
+        ( ( LocalEnvironment ) parent ).removeContainer( this );
 
-        Environment env = environmentManager.update( ( EnvironmentImpl ) parent );
+        Environment env = environmentManager.update( ( LocalEnvironment ) parent );
 
         environment = null;
 

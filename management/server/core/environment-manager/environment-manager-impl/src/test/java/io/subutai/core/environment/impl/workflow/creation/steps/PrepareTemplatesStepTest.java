@@ -13,7 +13,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Mockito.doReturn;
@@ -25,7 +25,7 @@ public class PrepareTemplatesStepTest
 {
     PrepareTemplatesStep step;
 
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     PeerManager peerManager;
     @Mock

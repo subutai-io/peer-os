@@ -9,19 +9,19 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.TaskUtil;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public class ChangeQuotaStep
 {
 
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final Map<String, ContainerSize> changedContainers;
     private final TrackerOperation trackerOperation;
     protected TaskUtil<Object> quotaUtil = new TaskUtil<>();
 
 
-    public ChangeQuotaStep( final EnvironmentImpl environment, final Map<String, ContainerSize> changedContainers,
+    public ChangeQuotaStep( final LocalEnvironment environment, final Map<String, ContainerSize> changedContainers,
                             final TrackerOperation trackerOperation )
     {
         this.environment = environment;

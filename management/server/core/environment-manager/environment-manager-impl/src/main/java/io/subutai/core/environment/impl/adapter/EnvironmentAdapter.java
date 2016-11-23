@@ -16,12 +16,9 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
@@ -29,7 +26,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -45,8 +42,6 @@ public class EnvironmentAdapter
 
     private final ProxyContainerHelper proxyContainerHelper;
 
-    private final PeerManager peerManager;
-
     private final HubAdapter hubAdapter;
     private final IdentityManager identityManager;
 
@@ -57,8 +52,6 @@ public class EnvironmentAdapter
         this.environmentManager = environmentManager;
 
         proxyContainerHelper = new ProxyContainerHelper( peerManager );
-
-        this.peerManager = peerManager;
 
         this.hubAdapter = hubAdapter;
 
@@ -129,25 +122,7 @@ public class EnvironmentAdapter
             log.error( "Error to parse json: ", e );
         }
 
-        printLocalContainers();
-
         return envs;
-    }
-
-
-    private void printLocalContainers()
-    {
-        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
-        {
-            for ( ContainerHost ch : rh.getContainerHosts() )
-            {
-                final HostInterfaces hostInterfaces = ch.getHostInterfaces();
-                String ip = hostInterfaces.findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
-
-                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip,
-                        ch.getContainerSize() );
-            }
-        }
     }
 
 
@@ -173,7 +148,7 @@ public class EnvironmentAdapter
     }
 
 
-    public void removeEnvironment( EnvironmentImpl env )
+    public void removeEnvironment( LocalEnvironment env )
     {
         if ( !isHubReachable() )
         {
@@ -200,12 +175,12 @@ public class EnvironmentAdapter
 
         for ( Environment env : envs )
         {
-            uploadEnvironment( ( EnvironmentImpl ) env );
+            uploadEnvironment( ( LocalEnvironment ) env );
         }
     }
 
 
-    public void uploadEnvironment( EnvironmentImpl env )
+    public void uploadEnvironment( LocalEnvironment env )
     {
         if ( !isHubReachable() )
         {
@@ -234,7 +209,7 @@ public class EnvironmentAdapter
     }
 
 
-    private void environmentContainersToJson( EnvironmentImpl env, ObjectNode json ) throws PeerException
+    private void environmentContainersToJson( LocalEnvironment env, ObjectNode json ) throws PeerException
     {
         ArrayNode contNode = json.putArray( "containers" );
 
@@ -275,7 +250,7 @@ public class EnvironmentAdapter
     }
 
 
-    private ObjectNode environmentToJson( EnvironmentImpl env )
+    private ObjectNode environmentToJson( LocalEnvironment env )
     {
         ObjectNode json = JsonUtil.createNode( "id", env.getEnvironmentId().getId() );
 
@@ -293,7 +268,7 @@ public class EnvironmentAdapter
     }
 
 
-    private void environmentPeersToJson( EnvironmentImpl env, ObjectNode json ) throws PeerException
+    private void environmentPeersToJson( LocalEnvironment env, ObjectNode json ) throws PeerException
     {
         ArrayNode peers = json.putArray( "peers" );
 
