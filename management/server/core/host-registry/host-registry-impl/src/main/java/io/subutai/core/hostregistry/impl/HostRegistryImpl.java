@@ -306,7 +306,7 @@ public class HostRegistryImpl implements HostRegistry
         }
         catch ( Exception e )
         {
-            LOG.error( "Error checking hosts", e );
+            LOG.error( "Error checking hosts: {}", e.getMessage() );
         }
     }
 
@@ -359,7 +359,7 @@ public class HostRegistryImpl implements HostRegistry
         }
         catch ( Exception e )
         {
-            LOG.error( "Error checking host {}", resourceHostInfo, e );
+            LOG.error( "Error checking host {}: {}", resourceHostInfo, e.getMessage() );
         }
         finally
         {

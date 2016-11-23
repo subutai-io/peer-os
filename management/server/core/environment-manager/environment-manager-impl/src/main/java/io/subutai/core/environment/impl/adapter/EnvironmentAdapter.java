@@ -16,12 +16,9 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
@@ -45,8 +42,6 @@ public class EnvironmentAdapter
 
     private final ProxyContainerHelper proxyContainerHelper;
 
-    private final PeerManager peerManager;
-
     private final HubAdapter hubAdapter;
     private final IdentityManager identityManager;
 
@@ -57,8 +52,6 @@ public class EnvironmentAdapter
         this.environmentManager = environmentManager;
 
         proxyContainerHelper = new ProxyContainerHelper( peerManager );
-
-        this.peerManager = peerManager;
 
         this.hubAdapter = hubAdapter;
 
@@ -129,25 +122,7 @@ public class EnvironmentAdapter
             log.error( "Error to parse json: ", e );
         }
 
-        printLocalContainers();
-
         return envs;
-    }
-
-
-    private void printLocalContainers()
-    {
-        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
-        {
-            for ( ContainerHost ch : rh.getContainerHosts() )
-            {
-                final HostInterfaces hostInterfaces = ch.getHostInterfaces();
-                String ip = hostInterfaces.findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
-
-                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip,
-                        ch.getContainerSize() );
-            }
-        }
     }
 
 
