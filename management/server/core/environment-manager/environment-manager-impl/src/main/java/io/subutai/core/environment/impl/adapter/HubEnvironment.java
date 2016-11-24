@@ -73,8 +73,6 @@ public class HubEnvironment extends LocalEnvironment
 
                 ch.setEnvironment( this );
 
-                ch.setEnvironmentAdapter( environmentAdapter );
-
                 containers.add( ch );
             }
         }

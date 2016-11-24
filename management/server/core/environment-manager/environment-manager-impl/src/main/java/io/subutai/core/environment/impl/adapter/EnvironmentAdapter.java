@@ -300,28 +300,6 @@ public class EnvironmentAdapter
     }
 
 
-    public void onContainerStart( String envId, String contId )
-    {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        hubAdapter.onContainerStart( envId, contId );
-    }
-
-
-    public void onContainerStop( String envId, String contId )
-    {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        hubAdapter.onContainerStop( envId, contId );
-    }
-
-
     public void removeSshKey( String envId, String sshKey )
     {
         if ( !isHubReachable() )
