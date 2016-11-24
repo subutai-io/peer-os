@@ -64,7 +64,6 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -153,9 +152,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Transient
     private Environment parent;
 
-    @Transient
-    private transient EnvironmentAdapter envAdapter;
-
 
     protected EnvironmentContainerImpl()
     {
@@ -197,12 +193,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         Preconditions.checkNotNull( environmentManager );
 
         this.environmentManager = environmentManager;
-    }
-
-
-    public void setEnvironmentAdapter( EnvironmentAdapter envAdapter )
-    {
-        this.envAdapter = envAdapter;
     }
 
 
@@ -315,7 +305,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     {
         getPeer().startContainer( getContainerId() );
 
-        envAdapter.onContainerStart( environment.getId(), getId() );
+        environmentManager.notifyOnContainerStarted( parent, getId() );
     }
 
 
@@ -324,7 +314,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     {
         getPeer().stopContainer( getContainerId() );
 
-        envAdapter.onContainerStop( environment.getId(), getId() );
+        environmentManager.notifyOnContainerStopped( parent, getId() );
     }
 
 

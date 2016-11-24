@@ -337,8 +337,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
 
             environmentContainer.setEnvironmentManager( this );
-
-            environmentContainer.setEnvironmentAdapter( environmentAdapter );
         }
     }
 
@@ -841,6 +839,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             environmentAdapter.removeEnvironment( environment );
 
+            notifyOnEnvironmentDestroyed( environmentId );
+
             return;
         }
         else if ( environment instanceof RemoteEnvironment )
@@ -869,6 +869,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     LOG.error( "Error excluding local peer from remote environment: {}", e.getMessage() );
                 }
             }
+
+            notifyOnEnvironmentDestroyed( environmentId );
 
             return;
         }
@@ -1559,6 +1561,38 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    public void notifyOnContainerStarted( final Environment environment, final String containerId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onContainerStarted( environment, containerId );
+                }
+            } );
+        }
+    }
+
+
+    public void notifyOnContainerStopped( final Environment environment, final String containerId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onContainerStopped( environment, containerId );
+                }
+            } );
+        }
+    }
+
+
     protected Long getUserId()
     {
         return identityManager.getActiveUser().getId();
@@ -1783,7 +1817,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
         catch ( Exception e )
         {
-            LOG.error( "Error on stop monitoring", e );
+            LOG.error( "Error on E monitoring", e );
             throw new EnvironmentManagerException( e.getMessage(), e );
         }
     }
@@ -1913,6 +1947,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         if ( environment.getEnvironmentPeers().isEmpty() )
         {
             remove( environment );
+
+            notifyOnEnvironmentDestroyed( environmentId );
         }
         else
         {

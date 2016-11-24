@@ -313,20 +313,6 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     }
 
 
-    @Override
-    public void onContainerStart( String envId, String contId )
-    {
-        onContainerStateChange( envId, contId, "start" );
-    }
-
-
-    @Override
-    public void onContainerStop( String envId, String contId )
-    {
-        onContainerStateChange( envId, contId, "stop" );
-    }
-
-
     private void onContainerStateChange( String envId, String contId, String state )
     {
         String userId = getUserIdWithCheck();
@@ -370,5 +356,19 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     public void onEnvironmentDestroyed( final String environmentId )
     {
         //not used
+    }
+
+
+    @Override
+    public void onContainerStarted( final Environment environment, final String containerId )
+    {
+        onContainerStateChange( environment.getId(), containerId, "start" );
+    }
+
+
+    @Override
+    public void onContainerStopped( final Environment environment, final String containerId )
+    {
+        onContainerStateChange( environment.getId(), containerId, "stop" );
     }
 }
