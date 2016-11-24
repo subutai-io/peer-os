@@ -535,7 +535,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	function setDomain(domain) {
 		var file = fileUploader;
 		LOADING_SCREEN();
-		console.log(file);
 		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
 			fileUploader = {};
 			SweetAlert.swal("Success!", "You have successfully added domain for " + vm.environmentForDomain + " environment!", "success");

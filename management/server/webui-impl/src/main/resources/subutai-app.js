@@ -98,6 +98,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             } else {
                 vm.hubStatus = true;
             }
+			hubRegisterStatus = vm.hubStatus;
 
             if (afterRegistration) {
                 hubPopupLoadScreen();
@@ -1048,6 +1049,7 @@ app.directive('focusInput', function ($timeout, $parse) {
 //Global variables
 
 var bazaarUpdate = false;
+var hubRegisterStatus = false;
 
 var SERVER_URL = '/';
 var GLOBAL_KURJUN_URL = '';

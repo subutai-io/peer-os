@@ -35,6 +35,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.currentDomainStatus = {};
 	vm.domainContainer = {};
 	vm.editingContainer = {};
+	vm.hasPGPplugin = false;
+	$timeout(function() {
+		vm.hubStatus = hubRegisterStatus;
+		vm.hasPGPplugin = hasPGPplugin();
+	}, 2000);
 
 	// functions
 	vm.filterContainersList = filterContainersList;
