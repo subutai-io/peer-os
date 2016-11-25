@@ -79,4 +79,9 @@ public interface RestService
     @Path( "updates_history" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getUpdatesHistory();
+
+    @GET
+    @Path( "/is_update_in_progress" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response isUpdateInProgress();
 }
