@@ -14,6 +14,7 @@ function monitoringSrv($http, environmentService, peerRegistrationService) {
 		getResourceHosts: getResourceHosts,
 		getInfo: getInfo,
 		getP2Pstatus: getP2Pstatus,
+		isAdminCheck: isAdminCheck,
 	};
 
 	return monitoringSrv;
@@ -29,6 +30,13 @@ function monitoringSrv($http, environmentService, peerRegistrationService) {
 	function getP2Pstatus() {
 		return $http.get(
 			BASE_URL + 'p2p/status',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
+	}
+
+	function isAdminCheck() {
+		return $http.get(
+			SERVER_URL + 'rest/ui/identity/is-admin',
 			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
 		);
 	}
