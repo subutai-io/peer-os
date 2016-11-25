@@ -62,7 +62,7 @@ public class ReserveNetworkStateHandler extends StateHandler
 
             NetworkResourceImpl networkResource =
                     new NetworkResourceImpl( envInfo.getId(), envInfo.getVni(), envInfo.getP2pSubnet(),
-                            subnetWithoutMask, Common.HUB_PEER_ID );
+                            subnetWithoutMask, Common.HUB_ID );
 
             peerDto.setVlan( ctx.localPeer.reserveNetworkResource( networkResource ) );
         }

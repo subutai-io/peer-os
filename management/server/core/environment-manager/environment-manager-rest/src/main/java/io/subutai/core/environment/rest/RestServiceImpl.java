@@ -15,6 +15,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.HubEnvironment;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.settings.Common;
@@ -97,18 +98,21 @@ public class RestServiceImpl implements RestService
         {
             Environment environment = environmentManager.loadEnvironment( environmentId );
 
+
+            String dataSource = ( environment instanceof HubEnvironment ) ? Common.HUB_ID : Common.SUBUTAI_ID;
+
             final Set<ContainerDto> containers = new HashSet<>();
             for ( EnvironmentContainerHost host : environment.getContainerHosts() )
             {
                 containers.add( new ContainerDto( host.getId(), environmentId, host.getHostname(),
                         host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), host.getTemplateName(),
                         host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
-                        host.getResourceHostId().getId(), host.isLocal(), "subutai", host.getState(),
+                        host.getResourceHostId().getId(), host.isLocal(), dataSource, host.getState(),
                         host.getTemplateId() ) );
             }
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(), containers,
-                            "subutai" );
+                            dataSource );
             return Response.ok( environmentDto ).build();
         }
         catch ( Exception e )
