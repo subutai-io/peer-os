@@ -14,7 +14,9 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 		cfpLoadingBar.complete();
 	});
 
-	vm.currentType = 'peer';
+	vm.currentType = 'environments';
+	vm.isAdmin = false;
+
 	vm.charts = [{}, {}, {}, {}];
 	vm.environments = [];
 	vm.containers = [];
@@ -117,7 +119,14 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 	monitoringSrv.getResourceHosts().success(function (data) {
 		vm.hosts = data;
 		vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : '';
-		getServerData();
+		monitoringSrv.isAdminCheck().success(function (data) {
+			vm.environments = data;
+			if(data == true || data == 'true') {
+				vm.isAdmin = true;
+				vm.currentType = 'peer';
+				getServerData();
+			}
+		});
 	});
 
 	function setCurrentType(type) {
