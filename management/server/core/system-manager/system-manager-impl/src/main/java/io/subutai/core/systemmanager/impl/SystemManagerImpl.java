@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,8 @@ public class SystemManagerImpl implements SystemManager
     private UpdateDao updateDao;
 
     private SystemSettings systemSettings;
+
+    private volatile boolean isUpdateInProgress = false;
 
 
     public SystemManagerImpl()
@@ -212,6 +215,8 @@ public class SystemManagerImpl implements SystemManager
     {
         try
         {
+            isUpdateInProgress = true;
+
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
             UpdateEntity updateEntity = new UpdateEntity( SubutaiInfo.getVersion(), SubutaiInfo.getCommitId() );
@@ -229,7 +234,7 @@ public class SystemManagerImpl implements SystemManager
 
                 updateDao.update( updateEntity );
             }
-            else
+            else if ( !result.hasTimedOut() )
             {
                 updateDao.remove( updateEntity.getId() );
             }
@@ -240,8 +245,19 @@ public class SystemManagerImpl implements SystemManager
 
             return false;
         }
+        finally
+        {
+            isUpdateInProgress = false;
+        }
 
         return true;
+    }
+
+
+    @Override
+    public boolean isUpdateInProgress()
+    {
+        return isUpdateInProgress;
     }
 
 
@@ -253,10 +269,18 @@ public class SystemManagerImpl implements SystemManager
 
         if ( updateEntity != null && updateEntity.getCurrentVersion() == null )
         {
-            updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
+            if ( Objects.equals( updateEntity.getPrevCommitId(), SubutaiInfo.getCommitId() ) )
+            {
+                updateEntity.setCurrentVersion( "No change" );
 
-            updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
+                updateEntity.setCurrentCommitId( "Probably update was interrupted" );
+            }
+            else
+            {
+                updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
 
+                updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
+            }
             updateDao.update( updateEntity );
         }
     }

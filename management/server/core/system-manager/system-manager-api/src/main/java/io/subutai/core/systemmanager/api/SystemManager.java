@@ -34,4 +34,6 @@ public interface SystemManager
     boolean updateManagement();
 
     List<UpdateDto> getUpdates();
+
+    boolean isUpdateInProgress();
 }
