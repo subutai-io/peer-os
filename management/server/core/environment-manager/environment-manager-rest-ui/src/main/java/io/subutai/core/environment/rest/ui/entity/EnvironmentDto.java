@@ -29,7 +29,7 @@ public class EnvironmentDto
         this.status = status;
         this.containers = containers;
 
-        dataSource = className.contains( "ProxyEnvironment" ) ? "hub" : "subutai";
+        dataSource = className.contains( "HubEnvironment" ) ? "hub" : "subutai";
     }
 
 
@@ -91,6 +91,7 @@ public class EnvironmentDto
     {
         this.containers = containers;
     }
+
 
     public String getDataSource()
     {

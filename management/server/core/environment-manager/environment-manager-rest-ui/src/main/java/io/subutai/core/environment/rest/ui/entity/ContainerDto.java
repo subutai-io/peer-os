@@ -50,6 +50,6 @@ public class ContainerDto
 
         this.templateId = templateId;
 
-        dataSource = className.contains( "ProxyEnvironment" ) ? "hub" : "subutai";
+        dataSource = className.contains( "ProxyEnvironmentContainer" ) ? "hub" : "subutai";
     }
 }
