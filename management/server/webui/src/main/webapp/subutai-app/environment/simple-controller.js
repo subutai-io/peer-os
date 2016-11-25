@@ -453,30 +453,30 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 		toolMarkup: [
 			'<g class="element-tools element-tools_big">',
-			'<g class="element-tool-remove">',
-			'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
-				'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
-				'<title>Remove</title>',
+				'<g class="element-tool-remove">',
+					'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
+					'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
+					'<title>Remove</title>',
+				'</g>',
+			'</g>',
+			'<g class="element-tools element-tools_copy">',
+				'<g class="element-tool-copy">',
+					'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
+					'<g class="copy-icon element-tool-copy">',
+						'<path class="element-tool-copy" d="M7.1,9.5H0.7c-0.1,0-0.2-0.1-0.2-0.2V2.8c0-0.1,0.1-0.2,0.2-0.2h6.5c0.1,0,0.2,0.1,0.2,0.2v6.5C7.3,9.4,7.2,9.5,7.1,9.5z M0.8,9.1H7V3H0.8V9.1z"/>',
+						'<path class="element-tool-copy" d="M9.3,7.3H8.8c-0.1,0-0.2-0.1-0.2-0.2S8.7,7,8.8,7h0.4V0.9H3v0.3c0,0.1-0.1,0.2-0.2,0.2c-0.1,0-0.2-0.1-0.2-0.2V0.7 c0-0.1,0.1-0.2,0.2-0.2h6.5c0.1,0,0.2,0.1,0.2,0.2v6.5C9.5,7.3,9.4,7.3,9.3,7.3z"/>',
 					'</g>',
-					'</g>',
-						'<g class="element-tools element-tools_copy">',
-						'<g class="element-tool-copy">',
-							'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
-							'<g class="copy-icon element-tool-copy">',
-								'<path class="element-tool-copy" d="M7.1,9.5H0.7c-0.1,0-0.2-0.1-0.2-0.2V2.8c0-0.1,0.1-0.2,0.2-0.2h6.5c0.1,0,0.2,0.1,0.2,0.2v6.5C7.3,9.4,7.2,9.5,7.1,9.5z M0.8,9.1H7V3H0.8V9.1z"/>',
-								'<path class="element-tool-copy" d="M9.3,7.3H8.8c-0.1,0-0.2-0.1-0.2-0.2S8.7,7,8.8,7h0.4V0.9H3v0.3c0,0.1-0.1,0.2-0.2,0.2c-0.1,0-0.2-0.1-0.2-0.2V0.7 c0-0.1,0.1-0.2,0.2-0.2h6.5c0.1,0,0.2,0.1,0.2,0.2v6.5C9.5,7.3,9.4,7.3,9.3,7.3z"/>',
-									'</g>',
-									'<title>Copy</title>',
-										'</g>',
-										'</g>',
-											'<g class="element-call-menu">',
-											'<rect class="b-magnet"/>',
-												'<g class="b-container-plus-icon">',
-												'<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="0" y1="4.5" x2="9" y2="4.5"/>',
-													'<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="4.5" y1="0" x2="4.5" y2="9"/>',
-													'</g>',
-														'</g>'
-															].join(''),
+					'<title>Copy</title>',
+				'</g>',
+			'</g>',
+			'<g class="element-call-menu">',
+				'<rect class="b-magnet"/>',
+				'<g class="b-container-plus-icon">',
+					'<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="0" y1="4.5" x2="9" y2="4.5"/>',
+					'<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="4.5" y1="0" x2="4.5" y2="9"/>',
+				'</g>',
+			'</g>'
+			].join(''),
 
 		defaults: joint.util.deepSupplement({
 			attrs: {
@@ -507,12 +507,12 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 		markup: [
 			'<g class="rotatable">',
-			'<g class="scalable">',
-			'<rect class="b-border"/>',
+				'<g class="scalable">',
+					'<rect class="b-border"/>',
 				'</g>',
 				'<title/>',
-					'<image/>',
-					'</g>'
+				'<image/>',
+			'</g>'
 		].join(''),
 
 		defaults: joint.util.deepSupplement({
@@ -594,6 +594,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				case 'b-container-plus-icon':
 					currentTemplate = this.model;
 					$('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
+					if(currentTemplate.get('edited') == true) {
+						$('#js-container-name').prop('disabled', true);
+					} else {
+						$('#js-container-name').prop('disabled', false);
+					}
 					$('#js-container-size').val(currentTemplate.get('quotaSize')).trigger('change');
 					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
@@ -747,6 +752,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		var containerName = 'Container ' + (containerCounter++).toString();
 		var devElement = new joint.shapes.tm.devElement({
 			position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
+			edited: false,
 			templateName: template,
 			quotaSize: size,
 			containerName: containerName,
@@ -958,13 +964,16 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				}
 			}
 
+			var containerNameArray = environment.containers[container].hostname.split('-');
+			var editedContainerName = containerNameArray[0];
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
+				edited: true,
 				templateName: environment.containers[container].templateName,
 				quotaSize: environment.containers[container].type,
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
-				containerName: environment.containers[container].hostname,
+				containerName: editedContainerName,
 				templateId : environment.containers[container].templateId,
 				attrs: {
 					image: { 'xlink:href': img },
