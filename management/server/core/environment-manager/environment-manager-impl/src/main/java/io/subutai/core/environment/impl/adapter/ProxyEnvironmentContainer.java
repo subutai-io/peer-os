@@ -43,7 +43,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
                                Set<String> localContainerIds )
     {
 
-        super( Common.HUB_PEER_ID, json.get( "peerId" ).asText(),
+        super( Common.HUB_ID, json.get( "peerId" ).asText(),
                 new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
                         json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
                         ContainerHostState.RUNNING ), templateId, json.get( "domainName" ).asText(), parseSize( json ),

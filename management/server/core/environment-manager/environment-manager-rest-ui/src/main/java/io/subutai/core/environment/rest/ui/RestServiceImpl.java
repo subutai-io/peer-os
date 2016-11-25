@@ -38,6 +38,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.HubEnvironment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
@@ -132,10 +133,12 @@ public class RestServiceImpl implements RestService
         {
             try
             {
+                String dataSource = ( environment instanceof HubEnvironment ) ? Common.HUB_ID : Common.SUBUTAI_ID;
+
                 EnvironmentDto environmentDto =
                         new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                                convertContainersToContainerJson( environment.getContainerHosts() ),
-                                environment.getClass().getName() );
+                                convertContainersToContainerJson( environment.getContainerHosts(), dataSource ),
+                                dataSource );
 
                 environmentDtos.add( environmentDto );
             }
@@ -987,7 +990,8 @@ public class RestServiceImpl implements RestService
 
     /** AUX **************************************************** */
 
-    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
+    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts,
+                                                                String datasource )
     {
         Set<ContainerDto> containerDtos = Sets.newHashSet();
 
@@ -999,8 +1003,8 @@ public class RestServiceImpl implements RestService
                         containerHost.getEnvironmentId().getId(), containerHost.getHostname(), containerHost.getIp(),
                         containerHost.getTemplateName(), containerHost.getContainerSize(),
                         containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
-                        containerHost.getResourceHostId().getId(), containerHost.isLocal(),
-                        containerHost.getClass().getName(), containerHost.getTemplateId() ) );
+                        containerHost.getResourceHostId().getId(), containerHost.isLocal(), datasource,
+                        containerHost.getTemplateId() ) );
             }
             catch ( Exception e )
             {
@@ -1008,8 +1012,7 @@ public class RestServiceImpl implements RestService
                         containerHost.getEnvironmentId().getId(), containerHost.getHostname(), "UNKNOWN",
                         containerHost.getTemplateName(), containerHost.getContainerSize(),
                         containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
-                        "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName(),
-                        containerHost.getTemplateId() ) );
+                        "UNKNOWN", containerHost.isLocal(), datasource, containerHost.getTemplateId() ) );
             }
         }
 

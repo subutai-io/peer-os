@@ -22,14 +22,14 @@ public class EnvironmentDto
 
 
     public EnvironmentDto( final String id, final String name, final EnvironmentStatus status,
-                           final Set<ContainerDto> containers, String className )
+                           final Set<ContainerDto> containers, String dataSource )
     {
         this.id = id;
         this.name = name;
         this.status = status;
         this.containers = containers;
 
-        dataSource = className.contains( "HubEnvironment" ) ? "hub" : "subutai";
+        this.dataSource = dataSource;
     }
 
 

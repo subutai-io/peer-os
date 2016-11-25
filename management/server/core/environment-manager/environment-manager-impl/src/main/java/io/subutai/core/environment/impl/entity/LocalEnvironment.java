@@ -496,7 +496,7 @@ public class LocalEnvironment implements Environment, Serializable
             containerDtos.add( new ContainerDto( host.getId(), getId(), host.getHostname(),
                     host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), host.getTemplateName(),
                     host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
-                    host.getResourceHostId().getId(), isLocalContainer, "subutai", containerHostState,
+                    host.getResourceHostId().getId(), isLocalContainer, Common.SUBUTAI_ID, containerHostState,
                     host.getTemplateId() ) );
         }
 
@@ -763,9 +763,9 @@ public class LocalEnvironment implements Environment, Serializable
     @Override
     public String toString()
     {
-        return "LocalEnvironment{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
-                + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr + '\''
-                + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers
+        return "LocalEnvironment{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\''
+                + ", name='" + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr
+                + '\'' + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers
                 + ", peerConfs=" + environmentPeers + ", status=" + status + ", sshKeys='" + sshKeys + '\''
                 + ", userId=" + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
     }
