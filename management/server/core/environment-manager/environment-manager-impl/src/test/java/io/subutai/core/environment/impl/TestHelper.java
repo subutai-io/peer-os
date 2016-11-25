@@ -42,7 +42,11 @@ public class TestHelper
     public static final String CONTAINER_ID = "123";
     public static final String PEER_NAME = "peer123";
     public static final String ENV_NAME = "env123";
-    public static final String SSH_KEY = "key";
+    public static final String SSH_KEY =  "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+KvsKYuzmuy23QNKdciu3zcLzmP4BjPDziXWqyjlARk22BOz2nXd+I5txpxm"
+            + "/ieM7X8D9tSh8C/dt168kOB14RvobqKMlZrYAJVZ/4jCj6/lUxy0D2c01filLIoMkCs"
+            + "+1aLPgHFpdzckGQDCPimTgLcWtWccbtqXH3QNQKg8gJHQBrXXtWNdWBPUVh/GxMwCwoSshAeKhbqSoZcitffhyQ0hAKA"
+            + "+sHEx6Lk22FUPEpDX31x63yWS0pwvx9NhxoqseSXi1U0psmKwuWLUT17KmwQAWSS6pq"
+            + "/G5yv9atJnfu2EtlJxX5cvV99odRAJojVXb7LmxrRJnOx+CRSfTGaiN dilshat@sol";
     public static final String RH_ID = "123";
     public static final String PEER_ID = "123";
     public static final String ENV_ID = "123";
