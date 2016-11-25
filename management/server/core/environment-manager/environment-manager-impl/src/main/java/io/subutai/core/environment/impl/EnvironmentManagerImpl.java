@@ -72,6 +72,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -438,6 +439,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+        if ( !Strings.isNullOrEmpty( topology.getSshKey() ) )
+        {
+            Preconditions.checkArgument( StringUtil.isValidSshPublicKey( topology.getSshKey() ), "Invalid ssh key" );
+        }
 
         //create operation tracker
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
@@ -617,7 +622,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( StringUtil.isValidSshPublicKey( sshKey ), "Invalid ssh key" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
