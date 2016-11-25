@@ -253,6 +253,7 @@ public class SystemManagerImpl implements SystemManager
 
         if ( updateEntity != null && updateEntity.getCurrentVersion() == null )
         {
+            //TODO check if prev and current version/commit id is the same
             updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
 
             updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
