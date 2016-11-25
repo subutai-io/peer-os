@@ -1,6 +1,8 @@
 package io.subutai.core.hubmanager.impl.tunnel;
 
 
+import java.util.Set;
+
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -158,5 +160,24 @@ public class TunnelHelper
             return null;
         }
         return tunnelInfoDto;
+    }
+
+
+    public static void deleteAllTunnelsForIp( final Set<ResourceHost> resourceHosts, final String ip )
+    {
+        String deleteTunnelCMD = "subutai tunnel del %s";
+
+        ResourceHost resourceHost = resourceHosts.iterator().next();
+
+        CommandResult result =
+                execute( resourceHost, String.format( "subutai tunnel list | grep %s | awk '{print $2}'", ip ) );
+
+
+        String[] data = result.getStdOut().split( "\n" );
+
+        for ( String tunnel : data )
+        {
+            execute( resourceHost, String.format( deleteTunnelCMD, tunnel ) );
+        }
     }
 }
