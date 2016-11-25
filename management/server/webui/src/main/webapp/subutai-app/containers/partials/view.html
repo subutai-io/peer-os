@@ -174,11 +174,14 @@
 								</div>
 								<div class="ssh-key-button_title">SSH</div>
 							</button>
-							<span class="ssh-info-button" >
+							<span class="ssh-info-button" ng-if="!containerViewCtrl.hubStatus || !containerViewCtrl.hasPGPplugin">
 								?
-								<div class="ssh-plugin-info-tooltip tooltip" >
+								<div class="ssh-plugin-info-tooltip tooltip" ng-if="!containerViewCtrl.hasPGPplugin">
 									<div style="padding-bottom: 10px">EZ ssh access to your environment container, use it with ease, pz.</div>
 									<a href="https://github.com/subutai-io/browsers/releases/latest" target="_blank">Download</a>
+								</div>
+								<div class="ssh-plugin-info-tooltip tooltip" style="height: auto;" ng-if="!containerViewCtrl.hubStatus && containerViewCtrl.hasPGPplugin">
+									Please register your peer with Hub to access you environment.
 								</div>
 							</span>
 							</div>
