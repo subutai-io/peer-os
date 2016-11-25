@@ -3,9 +3,9 @@
 angular.module('subutai.monitoring.controller', [])
 	.controller('MonitoringCtrl', MonitoringCtrl);
 
-MonitoringCtrl.$inject = ['$scope', 'monitoringSrv', 'cfpLoadingBar', '$http', '$sce', 'ngDialog'];
+MonitoringCtrl.$inject = ['$scope', 'monitoringSrv', 'cfpLoadingBar', '$http', '$sce', 'ngDialog', '$timeout'];
 
-function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDialog) {
+function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDialog, $timeout) {
 
 	var vm = this;
 
@@ -14,7 +14,9 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 		cfpLoadingBar.complete();
 	});
 
-	vm.currentType = 'peer';
+	vm.currentType = 'environments';
+	vm.isAdmin = false;
+
 	vm.charts = [{}, {}, {}, {}];
 	vm.environments = [];
 	vm.containers = [];
@@ -116,9 +118,30 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 
 	monitoringSrv.getResourceHosts().success(function (data) {
 		vm.hosts = data;
-		vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : '';
-		getServerData();
+		monitoringSrv.isAdminCheck().success(function (data) {
+			if(data == true || data == 'true') {
+				vm.isAdmin = true;
+				vm.currentType = 'peer';
+				vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : '';
+				getServerData();
+			} else {
+				$timeout(function() {
+					setFirstEnvByDefault();
+				}, 1000);
+			}
+		});
 	});
+
+	function setFirstEnvByDefault() {
+		if(vm.environments.length > 0) {
+			vm.selectedEnvironment = vm.environments[0].id;
+			vm.containers = vm.environments[0].containers;
+			if(vm.containers.length > 0) {
+				vm.currentHost = vm.containers[0].id;
+				getServerData();
+			}
+		}
+	}
 
 	function setCurrentType(type) {
 		vm.containers = [];

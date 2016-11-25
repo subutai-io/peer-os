@@ -606,4 +606,11 @@ public class RestServiceImpl implements RestService
     {
         return Response.status( Response.Status.OK ).entity( identityManager.isTenantManager() ).build();
     }
+
+
+    @Override
+    public Response isAdmin()
+    {
+        return Response.status( Response.Status.OK ).entity( identityManager.isAdmin() ).build();
+    }
 }

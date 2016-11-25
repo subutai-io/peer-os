@@ -87,7 +87,7 @@ public class ConfigureContainerStateHandler extends StateHandler
                 log.info( e.getMessage() );
             }
 
-            boolean isSsEnv = environment != null && !Common.HUB_PEER_ID.equals( environment.getPeerId() );
+            boolean isSsEnv = environment != null && !Common.HUB_ID.equals( environment.getPeerId() );
 
 
             Set<String> peerSshKeys = getCurrentSshKeys( envId, isSsEnv );

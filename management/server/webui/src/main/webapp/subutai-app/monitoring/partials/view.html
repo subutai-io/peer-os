@@ -4,6 +4,7 @@
 		<div class="b-tabs-menu b-tabs-menu_header">
 			<ul>
 				<li class="b-tabs-menu__item"
+					ng-if="monitoringCtrl.isAdmin" 
 					ng-class="monitoringCtrl.currentType == 'peer' ? 'b-tabs-menu__item_active' : ''"
 					ng-click="monitoringCtrl.setCurrentType('peer')">
 					Peer
@@ -14,11 +15,13 @@
 					Environment
 				</li>
 				<li class="b-tabs-menu__item"
+					ng-if="monitoringCtrl.isAdmin" 
 					ng-class="monitoringCtrl.currentType == 'management' ? 'b-tabs-menu__item_active' : ''"
 					ng-click="monitoringCtrl.setCurrentType('management')">
 					Management
 				</li>
 				<li class="b-tabs-menu__item"
+						ng-if="monitoringCtrl.isAdmin" 
 						ng-style="monitoringCtrl.p2pColor && {'color': monitoringCtrl.p2pColor}"
 						ng-class="monitoringCtrl.currentType == 'p2p' ? 'b-tabs-menu__item_active' : ''"
 						ng-click="monitoringCtrl.setCurrentType('p2p')">

@@ -63,6 +63,7 @@ import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -415,7 +416,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        String newHostname = hostname.replaceAll( "\\s+", "" );
+        String newHostname = StringUtil.removeHtmlAndSpecialChars( hostname, true );
 
         Preconditions
                 .checkArgument( !StringUtils.equalsIgnoreCase( this.hostname, newHostname ), "No change in hostname" );

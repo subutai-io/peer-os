@@ -20,7 +20,7 @@ import io.subutai.core.environment.impl.entity.LocalEnvironment;
 /**
  * NOTE: Using environmentManager from parent LocalEnvironment gives side effects. For example, empty container list.
  */
-public class HubEnvironment extends LocalEnvironment
+public class HubEnvironment extends LocalEnvironment implements io.subutai.common.environment.HubEnvironment
 {
     private final static Logger log = LoggerFactory.getLogger( HubEnvironment.class );
 
@@ -30,7 +30,7 @@ public class HubEnvironment extends LocalEnvironment
     HubEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
                     ProxyContainerHelper proxyContainerHelper )
     {
-        super( json.get( "name" ).asText(), null, 0L, Common.HUB_PEER_ID );
+        super( json.get( "name" ).asText(), null, 0L, Common.HUB_ID );
 
         init( json );
 
