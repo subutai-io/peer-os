@@ -23,6 +23,8 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class RestServiceImpl implements RestService
 {
+    private final static String INVALID_RESPONSE = "Invalid response";
+    private final static String INVALID_HEARTBEAT = "Invalid heartbeat";
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private final SecurityManager securityManager;
     private final RestProcessor restProcessor;
@@ -44,9 +46,18 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkArgument( heartbeat != null && !heartbeat.trim().isEmpty(), INVALID_HEARTBEAT );
+
             String decryptedHeartbeat = decrypt( heartbeat );
 
+            Preconditions.checkArgument( decryptedHeartbeat != null && !decryptedHeartbeat.trim().isEmpty(),
+                    INVALID_HEARTBEAT );
+
             final HeartBeat heartBeat = JsonUtil.fromJson( decryptedHeartbeat, HeartBeat.class );
+
+            Preconditions.checkNotNull( heartBeat, INVALID_HEARTBEAT );
+
+            Preconditions.checkNotNull( heartBeat.getHostInfo(), INVALID_HEARTBEAT );
 
             restProcessor.handleHeartbeat( heartBeat );
 
@@ -54,7 +65,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOG.error( "Error processing heartbeat from agent", e );
+            LOG.error( "Error processing heartbeat from agent: {}", e.getMessage() );
 
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
@@ -68,9 +79,18 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkArgument( response != null && !response.trim().isEmpty(), INVALID_RESPONSE );
+
             String decryptedResponse = decrypt( response );
 
+            Preconditions.checkArgument( decryptedResponse != null && !decryptedResponse.trim().isEmpty(),
+                    INVALID_RESPONSE );
+
             ResponseWrapper responseWrapper = JsonUtil.fromJson( decryptedResponse, ResponseWrapper.class );
+
+            Preconditions.checkNotNull( responseWrapper, INVALID_RESPONSE );
+
+            Preconditions.checkNotNull( responseWrapper.getResponse(), INVALID_RESPONSE );
 
             final ResponseImpl responseImpl = responseWrapper.getResponse();
 
@@ -80,7 +100,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOG.error( "Error processing command response from agent", e );
+            LOG.error( "Error processing command response from agent: {}", e.getMessage() );
 
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
@@ -134,7 +154,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    protected String decrypt( String message ) throws PGPException
+    private String decrypt( String message ) throws PGPException
     {
         return securityManager.decryptNVerifyResponseFromHost( message );
     }

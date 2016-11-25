@@ -1576,7 +1576,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         for ( Role role : user.getRoles() )
         {
-            if ( ADMIN_ROLE.equals( role.getName() ) )
+            if ( ADMIN_ROLE.equalsIgnoreCase( role.getName() ) )
             {
                 return true;
             }

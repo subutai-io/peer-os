@@ -17,18 +17,18 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public class RegisterHostsStep
 {
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> hostUtil = new PeerUtil<>();
 
 
-    public RegisterHostsStep( final Topology topology, final EnvironmentImpl environment,
+    public RegisterHostsStep( final Topology topology, final LocalEnvironment environment,
                               final TrackerOperation trackerOperation )
     {
         this.topology = topology;

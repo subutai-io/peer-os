@@ -35,9 +35,5 @@ public interface HubAdapter
 
     boolean deletePluginData( String pluginKey, String key );
 
-    void onContainerStart( String envId, String contId );
-
-    void onContainerStop( String envId, String contId );
-
     String getAllEnvironmentsForPeer();
 }

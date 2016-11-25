@@ -28,6 +28,7 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
@@ -293,6 +294,42 @@ public class HostRegistryImpl implements HostRegistry
 
                 return;
             }
+            else if ( localPeer != null )
+            {
+                boolean noManagement = false;
+
+                try
+                {
+                    localPeer.getManagementHost();
+                }
+                catch ( HostNotFoundException e )
+                {
+                    noManagement = true;
+                }
+
+                if ( noManagement )
+                {
+                    Set<ResourceHostInfo> allHosts = Sets.newHashSet();
+
+                    allHosts.addAll( registeredResourceHosts );
+
+                    allHosts.addAll( cachedResourceHosts );
+
+                    for ( final ResourceHostInfo resourceHostInfo : allHosts )
+                    {
+                        threadPool.execute( new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                requestHeartbeat( resourceHostInfo );
+                            }
+                        } );
+                    }
+
+                    return;
+                }
+            }
 
             if ( !CollectionUtil.isCollectionEmpty( cachedResourceHosts ) )
             {
@@ -306,7 +343,7 @@ public class HostRegistryImpl implements HostRegistry
         }
         catch ( Exception e )
         {
-            LOG.error( "Error checking hosts", e );
+            LOG.error( "Error checking hosts: {}", e.getMessage() );
         }
     }
 
@@ -359,7 +396,7 @@ public class HostRegistryImpl implements HostRegistry
         }
         catch ( Exception e )
         {
-            LOG.error( "Error checking host {}", resourceHostInfo, e );
+            LOG.error( "Error checking host {}: {}", resourceHostInfo, e.getMessage() );
         }
         finally
         {

@@ -66,7 +66,7 @@ import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.HubEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
@@ -150,7 +150,7 @@ public class EnvironmentManagerImplTest
     @Mock
     CancellableWorkflow checkWorkflow;
 
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
 
     @Mock
     EnvironmentPeer environmentPeer;
@@ -428,7 +428,7 @@ public class EnvironmentManagerImplTest
 
         environmentManager.createEmptyEnvironment( topology );
 
-        verify( environmentManager ).save( any( EnvironmentImpl.class ) );
+        verify( environmentManager ).save( any( LocalEnvironment.class ) );
     }
 
 

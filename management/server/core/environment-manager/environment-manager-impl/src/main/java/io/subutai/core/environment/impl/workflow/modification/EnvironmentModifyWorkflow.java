@@ -12,7 +12,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
@@ -29,7 +29,7 @@ import io.subutai.core.security.api.SecurityManager;
 public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
 {
     private final PeerManager peerManager;
-    private EnvironmentImpl environment;
+    private LocalEnvironment environment;
     private final Topology topology;
     private List<String> removedContainers;
     private Map<String, ContainerSize> changedContainers;
@@ -63,7 +63,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
 
     public EnvironmentModifyWorkflow( String defaultDomain, PeerManager peerManager, SecurityManager securityManager,
-                                      EnvironmentImpl environment, Topology topology, List<String> removedContainers,
+                                      LocalEnvironment environment, Topology topology, List<String> removedContainers,
                                       Map<String, ContainerSize> changedContainers, TrackerOperation operationTracker,
                                       EnvironmentManagerImpl environmentManager )
     {
@@ -112,7 +112,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
         {
             new ChangeQuotaStep( environment, changedContainers, operationTracker ).execute();
 
-            environment = ( EnvironmentImpl ) environmentManager.loadEnvironment( environment.getId() );
+            environment = ( LocalEnvironment ) environmentManager.loadEnvironment( environment.getId() );
 
             return hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
                    ( hasContainerCreation ? EnvironmentGrowingPhase.GENERATE_KEYS : EnvironmentGrowingPhase.FINALIZE );
@@ -139,7 +139,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
             }
 
             environment =
-                    ( EnvironmentImpl ) new DestroyContainersStep( environment, environmentManager, removedContainers,
+                    ( LocalEnvironment ) new DestroyContainersStep( environment, environmentManager, removedContainers,
                             operationTracker ).execute();
 
             saveEnvironment();

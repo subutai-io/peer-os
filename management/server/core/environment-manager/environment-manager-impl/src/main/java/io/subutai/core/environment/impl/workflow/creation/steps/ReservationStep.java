@@ -18,7 +18,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -30,13 +30,13 @@ import io.subutai.core.peer.api.PeerManager;
 public class ReservationStep
 {
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final PeerManager peerManager;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
-    public ReservationStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
+    public ReservationStep( final Topology topology, final LocalEnvironment environment, final PeerManager peerManager,
                             final TrackerOperation trackerOperation )
     {
         this.topology = topology;

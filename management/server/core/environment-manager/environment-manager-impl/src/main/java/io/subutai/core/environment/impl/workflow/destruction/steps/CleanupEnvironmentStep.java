@@ -8,17 +8,17 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public class CleanupEnvironmentStep
 {
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> cleanupUtil = new PeerUtil<>();
 
 
-    public CleanupEnvironmentStep( final EnvironmentImpl environment, final TrackerOperation trackerOperation )
+    public CleanupEnvironmentStep( final LocalEnvironment environment, final TrackerOperation trackerOperation )
     {
         this.environment = environment;
         this.trackerOperation = trackerOperation;

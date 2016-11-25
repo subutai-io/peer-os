@@ -14,7 +14,7 @@ import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.modification.steps.helpers.ContainerDestroyTask;
 
 import static org.mockito.Mockito.doReturn;
@@ -27,7 +27,7 @@ public class DestroyContainersStepTest
 {
     DestroyContainersStep step;
 
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     TaskUtil<Object> taskUtil;
     @Mock

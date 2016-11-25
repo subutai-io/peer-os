@@ -687,7 +687,7 @@ public class RemotePeerImpl implements RemotePeer
             @Override
             public String getClassPath()
             {
-                return "EnvironmentImpl";
+                return "LocalEnvironment";
             }
 
 

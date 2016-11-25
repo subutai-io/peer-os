@@ -1801,7 +1801,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             @Override
             public String getClassPath()
             {
-                return "EnvironmentImpl";
+                return "LocalEnvironment";
             }
 
 

@@ -77,9 +77,9 @@ import io.subutai.core.peer.api.PeerManager;
 @Access( AccessType.FIELD )
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
         setterVisibility = JsonAutoDetect.Visibility.NONE )
-public class EnvironmentImpl implements Environment, Serializable
+public class LocalEnvironment implements Environment, Serializable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( LocalEnvironment.class );
 
     @Transient
     @JsonIgnore
@@ -158,12 +158,12 @@ public class EnvironmentImpl implements Environment, Serializable
     protected EnvironmentId envId;
 
 
-    protected EnvironmentImpl()
+    protected LocalEnvironment()
     {
     }
 
 
-    public EnvironmentImpl( String name, String sshKey, Long userId, String peerId )
+    public LocalEnvironment( String name, String sshKey, Long userId, String peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
@@ -615,12 +615,12 @@ public class EnvironmentImpl implements Environment, Serializable
         {
             return true;
         }
-        if ( !( o instanceof EnvironmentImpl ) )
+        if ( !( o instanceof LocalEnvironment ) )
         {
             return false;
         }
 
-        final EnvironmentImpl that = ( EnvironmentImpl ) o;
+        final LocalEnvironment that = ( LocalEnvironment ) o;
 
         return getId().equals( that.getId() );
     }
@@ -763,7 +763,7 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public String toString()
     {
-        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
+        return "LocalEnvironment{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
                 + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr + '\''
                 + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers
                 + ", peerConfs=" + environmentPeers + ", status=" + status + ", sshKeys='" + sshKeys + '\''

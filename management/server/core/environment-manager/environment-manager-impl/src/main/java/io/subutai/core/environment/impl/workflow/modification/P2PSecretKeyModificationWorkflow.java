@@ -6,14 +6,14 @@ import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.modification.steps.P2PSecretKeyResetStep;
 
 
 public class P2PSecretKeyModificationWorkflow
         extends CancellableWorkflow<P2PSecretKeyModificationWorkflow.P2PSecretKeyModificationPhase>
 {
-    private EnvironmentImpl environment;
+    private LocalEnvironment environment;
     private final String p2pSecretKey;
     private final long p2pSecretKeyTtlSeconds;
     private final TrackerOperation operationTracker;
@@ -26,7 +26,7 @@ public class P2PSecretKeyModificationWorkflow
     }
 
 
-    public P2PSecretKeyModificationWorkflow( final EnvironmentImpl environment, final String p2pSecretKey,
+    public P2PSecretKeyModificationWorkflow( final LocalEnvironment environment, final String p2pSecretKey,
                                              final long p2pSecretKeyTtlSeconds, final TrackerOperation operationTracker,
                                              final EnvironmentManagerImpl environmentManager )
     {

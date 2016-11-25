@@ -60,7 +60,7 @@ public class EnvironmentContainerImplTest
     private EnvironmentContainerImpl environmentContainer;
 
     @Mock
-    EnvironmentImpl environment;
+    LocalEnvironment environment;
     @Mock
     EnvironmentManagerImpl environmentManager;
     @Mock
@@ -94,7 +94,6 @@ public class EnvironmentContainerImplTest
         doReturn( peer ).when( environmentContainer ).getLocalPeer();
         doReturn( template ).when( peer ).getTemplateById( TEMPLATE_ID );
 
-        environmentContainer.setEnvironmentAdapter( environmentAdapter );
         environmentContainer.setEnvironmentManager( environmentManager );
         environmentContainer.setEnvironment( environment );
 
@@ -387,7 +386,6 @@ public class EnvironmentContainerImplTest
     public void testGetInitiatorPeerId() throws Exception
     {
         assertEquals( INITIATOR_ID, environmentContainer.getInitiatorPeerId() );
-
     }
 
 
@@ -397,7 +395,6 @@ public class EnvironmentContainerImplTest
         environmentContainer.getAuthorizedKeys();
 
         verify( peer ).getContainerAuthorizedKeys( environmentContainer.getContainerId() );
-
     }
 
 
@@ -405,7 +402,6 @@ public class EnvironmentContainerImplTest
     public void testGetEnvironment() throws Exception
     {
         assertEquals( environment, environmentContainer.getEnvironment() );
-
     }
 
 
@@ -413,6 +409,5 @@ public class EnvironmentContainerImplTest
     public void testGetIp() throws Exception
     {
         assertEquals( Common.LOCAL_HOST_IP, environmentContainer.getIp() );
-
     }
 }

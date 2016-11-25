@@ -14,13 +14,13 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 /**
- * NOTE: Using environmentManager from parent EnvironmentImpl gives side effects. For example, empty container list.
+ * NOTE: Using environmentManager from parent LocalEnvironment gives side effects. For example, empty container list.
  */
-public class HubEnvironment extends EnvironmentImpl
+public class HubEnvironment extends LocalEnvironment
 {
     private final static Logger log = LoggerFactory.getLogger( HubEnvironment.class );
 
@@ -72,8 +72,6 @@ public class HubEnvironment extends EnvironmentImpl
                                 localContainerIds );
 
                 ch.setEnvironment( this );
-
-                ch.setEnvironmentAdapter( environmentAdapter );
 
                 containers.add( ch );
             }

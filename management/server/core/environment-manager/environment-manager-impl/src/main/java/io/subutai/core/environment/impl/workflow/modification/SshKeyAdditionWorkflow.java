@@ -4,14 +4,14 @@ package io.subutai.core.environment.impl.workflow.modification;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 
 
 public class SshKeyAdditionWorkflow extends CancellableWorkflow<SshKeyAdditionWorkflow.SshKeyAdditionPhase>
 {
-    private EnvironmentImpl environment;
+    private LocalEnvironment environment;
     private final String sshKey;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
@@ -23,7 +23,7 @@ public class SshKeyAdditionWorkflow extends CancellableWorkflow<SshKeyAdditionWo
     }
 
 
-    public SshKeyAdditionWorkflow( final EnvironmentImpl environment, final String sshKey,
+    public SshKeyAdditionWorkflow( final LocalEnvironment environment, final String sshKey,
                                    final TrackerOperation operationTracker,
                                    final EnvironmentManagerImpl environmentManager )
     {

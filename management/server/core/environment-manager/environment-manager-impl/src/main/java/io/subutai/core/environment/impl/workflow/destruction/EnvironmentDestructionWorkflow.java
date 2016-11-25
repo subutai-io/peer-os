@@ -7,7 +7,7 @@ import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
 
 
@@ -15,7 +15,7 @@ public class EnvironmentDestructionWorkflow
         extends CancellableWorkflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
 {
     private final EnvironmentManagerImpl environmentManager;
-    private EnvironmentImpl environment;
+    private LocalEnvironment environment;
     private final TrackerOperation operationTracker;
 
 
@@ -28,7 +28,7 @@ public class EnvironmentDestructionWorkflow
 
 
     public EnvironmentDestructionWorkflow( final EnvironmentManagerImpl environmentManager,
-                                           final EnvironmentImpl environment, final TrackerOperation operationTracker )
+                                           final LocalEnvironment environment, final TrackerOperation operationTracker )
     {
         super( EnvironmentDestructionPhase.INIT );
 
