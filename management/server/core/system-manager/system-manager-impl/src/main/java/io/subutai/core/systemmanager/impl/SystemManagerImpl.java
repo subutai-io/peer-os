@@ -50,6 +50,8 @@ public class SystemManagerImpl implements SystemManager
 
     private SystemSettings systemSettings;
 
+    private volatile boolean isUpdateInProgress = false;
+
 
     public SystemManagerImpl()
     {
@@ -213,6 +215,8 @@ public class SystemManagerImpl implements SystemManager
     {
         try
         {
+            isUpdateInProgress = true;
+
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
             UpdateEntity updateEntity = new UpdateEntity( SubutaiInfo.getVersion(), SubutaiInfo.getCommitId() );
@@ -230,7 +234,7 @@ public class SystemManagerImpl implements SystemManager
 
                 updateDao.update( updateEntity );
             }
-            else
+            else if ( !result.hasTimedOut() )
             {
                 updateDao.remove( updateEntity.getId() );
             }
@@ -241,8 +245,19 @@ public class SystemManagerImpl implements SystemManager
 
             return false;
         }
+        finally
+        {
+            isUpdateInProgress = false;
+        }
 
         return true;
+    }
+
+
+    @Override
+    public boolean isUpdateInProgress()
+    {
+        return isUpdateInProgress;
     }
 
 
