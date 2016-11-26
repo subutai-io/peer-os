@@ -2044,7 +2044,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 // exclude local reservations
                 if ( !peerManager.getLocalPeer().getId().equals( networkResource.getInitiatorPeerId() ) )
                 {
-                    if ( !includeHubEnvironments && Common.HUB_PEER_ID.equals( networkResource.getInitiatorPeerId() ) )
+                    if ( !includeHubEnvironments && Common.HUB_ID.equals( networkResource.getInitiatorPeerId() ) )
                     {
                         continue;
                     }

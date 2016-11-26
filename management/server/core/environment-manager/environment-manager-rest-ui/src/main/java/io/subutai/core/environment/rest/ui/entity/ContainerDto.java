@@ -33,7 +33,7 @@ public class ContainerDto
     public ContainerDto( final String id, final String name, final String environmentId, final String hostname,
                          final String ip, final String templateName, final ContainerSize type, final String arch,
                          final Set<String> tags, final String peerId, final String hostId, boolean local,
-                         String className, final String templateId )
+                         String dataSource, final String templateId )
     {
         this.id = id;
         this.name = name;
@@ -50,6 +50,6 @@ public class ContainerDto
 
         this.templateId = templateId;
 
-        dataSource = className.contains( "ProxyEnvironment" ) ? "hub" : "subutai";
+        this.dataSource = dataSource;
     }
 }

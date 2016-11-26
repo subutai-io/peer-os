@@ -188,6 +188,13 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response isUpdateInProgress()
+    {
+        return Response.status( Response.Status.OK ).entity( systemManager.isUpdateInProgress() ).build();
+    }
+
+
     public void setSystemManager( final SystemManager systemManager )
     {
         this.systemManager = systemManager;
