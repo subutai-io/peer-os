@@ -18,6 +18,8 @@ public interface HubManager
 
     boolean isRegistered();
 
+    String getPeerName();
+
     void sendHeartbeat() throws HubManagerException;
 
     void triggerHeartbeat();
