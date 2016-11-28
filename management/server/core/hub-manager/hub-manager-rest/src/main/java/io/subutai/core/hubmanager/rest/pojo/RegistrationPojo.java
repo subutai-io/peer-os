@@ -6,6 +6,8 @@ public class RegistrationPojo
     private boolean isRegisteredToHub;
     private String ownerId;
     private String currentUserEmail;
+    private String peerName;
+
 
     public boolean isRegisteredToHub()
     {
@@ -40,5 +42,11 @@ public class RegistrationPojo
     public void setCurrentUserEmail( String currentUserEmail )
     {
         this.currentUserEmail = currentUserEmail;
+    }
+
+
+    public void setPeerName( final String peerName )
+    {
+        this.peerName = peerName;
     }
 }

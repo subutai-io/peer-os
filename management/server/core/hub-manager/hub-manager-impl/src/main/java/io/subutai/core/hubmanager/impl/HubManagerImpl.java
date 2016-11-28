@@ -287,16 +287,18 @@ public class HubManagerImpl implements HubManager
 
         StateLinkProcessor commandProcessor = new CommandProcessor( ctx );
 
-        heartbeatProcessor = new HeartbeatProcessor( this, restClient, localPeer.getId() )
-                .addProcessor( hubEnvironmentProcessor )
-                .addProcessor( tunnelProcessor )
-                .addProcessor( environmentTelemetryProcessor )
-                .addProcessor( systemConfProcessor )
-                .addProcessor( productProcessor )
-                .addProcessor( vehsProccessor )
-                .addProcessor( appScaleProcessor )
-                .addProcessor( resourceHostRegisterProcessor )
-                .addProcessor( commandProcessor );
+        heartbeatProcessor =
+                new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
+                                                                             .addProcessor( tunnelProcessor )
+                                                                             .addProcessor(
+                                                                                     environmentTelemetryProcessor )
+                                                                             .addProcessor( systemConfProcessor )
+                                                                             .addProcessor( productProcessor )
+                                                                             .addProcessor( vehsProccessor )
+                                                                             .addProcessor( appScaleProcessor )
+                                                                             .addProcessor(
+                                                                                     resourceHostRegisterProcessor )
+                                                                             .addProcessor( commandProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -539,7 +541,21 @@ public class HubManagerImpl implements HubManager
     @Override
     public boolean isRegistered()
     {
-        return configDataService.getHubConfig( configManager.getPeerId() ) != null;
+        return getHubConfiguration() != null;
+    }
+
+
+    @Override
+    public String getPeerName()
+    {
+        Config config = getHubConfiguration();
+
+        if ( config != null )
+        {
+            return config.getPeerName();
+        }
+
+        return null;
     }
 
 
@@ -729,7 +745,7 @@ public class HubManagerImpl implements HubManager
 
         log.info( "currentUser: id={}, username={}, email={}", currentUser.getId(), currentUser.getUserName(), email );
 
-        if ( !email.contains( HUB_EMAIL_SUFFIX ) )
+        if ( !email.contains( HUB_EMAIL_SUFFIX ) && isRegistered() )
         {
             return getHubConfiguration().getOwnerEmail();
         }

@@ -153,6 +153,8 @@ public class RestServiceImpl implements RestService
             pojo.setOwnerId( hubManager.getHubConfiguration().getOwnerId() );
 
             pojo.setCurrentUserEmail( hubManager.getCurrentUserEmail() );
+
+            pojo.setPeerName(hubManager.getPeerName());
         }
 
         pojo.setRegisteredToHub( hubManager.isRegistered() );
