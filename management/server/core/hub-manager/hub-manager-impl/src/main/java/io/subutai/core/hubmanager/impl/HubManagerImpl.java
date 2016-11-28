@@ -151,6 +151,8 @@ public class HubManagerImpl implements HubManager
 
     private EnvironmentUserHelper envUserHelper;
 
+    private LogListenerImpl logListener;
+
 
     public HubManagerImpl( DaoManager daoManager )
     {
@@ -203,8 +205,7 @@ public class HubManagerImpl implements HubManager
 
             containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
-            //todo inject this as dependency
-            HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
+            HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this, logListener );
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
@@ -611,6 +612,12 @@ public class HubManagerImpl implements HubManager
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
         this.envManager = environmentManager;
+    }
+
+
+    public void setLogListener( final LogListenerImpl logListener )
+    {
+        this.logListener = logListener;
     }
 
 

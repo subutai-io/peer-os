@@ -1,10 +1,6 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.security.MessageDigest;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
@@ -12,20 +8,18 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import io.subutai.core.appender.SubutaiErrorEvent;
-import io.subutai.core.appender.SubutaiErrorEventListener;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
+import io.subutai.core.hubmanager.impl.LogListenerImpl;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
-public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
+public class HubLoggerProcessor implements Runnable
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -33,33 +27,24 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
 
     private HubManagerImpl hubManager;
 
-    private final Map<String, String> errLogs = new LinkedHashMap<>();
+    private LogListenerImpl logListener;
 
 
-    public HubLoggerProcessor( final ConfigManager configManager, final HubManagerImpl hubManager )
+    public HubLoggerProcessor( final ConfigManager configManager, final HubManagerImpl hubManager,
+                               LogListenerImpl logListener )
     {
         this.configManager = configManager;
         this.hubManager = hubManager;
-    }
-
-
-    public HubLoggerProcessor()
-    {
+        this.logListener = logListener;
     }
 
 
     @Override
     public void run()
     {
-        Set<String> logs = new HashSet<>();
+        Set<String> logs = logListener.getErrLogs();
 
-        synchronized ( errLogs )
-        {
-            logs.addAll( errLogs.values() );
-            errLogs.clear();
-        }
-
-        if ( !logs.isEmpty() && hubManager.isRegistered() )
+        if ( !logs.isEmpty() && hubManager.isRegistered() && hubManager.isHubReachable() )
         {
             WebClient client = null;
             try
@@ -99,38 +84,6 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
                     client.close();
                 }
             }
-        }
-    }
-
-
-    @Override
-    public void onEvent( final SubutaiErrorEvent event )
-    {
-        log.info( String.format( "RECEIVED:%n:%s", event.toString() ) );
-
-        try
-        {
-            byte[] loggerName = event.getLoggerName().getBytes();
-            byte[] renderedMsg = event.getRenderedMessage().getBytes();
-            byte[] combined = ArrayUtils.addAll( loggerName, renderedMsg );
-            MessageDigest md = MessageDigest.getInstance( "MD5" );
-            byte[] theDigest = md.digest( combined );
-            String key = new String( theDigest );
-
-            synchronized ( errLogs )
-            {
-                errLogs.put( key, event.toString() );
-
-                while ( errLogs.size() > 10 )
-                {
-                    //delete oldest value
-                    errLogs.remove( errLogs.keySet().iterator().next() );
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            log.warn( "Error in #onEvent {}", e.getMessage() );
         }
     }
 }
