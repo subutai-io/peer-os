@@ -26,7 +26,7 @@ import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
 import static java.lang.String.format;
 
-
+//TODO update peer name from Hub periodically since it can change on Hub side
 public class RegistrationManager
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -131,11 +131,11 @@ public class RegistrationManager
         }
 
 
-        Config config = null;
+        Config config;
         try
         {
             config = new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ),
-                    email );
+                    email, peerName );
         }
         catch ( Exception e )
         {

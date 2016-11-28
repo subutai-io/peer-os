@@ -29,18 +29,29 @@ public class ConfigEntity implements Config
     @Column( name = "user_email" )
     private String ownerEmail;
 
+    @Column( name = "peer_name" )
+    private String peerName;
+
 
     public ConfigEntity()
     {
     }
 
 
-    public ConfigEntity( String peerId, String serverIp, String ownerId, String ownerEmail )
+    public ConfigEntity( String peerId, String serverIp, String ownerId, String ownerEmail, String peerName )
     {
         this.peerId = peerId;
         this.serverIp = serverIp;
         this.ownerId = ownerId;
         this.ownerEmail = ownerEmail;
+        this.peerName = peerName;
+    }
+
+
+    @Override
+    public String getPeerName()
+    {
+        return peerName;
     }
 
 
@@ -51,7 +62,6 @@ public class ConfigEntity implements Config
     }
 
 
-    @Override
     public void setPeerId( String peerId )
     {
         this.peerId = peerId;
@@ -65,7 +75,6 @@ public class ConfigEntity implements Config
     }
 
 
-    @Override
     public void setHubIp( String serverIp )
     {
         this.serverIp = serverIp;
@@ -79,7 +88,6 @@ public class ConfigEntity implements Config
     }
 
 
-    @Override
     public void setOwnerId( String ownerId )
     {
         this.ownerId = ownerId;
@@ -93,7 +101,6 @@ public class ConfigEntity implements Config
     }
 
 
-    @Override
     public void setOwnerEmail( String ownerEmail )
     {
         this.ownerEmail = ownerEmail;
