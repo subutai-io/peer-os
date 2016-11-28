@@ -13,6 +13,7 @@ function SettingsUpdatesSrv($http) {
         getConfig: getConfig,
         update: update,
         getHistory: getHistory,
+        isUpdateInProgress: isUpdateInProgress,
         getHistoryUrl: function () {
             return HISTORY_URL
         }
@@ -20,6 +21,13 @@ function SettingsUpdatesSrv($http) {
 
     function getConfig() {
         return $http.get(BASE_URL + "management_updates", {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/json'}
+        });
+    }
+
+    function isUpdateInProgress() {
+        return $http.get(BASE_URL + "is_update_in_progress", {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
         });

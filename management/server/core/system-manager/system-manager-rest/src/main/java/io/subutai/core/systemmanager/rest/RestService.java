@@ -81,7 +81,7 @@ public interface RestService
     Response getUpdatesHistory();
 
     @GET
-    @Path( "/is_update_in_progress" )
+    @Path( "is_update_in_progress" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response isUpdateInProgress();
 }
