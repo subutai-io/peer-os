@@ -9,6 +9,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -108,21 +109,17 @@ public class DeletePeerStateHandler extends StateHandler
     {
         try
         {
-            EnvironmentId envId = new EnvironmentId( environmentId );
+            Set<ContainerHost> containerHosts = ctx.localPeer.findContainersByEnvironmentId( environmentId );
 
-            Containers containers = ctx.localPeer.getEnvironmentContainers( envId );
-            for ( ContainerHostInfo containerHostInfo : containers.getContainers() )
+            for ( ContainerHost containerHost : containerHosts )
             {
-                for ( HostInterfaceModel interfaceModel : containerHostInfo.getHostInterfaces().getAll() )
-                {
-                    deleteTunnel( interfaceModel.getIp() );
-                }
+                deleteTunnel( containerHost.getIp() );
             }
+
         }
         catch ( Exception e )
         {
             log.error( e.getMessage() );
-            e.printStackTrace();
         }
     }
 

@@ -29,6 +29,9 @@ public class TunnelHelper
 
     private static String COMMAND = "";
 
+    private static final String DELETE_TUNNEL_COMMAND =  "subutai tunnel del %s";
+    private static final String GET_OPENED_TUNNELS_FOR_IP_COMMAND =  "subutai tunnel list | grep %s | awk '{print $2}'";
+
 
     private TunnelHelper()
     {
@@ -165,19 +168,18 @@ public class TunnelHelper
 
     public static void deleteAllTunnelsForIp( final Set<ResourceHost> resourceHosts, final String ip )
     {
-        String deleteTunnelCMD = "subutai tunnel del %s";
 
         ResourceHost resourceHost = resourceHosts.iterator().next();
 
         CommandResult result =
-                execute( resourceHost, String.format( "subutai tunnel list | grep %s | awk '{print $2}'", ip ) );
+                execute( resourceHost, String.format( GET_OPENED_TUNNELS_FOR_IP_COMMAND, ip ) );
 
 
         String[] data = result.getStdOut().split( "\n" );
 
         for ( String tunnel : data )
         {
-            execute( resourceHost, String.format( deleteTunnelCMD, tunnel ) );
+            execute( resourceHost, String.format( DELETE_TUNNEL_COMMAND, tunnel ) );
         }
     }
 }
