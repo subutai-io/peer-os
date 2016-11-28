@@ -42,6 +42,7 @@ import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 public class SystemManagerImpl implements SystemManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemManagerImpl.class );
+    private static final String UPDATE_IN_PROGRESS_MSG = "Update is in progress";
 
     private IdentityManager identityManager;
     private PeerManager peerManager;
@@ -296,7 +297,9 @@ public class SystemManagerImpl implements SystemManager
         for ( UpdateEntity updateEntity : updateEntities )
         {
             updateDtos.add( new UpdateDto( updateEntity.getUpdateDate(), updateEntity.getPrevVersion(),
+                    updateEntity.getCurrentVersion() == null ? UPDATE_IN_PROGRESS_MSG :
                     updateEntity.getCurrentVersion(), updateEntity.getPrevCommitId(),
+                    updateEntity.getCurrentCommitId() == null ? UPDATE_IN_PROGRESS_MSG :
                     updateEntity.getCurrentCommitId() ) );
         }
 
