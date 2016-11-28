@@ -14,18 +14,17 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 	vm.updateText = 'Checking...';
 	vm.updateInProgress = false;
 
-
-
-    checkActiveUpdate();
-
+	checkActiveUpdate();
+    getHistoryData();
 
 	function checkActiveUpdate(){
 
         LOADING_SCREEN();
 
 	    SettingsUpdatesSrv.isUpdateInProgress().success(function (data){
-	         LOADING_SCREEN("none");
           	 if (data == true || data == 'true') {
+	            LOADING_SCREEN("none");
+
           	    vm.updateInProgress = true;
           	    vm.updateText = 'Update is in progress';
 
@@ -52,6 +51,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 			SweetAlert.swal("ERROR!", error, "error");
 		});
 	}
+
 
 	vm.dtInstance = {};
 	vm.dtOptions = DTOptionsBuilder
@@ -83,17 +83,15 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 	vm.getHistoryData = getHistoryData;
 
 	function getHistoryData() {
-		LOADING_SCREEN();
 		SettingsUpdatesSrv.getHistory().success(function (data) {
-			LOADING_SCREEN('none');
 			vm.getHistory = data;
 			console.log(vm.getHistory);
 		}).error(function(error) {
-			LOADING_SCREEN('none');
 			SweetAlert.swal("ERROR!", error, "error");
 		});
 	}
-	getHistoryData();
+
+
 
 	function update() {
 

@@ -1072,7 +1072,7 @@ var VARS_TOOLTIP_TIMEOUT = 1600;
 function LOADING_SCREEN(displayStatus) {
     if (displayStatus === undefined || displayStatus === null) displayStatus = 'block';
     var loadScreen = document.getElementsByClassName('js-loading-screen')[0];
-    if (loadScreen) {
+    if (loadScreen && loadScreen.style.display != displayStatus) {
         loadScreen.style.display = displayStatus;
     }
 }
