@@ -434,6 +434,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public void setName( final String peerId, final String newName ) throws PeerException
     {
@@ -808,6 +809,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Reat" } )
     @Override
     public void checkHostAvailability( final String destinationHost ) throws PeerException
     {
