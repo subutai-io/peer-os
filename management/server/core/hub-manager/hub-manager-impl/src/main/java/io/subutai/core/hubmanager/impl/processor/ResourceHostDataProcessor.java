@@ -1,21 +1,17 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
@@ -23,6 +19,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.JournalCtlLevel;
@@ -41,9 +38,6 @@ import io.subutai.hub.share.dto.HostInterfaceDto;
 import io.subutai.hub.share.dto.P2PDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.dto.host.ResourceHostMetricDto;
-import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.Series;
-import io.subutai.common.metric.SeriesBatch;
 import io.subutai.hub.share.dto.metrics.HostMetricsDto;
 import io.subutai.hub.share.dto.metrics.PeerMetricsDto;
 
@@ -54,17 +48,17 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static HubManagerImpl hubManager;
+    private HubManagerImpl hubManager;
 
-    private static LocalPeer localPeer;
+    private LocalPeer localPeer;
 
-    private static HubRestClient restClient;
+    private HubRestClient restClient;
 
-    private static Monitor monitor;
+    private Monitor monitor;
 
     private Date p2pLogsEndDate;
 
-    private static Set<HostInterfaceDto> interfaces = new HashSet<>();
+    private Set<HostInterfaceDto> interfaces = new HashSet<>();
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -77,12 +71,6 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
         this.monitor = monitor;
 
         this.restClient = restClient;
-    }
-
-
-    public ResourceHostDataProcessor()
-    {
-
     }
 
 

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -25,19 +24,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
@@ -80,7 +78,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
-public class HubManagerImpl implements HubManager
+public class HubManagerImpl implements HubManager, HostListener
 {
     private static final long TIME_15_MINUTES = 900;
 
@@ -132,12 +130,9 @@ public class HubManagerImpl implements HubManager
 
     private HeartbeatProcessor heartbeatProcessor;
 
-    //todo inject this as dependency
     private ResourceHostDataProcessor resourceHostDataProcessor;
 
     private ContainerEventProcessor containerEventProcessor;
-
-    private VersionInfoProcessor versionInfoProcessor;
 
     private RegistrationRequestProcessor registrationRequestProcessor;
 
@@ -151,28 +146,12 @@ public class HubManagerImpl implements HubManager
 
     private EnvironmentUserHelper envUserHelper;
 
+    private LogListenerImpl logListener;
+
 
     public HubManagerImpl( DaoManager daoManager )
     {
         this.daoManager = daoManager;
-    }
-
-
-    public void addListener( HubEventListener listener )
-    {
-        if ( listener != null )
-        {
-            hubEventListeners.add( listener );
-        }
-    }
-
-
-    public void removeListener( HubEventListener listener )
-    {
-        if ( listener != null )
-        {
-            hubEventListeners.remove( listener );
-        }
     }
 
 
@@ -203,8 +182,7 @@ public class HubManagerImpl implements HubManager
 
             containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
-            //todo inject this as dependency
-            HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
+            HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this, logListener );
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
@@ -212,7 +190,8 @@ public class HubManagerImpl implements HubManager
 
             tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
-            versionInfoProcessor = new VersionInfoProcessor( this, peerManager, configManager );
+            final VersionInfoProcessor versionInfoProcessor =
+                    new VersionInfoProcessor( this, peerManager, configManager );
 
             versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
@@ -251,14 +230,16 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
+    {
+        resourceHostDataProcessor.onHeartbeat( resourceHostInfo, alerts );
+    }
+
+
+    @Override
     public boolean isHubReachable()
     {
-        if ( heartbeatProcessor != null )
-        {
-            return heartbeatProcessor.isHubReachable();
-        }
-
-        return false;
+        return heartbeatProcessor != null && heartbeatProcessor.isHubReachable();
     }
 
 
@@ -303,14 +284,6 @@ public class HubManagerImpl implements HubManager
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
                         TimeUnit.SECONDS );
-    }
-
-
-    public void destroy()
-    {
-        heartbeatExecutorService.shutdown();
-        resourceHostConfExecutorService.shutdown();
-        resourceHostMonitorExecutorService.shutdown();
     }
 
 
@@ -477,8 +450,6 @@ public class HubManagerImpl implements HubManager
             if ( isRegistered() )
             {
                 ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
-                Set<String> links = new HashSet<>();
-                links.add( productProcessor.getProductProcessUrl( uid ) );
                 PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
                 peerProductDataDto.setProductId( uid );
                 peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
@@ -576,7 +547,7 @@ public class HubManagerImpl implements HubManager
                 byte[] encryptedContent = configManager.readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 PeerDto dto = JsonUtil.fromCbor( plainContent, PeerDto.class );
-                result.put( "OwnerId", dto.getOwnerId() );
+                result.put( "OwnerId", dto != null ? dto.getOwnerId() : null );
 
                 log.debug( "PeerDto: " + result.toString() );
             }
@@ -589,78 +560,10 @@ public class HubManagerImpl implements HubManager
     }
 
 
-    public CommandExecutor getCommandExecutor()
-    {
-        return commandExecutor;
-    }
-
-
-    public void setCommandExecutor( final CommandExecutor commandExecutor )
-    {
-        this.commandExecutor = commandExecutor;
-    }
-
-
     @Override
     public Config getHubConfiguration()
     {
         return configDataService.getHubConfig( configManager.getPeerId() );
-    }
-
-
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
-    {
-        this.envManager = environmentManager;
-    }
-
-
-    public void setSecurityManager( final SecurityManager securityManager )
-    {
-        this.securityManager = securityManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }
-
-
-    public ConfigDataService getConfigDataService()
-    {
-        return configDataService;
-    }
-
-
-    public void setConfigDataService( final ConfigDataService configDataService )
-    {
-        this.configDataService = configDataService;
-    }
-
-
-    public void setMonitor( Monitor monitor )
-    {
-        this.monitor = monitor;
-    }
-
-
-    private static ObjectMapper createMapper( JsonFactory factory )
-    {
-        ObjectMapper mapper = new ObjectMapper( factory );
-        mapper.setVisibility( PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY );
-        return mapper;
-    }
-
-
-    public void setIdentityManager( final IdentityManager identityManager )
-    {
-        this.identityManager = identityManager;
-    }
-
-
-    public void setHostRegistrationManager( final HostRegistrationManager hostRegistrationManager )
-    {
-        this.hostRegistrationManager = hostRegistrationManager;
     }
 
 
@@ -674,9 +577,9 @@ public class HubManagerImpl implements HubManager
             byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
             StringBuilder hexString = new StringBuilder();
 
-            for ( int i = 0; i < bytes.length; i++ )
+            for ( final byte aByte : bytes )
             {
-                String hex = Integer.toHexString( 0xFF & bytes[i] );
+                String hex = Integer.toHexString( 0xFF & aByte );
                 if ( hex.length() == 1 )
                 {
                     hexString.append( '0' );
@@ -753,5 +656,97 @@ public class HubManagerImpl implements HubManager
         UserDto userDto = envUserHelper.getUserDataFromHub( StringUtils.substringBefore( email, "@" ) );
 
         return userDto.getEmail();
+    }
+
+
+    public void addListener( HubEventListener listener )
+    {
+        if ( listener != null )
+        {
+            hubEventListeners.add( listener );
+        }
+    }
+
+
+    public void removeListener( HubEventListener listener )
+    {
+        if ( listener != null )
+        {
+            hubEventListeners.remove( listener );
+        }
+    }
+
+
+    public void destroy()
+    {
+        heartbeatExecutorService.shutdown();
+        resourceHostConfExecutorService.shutdown();
+        resourceHostMonitorExecutorService.shutdown();
+    }
+
+
+    public CommandExecutor getCommandExecutor()
+    {
+        return commandExecutor;
+    }
+
+
+    public void setCommandExecutor( final CommandExecutor commandExecutor )
+    {
+        this.commandExecutor = commandExecutor;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.envManager = environmentManager;
+    }
+
+
+    public void setLogListener( final LogListenerImpl logListener )
+    {
+        this.logListener = logListener;
+    }
+
+
+    public void setSecurityManager( final SecurityManager securityManager )
+    {
+        this.securityManager = securityManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
+    public ConfigDataService getConfigDataService()
+    {
+        return configDataService;
+    }
+
+
+    public void setConfigDataService( final ConfigDataService configDataService )
+    {
+        this.configDataService = configDataService;
+    }
+
+
+    public void setMonitor( Monitor monitor )
+    {
+        this.monitor = monitor;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
+    }
+
+
+    public void setHostRegistrationManager( final HostRegistrationManager hostRegistrationManager )
+    {
+        this.hostRegistrationManager = hostRegistrationManager;
     }
 }
