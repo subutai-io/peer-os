@@ -27,7 +27,7 @@ var app = angular.module('subutai-app', [
     .run(startup);
 
 CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog', 'trackerSrv'];
-routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider', '$http'];
+routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
 function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv) {
@@ -398,7 +398,7 @@ function SubutaiController($rootScope, $http) {
 }
 
 var $stateProviderRef = null;
-function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLoadProvider, $http) {
+function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
     $urlRouterProvider.otherwise('/404');
 
@@ -409,10 +409,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
     //$locationProvider.html5Mode(true);
     $urlRouterProvider.when('', '/');
 
-	$http.get(SERVER_URL + 'rest/ui/identity/is-admin', {
-		withCredentials: true,
-		headers: {'Content-Type': 'application/json'}
-	}).success(function (data) {
+	$.get(SERVER_URL + 'rest/ui/identity/is-admin', function( data ) {
 		if (data == true || data == 'true') {
 			$stateProvider
 				.state('identity-user', {
