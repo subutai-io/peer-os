@@ -150,6 +150,7 @@ public class ConfigManager
 
         User user = identityManager.getActiveUser();
 
+        //TODO review to make this temporary renewable token
         return identityManager.createUserToken( user, null, null, null, TokenType.PERMANENT.getId(), null );
     }
 

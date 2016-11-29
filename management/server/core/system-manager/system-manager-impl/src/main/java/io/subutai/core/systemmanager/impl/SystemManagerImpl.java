@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.security.RolesAllowed;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +69,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public SystemInfo getSystemInfo()
     {
         SystemInfo pojo = new SystemInfoPojo();
@@ -100,6 +103,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Update" )
     public void setPeerSettings()
     {
         identityManager.setPeerOwner( identityManager.getActiveUser() );
@@ -107,6 +111,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public PeerSettings getPeerSettings()
     {
         String peerOwnerId = identityManager.getPeerOwnerId();
@@ -122,6 +127,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public NetworkSettings getNetworkSettings() throws ConfigurationException
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
@@ -136,6 +142,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Update" )
     public void setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
                                     final String endRange ) throws ConfigurationException
     {
@@ -154,6 +161,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public AdvancedSettings getAdvancedSettings()
     {
         AdvancedSettings pojo = new AdvancedSettingsPojo();
@@ -175,6 +183,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public SystemInfo getManagementUpdates()
     {
         SystemInfo info = getSystemInfo();
@@ -212,6 +221,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Update" )
     public boolean updateManagement()
     {
         try
@@ -256,6 +266,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public boolean isUpdateInProgress()
     {
         return isUpdateInProgress;
@@ -288,6 +299,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public List<UpdateDto> getUpdates()
     {
         List<UpdateDto> updateDtos = new ArrayList<>();
