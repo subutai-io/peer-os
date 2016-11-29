@@ -18,11 +18,16 @@
              interface="io.subutai.core.executor.api.CommandExecutor" />
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
-
+  <reference id="identityManager" availability="mandatory"
+             interface="io.subutai.core.identity.api.IdentityManager" />
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
 
   <bean id="executorRestUIServiceImpl" class="io.subutai.core.executor.rest.ui.RestServiceImpl">
     <argument ref="commandExecutor" />
     <argument ref="environmentManager" />
+    <argument ref="identityManager" />
+    <argument ref="localPeer" />
   </bean>
 
   <jaxrs:server address="/ui/commands" id="executorRestUIService">
