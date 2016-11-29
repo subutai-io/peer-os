@@ -809,7 +809,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|Reat" } )
+    @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public void checkHostAvailability( final String destinationHost ) throws PeerException
     {
