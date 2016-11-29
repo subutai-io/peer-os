@@ -122,6 +122,7 @@ public class RestServiceImpl implements RestService
 
     /** Environments **************************************************** */
 
+    //TODO fix #1515
     @Override
     public Response listEnvironments()
     {
@@ -979,6 +980,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    //TODO fix #1515
     @Override
     public Response listTenantEnvironments()
     {
