@@ -355,6 +355,7 @@ function SubutaiController($rootScope, $http) {
     vm.activeState = '';
     vm.adminMenus = false;
     vm.isTenantManager = false;
+    vm.peerName = "Subutai Social";
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
@@ -376,6 +377,17 @@ function SubutaiController($rootScope, $http) {
             }).success(function (data) {
                 if (data == true || data == 'true') {
                     vm.isTenantManager = true;
+                }
+            });
+
+            $http.get(SERVER_URL + "rest/v1/hub/registration_state", {
+                withCredentials: true,
+                headers: {'Content-Type': 'application/json'}
+            }).success(function (data) {
+                if (data.isRegisteredToHub == true) {
+                    vm.peerName = data.peerName + " | Subutai Social";
+                }else{
+                    vm.peerName = "Subutai Social";
                 }
             });
             return;
@@ -1069,7 +1081,7 @@ var VARS_TOOLTIP_TIMEOUT = 1600;
 function LOADING_SCREEN(displayStatus) {
     if (displayStatus === undefined || displayStatus === null) displayStatus = 'block';
     var loadScreen = document.getElementsByClassName('js-loading-screen')[0];
-    if (loadScreen) {
+    if (loadScreen && loadScreen.style.display != displayStatus) {
         loadScreen.style.display = displayStatus;
     }
 }
@@ -1199,5 +1211,4 @@ function hasPGPplugin() {
         return false;
     }
 }
-
 
