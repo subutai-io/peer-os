@@ -5,11 +5,11 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
+import com.google.common.base.Preconditions;
+
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.host.ResourceHostInfo;
-
-import com.google.common.base.Preconditions;
 
 
 public class RestServiceImpl implements RestService
@@ -26,6 +26,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    //TODO check if used, and set appropriate permission
     @Override
     public Response getHosts()
     {

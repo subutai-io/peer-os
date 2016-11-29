@@ -1,6 +1,7 @@
 package io.subutai.core.executor.rest.ui;
 
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Resource-Management|Write", "Resource-Management|Update" } )
     @Override
     public Response executeCommand( final String hostId, final String command, String environmentId, final String path,
                                     final Boolean daemon, final Integer timeOut )

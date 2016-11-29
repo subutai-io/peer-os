@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.security.RolesAllowed;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +89,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager
     }
 
 
+    @RolesAllowed( "Resource-Management|Write" )
     @Override
     public synchronized void queueRequest( final RequestedHost requestedHost ) throws HostRegistrationException
     {
@@ -283,7 +286,8 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager
     {
         KeyManager keyManager = securityManager.getKeyManager();
         keyManager.savePublicKeyRing( hostId,
-                rh ? SecurityKeyType.RESOURCE_HOST_KEY.getId() : SecurityKeyType.CONTAINER_HOST_KEY.getId(), publicKey );
+                rh ? SecurityKeyType.RESOURCE_HOST_KEY.getId() : SecurityKeyType.CONTAINER_HOST_KEY.getId(),
+                publicKey );
     }
 
 

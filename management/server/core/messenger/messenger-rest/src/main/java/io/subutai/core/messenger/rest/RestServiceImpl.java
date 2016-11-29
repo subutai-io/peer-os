@@ -28,7 +28,7 @@ public class RestServiceImpl implements RestService
         this.messageProcessor = messageProcessor;
     }
 
-
+    //TODO set appropriate permission
     @Override
     public Response processMessage( final String envelope )
     {

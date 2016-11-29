@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -70,6 +71,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response getRegisteredPeers()
     {
@@ -114,6 +116,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public Response processRegisterRequest( final String ip, final String keyPhrase )
     {
@@ -137,6 +140,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public Response rejectForRegistrationRequest( final String peerId, Boolean force )
     {
@@ -165,6 +169,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public Response approveForRegistrationRequest( final String peerId, final String keyPhrase )
     {
@@ -193,6 +198,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public Response cancelForRegistrationRequest( final String peerId, Boolean force )
     {
@@ -221,6 +227,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Update" } )
     @Override
     public Response renamePeer( final String peerId, final String name )
     {
@@ -243,7 +250,7 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
-
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public Response unregisterForRegistrationRequest( final String peerId, Boolean force )
     {
@@ -271,7 +278,7 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
-
+    @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response getResourceHosts()
     {
@@ -284,7 +291,7 @@ public class RestServiceImpl implements RestService
         return new ExecutorCompletionService<>( executor );
     }
 
-
+    @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response checkPeer( String destinationHost )
     {

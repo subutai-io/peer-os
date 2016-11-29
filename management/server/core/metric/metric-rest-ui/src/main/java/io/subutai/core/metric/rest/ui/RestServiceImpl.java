@@ -4,6 +4,7 @@ package io.subutai.core.metric.rest.ui;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Preconditions;
@@ -39,6 +40,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( "System-Management|Read" )
     @Override
     public Response getMetrics( final String environmentId, final String hostId, final int interval )
     {
@@ -84,6 +86,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( "System-Management|Read" )
     @Override
     public Response getMetrics( final String hostId, final int interval )
     {
@@ -91,6 +94,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( "System-Management|Read" )
     @Override
     public Response getMetrics( final int interval )
     {
@@ -98,6 +102,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( "System-Management|Read" )
     @Override
     public Response getP2PStatus()
     {

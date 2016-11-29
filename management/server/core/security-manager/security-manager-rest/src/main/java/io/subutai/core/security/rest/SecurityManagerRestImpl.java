@@ -25,6 +25,7 @@ import io.subutai.core.security.rest.model.SecurityKeyData;
 
 /**
  * Implementation of Key Server Rest
+ * TODO determine what permissions plugin use and set appropriate permissions to this modules' methods
  */
 public class SecurityManagerRestImpl implements SecurityManagerRest
 {
