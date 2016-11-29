@@ -27,7 +27,7 @@ var app = angular.module('subutai-app', [
     .run(startup);
 
 CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog', 'trackerSrv'];
-routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
+routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider', '$http'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
 function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv) {
@@ -355,7 +355,6 @@ function SubutaiController($rootScope, $http) {
     vm.activeState = '';
     vm.adminMenus = false;
     vm.isTenantManager = false;
-    vm.peerName = "Subutai Social";
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
@@ -379,17 +378,6 @@ function SubutaiController($rootScope, $http) {
                     vm.isTenantManager = true;
                 }
             });
-
-            $http.get(SERVER_URL + "rest/v1/hub/registration_state", {
-                withCredentials: true,
-                headers: {'Content-Type': 'application/json'}
-            }).success(function (data) {
-                if (data.isRegisteredToHub == true) {
-                    vm.peerName = data.peerName + " | Subutai Social";
-                }else{
-                    vm.peerName = "Subutai Social";
-                }
-            });
             return;
         }
 
@@ -398,7 +386,7 @@ function SubutaiController($rootScope, $http) {
 }
 
 var $stateProviderRef = null;
-function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
+function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLoadProvider, $http) {
 
     $urlRouterProvider.otherwise('/404');
 
@@ -408,6 +396,262 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 
     //$locationProvider.html5Mode(true);
     $urlRouterProvider.when('', '/');
+
+	$http.get(SERVER_URL + 'rest/ui/identity/is-admin', {
+		withCredentials: true,
+		headers: {'Content-Type': 'application/json'}
+	}).success(function (data) {
+		if (data == true || data == 'true') {
+			$stateProvider
+				.state('identity-user', {
+					url: '/identity-user',
+					templateUrl: 'subutai-app/identityUser/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.identity-user',
+									files: [
+										'subutai-app/identityUser/identityUser.js',
+										'subutai-app/identityUser/controller.js',
+										'subutai-app/identity/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				})
+				.state('identity-role', {
+					url: '/identity-role',
+					templateUrl: 'subutai-app/identityRole/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.identity-role',
+									files: [
+										'subutai-app/identityRole/identityRole.js',
+										'subutai-app/identityRole/controller.js',
+										'subutai-app/identity/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				})
+				.state('peer-registration', {
+					url: '/peer-registration',
+					templateUrl: 'subutai-app/peerRegistration/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.peer-registration',
+									files: [
+										'subutai-app/peerRegistration/peerRegistration.js',
+										'subutai-app/peerRegistration/controller.js',
+										'subutai-app/peerRegistration/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				})
+				.state('nodeReg', {
+					url: '/nodeReg',
+					templateUrl: 'subutai-app/nodeReg/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load(
+								{
+									name: 'subutai.nodeReg',
+									files: [
+										'subutai-app/nodeReg/nodeReg.js',
+										'subutai-app/nodeReg/controller.js',
+										'subutai-app/nodeReg/service.js',
+										'subutai-app/environment/service.js'
+									]
+								});
+						}]
+					}
+				})
+				.state('settings-network', {
+					url: '/settings-network',
+					templateUrl: 'subutai-app/settingsNetwork/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.settings-network',
+									files: [
+										'subutai-app/settingsNetwork/settingsNetwork.js',
+										'subutai-app/settingsNetwork/controller.js',
+										'subutai-app/settingsNetwork/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				})
+				.state('settings-updates', {
+					url: '/settings-updates',
+					templateUrl: 'subutai-app/settingsUpdates/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.settings-updates',
+									files: [
+										'subutai-app/settingsUpdates/settingsUpdates.js',
+										'subutai-app/settingsUpdates/controller.js',
+										'subutai-app/settingsUpdates/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				})
+				.state('settings-advanced', {
+					url: '/settings-advanced',
+					templateUrl: 'subutai-app/settingsAdvanced/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									files: ['scripts/libs/FileSaver.min.js']
+								},
+								{
+									name: 'vtortola.ng-terminal'
+								},
+								{
+									name: 'subutai.settings-advanced',
+									files: [
+										'subutai-app/settingsAdvanced/settingsAdvanced.js',
+										'subutai-app/settingsAdvanced/controller.js',
+										'subutai-app/settingsAdvanced/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				})
+				.state('settings-security', {
+					url: '/settings-security',
+					templateUrl: 'subutai-app/settingsSecurity/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.settings-security',
+									files: [
+										'subutai-app/settingsSecurity/settingsSecurity.js',
+										'subutai-app/settingsSecurity/controller.js',
+										'subutai-app/settingsSecurity/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				})
+				.state('about', {
+					url: '/about',
+					templateUrl: 'subutai-app/about/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.about',
+									files: [
+										'subutai-app/about/about.js',
+										'subutai-app/about/controller.js',
+									]
+								}
+							])
+						}]
+					}
+				})
+				.state('settings-peer', {
+					url: '/settings-peer',
+					templateUrl: 'subutai-app/settingsPeer/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.settings-peer',
+									files: [
+										'subutai-app/settingsPeer/settingsPeer.js',
+										'subutai-app/settingsPeer/controller.js',
+										'subutai-app/settingsPeer/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				})
+				.state('settings-kurjun', {
+					url: '/settings-kurjun',
+					templateUrl: 'subutai-app/settingsKurjun/partials/view.html',
+					data: {
+						bodyClass: '',
+						layout: 'default'
+					},
+					resolve: {
+						loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+							return $ocLazyLoad.load([
+								{
+									name: 'subutai.settings-kurjun',
+									files: [
+										'subutai-app/settingsKurjun/settingsKurjun.js',
+										'subutai-app/settingsKurjun/controller.js',
+										'subutai-app/settingsKurjun/service.js'
+									]
+								}
+							]);
+						}]
+					}
+				});
+		}
+	});
 
     $stateProvider
         .state('login', {
@@ -573,72 +817,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
-        .state('identity-user', {
-            url: '/identity-user',
-            templateUrl: 'subutai-app/identityUser/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.identity-user',
-                            files: [
-                                'subutai-app/identityUser/identityUser.js',
-                                'subutai-app/identityUser/controller.js',
-                                'subutai-app/identity/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('identity-role', {
-            url: '/identity-role',
-            templateUrl: 'subutai-app/identityRole/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.identity-role',
-                            files: [
-                                'subutai-app/identityRole/identityRole.js',
-                                'subutai-app/identityRole/controller.js',
-                                'subutai-app/identity/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('nodeReg', {
-            url: '/nodeReg',
-            templateUrl: 'subutai-app/nodeReg/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load(
-                        {
-                            name: 'subutai.nodeReg',
-                            files: [
-                                'subutai-app/nodeReg/nodeReg.js',
-                                'subutai-app/nodeReg/controller.js',
-                                'subutai-app/nodeReg/service.js',
-                                'subutai-app/environment/service.js'
-                            ]
-                        });
-                }]
-            }
-        })
         .state('tracker', {
             url: '/tracker',
             templateUrl: 'subutai-app/tracker/partials/view.html',
@@ -655,28 +833,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/tracker/tracker.js',
                                 'subutai-app/tracker/controller.js',
                                 'subutai-app/tracker/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('peer-registration', {
-            url: '/peer-registration',
-            templateUrl: 'subutai-app/peerRegistration/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.peer-registration',
-                            files: [
-                                'subutai-app/peerRegistration/peerRegistration.js',
-                                'subutai-app/peerRegistration/controller.js',
-                                'subutai-app/peerRegistration/service.js'
                             ]
                         }
                     ]);
@@ -748,165 +904,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/console/service.js',
                                 'subutai-app/environment/service.js',
                                 'subutai-app/peerRegistration/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('about', {
-            url: '/about',
-            templateUrl: 'subutai-app/about/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.about',
-                            files: [
-                                'subutai-app/about/about.js',
-                                'subutai-app/about/controller.js',
-                            ]
-                        }
-                    ])
-                }]
-            }
-        })
-        .state('settings-peer', {
-            url: '/settings-peer',
-            templateUrl: 'subutai-app/settingsPeer/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.settings-peer',
-                            files: [
-                                'subutai-app/settingsPeer/settingsPeer.js',
-                                'subutai-app/settingsPeer/controller.js',
-                                'subutai-app/settingsPeer/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('settings-kurjun', {
-            url: '/settings-kurjun',
-            templateUrl: 'subutai-app/settingsKurjun/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.settings-kurjun',
-                            files: [
-                                'subutai-app/settingsKurjun/settingsKurjun.js',
-                                'subutai-app/settingsKurjun/controller.js',
-                                'subutai-app/settingsKurjun/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('settings-network', {
-            url: '/settings-network',
-            templateUrl: 'subutai-app/settingsNetwork/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.settings-network',
-                            files: [
-                                'subutai-app/settingsNetwork/settingsNetwork.js',
-                                'subutai-app/settingsNetwork/controller.js',
-                                'subutai-app/settingsNetwork/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('settings-updates', {
-            url: '/settings-updates',
-            templateUrl: 'subutai-app/settingsUpdates/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.settings-updates',
-                            files: [
-                                'subutai-app/settingsUpdates/settingsUpdates.js',
-                                'subutai-app/settingsUpdates/controller.js',
-                                'subutai-app/settingsUpdates/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('settings-advanced', {
-            url: '/settings-advanced',
-            templateUrl: 'subutai-app/settingsAdvanced/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            files: ['scripts/libs/FileSaver.min.js']
-                        },
-                        {
-                            name: 'vtortola.ng-terminal'
-                        },
-                        {
-                            name: 'subutai.settings-advanced',
-                            files: [
-                                'subutai-app/settingsAdvanced/settingsAdvanced.js',
-                                'subutai-app/settingsAdvanced/controller.js',
-                                'subutai-app/settingsAdvanced/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('settings-security', {
-            url: '/settings-security',
-            templateUrl: 'subutai-app/settingsSecurity/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.settings-security',
-                            files: [
-                                'subutai-app/settingsSecurity/settingsSecurity.js',
-                                'subutai-app/settingsSecurity/controller.js',
-                                'subutai-app/settingsSecurity/service.js'
                             ]
                         }
                     ]);
@@ -1072,7 +1069,7 @@ var VARS_TOOLTIP_TIMEOUT = 1600;
 function LOADING_SCREEN(displayStatus) {
     if (displayStatus === undefined || displayStatus === null) displayStatus = 'block';
     var loadScreen = document.getElementsByClassName('js-loading-screen')[0];
-    if (loadScreen && loadScreen.style.display != displayStatus) {
+    if (loadScreen) {
         loadScreen.style.display = displayStatus;
     }
 }
@@ -1202,4 +1199,5 @@ function hasPGPplugin() {
         return false;
     }
 }
+
 
