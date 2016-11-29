@@ -24,7 +24,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 
 
 /**
- * REST endpoint implementation of registration process
+ * TODO Seems obsolete. Check and delete
  */
 public class RestServiceImpl implements RestService
 {
