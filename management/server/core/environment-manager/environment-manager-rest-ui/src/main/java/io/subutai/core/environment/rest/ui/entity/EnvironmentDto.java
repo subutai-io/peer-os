@@ -8,6 +8,8 @@ import io.subutai.common.environment.EnvironmentStatus;
 
 /**
  * Trimmed environment for REST
+ *
+ * TODO use io.subutai.common.environment.EnvironmentDto instead of this and remove this
  */
 public class EnvironmentDto
 {

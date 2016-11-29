@@ -8,6 +8,8 @@ import io.subutai.common.peer.ContainerSize;
 
 /**
  * Trimmed container for REST
+ *
+ * TODO use io.subutai.common.environment.ContainerDto instead of this and remove this
  */
 public class ContainerDto
 {
