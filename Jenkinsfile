@@ -100,7 +100,7 @@ node() {
 			subutai destroy everything
 			if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
 			systemctl restart subutai_p2p_*.service
-			rm /mnt/lib/lxc/tmpdir/management-subutai-template_*
+			if test -f /mnt/lib/lxc/tmpdir/management-subutai-template_*; then rm /mnt/lib/lxc/tmpdir/management-subutai-template_*; fi
 		EOF"""
 
 		// update rh on test node
