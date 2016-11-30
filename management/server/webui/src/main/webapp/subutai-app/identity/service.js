@@ -31,6 +31,7 @@ function identitySrv($http) {
         getCurrentUser: getCurrentUser,
 
         getConfig: getConfig,
+		isAdminCheck: isAdminCheck,
 
         updatePublicKey: updatePublicKey,
         createIdentityDelegateDocument: createIdentityDelegateDocument,
@@ -208,4 +209,11 @@ function identitySrv($http) {
             headers: {'Content-Type': 'application/json'}
         });
     }
+
+	function isAdminCheck() {
+		return $http.get(
+			BASE_URL + 'is-admin',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
+	}
 }

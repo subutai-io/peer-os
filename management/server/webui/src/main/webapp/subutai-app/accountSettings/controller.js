@@ -68,39 +68,42 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	}, 3000);
 
 
-	identitySrv.getConfig().success(function (data) {
-		if (data.isUpdatesAvailable) {
-			$rootScope.notifications = {
-				"message": "Updates available",
-				"updateMessage": true,
-				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-				"links": [
-				{
-					"text": "Update",
-					"href": "/#/settings-updates"
-				}
-				]
-			};
-		} else {
-			var notifications = sessionStorage.getItem('notifications');
-			if (
-					notifications !== null &&
-					notifications !== undefined &&
-					notifications !== 'null' &&
-					notifications.length > 0
-			) {
-				notifications = JSON.parse(notifications);
-				for (var i = 0; i < notifications.length; i++) {
-					if (notifications[i].updateMessage !== undefined && notifications[i].updateMessage) {
-						notifications.splice(i, 1);
-						sessionStorage.setItem('notifications', JSON.stringify(notifications));
-						$rootScope.notifications = {};
-						break;
+	identitySrv.isAdminCheck().success(function (data) {
+		if (data == true || data == 'true') {
+			identitySrv.getConfig().success(function (data) {
+				if (data.isUpdatesAvailable) {
+					$rootScope.notifications = {
+						"message": "Updates available",
+						"updateMessage": true,
+						"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+						"links": [
+						{
+							"text": "Update",
+							"href": "/#/settings-updates"
+						}
+						]
+					};
+				} else {
+					var notifications = sessionStorage.getItem('notifications');
+					if (
+							notifications !== null &&
+							notifications !== undefined &&
+							notifications !== 'null' &&
+							notifications.length > 0
+					) {
+						notifications = JSON.parse(notifications);
+						for (var i = 0; i < notifications.length; i++) {
+							if (notifications[i].updateMessage !== undefined && notifications[i].updateMessage) {
+								notifications.splice(i, 1);
+								sessionStorage.setItem('notifications', JSON.stringify(notifications));
+								$rootScope.notifications = {};
+								break;
+							}
+						}
 					}
 				}
-			}
+			});
 		}
-
 	});
 
 

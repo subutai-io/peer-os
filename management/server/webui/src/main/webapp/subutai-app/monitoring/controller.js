@@ -63,6 +63,21 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 
 	monitoringSrv.getEnvironments().success(function (data) {
 		vm.environments = data;
+
+		monitoringSrv.isAdminCheck().success(function (data) {
+			if(data == true || data == 'true') {
+				getP2Pstatus();
+				monitoringSrv.getResourceHosts().success(function (data) {
+					vm.hosts = data;
+					vm.isAdmin = true;
+					vm.currentType = 'peer';
+					vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : '';
+					getServerData();
+				});
+			} else {
+				setFirstEnvByDefault();
+			}
+		});
 	});
 
 	function viewError(errorText) {
@@ -114,23 +129,6 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 		});
 		
 	}
-	getP2Pstatus();
-
-	monitoringSrv.getResourceHosts().success(function (data) {
-		vm.hosts = data;
-		monitoringSrv.isAdminCheck().success(function (data) {
-			if(data == true || data == 'true') {
-				vm.isAdmin = true;
-				vm.currentType = 'peer';
-				vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : '';
-				getServerData();
-			} else {
-				$timeout(function() {
-					setFirstEnvByDefault();
-				}, 2000);
-			}
-		});
-	});
 
 	function setFirstEnvByDefault() {
 		if(vm.environments.length > 0) {
