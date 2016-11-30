@@ -130,7 +130,8 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 						checkLastLog(true);
 					}
 
-					var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+					//var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+					var logs = data.log.split('},');
 					var result = [];
 					var i = 0;
 					if(prevLogs) {
@@ -144,7 +145,10 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 						var logCheck = logs[i].replace(/ /g,'');
 						if(logCheck.length > 0) {
 
-							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+							//var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+
+							logs[i] = logs[i].replace(/(?:\r\n|\r|\n)/g , '');
+							var logObj = JSON.parse(logs[i] + '}');
 							var logTime = moment(logObj.date).format('HH:mm:ss');
 
 							var logStatus = 'success';
@@ -176,18 +180,21 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 					return result;
 				} else {
 					if(!prevLogs) {
-						var logsArray = data.log.split(/(?:\r\n|\r|\n)/g);
+						var logsArray = data.log.split('},');
 						var logs = [];
 						for(var i = 0; i < logsArray.length; i++) {
-							var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
-							currentLog.time = moment(currentLog.date).format('HH:mm:ss');
+							if(logsArray[i].length > 0) {
+								logsArray[i] = logsArray[i].replace(/(?:\r\n|\r|\n)/g , '');
+								var currentLog = JSON.parse(logsArray[i] + '}');
+								currentLog.time = moment(currentLog.date).format('HH:mm:ss');
 
-							currentLog.classes = ['fa-check', 'g-text-green'];
-							if(currentLog.state == 'FAILED') {
-								currentLog.classes = ['fa-times', 'g-text-red'];
+								currentLog.classes = ['fa-check', 'g-text-green'];
+								if(currentLog.state == 'FAILED') {
+									currentLog.classes = ['fa-times', 'g-text-red'];
+								}
+
+								logs.push(currentLog);
 							}
-
-							logs.push(currentLog);
 						}
 						vm.currentLog = logs;
 					} else {
