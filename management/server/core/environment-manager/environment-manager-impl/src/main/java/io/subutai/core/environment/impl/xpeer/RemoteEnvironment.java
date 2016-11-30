@@ -46,11 +46,10 @@ public class RemoteEnvironment extends LocalEnvironment
 
         for ( ContainerHost host : containers )
         {
-            containerDtos.add( new ContainerDto( host.getId(), getId(), host.getHostname(),
-                    host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), host.getTemplateName(),
-                    host.getContainerSize(), host.getArch().name(), Sets.<String>newHashSet(), host.getPeerId(),
-                    host.getResourceHostId().getId(), true, Common.SUBUTAI_ID, host.getState(),
-                    host.getTemplateId() ) );
+            containerDtos.add( new ContainerDto( host.getId(), getId(), host.getHostname(), host.getIp(),
+                    host.getTemplateName(), host.getContainerSize(), host.getArch().name(), Sets.<String>newHashSet(),
+                    host.getPeerId(), host.getResourceHostId().getId(), true, Common.SUBUTAI_ID, host.getState(),
+                    host.getTemplateId(), host.getContainerName() ) );
         }
 
 

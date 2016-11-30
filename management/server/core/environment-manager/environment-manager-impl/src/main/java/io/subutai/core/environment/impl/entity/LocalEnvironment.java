@@ -319,6 +319,7 @@ public class LocalEnvironment implements Environment, Serializable
                 return containerHost;
             }
         }
+
         throw new ContainerHostNotFoundException( String.format( "Container host not found by id %s", id ) );
     }
 
@@ -493,11 +494,10 @@ public class LocalEnvironment implements Environment, Serializable
                 LOG.warn( "Error getting container state: {}", e.getMessage() );
             }
 
-            containerDtos.add( new ContainerDto( host.getId(), getId(), host.getHostname(),
-                    host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), host.getTemplateName(),
-                    host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
-                    host.getResourceHostId().getId(), isLocalContainer, Common.SUBUTAI_ID, containerHostState,
-                    host.getTemplateId() ) );
+            containerDtos.add( new ContainerDto( host.getId(), getId(), host.getHostname(), host.getIp(),
+                    host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
+                    host.getPeerId(), host.getResourceHostId().getId(), isLocalContainer, Common.SUBUTAI_ID,
+                    containerHostState, host.getTemplateId(), host.getContainerName() ) );
         }
 
         return containerDtos;

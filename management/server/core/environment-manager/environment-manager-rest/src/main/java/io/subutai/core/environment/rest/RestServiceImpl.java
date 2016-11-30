@@ -98,21 +98,22 @@ public class RestServiceImpl implements RestService
         {
             Environment environment = environmentManager.loadEnvironment( environmentId );
 
-
             String dataSource = ( environment instanceof HubEnvironment ) ? Common.HUB_ID : Common.SUBUTAI_ID;
 
             final Set<ContainerDto> containers = new HashSet<>();
+
             for ( EnvironmentContainerHost host : environment.getContainerHosts() )
             {
-                containers.add( new ContainerDto( host.getId(), environmentId, host.getHostname(),
-                        host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), host.getTemplateName(),
-                        host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
-                        host.getResourceHostId().getId(), host.isLocal(), dataSource, host.getState(),
-                        host.getTemplateId() ) );
+                containers.add( new ContainerDto( host.getId(), environmentId, host.getHostname(), host.getIp(),
+                        host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
+                        host.getPeerId(), host.getResourceHostId().getId(), host.isLocal(), dataSource, host.getState(),
+                        host.getTemplateId(), host.getContainerName() ) );
             }
+
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(), containers,
                             dataSource );
+
             return Response.ok( environmentDto ).build();
         }
         catch ( Exception e )
