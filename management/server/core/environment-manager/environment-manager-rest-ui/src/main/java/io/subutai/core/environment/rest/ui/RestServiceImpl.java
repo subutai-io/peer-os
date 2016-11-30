@@ -33,9 +33,11 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
+import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HubEnvironment;
@@ -56,12 +58,11 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.rest.ui.entity.ContainerDto;
-import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
 import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
 import io.subutai.core.lxc.quota.api.QuotaManager;
@@ -121,36 +122,6 @@ public class RestServiceImpl implements RestService
 
 
     /** Environments **************************************************** */
-
-    //TODO fix #1515
-    @Override
-    public Response listEnvironments()
-    {
-        Set<Environment> environments = environmentManager.getEnvironments();
-        Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
-
-
-        for ( Environment environment : environments )
-        {
-            try
-            {
-                String dataSource = ( environment instanceof HubEnvironment ) ? Common.HUB_ID : Common.SUBUTAI_ID;
-
-                EnvironmentDto environmentDto =
-                        new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                                convertContainersToContainerJson( environment.getContainerHosts(), dataSource ),
-                                dataSource );
-
-                environmentDtos.add( environmentDto );
-            }
-            catch ( Exception e )
-            {
-                LOG.error( "Error JSON-ifying environment {}: {}", environment.getId(), e.getMessage() );
-            }
-        }
-
-        return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
-    }
 
 
     @Override
@@ -743,7 +714,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    protected CompletionService<Boolean> getCompletionService( Executor executor )
+    private CompletionService<Boolean> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
     }
@@ -980,13 +951,60 @@ public class RestServiceImpl implements RestService
     }
 
 
-    //TODO fix #1515
+    @Override
+    public Response listEnvironments()
+    {
+        Set<Environment> environments = environmentManager.getEnvironments();
+        Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
+
+
+        for ( Environment environment : environments )
+        {
+            try
+            {
+                String dataSource = ( environment instanceof HubEnvironment ) ? Common.HUB_ID : Common.SUBUTAI_ID;
+
+                EnvironmentDto environmentDto =
+                        new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                                convertContainersToContainerJson( environment.getContainerHosts(), dataSource ),
+                                dataSource );
+
+                environmentDtos.add( environmentDto );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error JSON-ifying environment {}: {}", environment.getId(), e.getMessage() );
+            }
+        }
+
+        return Response.ok( JsonUtil.toJson( removeXss( environmentDtos ) ) ).build();
+    }
+
+
     @Override
     public Response listTenantEnvironments()
     {
-        Set<io.subutai.common.environment.EnvironmentDto> tenantEnvs = environmentManager.getTenantEnvironments();
+        Set<EnvironmentDto> tenantEnvs = environmentManager.getTenantEnvironments();
 
-        return Response.ok( JsonUtil.toJson( tenantEnvs ) ).build();
+        return Response.ok( JsonUtil.toJson( removeXss( tenantEnvs ) ) ).build();
+    }
+
+
+    private Set<EnvironmentDto> removeXss( final Set<EnvironmentDto> environmentDtos )
+    {
+        for ( EnvironmentDto environmentDto : environmentDtos )
+        {
+            environmentDto.setName( StringUtil.removeHtml( environmentDto.getName() ) );
+
+            for ( ContainerDto containerDto : environmentDto.getContainers() )
+            {
+                containerDto.setContainerName( StringUtil.removeHtml( containerDto.getContainerName() ) );
+                containerDto.setHostname( StringUtil.removeHtml( containerDto.getHostname() ) );
+                containerDto.setTemplateName( StringUtil.removeHtml( containerDto.getTemplateName() ) );
+            }
+        }
+
+        return environmentDtos;
     }
 
 
@@ -999,23 +1017,12 @@ public class RestServiceImpl implements RestService
 
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            try
-            {
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
-                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), containerHost.getIp(),
-                        containerHost.getTemplateName(), containerHost.getContainerSize(),
-                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
-                        containerHost.getResourceHostId().getId(), containerHost.isLocal(), datasource,
-                        containerHost.getTemplateId() ) );
-            }
-            catch ( Exception e )
-            {
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
-                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), "UNKNOWN",
-                        containerHost.getTemplateName(), containerHost.getContainerSize(),
-                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
-                        "UNKNOWN", containerHost.isLocal(), datasource, containerHost.getTemplateId() ) );
-            }
+            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                    containerHost.getHostname(), containerHost.getIp(), containerHost.getTemplateName(),
+                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
+                    containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
+                    datasource, containerHost.getState(), containerHost.getTemplateId(),
+                    containerHost.getContainerName() ) );
         }
 
         return containerDtos;

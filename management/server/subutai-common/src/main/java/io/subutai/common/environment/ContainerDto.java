@@ -10,7 +10,7 @@ import io.subutai.common.peer.ContainerSize;
 
 
 /**
- * Trimmed container for REST
+ * Container DTO
  */
 public class ContainerDto
 {
@@ -45,6 +45,9 @@ public class ContainerDto
     @JsonProperty( "dataSource" )
     private String dataSource;
 
+    @JsonProperty( "containerName" )
+    private String containerName;
+
 
     public ContainerDto( @JsonProperty( "id" ) final String id,
                          @JsonProperty( "environmentId" ) final String environmentId,
@@ -55,7 +58,8 @@ public class ContainerDto
                          @JsonProperty( "hostId" ) final String hostId, @JsonProperty( "local" ) boolean local,
                          @JsonProperty( "dataSource" ) String dataSource,
                          @JsonProperty( "state" ) ContainerHostState state,
-                         @JsonProperty( "templateId" ) String templateId )
+                         @JsonProperty( "templateId" ) String templateId,
+                         @JsonProperty( "containerName" ) String containerName )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -71,5 +75,186 @@ public class ContainerDto
         this.templateId = templateId;
         this.dataSource = dataSource;
         this.state = state;
+        this.containerName = containerName;
+    }
+
+
+    public String getId()
+    {
+        return id;
+    }
+
+
+    public void setId( final String id )
+    {
+        this.id = id;
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final String environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
+    public String getHostname()
+    {
+        return hostname;
+    }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
+    }
+
+
+    public String getIp()
+    {
+        return ip;
+    }
+
+
+    public void setIp( final String ip )
+    {
+        this.ip = ip;
+    }
+
+
+    public String getTemplateName()
+    {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
+    }
+
+
+    public String getTemplateId()
+    {
+        return templateId;
+    }
+
+
+    public void setTemplateId( final String templateId )
+    {
+        this.templateId = templateId;
+    }
+
+
+    public ContainerSize getType()
+    {
+        return type;
+    }
+
+
+    public void setType( final ContainerSize type )
+    {
+        this.type = type;
+    }
+
+
+    public String getArch()
+    {
+        return arch;
+    }
+
+
+    public void setArch( final String arch )
+    {
+        this.arch = arch;
+    }
+
+
+    public Set<String> getTags()
+    {
+        return tags;
+    }
+
+
+    public void setTags( final Set<String> tags )
+    {
+        this.tags = tags;
+    }
+
+
+    public String getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    public String getHostId()
+    {
+        return hostId;
+    }
+
+
+    public void setHostId( final String hostId )
+    {
+        this.hostId = hostId;
+    }
+
+
+    public boolean isLocal()
+    {
+        return local;
+    }
+
+
+    public void setLocal( final boolean local )
+    {
+        this.local = local;
+    }
+
+
+    public ContainerHostState getState()
+    {
+        return state;
+    }
+
+
+    public void setState( final ContainerHostState state )
+    {
+        this.state = state;
+    }
+
+
+    public String getDataSource()
+    {
+        return dataSource;
+    }
+
+
+    public void setDataSource( final String dataSource )
+    {
+        this.dataSource = dataSource;
+    }
+
+
+    public String getContainerName()
+    {
+        return containerName;
+    }
+
+
+    public void setContainerName( final String containerName )
+    {
+        this.containerName = containerName;
     }
 }
