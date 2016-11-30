@@ -127,7 +127,7 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 			} else {
 				$timeout(function() {
 					setFirstEnvByDefault();
-				}, 1000);
+				}, 2000);
 			}
 		});
 	});
