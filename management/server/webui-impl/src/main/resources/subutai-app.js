@@ -384,16 +384,16 @@ function SubutaiController($rootScope, $http) {
                 }
             });
 
-            $http.get(SERVER_URL + "rest/v1/hub/registration_state", {
+            /*$http.get(SERVER_URL + "rest/v1/hub/registration_state", {
                 withCredentials: true,
                 headers: {'Content-Type': 'application/json'}
             }).success(function (data) {
-                /*if (data.isRegisteredToHub == true) {
+                if (data.isRegisteredToHub == true) {
                     vm.peerName = data.peerName + " | Subutai Social";
                 }else{
                     vm.peerName = "Subutai Social";
-                }*/
-            });
+                }
+            });*/
             return;
         }
 
