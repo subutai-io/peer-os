@@ -582,7 +582,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public String getInitiatorPeerId()
     {
-        return this.peerId;
+        return this.initiatorPeerId;
     }
 
 
