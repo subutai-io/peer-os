@@ -1,6 +1,11 @@
 <div ng-controller="CurrentUserCtrl as currentUserCtrl" class="b-personal-space">
 	<div class="b-header__userbar b-header__userbar_right">
 		<!--<i class="fa fa-sign-in b-plugin-version"></i>-->
+
+		<span ng-if="currentUserCtrl.peerNameValue" class="b-header-userbar-name" style="text-decoration: none;">
+			{{ currentUserCtrl.peerNameValue }} / 
+		</span>
+
 		<span ng-if="currentUserCtrl.currentUser" class="b-header-userbar-name">
 			<a href ng-click="currentUserCtrl.logout()" class="b-header-userbar-name">
 				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>

@@ -2824,6 +2824,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public RegistrationStatus getStatus()
+    {
+        return RegistrationStatus.APPROVED;
+    }
+
+
+    //ORPHAN TODO review and delete if possible--------------->
+    @Override
     public Set<ContainerHost> listOrphanContainers()
     {
         Set<ContainerHost> result = new HashSet<>();
@@ -2881,13 +2889,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public RegistrationStatus getStatus()
-    {
-        return RegistrationStatus.APPROVED;
-    }
-
-
-    @Override
     public void removeOrphanContainers()
     {
         Set<ContainerHost> orphanContainers = listOrphanContainers();
@@ -2904,6 +2905,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
     }
+
+    //<----------ORPHAN
 
 
     @Override

@@ -926,11 +926,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		for(var i = 0; i < environment.containers.length; i++) {
 			var container = environment.containers[i];
 
-			if( container.name.match(/(\d+)(?!.*\d)/g) != null )
+			if( container.containerName.match(/(\d+)(?!.*\d)/g) != null )
 			{
-				if( containerCounter < parseInt( container.name.match(/(\d+)(?!.*\d)/g) ) + 1 )
+				if( containerCounter < parseInt( container.containerName.match(/(\d+)(?!.*\d)/g) ) + 1 )
 				{
-					containerCounter = parseInt( container.name.match(/(\d+)(?!.*\d)/g) ) + 1;
+					containerCounter = parseInt( container.containerName.match(/(\d+)(?!.*\d)/g) ) + 1;
 				}
 			}
 
