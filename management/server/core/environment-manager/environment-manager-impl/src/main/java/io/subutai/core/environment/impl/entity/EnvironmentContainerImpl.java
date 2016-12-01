@@ -101,7 +101,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
     @Column( name = "creator_peer_id", nullable = false )
     @JsonIgnore
-    private String creatorPeerId;
+    private String initiatorPeerId;
 
     @Column( name = "template_id", nullable = false )
     @JsonProperty( "template" )
@@ -165,7 +165,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     }
 
 
-    public EnvironmentContainerImpl( final String creatorPeerId, final String peerId,
+    public EnvironmentContainerImpl( final String initiatorPeerId, final String peerId,
                                      final ContainerHostInfoModel hostInfo, final String templateId, String domainName,
                                      ContainerSize containerSize, String resourceHostId )
     {
@@ -175,7 +175,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         Preconditions.checkNotNull( templateId );
         Preconditions.checkNotNull( containerSize );
 
-        this.creatorPeerId = creatorPeerId;
+        this.initiatorPeerId = initiatorPeerId;
         this.peerId = peerId;
         this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
@@ -647,7 +647,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         String envId = parent != null ? parent.getId() : null;
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
-                          .add( "creatorPeerId", creatorPeerId ).add( "templateId", templateId )
+                          .add( "initiatorPeerId", initiatorPeerId ).add( "templateId", templateId )
                           .add( "environmentId", envId ).add( "domainName", domainName ).add( "tags", tags )
                           .add( "hostArchitecture", hostArchitecture ).add( "resourceHostId", resourceHostId )
                           .toString();
