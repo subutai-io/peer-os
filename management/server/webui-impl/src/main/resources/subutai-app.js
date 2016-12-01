@@ -46,6 +46,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     $rootScope.notifications = {};
     vm.hubRegisterError = false;
     vm.isRegistrationFormVisible = false;
+    vm.peerNameValue = false;
 
     vm.getRegistrationFormVisibilityStatus = function () {
         return vm.isRegistrationFormVisible;
@@ -97,6 +98,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
                 vm.hubStatus = false;
             } else {
                 vm.hubStatus = true;
+				vm.peerNameValue = data.peerName;
             }
 			hubRegisterStatus = vm.hubStatus;
 
@@ -174,6 +176,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
                     console.log('hub/register error: ', error);
                     vm.hubRegisterError = error;
                 });
+
+				vm.peerNameValue = vm.hub.peerName;
 
             }).error(function (error) {
             console.log('hub/register error: ', error);
@@ -356,7 +360,6 @@ function SubutaiController($rootScope, $http) {
     vm.adminMenus = false;
     vm.isTenantManager = false;
     vm.peerName = "Subutai Social";
-    vm.peerNameValue = false;
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
@@ -385,11 +388,6 @@ function SubutaiController($rootScope, $http) {
                 withCredentials: true,
                 headers: {'Content-Type': 'application/json'}
             }).success(function (data) {
-
-                if (data.isRegisteredToHub == true) {
-					vm.peerNameValue = data.peerName;
-                }
-
                 /*if (data.isRegisteredToHub == true) {
                     vm.peerName = data.peerName + " | Subutai Social";
                 }else{
