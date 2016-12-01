@@ -956,11 +956,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				img = 'assets/templates/no-image.jpg';
 			}
 
-			if( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) != null )
+			if( environment.containers[container].containerName.match(/(\d+)(?!.*\d)/g) != null )
 			{
-				if( containerCounter < parseInt( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) ) + 1 )
+				if( containerCounter < parseInt( environment.containers[container].containerName.match(/(\d+)(?!.*\d)/g) ) + 1 )
 				{
-					containerCounter = parseInt( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) ) + 1;
+					containerCounter = parseInt( environment.containers[container].containerName.match(/(\d+)(?!.*\d)/g) ) + 1;
 				}
 			}
 
