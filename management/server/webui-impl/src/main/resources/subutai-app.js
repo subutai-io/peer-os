@@ -193,6 +193,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             .success(function () {
                 hubPopupLoadScreen();
                 vm.hubStatus = false;
+				vm.peerNameValue = false;
                 //SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
             }).error(function (error) {
             hubPopupLoadScreen();
