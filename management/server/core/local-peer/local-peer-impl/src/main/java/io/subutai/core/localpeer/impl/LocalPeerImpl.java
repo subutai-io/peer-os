@@ -2830,7 +2830,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //ORPHAN TODO review and delete if possible--------------->
+    // ORPHAN TODO review and delete if possible--------------->
+    // TODO NEW ORPHAN: should filter all tenant environments and exclude their containers from :
+    // all containers registered with local peer
+    // all containers in host registry
+    // the rest containers are orphan
+
+
     @Override
     public Set<ContainerHost> listOrphanContainers()
     {
