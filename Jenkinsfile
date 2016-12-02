@@ -60,7 +60,7 @@ node() {
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${artifactDir}/${debFileName}
 	"""
 	// Start MNG-RH Lock
-	// lock('rh-node') {
+	lock('rh-node') {
 		// create management template
 		sh """
 			set +x
@@ -84,7 +84,7 @@ node() {
 
 			mv /mnt/lib/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz /mnt/lib/lxc/jenkins/rootfs/${artifactDir}
 		EOF"""
-	// }
+	}
 
 	stage("Update management on test node")
 	// Deploy builded template to remore test-server
@@ -92,7 +92,7 @@ node() {
 
 	// Start Test-Peer Lock
 	if (env.BRANCH_NAME == 'dev') {
-		// lock('test-node') {
+		lock('test-node') {
 			// destroy existing management template on test node
 			sh """
 				set +x
@@ -161,7 +161,7 @@ node() {
 					exit 1
 				fi
 			"""
-		// }
+		}
 	}
 
 	stage("Deploy artifacts on kurjun")
