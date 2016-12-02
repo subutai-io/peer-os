@@ -30,6 +30,10 @@ public interface IdentityManager
     String TOKEN_ID = "token";
     String ADMIN_DEFAULT_PWD = "secret";
 
+    public static final String ENV_MANAGER_ROLE = "Environment-Manager";
+    public static final String TEMPLATE_MANAGER_ROLE = "Template-Manager";
+
+
     /* *************************************************
      */
     void removeRolePermission( long roleId, Permission permission );
