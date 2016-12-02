@@ -20,13 +20,13 @@
 					ng-click="monitoringCtrl.setCurrentType('management')">
 					Management
 				</li>
-				<li class="b-tabs-menu__item"
-						ng-if="monitoringCtrl.isAdmin" 
-						ng-style="monitoringCtrl.p2pColor && {'color': monitoringCtrl.p2pColor}"
-						ng-class="monitoringCtrl.currentType == 'p2p' ? 'b-tabs-menu__item_active' : ''"
-						ng-click="monitoringCtrl.setCurrentType('p2p')">
-					P2P health
-				</li>
+				<!--<li class="b-tabs-menu__item"-->
+						<!--ng-if="monitoringCtrl.isAdmin" -->
+						<!--ng-style="monitoringCtrl.p2pColor && {'color': monitoringCtrl.p2pColor}"-->
+						<!--ng-class="monitoringCtrl.currentType == 'p2p' ? 'b-tabs-menu__item_active' : ''"-->
+						<!--ng-click="monitoringCtrl.setCurrentType('p2p')">-->
+					<!--P2P health-->
+				<!--</li>-->
 			</ul>
 		</div>
 	</div>
@@ -38,10 +38,10 @@
 				ng-include="'subutai-app/monitoring/partials/graphs.html'">
 		</div>
 
-		<div
-				ng-if="monitoringCtrl.currentType == 'p2p'"
-				ng-include="'subutai-app/monitoring/partials/p2p.html'">
-		</div>
+		<!--<div-->
+				<!--ng-if="monitoringCtrl.currentType == 'p2p'"-->
+				<!--ng-include="'subutai-app/monitoring/partials/p2p.html'">-->
+		<!--</div>-->
 
 	</div>
 
