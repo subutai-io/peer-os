@@ -199,33 +199,6 @@ public class IdentityManagerImpl implements IdentityManager
                 assignRolePermission( role, per );
             }
 
-            //TODO REVIEW AND DELETE------>
-            // create karaf mgr role
-            //            role = createRole( KARAF_MANAGER_ROLE, UserType.SYSTEM.getId() );
-            //
-            //            // assign to admin user
-            //            assignUserRole( admin, role );
-            //
-            //            per = createPermission( PermissionObject.KARAF_SERVER_ADMINISTRATION.getId(),
-            //                    PermissionScope.ALL_SCOPE.getId(), true, true, true, true );
-            //
-            //            assignRolePermission( role, per );
-            //
-            //            // Create Peer Mgr role
-            //            role = createRole( PEER_MANAGER_ROLE, UserType.SYSTEM.getId() );
-            //
-            //            per = createPermission( PermissionObject.PEER_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE
-            // .getId(), true,
-            //                    true, true, true );
-            //            assignRolePermission( role, per );
-            //
-            //            per = createPermission( PermissionObject.RESOURCE_MANAGEMENT.getId(), PermissionScope
-            // .ALL_SCOPE.getId(),
-            //                    true, true, true, true );
-            //
-            //            assignRolePermission( role, per );
-            //<---TODO END
-
             // Create Env Mgr Role (system for hub users only)
             role = createRole( ENV_MANAGER_ROLE, UserType.SYSTEM.getId() );
 
