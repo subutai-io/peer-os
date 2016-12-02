@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
@@ -331,6 +333,10 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void registerPeer( String hupIp, String email, String password, String peerName ) throws HubManagerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hupIp ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );
+
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password, peerName );
