@@ -286,6 +286,13 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function changeNamePopup( container ) {
 
+		if ( container.dataSource == "hub" ) {
+
+			SweetAlert.swal("Feature coming soon...", "This container is created on Hub. Please use Hub to manage it.", "success");
+
+			return;
+		}
+
 		vm.editingContainer = container;
 
 		vm.editingContainer.containerName = getContainerNameFromHostName( container.hostname );
