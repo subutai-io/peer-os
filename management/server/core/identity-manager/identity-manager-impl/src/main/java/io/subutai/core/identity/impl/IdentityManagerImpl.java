@@ -101,7 +101,6 @@ public class IdentityManagerImpl implements IdentityManager
     private static final String ADMIN_ROLE = "Administrator";
     private static final String KARAF_MANAGER_ROLE = "Karaf-Manager";
     private static final String PEER_MANAGER_ROLE = "Peer-Manager";
-    private static final String ENV_MANAGER_ROLE = "Environment-Manager";
     private static final String SYSTEM_ROLE = "Internal-System";
     private static final String ENV_OWNER_ROLE = "Environment-Owner";
 
@@ -155,28 +154,38 @@ public class IdentityManagerImpl implements IdentityManager
             Role role;
             Permission per;
 
+            //---------------- internal system user
             // create system user
             User internal =
                     createUser( SYSTEM_USERNAME, "", SYSTEM_USER_FULL_NAME, SYSTEM_USER_EMAIL, UserType.SYSTEM.getId(),
                             KeyTrustLevel.FULL.getId(), false, false );
 
+            // Create System Role for internal user
+            role = createRole( SYSTEM_ROLE, UserType.SYSTEM.getId() );
+            assignUserRole( internal, role );
+
+            //assign permission for system role
+            for ( final PermissionObject aPermsp : permsp )
+            {
+                if ( aPermsp != PermissionObject.IDENTITY_MANAGEMENT
+                        && aPermsp != PermissionObject.KARAF_SERVER_ADMINISTRATION
+                        && aPermsp != PermissionObject.TENANT_MANAGEMENT )
+                {
+                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true, true, true,
+                            true );
+                    assignRolePermission( role, per );
+                }
+            }
+
+            // create system token for internal user
+            createUserToken( internal, "", "", "", TokenType.PERMANENT.getId(), null );
+
+
+            //---------------- admin user
             // create admin user
             User admin = createUser( ADMIN_USERNAME, ADMIN_DEFAULT_PWD, ADMIN_USER_FULL_NAME, ADMIN_EMAIL,
                     UserType.REGULAR.getId(), KeyTrustLevel.FULL.getId(), true, true );
 
-            // create system token
-            createUserToken( internal, "", "", "", TokenType.PERMANENT.getId(), null );
-
-            // create karaf mgr role
-            role = createRole( KARAF_MANAGER_ROLE, UserType.SYSTEM.getId() );
-
-            // assign to admin user
-            assignUserRole( admin, role );
-
-            per = createPermission( PermissionObject.KARAF_SERVER_ADMINISTRATION.getId(),
-                    PermissionScope.ALL_SCOPE.getId(), true, true, true, true );
-
-            assignRolePermission( role, per );
 
             // create admin role
             role = createRole( ADMIN_ROLE, UserType.SYSTEM.getId() );
@@ -190,19 +199,7 @@ public class IdentityManagerImpl implements IdentityManager
                 assignRolePermission( role, per );
             }
 
-            // Create Peer Mgr role
-            role = createRole( PEER_MANAGER_ROLE, UserType.SYSTEM.getId() );
-
-            per = createPermission( PermissionObject.PEER_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(), true,
-                    true, true, true );
-            assignRolePermission( role, per );
-
-            per = createPermission( PermissionObject.RESOURCE_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
-                    true, true, true, true );
-
-            assignRolePermission( role, per );
-
-            // Create Env Mgr Role
+            // Create Env Mgr Role (system for hub users only)
             role = createRole( ENV_MANAGER_ROLE, UserType.SYSTEM.getId() );
 
             per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
@@ -210,22 +207,15 @@ public class IdentityManagerImpl implements IdentityManager
 
             assignRolePermission( role, per );
 
+            // Create Template Mgr Role (system for hub users only)
+            role = createRole( TEMPLATE_MANAGER_ROLE, UserType.SYSTEM.getId() );
 
-            // Create System Role
-            role = createRole( SYSTEM_ROLE, UserType.SYSTEM.getId() );
-            assignUserRole( internal, role );
+            per = createPermission( PermissionObject.TEMPLATE_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
+                    true, true, true, true );
 
-            for ( final PermissionObject aPermsp : permsp )
-            {
-                if ( aPermsp != PermissionObject.IDENTITY_MANAGEMENT
-                        && aPermsp != PermissionObject.KARAF_SERVER_ADMINISTRATION
-                        && aPermsp != PermissionObject.TENANT_MANAGEMENT )
-                {
-                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true, true, true,
-                            true );
-                    assignRolePermission( role, per );
-                }
-            }
+            assignRolePermission( role, per );
+
+            // editable roles -----------------------------
 
             // pre-create env-owner role for regular users
             role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
