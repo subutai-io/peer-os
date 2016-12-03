@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.JsonUtil;
 
 
 public class RestServiceImpl implements RestService
@@ -31,7 +32,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getNotRegisteredContainers()
     {
-        return Response.ok( localPeer.getNotRegisteredContainers() ).build();
+        return Response.ok( JsonUtil.toJson( localPeer.getNotRegisteredContainers() ) ).build();
     }
 
 
