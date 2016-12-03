@@ -157,9 +157,7 @@ import io.subutai.hub.share.resource.RamResource;
 /**
  * Local peer implementation
  *
- * TODO externalize security specific operations to LocalPeerSecureProxy
  * TODO add proper security annotations
- * TODO remove duplicate functionality: addReverseProxy, addCustomProxy and setVniDomain+add/remove/isIpVNiDomain
  */
 @PermitAll
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
