@@ -519,6 +519,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function showDomainForm(environmentId) {
+
+		if ( alertForHubEnvironment( environmentId ) )
+		{
+			return;
+		}
+
 		vm.environmentForDomain = environmentId;
 		vm.currentDomain = {};
 		LOADING_SCREEN();
