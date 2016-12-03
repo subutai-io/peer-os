@@ -19,4 +19,6 @@ public interface PluginManager
     void unregister( Long pluginId );
 
     void setPermissions( Long pluginId, String permissionJson );
+
+    void update( String pluginId, String name, String version );
 }

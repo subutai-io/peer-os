@@ -131,4 +131,24 @@ public class ConfigDataServiceImpl implements ConfigDataService
             return null;
         }
     }
+
+
+    @Override
+    public void update( final String pluginId, final String name, final String version )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            PluginDetailsEntity entity = em.find( PluginDetailsEntity.class, pluginId );
+            entity.setName( name );
+            entity.setVersion( version );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
 }

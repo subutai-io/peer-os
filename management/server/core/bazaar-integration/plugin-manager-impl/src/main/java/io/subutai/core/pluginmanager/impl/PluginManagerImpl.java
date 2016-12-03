@@ -79,6 +79,13 @@ public class PluginManagerImpl implements PluginManager
     }
 
 
+    @Override
+    public void update( final String pluginId, final String name, final String version )
+    {
+        configDataService.update( pluginId, name, version );
+    }
+
+
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;

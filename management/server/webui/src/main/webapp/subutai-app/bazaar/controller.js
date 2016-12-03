@@ -330,6 +330,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 
     vm.newPlugin = {};
     vm.currentPlugin = {};
+    vm.editPlugin = {};
     vm.isNew = false;
     vm.step = "upload";
     vm.permissions = [
@@ -382,6 +383,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
     vm.removePermissionFromStack = removePermissionFromStack;
     vm.editPermissions = editPermissions;
     vm.uploadPlugin = uploadPlugin;
+    vm.updatePlugin = updatePlugin;
 
 
     function addPermission2Stack(permission) {
@@ -415,7 +417,38 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
         });
     }
 
+    function updatePlugin() {
+        if (vm.editPlugin.name === '' || vm.editPlugin.name === undefined) {
+            SweetAlert.swal("ERROR!", "Please enter name", "error");
+            return;
+        }
+        if (vm.editPlugin.version === '' || vm.editPlugin.version === undefined) {
+            SweetAlert.swal("ERROR!", "Please enter version", "error");
+            return;
+        }
+        BazaarSrv.updatePlugin(vm.editPlugin.id, vm.editPlugin.name, vm.editPlugin.version).success(function (data) {
+            ngDialog.closeAll();
+            getInstalledPlugins();
+            SweetAlert.swal("Success!", "Your plugin info was updated.", "success");
+        }).error(function (error) {
+            SweetAlert.swal("ERROR!", "Saving info error: " + error.replace(/\\n/g, " "), "error");
+        });
+    }
+
+
     function uploadPlugin() {
+        if (angular.equals(karUploader, {})) {
+            SweetAlert.swal("ERROR!", "Please select kar file", "error");
+            return;
+        }
+        if (vm.newPlugin.name === '' || vm.newPlugin.name === undefined) {
+            SweetAlert.swal("ERROR!", "Please enter name", "error");
+            return;
+        }
+        if (vm.newPlugin.version === '' || vm.newPlugin.version === undefined) {
+            SweetAlert.swal("ERROR!", "Please enter version", "error");
+            return;
+        }
         BazaarSrv.uploadPlugin(vm.newPlugin.name, vm.newPlugin.version, karUploader, JSON.stringify(vm.permissions2Add)).success(function (data) {
             SweetAlert.swal("Success!", "Your plugin was installed.", "success");
             vm.newPlugin = {};
@@ -448,84 +481,115 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
         });
     }
 
-    function editPermissionsWindow(plugin, isNew) {
-        vm.permissions = [
-            {
-                'object': 2,
-                'name': 'Peer-Management',
-                'scope': 1,
-                'read': true,
-                'write': true,
-                'update': true,
-                'delete': true,
-            },
-            {
-                'object': 3,
-                'name': 'Environment-Management',
-                'scope': 1,
-                'read': true,
-                'write': true,
-                'update': true,
-                'delete': true,
-            },
-            {
-                'object': 4,
-                'name': 'Resource-Management',
-                'scope': 1,
-                'read': true,
-                'write': true,
-                'update': true,
-                'delete': true,
-            },
-            {
-                'object': 5,
-                'name': 'Template-Management',
-                'scope': 1,
-                'read': true,
-                'write': true,
-                'update': true,
-                'delete': true,
-            }
-        ];
-        if (isNew) {
-            for (var i = 0; i < vm.installedPlugins.length; ++i) {
-                if (vm.installedPlugins[i].name === plugin.name) {
-                    SweetAlert.swal("ERROR!", "Plugin with such name already exists", "error");
-                    return;
-                }
-            }
-            if (angular.equals(karUploader, {})) {
-                SweetAlert.swal("ERROR!", "Please select kar file", "error");
-                return;
-            }
-            vm.permissions2Add = [];
-        }
-        else {
-            if (angular.equals(karUploader, {})) {
-                SweetAlert.swal("ERROR!", "Please select kar file", "error");
-                return;
-            }
-            vm.currentPlugin = plugin;
-            BazaarSrv.getPermissions(vm.currentPlugin.id).success(function (data) {
-                vm.permissions2Add = data.permissions;
-                for (var i = 0; i < vm.permissions2Add.length; i++) {
-                    for (var j = 0; j < vm.permissions.length; j++) {
-                        if (vm.permissions[j].object === vm.permissions2Add[i].object) {
-                            vm.permissions2Add[i].name = vm.permissions[j].name;
-                            vm.permissions.splice(j, 1);
-                            --j
-                            break;
-                        }
-                    }
-                }
-                ngDialog.open({
-                    template: "subutai-app/bazaar/partials/uploadPlugin.html",
-                    scope: $scope
-                });
+    // function editPermissionsWindow(plugin, isNew, isEdit) {
+    //     if (isEdit === undefined || isEdit === null) isEdit = false;
+    //     vm.permissions = [
+    //         {
+    //             'object': 2,
+    //             'name': 'Peer-Management',
+    //             'scope': 1,
+    //             'read': true,
+    //             'write': true,
+    //             'update': true,
+    //             'delete': true,
+    //         },
+    //         {
+    //             'object': 3,
+    //             'name': 'Environment-Management',
+    //             'scope': 1,
+    //             'read': true,
+    //             'write': true,
+    //             'update': true,
+    //             'delete': true,
+    //         },
+    //         {
+    //             'object': 4,
+    //             'name': 'Resource-Management',
+    //             'scope': 1,
+    //             'read': true,
+    //             'write': true,
+    //             'update': true,
+    //             'delete': true,
+    //         },
+    //         {
+    //             'object': 5,
+    //             'name': 'Template-Management',
+    //             'scope': 1,
+    //             'read': true,
+    //             'write': true,
+    //             'update': true,
+    //             'delete': true,
+    //         }
+    //     ];
+    //     if (isNew) {
+    //         for (var i = 0; i < vm.installedPlugins.length; ++i) {
+    //             if (vm.installedPlugins[i].name === plugin.name) {
+    //                 SweetAlert.swal("ERROR!", "Plugin with such name already exists", "error");
+    //                 return;
+    //             }
+    //         }
+    //         if (!isEdit) {
+    //             if (angular.equals(karUploader, {})) {
+    //                 SweetAlert.swal("ERROR!", "Please select kar file", "error");
+    //                 return;
+    //             }
+    //         }
+    //         if (vm.newPlugin.name === '' || vm.newPlugin.name === undefined) {
+    //             SweetAlert.swal("ERROR!", "Please enter name", "error");
+    //             return;
+    //         }
+    //         if (vm.newPlugin.version === '' || vm.newPlugin.version === undefined) {
+    //             SweetAlert.swal("ERROR!", "Please enter version", "error");
+    //             return;
+    //         }
+    //         vm.permissions2Add = [];
+    //     }
+    //     else {
+    //         if (!isEdit) {
+    //             if (angular.equals(karUploader, {})) {
+    //                 SweetAlert.swal("ERROR!", "Please select kar file", "error");
+    //                 return;
+    //             }
+    //         }
+    //         if (vm.newPlugin.name === '' || vm.newPlugin.name === undefined) {
+    //             SweetAlert.swal("ERROR!", "Please enter name", "error");
+    //             return;
+    //         }
+    //         if (vm.newPlugin.version === '' || vm.newPlugin.version === undefined) {
+    //             SweetAlert.swal("ERROR!", "Please enter version", "error");
+    //             return;
+    //         }
+    //         vm.currentPlugin = plugin;
+    //         BazaarSrv.getPermissions(vm.currentPlugin.id).success(function (data) {
+    //             vm.permissions2Add = data.permissions;
+    //             for (var i = 0; i < vm.permissions2Add.length; i++) {
+    //                 for (var j = 0; j < vm.permissions.length; j++) {
+    //                     if (vm.permissions[j].object === vm.permissions2Add[i].object) {
+    //                         vm.permissions2Add[i].name = vm.permissions[j].name;
+    //                         vm.permissions.splice(j, 1);
+    //                         --j
+    //                         break;
+    //                     }
+    //                 }
+    //             }
+    //             ngDialog.open({
+    //                 template: "subutai-app/bazaar/partials/uploadPlugin.html",
+    //                 scope: $scope
+    //             });
+    //         });
+    //     }
+    //     vm.isNew = isNew;
+    //     vm.step = "perms";
+    // }
+
+    function editPermissionsWindow(plugin, isNew, isEdit) {
+        BazaarSrv.getPluginInfo(plugin.id).success(function (data) {
+            vm.editPlugin = data;
+            ngDialog.open({
+                template: "subutai-app/bazaar/partials/editPlugin.html",
+                scope: $scope
             });
-        }
-        vm.isNew = isNew;
-        vm.step = "perms";
+        });
     }
 
 

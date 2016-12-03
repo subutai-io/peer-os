@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -109,6 +110,14 @@ public class RestServiceImpl implements RestService
     public Response setPermissions( final String pluginId, final String permissionJson )
     {
         return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response updatePlugin( final String pluginId, final String name, final String version )
+    {
+        pluginManager.update( pluginId, name, version );
+        return null;
     }
 
 
