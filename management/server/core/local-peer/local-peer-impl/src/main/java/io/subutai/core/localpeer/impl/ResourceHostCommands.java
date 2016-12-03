@@ -31,9 +31,9 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getDestroyContainerCommand( String hostname )
+    public RequestBuilder getDestroyContainerCommand( String containerName )
     {
-        return new RequestBuilder( String.format( "subutai destroy %s", hostname ) ).withTimeout( 60 );
+        return new RequestBuilder( String.format( "subutai destroy %s", containerName ) ).withTimeout( 60 );
     }
 
 

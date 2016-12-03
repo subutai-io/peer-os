@@ -19,6 +19,7 @@
     <module>local-peer-impl</module>
     <module>local-peer-cli</module>
     <module>local-peer-rest</module>
+    <module>local-peer-rest-ui</module>
   </modules>
 
 </project>

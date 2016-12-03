@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -428,9 +427,9 @@ public class LocalPeerImplTest
     public void testBindHost() throws Exception
     {
 
-        assertEquals( resourceHost, localPeer.bindHost( RESOURCE_HOST_ID ) );
+        assertEquals( resourceHost, localPeer.findHost( RESOURCE_HOST_ID ) );
 
-        assertEquals( containerHost, localPeer.bindHost( CONTAINER_HOST_ID ) );
+        assertEquals( containerHost, localPeer.findHost( CONTAINER_HOST_ID ) );
     }
 
 

@@ -101,7 +101,7 @@ public class CommandProcessor implements StateLinkProcessor
 
             try
             {
-                Host host = context.localPeer.bindHost( commandRequestDto.getHostId() );
+                Host host = context.localPeer.findHost( commandRequestDto.getHostId() );
 
                 CommandResult commandResult = host.execute( new RequestBuilder( commandRequestDto.getCommand() )
                         .withTimeout( commandRequestDto.getTimeout() ).withStdOutRedirection(

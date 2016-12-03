@@ -71,7 +71,7 @@ public class CommandRequestListenerTest
         listener = spy( new CommandRequestListener() );
         when( payload.getMessage( CommandRequest.class ) ).thenReturn( commandRequest );
         when( peerManager.getPeer( any( String.class ) ) ).thenReturn( sourcePeer );
-        when( localPeer.bindHost( any( String.class ) ) ).thenReturn( host );
+        when( localPeer.findHost( any( String.class ) ) ).thenReturn( host );
         doReturn( peerManager ).when( listener ).getPeerManager();
         doReturn( localPeer ).when( peerManager ).getLocalPeer();
     }

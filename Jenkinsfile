@@ -92,7 +92,7 @@ node() {
 
 	// Start Test-Peer Lock
 	if (env.BRANCH_NAME == 'dev') {
-		// lock('test-node') {
+		lock('test-node') {
 			// destroy existing management template on test node
 			sh """
 				set +x
@@ -161,7 +161,7 @@ node() {
 					exit 1
 				fi
 			"""
-		// }
+		}
 	}
 
 	stage("Deploy artifacts on kurjun")
