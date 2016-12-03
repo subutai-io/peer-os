@@ -484,6 +484,11 @@
         <artifactId>local-peer-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-rest-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--plugin-manager -->
@@ -780,12 +785,6 @@
         <artifactId>el-api</artifactId>
         <version>2.2</version>
       </dependency>
-      <!-- Json Mapper -->
-<!--      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-jaxrs</artifactId>
-        <version>${jackson-jaxrs.version}</version>
-      </dependency>-->
 
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>

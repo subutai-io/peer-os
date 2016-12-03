@@ -1,17 +1,13 @@
 package io.subutai.core.localpeer.cli;
 
 
-import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.Peer;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.peer.api.PeerManager;
 
 
 @Command( scope = "localpeer", name = "list-orphan-containers" )
@@ -29,7 +25,7 @@ public class ListOrphanContainersCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Set<ContainerHost> hosts = localPeer.listOrphanContainers();
+        Set<ContainerHost> hosts = localPeer.getOrphanContainers();
 
         for ( ContainerHost containerHost : hosts )
         {
