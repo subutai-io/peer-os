@@ -2804,10 +2804,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO add local-peer-rest-ui module
-    //expose getNotRegisteredContainers and destroyContainer
-    //make sure that destroyContainer rest method checks that the container is from notRegistered ones
-    //otherwise user should destroy environment instead
     @Override
     public Set<ContainerHostInfo> getNotRegisteredContainers()
     {
@@ -2838,6 +2834,45 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return containerHostInfos;
+    }
+
+
+    /**
+     * Destroys only not registered container
+     *
+     * @return - true if container is not registered and destroyed, false otherwise
+     */
+    @Override
+    public boolean destroyNotRegisteredContainer( final String containerId ) throws PeerException
+    {
+        ContainerHostInfo containerHost = null;
+
+        for ( ContainerHostInfo containerHostInfo : getNotRegisteredContainers() )
+        {
+            if ( containerHostInfo.getId().equals( containerId ) )
+            {
+                containerHost = containerHostInfo;
+
+                break;
+            }
+        }
+
+        if ( containerHost != null )
+        {
+            try
+            {
+                commandExecutor.execute( hostRegistry.getResourceHostByContainerHost( containerHost ).getId(),
+                        localPeerCommands.getDestroyContainerCommand( containerHost.getContainerName() ) );
+            }
+            catch ( Exception e )
+            {
+                throw new PeerException( e );
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
 

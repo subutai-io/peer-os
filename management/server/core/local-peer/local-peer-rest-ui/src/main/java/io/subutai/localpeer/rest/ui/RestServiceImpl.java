@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.JsonUtil;
 
@@ -41,22 +39,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            boolean notRegistered = false;
-
-            for ( ContainerHostInfo containerHostInfo : localPeer.getNotRegisteredContainers() )
+            if ( localPeer.destroyNotRegisteredContainer( containerId ) )
             {
-                if ( containerHostInfo.getId().equals( containerId ) )
-                {
-                    notRegistered = true;
-
-                    break;
-                }
-            }
-
-            if ( notRegistered )
-            {
-                localPeer.destroyContainer( new ContainerId( containerId ) );
-
                 return Response.ok().build();
             }
             else

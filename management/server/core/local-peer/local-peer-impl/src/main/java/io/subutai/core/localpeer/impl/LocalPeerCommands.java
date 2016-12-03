@@ -68,13 +68,11 @@ public class LocalPeerCommands
 
     protected RequestBuilder getReadOrCreateSSHCommand( SshEncryptionType encryptionType )
     {
-        return new RequestBuilder( String.format( "if [ -f %1$s/id_%2$s.pub ]; " +
-                "then cat %1$s/id_%2$s.pub ;" +
-                "else rm -rf %1$s && " +
-                "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "ssh-keygen -t %2$s -P '' -f %1$s/id_%2$s -q && " +
-                "cat %1$s/id_%2$s.pub; fi", Common.CONTAINER_SSH_FOLDER, encryptionType.name().toLowerCase() ) );
+        return new RequestBuilder( String.format(
+                "if [ -f %1$s/id_%2$s.pub ]; " + "then cat %1$s/id_%2$s.pub ;" + "else rm -rf %1$s && "
+                        + "mkdir -p %1$s && " + "chmod 700 %1$s && " + "ssh-keygen -t %2$s -P '' -f %1$s/id_%2$s -q && "
+                        + "cat %1$s/id_%2$s.pub; fi", Common.CONTAINER_SSH_FOLDER,
+                encryptionType.name().toLowerCase() ) );
     }
 
 
@@ -87,31 +85,36 @@ public class LocalPeerCommands
 
     protected RequestBuilder getRemoveSshKeyCommand( final String key )
     {
-        return new RequestBuilder( String.format( "chmod 700 %1$s && " +
-                "sed -i \"\\,%2$s,d\" %1$s && " +
-                "chmod 644 %1$s", Common.CONTAINER_SSH_FILE, key ) );
+        return new RequestBuilder(
+                String.format( "chmod 700 %1$s && " + "sed -i \"\\,%2$s,d\" %1$s && " + "chmod 644 %1$s",
+                        Common.CONTAINER_SSH_FILE, key ) );
     }
 
 
     protected RequestBuilder getAppendSshKeysCommand( String keys )
     {
-        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "echo '%3$s' >> %2$s && sort -u '%2$s' -o '%2$s' && " +
-                "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, keys ) );
+        return new RequestBuilder( String.format(
+                "mkdir -p %1$s && " + "chmod 700 %1$s && " + "echo '%3$s' >> %2$s && sort -u '%2$s' -o '%2$s' && "
+                        + "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, keys ) );
     }
 
 
     protected RequestBuilder getConfigSSHCommand()
     {
-        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
-                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
-                "chmod 644 %1$s/config", Common.CONTAINER_SSH_FOLDER ) );
+        return new RequestBuilder( String.format(
+                "echo 'Host *' > %1$s/config && " + "echo '    StrictHostKeyChecking no' >> %1$s/config && "
+                        + "chmod 644 %1$s/config", Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
     protected RequestBuilder getReadAuthorizedKeysFile()
     {
         return new RequestBuilder( String.format( "cat %s", Common.CONTAINER_SSH_FILE ) );
+    }
+
+
+    public RequestBuilder getDestroyContainerCommand( String containerName )
+    {
+        return new RequestBuilder( String.format( "subutai destroy %s", containerName ) ).withTimeout( 60 );
     }
 }

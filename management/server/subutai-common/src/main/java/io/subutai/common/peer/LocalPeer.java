@@ -181,5 +181,7 @@ public interface LocalPeer extends Peer
     Template getTemplateByName( String templateName ) throws PeerException;
 
     Template getTemplateById( String templateId ) throws PeerException;
+
+    boolean destroyNotRegisteredContainer( String containerId ) throws PeerException;
 }
 
