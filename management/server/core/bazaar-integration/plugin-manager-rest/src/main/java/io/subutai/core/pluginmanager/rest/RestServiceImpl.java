@@ -50,16 +50,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            File karFile = new File( System.getProperty( "karaf.home" ) + "/deploy/" + name + ".kar" );
-
-            if ( !karFile.createNewFile() )
-            {
-                LOG.info( "Plugin {} already exists. Overwriting", name );
-            }
-
-            kar.transferTo( karFile );
-
-            pluginManager.register( name, version, karFile.getAbsolutePath(), permissions );
+            pluginManager.register( name, version, kar, permissions );
         }
         catch ( IOException e )
         {
