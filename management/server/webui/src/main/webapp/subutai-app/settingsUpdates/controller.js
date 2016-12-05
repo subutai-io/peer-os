@@ -103,7 +103,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 			SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
 			checkActiveUpdate();
 		}).error(function (error) {
-			setInterval(function() {
+			setTimeout(function() {
 				update();
 			}, 120000);
 		});
