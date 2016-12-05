@@ -65,7 +65,7 @@ public class Common
     public static final String DEFAULT_DOMAIN_NAME = "intra.lan";
 
     //http/rest client settings
-    public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 10L;
+    public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 3L;
     public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15L;
     public static final int DEFAULT_MAX_RETRANSMITS = 3;
 
