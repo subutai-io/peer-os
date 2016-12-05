@@ -31,7 +31,12 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Returns hosted container by its hostname
      */
-    ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+    ContainerHost getContainerHostByHostName( String hostname ) throws HostNotFoundException;
+
+    /**
+     * Returns hosted container by its container name
+     */
+    ContainerHost getContainerHostByContainerName( final String containerName ) throws HostNotFoundException;
 
     /**
      * Returns hosted container by its id

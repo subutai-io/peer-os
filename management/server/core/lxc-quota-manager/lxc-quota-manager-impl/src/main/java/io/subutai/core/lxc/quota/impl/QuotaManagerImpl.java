@@ -202,7 +202,7 @@ public class QuotaManagerImpl implements QuotaManager
             {
                 try
                 {
-                    ResourceHost resourceHost = localPeer.getResourceHostByName( resourceHostMetric.getHostName() );
+                    ResourceHost resourceHost = localPeer.getResourceHostByHostName( resourceHostMetric.getHostName() );
                     BigDecimal[] usedResources = getUsedResources();
 
                     BigDecimal cpuLimit = getCpuLimit( policy );
@@ -280,7 +280,7 @@ public class QuotaManagerImpl implements QuotaManager
         for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
         {
             CommandResult result = executeOnContainersResourceHost( containerId,
-                    commands.getReadQuotaCommand( containerId.getHostName(), containerResourceType ) );
+                    commands.getReadQuotaCommand( containerId.getContainerName(), containerResourceType ) );
 
             try
             {
@@ -310,7 +310,7 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
 
         executeOnContainersResourceHost( containerId,
-                commands.getSetQuotaCommand( containerId.getHostName(), containerQuota ) );
+                commands.getSetQuotaCommand( containerId.getContainerName(), containerQuota ) );
     }
 
 
@@ -341,7 +341,7 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
 
         CommandResult result = executeOnContainersResourceHost( containerId,
-                commands.getReadCpuSetCommand( containerId.getHostName() ) );
+                commands.getReadCpuSetCommand( containerId.getContainerName() ) );
 
         Pattern p = Pattern.compile( "(\\s*\\d+\\s*-\\s*\\d+\\s*)" );
         StringTokenizer st = new StringTokenizer( result.getStdOut().trim(), "," );
@@ -385,7 +385,7 @@ public class QuotaManagerImpl implements QuotaManager
         cpuSetString.replace( cpuSetString.length() - 1, cpuSetString.length(), "" );
 
         executeOnContainersResourceHost( containerId,
-                commands.getWriteCpuSetCommand( containerId.getHostName(), cpuSetString.toString() ) );
+                commands.getWriteCpuSetCommand( containerId.getContainerName(), cpuSetString.toString() ) );
     }
 
 

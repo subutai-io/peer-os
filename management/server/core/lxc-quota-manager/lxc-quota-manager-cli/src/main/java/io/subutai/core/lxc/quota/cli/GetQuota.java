@@ -46,7 +46,7 @@ public class GetQuota extends SubutaiShellCommandSupport
     {
         try
         {
-            ContainerHost containerHost = localPeer.getContainerHostByName( containerName );
+            ContainerHost containerHost = localPeer.getContainerHostByContainerName( containerName );
             System.out.println( quotaManager.getQuota( containerHost.getContainerId() ) );
         }
         catch ( HostNotFoundException | QuotaException e )

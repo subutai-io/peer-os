@@ -180,10 +180,11 @@ public class MonitorImpl implements Monitor, HostListener
         {
 
             ContainerHost c = peerManager.getLocalPeer().getContainerHostById( containerId.getId() );
-            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( c.getHostname() );
+            ResourceHost resourceHost =
+                    peerManager.getLocalPeer().getResourceHostByContainerHostName( c.getHostname() );
 
             CommandResult commandResult =
-                    resourceHost.execute( commands.getProcessResourceUsageCommand( c.getHostname(), pid ) );
+                    resourceHost.execute( commands.getProcessResourceUsageCommand( c.getContainerName(), pid ) );
             if ( !commandResult.hasSucceeded() )
             {
                 throw new MonitorException(

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class GetQuotaTest
 {
     private static final String CONTAINER_HOST_ID = UUID.randomUUID().toString();
-    private static final String CONTAINER_HOST_NAME = "containerName";
+    private static final String CONTAINER_NAME = "containerName";
     private GetQuota getQuota;
 
     @Mock
@@ -54,10 +54,10 @@ public class GetQuotaTest
     @Before
     public void setUp() throws Exception
     {
-        when( containerId.getHostName() ).thenReturn( CONTAINER_HOST_NAME );
+        when( containerId.getHostName() ).thenReturn( CONTAINER_NAME );
         when( containerId.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( localPeer.getContainerHostByName( CONTAINER_HOST_NAME ) ).thenReturn( containerHost );
+        when( localPeer.getContainerHostByContainerName( CONTAINER_NAME ) ).thenReturn( containerHost );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
         //        when( quotaManager.getQuota( containerId, ContainerResourceType.RAM ) ).thenReturn( ramQuotaValue );
         //        when( quotaManager.getQuota( containerId, ContainerResourceType.HOME ) ).thenReturn( diskQuotaValue );
@@ -68,7 +68,7 @@ public class GetQuotaTest
         //        when( quotaManager.getQuota( containerId, ContainerResourceType.CPU ) ).thenReturn( cpuQuotaValue );
 
         getQuota = new GetQuota( quotaManager, localPeer );
-        getQuota.setContainerName( CONTAINER_HOST_NAME );
+        getQuota.setContainerName( CONTAINER_NAME );
     }
 
 

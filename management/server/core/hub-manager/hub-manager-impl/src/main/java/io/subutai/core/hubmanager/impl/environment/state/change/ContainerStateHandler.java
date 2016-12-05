@@ -47,7 +47,8 @@ public class ContainerStateHandler extends StateHandler
                     for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
                     {
                         ContainerId containerId =
-                                new ContainerId( nodeDto.getContainerId(), nodeDto.getHostName(), peerId, envId );
+                                new ContainerId( nodeDto.getContainerId(), nodeDto.getHostName(), peerId, envId,
+                                        nodeDto.getContainerName() );
 
                         if ( nodeDto.getState().equals( ContainerStateDto.STOPPING ) )
                         {

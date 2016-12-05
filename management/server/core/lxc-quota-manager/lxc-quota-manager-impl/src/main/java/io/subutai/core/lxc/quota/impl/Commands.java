@@ -19,14 +19,14 @@ public class Commands
     private static final String QUOTA_BINDING = "subutai quota";
 
 
-    public RequestBuilder getReadQuotaCommand( String containerHostname, ContainerResourceType containerResourceType )
+    public RequestBuilder getReadQuotaCommand( String containerName, ContainerResourceType containerResourceType )
     {
         return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerHostname, containerResourceType.getKey() ) );
+                .withCmdArgs( Lists.newArrayList( containerName, containerResourceType.getKey() ) );
     }
 
 
-    public RequestBuilder getSetQuotaCommand( String hostname, ContainerQuota quota )
+    public RequestBuilder getSetQuotaCommand( String containerName, ContainerQuota quota )
     {
 
         CommandBatch result = new CommandBatch( CommandBatch.Type.JSON );
@@ -35,7 +35,7 @@ public class Commands
         {
 
             Command quotaCommand = new Command( "quota" );
-            quotaCommand.addArgument( hostname );
+            quotaCommand.addArgument( containerName );
             quotaCommand.addArgument( r.getResource().getContainerResourceType().getKey() );
             quotaCommand.addArgument( "-s" );
             quotaCommand.addArgument( r.getResource().getWriteValue() );
@@ -46,15 +46,15 @@ public class Commands
     }
 
 
-    public RequestBuilder getReadCpuSetCommand( String containerHostname )
+    public RequestBuilder getReadCpuSetCommand( String containerName )
     {
-        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerHostname, "cpuset" ) );
+        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerName, "cpuset" ) );
     }
 
 
-    public RequestBuilder getWriteCpuSetCommand( String containerHostname, String cpuset )
+    public RequestBuilder getWriteCpuSetCommand( String containerName, String cpuset )
     {
         return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerHostname, "cpuset", "-s", cpuset ) );
+                .withCmdArgs( Lists.newArrayList( containerName, "cpuset", "-s", cpuset ) );
     }
 }
