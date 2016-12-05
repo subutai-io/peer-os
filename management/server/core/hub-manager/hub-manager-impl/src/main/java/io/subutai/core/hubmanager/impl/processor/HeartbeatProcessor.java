@@ -50,7 +50,7 @@ public class HeartbeatProcessor implements Runnable
 
     private ExecutorService processorPool = Executors.newFixedThreadPool( Common.MAX_EXECUTOR_SIZE );
 
-    private volatile boolean isHubReachable = false;
+    private volatile boolean isHubReachable = true;
 
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
