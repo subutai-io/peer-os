@@ -216,7 +216,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public boolean isLocal()
     {
-        return getPeer().isLocal();
+        return getPeerId().equals( getLocalPeer().getId() );
     }
 
 

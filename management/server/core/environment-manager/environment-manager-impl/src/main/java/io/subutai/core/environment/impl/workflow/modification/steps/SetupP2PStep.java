@@ -96,7 +96,7 @@ public class SetupP2PStep
     }
 
 
-    protected void setupP2p( LocalEnvironment environment, Map<String, Set<String>> peerRhIds, Set<String> p2pAddresses )
+    private void setupP2p( LocalEnvironment environment, Map<String, Set<String>> peerRhIds, Set<String> p2pAddresses )
             throws EnvironmentModificationException, PeerException
     {
         //generate p2p secret key
@@ -157,9 +157,8 @@ public class SetupP2PStep
     }
 
 
-    protected void setupTunnel( Environment environment ) throws EnvironmentModificationException, PeerException
+    private void setupTunnel( Environment environment ) throws EnvironmentModificationException, PeerException
     {
-
 
         for ( Peer peer : environment.getPeers() )
         {
