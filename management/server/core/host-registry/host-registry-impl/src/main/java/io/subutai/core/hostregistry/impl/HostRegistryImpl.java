@@ -112,6 +112,27 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
+    public ContainerHostInfo getContainerHostInfoByContainerName( final String containerName )
+            throws HostDisconnectedException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
+
+        for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
+        {
+            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+            {
+                if ( containerName.equalsIgnoreCase( containerHostInfo.getContainerName() ) )
+                {
+                    return containerHostInfo;
+                }
+            }
+        }
+
+        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, containerName ) );
+    }
+
+
+    @Override
     public Set<ContainerHostInfo> getContainerHostsInfo()
     {
         Set<ContainerHostInfo> containersInfo = Sets.newHashSet();

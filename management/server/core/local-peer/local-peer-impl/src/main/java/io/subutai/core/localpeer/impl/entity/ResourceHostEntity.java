@@ -313,7 +313,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             result = commandUtil
-                    .execute( resourceHostCommands.getListContainerInfoCommand( containerHost.getHostname() ), this );
+                    .execute( resourceHostCommands.getListContainerInfoCommand( containerHost.getContainerName() ),
+                            this );
         }
         catch ( CommandException e )
         {
@@ -367,7 +368,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getStartContainerCommand( containerHost.getHostname() ), this );
+            commandUtil
+                    .execute( resourceHostCommands.getStartContainerCommand( containerHost.getContainerName() ), this );
         }
         catch ( CommandException e )
         {
@@ -417,7 +419,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getStopContainerCommand( containerHost.getHostname() ), this );
+            commandUtil
+                    .execute( resourceHostCommands.getStopContainerCommand( containerHost.getContainerName() ), this );
         }
         catch ( CommandException e )
         {
@@ -446,7 +449,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getHostname() ), this );
+            commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getContainerName() ),
+                    this );
         }
         catch ( CommandException e )
         {
@@ -493,7 +497,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ContainerHost getContainerHostByName( final String hostname ) throws HostNotFoundException
+    public ContainerHost getContainerHostByHostName( final String hostname ) throws HostNotFoundException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
@@ -508,6 +512,26 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         throw new HostNotFoundException( String.format( "Container host not found by hostname %s", hostname ) );
+    }
+
+
+    @Override
+    public ContainerHost getContainerHostByContainerName( final String containerName ) throws HostNotFoundException
+    {
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
+
+        for ( ContainerHost containerHost : getContainerHosts() )
+        {
+
+            if ( containerHost.getContainerName().equalsIgnoreCase( containerName ) )
+            {
+                return containerHost;
+            }
+        }
+
+        throw new HostNotFoundException(
+                String.format( "Container host not found by container name %s", containerName ) );
     }
 
 
@@ -816,11 +840,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public String cloneContainer( final Template template, final String hostname, final String ip, final int vlan,
+    public String cloneContainer( final Template template, final String containerName, final String ip, final int vlan,
                                   final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid ip" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions
@@ -833,7 +857,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             String token = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
 
             CommandResult result = commandUtil.execute( resourceHostCommands
-                    .getCloneContainerCommand( template.getId(), hostname, ip, vlan, environmentId, token ), this );
+                            .getCloneContainerCommand( template.getId(), containerName, ip, vlan, environmentId,
+                                    token ),
+                    this );
 
             //parse ID from output
 
@@ -868,7 +894,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( Exception e )
         {
             throw new ResourceHostException(
-                    String.format( "Error cloning container %s: %s", hostname, e.getMessage() ), e );
+                    String.format( "Error cloning container %s: %s", containerName, e.getMessage() ), e );
         }
     }
 
@@ -1034,7 +1060,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             try
             {
                 commandUtil.execute( resourceHostCommands
-                        .getGetSetContainerHostnameCommand( containerHost.getContainerName(), hostname ), this );
+                        .getSetContainerHostnameCommand( containerHost.getContainerName(), hostname ), this );
             }
             catch ( CommandException e )
             {

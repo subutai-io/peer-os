@@ -144,7 +144,7 @@ public class EnvironmentUserHelper
     {
         for ( Role role : identityManager.getAllRoles() )
         {
-            if ( role.getName().equals( roleName ) )
+            if ( role.getName().equalsIgnoreCase( roleName ) )
             {
                 return role;
             }
@@ -167,8 +167,8 @@ public class EnvironmentUserHelper
                     UserType.REGULAR.getId(), KeyTrustLevel.MARGINAL.getId(), false, true );
 
             identityManager.setUserPublicKey( user.getId(), userDto.getPublicKey() );
-            identityManager.assignUserRole( user, getRole( "Environment-Manager" ) );
-            identityManager.assignUserRole( user, getRole( "Template-Management" ) );
+            identityManager.assignUserRole( user, getRole( IdentityManager.ENV_MANAGER_ROLE ) );
+            identityManager.assignUserRole( user, getRole( IdentityManager.TEMPLATE_MANAGER_ROLE ) );
 
             log.info( "User created successfully" );
 

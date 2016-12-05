@@ -49,13 +49,21 @@ public class HostsCommand extends SubutaiShellCommandSupport
     protected void print( Host host, String padding )
     {
         String connectionState = String.format( "%s ", host.isConnected() ? " CONNECTED" : " DISCONNECTED" );
+
+        String hostname = host.getHostname();
+
         if ( host instanceof ContainerHost )
         {
             ContainerHost c = ( ContainerHost ) host;
             connectionState += c.getState();
+
+            if ( !c.getContainerName().equalsIgnoreCase( c.getHostname() ) )
+            {
+                hostname = c.getHostname() + " [ " + c.getContainerName() + " ]";
+            }
         }
 
-        System.out.println( String.format( "%s+--%s %s %s", padding, host.getHostname(),
+        System.out.println( String.format( "%s+--%s %s %s", padding, hostname,
                 abbreviate ? StringUtils.abbreviate( host.getId(), 7 ) : host.getId(), connectionState ) );
     }
 }

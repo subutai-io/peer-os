@@ -34,9 +34,9 @@ public interface HostRegistry
     ContainerHostInfo getContainerHostInfoById( String id ) throws HostDisconnectedException;
 
     /**
-     * Returns container host info by name
+     * Returns container host info by host name
      *
-     * @param hostname - name of container
+     * @param hostname - hostname of container
      *
      * @return - container host info
      *
@@ -45,6 +45,18 @@ public interface HostRegistry
      */
     ContainerHostInfo getContainerHostInfoByHostname( String hostname ) throws HostDisconnectedException;
 
+    /**
+     * Returns container host info by container name
+     *
+     * @param containerName - name of container
+     *
+     * @return - container host info
+     *
+     * @throws HostDisconnectedException - thrown when container host is not present on any of connected resource hosts.
+     * However if it is present but status is other then RUNNING this exception is not thrown
+     */
+    ContainerHostInfo getContainerHostInfoByContainerName( final String containerName )
+            throws HostDisconnectedException;
 
     /**
      * Returns all present container hosts info on all connected resource hosts

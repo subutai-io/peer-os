@@ -4,7 +4,7 @@
     <a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg"
                                               class="b-icon g-right"/></a>
   </div>
-  <form ng-submit="bazaarCtrl.editPermissionsWindow(bazaarCtrl.newPlugin, true)">
+  <form ng-submit="bazaarCtrl.uploadPlugin()">
     <div class="b-popup__body">
       <div class="b-form">
         <div class="b-form__wrapper">
@@ -23,7 +23,7 @@
             <label class="b-popup-body-label">Version</label>
 
             <input type="text"
-                   placeholder="Enter plugin name"
+                   placeholder="Enter plugin version"
                    class="b-popup-body-input b-popup-body-input_box"
                    ng-model="bazaarCtrl.newPlugin.version" required>
             <div class="clear"></div>
@@ -44,7 +44,7 @@
           </div>
           <div>
             <button class="b-btn b-btn_blue g-right  b-btn_margin-l"
-                    type="submit" style="margin-top: 20px">Next
+                    type="submit" style="margin-top: 20px">Upload
             </button>
           </div>
           <div class="clear"></div>

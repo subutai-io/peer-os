@@ -90,7 +90,7 @@ public class QuotaManagerImplTest
     {
         when( containerId.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerId.getHostName() ).thenReturn( CONTAINER_HOST_NAME );
-        when( localPeer.getResourceHostByContainerName( anyString() ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerHostName( anyString() ) ).thenReturn( resourceHost );
         when( localPeer.getResourceHostByContainerId( CONTAINER_HOST_ID ) ).thenReturn( resourceHost );
         when( containerHost.getHostname() ).thenReturn( containerHostname );
 

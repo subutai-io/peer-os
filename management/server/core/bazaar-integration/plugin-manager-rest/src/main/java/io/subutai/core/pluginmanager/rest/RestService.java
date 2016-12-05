@@ -53,4 +53,12 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response setPermissions( @FormParam( "pluginId" ) String pluginId,
                                     @FormParam( "permission" ) String permissionJson );
+
+
+    // edit plugin info
+    @POST
+    @Path( "plugins/update" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response updatePlugin( @FormParam( "pluginId" ) String pluginId, @FormParam( "name" ) String name,
+                                  @FormParam( "version" ) String version );
 }

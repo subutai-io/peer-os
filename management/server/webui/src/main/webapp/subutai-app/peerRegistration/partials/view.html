@@ -1,25 +1,25 @@
 <div ng-controller="PeerRegistrationCtrl as peerRegistrationCtrl">
 
-	<div class="b-workspace__header">
+  <div class="b-workspace__header">
 
-		<h1 class="b-title">Peer registration</h1>
-	</div>
+    <h1 class="b-title">Remote peers</h1>
+  </div>
 
-	<div class="b-workspace__content">
-		<a class="b-btn b-btn_green b-btn_search-field-level"
-		   href
-		   id="subt_link__create-peer"
-		   ng-click="peerRegistrationCtrl.peerFrom()">
-			<i class="fa fa-plus"></i> Create peer
-		</a>
-		<div class="b-data-table">
-			<table datatable="" 
-				dt-options="peerRegistrationCtrl.dtOptions" 
-				dt-columns="peerRegistrationCtrl.dtColumns" 
-				dt-instance="peerRegistrationCtrl.dtInstance" 
-				class="row-border hover">
-			</table>
-		</div>
-	</div>	
+  <div class="b-workspace__content">
+    <a class="b-btn b-btn_green b-btn_search-field-level"
+       href
+       id="subt_link__create-peer"
+       ng-click="peerRegistrationCtrl.peerFrom()">
+      <i class="fa fa-plus"></i> Add peer
+    </a>
+    <div class="b-data-table">
+      <table datatable=""
+             dt-options="peerRegistrationCtrl.dtOptions"
+             dt-columns="peerRegistrationCtrl.dtColumns"
+             dt-instance="peerRegistrationCtrl.dtInstance"
+             class="row-border hover">
+      </table>
+    </div>
+  </div>
 
 </div>

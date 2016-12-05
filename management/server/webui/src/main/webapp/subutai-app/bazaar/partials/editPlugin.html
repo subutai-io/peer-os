@@ -1,0 +1,38 @@
+<div class="b-popup">
+  <form ng-submit="bazaarCtrl.updatePlugin()">
+    <div class="b-popup__header">
+      Edit
+      <a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/></a>
+    </div>
+    <div class="b-popup__body">
+      <div class="b-form">
+        <div class="b-form__wrapper">
+
+          <div class="popup-body-box">
+            <label class="b-popup-body-label">Name</label>
+
+            <input type="text"
+                   class="b-popup-body-input b-popup-body-input_box"
+                   ng-model="bazaarCtrl.editPlugin.name" required>
+            <div class="clear"></div>
+          </div>
+
+          <div class="popup-body-box">
+            <label class="b-popup-body-label">Version</label>
+
+            <input type="text"
+                   class="b-popup-body-input b-popup-body-input_box"
+                   ng-model="bazaarCtrl.editPlugin.version" required>
+            <div class="clear"></div>
+          </div>
+          <div>
+            <button class="b-btn b-btn_blue g-right  b-btn_margin-l"
+                    type="submit" style="margin-top: 20px">Save
+            </button>
+            <div class="clear"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

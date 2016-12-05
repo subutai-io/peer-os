@@ -292,7 +292,7 @@ public class ResourceHostEntityTest
     {
         try
         {
-            resourceHostEntity.getContainerHostByName( HOSTNAME );
+            resourceHostEntity.getContainerHostByHostName( HOSTNAME );
             fail( "Expected HostNotFoundException" );
         }
         catch ( HostNotFoundException e )
@@ -301,7 +301,7 @@ public class ResourceHostEntityTest
 
         resourceHostEntity.addContainerHost( containerHost );
 
-        ContainerHost containerHost1 = resourceHostEntity.getContainerHostByName( HOSTNAME );
+        ContainerHost containerHost1 = resourceHostEntity.getContainerHostByHostName( HOSTNAME );
 
         assertEquals( containerHost, containerHost1 );
     }
