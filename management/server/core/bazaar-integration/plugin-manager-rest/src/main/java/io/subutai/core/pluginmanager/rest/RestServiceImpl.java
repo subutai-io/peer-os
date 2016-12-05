@@ -89,7 +89,8 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( "Error deleting profile {}", e.getMessage() );
 
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+            return javax.ws.rs.core.Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                                            .build();
         }
 
         return Response.status( Response.Status.OK ).build();

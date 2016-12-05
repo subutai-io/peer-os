@@ -14,6 +14,7 @@
           Installed
         </li>
         <li class="b-tabs-menu__item"
+            ng-if="subutaiController.adminMenus"
             ng-click="bazaarCtrl.activeTab = 'other'"
             ng-class="bazaarCtrl.activeTab == 'other' ? 'b-tabs-menu__item_active' : ''">
           Advanced
