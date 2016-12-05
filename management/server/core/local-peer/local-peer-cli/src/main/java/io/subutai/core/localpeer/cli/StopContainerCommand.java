@@ -13,8 +13,8 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 public class StopContainerCommand extends SubutaiShellCommandSupport
 {
 
-    @Argument( index = 0, name = "hostname", multiValued = false, description = "Container name", required = true )
-    private String hostname;
+    @Argument( index = 0, name = "container name", multiValued = false, description = "Container name", required = true )
+    private String containerName;
 
     private final LocalPeer localPeer;
 
@@ -30,7 +30,7 @@ public class StopContainerCommand extends SubutaiShellCommandSupport
     {
 
 
-        ContainerHost host = localPeer.getContainerHostByName( hostname );
+        ContainerHost host = localPeer.getContainerHostByContainerName( containerName );
 
         localPeer.stopContainer( host.getContainerId() );
 

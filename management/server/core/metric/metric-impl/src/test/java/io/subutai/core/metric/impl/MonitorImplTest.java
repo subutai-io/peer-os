@@ -256,7 +256,7 @@ public class MonitorImplTest
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true ).thenReturn( false );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
-        when( localPeer.getResourceHostByContainerName( containerHost.getHostname() ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerHostName( containerHost.getHostname() ) ).thenReturn( resourceHost );
 
         monitor.getProcessResourceUsage( containerId, PID );
 

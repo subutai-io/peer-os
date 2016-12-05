@@ -148,7 +148,7 @@ public class AppScaleManager
 
         try
         {
-            ch = localPeer.getContainerHostByName( hostname );
+            ch = localPeer.getContainerHostByHostName( hostname );
         }
         catch ( HostNotFoundException e )
         {

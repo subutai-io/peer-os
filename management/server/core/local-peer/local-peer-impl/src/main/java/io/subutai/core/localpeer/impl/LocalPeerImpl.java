@@ -917,7 +917,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @PermitAll
     @Override
-    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException
+    public ContainerHost getContainerHostByHostName( String hostname ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Container hostname shouldn't be null" );
 
@@ -925,7 +925,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             try
             {
-                return resourceHost.getContainerHostByName( hostname );
+                return resourceHost.getContainerHostByHostName( hostname );
             }
             catch ( HostNotFoundException ignore )
             {
@@ -933,7 +933,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        throw new HostNotFoundException( String.format( "No container host found for name %s", hostname ) );
+        throw new HostNotFoundException( String.format( "No container host found for hostname %s", hostname ) );
+    }
+
+
+    @PermitAll
+    @Override
+    public ContainerHost getContainerHostByContainerName( String containerName ) throws HostNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Container name shouldn't be null" );
+
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            try
+            {
+                return resourceHost.getContainerHostByContainerName( containerName );
+            }
+            catch ( HostNotFoundException ignore )
+            {
+                //ignore
+            }
+        }
+
+        throw new HostNotFoundException( String.format( "No container host found for name %s", containerName ) );
     }
 
 
@@ -961,7 +983,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @PermitAll
     @Override
-    public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException
+    public ResourceHost getResourceHostByHostName( String hostname ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid resource host hostname" );
 
@@ -996,11 +1018,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @PermitAll
     @Override
+    public ResourceHost getResourceHostByContainerHostName( final String hostname ) throws HostNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid container hostname" );
+
+        ContainerHost c = getContainerHostByHostName( hostname );
+        ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) c;
+        return containerHostEntity.getParent();
+    }
+
+
+    @Override
     public ResourceHost getResourceHostByContainerName( final String containerName ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
 
-        ContainerHost c = getContainerHostByName( containerName );
+        ContainerHost c = getContainerHostByContainerName( containerName );
         ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) c;
         return containerHostEntity.getParent();
     }
@@ -1084,8 +1117,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            String errMsg =
-                    String.format( "Could not start container %s: %s", containerHost.getHostname(), e.getMessage() );
+            String errMsg = String.format( "Could not start container %s: %s", containerHost.getContainerName(),
+                    e.getMessage() );
             LOG.error( errMsg );
             throw new PeerException( errMsg, e );
         }
@@ -1106,8 +1139,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            String errMsg =
-                    String.format( "Could not stop container %s: %s", containerHost.getHostname(), e.getMessage() );
+            String errMsg = String.format( "Could not stop container %s: %s", containerHost.getContainerName(),
+                    e.getMessage() );
             LOG.error( errMsg );
             throw new PeerException( errMsg, e );
         }
@@ -1168,7 +1201,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHost getManagementHost() throws HostNotFoundException
     {
-        return getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
+        return getResourceHostByContainerHostName( Common.MANAGEMENT_HOSTNAME );
     }
 
 
@@ -1410,7 +1443,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 //setup security
                 try
                 {
-                    buildAdminHostRelation( getContainerHostByName( Common.MANAGEMENT_HOSTNAME ) );
+                    buildAdminHostRelation( getContainerHostByHostName( Common.MANAGEMENT_HOSTNAME ) );
                 }
                 catch ( Exception e )
                 {
@@ -1422,7 +1455,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws PeerException
+    public void exchangeKeys( ResourceHost resourceHost, String containerName ) throws PeerException
     {
         HostRegistrationManager registrationManager = ServiceLocator.lookup( HostRegistrationManager.class );
 
@@ -1430,7 +1463,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
 
-            commandUtil.execute( localPeerCommands.getExchangeKeyCommand( hostname, token ), resourceHost );
+            commandUtil.execute( localPeerCommands.getExchangeKeyCommand( containerName, token ), resourceHost );
         }
         catch ( Exception e )
         {
@@ -2414,7 +2447,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             try
             {
-                ResourceHost resourceHost = getResourceHostByName( resourceHostMetric.getHostName() );
+                ResourceHost resourceHost = getResourceHostByHostName( resourceHostMetric.getHostName() );
 
                 BigDecimal cpuLimit = new BigDecimal( "100.00" );
 
@@ -2670,7 +2703,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //check if container with new hostname already exists on peer
         try
         {
-            getContainerHostByName( hostname );
+            getContainerHostByHostName( hostname );
 
             throw new PeerException( String.format( "Container with hostname %s already exists", hostname ) );
         }

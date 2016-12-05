@@ -92,7 +92,7 @@ public class CloneContainerTask extends HostUtil.Task<String>
         request.setContainerName( request.getHostname() );
 
         String containerId = resourceHost
-                .cloneContainer( template, request.getHostname(), request.getIp(), networkResource.getVlan(),
+                .cloneContainer( template, request.getContainerName(), request.getIp(), networkResource.getVlan(),
                         networkResource.getEnvironmentId() );
 
         //wait for container connection

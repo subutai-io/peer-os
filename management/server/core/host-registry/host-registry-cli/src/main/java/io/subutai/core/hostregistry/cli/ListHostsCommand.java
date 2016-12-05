@@ -57,7 +57,12 @@ public class ListHostsCommand extends SubutaiShellCommandSupport
 
             for ( ContainerHostInfo containerHostInfo : containerHostInfos )
             {
-                System.out.println( String.format( "\t\t%s\t%s\t%s\t%s", containerHostInfo.getHostname(),
+                String hostname =
+                        containerHostInfo.getHostname().equalsIgnoreCase( containerHostInfo.getContainerName() ) ?
+                        containerHostInfo.getHostname() :
+                        containerHostInfo.getHostname() + " [ " + containerHostInfo.getContainerName() + " ]";
+
+                System.out.println( String.format( "\t\t%s\t%s\t%s\t%s", hostname,
                         abbreviate ? StringUtils.abbreviate( containerHostInfo.getId(), 7 ) : containerHostInfo.getId(),
                         containerHostInfo.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                         containerHostInfo.getState() ) );

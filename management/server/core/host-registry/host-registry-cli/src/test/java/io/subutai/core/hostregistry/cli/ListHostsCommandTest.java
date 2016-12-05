@@ -49,6 +49,8 @@ public class ListHostsCommandTest extends SystemOutRedirectTest
         when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( hostInterface ) );
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
         when( hostInterfaces.findByName( anyString() ) ).thenReturn( hostInterface );
+        when( containerHostInfo .getContainerName()).thenReturn( "containername" );
+        when( containerHostInfo .getHostname()).thenReturn( "hostname" );
     }
 
 

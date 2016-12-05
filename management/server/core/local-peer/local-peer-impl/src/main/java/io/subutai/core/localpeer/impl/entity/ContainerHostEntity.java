@@ -291,7 +291,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         if ( containerId == null )
         {
-            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId(),
+                    getContainerName() );
         }
         return containerId;
     }

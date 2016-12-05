@@ -50,7 +50,7 @@ public interface LocalPeer extends Peer
     /**
      * Returns resource host instance by its hostname
      */
-    ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
+    ResourceHost getResourceHostByHostName( String hostname ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by its id
@@ -59,6 +59,11 @@ public interface LocalPeer extends Peer
 
     /**
      * Returns resource host instance by hostname of its container
+     */
+    ResourceHost getResourceHostByContainerHostName( String containerName ) throws HostNotFoundException;
+
+    /**
+     * Returns resource host instance by name of its container
      */
     ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
 
@@ -71,10 +76,18 @@ public interface LocalPeer extends Peer
     /**
      * Returns implementation of ContainerHost interface.
      *
-     * @param hostname name of the container
+     * @param hostname hostname of the container
      */
 
-    ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+    ContainerHost getContainerHostByHostName( String hostname ) throws HostNotFoundException;
+
+    /**
+     * Returns implementation of ContainerHost interface.
+     *
+     * @param containerName name of the container
+     */
+
+    ContainerHost getContainerHostByContainerName( String containerName ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ContainerHost interface.
