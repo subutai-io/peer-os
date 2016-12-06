@@ -219,7 +219,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     function logout() {
         removeCookie('sptoken');
         localStorage.removeItem('currentUser');
-        sessionStorage.removeItem('isAdmin');
+        localStorage.removeItem('isAdmin');
         $location.path('login');
     }
 
@@ -368,9 +368,9 @@ function SubutaiController($rootScope, $http, $state) {
 		headers: {'Content-Type': 'application/json'}
 	}).success(function (data) {
 		if (data == true || data == 'true') {
-			sessionStorage.setItem('isAdmin', true);
+			localStorage.setItem('isAdmin', true);
 		} else {
-			sessionStorage.setItem('isAdmin', false);
+			localStorage.setItem('isAdmin', false);
 		}
 	});
 
@@ -465,7 +465,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -492,7 +492,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -519,7 +519,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -546,7 +546,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -573,7 +573,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -600,7 +600,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -633,7 +633,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -660,7 +660,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -686,7 +686,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -713,7 +713,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
@@ -740,7 +740,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			},
 			resolve: {
 				security: ['$q', function($q){
-					if(!sessionStorage.getItem('isAdmin')){
+					if(!localStorage.getItem('isAdmin')){
 						return $q.reject("notAdmin");
 					}
 				}],
