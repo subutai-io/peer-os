@@ -219,6 +219,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     function logout() {
         removeCookie('sptoken');
         localStorage.removeItem('currentUser');
+        sessionStorage.removeItem('isAdmin');
         $location.path('login');
     }
 
@@ -361,6 +362,17 @@ function SubutaiController($rootScope, $http, $state) {
     vm.adminMenus = false;
     vm.isTenantManager = false;
     vm.peerName = "Subutai Social";
+
+	$http.get(SERVER_URL + 'rest/ui/identity/is-admin', {
+		withCredentials: true,
+		headers: {'Content-Type': 'application/json'}
+	}).success(function (data) {
+		if (data == true || data == 'true') {
+			sessionStorage.setItem('isAdmin', true);
+		} else {
+			sessionStorage.setItem('isAdmin', false);
+		}
+	});
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
