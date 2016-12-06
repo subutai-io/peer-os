@@ -38,6 +38,12 @@ $(document).on('click', '.b-nav-menu-link', function () {
 	}
 });
 
+$(document).on('click', '.b-nav-menu-sub a', function () {
+	if($(this).parent().hasClass('b-nav-menu-sub_active')) {
+		location.reload();
+	}
+});
+
 $('body').on('click', '.js-notification', function() {
 	$('.b-hub-status__dropdown').stop().slideUp(100);
 	var currentDropDown = $(this).next('.b-hub-status__dropdown');
