@@ -14,6 +14,7 @@ import org.apache.http.HttpStatus;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.LogListenerImpl;
+import io.subutai.hub.share.dto.SubutaiErrorEvent;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -42,7 +43,7 @@ public class HubLoggerProcessor implements Runnable
     @Override
     public void run()
     {
-        Set<String> logs = logListener.getErrLogs();
+        Set<SubutaiErrorEvent> logs = logListener.getErrLogs();
 
         if ( !logs.isEmpty() && hubManager.isRegistered() && hubManager.isHubReachable() )
         {
