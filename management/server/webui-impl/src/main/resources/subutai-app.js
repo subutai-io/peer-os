@@ -354,7 +354,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 }
 
 
-function SubutaiController($rootScope, $http) {
+function SubutaiController($rootScope, $http, $state) {
     var vm = this;
     vm.bodyClass = '';
     vm.activeState = '';

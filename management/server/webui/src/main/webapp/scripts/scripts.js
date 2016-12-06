@@ -29,7 +29,6 @@ $(document).on('click', '.b-nav-menu-link', function () {
 		}
 		return false;
 	} else {
-		console.log('lololo');
 		if($(this).parent().hasClass('b-nav-menu_active')) {
 			location.reload();
 		} else {
