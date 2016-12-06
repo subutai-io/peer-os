@@ -29,12 +29,19 @@ $(document).on('click', '.b-nav-menu-link', function () {
 		}
 		return false;
 	} else {
+		console.log('lololo');
 		if($(this).parent().hasClass('b-nav-menu_active')) {
 			location.reload();
 		} else {
 			$('.b-nav-menu__sub').stop().slideUp(300);
 			$('.b-nav-menu_active').removeClass('b-nav-menu_active');
 		}
+	}
+});
+
+$(document).on('click', '.b-nav-menu-sub a', function () {
+	if($(this).parent().hasClass('b-nav-menu-sub_active')) {
+		location.reload();
 	}
 });
 
