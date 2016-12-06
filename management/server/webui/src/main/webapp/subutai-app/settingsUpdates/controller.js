@@ -97,15 +97,16 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 
 		LOADING_SCREEN();
 		vm.updateText = 'Please wait, update is in progress. System will restart automatically';
-		SettingsUpdatesSrv.update(vm.config).success(function (data) {
+
+		SettingsUpdatesSrv.update(vm.config).success(function (data, status) {
 			LOADING_SCREEN('none');
 			sessionStorage.removeItem('notifications');
-			SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
+			if(status == 200){
+			    SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
+			}
 			checkActiveUpdate();
 		}).error(function (error) {
-			setInterval(function() {
-				update();
-			}, 120000);
+			SweetAlert.swal("ERROR!", error, "error");
 		});
 
 		var notifications = sessionStorage.getItem('notifications');

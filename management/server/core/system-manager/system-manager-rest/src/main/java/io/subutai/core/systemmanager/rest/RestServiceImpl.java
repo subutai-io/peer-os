@@ -183,7 +183,8 @@ public class RestServiceImpl implements RestService
         }
         else
         {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+            //no update available
+            return Response.status( Response.Status.NO_CONTENT ).build();
         }
     }
 
