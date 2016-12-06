@@ -22,8 +22,9 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	vm.viewLogs = viewLogs;
 
 	vm.selectedModule = 'ENVIRONMENT MANAGER';
-	vm.startDate = new Date(new Date().getFullYear(), 0, 1);;
-	vm.endDate = new Date(new Date().getFullYear(), 11, 1);;
+	vm.endDate = new Date();
+	vm.startDate = new Date();
+	vm.startDate.setDate(vm.endDate.getDate()-7);
 
 	trackerSrv.getModules().success(function (data) {
 		vm.modules = data;

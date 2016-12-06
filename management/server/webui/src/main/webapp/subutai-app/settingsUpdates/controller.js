@@ -59,9 +59,9 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 			return $resource( SettingsUpdatesSrv.getHistoryUrl() ).query().$promise;
 		})
 		.withPaginationType('full_numbers')
-		.withOption('stateSave', true)
+		.withOption('createdRow', createdRow)
 		.withOption('order', [[ 0, "desc" ]])
-		.withOption('createdRow', createdRow);
+		.withOption('stateSave', true);
 
 	vm.dtColumns = [
 		DTColumnBuilder.newColumn('updateDate').withTitle('Date').renderWith(dateHTML),
@@ -75,9 +75,13 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 		$compile(angular.element(row).contents())($scope);
 	}
 
-	function dateHTML(data, type, full, meta) {
+	/*function dateHTML(data, type, full, meta) {
 		return moment( data ).format('MMM Do YYYY HH:mm:ss');
-	}
+	}*/
+
+	function dateHTML(data, type, full, meta) {
+		return '<div>' + moment( data ).format('MMM Do YYYY HH:mm:ss') + '</div>';
+	}	
 
 	vm.update = update;
 	vm.getHistoryData = getHistoryData;
