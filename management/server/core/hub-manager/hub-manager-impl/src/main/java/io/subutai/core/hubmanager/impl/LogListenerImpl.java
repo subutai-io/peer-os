@@ -23,7 +23,7 @@ public class LogListenerImpl implements SubutaiErrorEventListener
     private final Map<String, SubutaiErrorEvent> errLogs = new LinkedHashMap<>();
 
 
-    public Set<SubutaiErrorEvent> getErrLogs()
+    public Set<SubutaiErrorEvent> getSubutaiErrorEvents()
     {
         Set<SubutaiErrorEvent> logs = new HashSet<>();
 

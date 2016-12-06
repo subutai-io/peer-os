@@ -43,9 +43,9 @@ public class HubLoggerProcessor implements Runnable
     @Override
     public void run()
     {
-        Set<SubutaiErrorEvent> logs = logListener.getErrLogs();
+        Set<SubutaiErrorEvent> subutaiErrorEvents = logListener.getSubutaiErrorEvents();
 
-        if ( !logs.isEmpty() && hubManager.isRegistered() && hubManager.isHubReachable() )
+        if ( !subutaiErrorEvents.isEmpty() && hubManager.isRegistered() && hubManager.isHubReachable() )
         {
             WebClient client = null;
             try
@@ -53,7 +53,7 @@ public class HubLoggerProcessor implements Runnable
                 client = configManager.getTrustedWebClientWithAuth( "/rest/v1/system-bugs", configManager.getHubIp() );
 
                 SystemLogsDto logsDto = new SystemLogsDto();
-                logsDto.setLogs( logs );
+                logsDto.setSubutaiErrorEvents( subutaiErrorEvents );
 
                 byte[] plainData = JsonUtil.toCbor( logsDto );
                 byte[] encryptedData = configManager.getMessenger().produce( plainData );
