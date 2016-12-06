@@ -20,6 +20,8 @@
 
 import groovy.json.JsonSlurperClassic
 
+notifyBuildDetails = ""
+
 node() {
 	// Send job started notifications
 	try {
@@ -31,7 +33,6 @@ node() {
 	String artifactDir = "/tmp/jenkins/${env.JOB_NAME}"
 	String debFileName = "management-${env.BRANCH_NAME}.deb"
 	String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
-	notifyBuildDetails = ""
 	
 	stage("Build management deb/template")
 	// Use maven to to build deb and template files of management
