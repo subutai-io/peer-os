@@ -225,9 +225,15 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Update" )
     public boolean updateManagement()
     {
+        if ( isUpdateInProgress )
+        {
+            return false;
+        }
+
+        isUpdateInProgress = true;
+
         try
         {
-            isUpdateInProgress = true;
 
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
