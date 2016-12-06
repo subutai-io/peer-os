@@ -449,8 +449,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getContainerName() ),
-                    this );
+            commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getId() ), this );
         }
         catch ( CommandException e )
         {
