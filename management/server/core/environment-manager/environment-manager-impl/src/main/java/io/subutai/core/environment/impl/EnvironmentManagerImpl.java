@@ -1847,6 +1847,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    //TODO upload all not uploaded peer owner env-s in background job
     @Override
     public void onRegistrationSucceeded()
     {
