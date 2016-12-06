@@ -1,4 +1,4 @@
-package io.subutai.core.appender;
+package io.subutai.hub.share.dto;
 
 
 public class SubutaiErrorEvent

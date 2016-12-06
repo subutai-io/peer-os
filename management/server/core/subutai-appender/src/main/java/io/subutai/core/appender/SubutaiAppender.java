@@ -13,6 +13,8 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
+import io.subutai.hub.share.dto.SubutaiErrorEvent;
+
 
 public class SubutaiAppender extends AppenderSkeleton
 {

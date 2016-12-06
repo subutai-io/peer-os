@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import io.subutai.hub.share.dto.SubutaiErrorEvent;
+
 import static junit.framework.TestCase.assertEquals;
 
 
