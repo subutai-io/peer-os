@@ -43,7 +43,7 @@ public class SubutaiSystemLog
 
     @JsonCreator
     public SubutaiSystemLog( @JsonProperty( value = "sourceType" ) final LogSource sourceType,
-                             @JsonProperty( value = "sourceType" ) final String sourceName,
+                             @JsonProperty( value = "sourceName" ) final String sourceName,
                              @JsonProperty( value = "type" ) final LogType type,
                              @JsonProperty( value = "timeStamp" ) final long timeStamp,
                              @JsonProperty( value = "loggerName" ) final String loggerName,
