@@ -13,7 +13,9 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
-import io.subutai.hub.share.dto.SubutaiErrorEvent;
+import io.subutai.hub.share.dto.SubutaiSystemLog;
+
+import static io.subutai.hub.share.dto.SubutaiSystemLog.LogType.ERROR;
 
 
 public class SubutaiAppender extends AppenderSkeleton

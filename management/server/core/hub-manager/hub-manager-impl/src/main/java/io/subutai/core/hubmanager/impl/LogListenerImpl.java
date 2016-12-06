@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import io.subutai.hub.share.dto.SubutaiErrorEvent;
+import io.subutai.core.appender.SubutaiErrorEvent;
 import io.subutai.core.appender.SubutaiErrorEventListener;
 
 
