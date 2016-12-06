@@ -1,6 +1,6 @@
 #!groovy
 
-// Cofiguring builder:
+// Configuring builder:
 // Manage Jenkins -> Global Tool Configuration -> Maven installations -> Add Maven:
 // Name - M3
 // MAVEN_HOME - path to Maven3 home dir
@@ -16,7 +16,7 @@
 //
 // TODO:
 // - refactor getVersion function on native groovy
-// - Stash and unstash for builded artifacts (?)
+// - Stash and unstash for built artifacts (?)
 
 import groovy.json.JsonSlurperClassic
 
@@ -53,6 +53,8 @@ node() {
 		export GIT_BRANCH=${env.BRANCH_NAME}
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
 			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
+		elif [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
+			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
@@ -86,13 +88,13 @@ node() {
 	}
 
 	stage("Update management on test node")
-	// Deploy builded template to remore test-server
+	// Deploy built template to remore test-server
 	notifyBuildDetails = "\nFailed on Stage - Update management on test node"
 
 	// Start Test-Peer Lock
-	if (env.BRANCH_NAME == 'dev') {
+	if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/) {
 		lock('test-node') {
-			// destroy existing management template on test node
+			// destroy existing management template on test node and install latest available snap
 			sh """
 				set +x
 				ssh root@${env.SS_TEST_NODE} <<- EOF
@@ -120,7 +122,7 @@ node() {
 				scp ${artifactDir}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE}:/mnt/lib/lxc/tmpdir
 			"""
 
-			// install genetared management template
+			// install generated management template
 			sh """
 				set +x
 				ssh root@${env.SS_TEST_NODE} <<- EOF
@@ -163,65 +165,67 @@ node() {
 		}
 	}
 
-	stage("Deploy artifacts on kurjun")
-	// Deploy builded and tested artifacts to cdn
-	notifyBuildDetails = "\nFailed on Stage - Deploy artifacts on kurjun"
+	if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev') {
+		stage("Deploy artifacts on kurjun")
+		// Deploy built and tested artifacts to cdn
+		notifyBuildDetails = "\nFailed on Stage - Deploy artifacts on kurjun"
 
-	// cdn auth creadentials 
-	String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
-	String user = "jenkins"
-	def authID = sh (script: """
-		set +x
-		curl -s -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
-		""", returnStdout: true)
-	def token = sh (script: """
-		set +x
-		curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} ${url}/auth/token
-		""", returnStdout: true)
+		// cdn auth creadentials 
+		String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
+		String user = "jenkins"
+		def authID = sh (script: """
+			set +x
+			curl -s -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
+			""", returnStdout: true)
+		def token = sh (script: """
+			set +x
+			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} ${url}/auth/token
+			""", returnStdout: true)
 
-	// upload artifacts on cdn
-	// upload deb
-	String responseDeb = sh (script: """
-		set +x
-		curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/apt/info?name=${debFileName}
-		""", returnStdout: true)
-	sh """
-		set +x
-		curl -s -k -Ffile=@${artifactDir}/${debFileName} -Ftoken=${token} ${url}/apt/upload
-	"""
-	// def signatureDeb = sh (script: "curl -s -k -Ffile=@${artifactDir}/${debFileName} -Ftoken=${token} ${url}/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
-	// sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" ${url}/auth/sign"
-
-	// delete old deb
-	if (responseDeb != "Not found") {
-		def jsonDeb = jsonParse(responseDeb)	
+		// upload artifacts on cdn
+		// upload deb
+		String responseDeb = sh (script: """
+			set +x
+			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/apt/info?name=${debFileName}
+			""", returnStdout: true)
 		sh """
 			set +x
-			curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb["id"]}'&'token=${token}
+			curl -s -k -Ffile=@${artifactDir}/${debFileName} -Ftoken=${token} ${url}/apt/upload
 		"""
-	}
+		// def signatureDeb = sh (script: "curl -s -k -Ffile=@${artifactDir}/${debFileName} -Ftoken=${token} ${url}/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
+		// sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" ${url}/auth/sign"
 
-	// upload template
-	String responseTemplate = sh (script: """
-		set +x
-		curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=${templateFileName}
-		""", returnStdout: true)
-	def signatureTemplate = sh (script: """
-		set +x
-		curl -s -k -Ffile=@${artifactDir}/${templateFileName} -Ftoken=${token} ${url}/template/upload | gpg --clearsign --no-tty
-		""", returnStdout: true)
-	sh """
-		set +x
-		curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" ${url}/auth/sign
-	"""
+		// delete old deb
+		if (responseDeb != "Not found") {
+			def jsonDeb = jsonParse(responseDeb)	
+			sh """
+				set +x
+				curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb["id"]}'&'token=${token}
+			"""
+		}
 
-	// delete old template
-	if (responseTemplate != "Not found") {
-		def jsonTemplate = jsonParse(responseTemplate)
+		// upload template
+		String responseTemplate = sh (script: """
+			set +x
+			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=${templateFileName}
+			""", returnStdout: true)
+		def signatureTemplate = sh (script: """
+			set +x
+			curl -s -k -Ffile=@${artifactDir}/${templateFileName} -Ftoken=${token} ${url}/template/upload | gpg --clearsign --no-tty
+			""", returnStdout: true)
 		sh """
 			set +x
-			curl -s -k -X DELETE ${url}/template/delete?id=${jsonTemplate["id"]}'&'token=${token}
+			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" ${url}/auth/sign
 		"""
+
+		// delete old template
+		if (responseTemplate != "Not found") {
+			def jsonTemplate = jsonParse(responseTemplate)
+			sh """
+				set +x
+				curl -s -k -X DELETE ${url}/template/delete?id=${jsonTemplate["id"]}'&'token=${token}
+			"""
+		}
 	}
 	} catch (e) { 
 		currentBuild.result = "FAILED"
