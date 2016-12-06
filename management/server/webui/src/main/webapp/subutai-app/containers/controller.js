@@ -59,7 +59,25 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		vm.containersType = data;
 	});
 
+
+	function alertForHubContainer( container )
+	{
+        if (container.dataSource == "hub") {
+
+            SweetAlert.swal("Feature coming soon...", "This container is created on Hub. Please use Hub to manage it.", "success");
+
+            return true;
+        }
+
+		return false;
+	}
+
 	function showDomainForm(container) {
+
+        if (alertForHubContainer(container)) {
+            return;
+        }
+
 		LOADING_SCREEN();
 		vm.currentDomainStatus = {};
 		vm.domainContainer = container;
@@ -85,6 +103,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function addTagForm(container) {
+
+        if (alertForHubContainer(container)) {
+            return;
+        }
+
 		vm.tags2Container = container;
 		vm.currentTags = [];
 		for(var i = 0; i < container.tags.length; i++) {
@@ -285,6 +308,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 
 	function changeNamePopup( container ) {
+
+        if (alertForHubContainer(container)) {
+            return;
+        }
 
 		vm.editingContainer = container;
 

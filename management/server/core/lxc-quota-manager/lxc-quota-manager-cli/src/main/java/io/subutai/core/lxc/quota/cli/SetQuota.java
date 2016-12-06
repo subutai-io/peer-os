@@ -58,7 +58,7 @@ public class SetQuota extends SubutaiShellCommandSupport
         ContainerResource containerResource = getContainerResource( type, value );
 
         containerQuota.add( new Quota( containerResource, threshold ) );
-        final ContainerHost container = localPeer.getContainerHostByName( containerName );
+        final ContainerHost container = localPeer.getContainerHostByContainerName( containerName );
         if ( container == null )
         {
             System.out.println( "Container not found by id." );

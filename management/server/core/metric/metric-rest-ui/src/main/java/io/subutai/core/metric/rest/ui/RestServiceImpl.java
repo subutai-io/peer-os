@@ -66,7 +66,7 @@ public class RestServiceImpl implements RestService
             }
             else if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( hostId ) )
             {
-                host = localPeer.getContainerHostByName( hostId );
+                host = localPeer.getContainerHostByHostName( hostId );
             }
             else if ( hostId != null )
             {

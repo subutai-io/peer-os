@@ -593,7 +593,15 @@ public class LocalEnvironment implements Environment, Serializable
 
         for ( EnvironmentPeer environmentPeer : environmentPeers )
         {
-            peers.add( environmentManager.resolvePeer( environmentPeer.getPeerId() ) );
+            try
+            {
+                Peer peer = environmentManager.resolvePeer( environmentPeer.getPeerId() );
+                peers.add( peer );
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( "Error resolving peer {} : {}", environmentPeer.getPeerId(), e.getMessage() );
+            }
         }
 
         return peers;

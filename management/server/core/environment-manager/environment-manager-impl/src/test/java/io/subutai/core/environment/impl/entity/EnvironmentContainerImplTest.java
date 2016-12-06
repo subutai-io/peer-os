@@ -122,7 +122,8 @@ public class EnvironmentContainerImplTest
     {
         environmentContainer.isLocal();
 
-        verify( peer ).isLocal();
+        verify( environmentContainer ).getLocalPeer();
+        verify( environmentContainer ).getPeerId();
     }
 
 

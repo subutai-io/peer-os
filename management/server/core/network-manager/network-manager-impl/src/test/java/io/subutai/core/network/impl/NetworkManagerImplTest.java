@@ -109,8 +109,8 @@ public class NetworkManagerImplTest
         networkManager.commands = commands;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getManagementHost() ).thenReturn( managementHost );
-        when( localPeer.getContainerHostByName( anyString() ) ).thenReturn( containerHost );
-        when( localPeer.getResourceHostByContainerName( anyString() ) ).thenReturn( resourceHost );
+        when( localPeer.getContainerHostByHostName( anyString() ) ).thenReturn( containerHost );
+        when( localPeer.getResourceHostByContainerHostName( anyString() ) ).thenReturn( resourceHost );
         when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( containerHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );

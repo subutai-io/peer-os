@@ -22,6 +22,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This is a cache with entries having time-to-live setting. After the specified interval entry gets evicted (expires).
  * It is possible to add expiry callback to an entry to handle the expiration event
+ *
+ * TODO review possibility to use simple map and synchronize on it to avoid concurrent issues
+ * OR properly synchronize eviction with get(update timestamp)
  */
 public class ExpiringCache<K, V>
 {

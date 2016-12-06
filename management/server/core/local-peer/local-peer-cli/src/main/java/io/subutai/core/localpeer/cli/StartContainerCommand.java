@@ -13,8 +13,8 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 public class StartContainerCommand extends SubutaiShellCommandSupport
 {
 
-    @Argument( index = 0, name = "hostname", multiValued = false, description = "Container name", required = true )
-    private String hostname;
+    @Argument( index = 0, name = "container name", multiValued = false, description = "Container name", required = true )
+    private String containerName;
 
     private final LocalPeer localPeer;
 
@@ -29,7 +29,7 @@ public class StartContainerCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        ContainerHost host = localPeer.getContainerHostByName( hostname );
+        ContainerHost host = localPeer.getContainerHostByContainerName( containerName );
 
         localPeer.startContainer( host.getContainerId() );
 

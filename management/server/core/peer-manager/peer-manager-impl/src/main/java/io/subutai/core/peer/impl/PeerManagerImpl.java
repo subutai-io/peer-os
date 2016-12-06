@@ -1043,7 +1043,7 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( !forceAction )
             {
-                throw new PeerException( "Could not unregister peer. Peer in use." );
+                throw new PeerException( "Could not unregister peer: " + e.getMessage() );
             }
             else
             {

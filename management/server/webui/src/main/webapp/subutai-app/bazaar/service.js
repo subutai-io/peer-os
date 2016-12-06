@@ -1,138 +1,157 @@
 'use strict';
 
-angular.module('subutai.bazaar.service',[])
-	.factory('BazaarSrv', BazaarSrv);
+angular.module('subutai.bazaar.service', [])
+    .factory('BazaarSrv', BazaarSrv);
 
 BazaarSrv.$inject = ['$http'];
 
 function BazaarSrv($http) {
 
-	var BAZAAR_URL = SERVER_URL + "rest/v1/bazaar/";
-	var PLUGIN_URL = SERVER_URL + "rest/v1/plugin-integrator/"
-	var PLUGINS_URL = SERVER_URL + 'js/plugins.json';
+    var BAZAAR_URL = SERVER_URL + "rest/v1/bazaar/";
+    var PLUGIN_URL = SERVER_URL + "rest/v1/plugin-integrator/"
+    var PLUGINS_URL = SERVER_URL + 'js/plugins.json';
 
-	var BazaarSrv = {
-		uploadPlugin: uploadPlugin,
-		getInstalledPlugins: getInstalledPlugins,
-		deletePlugin: deletePlugin,
-		editPermissions: editPermissions,
-		getPermissions: getPermissions,
-		getHubPlugins: getHubPlugins,
-		installHubPlugin: installHubPlugin,
-		getInstalledHubPlugins: getInstalledHubPlugins,
-		uninstallHubPlugin: uninstallHubPlugin,
-		restoreHubPlugin: restoreHubPlugin,
-		registerPeer: registerPeer,
-		checkRegistration: checkRegistration,
-		getRefOldPlugins: getRefOldPlugins
-		//uninstallHubPluginWOButton: uninstallHubPluginWOButton
-	};
+    var BazaarSrv = {
+        uploadPlugin: uploadPlugin,
+        getInstalledPlugins: getInstalledPlugins,
+        deletePlugin: deletePlugin,
+        editPermissions: editPermissions,
+        getPluginInfo: getPluginInfo,
+        getHubPlugins: getHubPlugins,
+        installHubPlugin: installHubPlugin,
+        getInstalledHubPlugins: getInstalledHubPlugins,
+        uninstallHubPlugin: uninstallHubPlugin,
+        restoreHubPlugin: restoreHubPlugin,
+        registerPeer: registerPeer,
+        checkRegistration: checkRegistration,
+        getRefOldPlugins: getRefOldPlugins,
+        updatePlugin: updatePlugin
+        //uninstallHubPluginWOButton: uninstallHubPluginWOButton
+    };
 
-	return BazaarSrv;
+    return BazaarSrv;
 
-	function uploadPlugin (pluginName, pluginVersion, kar, permissions) {
-		var fd = new FormData();
-		fd.append('name', pluginName);
-		fd.append('version', pluginVersion);
-		fd.append('kar', kar);
-		fd.append('permission', permissions);
-		return $http.post(
-			PLUGIN_URL + 'upload',
-			fd,
-			{transformRequest: angular.identity, headers: {'Content-Type': undefined}}
-		);
-	}
+    function uploadPlugin(pluginName, pluginVersion, kar, permissions) {
+        var fd = new FormData();
+        fd.append('name', pluginName);
+        fd.append('version', pluginVersion);
+        fd.append('kar', kar);
+        fd.append('permission', permissions);
+        return $http.post(
+            PLUGIN_URL + 'upload',
+            fd,
+            {transformRequest: angular.identity, headers: {'Content-Type': undefined}}
+        );
+    }
 
-	function deletePlugin (plugin) {
-		return $http.delete (PLUGIN_URL + "plugins/" + plugin);
-	}
+    function deletePlugin(plugin) {
+        return $http.delete(PLUGIN_URL + "plugins/" + plugin);
+    }
 
-	function getInstalledPlugins() {
-		return $http.get (PLUGIN_URL + "plugins/registered");
-	}
+    function getInstalledPlugins() {
+        return $http.get(PLUGIN_URL + "plugins/registered");
+    }
 
-	function editPermissions (postData) {
-		return $http.post(
-			PLUGIN_URL + "plugins/permission",
-			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
+    function editPermissions(postData) {
+        return $http.post(
+            PLUGIN_URL + "plugins/permission",
+            postData,
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
+    }
 
-	function getPermissions (pluginId) {
-		return $http.get (PLUGIN_URL + "plugins/registered/" + pluginId);
-	}
-
-
-
-	function getHubPlugins() {
-		return $http.get (BAZAAR_URL + "products", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
-
-
-	function installHubPlugin (plugin) {
-		var kar = "";
-		var postData = "name=" + plugin.name + "&version=" + plugin.version + "&kar=" + plugin.metadata[0] + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
-		console.log (postData);
-		return $http.post(
-			BAZAAR_URL + "install",
-			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
+    function updatePlugin(id, name, version) {
+        var postData = "pluginId=" + id + "&name=" + name + "&version=" + version;
+        return $http.post(
+            PLUGIN_URL + "plugins/update",
+            postData,
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
+    }
 
 
-	function uninstallHubPlugin (plugin) {
-		var kar = "";
-		// TODO: change to filename
-		var postData = "id=" + plugin.hubId + "&name=" + plugin.name;
-		return $http.post(
-			BAZAAR_URL + "uninstall",
-			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
-
-	function restoreHubPlugin (plugin) {
-		var kar = "";
-		// TODO: refactor
-		var postData = "id=" + plugin.hubId + "&name=" + plugin.name + "&version=" + plugin.version + "&kar=" + plugin.metadata[0] + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
-		return $http.post(
-			BAZAAR_URL + "restore",
-			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
+    function getPluginInfo(pluginId) {
+        return $http.get(PLUGIN_URL + "plugins/registered/" + pluginId);
+    }
 
 
-	function getInstalledHubPlugins() {
-		return $http.get (BAZAAR_URL + "installed", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
+    function getHubPlugins() {
+        return $http.get(BAZAAR_URL + "products", {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/json'}
+        });
+    }
 
-	function registerPeer() {
-		return $http.post(
-    		BAZAAR_URL + "register",
-    		{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    	);
-	}
 
-	function checkRegistration() {
-		return $http.get (SERVER_URL + "rest/v1/hub/registration_state", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
+    function installHubPlugin(plugin) {
+        var kar = "";
+        var postData = "name=" + plugin.name + "&version=" + plugin.version + "&kar=" + plugin.metadata[0] + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
+        console.log(postData);
+        return $http.post(
+            BAZAAR_URL + "install",
+            postData,
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
+    }
 
-	function getRefOldPlugins() {
-		return $http.get(PLUGINS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
 
-/*	function uninstallHubPluginWOButton (plugin) {
-		console.log (plugin);
-		var postData = "id=" + plugin.hubId + "&kar=" + plugin.name.toLowerCase() + "&name=" + plugin.name.toLowerCase();
-		console.log (postData);
-		return $http.post(
-			BAZAAR_URL + "uninstall",
-			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}*/
+    function uninstallHubPlugin(plugin) {
+        var kar = "";
+        // TODO: change to filename
+        var postData = "id=" + plugin.hubId + "&name=" + plugin.name;
+        return $http.post(
+            BAZAAR_URL + "uninstall",
+            postData,
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
+    }
+
+    function restoreHubPlugin(plugin) {
+        var kar = "";
+        // TODO: refactor
+        var postData = "id=" + plugin.hubId + "&name=" + plugin.name + "&version=" + plugin.version + "&kar=" + plugin.metadata[0] + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
+        return $http.post(
+            BAZAAR_URL + "restore",
+            postData,
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
+    }
+
+
+    function getInstalledHubPlugins() {
+        return $http.get(BAZAAR_URL + "installed", {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/json'}
+        });
+    }
+
+    function registerPeer() {
+        return $http.post(
+            BAZAAR_URL + "register",
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
+    }
+
+    function checkRegistration() {
+        return $http.get(SERVER_URL + "rest/v1/hub/registration_state", {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/json'}
+        });
+    }
+
+    function getRefOldPlugins() {
+        return $http.get(PLUGINS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+    }
+
+    /*	function uninstallHubPluginWOButton (plugin) {
+     console.log (plugin);
+     var postData = "id=" + plugin.hubId + "&kar=" + plugin.name.toLowerCase() + "&name=" + plugin.name.toLowerCase();
+     console.log (postData);
+     return $http.post(
+     BAZAAR_URL + "uninstall",
+     postData,
+     {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+     );
+     }*/
 }
 

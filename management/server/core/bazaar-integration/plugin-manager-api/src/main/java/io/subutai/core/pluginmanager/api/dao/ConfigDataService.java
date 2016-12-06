@@ -15,4 +15,6 @@ public interface ConfigDataService
     public void deleteDetails( Long pluginId );
 
     public PluginDetails getPluginDetails( Long pluginId );
+
+    void update( String pluginId, String name, String version );
 }

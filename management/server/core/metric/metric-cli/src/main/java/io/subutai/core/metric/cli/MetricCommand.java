@@ -48,7 +48,7 @@ public class MetricCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Host host = localPeer.bindHost( hostId );
+        Host host = localPeer.findHost( hostId );
 
         //calculate start date (current date - given # of hours)
         Calendar calendar = Calendar.getInstance();

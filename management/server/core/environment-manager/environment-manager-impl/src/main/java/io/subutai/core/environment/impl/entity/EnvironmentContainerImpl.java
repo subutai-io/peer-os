@@ -216,7 +216,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public boolean isLocal()
     {
-        return getPeer().isLocal();
+        return getPeerId().equals( getLocalPeer().getId() );
     }
 
 
@@ -628,7 +628,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     {
         if ( containerId == null )
         {
-            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId(),
+                    getContainerName() );
         }
         return containerId;
     }
