@@ -96,9 +96,9 @@ public class HubLoggerProcessor implements Runnable
         final Set<SubutaiSystemLog> result = new HashSet<>();
         for ( SubutaiErrorEvent e : subutaiErrorEvents )
         {
-            result.add(
-                    new SubutaiSystemLog( "PEER", SubutaiSystemLog.LogType.ERROR, e.getTimeStamp(), e.getLoggerName(),
-                            e.getRenderedMessage(), e.getStackTrace() ) );
+            result.add( new SubutaiSystemLog( SubutaiSystemLog.LogSource.PEER, configManager.getPeerId(),
+                    SubutaiSystemLog.LogType.ERROR, e.getTimeStamp(), e.getLoggerName(), e.getRenderedMessage(),
+                    e.getStackTrace() ) );
         }
         return result;
     }
