@@ -1024,7 +1024,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 bodyClass: 'b-body',
                 layout: 'fullpage'
             }
-        });
+        })
+        .state();
 
     $stateProviderRef = $stateProvider;
 
