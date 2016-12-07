@@ -17,7 +17,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	$timeout(function () {
 		vm.hasPGPplugin = hasPGPplugin();
 		if (!vm.hasPGPplugin) {
-			var pluginUrl = 'https://github.com/subutai-io/browsers/releases/tag/2.0.0';
+			var pluginUrl = 'https://github.com/subutai-io/browsers/releases/tag/2.0.12';
 			var isFirefox = typeof InstallTrigger !== 'undefined';
 			var isChrome = !!window.chrome && !!window.chrome.webstore;
 
@@ -70,42 +70,56 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 
 	identitySrv.isAdminCheck().success(function (data) {
 		if (data == true || data == 'true') {
-			identitySrv.getConfig().success(function (data) {
-				if (data.isUpdatesAvailable) {
-					$rootScope.notifications = {
-						"message": "Updates available",
-						"updateMessage": true,
-						"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-						"links": [
-						{
-							"text": "Update",
-							"href": "/#/settings-updates"
-						}
-						]
-					};
-				} else {
-					var notifications = sessionStorage.getItem('notifications');
-					if (
-							notifications !== null &&
-							notifications !== undefined &&
-							notifications !== 'null' &&
-							notifications.length > 0
-					) {
-						notifications = JSON.parse(notifications);
-						for (var i = 0; i < notifications.length; i++) {
-							if (notifications[i].updateMessage !== undefined && notifications[i].updateMessage) {
-								notifications.splice(i, 1);
-								sessionStorage.setItem('notifications', JSON.stringify(notifications));
-								$rootScope.notifications = {};
-								break;
-							}
-						}
-					}
-				}
+			identitySrv.isUpdateInProgress().success(function (data){
+				console.log("Update in progress: " + data);
+				 if (data == true || data == 'true') {
+					removeUpdateMessage();
+				 }else{
+					checkUpdate();
+				 }
 			});
 		}
 	});
 
+	function checkUpdate() {
+		identitySrv.getConfig().success(function (data) {
+			if (data.isUpdatesAvailable) {
+				$rootScope.notifications = {
+					"message": "Updates available",
+					"updateMessage": true,
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+					"links": [
+					{
+						"text": "Update",
+						"href": "/#/settings-updates"
+					}
+					]
+				};
+			} else {
+				removeUpdateMessage();
+			}
+		});
+	}
+
+	function removeUpdateMessage() {
+		var notifications = sessionStorage.getItem('notifications');
+		if (
+			notifications !== null &&
+			notifications !== undefined &&
+			notifications !== 'null' &&
+			notifications.length > 0
+		) {
+			notifications = JSON.parse(notifications);
+			for (var i = 0; i < notifications.length; i++) {
+				if (notifications[i].updateMessage !== undefined && notifications[i].updateMessage) {
+					notifications.splice(i, 1);
+					sessionStorage.setItem('notifications', JSON.stringify(notifications));
+					$rootScope.notifications = {};
+					break;
+				}
+			}
+		}
+	}
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
