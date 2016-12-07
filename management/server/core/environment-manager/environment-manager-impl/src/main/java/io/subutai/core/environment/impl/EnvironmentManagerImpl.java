@@ -143,6 +143,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private EnvironmentService environmentService;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected PGPKeyUtil pgpKeyUtil = new PGPKeyUtil();
+    private volatile long lastP2pSecretKeyResetTs = 0L;
 
 
     public EnvironmentManagerImpl( final PeerManager peerManager, SecurityManager securityManager,
@@ -172,7 +173,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //******************************************
 
         backgroundTasksExecutorService = getScheduleExecutor();
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 1, TimeUnit.MINUTES );
 
         executor = getCachedExecutor();
 
@@ -1929,8 +1930,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.debug( "Environment background tasks started..." );
 
+            uploadPeerOwnerEnvironmentsToHub();
 
-            //**************************************************
+            resetP2pKeys();
+
+            LOG.debug( "Environment background tasks finished." );
+        }
+    }
+
+
+    private void resetP2pKeys()
+    {
+        if ( System.currentTimeMillis() - lastP2pSecretKeyResetTs >= TimeUnit.MINUTES.toMillis( 60 ) )
+        {
+            lastP2pSecretKeyResetTs = System.currentTimeMillis();
+
             Subject.doAs( systemUser, new PrivilegedAction<Void>()
             {
                 @Override
@@ -1940,9 +1954,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     return null;
                 }
             } );
-            //**************************************************
-
-            LOG.debug( "Environment background tasks finished." );
         }
     }
 
