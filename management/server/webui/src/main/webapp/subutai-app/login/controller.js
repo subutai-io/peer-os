@@ -5,7 +5,7 @@ angular.module('subutai.login.controller', [])
 	.controller('ChangePassCtrl', ChangePassCtrl)
 	.directive('pwCheck', pwCheck);
 
-LoginCtrl.$inject = ['loginSrv', '$http', '$rootScope'];
+LoginCtrl.$inject = ['$scope', 'loginSrv', '$http', '$rootScope'];
 ChangePassCtrl.$inject = ['$scope', 'loginSrv', 'SweetAlert'];
 
 function ChangePassCtrl( $scope, loginSrv, SweetAlert) {
@@ -41,7 +41,7 @@ function pwCheck() {
 	}
 };
 
-function LoginCtrl( loginSrv, $http, $rootScope )
+function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 {
 	var vm = this;
 
@@ -86,8 +86,9 @@ function LoginCtrl( loginSrv, $http, $rootScope )
 			}).error(function(error, status){
 				vm.errorMessage = error;
 
-				if( status == 412 )
+				if( status == 412 ) {
 					vm.passExpired = true;
+				}
 			});
 		}
 	}
@@ -127,3 +128,4 @@ function LoginCtrl( loginSrv, $http, $rootScope )
 		}
 	}
 }
+
