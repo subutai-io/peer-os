@@ -98,7 +98,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -1365,7 +1364,7 @@ public class EnvironmentManagerImplTest
     {
         environmentManager.onRegistrationSucceeded();
 
-        verify( environmentAdapter ).uploadEnvironments( anySet() );
+        verify( environmentManager ).uploadPeerOwnerEnvironmentsToHub();
     }
 
 

@@ -1847,37 +1847,71 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    //TODO upload all not uploaded peer owner env-s in background job
-    @Override
-    public void onRegistrationSucceeded()
+    //TODO call this method in a job
+    protected void uploadPeerOwnerEnvironmentsToHub()
     {
-        Set<Environment> envs = new HashSet<>();
+        //0. check if peer is registered with Hub and Hub is reachable
+        if ( !environmentAdapter.canWorkWithHub() )
+        {
+            return;
+        }
+
+
+        //1. obtain peer owner
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+
+
+        //2. filter out not peer owner's environments or uploaded environments
+        Set<LocalEnvironment> envs = new HashSet<>();
 
         envs.addAll( environmentService.getAll() );
 
-        //upload only active user's environments (i.e. peer owner's env-s)
-        for ( Iterator<Environment> iterator = envs.iterator(); iterator.hasNext(); )
+        for ( Iterator<LocalEnvironment> iterator = envs.iterator(); iterator.hasNext(); )
         {
-            final Environment environment = iterator.next();
+            final LocalEnvironment environment = iterator.next();
 
-            if ( !Objects.equals( environment.getUserId(), identityManager.getActiveUser().getId() ) )
+            if ( environment.isUploaded() || !Objects.equals( environment.getUserId(), peerOwner.getId() ) )
             {
                 iterator.remove();
             }
         }
 
-        setTransientFields( envs );
-
-        LOG.info( "onRegistrationSucceeded: local environments count = {}", envs.size() );
-
-        try
+        if ( envs.isEmpty() )
         {
-            environmentAdapter.uploadEnvironments( envs );
+            return;
         }
-        catch ( Exception e )
+
+
+        //3. upload them to Hub
+        Set<Environment> environments = Sets.newHashSet();
+
+        environments.addAll( envs );
+
+        setTransientFields( environments );
+
+        for ( LocalEnvironment environment : envs )
         {
-            LOG.error( "Error uploading environments to Hub: {}", e.getMessage() );
+            try
+            {
+                if ( environmentAdapter.uploadPeerOwnerEnvironment( environment ) )
+                {
+                    environment.markAsUploaded();
+
+                    environmentService.merge( environment );
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error uploading environment {} to Hub: {}", environment.getName(), e.getMessage() );
+            }
         }
+    }
+
+
+    @Override
+    public void onRegistrationSucceeded()
+    {
+        uploadPeerOwnerEnvironmentsToHub();
     }
 
 
@@ -1983,7 +2017,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         // add local env-s
         environments.addAll( environmentService.getAll() );
 
-        if ( environmentAdapter.isHubReachable() && environmentAdapter.isRegisteredWithHub() )
+        if ( environmentAdapter.canWorkWithHub() )
         {
             // add hub env-s
             Set<HubEnvironment> hubEnvironments = environmentAdapter.getEnvironments( true );

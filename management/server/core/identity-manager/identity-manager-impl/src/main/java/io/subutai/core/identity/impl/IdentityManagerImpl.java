@@ -232,6 +232,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else
         {
+            //todo do we need this else clause at all?
             User admin = identityDataService.getUserByUsername( ADMIN_USERNAME );
             //***** setPeer Owner By Default ***************
             setPeerOwner( admin );
