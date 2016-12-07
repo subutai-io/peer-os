@@ -19,20 +19,21 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 
 	function checkActiveUpdate(){
 
-        LOADING_SCREEN();
+		LOADING_SCREEN();
 
-	    SettingsUpdatesSrv.isUpdateInProgress().success(function (data){
-          	 if (data == true || data == 'true') {
-	            LOADING_SCREEN("none");
+		SettingsUpdatesSrv.isUpdateInProgress().success(function (data){
+			 if (data == true || data == 'true') {
+				LOADING_SCREEN("none");
 
-          	    vm.updateInProgress = true;
-          	    vm.updateText = 'Update is in progress';
+				vm.updateInProgress = true;
+				vm.updateText = 'Update is in progress';
+				removeUpdateMessage();
 
-                setTimeout(function() {checkActiveUpdate();}, 30000);
-          	 }else{
-          	    getConfig();
-          	 }
-	    });
+				setTimeout(function() {checkActiveUpdate();}, 30000);
+			 }else{
+				getConfig();
+			 }
+		});
 	}
 
 
@@ -45,6 +46,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 				vm.updateText = 'Update is available';
 			} else {
 				vm.updateText = 'Your system is already up-to-date';
+				removeUpdateMessage();
 			}
 		}).error(function(error) {
 			LOADING_SCREEN('none');
@@ -95,24 +97,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 		});
 	}
 
-
-
-	function update() {
-
-		LOADING_SCREEN();
-		vm.updateText = 'Please wait, update is in progress. System will restart automatically';
-
-		SettingsUpdatesSrv.update(vm.config).success(function (data, status) {
-			LOADING_SCREEN('none');
-			sessionStorage.removeItem('notifications');
-			if(status == 200){
-			    SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
-			}
-			checkActiveUpdate();
-		}).error(function (error) {
-			SweetAlert.swal("ERROR!", error, "error");
-		});
-
+	function removeUpdateMessage() {
 		var notifications = sessionStorage.getItem('notifications');
 		if (
 			notifications !== null &&
@@ -130,6 +115,22 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 				}
 			}
 		}
+	}
 
+	function update() {
+		LOADING_SCREEN();
+		vm.updateText = 'Please wait, update is in progress. System will restart automatically';
+		SettingsUpdatesSrv.update(vm.config).success(function (data, status) {
+			LOADING_SCREEN('none');
+			sessionStorage.removeItem('notifications');
+			if(status == 200){
+				SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
+			}
+			checkActiveUpdate();
+		}).error(function (error) {
+			SweetAlert.swal("ERROR!", error, "error");
+		});
+
+		removeUpdateMessage();
 	}
 }
