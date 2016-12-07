@@ -46,6 +46,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
             daoManager.startTransaction( em );
             em.merge( pluginDetails );
             daoManager.commitTransaction( em );
+            LOG.info( String.format( "Plugin: %s ; %s installed from Plugin Manager", name, version ) );
         }
         catch ( Exception e )
         {
@@ -102,6 +103,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
                 em.flush();
                 daoManager.commitTransaction( em );
             }
+            LOG.info( String.format( "Plugin: %s ; %s deleted from Plugin Manager", entity.getName(), entity.getVersion() ) );
         }
         catch ( Exception ex )
         {

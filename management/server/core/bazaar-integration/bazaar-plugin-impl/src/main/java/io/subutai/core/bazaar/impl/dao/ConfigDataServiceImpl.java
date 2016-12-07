@@ -45,6 +45,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
             daoManager.startTransaction( em );
             em.merge( newPlugin );
             daoManager.commitTransaction( em );
+            LOG.info( String.format( "Plugin: %s ; %s installed from Bazaar", name, version ) );
         }
         catch ( Exception e )
         {
@@ -70,6 +71,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
             em.remove( entity );
             em.flush();
             daoManager.commitTransaction( em );
+            LOG.info( String.format( "Plugin: %s ; %s deleted from Bazaar", entity.getName(), entity.getVersion() ) );
         }
         catch ( Exception e )
         {
