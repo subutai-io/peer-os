@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1846,12 +1847,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    //TODO upload all not uploaded peer owner env-s in background job
     @Override
     public void onRegistrationSucceeded()
     {
         Set<Environment> envs = new HashSet<>();
 
         envs.addAll( environmentService.getAll() );
+
+        //upload only active user's environments (i.e. peer owner's env-s)
+        for ( Iterator<Environment> iterator = envs.iterator(); iterator.hasNext(); )
+        {
+            final Environment environment = iterator.next();
+
+            if ( !Objects.equals( environment.getUserId(), identityManager.getActiveUser().getId() ) )
+            {
+                iterator.remove();
+            }
+        }
 
         setTransientFields( envs );
 

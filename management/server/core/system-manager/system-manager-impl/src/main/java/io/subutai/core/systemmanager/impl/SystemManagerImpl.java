@@ -19,6 +19,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -224,9 +225,15 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Update" )
     public boolean updateManagement()
     {
+        if ( isUpdateInProgress )
+        {
+            return false;
+        }
+
+        isUpdateInProgress = true;
+
         try
         {
-            isUpdateInProgress = true;
 
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
@@ -249,19 +256,19 @@ public class SystemManagerImpl implements SystemManager
             {
                 updateDao.remove( updateEntity.getId() );
             }
+
+            return result.hasSucceeded();
         }
         catch ( Exception e )
         {
             LOG.error( "Error updating Management: {}", e.getMessage() );
 
-            return false;
+            throw new ActionFailedException( "Error updating Management: " + e.getMessage() );
         }
         finally
         {
             isUpdateInProgress = false;
         }
-
-        return true;
     }
 
 
