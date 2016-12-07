@@ -17,6 +17,8 @@ public interface HubAdapter
 
     void uploadEnvironment( String json );
 
+    void uploadPeerOwnerEnvironment( String json );
+
     void removeEnvironment( String envId );
 
     void removeSshKey( String envId, String sshKey );
