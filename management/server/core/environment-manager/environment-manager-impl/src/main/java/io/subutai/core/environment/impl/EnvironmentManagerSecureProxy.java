@@ -876,8 +876,15 @@ public class EnvironmentManagerSecureProxy
     }
 
 
+    @Override
+    public String getEnvironmentOwnerNameById( final long userId )
+    {
+        return environmentManager.getEnvironmentOwnerNameById( userId );
+    }
+
+
     /* *************************************************
-         */
+             */
     private String validateInput( String inputStr, boolean removeSpaces )
     {
         return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );

@@ -73,6 +73,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
@@ -1848,7 +1849,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    //TODO call this method in a job
     protected void uploadPeerOwnerEnvironmentsToHub()
     {
         //0. check if peer is registered with Hub and Hub is reachable
@@ -2055,12 +2055,28 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            environment.getContainerDtos(), environment.getClass().getName() );
+                            environment.getContainerDtos(), environment.getClass().getName(),
+                            getEnvironmentOwnerNameById( environment.getUserId() ) );
 
             environmentDtos.add( environmentDto );
         }
 
         return environmentDtos;
+    }
+
+
+    public String getEnvironmentOwnerNameById( long userId )
+    {
+        User user = ServiceLocator.lookup( IdentityManager.class ).getUser( userId );
+
+        if ( user == null )
+        {
+            return "x-peer";
+        }
+        else
+        {
+            return user.getUserName();
+        }
     }
 
 
