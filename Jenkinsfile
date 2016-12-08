@@ -29,16 +29,16 @@ node() {
 
 	def mvnHome = tool 'M3'
 	def workspace = pwd() 
-	def artifactVersion = getVersion("${workspace}@script/management/pom.xml")
 	String artifactDir = "/tmp/jenkins/${env.JOB_NAME}"
-	String debFileName = "management-${env.BRANCH_NAME}.deb"
-	String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 	
 	stage("Build management deb/template")
 	// Use maven to to build deb and template files of management
 	notifyBuildDetails = "\nFailed Step - Build management deb/template"
 
 	checkout scm
+	def artifactVersion = getVersion("management/pom.xml")
+	String debFileName = "management-${env.BRANCH_NAME}.deb"
+	String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 
 	commitId = sh (script: "git rev-parse HEAD", returnStdout: true)
 	String serenityReportDir = "/var/lib/jenkins/www/serenity/${commitId}"
@@ -208,7 +208,7 @@ node() {
 		// upload template
 		String responseTemplate = sh (script: """
 			set +x
-			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=${templateFileName}
+			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=management&version=${env.BRANCH_NAME}
 			""", returnStdout: true)
 		def signatureTemplate = sh (script: """
 			set +x
