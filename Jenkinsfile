@@ -207,9 +207,9 @@ node() {
 
 		// upload template
 		String responseTemplate = sh (script: """
+			set +x
 			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
 			""", returnStdout: true)
-		println responseTemplate
 		def signatureTemplate = sh (script: """
 			set +x
 			curl -s -k -Ffile=@${artifactDir}/${templateFileName} -Ftoken=${token} ${url}/template/upload | gpg --clearsign --no-tty
