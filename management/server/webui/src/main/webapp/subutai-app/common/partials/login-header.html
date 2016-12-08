@@ -103,13 +103,13 @@
 				</g>
 			</svg>
 			<div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
-				<span data-hub-email="{{ currentUserCtrl.userEmail }}">Online</span>
+				<span data-hub-email="{{ currentUserCtrl.userEmail }}">Online</span> <a href="https://hub.subut.ai" target="_blank" ng-if="!currentUserCtrl.isAdmin">Sign Up</a>
 			</div>
 			<span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus && subutaiController.adminMenus">
 				Register Peer
 			</span>
 			<div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus == false && subutaiController.adminMenus == false">
-				Offline <a href="#" onclick='window.open("https://hub.subut.ai");return false;'>Sign Up</a>
+				Offline <a href="https://hub.subut.ai" target="_blank">Sign Up</a>
 			</div>
 		</div>
 		<div class="b-hub-status__dropdown" ng-if="subutaiController.adminMenus">
