@@ -4,9 +4,9 @@ angular.module("subutai.settings-updates.controller", [])
 .controller("SettingsUpdatesCtrl", SettingsUpdatesCtrl);
 
 
-SettingsUpdatesCtrl.$inject = ['$scope', 'SettingsUpdatesSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
+SettingsUpdatesCtrl.$inject = ['$scope', '$rootScope', 'SettingsUpdatesSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
 
-function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile) {
+function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile) {
 	var vm = this;
 	vm.config = {isUpdatesAvailable: "waiting"};
 	vm.getHistory = [];
