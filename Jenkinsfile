@@ -207,7 +207,7 @@ node() {
 
 		// upload template
 		String responseTemplate = sh (script: """
-			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=management&version=${env.BRANCH_NAME}
+			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=management\&version=${env.BRANCH_NAME}
 			""", returnStdout: true)
 		println responseTemplate
 		def signatureTemplate = sh (script: """
