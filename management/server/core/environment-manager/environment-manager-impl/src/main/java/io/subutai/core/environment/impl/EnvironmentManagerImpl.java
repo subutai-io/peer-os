@@ -2065,13 +2065,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public String getEnvironmentOwnerNameById( long userId )
+    public String getEnvironmentOwnerNameById( Long userId )
     {
+        if ( userId == null )
+        {
+            return "remote";
+        }
+        else if ( userId == 0L )
+        {
+            return Common.HUB_ID;
+        }
+
         User user = ServiceLocator.lookup( IdentityManager.class ).getUser( userId );
 
         if ( user == null )
         {
-            return "x-peer";
+            return "unknown";
         }
         else
         {

@@ -541,7 +541,11 @@ public class RestServiceImpl implements RestService
         try
         {
             Environment environment = findEnvironmentByContainerId( containerId );
+
+            Preconditions.checkNotNull( environment, "Environment not found" );
+
             ContainerHost containerHost = environment.getContainerHostById( containerId );
+
             environmentManager.changeContainerHostname( containerHost.getContainerId(), name, false );
         }
         catch ( Exception e )
