@@ -73,6 +73,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
@@ -143,6 +144,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private EnvironmentService environmentService;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected PGPKeyUtil pgpKeyUtil = new PGPKeyUtil();
+    private volatile long lastP2pSecretKeyResetTs = 0L;
 
 
     public EnvironmentManagerImpl( final PeerManager peerManager, SecurityManager securityManager,
@@ -172,7 +174,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //******************************************
 
         backgroundTasksExecutorService = getScheduleExecutor();
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 1, TimeUnit.MINUTES );
 
         executor = getCachedExecutor();
 
@@ -1847,37 +1849,70 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    //TODO upload all not uploaded peer owner env-s in background job
-    @Override
-    public void onRegistrationSucceeded()
+    protected void uploadPeerOwnerEnvironmentsToHub()
     {
-        Set<Environment> envs = new HashSet<>();
+        //0. check if peer is registered with Hub and Hub is reachable
+        if ( !environmentAdapter.canWorkWithHub() )
+        {
+            return;
+        }
+
+
+        //1. obtain peer owner
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+
+
+        //2. filter out not peer owner's environments or uploaded environments
+        Set<LocalEnvironment> envs = new HashSet<>();
 
         envs.addAll( environmentService.getAll() );
 
-        //upload only active user's environments (i.e. peer owner's env-s)
-        for ( Iterator<Environment> iterator = envs.iterator(); iterator.hasNext(); )
+        for ( Iterator<LocalEnvironment> iterator = envs.iterator(); iterator.hasNext(); )
         {
-            final Environment environment = iterator.next();
+            final LocalEnvironment environment = iterator.next();
 
-            if ( !Objects.equals( environment.getUserId(), identityManager.getActiveUser().getId() ) )
+            if ( environment.isUploaded() || !Objects.equals( environment.getUserId(), peerOwner.getId() ) )
             {
                 iterator.remove();
             }
         }
 
-        setTransientFields( envs );
-
-        LOG.info( "onRegistrationSucceeded: local environments count = {}", envs.size() );
-
-        try
+        if ( envs.isEmpty() )
         {
-            environmentAdapter.uploadEnvironments( envs );
+            return;
         }
-        catch ( Exception e )
+
+
+        //3. upload them to Hub
+        Set<Environment> environments = Sets.newHashSet();
+
+        environments.addAll( envs );
+
+        setTransientFields( environments );
+
+        for ( LocalEnvironment environment : envs )
         {
-            LOG.error( "Error uploading environments to Hub: {}", e.getMessage() );
+            try
+            {
+                if ( environmentAdapter.uploadPeerOwnerEnvironment( environment ) )
+                {
+                    environment.markAsUploaded();
+
+                    environmentService.merge( environment );
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error uploading environment {} to Hub: {}", environment.getName(), e.getMessage() );
+            }
         }
+    }
+
+
+    @Override
+    public void onRegistrationSucceeded()
+    {
+        uploadPeerOwnerEnvironmentsToHub();
     }
 
 
@@ -1895,8 +1930,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.debug( "Environment background tasks started..." );
 
+            uploadPeerOwnerEnvironmentsToHub();
 
-            //**************************************************
+            resetP2pKeys();
+
+            LOG.debug( "Environment background tasks finished." );
+        }
+    }
+
+
+    private void resetP2pKeys()
+    {
+        if ( System.currentTimeMillis() - lastP2pSecretKeyResetTs >= TimeUnit.MINUTES.toMillis( 60 ) )
+        {
+            lastP2pSecretKeyResetTs = System.currentTimeMillis();
+
             Subject.doAs( systemUser, new PrivilegedAction<Void>()
             {
                 @Override
@@ -1906,9 +1954,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     return null;
                 }
             } );
-            //**************************************************
-
-            LOG.debug( "Environment background tasks finished." );
         }
     }
 
@@ -1983,7 +2028,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         // add local env-s
         environments.addAll( environmentService.getAll() );
 
-        if ( environmentAdapter.isHubReachable() && environmentAdapter.isRegisteredWithHub() )
+        if ( environmentAdapter.canWorkWithHub() )
         {
             // add hub env-s
             Set<HubEnvironment> hubEnvironments = environmentAdapter.getEnvironments( true );
@@ -2010,12 +2055,28 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            environment.getContainerDtos(), environment.getClass().getName() );
+                            environment.getContainerDtos(), environment.getClass().getName(),
+                            getEnvironmentOwnerNameById( environment.getUserId() ) );
 
             environmentDtos.add( environmentDto );
         }
 
         return environmentDtos;
+    }
+
+
+    public String getEnvironmentOwnerNameById( long userId )
+    {
+        User user = ServiceLocator.lookup( IdentityManager.class ).getUser( userId );
+
+        if ( user == null )
+        {
+            return "x-peer";
+        }
+        else
+        {
+            return user.getUserName();
+        }
     }
 
 
