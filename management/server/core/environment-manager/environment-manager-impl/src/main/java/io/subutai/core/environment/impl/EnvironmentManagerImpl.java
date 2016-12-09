@@ -2056,7 +2056,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             environment.getContainerDtos(), environment.getClass().getName(),
-                            getEnvironmentOwnerNameById( environment.getUserId() ) );
+                            getEnvironmentOwnerName( environment ) );
 
             environmentDtos.add( environmentDto );
         }
@@ -2065,13 +2065,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public String getEnvironmentOwnerNameById( long userId )
+    public String getEnvironmentOwnerName( Environment environment )
     {
-        User user = ServiceLocator.lookup( IdentityManager.class ).getUser( userId );
+        if ( environment instanceof RemoteEnvironment )
+        {
+            if ( Objects.equals( ( ( RemoteEnvironment ) environment ).getInitiatorPeerId(), Common.HUB_ID ) )
+            {
+                return Common.HUB_ID;
+            }
+            else
+            {
+                return "remote";
+            }
+        }
+        else if ( environment instanceof HubEnvironment )
+        {
+            return Common.HUB_ID;
+        }
+
+        User user = ServiceLocator.lookup( IdentityManager.class ).getUser( environment.getUserId() );
 
         if ( user == null )
         {
-            return "x-peer";
+            return "unknown";
         }
         else
         {
