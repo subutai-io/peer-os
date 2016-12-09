@@ -877,7 +877,7 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    public String getEnvironmentOwnerNameById( final long userId )
+    public String getEnvironmentOwnerNameById( final Long userId )
     {
         return environmentManager.getEnvironmentOwnerNameById( userId );
     }
