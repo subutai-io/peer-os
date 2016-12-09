@@ -33,7 +33,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 public interface EnvironmentManager
 {
 
-    String getEnvironmentOwnerNameById( Long userId );
+    String getEnvironmentOwnerName( Environment environment );
 
     /**
      * Returns a set of DTO objects of all local environments
