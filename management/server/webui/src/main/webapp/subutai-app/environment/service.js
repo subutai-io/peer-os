@@ -93,6 +93,7 @@ function environmentService($http, $q) {
 		getInstalledPlugins: getInstalledPlugins,
 
 		getOrphanContainers: getOrphanContainers,
+		deleteOrphanContainers: deleteOrphanContainers,
 
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; },
 		getTenantsUrl : function getTenantsUrl() { return TENANTS_URL; }
