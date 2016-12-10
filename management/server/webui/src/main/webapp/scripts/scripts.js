@@ -54,7 +54,7 @@ $('body').on('click', '.js-notification', function() {
 		currentDropDown.stop().slideDown(200);
 		currentDropDown.addClass('b-hub-status__dropdown_open');
 	}
-	return false;
+	/*return false;*/
 });
 
 $(document).on('click', function(event) {
