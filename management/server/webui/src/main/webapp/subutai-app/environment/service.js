@@ -9,6 +9,7 @@ environmentService.$inject = ['$http', '$q'];
 function environmentService($http, $q) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
+	var ORPHAN_URL = SERVER_URL + 'rest/ui/local/containers/notregistered';
 
 	var ENVIRONMENT_START_BUILD = ENVIRONMENTS_URL + 'build/';
 	var ENVIRONMENT_ADVANCED_BUILD = ENVIRONMENTS_URL + 'build/advanced';
@@ -90,6 +91,9 @@ function environmentService($http, $q) {
 		revoke: revoke,
 
 		getInstalledPlugins: getInstalledPlugins,
+
+		getOrphanContainers: getOrphanContainers,
+		deleteOrphanContainers: deleteOrphanContainers,
 
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; },
 		getTenantsUrl : function getTenantsUrl() { return TENANTS_URL; }
@@ -354,5 +358,13 @@ function environmentService($http, $q) {
 
 	function getInstalledPlugins() {
 		return $http.get(SERVER_URL + 'js/plugins.json', {headers: {'Content-Type': 'application/json'}});
+	}
+
+	function getOrphanContainers() {
+		return $http.get(ORPHAN_URL, {headers: {'Content-Type': 'application/json'}});
+	}
+
+	function deleteOrphanContainers(containerId) {
+		return $http.delete(ORPHAN_URL + '/' + containerId);		
 	}
 }
