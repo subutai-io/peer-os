@@ -157,6 +157,10 @@ public class LocalEnvironment implements Environment, Serializable
     @JsonIgnore
     protected EnvironmentId envId;
 
+    @Column
+    @JsonIgnore
+    private boolean uploaded = false;
+
 
     protected LocalEnvironment()
     {
@@ -178,6 +182,18 @@ public class LocalEnvironment implements Environment, Serializable
         this.status = EnvironmentStatus.EMPTY;
         this.userId = userId;
         this.peerId = peerId;
+    }
+
+
+    public boolean isUploaded()
+    {
+        return uploaded;
+    }
+
+
+    public void markAsUploaded()
+    {
+        uploaded = true;
     }
 
 

@@ -33,6 +33,8 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 public interface EnvironmentManager
 {
 
+    String getEnvironmentOwnerName( Environment environment );
+
     /**
      * Returns a set of DTO objects of all local environments
      * Used by users with Tenant-Management role

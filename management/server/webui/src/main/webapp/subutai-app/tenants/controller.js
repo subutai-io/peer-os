@@ -22,6 +22,7 @@ function TenantsViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTO
 
 	vm.dtColumns = [
 		DTColumnBuilder.newColumn('name').withTitle('Name'),
+		DTColumnBuilder.newColumn('username').withTitle('User'),
 		DTColumnBuilder.newColumn('id').withTitle('ID'),
 		DTColumnBuilder.newColumn('dataSource').withTitle('Source').renderWith(parseSource),
 		DTColumnBuilder.newColumn('status').withTitle('Status').renderWith(actionStatus),
