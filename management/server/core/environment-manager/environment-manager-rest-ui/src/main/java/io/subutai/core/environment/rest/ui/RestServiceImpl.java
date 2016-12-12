@@ -4,6 +4,7 @@ package io.subutai.core.environment.rest.ui;
 import java.io.File;
 import java.security.AccessControlException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -927,7 +928,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Set<PeerTemplatesDownloadProgress> set =
+            List<PeerTemplatesDownloadProgress> result =
                     environmentManager.loadEnvironment( environmentId ).getPeers().stream().map( p ->
                     {
                         try
@@ -938,14 +939,15 @@ public class RestServiceImpl implements RestService
                         {
                             return new PeerTemplatesDownloadProgress( "NONE" );
                         }
-                    } ).collect( Collectors.toSet() );
+                    } ).sorted( Comparator.comparing( PeerTemplatesDownloadProgress::getPeerId ) )
+                                      .collect( Collectors.toList() );
 
-            if ( set.stream().filter( s -> !s.getTemplatesDownloadProgresses().isEmpty() ).count() == 0 )
+            if ( result.stream().filter( s -> !s.getTemplatesDownloadProgresses().isEmpty() ).count() == 0 )
             {
                 return Response.ok().build();
             }
 
-            return Response.ok( JsonUtil.toJson( set ) ).build();
+            return Response.ok( JsonUtil.toJson( result ) ).build();
         }
 
         catch ( Exception e )
