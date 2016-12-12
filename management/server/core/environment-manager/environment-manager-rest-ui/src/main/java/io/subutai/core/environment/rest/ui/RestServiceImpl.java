@@ -490,31 +490,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    //    @Override
-    //    public Response isContainerDomain( final String environmentId, final String containerId )
-    //    {
-    //        try
-    //        {
-    //            if ( environmentManager.getEnvironmentDomain( environmentId ) == null )
-    //            {
-    //                return Response.serverError()
-    //                               .entity( JsonUtil.toJson( "You must first register domain for environment" ) )
-    // .build();
-    //            }
-    //
-    //
-    //            return Response.ok( JsonUtil
-    //                    .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
-    //                           .build();
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) )
-    // .build();
-    //        }
-    //    }
-
-
     @Override
     public Response getContainerDomainNPort( final String environmentId, final String containerId )
     {
