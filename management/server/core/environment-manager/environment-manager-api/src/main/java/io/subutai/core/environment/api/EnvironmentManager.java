@@ -203,7 +203,10 @@ public interface EnvironmentManager
             throws EnvironmentManagerException, EnvironmentNotFoundException;
 
 
-    void addContainerToEnvironmentDomain( String containerHostId, String environmentId )
+    void addContainerToEnvironmentDomain( String containerHostId, String environmentId, int port )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+    void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     /**
@@ -218,8 +221,6 @@ public interface EnvironmentManager
     SshTunnel setupSshTunnelForContainer( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
-    void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void notifyOnContainerDestroyed( Environment environment, String containerId );
 

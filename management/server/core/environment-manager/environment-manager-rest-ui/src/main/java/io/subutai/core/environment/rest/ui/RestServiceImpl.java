@@ -490,8 +490,33 @@ public class RestServiceImpl implements RestService
     }
 
 
+    //    @Override
+    //    public Response isContainerDomain( final String environmentId, final String containerId )
+    //    {
+    //        try
+    //        {
+    //            if ( environmentManager.getEnvironmentDomain( environmentId ) == null )
+    //            {
+    //                return Response.serverError()
+    //                               .entity( JsonUtil.toJson( "You must first register domain for environment" ) )
+    // .build();
+    //            }
+    //
+    //
+    //            return Response.ok( JsonUtil
+    //                    .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
+    //                           .build();
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) )
+    // .build();
+    //        }
+    //    }
+
+
     @Override
-    public Response isContainerDomain( final String environmentId, final String containerId )
+    public Response getContainerDomainNPort( final String environmentId, final String containerId )
     {
         try
         {
@@ -501,10 +526,18 @@ public class RestServiceImpl implements RestService
                                .entity( JsonUtil.toJson( "You must first register domain for environment" ) ).build();
             }
 
+            Map<String, String> result = new HashMap<>();
 
-            return Response.ok( JsonUtil
-                    .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
-                           .build();
+            Environment environment = environmentManager.loadEnvironment( environmentId );
+
+            EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
+
+            result.put( "status",
+                    String.valueOf( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) );
+
+            result.put( "port", String.valueOf( containerHost.getDomainPort() ) );
+
+            return Response.ok( JsonUtil.toJson( result ) ).build();
         }
         catch ( Exception e )
         {
@@ -514,7 +547,8 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setContainerDomain( final String environmentId, final String containerId, final Boolean state )
+    public Response setContainerDomainNPort( final String environmentId, final String containerId, final Boolean state,
+                                             final int port )
     {
         try
         {
@@ -524,7 +558,7 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId );
+                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId, port );
             }
         }
         catch ( Exception e )

@@ -1263,11 +1263,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+            EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
             return peerManager.getLocalPeer().isIpInVniDomain(
-                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
-                    environment.getVni() );
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":" + containerHost
+                            .getDomainPort(), environment.getVni() );
         }
         catch ( PeerException e )
         {
@@ -1279,10 +1279,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @Override
-    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
+    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId, int port )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        toggleContainerDomain( containerHostId, environmentId, true );
+        toggleContainerDomain( containerHostId, environmentId, port, true );
     }
 
 
@@ -1291,11 +1291,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
 
-        toggleContainerDomain( containerHostId, environmentId, false );
+        toggleContainerDomain( containerHostId, environmentId, -1, false );
     }
 
 
-    public void toggleContainerDomain( final String containerHostId, final String environmentId, final boolean add )
+    public void toggleContainerDomain( final String containerHostId, final String environmentId, int port,
+                                       final boolean add )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
@@ -1303,7 +1304,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
-        ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+        EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHostId ) );
@@ -1321,15 +1322,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             if ( add )
             {
                 peerManager.getLocalPeer().addIpToVniDomain(
-                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":" + port,
                         environment.getVni() );
+
+                ( ( EnvironmentContainerImpl ) containerHost ).setDomainPort( port );
             }
             else
             {
                 peerManager.getLocalPeer().removeIpFromVniDomain(
-                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
-                        environment.getVni() );
+                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":"
+                                + containerHost.getDomainPort(), environment.getVni() );
+
+                ( ( EnvironmentContainerImpl ) containerHost ).setDomainPort( null );
             }
+
+            update( ( EnvironmentContainerImpl ) containerHost );
 
             operationTracker.addLogDone(
                     String.format( "Container is %s environment domain", add ? "included in" : "excluded from" ) );

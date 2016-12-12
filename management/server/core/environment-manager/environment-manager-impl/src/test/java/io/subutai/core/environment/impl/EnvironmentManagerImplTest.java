@@ -117,6 +117,7 @@ import static org.mockito.Mockito.verify;
 public class EnvironmentManagerImplTest
 {
 
+    private static final int PORT = 80;
     EnvironmentManagerImpl environmentManager;
 
     @Mock
@@ -994,9 +995,9 @@ public class EnvironmentManagerImplTest
     @Test
     public void testAddContainerToEnvironmentDomain() throws Exception
     {
-        environmentManager.addContainerToEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
+        environmentManager.addContainerToEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT );
 
-        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, true );
+        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
     }
 
 
@@ -1005,26 +1006,27 @@ public class EnvironmentManagerImplTest
     {
         environmentManager.removeContainerFromEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
 
-        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
     }
 
 
     @Test
     public void testToggleContainerDomain() throws Exception
     {
-        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, true );
+        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
 
-        verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
-        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
-        verify( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
-        doThrow( new PeerException() ).when( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        doThrow( new PeerException() ).when( localPeer )
+                                      .removeIpFromVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
         try
         {
-            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
             fail( "Expected EnvironmentModificationException" );
         }
@@ -1036,7 +1038,7 @@ public class EnvironmentManagerImplTest
 
         try
         {
-            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
             fail( "Expected EnvironmentModificationException" );
         }

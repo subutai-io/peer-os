@@ -64,8 +64,8 @@ function environmentService($http, $q) {
 		getContainerStatus : getContainerStatus,
 		destroyContainer : destroyContainer,
 		switchContainer : switchContainer,
-		getContainerDomain : getContainerDomain,
-		checkDomain : checkDomain,
+		getContainerDomainNPort : getContainerDomainNPort,
+		setContainerDomainNPort : setContainerDomainNPort,
 		setContainerName : setContainerName,
 
 
@@ -235,16 +235,17 @@ function environmentService($http, $q) {
 		);
 	}
 
-	function getContainerDomain(container) {
-		return $http.get(
-			ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain',
-			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
-		);
+
+	function setContainerDomainNPort(container, state, port) {
+		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domainnport' +
+			'?state=' + state + '&port=' + port);
 	}
 
-	function checkDomain(container, state) {
-		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain' +
-			'?state=' + state);
+	function getContainerDomainNPort(container, state) {
+		return $http.get(
+			ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domainnport',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
 	}
 
 
