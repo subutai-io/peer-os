@@ -141,6 +141,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @JsonProperty( "size" )
     private ContainerSize containerSize;
 
+    @Column
+    private Integer domainPort = 80;
+
     @Transient
     @JsonIgnore
     protected transient EnvironmentManagerImpl environmentManager;
@@ -186,6 +189,25 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         this.containerSize = containerSize;
         this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
+    }
+
+
+    @Override
+    public Integer getDomainPort()
+    {
+        //workaround for existing environments
+        if ( domainPort == null )
+        {
+            return 80;
+        }
+
+        return domainPort;
+    }
+
+
+    public void setDomainPort( final Integer domainPort )
+    {
+        this.domainPort = domainPort;
     }
 
 
