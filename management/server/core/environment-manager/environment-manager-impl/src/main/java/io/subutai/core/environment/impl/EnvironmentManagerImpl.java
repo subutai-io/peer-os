@@ -73,6 +73,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
@@ -1282,6 +1283,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId, int port )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
+        Preconditions.checkArgument( NumUtil.isIntBetween( port, Common.MIN_PORT, Common.MAX_PORT ) );
         toggleContainerDomain( containerHostId, environmentId, port, true );
     }
 
