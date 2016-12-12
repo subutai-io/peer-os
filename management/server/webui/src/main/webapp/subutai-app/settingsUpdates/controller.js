@@ -33,7 +33,9 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 			 }else{
 				getConfig();
 			 }
-		});
+		}).error(function (error) {
+            setTimeout(function() {checkActiveUpdate();}, 30000);
+        });
 	}
 
 
@@ -128,7 +130,7 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 			}
 			checkActiveUpdate();
 		}).error(function (error) {
-			SweetAlert.swal("ERROR!", error, "error");
+			setTimeout(function() {checkActiveUpdate();}, 30000);
 		});
 
 		removeUpdateMessage();
