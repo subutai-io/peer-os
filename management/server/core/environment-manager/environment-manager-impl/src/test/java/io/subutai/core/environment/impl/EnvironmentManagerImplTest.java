@@ -223,6 +223,7 @@ public class EnvironmentManagerImplTest
 
         doReturn( Sets.newHashSet( environment ) ).when( environmentService ).getAll();
         doReturn( environment ).when( environmentService ).find( TestHelper.ENV_ID );
+        doReturn( environmentContainer ).when( environmentService ).mergeContainer( environmentContainer );
         doReturn( Sets.newHashSet( environmentPeer ) ).when( environment ).getEnvironmentPeers();
         doReturn( TestHelper.PEER_ID ).when( environmentPeer ).getPeerId();
         doReturn( Lists.newArrayList( environmentContainer ) ).when( localPeer )
@@ -981,9 +982,11 @@ public class EnvironmentManagerImplTest
     public void testIsContainerInEnvironmentDomain() throws Exception
     {
 
+        doReturn( PORT ).when( environmentContainer ).getDomainPort();
+
         environmentManager.isContainerInEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
 
-        verify( localPeer ).isIpInVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).isIpInVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
         doThrow( new ContainerHostNotFoundException( "" ) ).when( environment )
                                                            .getContainerHostById( TestHelper.CONTAINER_ID );
@@ -1016,6 +1019,8 @@ public class EnvironmentManagerImplTest
         environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
 
         verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
+
+        doReturn( PORT ).when( environmentContainer ).getDomainPort();
 
         environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
