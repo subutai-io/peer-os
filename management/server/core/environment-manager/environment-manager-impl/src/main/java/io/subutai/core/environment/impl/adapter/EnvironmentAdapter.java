@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.adapter;
 
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.RhP2pIp;
@@ -59,22 +57,6 @@ public class EnvironmentAdapter
     }
 
 
-    public boolean isHubReachable()
-    {
-        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
-
-        return hubManager != null && hubManager.isHubReachable();
-    }
-
-
-    public boolean isRegisteredWithHub()
-    {
-        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
-
-        return hubManager != null && hubManager.isRegistered();
-    }
-
-
     public HubEnvironment get( String id )
     {
 
@@ -92,7 +74,7 @@ public class EnvironmentAdapter
 
     public Set<HubEnvironment> getEnvironments( boolean all )
     {
-        if ( !isHubReachable() )
+        if ( !canWorkWithHub() )
         {
             return Collections.emptySet();
         }
@@ -128,7 +110,7 @@ public class EnvironmentAdapter
 
     public void destroyContainer( HubEnvironment env, String containerId )
     {
-        if ( !isHubReachable() )
+        if ( !canWorkWithHub() )
         {
             return;
         }
@@ -150,7 +132,7 @@ public class EnvironmentAdapter
 
     public void removeEnvironment( LocalEnvironment env )
     {
-        if ( !isHubReachable() )
+        if ( !canWorkWithHub() )
         {
             return;
         }
@@ -166,23 +148,31 @@ public class EnvironmentAdapter
     }
 
 
-    public void uploadEnvironments( Collection<Environment> envs )
+    public boolean canWorkWithHub()
     {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
+        return isHubReachable() && isRegisteredWithHub();
+    }
 
-        for ( Environment env : envs )
-        {
-            uploadEnvironment( ( LocalEnvironment ) env );
-        }
+
+    private boolean isHubReachable()
+    {
+        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
+
+        return hubManager != null && hubManager.isHubReachable();
+    }
+
+
+    private boolean isRegisteredWithHub()
+    {
+        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
+
+        return hubManager != null && hubManager.isRegistered();
     }
 
 
     public void uploadEnvironment( LocalEnvironment env )
     {
-        if ( !isHubReachable() )
+        if ( !canWorkWithHub() )
         {
             return;
         }
@@ -206,6 +196,61 @@ public class EnvironmentAdapter
         {
             log.debug( "Error to post local environment to Hub: ", e );
         }
+    }
+
+
+    public boolean uploadPeerOwnerEnvironment( LocalEnvironment env )
+    {
+        if ( !canWorkWithHub() )
+        {
+            return false;
+        }
+
+        if ( env.getStatus() != EnvironmentStatus.HEALTHY )
+        {
+            return false;
+        }
+
+        try
+        {
+            ObjectNode envJson = environmentToJson( env );
+
+            environmentPeersToJson( env, envJson );
+
+            environmentContainersToJson( env, envJson );
+
+            hubAdapter.uploadPeerOwnerEnvironment( envJson.toString() );
+
+            return true;
+        }
+        catch ( Exception e )
+        {
+            log.debug( "Error to post local environment to Hub: ", e );
+        }
+
+        return false;
+    }
+
+
+    public void removeSshKey( String envId, String sshKey )
+    {
+        if ( !canWorkWithHub() )
+        {
+            return;
+        }
+
+        hubAdapter.removeSshKey( envId, sshKey );
+    }
+
+
+    public void addSshKey( String envId, String sshKey )
+    {
+        if ( !canWorkWithHub() )
+        {
+            return;
+        }
+
+        hubAdapter.addSshKey( envId, sshKey );
     }
 
 
@@ -297,27 +342,5 @@ public class EnvironmentAdapter
 
             rhs.add( rhJson );
         }
-    }
-
-
-    public void removeSshKey( String envId, String sshKey )
-    {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        hubAdapter.removeSshKey( envId, sshKey );
-    }
-
-
-    public void addSshKey( String envId, String sshKey )
-    {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        hubAdapter.addSshKey( envId, sshKey );
     }
 }

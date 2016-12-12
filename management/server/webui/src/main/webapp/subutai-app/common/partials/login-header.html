@@ -175,5 +175,18 @@
 				<div class="b-load-icon"></div>
 			</div>
 		</div>
+		<div class="b-hub-status__dropdown" ng-if="!subutaiController.adminMenus">
+			<div>
+				<ul class="list">
+					<li style="text-align: center;">
+						<a href="https://hub.subut.ai/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to HUB</a>
+						<div class="date"></div>
+					</li>
+				</ul>
+			</div>
+			<div class="b-loading-screen js-hub-screen">
+				<div class="b-load-icon"></div>
+			</div>
+		</div>
 	</div>
 </div>

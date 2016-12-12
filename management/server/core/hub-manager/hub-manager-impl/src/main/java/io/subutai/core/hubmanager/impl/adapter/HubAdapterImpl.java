@@ -135,6 +135,16 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
 
     @Override
+    public void uploadPeerOwnerEnvironment( final String json )
+    {
+        //obtain Hub peer owner id
+        String userId = getOwnerId();
+
+        httpClient.doPost( format( ENVIRONMENTS_URL, userId ), json );
+    }
+
+
+    @Override
     public void removeEnvironment( String envId )
     {
         String userId = getUserIdWithCheck();

@@ -449,6 +449,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
+            //todo use commandExecutor.execute to avoid exception in case container does not exist
+            //todo check if exception is due to not existing container and ignore such exception
             commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getId() ), this );
         }
         catch ( CommandException e )
