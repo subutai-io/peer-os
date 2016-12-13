@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
@@ -11,9 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import io.subutai.core.appender.SubutaiErrorEvent;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.LogListenerImpl;
+import io.subutai.hub.share.dto.SubutaiSystemLog;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -42,9 +45,9 @@ public class HubLoggerProcessor implements Runnable
     @Override
     public void run()
     {
-        Set<String> logs = logListener.getErrLogs();
+        Set<SubutaiErrorEvent> subutaiErrorEvents = logListener.getSubutaiErrorEvents();
 
-        if ( !logs.isEmpty() && hubManager.isRegistered() && hubManager.isHubReachable() )
+        if ( !subutaiErrorEvents.isEmpty() && hubManager.isRegistered() && hubManager.isHubReachable() )
         {
             WebClient client = null;
             try
@@ -52,7 +55,7 @@ public class HubLoggerProcessor implements Runnable
                 client = configManager.getTrustedWebClientWithAuth( "/rest/v1/system-bugs", configManager.getHubIp() );
 
                 SystemLogsDto logsDto = new SystemLogsDto();
-                logsDto.setLogs( logs );
+                logsDto.setSubutaiSystemLogs( toSubutaiSystemLogs( subutaiErrorEvents ) );
 
                 byte[] plainData = JsonUtil.toCbor( logsDto );
                 byte[] encryptedData = configManager.getMessenger().produce( plainData );
@@ -85,5 +88,18 @@ public class HubLoggerProcessor implements Runnable
                 }
             }
         }
+    }
+
+
+    private Set<SubutaiSystemLog> toSubutaiSystemLogs( final Set<SubutaiErrorEvent> subutaiErrorEvents )
+    {
+        final Set<SubutaiSystemLog> result = new HashSet<>();
+        for ( SubutaiErrorEvent e : subutaiErrorEvents )
+        {
+            result.add( new SubutaiSystemLog( SubutaiSystemLog.LogSource.PEER, configManager.getPeerId(),
+                    SubutaiSystemLog.LogType.ERROR, e.getTimeStamp(), e.getLoggerName(), e.getRenderedMessage(),
+                    e.getStackTrace() ) );
+        }
+        return result;
     }
 }

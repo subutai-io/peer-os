@@ -1,47 +1,16 @@
 package io.subutai.core.appender;
 
 
-public class SubutaiErrorEvent
+public class SubutaiErrorEvent extends SubutaiLogEvent
 {
-    final long timeStamp;
-    final String loggerName;
-    final String renderedMessage;
     final String stackTrace;
 
 
     public SubutaiErrorEvent( final long timeStamp, final String loggerName, final String renderedMessage,
                               final String stackTrace )
     {
-        this.timeStamp = timeStamp;
-        this.loggerName = loggerName;
-        this.renderedMessage = renderedMessage;
+        super( timeStamp, loggerName, renderedMessage );
         this.stackTrace = stackTrace;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "SubutaiLogEvent{" + "timeStamp=" + timeStamp + ", loggerName='" + loggerName + '\''
-                + ", renderedMessage='" + renderedMessage + '\'' + ", stackTrace='" + stackTrace + '\'' + '}';
-    }
-
-
-    public long getTimeStamp()
-    {
-        return timeStamp;
-    }
-
-
-    public String getLoggerName()
-    {
-        return loggerName;
-    }
-
-
-    public String getRenderedMessage()
-    {
-        return renderedMessage;
     }
 
 
