@@ -104,11 +104,11 @@ public class PeerMetricsProcessor implements Runnable
 
                 try
                 {
-                    hostMetrics.getMemory().setFree( resourceHostMetric.getAvailableRam() );
+                    hostMetrics.getMemory().setMemFree( resourceHostMetric.getAvailableRam() );
                 }
                 catch ( Exception e )
                 {
-                    hostMetrics.getMemory().setFree( 0.0 );
+                    hostMetrics.getMemory().setMemFree( 0.0 );
                     log.info( e.getMessage(), "No info about available RAM" );
                 }
 

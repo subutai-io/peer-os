@@ -9,9 +9,6 @@ public class MemoryDto
     @JsonProperty( "total" )
     private Double total;
 
-    @JsonProperty( "free" )
-    private Double free;
-
     @JsonProperty( "active" )
     private double active = 0.0D;
 
@@ -34,18 +31,6 @@ public class MemoryDto
     public void setTotal( final Double total )
     {
         this.total = total;
-    }
-
-
-    public Double getFree()
-    {
-        return free;
-    }
-
-
-    public void setFree( final Double free )
-    {
-        this.free = free;
     }
 
 
