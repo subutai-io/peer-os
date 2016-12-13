@@ -51,7 +51,7 @@ public class HostMetricsDto
     private Map<String, DiskDto> disk = new HashMap<>();
 
     @JsonProperty( "containersCount" )
-    private Integer containersCount;
+    private Integer containersCount = 0;
 
     @JsonProperty( "management" )
     private boolean management;

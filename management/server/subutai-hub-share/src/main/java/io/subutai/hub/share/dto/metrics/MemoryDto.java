@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MemoryDto
 {
     @JsonProperty( "total" )
-    private Double total;
+    private Double total= 0.0D;
 
     @JsonProperty( "active" )
     private double active = 0.0D;
