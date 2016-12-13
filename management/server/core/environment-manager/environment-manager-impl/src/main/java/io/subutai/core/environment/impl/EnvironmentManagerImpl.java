@@ -2089,7 +2089,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
         else if ( environment instanceof HubEnvironment )
         {
-            return Common.HUB_ID;
+            return ( ( HubEnvironment ) environment ).getOwner();
         }
 
         User user = ServiceLocator.lookup( IdentityManager.class ).getUser( environment.getUserId() );
