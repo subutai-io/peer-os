@@ -1,12 +1,10 @@
-package io.subutai.core.appender;
+package io.subutai.hub.share.dto;
 
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import io.subutai.hub.share.dto.SubutaiSystemLog;
 
 import static junit.framework.TestCase.assertEquals;
 
