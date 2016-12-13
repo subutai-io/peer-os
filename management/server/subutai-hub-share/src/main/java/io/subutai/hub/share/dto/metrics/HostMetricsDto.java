@@ -3,6 +3,7 @@ package io.subutai.hub.share.dto.metrics;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,9 @@ public class HostMetricsDto
     @JsonProperty( "hostId" )
     private String hostId;
 
+    @JsonProperty( "hostName" )
+    private String hostName;
+
     @JsonProperty( "type" )
     private HostType type;
 
@@ -46,6 +50,15 @@ public class HostMetricsDto
     @JsonProperty( "hostDisk" )
     private Map<String, DiskDto> disk = new HashMap<>();
 
+    @JsonProperty( "containersCount" )
+    private Integer containersCount;
+
+    @JsonProperty( "management" )
+    private boolean management;
+
+    @JsonProperty( "createdTime" )
+    private Date createdTime = new Date();
+
 
     public String getHostId()
     {
@@ -56,6 +69,18 @@ public class HostMetricsDto
     public void setHostId( final String hostId )
     {
         this.hostId = hostId;
+    }
+
+
+    public String getHostName()
+    {
+        return hostName;
+    }
+
+
+    public void setHostName( final String hostName )
+    {
+        this.hostName = hostName;
     }
 
 
@@ -116,5 +141,71 @@ public class HostMetricsDto
     public void setDisk( final Map<String, DiskDto> disk )
     {
         this.disk = disk;
+    }
+
+
+    public void addDisk( final String partition, final DiskDto diskDto )
+    {
+        if ( diskDto == null )
+        {
+            throw new IllegalArgumentException( "Disk DTO could not be null." );
+        }
+
+        this.disk.put( partition, diskDto );
+    }
+
+
+    public Integer getContainersCount()
+    {
+        return containersCount;
+    }
+
+
+    public void setContainersCount( final Integer containersCount )
+    {
+        this.containersCount = containersCount;
+    }
+
+
+    public boolean isManagement()
+    {
+        return management;
+    }
+
+
+    public void setManagement( final boolean management )
+    {
+        this.management = management;
+    }
+
+
+    public Date getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public void setCreatedTime( final Date createdTime )
+    {
+        this.createdTime = createdTime;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "HostMetricsDto{" );
+        sb.append( "hostId='" ).append( hostId ).append( '\'' );
+        sb.append( ", hostName='" ).append( hostName ).append( '\'' );
+        sb.append( ", type=" ).append( type );
+        sb.append( ", memory=" ).append( memory );
+        sb.append( ", cpu=" ).append( cpu );
+        sb.append( ", net=" ).append( net );
+        sb.append( ", disk=" ).append( disk );
+        sb.append( ", containersCount=" ).append( containersCount );
+        sb.append( ", management=" ).append( management );
+        sb.append( ", createdTime=" ).append( createdTime );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

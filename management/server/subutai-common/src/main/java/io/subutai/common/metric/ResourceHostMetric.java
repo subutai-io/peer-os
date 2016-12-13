@@ -87,6 +87,13 @@ public class ResourceHostMetric extends BaseMetric
 
 
     @JsonIgnore
+    public Double getUsedSpace()
+    {
+        return disk != null ? disk.getUsed() : 0;
+    }
+
+
+    @JsonIgnore
     public Double getTotalRam()
     {
         return ram != null && ram.total != null ? ram.total : 0;
@@ -105,6 +112,13 @@ public class ResourceHostMetric extends BaseMetric
     {
 
         return cpu != null ? 100 - cpu.idle : null;
+    }
+
+    @JsonIgnore
+    public Double getCpuIdle()
+    {
+
+        return cpu != null ? cpu.idle : null;
     }
 
 

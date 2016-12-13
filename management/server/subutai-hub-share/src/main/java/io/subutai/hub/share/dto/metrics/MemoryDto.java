@@ -6,6 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MemoryDto
 {
+    @JsonProperty( "total" )
+    private Double total;
+
+    @JsonProperty( "free" )
+    private Double free;
+
     @JsonProperty( "active" )
     private double active = 0.0D;
 
@@ -17,6 +23,30 @@ public class MemoryDto
 
     @JsonProperty( "buffers" )
     private double buffers = 0.0D;
+
+
+    public Double getTotal()
+    {
+        return total;
+    }
+
+
+    public void setTotal( final Double total )
+    {
+        this.total = total;
+    }
+
+
+    public Double getFree()
+    {
+        return free;
+    }
+
+
+    public void setFree( final Double free )
+    {
+        this.free = free;
+    }
 
 
     public double getActive()

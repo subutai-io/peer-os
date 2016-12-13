@@ -2,6 +2,8 @@ package io.subutai.common.metric;
 
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import org.junit.Before;
@@ -34,6 +36,12 @@ public class HistoricalMetricsTest
         final String rhJson = IOUtils.toString( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream(
                 "metrics/resource_host_metrics.json" ), "UTF-8" );
         rhMetrics = objectMapper.readValue( rhJson, HistoricalMetrics.class );
+        Calendar cal = Calendar.getInstance();
+        Date endTime = cal.getTime();
+        cal.add( Calendar.MINUTE, -15 );
+        Date startTime = cal.getTime();
+        rhMetrics.setStartTime( startTime );
+        rhMetrics.setEndTime( endTime );
         final String chJson = IOUtils.toString( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream(
                 "metrics/container_host_metrics.json" ), "UTF-8" );
         chMetrics = objectMapper.readValue( chJson, HistoricalMetrics.class );
