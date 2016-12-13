@@ -15,6 +15,10 @@
   <description>Subutai Hub Manager Impl</description>
 
   <dependencies>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>commons-net</groupId>
@@ -26,10 +30,6 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-hub-share</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
