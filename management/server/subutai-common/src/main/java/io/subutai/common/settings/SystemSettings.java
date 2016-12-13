@@ -19,8 +19,8 @@ public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
 
-    private static final int DEFAULT_P2P_PORT_START_RANGE = 0;
-    private static final int DEFAULT_P2P_PORT_END_RANGE = 65535;
+    private static final int DEFAULT_P2P_PORT_START_RANGE = Common.MIN_PORT;
+    private static final int DEFAULT_P2P_PORT_END_RANGE = Common.MAX_PORT;
 
     private PropertiesConfiguration PROPERTIES = null;
 

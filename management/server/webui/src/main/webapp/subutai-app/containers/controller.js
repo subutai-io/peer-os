@@ -34,6 +34,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.allTags = [];
 	vm.tags2Container = {};
 	vm.currentDomainStatus = {};
+	vm.currentDomainPort = {};
 	vm.domainContainer = {};
 	vm.editingContainer = {};
 	vm.hasPGPplugin = false;
@@ -52,7 +53,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.addTags = addTags;
 	vm.removeTag = removeTag;
 	vm.showDomainForm = showDomainForm;
-	vm.checkDomain = checkDomain;
+	vm.setContainerDomain = setContainerDomain;
 	vm.getContainerStatus = getContainerStatus;
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
@@ -82,9 +83,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 		LOADING_SCREEN();
 		vm.currentDomainStatus = {};
+		vm.currentDomainPort = {};
 		vm.domainContainer = container;
-		environmentService.getContainerDomain(container).success(function (data) {
-			vm.currentDomainStatus = data;
+		environmentService.getContainerDomainNPort(container).success(function (data) {
+			vm.currentDomainStatus = data.status == "true";
+			vm.currentDomainPort = parseInt( data.port, 10);
 			ngDialog.open({
 				template: 'subutai-app/containers/partials/addToDomain.html',
 				scope: $scope
@@ -97,10 +100,15 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		});
 	}
 
-	function checkDomain() {
-		environmentService.checkDomain(vm.domainContainer, vm.currentDomainStatus).success(function (data) {
-			vm.currentDomainStatus = data;
-		});
+	function setContainerDomain() {
+		environmentService.setContainerDomainNPort(vm.domainContainer, vm.currentDomainStatus, vm.currentDomainPort).success(function (data) {
+			vm.currentDomainStatus = data.status == "true";
+			vm.currentDomainPort = parseInt( data.port, 10);
+		}).error(function(error){
+          			LOADING_SCREEN('none');
+          			SweetAlert.swal ("ERROR!", error.replace(/\\n/g, " "));
+          			ngDialog.closeAll();
+        });
 		ngDialog.closeAll();
 	}
 
