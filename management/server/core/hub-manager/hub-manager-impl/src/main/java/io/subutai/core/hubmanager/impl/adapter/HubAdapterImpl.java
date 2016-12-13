@@ -34,7 +34,9 @@ import static java.lang.String.format;
 //TODO use HubRestClient and ConfigDataServiceimpl instead of DaoHelper and HttpClient
 public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 {
-    private static final String ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
+    private static final String USER_ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
+
+    private static final String PEER_ENVIRONMENTS_URL = "/rest/v1/adapter/peer/environments";
 
     private static final String CONTAINERS_URL = "/rest/v1/adapter/environments/%s/containers/%s";
 
@@ -129,7 +131,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         {
             log.debug( "json: {}", json );
 
-            httpClient.doPost( format( ENVIRONMENTS_URL, userId ), json );
+            httpClient.doPost( format( USER_ENVIRONMENTS_URL, userId ), json );
         }
     }
 
@@ -140,7 +142,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         //obtain Hub peer owner id
         String userId = getOwnerId();
 
-        httpClient.doPost( format( ENVIRONMENTS_URL, userId ), json );
+        httpClient.doPost( format( USER_ENVIRONMENTS_URL, userId ), json );
     }
 
 
@@ -157,7 +159,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
         if ( userId != null )
         {
-            String path = format( ENVIRONMENTS_URL, getUserId() ) + "/" + envId;
+            String path = format( USER_ENVIRONMENTS_URL, getUserId() ) + "/" + envId;
 
             httpClient.doDelete( path );
         }
@@ -190,7 +192,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         {
             log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", userId, peerId );
 
-            return httpClient.doGet( format( ENVIRONMENTS_URL, userId ) );
+            return httpClient.doGet( format( USER_ENVIRONMENTS_URL, userId ) );
         }
 
         return null;
@@ -200,7 +202,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     @Override
     public String getAllEnvironmentsForPeer()
     {
-        return httpClient.doGet( format( ENVIRONMENTS_URL, 0 ) );
+        return httpClient.doGet( PEER_ENVIRONMENTS_URL );
     }
 
 
