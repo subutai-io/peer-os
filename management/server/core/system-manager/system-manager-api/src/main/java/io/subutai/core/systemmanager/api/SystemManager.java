@@ -36,4 +36,6 @@ public interface SystemManager
     List<UpdateDto> getUpdates();
 
     boolean isUpdateInProgress();
+
+    String getHubIp();
 }

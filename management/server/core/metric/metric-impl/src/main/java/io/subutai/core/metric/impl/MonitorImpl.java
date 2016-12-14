@@ -56,6 +56,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -93,6 +94,8 @@ public class MonitorImpl implements Monitor, HostListener
     private PeerManager peerManager;
     protected ObjectMapper mapper = new ObjectMapper();
 
+    private SystemSettings systemSettings;
+
 
     public MonitorImpl( PeerManager peerManager, DaoManager daoManager, HostRegistry hostRegistry )
             throws MonitorException
@@ -103,6 +106,7 @@ public class MonitorImpl implements Monitor, HostListener
 
         try
         {
+            this.systemSettings = new SystemSettings();
             this.daoManager = daoManager;
             this.monitorDataService = new MonitorDataService( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
@@ -180,7 +184,8 @@ public class MonitorImpl implements Monitor, HostListener
         {
 
             Host c = peerManager.getLocalPeer().findHostByName( containerId.getHostName() );
-            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerHostName( c.getHostname() );
+            ResourceHost resourceHost =
+                    peerManager.getLocalPeer().getResourceHostByContainerHostName( c.getHostname() );
 
             CommandResult commandResult =
                     resourceHost.execute( commands.getProcessResourceUsageCommand( c.getHostname(), pid ) );
@@ -570,8 +575,8 @@ public class MonitorImpl implements Monitor, HostListener
                 info.setP2pErrorLogs( errorList );
 
 
-                WebClient client =
-                        RestUtil.createTrustedWebClient( "https://hub.subut.ai:443/rest/v1/system/versions/range" );
+                WebClient client = RestUtil.createTrustedWebClient(
+                        String.format( "https://%s:443/rest/v1/system/versions/range", systemSettings.getHubIp() ) );
                 Response response = client.get();
 
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )

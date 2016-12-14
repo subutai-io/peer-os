@@ -413,7 +413,7 @@ public class HubManagerImpl implements HubManager, HostListener
         try
         {
             WebClient client = configManager
-                    .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "hub.subut.ai" );
+                    .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", configManager.getHubIp() );
 
             Response r = client.get();
 
