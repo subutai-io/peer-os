@@ -196,6 +196,13 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response getHubIp()
+    {
+        return Response.status( Response.Status.OK ).entity( systemManager.getHubIp() ).build();
+    }
+
+
     public void setSystemManager( final SystemManager systemManager )
     {
         this.systemManager = systemManager;
