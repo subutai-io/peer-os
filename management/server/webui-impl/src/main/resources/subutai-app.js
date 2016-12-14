@@ -175,7 +175,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 			});
 		}
 
-        var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&peerName=' + vm.hub.peerName + '&password=' + encodeURIComponent(vm.hub.password);
+        var postData = 'hubIp=' + hubIp + '&email=' + vm.hub.login + '&peerName=' + vm.hub.peerName + '&password=' + encodeURIComponent(vm.hub.password);
         $http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
             withCredentials: true,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -184,7 +184,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
                 checkIfRegistered(true);
 
-                $http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {
+                $http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=' + hubIp, {
                     withCredentials: true,
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 })
@@ -194,7 +194,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
                     vm.hubRegisterError = error;
                 });
 
-                $http.post(SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {
+                $http.post(SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=' + hubIp, {
                     withCredentials: true,
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 })
