@@ -31,7 +31,7 @@
         </div>
         <ul>
           <li ng-repeat="template in advEnvCtrl.templatesList  | filter:{'name' : searchTemplate} | orderBy: 'name'"
-              data-template="{{ template.name }}">
+              data-template="{{ template.name }}" title="Version: {{ template.version }} Size: {{ template.size }} Parent: {{ template.parent }} Owners: {{template.owner}}">
 					<span class="b-tools-menu__item">
 						<span class="b-cloud-item">
 							<img
