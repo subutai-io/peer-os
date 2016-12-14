@@ -113,6 +113,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
         Date startTime = cal.getTime();
 
         PeerMetricsDto peerMetricsDto = new PeerMetricsDto( localPeer.getId(), startTime.getTime(), endTime.getTime() );
+
         try
         {
             for ( Host host : localPeer.getResourceHosts() )
@@ -120,6 +121,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
                 final HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startTime, endTime );
                 final HostMetricsDto hostMetrics = historicalMetrics.getHostMetrics();
                 hostMetrics.setHostId( host.getId() );
+                hostMetrics.setHostName( host.getHostname() );
                 peerMetricsDto.addHostMetrics( hostMetrics );
             }
             String path = format( "/rest/v1/peers/%s/metrics/save", localPeer.getId() );
