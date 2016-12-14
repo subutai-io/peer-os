@@ -309,6 +309,8 @@ public class EnvironmentAdapter
 
         json.put( "p2pKey", env.getP2pKey() );
 
+        json.put( "vni", env.getVni() );
+
         return json;
     }
 
