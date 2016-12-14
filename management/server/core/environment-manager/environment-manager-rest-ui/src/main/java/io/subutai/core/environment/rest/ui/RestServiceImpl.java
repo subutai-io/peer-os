@@ -4,6 +4,7 @@ package io.subutai.core.environment.rest.ui;
 import java.io.File;
 import java.security.AccessControlException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -490,7 +491,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response isContainerDomain( final String environmentId, final String containerId )
+    public Response getContainerDomainNPort( final String environmentId, final String containerId )
     {
         try
         {
@@ -500,10 +501,18 @@ public class RestServiceImpl implements RestService
                                .entity( JsonUtil.toJson( "You must first register domain for environment" ) ).build();
             }
 
+            Map<String, String> result = new HashMap<>();
 
-            return Response.ok( JsonUtil
-                    .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
-                           .build();
+            Environment environment = environmentManager.loadEnvironment( environmentId );
+
+            EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
+
+            result.put( "status",
+                    String.valueOf( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) );
+
+            result.put( "port", String.valueOf( containerHost.getDomainPort() ) );
+
+            return Response.ok( JsonUtil.toJson( result ) ).build();
         }
         catch ( Exception e )
         {
@@ -513,7 +522,8 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setContainerDomain( final String environmentId, final String containerId, final Boolean state )
+    public Response setContainerDomainNPort( final String environmentId, final String containerId, final Boolean state,
+                                             final int port )
     {
         try
         {
@@ -523,7 +533,7 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId );
+                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId, port );
             }
         }
         catch ( Exception e )
@@ -541,7 +551,11 @@ public class RestServiceImpl implements RestService
         try
         {
             Environment environment = findEnvironmentByContainerId( containerId );
+
+            Preconditions.checkNotNull( environment, "Environment not found" );
+
             ContainerHost containerHost = environment.getContainerHostById( containerId );
+
             environmentManager.changeContainerHostname( containerHost.getContainerId(), name, false );
         }
         catch ( Exception e )
@@ -923,7 +937,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Set<PeerTemplatesDownloadProgress> set =
+            List<PeerTemplatesDownloadProgress> result =
                     environmentManager.loadEnvironment( environmentId ).getPeers().stream().map( p ->
                     {
                         try
@@ -934,14 +948,15 @@ public class RestServiceImpl implements RestService
                         {
                             return new PeerTemplatesDownloadProgress( "NONE" );
                         }
-                    } ).collect( Collectors.toSet() );
+                    } ).sorted( Comparator.comparing( PeerTemplatesDownloadProgress::getPeerId ) )
+                                      .collect( Collectors.toList() );
 
-            if ( set.stream().filter( s -> !s.getTemplatesDownloadProgresses().isEmpty() ).count() == 0 )
+            if ( result.stream().filter( s -> !s.getTemplatesDownloadProgresses().isEmpty() ).count() == 0 )
             {
                 return Response.ok().build();
             }
 
-            return Response.ok( JsonUtil.toJson( set ) ).build();
+            return Response.ok( JsonUtil.toJson( result ) ).build();
         }
 
         catch ( Exception e )
@@ -967,7 +982,7 @@ public class RestServiceImpl implements RestService
                 EnvironmentDto environmentDto =
                         new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                                 convertContainersToContainerJson( environment.getContainerHosts(), dataSource ),
-                                dataSource );
+                                dataSource, environmentManager.getEnvironmentOwnerName( environment ) );
 
                 environmentDtos.add( environmentDto );
             }

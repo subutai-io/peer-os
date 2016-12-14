@@ -73,6 +73,8 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.NumUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
@@ -1262,11 +1264,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+            EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
             return peerManager.getLocalPeer().isIpInVniDomain(
-                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
-                    environment.getVni() );
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":" + containerHost
+                            .getDomainPort(), environment.getVni() );
         }
         catch ( PeerException e )
         {
@@ -1278,10 +1280,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @Override
-    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
+    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId, int port )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        toggleContainerDomain( containerHostId, environmentId, true );
+        Preconditions.checkArgument( NumUtil.isIntBetween( port, Common.MIN_PORT, Common.MAX_PORT ) );
+        toggleContainerDomain( containerHostId, environmentId, port, true );
     }
 
 
@@ -1290,11 +1293,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
 
-        toggleContainerDomain( containerHostId, environmentId, false );
+        toggleContainerDomain( containerHostId, environmentId, -1, false );
     }
 
 
-    public void toggleContainerDomain( final String containerHostId, final String environmentId, final boolean add )
+    public void toggleContainerDomain( final String containerHostId, final String environmentId, int port,
+                                       final boolean add )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
@@ -1302,7 +1306,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
-        ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+        EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHostId ) );
@@ -1320,15 +1324,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             if ( add )
             {
                 peerManager.getLocalPeer().addIpToVniDomain(
-                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":" + port,
                         environment.getVni() );
+
+                ( ( EnvironmentContainerImpl ) containerHost ).setDomainPort( port );
             }
             else
             {
                 peerManager.getLocalPeer().removeIpFromVniDomain(
-                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
-                        environment.getVni() );
+                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":"
+                                + containerHost.getDomainPort(), environment.getVni() );
+
+                ( ( EnvironmentContainerImpl ) containerHost ).setDomainPort( null );
             }
+
+            update( ( EnvironmentContainerImpl ) containerHost );
 
             operationTracker.addLogDone(
                     String.format( "Container is %s environment domain", add ? "included in" : "excluded from" ) );
@@ -1848,7 +1858,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    //TODO call this method in a job
     protected void uploadPeerOwnerEnvironmentsToHub()
     {
         //0. check if peer is registered with Hub and Hub is reachable
@@ -2055,12 +2064,44 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            environment.getContainerDtos(), environment.getClass().getName() );
+                            environment.getContainerDtos(), environment.getClass().getName(),
+                            getEnvironmentOwnerName( environment ) );
 
             environmentDtos.add( environmentDto );
         }
 
         return environmentDtos;
+    }
+
+
+    public String getEnvironmentOwnerName( Environment environment )
+    {
+        if ( environment instanceof RemoteEnvironment )
+        {
+            if ( Objects.equals( ( ( RemoteEnvironment ) environment ).getInitiatorPeerId(), Common.HUB_ID ) )
+            {
+                return Common.HUB_ID;
+            }
+            else
+            {
+                return "remote";
+            }
+        }
+        else if ( environment instanceof HubEnvironment )
+        {
+            return ( ( HubEnvironment ) environment ).getOwner();
+        }
+
+        User user = ServiceLocator.lookup( IdentityManager.class ).getUser( environment.getUserId() );
+
+        if ( user == null )
+        {
+            return "unknown";
+        }
+        else
+        {
+            return user.getUserName();
+        }
     }
 
 

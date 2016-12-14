@@ -23,18 +23,22 @@ public class EnvironmentDto
     // Where environment created: subutai, hub
     @JsonProperty( "dataSource" )
     private String dataSource;
+    @JsonProperty( "username" )
+    private String username;
 
 
     public EnvironmentDto( @JsonProperty( "id" ) final String id, @JsonProperty( "name" ) final String name,
                            @JsonProperty( "status" ) final EnvironmentStatus status,
                            @JsonProperty( "containers" ) final Set<ContainerDto> containers,
-                           @JsonProperty( "dataSource" ) String dataSource )
+                           @JsonProperty( "dataSource" ) String dataSource,
+                           @JsonProperty( "username" ) final String username )
     {
         this.id = id;
         this.name = name;
         this.status = status;
         this.containers = containers;
         this.dataSource = dataSource;
+        this.username = username;
     }
 
 

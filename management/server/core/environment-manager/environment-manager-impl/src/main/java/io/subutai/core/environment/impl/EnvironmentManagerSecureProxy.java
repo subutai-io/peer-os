@@ -569,7 +569,7 @@ public class EnvironmentManagerSecureProxy
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
+    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId, final int port )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Environment environment = loadEnvironment( environmentId );
@@ -590,7 +590,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new ContainerHostNotFoundException( e.getMessage() );
         }
-        environmentManager.addContainerToEnvironmentDomain( containerHostId, environmentId );
+        environmentManager.addContainerToEnvironmentDomain( containerHostId, environmentId, port );
     }
 
 
@@ -876,8 +876,15 @@ public class EnvironmentManagerSecureProxy
     }
 
 
+    @Override
+    public String getEnvironmentOwnerName( final Environment environment )
+    {
+        return environmentManager.getEnvironmentOwnerName( environment );
+    }
+
+
     /* *************************************************
-         */
+             */
     private String validateInput( String inputStr, boolean removeSpaces )
     {
         return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );

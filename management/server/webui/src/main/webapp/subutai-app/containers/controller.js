@@ -27,12 +27,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	vm.environments = [];
 	vm.containers = [];
+	vm.orphanContainers = [];
 	vm.containersType = [];
 	vm.environmentId = $stateParams.environmentId;
 	vm.currentTags = [];
 	vm.allTags = [];
 	vm.tags2Container = {};
 	vm.currentDomainStatus = {};
+	vm.currentDomainPort = {};
 	vm.domainContainer = {};
 	vm.editingContainer = {};
 	vm.hasPGPplugin = false;
@@ -46,11 +48,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.filterContainersList = filterContainersList;
 	vm.containerAction = containerAction;
 	vm.destroyContainer = destroyContainer;
+	vm.destroyOrphanContainer = destroyOrphanContainer;
 	vm.addTagForm = addTagForm;
 	vm.addTags = addTags;
 	vm.removeTag = removeTag;
 	vm.showDomainForm = showDomainForm;
-	vm.checkDomain = checkDomain;
+	vm.setContainerDomain = setContainerDomain;
 	vm.getContainerStatus = getContainerStatus;
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
@@ -80,9 +83,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 		LOADING_SCREEN();
 		vm.currentDomainStatus = {};
+		vm.currentDomainPort = {};
 		vm.domainContainer = container;
-		environmentService.getContainerDomain(container).success(function (data) {
-			vm.currentDomainStatus = data;
+		environmentService.getContainerDomainNPort(container).success(function (data) {
+			vm.currentDomainStatus = data.status == "true";
+			vm.currentDomainPort = parseInt( data.port, 10);
 			ngDialog.open({
 				template: 'subutai-app/containers/partials/addToDomain.html',
 				scope: $scope
@@ -95,10 +100,15 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		});
 	}
 
-	function checkDomain() {
-		environmentService.checkDomain(vm.domainContainer, vm.currentDomainStatus).success(function (data) {
-			vm.currentDomainStatus = data;
-		});
+	function setContainerDomain() {
+		environmentService.setContainerDomainNPort(vm.domainContainer, vm.currentDomainStatus, vm.currentDomainPort).success(function (data) {
+			vm.currentDomainStatus = data.status == "true";
+			vm.currentDomainPort = parseInt( data.port, 10);
+		}).error(function(error){
+          			LOADING_SCREEN('none');
+          			SweetAlert.swal ("ERROR!", error.replace(/\\n/g, " "));
+          			ngDialog.closeAll();
+        });
 		ngDialog.closeAll();
 	}
 
@@ -137,6 +147,41 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			console.log(data);
 		});
 		container.tags.splice(key, 1);
+	}
+
+	function getOrphanContainers() {
+		environmentService.getOrphanContainers().success(function (data) {
+			console.log(data);
+			vm.orphanContainers = data;
+		});
+	}
+	getOrphanContainers();
+
+	function destroyOrphanContainer(containerId, key) {
+		var previousWindowKeyDown = window.onkeydown;
+		SweetAlert.swal({
+			title: "Are you sure?",
+			text: "Your will not be able to recover this Orphan Container!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Destroy",
+			cancelButtonText: "Cancel",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
+			if (isConfirm) {
+				environmentService.deleteOrphanContainers(containerId).success(function (data) {
+					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
+					vm.orphanContainers.splice(key, 1);
+				}).error(function (data) {
+					SweetAlert.swal("ERROR!", "Your Orphan Container is safe. Error: " + data.ERROR, "error");
+				});
+			}
+		});
 	}
 
 	function getContainers() {
@@ -178,35 +223,37 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		vm.allTags = [];
 		vm.containers = [];
 
-		for(var i in vm.environments) {
+		if(vm.environmentId != 'ORPHAN') {
+			for(var i in vm.environments) {
 
-			if(
-				vm.environmentId == vm.environments[i].id || 
-				vm.environmentId === undefined || 
-				vm.environmentId.length == 0
-			) {
-				for(var j in vm.environments[i].containers) {
-					if(
-						vm.containersTypeId !== undefined && 
-						vm.containersTypeId != vm.environments[i].containers[j].type && 
-						vm.containersTypeId.length > 0
-					) {continue;}
-					if(
-						vm.containerState !== undefined && 
-						vm.containerState != vm.environments[i].containers[j].state && 
-						vm.containerState.length > 0
-					) {continue;}
+				if(
+					vm.environmentId == vm.environments[i].id || 
+					vm.environmentId === undefined || 
+					vm.environmentId.length == 0
+				) {
+					for(var j in vm.environments[i].containers) {
+						if(
+							vm.containersTypeId !== undefined && 
+							vm.containersTypeId != vm.environments[i].containers[j].type && 
+							vm.containersTypeId.length > 0
+						) {continue;}
+						if(
+							vm.containerState !== undefined && 
+							vm.containerState != vm.environments[i].containers[j].state && 
+							vm.containerState.length > 0
+						) {continue;}
 
-					// We don't show on UI containers created by Hub, located on other peers.
-					// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
-					// @todo remove when implement on backend
-					var container = vm.environments[i].containers[j];
-					var remoteProxyContainer = !container.local && container.dataSource == "hub";
+						// We don't show on UI containers created by Hub, located on other peers.
+						// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
+						// @todo remove when implement on backend
+						var container = vm.environments[i].containers[j];
+						var remoteProxyContainer = !container.local && container.dataSource == "hub";
 
-					if ( !remoteProxyContainer )
-					{
-						vm.containers.push(vm.environments[i].containers[j]);
-						vm.allTags = vm.allTags.concat(vm.environments[i].containers[j].tags);
+						if ( !remoteProxyContainer )
+						{
+							vm.containers.push(vm.environments[i].containers[j]);
+							vm.allTags = vm.allTags.concat(vm.environments[i].containers[j].tags);
+						}
 					}
 				}
 			}
@@ -227,20 +274,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		DTColumnDefBuilder.newColumnDef(5).notSortable(),
 		DTColumnDefBuilder.newColumnDef(6).notSortable()
 	];
-
-	/*var refreshTable;
-	var reloadTableData = function() {
-		refreshTable = $timeout(function myFunction() {
-			getContainers();
-			refreshTable = $timeout(reloadTableData, 30000);
-		}, 30000);
-	};
-	reloadTableData();*/
-
-	/*$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
-		console.log('cancel');
-		$timeout.cancel(refreshTable);
-	});*/
 
 	function destroyContainer(containerId, key) {
 		var previousWindowKeyDown = window.onkeydown;

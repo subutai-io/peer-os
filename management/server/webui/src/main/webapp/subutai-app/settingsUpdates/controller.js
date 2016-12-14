@@ -4,9 +4,9 @@ angular.module("subutai.settings-updates.controller", [])
 .controller("SettingsUpdatesCtrl", SettingsUpdatesCtrl);
 
 
-SettingsUpdatesCtrl.$inject = ['$scope', 'SettingsUpdatesSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
+SettingsUpdatesCtrl.$inject = ['$scope', '$rootScope', 'SettingsUpdatesSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
 
-function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile) {
+function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile) {
 	var vm = this;
 	vm.config = {isUpdatesAvailable: "waiting"};
 	vm.getHistory = [];
@@ -33,7 +33,9 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 			 }else{
 				getConfig();
 			 }
-		});
+		}).error(function (error) {
+            setTimeout(function() {checkActiveUpdate();}, 30000);
+        });
 	}
 
 
@@ -128,7 +130,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert, DTOptionsBu
 			}
 			checkActiveUpdate();
 		}).error(function (error) {
-			SweetAlert.swal("ERROR!", error, "error");
+			setTimeout(function() {checkActiveUpdate();}, 30000);
 		});
 
 		removeUpdateMessage();

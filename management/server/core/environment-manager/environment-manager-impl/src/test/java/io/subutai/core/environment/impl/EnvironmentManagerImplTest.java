@@ -117,6 +117,7 @@ import static org.mockito.Mockito.verify;
 public class EnvironmentManagerImplTest
 {
 
+    private static final int PORT = 80;
     EnvironmentManagerImpl environmentManager;
 
     @Mock
@@ -222,6 +223,7 @@ public class EnvironmentManagerImplTest
 
         doReturn( Sets.newHashSet( environment ) ).when( environmentService ).getAll();
         doReturn( environment ).when( environmentService ).find( TestHelper.ENV_ID );
+        doReturn( environmentContainer ).when( environmentService ).mergeContainer( environmentContainer );
         doReturn( Sets.newHashSet( environmentPeer ) ).when( environment ).getEnvironmentPeers();
         doReturn( TestHelper.PEER_ID ).when( environmentPeer ).getPeerId();
         doReturn( Lists.newArrayList( environmentContainer ) ).when( localPeer )
@@ -980,9 +982,11 @@ public class EnvironmentManagerImplTest
     public void testIsContainerInEnvironmentDomain() throws Exception
     {
 
+        doReturn( PORT ).when( environmentContainer ).getDomainPort();
+
         environmentManager.isContainerInEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
 
-        verify( localPeer ).isIpInVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).isIpInVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
         doThrow( new ContainerHostNotFoundException( "" ) ).when( environment )
                                                            .getContainerHostById( TestHelper.CONTAINER_ID );
@@ -994,9 +998,9 @@ public class EnvironmentManagerImplTest
     @Test
     public void testAddContainerToEnvironmentDomain() throws Exception
     {
-        environmentManager.addContainerToEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
+        environmentManager.addContainerToEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT );
 
-        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, true );
+        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
     }
 
 
@@ -1005,26 +1009,29 @@ public class EnvironmentManagerImplTest
     {
         environmentManager.removeContainerFromEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
 
-        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
     }
 
 
     @Test
     public void testToggleContainerDomain() throws Exception
     {
-        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, true );
+        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
 
-        verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
-        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+        doReturn( PORT ).when( environmentContainer ).getDomainPort();
 
-        verify( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
-        doThrow( new PeerException() ).when( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
+
+        doThrow( new PeerException() ).when( localPeer )
+                                      .removeIpFromVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
         try
         {
-            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
             fail( "Expected EnvironmentModificationException" );
         }
@@ -1036,7 +1043,7 @@ public class EnvironmentManagerImplTest
 
         try
         {
-            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
             fail( "Expected EnvironmentModificationException" );
         }

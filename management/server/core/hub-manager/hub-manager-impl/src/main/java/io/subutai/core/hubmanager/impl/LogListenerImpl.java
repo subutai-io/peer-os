@@ -20,12 +20,12 @@ public class LogListenerImpl implements SubutaiErrorEventListener
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private final Map<String, String> errLogs = new LinkedHashMap<>();
+    private final Map<String, SubutaiErrorEvent> errLogs = new LinkedHashMap<>();
 
 
-    public Set<String> getErrLogs()
+    public Set<SubutaiErrorEvent> getSubutaiErrorEvents()
     {
-        Set<String> logs = new HashSet<>();
+        Set<SubutaiErrorEvent> logs = new HashSet<>();
 
         synchronized ( errLogs )
         {
@@ -53,7 +53,7 @@ public class LogListenerImpl implements SubutaiErrorEventListener
 
             synchronized ( errLogs )
             {
-                errLogs.put( key, event.toString() );
+                errLogs.put( key, event );
 
                 while ( errLogs.size() > 10 )
                 {

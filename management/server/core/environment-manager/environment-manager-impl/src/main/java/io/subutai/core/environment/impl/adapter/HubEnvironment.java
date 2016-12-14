@@ -26,6 +26,9 @@ public class HubEnvironment extends LocalEnvironment implements io.subutai.commo
 
     private transient final EnvironmentAdapter environmentAdapter;
 
+    private String owner;
+    private String ownerHubId;
+
 
     HubEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
                     ProxyContainerHelper proxyContainerHelper )
@@ -51,6 +54,9 @@ public class HubEnvironment extends LocalEnvironment implements io.subutai.commo
         setVni( json.get( "vni" ).asLong() );
 
         setStatus( EnvironmentStatus.HEALTHY );
+
+        this.owner = json.get( "owner" ).asText();
+        this.ownerHubId = json.get( "ownerHubId" ).asText();
     }
 
 
@@ -88,6 +94,18 @@ public class HubEnvironment extends LocalEnvironment implements io.subutai.commo
         resultSet.addAll( containers );
 
         return resultSet;
+    }
+
+
+    public String getOwner()
+    {
+        return owner;
+    }
+
+
+    public String getOwnerHubId()
+    {
+        return ownerHubId;
     }
 
 

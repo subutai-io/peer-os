@@ -116,16 +116,17 @@ public interface RestService
 
 
     @GET
-    @Path( "{environmentId}/containers/{containerId}/domain" )
+    @Path( "{environmentId}/containers/{containerId}/domainnport" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response isContainerDomain( @PathParam( "environmentId" ) String environmentId,
-                                @PathParam( "containerId" ) String containerId );
+    Response getContainerDomainNPort( @PathParam( "environmentId" ) String environmentId,
+                                      @PathParam( "containerId" ) String containerId );
 
 
     @PUT
-    @Path( "{environmentId}/containers/{containerId}/domain" )
-    Response setContainerDomain( @PathParam( "environmentId" ) String environmentId,
-                                 @PathParam( "containerId" ) String containerId, @QueryParam( "state" ) Boolean state );
+    @Path( "{environmentId}/containers/{containerId}/domainnport" )
+    Response setContainerDomainNPort( @PathParam( "environmentId" ) String environmentId,
+                                      @PathParam( "containerId" ) String containerId,
+                                      @QueryParam( "state" ) Boolean state, @QueryParam( "port" ) int port );
 
     @PUT
     @Path( "{environmentId}/containers/{containerId}/name" )

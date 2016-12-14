@@ -23,6 +23,7 @@
 						ng-selected="containerViewCtrl.environmentId == environment.id">
 						{{ environment.name }}
 					</option>
+					<option value="ORPHAN">Orphan</option>
 				</select>
 				<div class="clear"></div>
 			</div>
@@ -59,12 +60,10 @@
 			</div>
 		</div>
 
-		<div class="b-data-table">
+		<div class="b-main-table-border">
 
-			<table datatable="ng" 
-				dt-options="containerViewCtrl.dtOptions" 
-				dt-column-defs="containerViewCtrl.dtColumnDefs" 
-				class="row-border hover subt_table-containers-table ez-ssh-table">
+			<table 
+				class="b-main-table b-main-table_with-header ez-ssh-table subt_table-containers-table">
 				<thead>
 					<tr>
 						<th>Status</th>
@@ -193,6 +192,56 @@
 							</a>
 						</td>
 					</tr>
+
+					<tr ng-repeat="(key, container) in containerViewCtrl.orphanContainers" ng-if="containerViewCtrl.environmentId == 'ORPHAN' || containerViewCtrl.environmentId.length == 0">
+						<td class="b-main-table__container-status">
+							<div 
+								class="b-status-icon b-status-icon_{{ container.status }}" 
+								tooltips 
+								tooltip-template="{{ container.status.length > 0 ? container.status : 'UNCHECKED' }}"
+								tooltip-side="right">
+							</div>
+						</td>
+						<td>
+							<span 
+								tooltips 
+								tooltip-template='
+									<span class="b-nowrap">ID: {{ container.id }}</span><br>
+								' 
+								tooltip-side="right"
+								container-id="{{ container.id }}"
+							>
+								{{ container.hostname }}
+							</span>
+						</td>
+						<td>
+						</td>
+						<td class="subt_text__container-ip">
+							<span 
+								ng-repeat="interfaces in container.interfaces" 
+								tooltips 
+								tooltip-template='<span class="b-nowrap">interfaceName: {{ interfaces.interfaceName }}</span>'>
+								{{ interfaces.ip }}
+							</span><br/>
+						</td>
+
+						<td class="b-main-table__tags">
+						</td>
+						<td>
+						</td>
+						<td>
+						</td>
+
+						<td>
+						</td>
+						<td>
+							<a href 
+								class="b-icon b-icon_remove" 
+								ng-click="containerViewCtrl.destroyOrphanContainer(container.id, key)">
+							</a>
+						</td>
+					</tr>
+
 				</tbody>
 			</table>
 

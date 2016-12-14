@@ -8,11 +8,13 @@ import java.util.Set;
 
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 import io.subutai.common.metric.HistoricalMetrics;
 
@@ -35,6 +37,8 @@ public interface Monitor
 
 
     ResourceHostMetrics getResourceHostMetrics();
+
+    ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost );
 
     /**
      * Returns the list of alerts

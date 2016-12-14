@@ -179,12 +179,11 @@ public class MonitorImpl implements Monitor, HostListener
         try
         {
 
-            ContainerHost c = peerManager.getLocalPeer().getContainerHostById( containerId.getId() );
-            ResourceHost resourceHost =
-                    peerManager.getLocalPeer().getResourceHostByContainerHostName( c.getHostname() );
+            Host c = peerManager.getLocalPeer().findHostByName( containerId.getHostName() );
+            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerHostName( c.getHostname() );
 
             CommandResult commandResult =
-                    resourceHost.execute( commands.getProcessResourceUsageCommand( c.getContainerName(), pid ) );
+                    resourceHost.execute( commands.getProcessResourceUsageCommand( c.getHostname(), pid ) );
             if ( !commandResult.hasSucceeded() )
             {
                 throw new MonitorException(
@@ -342,7 +341,8 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    private ResourceHostMetric getResourceHostMetric( final ResourceHost resourceHost )
+    @Override
+    public ResourceHostMetric getResourceHostMetric( final ResourceHost resourceHost )
     {
         ResourceHostMetric resourceHostMetric = null;
 
@@ -621,7 +621,7 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public HistoricalMetrics getMetricsSeries( final Host host, Date startTime, Date endTime )
     {
-        HistoricalMetrics result = new HistoricalMetrics();
+        HistoricalMetrics result = new HistoricalMetrics( startTime, endTime );
 
         try
         {
@@ -631,6 +631,8 @@ public class MonitorImpl implements Monitor, HostListener
             if ( null != commandResult && commandResult.hasSucceeded() )
             {
                 result = mapper.readValue( commandResult.getStdOut(), HistoricalMetrics.class );
+                result.setStartTime( startTime );
+                result.setEndTime( endTime );
             }
             else
             {

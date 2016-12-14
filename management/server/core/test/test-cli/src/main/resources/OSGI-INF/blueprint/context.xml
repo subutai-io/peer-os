@@ -7,4 +7,10 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="test/exception">
+      <action class="io.subutai.core.test.cli.TestExceptionCommand" />
+    </command>
+  </command-bundle>
+
 </blueprint>
