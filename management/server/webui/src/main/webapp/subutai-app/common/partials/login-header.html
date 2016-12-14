@@ -149,7 +149,7 @@
 						</div>
 					</div>
 					<div class="footer">
-						<a href="https://hub.subut.ai" target="_blank" tabindex=3 class="b-form-label">Sign Up</a>
+						<a href="https://{{ currentUserCtrl.hubIp }}" target="_blank" tabindex=3 class="b-form-label">Sign Up</a>
 						<button type="submit" class="b-btn b-btn_green g-right" tabindex=4
 										ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
 							Register
@@ -160,7 +160,7 @@
 			<div ng-if="currentUserCtrl.hubStatus">
 				<ul class="list">
 					<li style="text-align: center;">
-						<a href="https://hub.subut.ai/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to HUB</a>
+						<a href="https://{{ currentUserCtrl.hubIp }}/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to HUB</a>
 						<div class="date"></div>
 					</li>
 					<li>
@@ -179,7 +179,7 @@
 			<div>
 				<ul class="list">
 					<li style="text-align: center;">
-						<a href="https://hub.subut.ai/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to HUB</a>
+						<a href="https://{{ currentUserCtrl.hubIp }}" target="_blank">Go to HUB</a>
 						<div class="date"></div>
 					</li>
 				</ul>
