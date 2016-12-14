@@ -47,6 +47,8 @@ public class NodeSchema
     }
 
 
+    @Deprecated
+    //This method is deprecated. Use getTemplateId instead
     public String getTemplateName()
     {
         return templateName;
