@@ -8,8 +8,6 @@ import io.subutai.common.network.ProxyLoadBalanceStrategy;
 
 /**
  * DTO object for reverse proxy config
- *
- * TODO add port
  */
 public class ReverseProxyConfig
 {
