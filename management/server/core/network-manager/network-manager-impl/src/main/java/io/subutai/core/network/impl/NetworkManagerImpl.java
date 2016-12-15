@@ -398,7 +398,7 @@ public class NetworkManagerImpl implements NetworkManager
                 ProxyLoadBalanceStrategy.NONE,
                 String.format( "/mnt/lib/lxc/%s/rootfs/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
         execute( getManagementHost(), commands.getAddIpToVlanDomainCommand(
-                proxyConfig.getHost() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
+                containerHost.getIp() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
                 proxyConfig.getVlan() ) );
     }
 
