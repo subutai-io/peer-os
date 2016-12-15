@@ -2682,7 +2682,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             getNetworkManager().removeVlanDomain( networkResource.getVlan() );
             getNetworkManager().setVlanDomain( networkResource.getVlan(), reverseProxyConfig.getDomainName(),
                     reverseProxyConfig.getLoadBalanceStrategy(), reverseProxyConfig.getSslCertPath() );
-            getNetworkManager().addIpToVlanDomain( netInterface.getIp(), networkResource.getVlan() );
+            getNetworkManager().addIpToVlanDomain( netInterface.getIp() + ":" + reverseProxyConfig.getPort(),
+                    networkResource.getVlan() );
         }
         catch ( Exception e )
         {
