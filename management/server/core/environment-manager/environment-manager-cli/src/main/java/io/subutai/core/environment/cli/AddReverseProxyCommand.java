@@ -54,8 +54,9 @@ public class AddReverseProxyCommand extends SubutaiShellCommandSupport
         {
             sslCert = readFile( certPath, Charset.defaultCharset() );
         }
-        final ReverseProxyConfig config = new ReverseProxyConfig( environmentId, containerId, domainName, sslCert,
-                ProxyLoadBalanceStrategy.NONE );
+        final ReverseProxyConfig config =
+                new ReverseProxyConfig( environmentId, containerId, domainName, sslCert, ProxyLoadBalanceStrategy.NONE,
+                        80 );
         environmentManager.addReverseProxy( environment, config );
         return null;
     }

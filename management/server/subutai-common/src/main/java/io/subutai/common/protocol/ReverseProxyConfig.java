@@ -22,18 +22,7 @@ public class ReverseProxyConfig
     @JsonProperty( "loadBalanceStrategy" )
     private ProxyLoadBalanceStrategy loadBalanceStrategy;
     @JsonProperty( "port" )
-    private int port = 80;
-
-
-    public ReverseProxyConfig( @JsonProperty( "environmentId" ) final String environmentId,
-                               @JsonProperty( "containerId" ) final String containerId,
-                               @JsonProperty( "domainName" ) final String domainName,
-                               @JsonProperty( "sslCertPath" ) final String sslCertPath,
-                               @JsonProperty( "loadBalanceStrategy" )
-                               final ProxyLoadBalanceStrategy loadBalanceStrategy )
-    {
-        this( environmentId, containerId, domainName, sslCertPath, loadBalanceStrategy, 80 );
-    }
+    private int port;
 
 
     public ReverseProxyConfig( @JsonProperty( "environmentId" ) final String environmentId,
