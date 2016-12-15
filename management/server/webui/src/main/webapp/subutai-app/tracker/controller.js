@@ -76,7 +76,7 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	}
 
 	function dateHTML(data, type, full, meta) {
-		return '<div>' + moment( data ).format('MMM Do YYYY HH:mm:ss') + '</div>';
+		return '<div>' + moment( data ).format('YYYY-MM-DD HH:mm:ss') + '</div>';
 	}
 
 	function viewLogsButton(data, type, full, meta) {
