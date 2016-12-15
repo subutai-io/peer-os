@@ -278,10 +278,8 @@ public interface Peer extends RelationLink
 
     void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
 
-    @Deprecated
     void addCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
 
-    @Deprecated
     void removeCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
 
     SshKeys getSshKeys( EnvironmentId environmentId, SshEncryptionType sshEncryptionType ) throws PeerException;
