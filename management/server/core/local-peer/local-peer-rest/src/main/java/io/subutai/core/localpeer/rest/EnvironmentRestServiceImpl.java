@@ -20,7 +20,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.CustomProxyConfig;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -338,25 +337,6 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
             return localPeer.getResourceHostIdByContainerId( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response addReverseProxy( final ReverseProxyConfig reverseProxyConfig )
-    {
-        try
-        {
-            Preconditions.checkNotNull( reverseProxyConfig );
-
-            localPeer.addReverseProxy( reverseProxyConfig );
-
-            return Response.ok().build();
         }
         catch ( Exception e )
         {

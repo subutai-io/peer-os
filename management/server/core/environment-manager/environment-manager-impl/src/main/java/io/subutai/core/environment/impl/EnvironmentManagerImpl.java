@@ -60,7 +60,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -1836,24 +1835,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.error( "Error on E monitoring", e );
             throw new EnvironmentManagerException( e.getMessage(), e );
-        }
-    }
-
-
-    @Override
-    public void addReverseProxy( final Environment environment, final ReverseProxyConfig reverseProxyConfig )
-            throws EnvironmentModificationException
-    {
-        try
-        {
-            ContainerHost containerHost = environment.getContainerHostById( reverseProxyConfig.getContainerId() );
-            Peer peer = peerManager.getPeer( containerHost.getPeerId() );
-            peer.addReverseProxy( reverseProxyConfig );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new EnvironmentModificationException( "Error on adding reverse proxy." );
         }
     }
 

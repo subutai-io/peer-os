@@ -61,7 +61,6 @@ import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -978,15 +977,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( peerId, "Invalid peer id" );
 
         return peerWebClient.getResourceLimits( peerId );
-    }
-
-
-    @Override
-    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
-    {
-        Preconditions.checkNotNull( reverseProxyConfig, "Invalid proxy config" );
-
-        environmentWebClient.addReverseProxy( reverseProxyConfig );
     }
 
 
