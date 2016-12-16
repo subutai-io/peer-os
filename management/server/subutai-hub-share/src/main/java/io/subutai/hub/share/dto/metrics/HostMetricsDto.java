@@ -25,7 +25,7 @@ public class HostMetricsDto
 
     public enum HostType
     {
-        RESOURCE_HOST, CONTAINER_HOST
+        RESOURCE_HOST, CONTAINER_HOST, UNKNOWN
     }
 
 

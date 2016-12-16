@@ -91,26 +91,28 @@ public class HistoricalMetrics
     @JsonIgnore
     public HostMetricsDto.HostType getHostType()
     {
-        HostMetricsDto.HostType result = null;
-        if ( !metrics.isEmpty() && !metrics.get( 0 ).getSeries().isEmpty() )
+        HostMetricsDto.HostType result = HostMetricsDto.HostType.UNKNOWN;
+        if ( metrics != null && !metrics.isEmpty() && ( metrics.get( 0 ).getSeries() != null ) && !( metrics.get( 0 )
+                                                                                                            .getSeries()
+                                                                                                            .isEmpty() ) )
         {
-            if ( metrics.get( 0 ).getSeries().get( 0 ).getName().startsWith( "host_" ) )
+            String name = metrics.get( 0 ).getSeries().get( 0 ).getName();
+            if ( name != null )
             {
-                result = HostMetricsDto.HostType.RESOURCE_HOST;
-            }
-            else
-            {
-                if ( metrics.get( 0 ).getSeries().get( 0 ).getName().startsWith( "lxc_" ) )
+                if ( name.startsWith( "host_" ) )
                 {
-                    result = HostMetricsDto.HostType.CONTAINER_HOST;
+                    result = HostMetricsDto.HostType.RESOURCE_HOST;
+                }
+                else
+                {
+                    if ( name.startsWith( "lxc_" ) )
+                    {
+                        result = HostMetricsDto.HostType.CONTAINER_HOST;
+                    }
                 }
             }
         }
 
-        if ( result == null )
-        {
-            throw new IllegalStateException( "Could not determine host type." );
-        }
         return result;
     }
 
