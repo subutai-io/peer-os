@@ -46,7 +46,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -1351,18 +1350,6 @@ public class EnvironmentManagerImplTest
         environmentManager.stopMonitoring( "ID", AlertHandlerPriority.HIGH, TestHelper.ENV_ID );
 
         verify( environmentManager ).update( environment );
-    }
-
-
-    @Test
-    public void testAddReverseProxy() throws Exception
-    {
-        ReverseProxyConfig config = mock( ReverseProxyConfig.class );
-        doReturn( TestHelper.CONTAINER_ID ).when( config ).getContainerId();
-
-        environmentManager.addReverseProxy( environment, config );
-
-        verify( localPeer ).addReverseProxy( config );
     }
 
 

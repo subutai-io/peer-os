@@ -36,7 +36,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.Ownership;
@@ -569,7 +568,8 @@ public class EnvironmentManagerSecureProxy
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId, final int port )
+    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId,
+                                                 final int port )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Environment environment = loadEnvironment( environmentId );
@@ -788,14 +788,6 @@ public class EnvironmentManagerSecureProxy
                                 final String environmentId ) throws EnvironmentManagerException
     {
         environmentManager.stopMonitoring( handlerId, handlerPriority, environmentId );
-    }
-
-
-    @Override
-    public void addReverseProxy( final Environment environment, final ReverseProxyConfig reverseProxyConfig )
-            throws EnvironmentModificationException
-    {
-        environmentManager.addReverseProxy( environment, reverseProxyConfig );
     }
 
 

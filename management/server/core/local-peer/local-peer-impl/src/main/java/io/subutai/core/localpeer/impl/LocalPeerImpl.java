@@ -46,10 +46,8 @@ import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -83,7 +81,6 @@ import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
@@ -2650,45 +2647,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Error on removing custom reverse proxy: %s", e.getMessage() ) );
-        }
-    }
-
-
-    @Override
-    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
-    {
-        Preconditions.checkNotNull( reverseProxyConfig, "Invalid proxy config" );
-
-
-        ContainerHost containerHost = getContainerHostById( reverseProxyConfig.getContainerId() );
-
-        final NetworkResource networkResource =
-                getReservedNetworkResources().findByEnvironmentId( containerHost.getEnvironmentId().getId() );
-
-        if ( networkResource == null )
-        {
-            throw new PeerException( "Network resources not found." );
-        }
-
-        final HostInterface netInterface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-        if ( netInterface instanceof NullHostInterface )
-        {
-            throw new PeerException( "Container network interface is null." );
-        }
-
-        try
-        {
-            getNetworkManager().removeVlanDomain( networkResource.getVlan() );
-            getNetworkManager().setVlanDomain( networkResource.getVlan(), reverseProxyConfig.getDomainName(),
-                    reverseProxyConfig.getLoadBalanceStrategy(), reverseProxyConfig.getSslCertPath() );
-            getNetworkManager().addIpToVlanDomain( netInterface.getIp() + ":" + reverseProxyConfig.getPort(),
-                    networkResource.getVlan() );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
         }
     }
 
