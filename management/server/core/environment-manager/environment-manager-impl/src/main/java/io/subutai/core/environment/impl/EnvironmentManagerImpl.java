@@ -127,6 +127,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
     protected static final String MODULE_NAME = "Environment Manager";
+    private static final long RESET_ENVS_P2P_KEYS_INTERVAL_MIN = 60;
+    private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 1;
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
@@ -1658,9 +1660,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void remove( final LocalEnvironment environment )
     {
-        environmentService.remove( environment.getId() );
+        if ( environmentAdapter.removeEnvironment( environment ) )
+        {
+            environmentService.remove( environment.getId() );
+        }
+        else
+        {
+            environment.markAsDeleted();
 
-        environmentAdapter.removeEnvironment( environment );
+            environmentService.merge( environment );
+        }
     }
 
 
@@ -2073,8 +2082,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.debug( "Environment background tasks started..." );
 
-            uploadPeerOwnerEnvironmentsToHub();
-
             syncEnvironments();
 
             resetP2pKeys();
@@ -2147,7 +2154,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private void resetP2pKeys()
     {
-        if ( System.currentTimeMillis() - lastP2pSecretKeyResetTs >= TimeUnit.MINUTES.toMillis( 60 ) )
+        if ( System.currentTimeMillis() - lastP2pSecretKeyResetTs >= TimeUnit.MINUTES
+                .toMillis( RESET_ENVS_P2P_KEYS_INTERVAL_MIN ) )
         {
             lastP2pSecretKeyResetTs = System.currentTimeMillis();
 
@@ -2192,7 +2200,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private void syncEnvironments()
     {
-        if ( System.currentTimeMillis() - lastEnvSyncTs >= TimeUnit.MINUTES.toMillis( 30 ) )
+        if ( System.currentTimeMillis() - lastEnvSyncTs >= TimeUnit.MINUTES
+                .toMillis( SYNC_ENVS_WITH_HUB_INTERVAL_MIN ) )
         {
             lastEnvSyncTs = System.currentTimeMillis();
 
@@ -2201,7 +2210,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 @Override
                 public Void run()
                 {
+                    uploadPeerOwnerEnvironmentsToHub();
+
                     doSyncEnvironments();
+
                     return null;
                 }
             } );
@@ -2293,6 +2305,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 catch ( PeerException e )
                 {
                     LOG.error( e.getMessage() );
+                }
+            }
+
+            // 3. Remove deleted local env-s from Hub
+
+            Collection<LocalEnvironment> deletedEnvs = environmentService.getDeleted();
+
+            for ( LocalEnvironment deletedEnvironment : deletedEnvs )
+            {
+                if ( environmentAdapter.removeEnvironment( deletedEnvironment ) )
+                {
+                    environmentService.remove( deletedEnvironment.getId() );
                 }
             }
         }

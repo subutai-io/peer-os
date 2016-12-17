@@ -1209,6 +1209,7 @@ public class EnvironmentManagerImplTest
     @Test
     public void testRemove() throws Exception
     {
+        doReturn( true ).when( environmentAdapter ).removeEnvironment( environment );
         environmentManager.remove( environment );
 
         verify( environmentService ).remove( TestHelper.ENV_ID );

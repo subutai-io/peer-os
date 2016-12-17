@@ -144,21 +144,25 @@ public class EnvironmentAdapter
     }
 
 
-    public void removeEnvironment( LocalEnvironment env )
+    public boolean removeEnvironment( LocalEnvironment env )
     {
         if ( !canWorkWithHub() )
         {
-            return;
+            return false;
         }
 
         try
         {
             hubAdapter.removeEnvironment( env.getId() );
+
+            return true;
         }
         catch ( Exception e )
         {
             log.error( "Error to remove environment: ", e );
         }
+
+        return false;
     }
 
 
