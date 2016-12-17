@@ -1556,6 +1556,20 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
+    public boolean isSystemUser()
+    {
+        User user = getActiveUser();
+
+        if ( user == null )
+        {
+            return false;
+        }
+
+        return SYSTEM_USERNAME.equalsIgnoreCase( user.getUserName() );
+    }
+
+
+    @Override
     public boolean isAdmin()
     {
         User user = getActiveUser();

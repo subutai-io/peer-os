@@ -161,6 +161,10 @@ public class LocalEnvironment implements Environment, Serializable
     @JsonIgnore
     private boolean uploaded = false;
 
+    @Column
+    @JsonIgnore
+    private boolean deleted = false;
+
 
     protected LocalEnvironment()
     {
@@ -194,6 +198,18 @@ public class LocalEnvironment implements Environment, Serializable
     public void markAsUploaded()
     {
         uploaded = true;
+    }
+
+
+    public boolean isDeleted()
+    {
+        return deleted;
+    }
+
+
+    public void markAsDeleted()
+    {
+        deleted = true;
     }
 
 

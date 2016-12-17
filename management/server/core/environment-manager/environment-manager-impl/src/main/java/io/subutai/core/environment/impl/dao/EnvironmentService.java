@@ -14,6 +14,8 @@ public interface EnvironmentService
 
     Collection<LocalEnvironment> getAll();
 
+    Collection<LocalEnvironment> getDeleted();
+
     void persist( Environment item );
 
     void remove( final String id );
