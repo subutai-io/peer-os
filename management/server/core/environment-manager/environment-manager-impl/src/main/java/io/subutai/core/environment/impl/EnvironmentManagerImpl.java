@@ -128,7 +128,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     protected static final String MODULE_NAME = "Environment Manager";
     private static final long RESET_ENVS_P2P_KEYS_INTERVAL_MIN = 60;
-    private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 1;
+    private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 30;
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
