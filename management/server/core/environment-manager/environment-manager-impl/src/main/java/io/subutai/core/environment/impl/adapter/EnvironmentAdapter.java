@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.adapter;
 
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.RhP2pIp;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -59,31 +59,43 @@ public class EnvironmentAdapter
 
     public HubEnvironment get( String id )
     {
-
-        for ( HubEnvironment e : getEnvironments( identityManager.isTenantManager() ) )
+        try
         {
-            if ( e.getId().equals( id ) )
+            for ( HubEnvironment e : getEnvironments( identityManager.isTenantManager() ) )
             {
-                return e;
+                if ( e.getId().equals( id ) )
+                {
+                    return e;
+                }
             }
+        }
+        catch ( ActionFailedException e )
+        {
+            log.error( e.getMessage() );
         }
 
         return null;
     }
 
 
+    /**
+     * Returns hub environments for this peer. Throws {@code ActionFailedException} if requests to Hub failed for some
+     * reason
+     *
+     * @param all true: returns all environments, false: returns current user environments
+     */
     public Set<HubEnvironment> getEnvironments( boolean all )
     {
         if ( !canWorkWithHub() )
         {
-            return Collections.emptySet();
+            throw new ActionFailedException( "Peer is not registered with Hub or connection to Hub failed" );
         }
 
         String json = all ? hubAdapter.getAllEnvironmentsForPeer() : hubAdapter.getUserEnvironmentsForPeer();
 
         if ( json == null )
         {
-            return Collections.emptySet();
+            throw new ActionFailedException( "Failed to obtain environments from Hub" );
         }
 
         log.debug( "Json with environments: {}", json );
@@ -102,6 +114,8 @@ public class EnvironmentAdapter
         catch ( Exception e )
         {
             log.error( "Error to parse json: ", e );
+
+            throw new ActionFailedException( "Failed to parse environments from Hub: " + e.getMessage() );
         }
 
         return envs;

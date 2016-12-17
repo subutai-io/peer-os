@@ -272,6 +272,10 @@ public interface IdentityManager
      */
     boolean isTenantManager();
 
+    /**
+     * Returns true if user is internal system user, false otherwise
+     */
+    boolean isSystemUser();
 
     /**
      * Returns true if user has admin role, false otherwise

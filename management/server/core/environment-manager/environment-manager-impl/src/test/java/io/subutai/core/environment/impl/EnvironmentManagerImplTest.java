@@ -1367,7 +1367,7 @@ public class EnvironmentManagerImplTest
     {
         doNothing().when( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
 
-        environmentManager.resetP2Pkey();
+        environmentManager.doResetP2Pkeys();
 
         verify( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
     }
