@@ -87,7 +87,7 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
         if ( sendMetrics )
         {
-            processPeerMetrics();
+//            processPeerMetrics();
         }
     }
 
