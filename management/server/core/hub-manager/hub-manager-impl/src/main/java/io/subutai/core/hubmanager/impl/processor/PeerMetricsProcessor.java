@@ -73,7 +73,7 @@ public class PeerMetricsProcessor implements Runnable
 
     public void sendPeerMetrics() throws HubManagerException
     {
-        if ( manager.isRegistered() )
+        if ( manager.isRegisteredWithHub() )
         {
             Calendar cal = Calendar.getInstance();
             Date endTime = cal.getTime();

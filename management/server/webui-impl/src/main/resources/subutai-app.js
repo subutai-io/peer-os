@@ -239,7 +239,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
                 SweetAlert.swal("Success!", "Heartbeat sent successfully.", "success");
             }).error(function (error) {
             hubPopupLoadScreen();
-            SweetAlert.swal("ERROR!", "Error to process heartbeat: " + error.replace(/\\n/g, " "), "error");
+            SweetAlert.swal("ERROR!", "Error performing heartbeat: " + error.replace(/\\n/g, " "), "error");
         });
     }
 

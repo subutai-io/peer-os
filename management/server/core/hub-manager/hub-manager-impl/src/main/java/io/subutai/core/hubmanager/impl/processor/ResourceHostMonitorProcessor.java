@@ -14,6 +14,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -24,13 +26,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
-
-
-/**
- * Please use PeerMetricsProcessor
- */
-@Deprecated
-public class ResourceHostMonitorProcessor implements Runnable
+public class ResourceHostMonitorProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -38,102 +34,91 @@ public class ResourceHostMonitorProcessor implements Runnable
 
     private ConfigManager configManager;
 
-    private HubManagerImpl manager;
-
     private PeerManager peerManager;
 
     private Monitor monitor;
 
-    protected ConcurrentLinkedDeque<ResourceHostMonitorDto> queue = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque<ResourceHostMonitorDto> queue = new ConcurrentLinkedDeque<>();
 
 
-    public ResourceHostMonitorProcessor( final HubManagerImpl integration, final PeerManager peerManager,
-                                         final ConfigManager configManager, final Monitor monitor )
+    public ResourceHostMonitorProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
+                                         final ConfigManager configManager, final Monitor monitor,
+                                         final RestClient restClient )
     {
+        super( hubManager, restClient );
         this.peerManager = peerManager;
         this.configManager = configManager;
-        this.manager = integration;
         this.monitor = monitor;
     }
 
 
     @Override
-    public void run()
+    public void request() throws HubManagerException
     {
-        try
-        {
-            // sendResourceHostMonitoringData();
-        }
-        catch ( Exception e )
-        {
-            log.error( "Sending resource hosts monitoring data failed.", e.getMessage() );
-        }
+        sendResourceHostMonitoringData();
     }
 
 
-    public void sendResourceHostMonitoringData() throws HubManagerException
+    private void sendResourceHostMonitoringData() throws HubManagerException
     {
-        if ( manager.isRegistered() )
+        for ( ResourceHostMetric resourceHostMetric : monitor.getResourceHostMetrics().getResources() )
         {
-            for ( ResourceHostMetric resourceHostMetric : monitor.getResourceHostMetrics().getResources() )
+            ResourceHostMonitorDto resourceHostMonitorDto = new ResourceHostMonitorDto();
+
+            resourceHostMonitorDto.setPeerId( peerManager.getLocalPeer().getId() );
+            resourceHostMonitorDto.setName( resourceHostMetric.getHostInfo().getHostname() );
+            resourceHostMonitorDto.setHostId( resourceHostMetric.getHostInfo().getId() );
+
+            try
             {
-                ResourceHostMonitorDto resourceHostMonitorDto = new ResourceHostMonitorDto();
-
-                resourceHostMonitorDto.setPeerId( peerManager.getLocalPeer().getId() );
-                resourceHostMonitorDto.setName( resourceHostMetric.getHostInfo().getHostname() );
-                resourceHostMonitorDto.setHostId( resourceHostMetric.getHostInfo().getId() );
-
-                try
-                {
-                    resourceHostMonitorDto.setAvailableRam( resourceHostMetric.getAvailableRam() );
-                }
-                catch ( Exception e )
-                {
-                    resourceHostMonitorDto.setAvailableRam( 0.0 );
-                    log.info( e.getMessage(), "No info about available RAM" );
-                }
-
-                try
-                {
-                    resourceHostMonitorDto.setAvailableSpace( resourceHostMetric.getAvailableSpace() );
-                }
-                catch ( Exception e )
-                {
-                    resourceHostMonitorDto.setAvailableSpace( 0.0 );
-                    log.info( e.getMessage(), "No info about available Space" );
-                }
-
-                try
-                {
-                    resourceHostMonitorDto.setTotalRam( resourceHostMetric.getTotalRam() );
-                }
-                catch ( Exception e )
-                {
-                    resourceHostMonitorDto.setTotalRam( 0.0 );
-                    log.info( e.getMessage(), "No info about total RAM" );
-                }
-                try
-                {
-                    resourceHostMonitorDto.setTotalSpace( resourceHostMetric.getTotalSpace() );
-                }
-                catch ( Exception e )
-                {
-                    resourceHostMonitorDto.setTotalSpace( 0.0 );
-                    log.info( e.getMessage(), "No info about total Space" );
-                }
-                try
-                {
-                    resourceHostMonitorDto.setUsedCpu( resourceHostMetric.getUsedCpu() );
-                }
-                catch ( Exception e )
-                {
-                    resourceHostMonitorDto.setUsedCpu( 0.0 );
-                    log.info( e.getMessage(), "No info about used CPU" );
-                }
-
-                queue( resourceHostMonitorDto );
-                send();
+                resourceHostMonitorDto.setAvailableRam( resourceHostMetric.getAvailableRam() );
             }
+            catch ( Exception e )
+            {
+                resourceHostMonitorDto.setAvailableRam( 0.0 );
+                log.info( e.getMessage(), "No info about available RAM" );
+            }
+
+            try
+            {
+                resourceHostMonitorDto.setAvailableSpace( resourceHostMetric.getAvailableSpace() );
+            }
+            catch ( Exception e )
+            {
+                resourceHostMonitorDto.setAvailableSpace( 0.0 );
+                log.info( e.getMessage(), "No info about available Space" );
+            }
+
+            try
+            {
+                resourceHostMonitorDto.setTotalRam( resourceHostMetric.getTotalRam() );
+            }
+            catch ( Exception e )
+            {
+                resourceHostMonitorDto.setTotalRam( 0.0 );
+                log.info( e.getMessage(), "No info about total RAM" );
+            }
+            try
+            {
+                resourceHostMonitorDto.setTotalSpace( resourceHostMetric.getTotalSpace() );
+            }
+            catch ( Exception e )
+            {
+                resourceHostMonitorDto.setTotalSpace( 0.0 );
+                log.info( e.getMessage(), "No info about total Space" );
+            }
+            try
+            {
+                resourceHostMonitorDto.setUsedCpu( resourceHostMetric.getUsedCpu() );
+            }
+            catch ( Exception e )
+            {
+                resourceHostMonitorDto.setUsedCpu( 0.0 );
+                log.info( e.getMessage(), "No info about used CPU" );
+            }
+
+            queue( resourceHostMonitorDto );
+            send();
         }
     }
 

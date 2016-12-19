@@ -11,7 +11,7 @@ import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;

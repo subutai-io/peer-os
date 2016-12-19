@@ -16,8 +16,6 @@ public interface HubManager
 
     void unregisterPeer() throws HubManagerException;
 
-    boolean isRegistered();
-
     String getPeerName();
 
     void sendHeartbeat() throws HubManagerException;
@@ -44,5 +42,9 @@ public interface HubManager
 
     String getCurrentUserEmail();
 
+    boolean isRegisteredWithHub();
+
     boolean isHubReachable();
+
+    boolean canWorkWithHub();
 }

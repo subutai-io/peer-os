@@ -150,7 +150,7 @@ public class RestServiceImpl implements RestService
     {
         RegistrationPojo pojo = new RegistrationPojo();
 
-        if ( hubManager.isRegistered() )
+        if ( hubManager.isRegisteredWithHub() )
         {
             pojo.setOwnerId( hubManager.getHubConfiguration().getOwnerId() );
 
@@ -159,7 +159,7 @@ public class RestServiceImpl implements RestService
             pojo.setPeerName( hubManager.getPeerName() );
         }
 
-        pojo.setRegisteredToHub( hubManager.isRegistered() );
+        pojo.setRegisteredToHub( hubManager.isRegisteredWithHub() );
 
         String hubRegistrationInfo = JsonUtil.GSON.toJson( pojo );
 
