@@ -210,32 +210,34 @@ public class HubManagerImpl implements HubManager, HostListener
         //***********
 
         ResourceHostMonitorProcessor resourceHostMonitorProcessor =
-                new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
+                new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor, restClient );
 
         resourceHostMonitorExecutorService
                 .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
 
         //***********
 
-        containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
+        containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager, restClient );
 
         containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
         //***********
 
-        HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this, logListener );
+        HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this, logListener, restClient );
 
         hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
         //***********
 
-        TunnelEventProcessor tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
+        TunnelEventProcessor tunnelEventProcessor =
+                new TunnelEventProcessor( this, peerManager, configManager, restClient );
 
         tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
         //***********
 
-        final VersionInfoProcessor versionInfoProcessor = new VersionInfoProcessor( this, peerManager, configManager );
+        final VersionInfoProcessor versionInfoProcessor =
+                new VersionInfoProcessor( this, peerManager, configManager, restClient );
 
         versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
@@ -249,7 +251,7 @@ public class HubManagerImpl implements HubManager, HostListener
         //***********
 
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
-                new EnvironmentTelemetryProcessor( this, peerManager, configManager );
+                new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
 
         environmentTelemetryService.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
     }
@@ -273,7 +275,7 @@ public class HubManagerImpl implements HubManager, HostListener
                 new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
-                new EnvironmentTelemetryProcessor( this, peerManager, configManager );
+                new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
 
         StateLinkProcessor resourceHostRegisterProcessor =
                 new ResourceHostRegisterProcessor( hostRegistrationManager, peerManager, restClient );

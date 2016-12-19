@@ -23,6 +23,8 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -35,7 +37,7 @@ import io.subutai.hub.share.json.JsonUtil;
 import static java.lang.String.format;
 
 
-public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcessor
+public class EnvironmentTelemetryProcessor extends HubRequester implements StateLinkProcessor
 {
     private static final String GET_ENV_URL = "/rest/v1/peers/%s/environments";
     private static final String GET_ENV_CONTAINERS_URL = "/rest/v1/environments/%s";
@@ -53,34 +55,32 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
 
     private PeerManager peerManager;
     private ConfigManager configManager;
-    private HubManager hubManager;
 
 
-    public EnvironmentTelemetryProcessor( HubManager hubManager, PeerManager peerManager, ConfigManager configManager )
+    EnvironmentTelemetryProcessor( final HubManager hubManager, final PeerManager peerManager,
+                                   final ConfigManager configManager, final RestClient restClient )
     {
+        super( hubManager, restClient );
+
         this.peerManager = peerManager;
         this.configManager = configManager;
-        this.hubManager = hubManager;
     }
 
 
     @Override
-    public void run()
+    public void request()
     {
-        if ( hubManager.isRegisteredWithHub() )
-        {
-            startProccess( "pingssh" );
-        }
+        startProcess();
     }
 
 
-    private void startProccess( String tools )
+    private void startProcess()
     {
         Set<String> envs = getEnvIds( format( GET_ENV_URL, configManager.getPeerId() ), configManager );
 
         for ( String envId : envs )
         {
-            checkEnvironmentHealth( envId, tools );
+            checkEnvironmentHealth( envId, "pingssh" );
         }
     }
 
@@ -235,7 +235,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     }
 
 
-    public JSONObject getTelemetry( String link, ConfigManager configManager )
+    private JSONObject getTelemetry( String link, ConfigManager configManager )
     {
         try
         {
@@ -333,11 +333,6 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     @Override
     public synchronized boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
     {
-        if ( !hubManager.isRegisteredWithHub() )
-        {
-            return false;
-        }
-
         for ( String link : stateLinks )
         {
             processStateLink( link );
@@ -385,6 +380,8 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     private void process( String link )
     {
         JSONObject result = getTelemetry( link, configManager );
+
+        Preconditions.checkNotNull( result );
 
         checkEnvironmentHealth( result.getString( "envId" ), result.getString( "tools" ) );
     }

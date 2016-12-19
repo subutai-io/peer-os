@@ -16,6 +16,8 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
@@ -25,7 +27,7 @@ import static java.lang.String.format;
 import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.READY;
 
 
-public class TunnelEventProcessor implements Runnable
+public class TunnelEventProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -39,24 +41,21 @@ public class TunnelEventProcessor implements Runnable
 
     private ConfigManager configManager;
 
-    private HubManager hubManager;
 
-
-    public TunnelEventProcessor( final HubManager hubManager, PeerManager peerManager, ConfigManager configManager )
+    public TunnelEventProcessor( final HubManager hubManager, final PeerManager peerManager,
+                                 final ConfigManager configManager, final RestClient restClient )
     {
+        super( hubManager, restClient );
+
         this.peerManager = peerManager;
         this.configManager = configManager;
-        this.hubManager = hubManager;
     }
 
 
     @Override
-    public void run()
+    public void request()
     {
-        if ( hubManager.isRegisteredWithHub() )
-        {
-            startProccess();
-        }
+        startProccess();
     }
 
 

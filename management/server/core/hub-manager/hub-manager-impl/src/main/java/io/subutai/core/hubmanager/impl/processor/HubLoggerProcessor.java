@@ -13,6 +13,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import io.subutai.core.appender.SubutaiErrorEvent;
+import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.LogListenerImpl;
@@ -22,32 +24,31 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
-public class HubLoggerProcessor implements Runnable
+public class HubLoggerProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private ConfigManager configManager;
 
-    private HubManagerImpl hubManager;
 
     private LogListenerImpl logListener;
 
 
     public HubLoggerProcessor( final ConfigManager configManager, final HubManagerImpl hubManager,
-                               LogListenerImpl logListener )
+                               final LogListenerImpl logListener, final RestClient restClient )
     {
+        super( hubManager, restClient );
         this.configManager = configManager;
-        this.hubManager = hubManager;
         this.logListener = logListener;
     }
 
 
     @Override
-    public void run()
+    public void request()
     {
         Set<SubutaiErrorEvent> subutaiErrorEvents = logListener.getSubutaiErrorEvents();
 
-        if ( !subutaiErrorEvents.isEmpty() && hubManager.isRegisteredWithHub() && hubManager.isHubReachable() )
+        if ( !subutaiErrorEvents.isEmpty() )
         {
             WebClient client = null;
             try
