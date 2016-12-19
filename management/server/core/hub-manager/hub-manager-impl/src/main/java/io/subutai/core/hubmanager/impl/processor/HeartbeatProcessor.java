@@ -14,11 +14,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.settings.Common;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
 
 
@@ -122,7 +122,7 @@ public class HeartbeatProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            log.error( "Error to process heartbeat: ", e.getMessage() );
+            log.error( "Error performing heartbeat: ", e.getMessage() );
 
             if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( e.getMessage() ) )
             {

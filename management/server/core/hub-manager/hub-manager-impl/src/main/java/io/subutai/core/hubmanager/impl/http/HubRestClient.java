@@ -30,7 +30,7 @@ import io.subutai.hub.share.json.JsonUtil;
 public class HubRestClient implements RestClient
 {
     public static final String CONNECTION_EXCEPTION_MARKER = "ConnectException";
-    private static final String ERROR = "Error to execute request to Hub: ";
+    private static final String ERROR = "Error executing request to Hub: ";
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
