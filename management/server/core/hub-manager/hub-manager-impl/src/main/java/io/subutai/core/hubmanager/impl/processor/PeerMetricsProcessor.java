@@ -39,7 +39,6 @@ public class PeerMetricsProcessor extends HubRequester
 
     private ConfigManager configManager;
 
-
     private PeerManager peerManager;
 
     private Monitor monitor;
