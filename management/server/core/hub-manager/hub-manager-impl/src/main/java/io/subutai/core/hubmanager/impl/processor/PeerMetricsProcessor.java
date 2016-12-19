@@ -77,7 +77,7 @@ public class PeerMetricsProcessor implements Runnable
         {
             Calendar cal = Calendar.getInstance();
             Date endTime = cal.getTime();
-            cal.add( Calendar.MINUTE, -15 );
+            cal.add( Calendar.MINUTE, -30 );
             Date startTime = cal.getTime();
             PeerMetricsDto peerMetricsDto =
                     new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
@@ -183,7 +183,7 @@ public class PeerMetricsProcessor implements Runnable
 
         while ( i.hasNext() )
         {
-            PeerMetricsDto dto = iterator.next();
+            PeerMetricsDto dto = i.next();
             if ( dto.getCreatedTime() + DTO_TTL < System.currentTimeMillis() )
             {
                 log.warn( "Removing peer monitoring data {}", dto );

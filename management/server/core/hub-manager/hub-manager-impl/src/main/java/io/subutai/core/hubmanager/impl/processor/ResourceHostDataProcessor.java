@@ -97,14 +97,19 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
 
             processP2PLogs();
 
-            if ( sendMetrics )
-            {
-                processPeerMetrics();
-            }
+            //            if ( sendMetrics )
+            //            {
+            //                processPeerMetrics();
+            //            }
         }
     }
 
-
+    /**
+     * Sends RH metrics to HUB.
+     *
+     * @deprecated use {@link PeerMetricsProcessor.sendPeerMetrics()} instead.
+     */
+    @Deprecated
     private void processPeerMetrics()
     {
         Calendar cal = Calendar.getInstance();

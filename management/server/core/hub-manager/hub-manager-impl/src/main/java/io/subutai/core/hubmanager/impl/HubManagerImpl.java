@@ -54,6 +54,7 @@ import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.processor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
@@ -93,6 +94,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final ScheduledExecutorService resourceHostMonitorExecutorService =
             Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService peerMetricsExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -134,6 +137,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private ResourceHostDataProcessor resourceHostDataProcessor;
 
+    private PeerMetricsProcessor peerMetricsProcessor;
+
     private ContainerEventProcessor containerEventProcessor;
 
     private RegistrationRequestProcessor registrationRequestProcessor;
@@ -171,14 +176,23 @@ public class HubManagerImpl implements HubManager, HostListener
 
             resourceHostDataProcessor = new ResourceHostDataProcessor( this, localPeer, monitor, restClient );
 
-            ResourceHostMonitorProcessor resourceHostMonitorProcessor =
-                    new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
-
             resourceHostConfExecutorService
                     .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
 
+/*
+            ResourceHostMonitorProcessor resourceHostMonitorProcessor =
+                    new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
+
             resourceHostMonitorExecutorService
                     .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
+*/
+
+            peerMetricsProcessor =
+                    new PeerMetricsProcessor( this, peerManager, configManager, monitor );
+
+            peerMetricsExecutorService
+                    .scheduleWithFixedDelay( peerMetricsProcessor, 30, TimeUnit.MINUTES.toSeconds( 30 ),
+                            TimeUnit.SECONDS );
 
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 

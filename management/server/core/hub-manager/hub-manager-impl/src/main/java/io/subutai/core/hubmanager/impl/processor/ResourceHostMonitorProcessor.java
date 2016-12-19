@@ -24,6 +24,12 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
+
+
+/**
+ * Please use PeerMetricsProcessor
+ */
+@Deprecated
 public class ResourceHostMonitorProcessor implements Runnable
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -56,7 +62,7 @@ public class ResourceHostMonitorProcessor implements Runnable
     {
         try
         {
-            sendResourceHostMonitoringData();
+            // sendResourceHostMonitoringData();
         }
         catch ( Exception e )
         {
