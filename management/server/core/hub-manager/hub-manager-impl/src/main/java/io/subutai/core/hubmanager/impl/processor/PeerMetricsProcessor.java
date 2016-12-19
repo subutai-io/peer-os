@@ -17,6 +17,8 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -29,7 +31,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
-public class PeerMetricsProcessor implements Runnable
+public class PeerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -37,101 +39,91 @@ public class PeerMetricsProcessor implements Runnable
 
     private ConfigManager configManager;
 
-    private HubManagerImpl manager;
-
     private PeerManager peerManager;
 
     private Monitor monitor;
 
-    protected ConcurrentLinkedDeque<PeerMetricsDto> queue = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque<PeerMetricsDto> queue = new ConcurrentLinkedDeque<>();
 
 
-    public PeerMetricsProcessor( final HubManagerImpl integration, final PeerManager peerManager,
-                                 final ConfigManager configManager, final Monitor monitor )
+    public PeerMetricsProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
+                                 final ConfigManager configManager, final Monitor monitor, final RestClient restClient )
     {
+        super( hubManager, restClient );
+
         this.peerManager = peerManager;
         this.configManager = configManager;
-        this.manager = integration;
         this.monitor = monitor;
     }
 
 
     @Override
-    public void run()
+    public void request() throws HubManagerException
     {
-        try
-        {
-            sendPeerMetrics();
-        }
-        catch ( Exception e )
-        {
-            log.error( e.getMessage(), e );
-            log.error( "Sending peer metrics data failed.", e.getMessage() );
-        }
+        sendPeerMetrics();
     }
 
 
-    public void sendPeerMetrics() throws HubManagerException
+    private void sendPeerMetrics() throws HubManagerException
     {
-        if ( manager.isRegisteredWithHub() )
+        Calendar cal = Calendar.getInstance();
+        Date endTime = cal.getTime();
+        cal.add( Calendar.MINUTE, -30 );
+        Date startTime = cal.getTime();
+        PeerMetricsDto peerMetricsDto =
+                new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
+        for ( ResourceHost host : peerManager.getLocalPeer().getResourceHosts() )
         {
-            Calendar cal = Calendar.getInstance();
-            Date endTime = cal.getTime();
-            cal.add( Calendar.MINUTE, -30 );
-            Date startTime = cal.getTime();
-            PeerMetricsDto peerMetricsDto =
-                    new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
-            for ( ResourceHost host : peerManager.getLocalPeer().getResourceHosts() )
+            ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
+            final HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startTime, endTime );
+            final HostMetricsDto hostMetrics = historicalMetrics.getHostMetrics();
+
+            hostMetrics.setHostName( resourceHostMetric.getHostInfo().getHostname() );
+            hostMetrics.setHostId( resourceHostMetric.getHostInfo().getId() );
+            hostMetrics.setContainersCount( resourceHostMetric.getContainersCount() );
+            hostMetrics.setManagement( host.isManagementHost() );
+
+            try
             {
-                ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
-                final HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startTime, endTime );
-                final HostMetricsDto hostMetrics = historicalMetrics.getHostMetrics();
-
-                hostMetrics.setHostName( resourceHostMetric.getHostInfo().getHostname() );
-                hostMetrics.setHostId( resourceHostMetric.getHostInfo().getId() );
-                hostMetrics.setContainersCount( resourceHostMetric.getContainersCount() );
-                hostMetrics.setManagement( host.isManagementHost() );
-
-                try
-                {
-                    hostMetrics.getMemory().setTotal( resourceHostMetric.getTotalRam() );
-                }
-                catch ( Exception e )
-                {
-                    hostMetrics.getMemory().setTotal( 0.0 );
-                    log.info( e.getMessage(), "No info about total RAM" );
-                }
-
-                try
-                {
-                    hostMetrics.getMemory().setMemFree( resourceHostMetric.getAvailableRam() );
-                }
-                catch ( Exception e )
-                {
-                    hostMetrics.getMemory().setMemFree( 0.0 );
-                    log.info( e.getMessage(), "No info about available RAM" );
-                }
-
-                DiskDto mntPartition = new DiskDto();
-                mntPartition.setTotal( resourceHostMetric.getTotalSpace() );
-                mntPartition.setUsed( resourceHostMetric.getUsedSpace() );
-
-                try
-                {
-                    hostMetrics.getCpu().setIdle( resourceHostMetric.getCpuIdle() );
-                    hostMetrics.getCpu().setModel( resourceHostMetric.getCpuModel() );
-                    hostMetrics.getCpu().setCoreCount( resourceHostMetric.getCpuCore() );
-                    hostMetrics.getCpu().setFrequency( resourceHostMetric.getCpuFrequency() );
-                }
-                catch ( Exception e )
-                {
-                    hostMetrics.getCpu().setIdle( 0.0 );
-                    log.info( e.getMessage(), "No info about used CPU" );
-                }
-                peerMetricsDto.addHostMetrics( hostMetrics );
+                hostMetrics.getMemory().setTotal( resourceHostMetric.getTotalRam() );
             }
-            queue( peerMetricsDto );
+            catch ( Exception e )
+            {
+                hostMetrics.getMemory().setTotal( 0.0 );
+                log.info( e.getMessage(), "No info about total RAM" );
+            }
+
+            try
+            {
+                hostMetrics.getMemory().setMemFree( resourceHostMetric.getAvailableRam() );
+            }
+            catch ( Exception e )
+            {
+                hostMetrics.getMemory().setMemFree( 0.0 );
+                log.info( e.getMessage(), "No info about available RAM" );
+            }
+
+            DiskDto mntPartition = new DiskDto();
+            mntPartition.setTotal( resourceHostMetric.getTotalSpace() );
+            mntPartition.setUsed( resourceHostMetric.getUsedSpace() );
+
+            try
+            {
+                hostMetrics.getCpu().setIdle( resourceHostMetric.getCpuIdle() );
+                hostMetrics.getCpu().setModel( resourceHostMetric.getCpuModel() );
+                hostMetrics.getCpu().setCoreCount( resourceHostMetric.getCpuCore() );
+                hostMetrics.getCpu().setFrequency( resourceHostMetric.getCpuFrequency() );
+            }
+            catch ( Exception e )
+            {
+                hostMetrics.getCpu().setIdle( 0.0 );
+                log.info( e.getMessage(), "No info about used CPU" );
+            }
+            peerMetricsDto.addHostMetrics( hostMetrics );
         }
+
+        queue( peerMetricsDto );
+
         send();
     }
 
@@ -179,11 +171,9 @@ public class PeerMetricsProcessor implements Runnable
         }
 
         // clean up queue to avoid memory exhaustion
-        Iterator<PeerMetricsDto> i = queue.iterator();
 
-        while ( i.hasNext() )
+        for ( final PeerMetricsDto dto : queue )
         {
-            PeerMetricsDto dto = i.next();
             if ( dto.getCreatedTime() + DTO_TTL < System.currentTimeMillis() )
             {
                 log.warn( "Removing peer monitoring data {}", dto );
