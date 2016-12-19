@@ -122,7 +122,7 @@ public class HeartbeatProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            log.error( "Error performing heartbeat: ", e.getMessage() );
+            log.error( "Error performing heartbeat: " + e.getMessage() );
 
             if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( e.getMessage() ) )
             {
