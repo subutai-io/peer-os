@@ -26,6 +26,12 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
+// TODO: 12/19/16 need to remove this class later
+
+/**
+ * Please use {@link PeerMetricsProcessor}
+ */
+@Deprecated
 public class ResourceHostMonitorProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
