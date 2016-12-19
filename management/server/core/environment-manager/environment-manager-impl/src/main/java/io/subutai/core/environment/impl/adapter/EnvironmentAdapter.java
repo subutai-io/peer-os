@@ -184,7 +184,7 @@ public class EnvironmentAdapter
     {
         HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
 
-        return hubManager != null && hubManager.isRegistered();
+        return hubManager != null && hubManager.isRegisteredWithHub();
     }
 
 

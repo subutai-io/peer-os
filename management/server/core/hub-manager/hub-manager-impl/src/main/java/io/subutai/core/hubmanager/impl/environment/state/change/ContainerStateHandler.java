@@ -7,7 +7,7 @@ import io.subutai.common.peer.PeerId;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;

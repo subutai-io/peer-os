@@ -28,10 +28,11 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 import io.subutai.hub.share.dto.HostInterfaceDto;
@@ -44,15 +45,11 @@ import io.subutai.hub.share.dto.metrics.PeerMetricsDto;
 import static java.lang.String.format;
 
 
-public class ResourceHostDataProcessor implements Runnable, HostListener
+public class ResourceHostDataProcessor extends HubRequester implements HostListener
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private HubManagerImpl hubManager;
-
     private LocalPeer localPeer;
-
-    private HubRestClient restClient;
 
     private Monitor monitor;
 
@@ -66,41 +63,31 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
     public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
                                       HubRestClient restClient )
     {
-        this.hubManager = hubManager;
-        this.localPeer = localPeer;
-        this.monitor = monitor;
+        super( hubManager, restClient );
 
-        this.restClient = restClient;
+        this.localPeer = localPeer;
+
+        this.monitor = monitor;
     }
 
 
     @Override
-    public void run()
+    public void request() throws HubManagerException
     {
-        try
-        {
-            process( true );
-        }
-        catch ( Exception e )
-        {
-            log.error( "Error to process resource host data: {}", e.getMessage() );
-        }
+        process( true );
     }
 
 
     public void process( boolean sendMetrics ) throws HubManagerException
     {
-        if ( hubManager.isRegistered() )
+        // TODO: 10/31/16 we need combine processConfigs and processPeerMetrics methods
+        processConfigs();
+
+        processP2PLogs();
+
+        if ( sendMetrics )
         {
-            // TODO: 10/31/16 we need combine processConfigs and processPeerMetrics methods
-            processConfigs();
-
-            processP2PLogs();
-
-            if ( sendMetrics )
-            {
-                processPeerMetrics();
-            }
+            processPeerMetrics();
         }
     }
 
@@ -309,7 +296,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
         // // TODO: 7/29/16 need optimize 
-        if ( hubManager.isRegistered() )
+        if ( hubManager.canWorkWithHub() )
         {
             HostInterfaces as = resourceHostInfo.getHostInterfaces();
             Set<HostInterfaceModel> test = as.getAll();
@@ -322,6 +309,7 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
 
                 interfaces.add( dto );
             }
+
             processConfigs();
         }
     }

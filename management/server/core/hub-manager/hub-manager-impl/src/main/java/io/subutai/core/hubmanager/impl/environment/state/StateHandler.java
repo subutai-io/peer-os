@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
