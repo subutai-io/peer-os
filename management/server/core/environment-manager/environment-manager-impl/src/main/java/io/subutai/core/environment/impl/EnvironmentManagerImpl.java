@@ -1660,7 +1660,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void remove( final LocalEnvironment environment )
     {
-        if ( environmentAdapter.removeEnvironment( environment ) )
+        if ( !environmentAdapter.isRegisteredWithHub() || environmentAdapter.removeEnvironment( environment ) )
         {
             environmentService.remove( environment.getId() );
         }
