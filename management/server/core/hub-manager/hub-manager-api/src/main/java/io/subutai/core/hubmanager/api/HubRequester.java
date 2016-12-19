@@ -37,7 +37,7 @@ public abstract class HubRequester implements Runnable
             }
             catch ( Exception e )
             {
-                LOGGER.error( "Error in {}: {}", getClass().getName(), e.getMessage() );
+                LOGGER.error( "Error in " + getClass().getName(), e );
             }
         }
     }
