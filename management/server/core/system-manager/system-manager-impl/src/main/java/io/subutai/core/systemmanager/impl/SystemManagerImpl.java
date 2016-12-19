@@ -280,6 +280,13 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
+    @Override
+    public String getHubIp()
+    {
+        return systemSettings.getHubIp();
+    }
+
+
     public void init()
     {
         this.updateDao = new UpdateDao( daoManager.getEntityManagerFactory() );

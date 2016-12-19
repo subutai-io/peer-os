@@ -23,7 +23,7 @@
 						ng-selected="containerViewCtrl.environmentId == environment.id">
 						{{ environment.name }}
 					</option>
-					<option value="ORPHAN">Orphan</option>
+					<option value="NOT_REGISTERED">Standalone</option>
 				</select>
 				<div class="clear"></div>
 			</div>
@@ -193,7 +193,7 @@
 						</td>
 					</tr>
 
-					<tr ng-repeat="(key, container) in containerViewCtrl.orphanContainers" ng-if="containerViewCtrl.environmentId == 'ORPHAN' || containerViewCtrl.environmentId.length == 0">
+					<tr ng-repeat="(key, container) in containerViewCtrl.notRegisteredContainers" ng-if="containerViewCtrl.environmentId == 'NOT_REGISTERED' || containerViewCtrl.environmentId.length == 0">
 						<td class="b-main-table__container-status">
 							<div 
 								class="b-status-icon b-status-icon_{{ container.status }}" 
@@ -237,7 +237,7 @@
 						<td>
 							<a href 
 								class="b-icon b-icon_remove" 
-								ng-click="containerViewCtrl.destroyOrphanContainer(container.id, key)">
+								ng-click="containerViewCtrl.destroyNotRegisteredContainer(container.id, key)">
 							</a>
 						</td>
 					</tr>

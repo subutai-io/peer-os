@@ -46,7 +46,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -1210,6 +1209,7 @@ public class EnvironmentManagerImplTest
     @Test
     public void testRemove() throws Exception
     {
+        doReturn( true ).when( environmentAdapter ).removeEnvironment( environment );
         environmentManager.remove( environment );
 
         verify( environmentService ).remove( TestHelper.ENV_ID );
@@ -1355,18 +1355,6 @@ public class EnvironmentManagerImplTest
 
 
     @Test
-    public void testAddReverseProxy() throws Exception
-    {
-        ReverseProxyConfig config = mock( ReverseProxyConfig.class );
-        doReturn( TestHelper.CONTAINER_ID ).when( config ).getContainerId();
-
-        environmentManager.addReverseProxy( environment, config );
-
-        verify( localPeer ).addReverseProxy( config );
-    }
-
-
-    @Test
     public void testOnRegistrationSucceeded() throws Exception
     {
         environmentManager.onRegistrationSucceeded();
@@ -1380,7 +1368,7 @@ public class EnvironmentManagerImplTest
     {
         doNothing().when( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
 
-        environmentManager.resetP2Pkey();
+        environmentManager.doResetP2Pkeys();
 
         verify( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
     }

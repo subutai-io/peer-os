@@ -27,7 +27,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	vm.environments = [];
 	vm.containers = [];
-	vm.orphanContainers = [];
+	vm.notRegisteredContainers = [];
 	vm.containersType = [];
 	vm.environmentId = $stateParams.environmentId;
 	vm.currentTags = [];
@@ -48,7 +48,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.filterContainersList = filterContainersList;
 	vm.containerAction = containerAction;
 	vm.destroyContainer = destroyContainer;
-	vm.destroyOrphanContainer = destroyOrphanContainer;
+	vm.destroyNotRegisteredContainer = destroyNotRegisteredContainer;
 	vm.addTagForm = addTagForm;
 	vm.addTags = addTags;
 	vm.removeTag = removeTag;
@@ -149,19 +149,19 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		container.tags.splice(key, 1);
 	}
 
-	function getOrphanContainers() {
-		environmentService.getOrphanContainers().success(function (data) {
+	function getNotRegisteredContainers() {
+		environmentService.getNotRegisteredContainers().success(function (data) {
 			console.log(data);
-			vm.orphanContainers = data;
+			vm.notRegisteredContainers = data;
 		});
 	}
-	getOrphanContainers();
+	getNotRegisteredContainers();
 
-	function destroyOrphanContainer(containerId, key) {
+	function destroyNotRegisteredContainer(containerId, key) {
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
-			text: "Your will not be able to recover this Orphan Container!",
+			text: "Your will not be able to recover this Container!",
 			type: "warning",
 			showCancelButton: true,
 			confirmButtonColor: "#ff3f3c",
@@ -174,11 +174,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		function (isConfirm) {
 			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
-				environmentService.deleteOrphanContainers(containerId).success(function (data) {
+				environmentService.deleteNotRegisteredContainer(containerId).success(function (data) {
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
-					vm.orphanContainers.splice(key, 1);
+					vm.notRegisteredContainers.splice(key, 1);
 				}).error(function (data) {
-					SweetAlert.swal("ERROR!", "Your Orphan Container is safe. Error: " + data.ERROR, "error");
+					SweetAlert.swal("ERROR!", "Your Container is safe. Error: " + data.ERROR, "error");
 				});
 			}
 		});

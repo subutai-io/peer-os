@@ -60,7 +60,7 @@ public class EnvironmentServiceImplTest
     {
         environmentService.getAll();
 
-        verify( entityManager ).createQuery( "select e from LocalEnvironment e", LocalEnvironment.class );
+        verify( entityManager ).createQuery( "select e from LocalEnvironment e where e.deleted = false", LocalEnvironment.class );
 
         verify( query ).getResultList();
     }

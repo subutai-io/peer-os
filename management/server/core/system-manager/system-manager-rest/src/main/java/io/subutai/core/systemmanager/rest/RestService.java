@@ -84,4 +84,9 @@ public interface RestService
     @Path( "is_update_in_progress" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response isUpdateInProgress();
+
+    @GET
+    @Path( "hub_ip" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response getHubIp();
 }

@@ -29,7 +29,6 @@ import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -276,12 +275,8 @@ public interface Peer extends RelationLink
 
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 
-    void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
-
-    @Deprecated
     void addCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
 
-    @Deprecated
     void removeCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
 
     SshKeys getSshKeys( EnvironmentId environmentId, SshEncryptionType sshEncryptionType ) throws PeerException;

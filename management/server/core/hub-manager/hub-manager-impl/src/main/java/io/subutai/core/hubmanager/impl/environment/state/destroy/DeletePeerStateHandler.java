@@ -3,12 +3,8 @@ package io.subutai.core.hubmanager.impl.environment.state.destroy;
 
 import java.util.Set;
 
-import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
@@ -17,8 +13,7 @@ import io.subutai.core.environment.api.exception.EnvironmentDestructionException
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.http.RestResult;
-import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelHelper;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 

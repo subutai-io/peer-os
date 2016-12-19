@@ -72,8 +72,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     }
 
 
-    @Override
-    public boolean isRegistered()
+    private boolean isRegistered()
     {
         return daoHelper.isPeerRegisteredToHub( peerId );
     }
@@ -152,7 +151,8 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         String userId = getUserIdWithCheck();
 
         // in case user is tenant manager we pass 0 as user id to Hub
-        if ( userId == null && identityManager.isTenantManager() && isRegistered() )
+        if ( userId == null && isRegistered() && ( identityManager.isTenantManager() || identityManager
+                .isSystemUser() ) )
         {
             userId = "0";
         }

@@ -32,6 +32,7 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.json.JsonUtil;
@@ -43,13 +44,13 @@ class HttpClient
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final String HUB_ADDRESS = "https://hub.subut.ai:444";
-
     private final PGPMessenger messenger;
 
     private static KeyStore peerKeyStore;
 
     private final String PEER_KEY_FINGERPRINT;
+
+    private SystemSettings systemSettings;
 
 
     private synchronized KeyStore getPeerKeyStore() throws HubManagerException
@@ -67,6 +68,8 @@ class HttpClient
     {
         try
         {
+            this.systemSettings = new SystemSettings();
+
             PGPPrivateKey senderKey = securityManager.getKeyManager().getPrivateKey( null );
 
             PGPPublicKey receiverKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
@@ -195,7 +198,7 @@ class HttpClient
 
     private WebClient getWebClient( String path ) throws HubManagerException
     {
-        WebClient client = WebClient.create( HUB_ADDRESS + path );
+        WebClient client = WebClient.create( String.format( "https://%s:444%s", systemSettings.getHubIp(), path ) );
 
         fixAsyncHttp( client );
 

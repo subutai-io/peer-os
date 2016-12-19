@@ -19,22 +19,18 @@ public class CustomProxyConfig
     @JsonProperty
     private String containerId;
     @JsonProperty
-    private String host;
-    @JsonProperty
     private int port = -1;
     @JsonProperty
     private String environmentId;
 
 
     public CustomProxyConfig( @JsonProperty String environmentId, @JsonProperty final String vlan,
-                              @JsonProperty final String domain, @JsonProperty final String containerId,
-                              @JsonProperty final String host )
+                              @JsonProperty final String domain, @JsonProperty final String containerId )
     {
         this.environmentId = environmentId;
         this.vlan = vlan;
         this.domain = domain;
         this.containerId = containerId;
-        this.host = host;
     }
 
 
@@ -83,13 +79,6 @@ public class CustomProxyConfig
     public String getContainerId()
     {
         return containerId;
-    }
-
-
-    @JsonIgnore
-    public String getHost()
-    {
-        return host;
     }
 
 

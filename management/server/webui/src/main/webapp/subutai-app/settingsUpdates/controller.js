@@ -9,13 +9,11 @@ SettingsUpdatesCtrl.$inject = ['$scope', '$rootScope', 'SettingsUpdatesSrv', 'Sw
 function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile) {
 	var vm = this;
 	vm.config = {isUpdatesAvailable: "waiting"};
-	vm.getHistory = [];
 	vm.activeTab = 'update';
 	vm.updateText = 'Checking...';
 	vm.updateInProgress = false;
 
 	checkActiveUpdate();
-    getHistoryData();
 
 	function checkActiveUpdate(){
 
@@ -79,25 +77,11 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 		$compile(angular.element(row).contents())($scope);
 	}
 
-	/*function dateHTML(data, type, full, meta) {
-		return moment( data ).format('MMM Do YYYY HH:mm:ss');
-	}*/
-
 	function dateHTML(data, type, full, meta) {
-		return '<div>' + moment( data ).format('MMM Do YYYY HH:mm:ss') + '</div>';
+		return '<div>' + moment( data ).format('YYYY-MM-DD HH:mm:ss') + '</div>';
 	}	
 
 	vm.update = update;
-	vm.getHistoryData = getHistoryData;
-
-	function getHistoryData() {
-		SettingsUpdatesSrv.getHistory().success(function (data) {
-			vm.getHistory = data;
-			console.log(vm.getHistory);
-		}).error(function(error) {
-			SweetAlert.swal("ERROR!", error, "error");
-		});
-	}
 
 	function removeUpdateMessage() {
 		var notifications = sessionStorage.getItem('notifications');
