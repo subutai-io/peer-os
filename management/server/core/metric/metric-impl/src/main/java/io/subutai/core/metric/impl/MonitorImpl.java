@@ -55,7 +55,6 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -611,7 +610,7 @@ public class MonitorImpl implements Monitor, HostListener
 
                 pojos.add( info );
             }
-            catch ( CommandException | ResourceHostException e )
+            catch ( Exception e )
             {
                 LOG.error( "Error while getting RH version and P2P status. Seems RH is not connected." );
 

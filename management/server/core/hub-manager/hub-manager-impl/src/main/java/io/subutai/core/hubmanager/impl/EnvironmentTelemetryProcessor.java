@@ -67,7 +67,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     @Override
     public void run()
     {
-        if ( hubManager.isRegistered() )
+        if ( hubManager.isRegisteredWithHub() )
         {
             startProccess( "pingssh" );
         }
@@ -333,7 +333,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
     @Override
     public synchronized boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
     {
-        if ( !hubManager.isRegistered() )
+        if ( !hubManager.isRegisteredWithHub() )
         {
             return false;
         }

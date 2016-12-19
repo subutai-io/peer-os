@@ -12,7 +12,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -62,7 +62,7 @@ public class RegistrationRequestProcessor implements Runnable
 
     public void sendRegistrationRequests() throws HubManagerException
     {
-        if ( manager.isRegistered() )
+        if ( manager.isRegisteredWithHub() )
         {
             String path = format( "/rest/v1/peers/%s/requested-hosts", peerManager.getLocalPeer().getId() );
 

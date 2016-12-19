@@ -67,7 +67,7 @@ public class ResourceHostMonitorProcessor implements Runnable
 
     public void sendResourceHostMonitoringData() throws HubManagerException
     {
-        if ( manager.isRegistered() )
+        if ( manager.isRegisteredWithHub() )
         {
             for ( ResourceHostMetric resourceHostMetric : monitor.getResourceHostMetrics().getResources() )
             {

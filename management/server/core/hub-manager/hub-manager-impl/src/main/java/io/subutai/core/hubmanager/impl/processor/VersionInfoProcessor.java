@@ -10,7 +10,7 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.VersionInfoDto;
 
@@ -59,7 +59,7 @@ public class VersionInfoProcessor implements Runnable
 
     public void sendVersionInfo() throws HubManagerException
     {
-        if ( manager.isRegistered() )
+        if ( manager.isRegisteredWithHub() )
         {
             String path = format( "/rest/v1/peers/%s/version-info", peerManager.getLocalPeer().getId() );
 

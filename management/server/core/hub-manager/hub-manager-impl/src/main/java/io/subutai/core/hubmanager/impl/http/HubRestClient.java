@@ -20,12 +20,14 @@ import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.subutai.core.hubmanager.api.RestClient;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-public class HubRestClient
+public class HubRestClient implements RestClient
 {
     public static final String CONNECTION_EXCEPTION_MARKER = "ConnectException";
     private static final String ERROR = "Error to execute request to Hub: ";
@@ -41,6 +43,7 @@ public class HubRestClient
     }
 
 
+    @Override
     public <T> RestResult<T> get( String url, Class<T> clazz )
     {
         return execute( "GET", url, null, clazz, true );
@@ -50,6 +53,7 @@ public class HubRestClient
     /**
      * Throws exception if result is not successful
      */
+    @Override
     public <T> T getStrict( String url, Class<T> clazz ) throws HubManagerException
     {
         RestResult<T> restResult = get( url, clazz );
@@ -63,12 +67,14 @@ public class HubRestClient
     }
 
 
+    @Override
     public <T> RestResult<T> post( String url, Object body, Class<T> clazz )
     {
         return execute( "POST", url, body, clazz, true );
     }
 
 
+    @Override
     public RestResult<Object> post( String url, Object body )
     {
         return post( url, body, Object.class );
@@ -78,18 +84,21 @@ public class HubRestClient
     /**
      * Executes POST request without encrypting body and response
      */
+    @Override
     public RestResult<Object> postPlain( String url, Object body )
     {
         return execute( "POST", url, body, Object.class, false );
     }
 
 
+    @Override
     public <T> RestResult<T> put( String url, Object body, Class<T> clazz )
     {
         return execute( "PUT", url, body, clazz, true );
     }
 
 
+    @Override
     public RestResult<Object> delete( String url )
     {
         return execute( "DELETE", url, null, Object.class, false );
@@ -127,7 +136,7 @@ public class HubRestClient
                 restResult.setError( ERROR + e.getMessage() );
             }
 
-            log.error( ERROR, e );
+            log.error( ERROR + e.getMessage() );
         }
         finally
         {

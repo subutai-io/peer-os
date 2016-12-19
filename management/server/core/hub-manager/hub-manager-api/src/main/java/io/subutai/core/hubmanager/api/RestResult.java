@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.http;
+package io.subutai.core.hubmanager.api;
 
 
 import org.apache.http.HttpStatus;

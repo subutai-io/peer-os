@@ -56,7 +56,7 @@ public class ContainerEventProcessor implements Runnable
 
     public void process() throws HubManagerException
     {
-        if ( !hubManager.isRegistered() )
+        if ( !hubManager.isRegisteredWithHub() )
         {
             return;
         }

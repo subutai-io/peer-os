@@ -53,7 +53,7 @@ public class TunnelEventProcessor implements Runnable
     @Override
     public void run()
     {
-        if ( hubManager.isRegistered() )
+        if ( hubManager.isRegisteredWithHub() )
         {
             startProccess();
         }

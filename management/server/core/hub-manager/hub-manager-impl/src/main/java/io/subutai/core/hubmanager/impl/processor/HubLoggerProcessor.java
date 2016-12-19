@@ -47,7 +47,7 @@ public class HubLoggerProcessor implements Runnable
     {
         Set<SubutaiErrorEvent> subutaiErrorEvents = logListener.getSubutaiErrorEvents();
 
-        if ( !subutaiErrorEvents.isEmpty() && hubManager.isRegistered() && hubManager.isHubReachable() )
+        if ( !subutaiErrorEvents.isEmpty() && hubManager.isRegisteredWithHub() && hubManager.isHubReachable() )
         {
             WebClient client = null;
             try
