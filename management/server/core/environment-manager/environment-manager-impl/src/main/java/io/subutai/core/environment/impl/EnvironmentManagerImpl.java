@@ -2490,19 +2490,19 @@ public class EnvironmentManagerImpl
 
         if ( !environmentFound )
         {
-            Peer peer = containerHost.getPeer();
-
-            if ( peer instanceof RemotePeer )
+            try
             {
-                try
+                Peer peer = containerHost.getPeer();
+
+                if ( peer instanceof RemotePeer )
                 {
                     ( ( RemotePeer ) peer ).excludeContainerFromEnvironment( containerHost.getEnvironmentId().getId(),
                             containerHost.getId() );
                 }
-                catch ( PeerException e )
-                {
-                    LOG.error( "Error excluding container from environment on remote peer: {}", e.getMessage() );
-                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error excluding container from environment on remote peer: {}", e.getMessage() );
             }
         }
     }
