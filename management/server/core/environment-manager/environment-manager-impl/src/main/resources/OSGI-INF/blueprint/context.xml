@@ -90,6 +90,7 @@
   <service ref="environmentManager" interface="io.subutai.common.peer.AlertListener" />
   <service ref="environmentManager" interface="io.subutai.core.peer.api.PeerActionListener" />
   <service ref="environmentManager" interface="io.subutai.hub.share.common.HubEventListener" />
+  <service ref="environmentManager" interface="io.subutai.core.hostregistry.api.HostListener" />
 
   <reference-list id="alertHandler"
                   interface="io.subutai.common.peer.AlertHandler"
