@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
@@ -54,8 +53,6 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
     private Set<HostInterfaceDto> interfaces = new HashSet<>();
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
 
     public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
                                       HubRestClient restClient )
@@ -77,7 +74,6 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
     public void process() throws HubManagerException
     {
-        // TODO: 10/31/16 we need combine processConfigs and processPeerMetrics methods
         processConfigs();
 
         processP2PLogs();
@@ -251,7 +247,7 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        // // TODO: 7/29/16 need optimize 
+        // TODO: 7/29/16 need optimize
         if ( hubManager.canWorkWithHub() )
         {
             HostInterfaces as = resourceHostInfo.getHostInterfaces();
