@@ -293,25 +293,28 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     }
 
 
-    public Environment destroy() throws PeerException
+    public Environment destroy( boolean removeMetadataOnly ) throws PeerException
     {
-        try
+        if ( !removeMetadataOnly )
         {
-            final Peer peer = getPeer();
-
-            peer.destroyContainer( getContainerId() );
-
-            if ( parent.getContainerHostsByPeerId( getPeerId() ).isEmpty() )
+            try
             {
-                ( ( LocalEnvironment ) parent ).removeEnvironmentPeer( getPeerId() );
+                final Peer peer = getPeer();
+
+                peer.destroyContainer( getContainerId() );
             }
-        }
-        catch ( Exception e )
-        {
-            logger.warn( e.getMessage() );
+            catch ( Exception e )
+            {
+                logger.warn( e.getMessage() );
+            }
         }
 
         ( ( LocalEnvironment ) parent ).removeContainer( this );
+
+        if ( parent.getContainerHostsByPeerId( getPeerId() ).isEmpty() )
+        {
+            ( ( LocalEnvironment ) parent ).removeEnvironmentPeer( getPeerId() );
+        }
 
         Environment env = environmentManager.update( ( LocalEnvironment ) parent );
 

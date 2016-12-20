@@ -854,9 +854,17 @@ public class EnvironmentManagerSecureProxy
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void excludePeerFromEnvironment( final String environmentId, final String peerId )
-            throws EnvironmentNotFoundException, EnvironmentManagerException
+            throws EnvironmentNotFoundException
     {
         environmentManager.excludePeerFromEnvironment( environmentId, peerId );
+    }
+
+    @RolesAllowed( "Environment-Management|Delete" )
+    @Override
+    public void excludeContainerFromEnvironment( final String environmentId, final String containerId )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        environmentManager.excludeContainerFromEnvironment( environmentId, containerId );
     }
 
 

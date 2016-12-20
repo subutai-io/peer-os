@@ -167,7 +167,7 @@ public class EnvironmentContainerImplTest
     @Test
     public void testDestroy() throws Exception
     {
-        environmentContainer.destroy();
+        environmentContainer.destroy( false );
 
         verify( peer ).destroyContainer( any( ContainerId.class ) );
         verify( environment ).removeEnvironmentPeer( PEER_ID );

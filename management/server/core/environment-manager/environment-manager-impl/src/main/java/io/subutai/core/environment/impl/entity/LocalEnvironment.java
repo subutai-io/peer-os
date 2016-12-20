@@ -413,7 +413,7 @@ public class LocalEnvironment implements Environment, Serializable
     }
 
 
-    void removeEnvironmentPeer( final String peerId )
+    public void removeEnvironmentPeer( final String peerId )
     {
 
         Preconditions.checkNotNull( peerId, "Environment peer id could not be null." );

@@ -33,7 +33,7 @@ public class ContainerDestroyTaskTest
     {
         task.call();
 
-        verify( container ).destroy();
+        verify( container ).destroy( false );
     }
 
 
