@@ -2450,6 +2450,8 @@ public class EnvironmentManagerImpl
         // exclude Hub env-s, b/c they are handled in HubAdapter
         environments.addAll( getRemoteEnvironments( false ) );
 
+        setTransientFields( environments );
+
         for ( Environment environment : environments )
         {
             try
