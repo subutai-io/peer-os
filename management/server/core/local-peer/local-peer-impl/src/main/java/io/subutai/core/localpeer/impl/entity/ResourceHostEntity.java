@@ -536,7 +536,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    private void removeContainerHost( final ContainerHost containerHost )
+    @Override
+    public void removeContainerHost( final ContainerHost containerHost )
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
@@ -966,22 +967,22 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         //remove containers that are missing in heartbeat
-        for ( ContainerHost containerHost : getContainerHosts() )
-        {
-            boolean found = false;
-            for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
-            {
-                if ( info.getId().equals( containerHost.getId() ) )
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if ( !found )
-            {
-                removeContainerHost( containerHost );
-            }
-        }
+        //        for ( ContainerHost containerHost : getContainerHosts() )
+        //        {
+        //            boolean found = false;
+        //            for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
+        //            {
+        //                if ( info.getId().equals( containerHost.getId() ) )
+        //                {
+        //                    found = true;
+        //                    break;
+        //                }
+        //            }
+        //            if ( !found )
+        //            {
+        //                removeContainerHost( containerHost );
+        //            }
+        //        }
 
         return true;
     }

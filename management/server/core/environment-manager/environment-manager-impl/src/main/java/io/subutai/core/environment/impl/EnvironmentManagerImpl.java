@@ -67,6 +67,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -2431,8 +2432,12 @@ public class EnvironmentManagerImpl
 
         try
         {
-            //TODO at the moment of lookup, the container might have already been removed from the local peer cache
             containerHost = peerManager.getLocalPeer().getContainerHostById( containerInfo.getId() );
+
+            ResourceHost resourceHost =
+                    peerManager.getLocalPeer().getResourceHostById( containerHost.getResourceHostId().getId() );
+
+            resourceHost.removeContainerHost( containerHost );
         }
         catch ( HostNotFoundException e )
         {
@@ -2440,10 +2445,9 @@ public class EnvironmentManagerImpl
         }
 
         Set<Environment> environments = Sets.newHashSet();
-
         // add local env-s
         environments.addAll( environmentService.getAll() );
-        // exclude HUb env-s, b/c they are handled in HubAdapter
+        // exclude Hub env-s, b/c they are handled in HubAdapter
         environments.addAll( getRemoteEnvironments( false ) );
 
         for ( Environment environment : environments )
