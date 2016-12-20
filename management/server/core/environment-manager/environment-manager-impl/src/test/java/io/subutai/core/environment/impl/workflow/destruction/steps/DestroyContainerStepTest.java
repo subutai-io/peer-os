@@ -39,6 +39,6 @@ public class DestroyContainerStepTest
     {
         step.execute();
 
-        verify( containerHost ).destroy();
+        verify( containerHost ).destroy( false );
     }
 }

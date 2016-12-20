@@ -11,10 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
@@ -52,8 +53,6 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
     private Set<HostInterfaceDto> interfaces = new HashSet<>();
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
 
     public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
                                       HubRestClient restClient )
@@ -75,7 +74,6 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
     public void process() throws HubManagerException
     {
-        // TODO: 10/31/16 we need combine processConfigs and processPeerMetrics methods
         processConfigs();
 
         processP2PLogs();
@@ -249,7 +247,7 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        // // TODO: 7/29/16 need optimize 
+        // TODO: 7/29/16 need optimize
         if ( hubManager.canWorkWithHub() )
         {
             HostInterfaces as = resourceHostInfo.getHostInterfaces();
@@ -266,5 +264,60 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
             processConfigs();
         }
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+
     }
 }

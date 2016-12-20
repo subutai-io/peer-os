@@ -133,7 +133,7 @@ public class EnvironmentAdapter
         {
             EnvironmentContainerHost ch = env.getContainerHostById( containerId );
 
-            ( ( EnvironmentContainerImpl ) ch ).destroy();
+            ( ( EnvironmentContainerImpl ) ch ).destroy( false );
 
             hubAdapter.destroyContainer( env.getId(), containerId );
         }

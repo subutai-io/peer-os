@@ -504,4 +504,26 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
+
+
+    @Override
+    public Response excludeContainerFromEnvironment( final String environmentId, final String containerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
+
+            environmentManager.excludeContainerFromEnvironment( environmentId, containerId );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
 }

@@ -20,6 +20,6 @@ public class DestroyContainerStep
 
     public Environment execute() throws PeerException
     {
-        return ( ( EnvironmentContainerImpl ) containerHost ).destroy();
+        return ( ( EnvironmentContainerImpl ) containerHost ).destroy( false );
     }
 }

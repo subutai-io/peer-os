@@ -251,6 +251,8 @@ public interface EnvironmentManager
      */
     void addSshKeyToEnvironmentEntity( String environmentId, String sshKey ) throws EnvironmentNotFoundException;
 
-    void excludePeerFromEnvironment( String environmentId, String peerId )
-            throws EnvironmentNotFoundException, EnvironmentManagerException;
+    void excludePeerFromEnvironment( String environmentId, String peerId ) throws EnvironmentNotFoundException;
+
+    void excludeContainerFromEnvironment( String environmentId, String containerId )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException;
 }

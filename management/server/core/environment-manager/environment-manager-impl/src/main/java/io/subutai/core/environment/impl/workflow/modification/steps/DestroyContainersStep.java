@@ -57,6 +57,8 @@ public class DestroyContainersStep
 
                 if ( destroyResult.hasSucceeded() )
                 {
+                    environmentManager.getRelationManager().removeRelation( containerHost );
+
                     trackerOperation.addLog( String.format( "Container %s destroyed", containerHost.getHostname() ) );
                 }
                 else

@@ -12,9 +12,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.common.host.ResourceHostInfo;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -29,7 +29,9 @@ public class HostNotifierTest
     @Mock
     HostListener listener;
     @Mock
-    ResourceHostInfo resourceHostInfo;
+    ResourceHostInfo oldRhInfo;
+    @Mock
+    ResourceHostInfo newRhInfo;
 
     @Mock
     QuotaAlertValue quotaAlertValue;
@@ -43,7 +45,7 @@ public class HostNotifierTest
     public void setUp() throws Exception
     {
         alerts = Sets.newHashSet( quotaAlertValue );
-        notifier = new HostNotifier( listener, resourceHostInfo, alerts );
+        notifier = new HostNotifier( listener, oldRhInfo, newRhInfo, alerts );
     }
 
 
@@ -52,10 +54,10 @@ public class HostNotifierTest
     {
         notifier.run();
 
-        verify( listener ).onHeartbeat( resourceHostInfo, alerts );
+        verify( listener ).onHeartbeat( newRhInfo, alerts );
 
         RuntimeException exception = mock( RuntimeException.class );
-        doThrow( exception ).when( listener ).onHeartbeat( resourceHostInfo, alerts );
+        doThrow( exception ).when( listener ).onHeartbeat( newRhInfo, alerts );
 
         notifier.run();
 
