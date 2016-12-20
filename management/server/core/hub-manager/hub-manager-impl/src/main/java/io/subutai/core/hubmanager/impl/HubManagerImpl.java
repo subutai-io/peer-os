@@ -84,6 +84,8 @@ public class HubManagerImpl implements HubManager, HostListener
 {
     private static final long TIME_15_MINUTES = 900;
 
+    public static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
+
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final ScheduledExecutorService heartbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -213,19 +215,11 @@ public class HubManagerImpl implements HubManager, HostListener
 
         //***********
 
-/*
-        ResourceHostMonitorProcessor resourceHostMonitorProcessor =
-                new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor, restClient );
-
-        resourceHostMonitorExecutorService
-                .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
-*/
-
-        //***********
-        peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient );
+        peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient,
+                ( int ) METRICS_SEND_DELAY );
 
         peerMetricsExecutorService
-                .scheduleWithFixedDelay( peerMetricsProcessor, 30, TimeUnit.MINUTES.toSeconds( 30 ), TimeUnit.SECONDS );
+                .scheduleWithFixedDelay( peerMetricsProcessor, 30, METRICS_SEND_DELAY, TimeUnit.SECONDS );
 
         //***********
 
