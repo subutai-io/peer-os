@@ -313,7 +313,7 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void sendHeartbeat() throws HubManagerException
     {
-        resourceHostDataProcessor.process( false );
+        resourceHostDataProcessor.process();
         heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
     }
@@ -346,7 +346,7 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void sendResourceHostInfo() throws HubManagerException
     {
-        resourceHostDataProcessor.process( true );
+        resourceHostDataProcessor.process();
     }
 
 
