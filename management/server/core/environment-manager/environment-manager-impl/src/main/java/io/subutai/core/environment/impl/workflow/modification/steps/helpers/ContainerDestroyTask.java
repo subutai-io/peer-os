@@ -28,6 +28,6 @@ public class ContainerDestroyTask extends TaskUtil.Task<Object>
     @Override
     public Environment call() throws Exception
     {
-        return ( ( EnvironmentContainerImpl ) containerHost ).destroy();
+        return ( ( EnvironmentContainerImpl ) containerHost ).destroy( false );
     }
 }

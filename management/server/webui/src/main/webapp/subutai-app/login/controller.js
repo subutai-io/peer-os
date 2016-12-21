@@ -81,6 +81,14 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 				sessionStorage.removeItem('notifications');
+
+				loginSrv.getHubIp().success(function(data){
+					localStorage.setItem('getHubIp', data);
+				}).error(function(error){
+					console.log(error);
+					localStorage.setItem('getHubIp', 'hub.subut.ai');
+				});
+
 				//$state.go('home');
 				checkUserPermissions();
 			}).error(function(error, status){

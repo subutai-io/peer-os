@@ -12,7 +12,8 @@ function loginSrv($http)
 
 	var loginSrv = {
 		login: login,
-		changePass: changePass
+		changePass: changePass,
+		getHubIp: getHubIp
 	};
 
 	return loginSrv;
@@ -21,6 +22,10 @@ function loginSrv($http)
 	function login( postData ) {
 		return $http.post(LOGIN_URL, postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
 	}
+
+    function getHubIp() {
+		return $http.get(SERVER_URL + '/rest/v1/system/hub_ip', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+    }
 
 	function changePass (passObj) {
 		var postData = "old=" + passObj.oldPassword + "&new=" + passObj.newPassword;

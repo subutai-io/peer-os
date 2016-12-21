@@ -161,6 +161,10 @@ public class LocalEnvironment implements Environment, Serializable
     @JsonIgnore
     private boolean uploaded = false;
 
+    @Column
+    @JsonIgnore
+    private boolean deleted = false;
+
 
     protected LocalEnvironment()
     {
@@ -194,6 +198,18 @@ public class LocalEnvironment implements Environment, Serializable
     public void markAsUploaded()
     {
         uploaded = true;
+    }
+
+
+    public boolean isDeleted()
+    {
+        return deleted;
+    }
+
+
+    public void markAsDeleted()
+    {
+        deleted = true;
     }
 
 
@@ -397,7 +413,7 @@ public class LocalEnvironment implements Environment, Serializable
     }
 
 
-    void removeEnvironmentPeer( final String peerId )
+    public void removeEnvironmentPeer( final String peerId )
     {
 
         Preconditions.checkNotNull( peerId, "Environment peer id could not be null." );

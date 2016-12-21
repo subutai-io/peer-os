@@ -61,7 +61,6 @@ import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -189,6 +188,17 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
 
         environmentWebClient.excludePeerFromEnvironment( environmentId, peerId );
+    }
+
+
+    @Override
+    public void excludeContainerFromEnvironment( final String environmentId, final String containerId )
+            throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+
+        environmentWebClient.excludeContainerFromEnvironment( environmentId, containerId );
     }
 
 
@@ -978,15 +988,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( peerId, "Invalid peer id" );
 
         return peerWebClient.getResourceLimits( peerId );
-    }
-
-
-    @Override
-    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
-    {
-        Preconditions.checkNotNull( reverseProxyConfig, "Invalid proxy config" );
-
-        environmentWebClient.addReverseProxy( reverseProxyConfig );
     }
 
 

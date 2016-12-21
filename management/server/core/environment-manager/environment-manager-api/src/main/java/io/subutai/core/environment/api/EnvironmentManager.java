@@ -22,7 +22,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -242,10 +241,6 @@ public interface EnvironmentManager
     void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
             throws EnvironmentManagerException;
 
-    void addReverseProxy( final Environment environment, final ReverseProxyConfig reverseProxyConfig )
-            throws EnvironmentModificationException;
-
-
     void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
@@ -256,6 +251,8 @@ public interface EnvironmentManager
      */
     void addSshKeyToEnvironmentEntity( String environmentId, String sshKey ) throws EnvironmentNotFoundException;
 
-    void excludePeerFromEnvironment( String environmentId, String peerId )
-            throws EnvironmentNotFoundException, EnvironmentManagerException;
+    void excludePeerFromEnvironment( String environmentId, String peerId ) throws EnvironmentNotFoundException;
+
+    void excludeContainerFromEnvironment( String environmentId, String containerId )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException;
 }

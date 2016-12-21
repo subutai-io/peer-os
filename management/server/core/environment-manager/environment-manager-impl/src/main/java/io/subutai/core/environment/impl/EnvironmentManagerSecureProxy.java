@@ -24,6 +24,11 @@ import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
@@ -36,7 +41,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.Ownership;
@@ -60,6 +64,7 @@ import io.subutai.core.environment.api.exception.EnvironmentDestructionException
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.HubEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -76,7 +81,8 @@ import io.subutai.hub.share.dto.PeerProductDataDto;
 
 @PermitAll
 public class EnvironmentManagerSecureProxy
-        implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, HubEventListener
+        implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, HubEventListener,
+        HostListener
 {
     private final EnvironmentManagerImpl environmentManager;
     private final IdentityManager identityManager;
@@ -221,7 +227,7 @@ public class EnvironmentManagerSecureProxy
     {
         //*********************************
         // Remove XSS vulnerability code
-        topology.setEnvironmentName( validateInput( topology.getEnvironmentName(), true ) );
+        topology.setEnvironmentName( StringUtil.removeHtmlAndSpecialChars( topology.getEnvironmentName(), true ) );
         //*********************************
 
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -569,7 +575,8 @@ public class EnvironmentManagerSecureProxy
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId, final int port )
+    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId,
+                                                 final int port )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Environment environment = loadEnvironment( environmentId );
@@ -792,14 +799,6 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    public void addReverseProxy( final Environment environment, final ReverseProxyConfig reverseProxyConfig )
-            throws EnvironmentModificationException
-    {
-        environmentManager.addReverseProxy( environment, reverseProxyConfig );
-    }
-
-
-    @Override
     public String getId()
     {
         return environmentManager.getId();
@@ -862,9 +861,18 @@ public class EnvironmentManagerSecureProxy
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void excludePeerFromEnvironment( final String environmentId, final String peerId )
-            throws EnvironmentNotFoundException, EnvironmentManagerException
+            throws EnvironmentNotFoundException
     {
         environmentManager.excludePeerFromEnvironment( environmentId, peerId );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Delete" )
+    @Override
+    public void excludeContainerFromEnvironment( final String environmentId, final String containerId )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        environmentManager.excludeContainerFromEnvironment( environmentId, containerId );
     }
 
 
@@ -883,10 +891,64 @@ public class EnvironmentManagerSecureProxy
     }
 
 
-    /* *************************************************
-             */
-    private String validateInput( String inputStr, boolean removeSpaces )
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
+        environmentManager.onHeartbeat( resourceHostInfo, alerts );
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+        environmentManager.onContainerStateChanged( containerInfo, previousState, currentState );
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+        environmentManager.onContainerHostnameChanged( containerInfo, previousHostname, currentHostname );
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+        environmentManager.onContainerCreated( containerInfo );
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+        environmentManager.onContainerNetInterfaceChanged( containerInfo, oldNetInterface, newNetInterface );
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+        environmentManager.onContainerNetInterfaceAdded( containerInfo, netInterface );
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+        environmentManager.onContainerNetInterfaceRemoved( containerInfo, netInterface );
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+        environmentManager.onContainerDestroyed( containerInfo );
     }
 }

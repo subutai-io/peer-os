@@ -25,14 +25,30 @@ public class EnvironmentServiceImpl implements EnvironmentService
     @Override
     public LocalEnvironment find( final String id )
     {
-        return em.find( LocalEnvironment.class, id );
+        LocalEnvironment localEnvironment = em.find( LocalEnvironment.class, id );
+
+        if ( localEnvironment != null && !localEnvironment.isDeleted() )
+        {
+            return localEnvironment;
+        }
+
+        return null;
     }
 
 
     @Override
     public List<LocalEnvironment> getAll()
     {
-        return em.createQuery( "select e from LocalEnvironment e", LocalEnvironment.class ).getResultList();
+        return em.createQuery( "select e from LocalEnvironment e where e.deleted = false", LocalEnvironment.class )
+                 .getResultList();
+    }
+
+
+    @Override
+    public List<LocalEnvironment> getDeleted()
+    {
+        return em.createQuery( "select e from LocalEnvironment e where e.deleted = true", LocalEnvironment.class )
+                 .getResultList();
     }
 
 

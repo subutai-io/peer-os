@@ -20,7 +20,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.CustomProxyConfig;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -348,25 +347,6 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response addReverseProxy( final ReverseProxyConfig reverseProxyConfig )
-    {
-        try
-        {
-            Preconditions.checkNotNull( reverseProxyConfig );
-
-            localPeer.addReverseProxy( reverseProxyConfig );
-
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
     public Response getSshKeys( final EnvironmentId environmentId, final SshEncryptionType encryptionType )
     {
         try
@@ -515,6 +495,28 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 
             environmentManager.excludePeerFromEnvironment( environmentId, peerId );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response excludeContainerFromEnvironment( final String environmentId, final String containerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
+
+            environmentManager.excludeContainerFromEnvironment( environmentId, containerId );
 
             return Response.ok().build();
         }

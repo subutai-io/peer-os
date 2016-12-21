@@ -11,6 +11,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
+import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -21,46 +23,34 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
-public class ContainerEventProcessor implements Runnable
+public class ContainerEventProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private HubManagerImpl hubManager;
 
     private ConfigManager configManager;
 
     private PeerManager peerManager;
 
 
-    public ContainerEventProcessor( HubManagerImpl hubManager, ConfigManager configManager, PeerManager peerManager )
+    public ContainerEventProcessor( final HubManagerImpl hubManager, final ConfigManager configManager,
+                                    final PeerManager peerManager, final RestClient restClient )
     {
-        this.hubManager = hubManager;
+        super( hubManager, restClient );
         this.configManager = configManager;
         this.peerManager = peerManager;
     }
 
 
     @Override
-    public void run()
+    public void request() throws HubManagerException
     {
-        try
-        {
-            process();
-        }
-        catch ( Exception e )
-        {
-            log.error( "Error to process container event: {}", e.getMessage() );
-        }
+        process();
     }
 
 
     public void process() throws HubManagerException
     {
-        if ( !hubManager.isRegistered() )
-        {
-            return;
-        }
-
         try
         {
             for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
