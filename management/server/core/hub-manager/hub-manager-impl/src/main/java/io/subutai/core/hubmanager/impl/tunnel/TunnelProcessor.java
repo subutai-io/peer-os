@@ -32,7 +32,7 @@ import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.READY;
 // TODO: Replace WebClient with HubRestClient.
 public class TunnelProcessor implements StateLinkProcessor
 {
-    static final String CREATE_TUNNEL_COMMAND = "subutai tunnel add %s:%s %s -g";
+    public static final String CREATE_TUNNEL_COMMAND = "subutai tunnel add %s:%s %s -g";
 
     public static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s:%s";
 
@@ -127,7 +127,8 @@ public class TunnelProcessor implements StateLinkProcessor
             log.error( e.getMessage() );
         }
 
-        CommandResult result = TunnelHelper.execute( resourceHost, format( DELETE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen() ) );
+        CommandResult result = TunnelHelper.execute( resourceHost,
+                format( DELETE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen() ) );
 
         Preconditions.checkNotNull( result );
 
@@ -147,6 +148,13 @@ public class TunnelProcessor implements StateLinkProcessor
         try
         {
             ResourceHost resourceHost = peerManager.getLocalPeer().getManagementHost();
+
+            if ( tunnelInfoDto.getContainerId() != null && !tunnelInfoDto.getContainerId().isEmpty() )
+            {
+                resourceHost =
+                        peerManager.getLocalPeer().getResourceHostByContainerId( tunnelInfoDto.getContainerId() );
+            }
+
 
             String tunnelLifeTime = getTunnelLifetime( tunnelInfoDto );
 
