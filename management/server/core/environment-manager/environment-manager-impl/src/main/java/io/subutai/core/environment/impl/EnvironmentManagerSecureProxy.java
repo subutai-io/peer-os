@@ -227,7 +227,7 @@ public class EnvironmentManagerSecureProxy
     {
         //*********************************
         // Remove XSS vulnerability code
-        topology.setEnvironmentName( validateInput( topology.getEnvironmentName(), true ) );
+        topology.setEnvironmentName( StringUtil.removeHtmlAndSpecialChars( topology.getEnvironmentName(), true ) );
         //*********************************
 
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -894,7 +894,7 @@ public class EnvironmentManagerSecureProxy
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-
+        environmentManager.onHeartbeat( resourceHostInfo, alerts );
     }
 
 
@@ -902,7 +902,7 @@ public class EnvironmentManagerSecureProxy
     public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
                                          final ContainerHostState currentState )
     {
-
+        environmentManager.onContainerStateChanged( containerInfo, previousState, currentState );
     }
 
 
@@ -910,14 +910,14 @@ public class EnvironmentManagerSecureProxy
     public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
                                             final String currentHostname )
     {
-
+        environmentManager.onContainerHostnameChanged( containerInfo, previousHostname, currentHostname );
     }
 
 
     @Override
     public void onContainerCreated( final ContainerHostInfo containerInfo )
     {
-
+        environmentManager.onContainerCreated( containerInfo );
     }
 
 
@@ -926,7 +926,7 @@ public class EnvironmentManagerSecureProxy
                                                 final HostInterfaceModel oldNetInterface,
                                                 final HostInterfaceModel newNetInterface )
     {
-
+        environmentManager.onContainerNetInterfaceChanged( containerInfo, oldNetInterface, newNetInterface );
     }
 
 
@@ -934,7 +934,7 @@ public class EnvironmentManagerSecureProxy
     public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
                                               final HostInterfaceModel netInterface )
     {
-
+        environmentManager.onContainerNetInterfaceAdded( containerInfo, netInterface );
     }
 
 
@@ -942,7 +942,7 @@ public class EnvironmentManagerSecureProxy
     public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
                                                 final HostInterfaceModel netInterface )
     {
-
+        environmentManager.onContainerNetInterfaceRemoved( containerInfo, netInterface );
     }
 
 
@@ -950,13 +950,5 @@ public class EnvironmentManagerSecureProxy
     public void onContainerDestroyed( final ContainerHostInfo containerInfo )
     {
         environmentManager.onContainerDestroyed( containerInfo );
-    }
-
-
-    /* *************************************************
-                 */
-    private String validateInput( String inputStr, boolean removeSpaces )
-    {
-        return StringUtil.removeHtmlAndSpecialChars( inputStr, removeSpaces );
     }
 }
