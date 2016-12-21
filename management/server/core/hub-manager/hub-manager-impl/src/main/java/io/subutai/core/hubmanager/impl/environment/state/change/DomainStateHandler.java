@@ -96,7 +96,7 @@ public class DomainStateHandler extends StateHandler
                                     if ( hasDirectAccess )
 
                                     {
-                                        if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
+                                        if ( !ctx.localPeer.isIpInVniDomain( ip + ":" + port, env.getVni() ) )
                                         {
                                             ctx.localPeer.addIpToVniDomain( ip + ":" + port, env.getVni() );
                                         }
