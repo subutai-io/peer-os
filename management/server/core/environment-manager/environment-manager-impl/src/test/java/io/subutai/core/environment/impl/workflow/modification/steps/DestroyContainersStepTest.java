@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Lists;
 
+import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
@@ -41,6 +42,9 @@ public class DestroyContainersStepTest
     ContainerDestroyTask task;
     EnvironmentContainerImpl environmentContainer = TestHelper.ENV_CONTAINER();
 
+    @Mock
+    RelationManager relationManager;
+
 
     @Before
     public void setUp() throws Exception
@@ -52,6 +56,8 @@ public class DestroyContainersStepTest
         doReturn( task ).when( taskResult ).getTask();
         doReturn( environmentContainer ).when( task ).getContainerHost();
         doReturn( environmentContainer ).when( environment ).getContainerHostById( TestHelper.CONTAINER_ID );
+
+        doReturn( relationManager ).when( environmentManager ).getRelationManager();
     }
 
 

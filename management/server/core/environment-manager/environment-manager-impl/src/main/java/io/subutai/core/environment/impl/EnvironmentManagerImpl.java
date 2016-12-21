@@ -42,7 +42,12 @@ import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.exception.ActionFailedException;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.AlertValue;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
@@ -58,9 +63,11 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -97,6 +104,7 @@ import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModifi
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -122,7 +130,8 @@ import io.subutai.hub.share.dto.PeerProductDataDto;
  * 2) add secret key TTL property to environment (user should be able to change it - add to EM API), update background
  * task to consider this TTL (make background task run frequently with short intervals)
  **/
-public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener
+public class EnvironmentManagerImpl
+        implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, HostListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
@@ -1881,7 +1890,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @Override
     public void excludePeerFromEnvironment( final String environmentId, final String peerId )
-            throws EnvironmentNotFoundException, EnvironmentManagerException
+            throws EnvironmentNotFoundException
     {
         LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
@@ -1897,6 +1906,38 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             update( environment );
         }
+    }
+
+
+    @Override
+    public void excludeContainerFromEnvironment( final String environmentId, final String containerId )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
+
+        EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
+
+        environment.removeContainer( containerHost );
+
+        if ( environment.getContainerHostsByPeerId( containerHost.getPeerId() ).isEmpty() )
+        {
+            environment.removeEnvironmentPeer( containerHost.getPeerId() );
+        }
+
+        if ( environment.getEnvironmentPeers().isEmpty() )
+        {
+            remove( environment );
+
+            notifyOnEnvironmentDestroyed( environmentId );
+        }
+        else
+        {
+            update( environment );
+
+            notifyOnContainerDestroyed( environment, containerId );
+        }
+
+        relationManager.removeRelation( containerHost );
     }
 
 
@@ -2323,6 +2364,146 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         catch ( ActionFailedException e )
         {
             LOG.error( e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
+    {
+        // not needed
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+        // not needed
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+        // not needed
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+        // todo implement
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+        // todo implement
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+        // todo implement
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+        // todo implement
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+        boolean environmentFound = false;
+
+        ContainerHost containerHost;
+
+        try
+        {
+            containerHost = peerManager.getLocalPeer().getContainerHostById( containerInfo.getId() );
+
+            ResourceHost resourceHost =
+                    peerManager.getLocalPeer().getResourceHostById( containerHost.getResourceHostId().getId() );
+
+            resourceHost.removeContainerHost( containerHost );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return;
+        }
+
+        Set<Environment> environments = Sets.newHashSet();
+        // add local env-s
+        environments.addAll( environmentService.getAll() );
+        // exclude Hub env-s, b/c they are handled in HubAdapter
+        environments.addAll( getRemoteEnvironments( false ) );
+
+        setTransientFields( environments );
+
+        for ( Environment environment : environments )
+        {
+            try
+            {
+                EnvironmentContainerImpl environmentContainerHost =
+                        ( EnvironmentContainerImpl ) environment.getContainerHostById( containerInfo.getId() );
+
+                environmentFound = true;
+
+                Environment env = environmentContainerHost.destroy( true );
+
+                if ( env.getContainerHosts().isEmpty() )
+                {
+                    remove( ( LocalEnvironment ) env );
+
+                    notifyOnEnvironmentDestroyed( env.getId() );
+                }
+                else
+                {
+                    notifyOnContainerDestroyed( env, containerInfo.getId() );
+                }
+
+                relationManager.removeRelation( containerHost );
+
+                break;
+            }
+            catch ( ContainerHostNotFoundException e )
+            {
+                // ignore
+            }
+            catch ( PeerException e )
+            {
+                break;
+            }
+        }
+
+        if ( !environmentFound )
+        {
+            try
+            {
+                Peer peer = containerHost.getPeer();
+
+                if ( peer instanceof RemotePeer )
+                {
+                    ( ( RemotePeer ) peer ).excludeContainerFromEnvironment( containerHost.getEnvironmentId().getId(),
+                            containerHost.getId() );
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error excluding container from environment on remote peer: {}", e.getMessage() );
+            }
         }
     }
 }

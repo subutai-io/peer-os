@@ -29,6 +29,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
@@ -83,6 +86,8 @@ import io.subutai.hub.share.json.JsonUtil;
 public class HubManagerImpl implements HubManager, HostListener
 {
     private static final long TIME_15_MINUTES = 900;
+
+    public static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -213,19 +218,11 @@ public class HubManagerImpl implements HubManager, HostListener
 
         //***********
 
-/*
-        ResourceHostMonitorProcessor resourceHostMonitorProcessor =
-                new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor, restClient );
-
-        resourceHostMonitorExecutorService
-                .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
-*/
-
-        //***********
-        peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient );
+        peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient,
+                ( int ) METRICS_SEND_DELAY );
 
         peerMetricsExecutorService
-                .scheduleWithFixedDelay( peerMetricsProcessor, 30, TimeUnit.MINUTES.toSeconds( 30 ), TimeUnit.SECONDS );
+                .scheduleWithFixedDelay( peerMetricsProcessor, 30, METRICS_SEND_DELAY, TimeUnit.SECONDS );
 
         //***********
 
@@ -316,7 +313,7 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void sendHeartbeat() throws HubManagerException
     {
-        resourceHostDataProcessor.process( false );
+        resourceHostDataProcessor.process();
         heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
     }
@@ -349,7 +346,7 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void sendResourceHostInfo() throws HubManagerException
     {
-        resourceHostDataProcessor.process( true );
+        resourceHostDataProcessor.process();
     }
 
 
@@ -792,5 +789,60 @@ public class HubManagerImpl implements HubManager, HostListener
     public void setHostRegistrationManager( final HostRegistrationManager hostRegistrationManager )
     {
         this.hostRegistrationManager = hostRegistrationManager;
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+
     }
 }

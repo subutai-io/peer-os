@@ -168,4 +168,11 @@ public interface EnvironmentRestService
     @Produces( MediaType.APPLICATION_JSON )
     Response excludePeerFromEnvironment( @PathParam( "environmentId" ) String environmentId,
                                          @PathParam( "peerId" ) String peerId );
+
+    @POST
+    @Path( "{environmentId}/containers/{containerId}/exclude" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response excludeContainerFromEnvironment( @PathParam( "environmentId" ) String environmentId,
+                                              @PathParam( "containerId" ) String containerId );
 }

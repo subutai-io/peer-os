@@ -17,8 +17,17 @@ import com.google.gson.GsonBuilder;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.environment.api.EnvironmentEventListener;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.identity.api.IdentityManager;
@@ -32,7 +41,7 @@ import static java.lang.String.format;
 
 
 //TODO use HubRestClient and ConfigDataServiceimpl instead of DaoHelper and HttpClient
-public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
+public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, HostListener
 {
     private static final String USER_ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
 
@@ -58,6 +67,8 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
     private final String peerId;
 
+    private final LocalPeer localPeer;
+
 
     public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager,
                            IdentityManager identityManager ) throws HubManagerException
@@ -67,6 +78,8 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         httpClient = new HttpClient( securityManager );
 
         this.identityManager = identityManager;
+
+        localPeer = peerManager.getLocalPeer();
 
         peerId = peerManager.getLocalPeer().getId();
     }
@@ -87,6 +100,11 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     private String getUserId()
     {
         User user = identityManager.getActiveUser();
+
+        if ( user == null )
+        {
+            return null;
+        }
 
         log.debug( "Active user: username={}, email={}", user.getUserName(), user.getEmail() );
 
@@ -327,9 +345,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
     private void onContainerStateChange( String envId, String contId, String state )
     {
-        String userId = getUserIdWithCheck();
-
-        if ( userId == null )
+        if ( !isRegistered() )
         {
             return;
         }
@@ -382,5 +398,89 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     public void onContainerStopped( final Environment environment, final String containerId )
     {
         onContainerStateChange( environment.getId(), containerId, "stop" );
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+        if ( currentState == ContainerHostState.RUNNING || currentState == ContainerHostState.STOPPED )
+        {
+            try
+            {
+                ContainerHost containerHost = localPeer.getContainerHostById( containerInfo.getId() );
+
+                onContainerStateChange( containerHost.getEnvironmentId().getId(), containerInfo.getId(),
+                        currentState == ContainerHostState.RUNNING ? "start" : "stop" );
+            }
+            catch ( HostNotFoundException e )
+            {
+                //ignore
+            }
+        }
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+        try
+        {
+            ContainerHost containerHost = localPeer.getContainerHostById( containerInfo.getId() );
+
+            destroyContainer( containerHost.getEnvironmentId().getId(), containerInfo.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            //ignore
+        }
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+        // todo
     }
 }

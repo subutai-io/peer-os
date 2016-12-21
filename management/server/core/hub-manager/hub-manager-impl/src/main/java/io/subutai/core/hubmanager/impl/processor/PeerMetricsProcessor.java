@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 
@@ -35,7 +36,7 @@ public class PeerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final int DTO_TTL = 1000 * 60 * 60 * 24 * 2;
+    private static final long DTO_TTL = TimeUnit.DAYS.toMillis( 2 );
 
     private ConfigManager configManager;
 
@@ -45,15 +46,19 @@ public class PeerMetricsProcessor extends HubRequester
 
     private ConcurrentLinkedDeque<PeerMetricsDto> queue = new ConcurrentLinkedDeque<>();
 
+    private int interval;
+
 
     public PeerMetricsProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
-                                 final ConfigManager configManager, final Monitor monitor, final RestClient restClient )
+                                 final ConfigManager configManager, final Monitor monitor, final RestClient restClient,
+                                 final int interval )
     {
         super( hubManager, restClient );
 
         this.peerManager = peerManager;
         this.configManager = configManager;
         this.monitor = monitor;
+        this.interval = interval;
     }
 
 
@@ -68,7 +73,7 @@ public class PeerMetricsProcessor extends HubRequester
     {
         Calendar cal = Calendar.getInstance();
         Date endTime = cal.getTime();
-        cal.add( Calendar.MINUTE, -30 );
+        cal.add( Calendar.SECOND, -interval );
         Date startTime = cal.getTime();
         PeerMetricsDto peerMetricsDto =
                 new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
@@ -172,12 +177,14 @@ public class PeerMetricsProcessor extends HubRequester
 
         // clean up queue to avoid memory exhaustion
 
-        for ( final PeerMetricsDto dto : queue )
+        Iterator<PeerMetricsDto> i = queue.iterator();
+        while ( i.hasNext() )
         {
+            final PeerMetricsDto dto = i.next();
             if ( dto.getCreatedTime() + DTO_TTL < System.currentTimeMillis() )
             {
                 log.warn( "Removing peer monitoring data {}", dto );
-                iterator.remove();
+                i.remove();
             }
         }
     }

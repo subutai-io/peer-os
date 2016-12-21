@@ -1,7 +1,6 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -12,19 +11,18 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
-import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -39,8 +37,6 @@ import io.subutai.hub.share.dto.HostInterfaceDto;
 import io.subutai.hub.share.dto.P2PDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.dto.host.ResourceHostMetricDto;
-import io.subutai.hub.share.dto.metrics.HostMetricsDto;
-import io.subutai.hub.share.dto.metrics.PeerMetricsDto;
 
 import static java.lang.String.format;
 
@@ -57,8 +53,6 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
     private Set<HostInterfaceDto> interfaces = new HashSet<>();
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
 
     public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
                                       HubRestClient restClient )
@@ -74,57 +68,15 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
     @Override
     public void request() throws HubManagerException
     {
-        process( true );
+        process();
     }
 
 
-    public void process( boolean sendMetrics ) throws HubManagerException
+    public void process() throws HubManagerException
     {
-        // TODO: 10/31/16 we need combine processConfigs and processPeerMetrics methods
         processConfigs();
 
         processP2PLogs();
-
-        if ( sendMetrics )
-        {
-//            processPeerMetrics();
-        }
-    }
-
-
-    private void processPeerMetrics()
-    {
-        Calendar cal = Calendar.getInstance();
-        Date endTime = cal.getTime();
-        cal.add( Calendar.MINUTE, -15 );
-        Date startTime = cal.getTime();
-
-        PeerMetricsDto peerMetricsDto = new PeerMetricsDto( localPeer.getId(), startTime.getTime(), endTime.getTime() );
-
-        try
-        {
-            for ( Host host : localPeer.getResourceHosts() )
-            {
-                final HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startTime, endTime );
-                final HostMetricsDto hostMetrics = historicalMetrics.getHostMetrics();
-                hostMetrics.setHostId( host.getId() );
-                hostMetrics.setHostName( host.getHostname() );
-                peerMetricsDto.addHostMetrics( hostMetrics );
-            }
-            String path = format( "/rest/v1/peers/%s/metrics/save", localPeer.getId() );
-
-            String body = objectMapper.writeValueAsString( peerMetricsDto );
-            log.debug( "Peer metrics JSON: {}", body );
-            RestResult<Object> restResult = restClient.post( path, body );
-            if ( restResult.isSuccess() )
-            {
-                log.debug( "Peer metrics successfully sent to HUB." );
-            }
-        }
-        catch ( Exception e )
-        {
-            log.error( "Error on sending peer metrics to HUB", e );
-        }
     }
 
 
@@ -295,7 +247,7 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        // // TODO: 7/29/16 need optimize 
+        // TODO: 7/29/16 need optimize
         if ( hubManager.canWorkWithHub() )
         {
             HostInterfaces as = resourceHostInfo.getHostInterfaces();
@@ -312,5 +264,60 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
             processConfigs();
         }
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+
     }
 }

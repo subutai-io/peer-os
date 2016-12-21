@@ -121,4 +121,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     boolean isManagementHost();
 
     RhTemplatesDownloadProgress getTemplateDownloadProgress( String environmentId );
+
+    void removeContainerHost(ContainerHost containerHost);
 }
