@@ -16,6 +16,9 @@ public class TunnelInfoDto
     }
 
 
+    @JsonIgnore
+    private String containerId;
+
     private String ip;
     private String portToOpen;
     private long ttl;
@@ -124,5 +127,17 @@ public class TunnelInfoDto
     public void setErrorLogs( final String errorLogs )
     {
         this.errorLogs = errorLogs;
+    }
+
+
+    public String getContainerId()
+    {
+        return containerId;
+    }
+
+
+    public void setContainerId( final String containerId )
+    {
+        this.containerId = containerId;
     }
 }
