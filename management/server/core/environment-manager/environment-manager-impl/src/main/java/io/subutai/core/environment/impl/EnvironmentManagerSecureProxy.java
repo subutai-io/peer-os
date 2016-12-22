@@ -951,4 +951,11 @@ public class EnvironmentManagerSecureProxy
     {
         environmentManager.onContainerDestroyed( containerInfo );
     }
+
+
+    @Override
+    public Set<String> getDeletedEnvironmentsFromHub()
+    {
+        return environmentManager.getDeletedEnvironmentsFromHub();
+    }
 }

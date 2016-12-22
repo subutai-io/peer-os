@@ -255,4 +255,6 @@ public interface EnvironmentManager
 
     void excludeContainerFromEnvironment( String environmentId, String containerId )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+    Set<String> getDeletedEnvironmentsFromHub();
 }

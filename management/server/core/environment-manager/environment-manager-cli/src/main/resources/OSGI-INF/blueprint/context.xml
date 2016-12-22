@@ -121,4 +121,12 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/list-deleted-on-hub">
+      <action class="io.subutai.core.environment.cli.ListDeletedHubEnvironmentsCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>
