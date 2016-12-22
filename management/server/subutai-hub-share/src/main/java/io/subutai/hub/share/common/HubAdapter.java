@@ -12,6 +12,10 @@ public interface HubAdapter
 
     String getUserEnvironmentsForPeer();
 
+    String getAllEnvironmentsForPeer();
+
+    String getDeletedEnvironmentsForPeer();
+
     void destroyContainer( String envId, String containerId );
 
     void uploadEnvironment( String json );
@@ -35,6 +39,4 @@ public interface HubAdapter
     boolean uploadPluginData( String pluginKey, String key, Object data );
 
     boolean deletePluginData( String pluginKey, String key );
-
-    String getAllEnvironmentsForPeer();
 }

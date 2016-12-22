@@ -2311,17 +2311,18 @@ public class EnvironmentManagerImpl
 
             // 2. remove local environments that are missing on Hub
 
+            Set<String> deletedEnvironmentsIdsOnHub = environmentAdapter.getDeletedEnvironmentsIds();
             Set<Environment> environmentsMissingOnHub = Sets.newHashSet();
 
             for ( Environment localEnvironment : locallyRegisteredHubEnvironments )
             {
-                boolean isMissingOnHub = true;
+                boolean isMissingOnHub = false;
 
-                for ( Environment hubEnvironment : environmentsObtainedFromHub )
+                for ( String hubEnvironmentId : deletedEnvironmentsIdsOnHub )
                 {
-                    if ( localEnvironment.getId().equalsIgnoreCase( hubEnvironment.getId() ) )
+                    if ( localEnvironment.getId().equalsIgnoreCase( hubEnvironmentId ) )
                     {
-                        isMissingOnHub = false;
+                        isMissingOnHub = true;
 
                         break;
                     }
@@ -2340,6 +2341,8 @@ public class EnvironmentManagerImpl
                 try
                 {
                     peerManager.getLocalPeer().cleanupEnvironment( environment.getEnvironmentId() );
+
+                    environmentAdapter.removeEnvironment( ( LocalEnvironment ) environment );
 
                     notifyOnEnvironmentDestroyed( environment.getId() );
                 }
@@ -2505,5 +2508,12 @@ public class EnvironmentManagerImpl
                 LOG.error( "Error excluding container from environment on remote peer: {}", e.getMessage() );
             }
         }
+    }
+
+
+    @Override
+    public Set<String> getDeletedEnvironmentsFromHub()
+    {
+        return environmentAdapter.getDeletedEnvironmentsIds();
     }
 }

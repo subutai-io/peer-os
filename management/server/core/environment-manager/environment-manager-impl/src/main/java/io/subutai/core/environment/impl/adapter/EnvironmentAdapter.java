@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
@@ -100,7 +101,7 @@ public class EnvironmentAdapter
 
         log.debug( "Json with environments: {}", json );
 
-        HashSet<HubEnvironment> envs = new HashSet<>();
+        Set<HubEnvironment> envs = new HashSet<>();
 
         try
         {
@@ -119,6 +120,38 @@ public class EnvironmentAdapter
         }
 
         return envs;
+    }
+
+
+    public Set<String> getDeletedEnvironmentsIds()
+    {
+
+        if ( !canWorkWithHub() )
+        {
+            throw new ActionFailedException( "Peer is not registered with Hub or connection to Hub failed" );
+        }
+
+        String json = hubAdapter.getDeletedEnvironmentsForPeer();
+
+        if ( json == null )
+        {
+            throw new ActionFailedException( "Failed to obtain deleted environments from Hub" );
+        }
+
+        log.debug( "Json with deleted environments: {}", json );
+
+        try
+        {
+            return io.subutai.common.util.JsonUtil.fromJson( json, new TypeToken<Set<String>>()
+            {
+            }.getType() );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to parse json: ", e );
+
+            throw new ActionFailedException( "Failed to parse deleted environments from Hub: " + e.getMessage() );
+        }
     }
 
 

@@ -47,6 +47,8 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
     private static final String PEER_ENVIRONMENTS_URL = "/rest/v1/adapter/peer/environments";
 
+    private static final String DELETED_ENVIRONMENTS_URL = "/rest/v1/adapter/peer/deleted/environments";
+
     private static final String CONTAINERS_URL = "/rest/v1/adapter/environments/%s/containers/%s";
 
     private static final String ENVIRONMENT_SSHKEY_URL = "/rest/v1/adapter/environments/%s/ssh-key";
@@ -214,6 +216,13 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
         }
 
         return null;
+    }
+
+
+    @Override
+    public String getDeletedEnvironmentsForPeer()
+    {
+        return httpClient.doGet( DELETED_ENVIRONMENTS_URL );
     }
 
 
