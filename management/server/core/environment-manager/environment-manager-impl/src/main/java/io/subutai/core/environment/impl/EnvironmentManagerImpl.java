@@ -2342,14 +2342,19 @@ public class EnvironmentManagerImpl
                 {
                     peerManager.getLocalPeer().cleanupEnvironment( environment.getEnvironmentId() );
 
-                    environmentAdapter.removeEnvironment( ( LocalEnvironment ) environment );
-
                     notifyOnEnvironmentDestroyed( environment.getId() );
                 }
                 catch ( PeerException e )
                 {
                     LOG.error( e.getMessage() );
                 }
+            }
+
+            // notify Hub about environment deletion
+
+            for ( String hubEnvironmentId : deletedEnvironmentsIdsOnHub )
+            {
+                environmentAdapter.removeEnvironment( hubEnvironmentId );
             }
 
             // 3. Remove deleted local env-s from Hub

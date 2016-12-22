@@ -177,7 +177,7 @@ public class EnvironmentAdapter
     }
 
 
-    public boolean removeEnvironment( LocalEnvironment env )
+    public boolean removeEnvironment( String envId )
     {
         if ( !canWorkWithHub() )
         {
@@ -186,7 +186,7 @@ public class EnvironmentAdapter
 
         try
         {
-            hubAdapter.removeEnvironment( env.getId() );
+            hubAdapter.removeEnvironment( envId );
 
             return true;
         }
@@ -196,6 +196,12 @@ public class EnvironmentAdapter
         }
 
         return false;
+    }
+
+
+    public boolean removeEnvironment( LocalEnvironment env )
+    {
+        return removeEnvironment( env.getId() );
     }
 
 
