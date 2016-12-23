@@ -2036,7 +2036,7 @@ public class EnvironmentManagerImpl
 
             for ( Iterator<HubEnvironment> iterator = hubEnvironments.iterator(); iterator.hasNext(); )
             {
-                final HubEnvironment environment = iterator.next();
+                HubEnvironment environment = iterator.next();
 
                 if ( networkResources.findByEnvironmentId( environment.getId() ) == null )
                 {
