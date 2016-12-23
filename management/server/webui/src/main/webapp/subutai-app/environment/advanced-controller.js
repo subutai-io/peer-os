@@ -941,6 +941,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
 			}
+			//todo pass template id to addContainerToHost (container.templateId)
 			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname);
 		}
 		filterPluginsList();
@@ -1008,6 +1009,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         vm.selectedPlugin.selected = true;
     }
 
+    //todo get verified template id by name and supply to addContainerToHost method
     function setTemplatesByPlugin() {
 
         if (vm.selectedPlugin.requirement !== undefined) {

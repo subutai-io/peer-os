@@ -686,7 +686,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.selectedPlugin.selected = true;
 	}
 
-	//todo make plugins expose template ids in requirements
+	//todo get verified template id by name and supply to addContainer method
 	function setTemplatesByPlugin() {
 
 		if (vm.selectedPlugin.requirement !== undefined) {
