@@ -941,8 +941,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
 			}
-			//todo pass template id to addContainerToHost (container.templateId)
-			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname);
+			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname, container.templateId);
 		}
 		filterPluginsList();
 	}
@@ -1009,7 +1008,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         vm.selectedPlugin.selected = true;
     }
 
-    //todo get verified template id by name and supply to addContainerToHost method
     function setTemplatesByPlugin() {
 
         if (vm.selectedPlugin.requirement !== undefined) {
@@ -1042,7 +1040,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                             if (!imageExists(img)) {
                                 img = 'assets/templates/no-image.jpg';
                             }
-                            addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size);
+                            environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                                addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
+                            });
                         }
 
                     } else {
@@ -1050,7 +1050,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                         if (!imageExists(img)) {
                             img = 'assets/templates/no-image.jpg';
                         }
-                        addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size);
+                        environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                            addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
+                        });
                     }
 
                 }

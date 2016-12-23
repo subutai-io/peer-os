@@ -13,4 +13,6 @@ public interface TemplateManager
     Template getTemplate( String id );
 
     Template getTemplateByName( String name );
+
+    Template getVerifiedTemplateByName( final String name );
 }

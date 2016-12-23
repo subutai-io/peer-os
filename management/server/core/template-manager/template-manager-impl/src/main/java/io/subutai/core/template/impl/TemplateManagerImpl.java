@@ -26,15 +26,17 @@ public class TemplateManagerImpl implements TemplateManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( TemplateManagerImpl.class.getName() );
     private static final String GORJUN_LIST_TEMPLATES_URL = "http://localhost:8338/kurjun/rest/template/list";
+    private static final String GORJUN_GET_VERIFIED_TEMPLATE_URL =
+            "http://localhost:8338/kurjun/rest/template/info?name=%s&verified=true";
 
     private static final int TEMPLATE_CACHE_TTL_SEC = 30;
     private Set<Template> templatesCache = Sets.newHashSet();
     private long lastTemplatesFetchTime;
 
 
-    protected WebClient getWebClient()
+    WebClient getWebClient( String url )
     {
-        return RestUtil.createWebClient( GORJUN_LIST_TEMPLATES_URL, 3000, 5000, 1 );
+        return RestUtil.createWebClient( url, 3000, 5000, 1 );
     }
 
 
@@ -50,7 +52,7 @@ public class TemplateManagerImpl implements TemplateManager
 
             try
             {
-                webClient = getWebClient();
+                webClient = getWebClient( GORJUN_LIST_TEMPLATES_URL );
 
                 response = webClient.get();
 
@@ -102,12 +104,48 @@ public class TemplateManagerImpl implements TemplateManager
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
 
+        Template verifiedTemplate = getVerifiedTemplateByName( name );
+
+        if ( verifiedTemplate != null )
+        {
+            return verifiedTemplate;
+        }
+
         for ( Template template : getTemplates() )
         {
             if ( template.getName().equalsIgnoreCase( name ) )
             {
                 return template;
             }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public Template getVerifiedTemplateByName( final String name )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+
+        WebClient webClient = null;
+        Response response = null;
+
+        try
+        {
+            webClient = getWebClient( String.format( GORJUN_GET_VERIFIED_TEMPLATE_URL, name.toLowerCase() ) );
+
+            response = webClient.get();
+
+            return JsonUtil.fromJson( response.readEntity( String.class ), Template.class );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( String.format( "Error getting verified template by name %s from local Gorjun", name ), e );
+        }
+        finally
+        {
+            RestUtil.close( response, webClient );
         }
 
         return null;

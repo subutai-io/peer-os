@@ -122,6 +122,30 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response getVerifiedTemplate( final String templateName )
+    {
+        try
+        {
+            Template template = templateManager.getVerifiedTemplateByName( templateName );
+
+            if ( template != null )
+            {
+                return Response.ok( gson.toJson( template ) ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
+        }
+    }
+
+
     /** Environments **************************************************** */
 
 

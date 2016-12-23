@@ -67,4 +67,21 @@ public class Template
     {
         return architecture;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "Template{" );
+        sb.append( "id='" ).append( id ).append( '\'' );
+        sb.append( ", name='" ).append( name ).append( '\'' );
+        sb.append( ", size=" ).append( size );
+        sb.append( ", owners=" ).append( owners );
+        sb.append( ", parent='" ).append( parent ).append( '\'' );
+        sb.append( ", version='" ).append( version ).append( '\'' );
+        sb.append( ", filename='" ).append( filename ).append( '\'' );
+        sb.append( ", architecture=" ).append( architecture );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

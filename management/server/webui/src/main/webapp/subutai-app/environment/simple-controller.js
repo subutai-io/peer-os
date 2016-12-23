@@ -686,7 +686,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.selectedPlugin.selected = true;
 	}
 
-	//todo get verified template id by name and supply to addContainer method
 	function setTemplatesByPlugin() {
 
 		if (vm.selectedPlugin.requirement !== undefined) {
@@ -705,10 +704,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 							}
 						}
 						if (!alreadyONWorckspace || templatesCounter == i) {
-							addContainer(template.toLowerCase(), null, vm.selectedPlugin.size);
+						    environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+							    addContainer(template.toLowerCase(), null, vm.selectedPlugin.size, null, verifiedTemplate.id);
+						    });
 						}
 					} else {
-						addContainer(template.toLowerCase(), null, vm.selectedPlugin.size);
+                        environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                            addContainer(template.toLowerCase(), null, vm.selectedPlugin.size, null, verifiedTemplate.id);
+                        });
 					}
 				}
 			}

@@ -17,6 +17,7 @@ import io.subutai.common.protocol.Template;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
@@ -44,7 +45,7 @@ public class TemplateManagerImplTest
 
         templateManager = spy( new TemplateManagerImpl() );
 
-        doReturn( webClient ).when( templateManager ).getWebClient();
+        doReturn( webClient ).when( templateManager ).getWebClient( anyString() );
         doReturn( response ).when( webClient ).get();
         doReturn( GORJUN_OUTPUT ).when( response ).readEntity( String.class );
     }
