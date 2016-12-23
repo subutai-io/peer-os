@@ -1961,7 +1961,7 @@ public class EnvironmentManagerImpl
             environments.addAll( hubEnvironments );
 
             // add remote env-s
-            environments.addAll( getRemoteEnvironments( false ) );
+            environments.addAll( getRemoteEnvironments( true ) );
         }
         catch ( ActionFailedException e )
         {
@@ -1970,7 +1970,6 @@ public class EnvironmentManagerImpl
             //failed to obtain Hub metadata, return all locally registered env-s
             environments.addAll( getRemoteEnvironments( true ) );
         }
-
 
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
@@ -2037,7 +2036,7 @@ public class EnvironmentManagerImpl
 
             for ( Iterator<HubEnvironment> iterator = hubEnvironments.iterator(); iterator.hasNext(); )
             {
-                final HubEnvironment environment = iterator.next();
+                HubEnvironment environment = iterator.next();
 
                 if ( networkResources.findByEnvironmentId( environment.getId() ) == null )
                 {

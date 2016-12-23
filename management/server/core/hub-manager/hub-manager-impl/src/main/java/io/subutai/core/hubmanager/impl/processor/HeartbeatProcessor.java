@@ -115,19 +115,11 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            if ( sendHeartbeat( false ) )
-            {
-                isHubReachable = true;
-            }
+            sendHeartbeat( false );
         }
         catch ( Exception e )
         {
             log.error( "Error performing heartbeat: " + e.getMessage() );
-
-            if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( e.getMessage() ) )
-            {
-                isHubReachable = false;
-            }
         }
     }
 
@@ -138,14 +130,12 @@ public class HeartbeatProcessor implements Runnable
      * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option is used
      * to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor sets this option.
      * See HubEnvironmentProcessor for example.
-     *
-     * return true if an attempt to send HB was actually taken, false otherwise
      */
-    public boolean sendHeartbeat( boolean force ) throws HubManagerException
+    public void sendHeartbeat( boolean force ) throws HubManagerException
     {
         if ( !hubManager.isRegisteredWithHub() )
         {
-            return false;
+            return;
         }
 
         long interval = ( System.currentTimeMillis() - lastSentMillis ) / 1000;
@@ -157,12 +147,22 @@ public class HeartbeatProcessor implements Runnable
             log.info( "Sending heartbeat to HUB: interval={}, force={}, fastModeLeft={}", interval, force,
                     fastModeLeft );
 
-            doHeartbeat();
+            try
+            {
+                doHeartbeat();
 
-            return true;
+                isHubReachable = true;
+            }
+            catch ( Exception e )
+            {
+                if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( e.getMessage() ) )
+                {
+                    isHubReachable = false;
+                }
+
+                throw e;
+            }
         }
-
-        return false;
     }
 
 
