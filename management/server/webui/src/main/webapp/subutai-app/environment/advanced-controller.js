@@ -1328,7 +1328,7 @@ function drop(event) {
 
     for (var i = 0; i < models.length; i++) {
         if (models[i].attributes.hostId !== undefined) {
-            addContainerToHost(models[i], template, img, null, null, null, templateId);
+            addContainerToHost(models[i], template.toLowerCase(), img, null, null, null, templateId);
         }
     }
 }

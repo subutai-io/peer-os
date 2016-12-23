@@ -322,7 +322,7 @@ public class EnvironmentManagerImpl
         }
         catch ( ActionFailedException e )
         {
-            LOG.error( e.getMessage() );
+            //ignore
         }
 
         setTransientFields( envs );
@@ -1965,8 +1965,6 @@ public class EnvironmentManagerImpl
         }
         catch ( ActionFailedException e )
         {
-            LOG.error( e.getMessage() );
-
             //failed to obtain Hub metadata, return all locally registered env-s
             environments.addAll( getRemoteEnvironments( true ) );
         }

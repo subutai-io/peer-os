@@ -6,12 +6,15 @@ import java.util.Set;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+
+import com.google.common.cache.LoadingCache;
 
 import io.subutai.common.protocol.Template;
 
@@ -39,6 +42,10 @@ public class TemplateManagerImplTest
     WebClient webClient;
     @Mock
     Response response;
+    @Mock
+    LoadingCache<String, Template> cache;
+    @Mock
+    Template template;
 
 
     @Before
@@ -50,6 +57,8 @@ public class TemplateManagerImplTest
         doReturn( webClient ).when( templateManager ).getWebClient( anyString() );
         doReturn( response ).when( webClient ).get();
         doReturn( GORJUN_LIST_OUTPUT ).when( response ).readEntity( String.class );
+        doReturn( cache ).when( templateManager ).getVerifiedTemplatesCache();
+        doReturn( null ).when( cache ).get( TEMPLATE_NAME );
     }
 
 
@@ -70,11 +79,9 @@ public class TemplateManagerImplTest
         assertNotNull( template );
     }
 
-
     @Test
     public void testGetTemplateByName() throws Exception
     {
-
         Template template = templateManager.getTemplateByName( TEMPLATE_NAME );
 
         assertNotNull( template );
@@ -84,6 +91,7 @@ public class TemplateManagerImplTest
     @Test
     public void testGetVerifiedTemplateByName() throws Exception
     {
+        doReturn( template ).when( cache ).get( TEMPLATE_NAME );
         doReturn( GORJUN_TEMPLATE_OUTPUT ).when( response ).readEntity( String.class );
 
         Template template = templateManager.getVerifiedTemplateByName( TEMPLATE_NAME );

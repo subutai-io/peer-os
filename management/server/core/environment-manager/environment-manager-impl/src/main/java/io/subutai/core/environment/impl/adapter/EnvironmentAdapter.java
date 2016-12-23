@@ -114,7 +114,7 @@ public class EnvironmentAdapter
         }
         catch ( Exception e )
         {
-            log.error( "Error to parse json: ", e );
+            log.error( "Failed to parse environments from Hub", e );
 
             throw new ActionFailedException( "Failed to parse environments from Hub: " + e.getMessage() );
         }

@@ -2,6 +2,8 @@ package io.subutai.core.template.impl;
 
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.ws.rs.core.Response;
 
@@ -12,6 +14,9 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 
@@ -28,10 +33,10 @@ public class TemplateManagerImpl implements TemplateManager
     private static final String GORJUN_LIST_TEMPLATES_URL = "http://localhost:8338/kurjun/rest/template/list";
     private static final String GORJUN_GET_VERIFIED_TEMPLATE_URL =
             "http://localhost:8338/kurjun/rest/template/info?name=%s&verified=true";
-
     private static final int TEMPLATE_CACHE_TTL_SEC = 30;
     private Set<Template> templatesCache = Sets.newHashSet();
-    private long lastTemplatesFetchTime;
+    private volatile long lastTemplatesFetchTime = 0L;
+    private final ReentrantLock lock = new ReentrantLock( true );
 
 
     WebClient getWebClient( String url )
@@ -43,9 +48,29 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public Set<Template> getTemplates()
     {
+        boolean needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
+                .toMillis( TEMPLATE_CACHE_TTL_SEC );
 
-        if ( templatesCache.isEmpty()
-                || ( System.currentTimeMillis() - lastTemplatesFetchTime ) / 1000 >= TEMPLATE_CACHE_TTL_SEC )
+        if ( !needToUpdate )
+        {
+            return templatesCache;
+        }
+
+        lock.lock();
+
+        //check again just in case
+
+        needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
+                .toMillis( TEMPLATE_CACHE_TTL_SEC );
+
+        if ( !needToUpdate )
+        {
+            lock.unlock();
+
+            return templatesCache;
+        }
+
+        try
         {
             WebClient webClient = null;
             Response response = null;
@@ -61,10 +86,10 @@ public class TemplateManagerImpl implements TemplateManager
                         {
                         }.getType() );
 
-                lastTemplatesFetchTime = System.currentTimeMillis();
-
                 if ( !CollectionUtil.isCollectionEmpty( freshTemplateList ) )
                 {
+                    lastTemplatesFetchTime = System.currentTimeMillis();
+
                     templatesCache = freshTemplateList;
                 }
             }
@@ -76,6 +101,10 @@ public class TemplateManagerImpl implements TemplateManager
             {
                 RestUtil.close( response, webClient );
             }
+        }
+        finally
+        {
+            lock.unlock();
         }
 
         return templatesCache;
@@ -123,31 +152,54 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    @Override
-    public Template getVerifiedTemplateByName( final String name )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+    private LoadingCache<String, Template> verifiedTemplatesCache =
+            CacheBuilder.newBuilder().maximumSize( 1000 ).expireAfterWrite( TEMPLATE_CACHE_TTL_SEC, TimeUnit.SECONDS )
+                        .build( new CacheLoader<String, Template>()
+                        {
+                            @Override
+                            public Template load( String templateName ) throws Exception
+                            {
+                                WebClient webClient = null;
+                                Response response = null;
 
-        WebClient webClient = null;
-        Response response = null;
+                                try
+                                {
+                                    webClient = getWebClient( String.format( GORJUN_GET_VERIFIED_TEMPLATE_URL,
+                                            templateName.toLowerCase() ) );
+
+                                    response = webClient.get();
+
+                                    return JsonUtil.fromJson( response.readEntity( String.class ), Template.class );
+                                }
+                                finally
+                                {
+                                    RestUtil.close( response, webClient );
+                                }
+                            }
+                        } );
+
+
+    LoadingCache<String, Template> getVerifiedTemplatesCache()
+    {
+        return verifiedTemplatesCache;
+    }
+
+
+    @Override
+    public Template getVerifiedTemplateByName( final String templateName )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
 
         try
         {
-            webClient = getWebClient( String.format( GORJUN_GET_VERIFIED_TEMPLATE_URL, name.toLowerCase() ) );
-
-            response = webClient.get();
-
-            return JsonUtil.fromJson( response.readEntity( String.class ), Template.class );
+            return getVerifiedTemplatesCache().get( templateName );
         }
         catch ( Exception e )
         {
-            LOG.error( String.format( "Error getting verified template by name %s from local Gorjun", name ), e );
-        }
-        finally
-        {
-            RestUtil.close( response, webClient );
-        }
+            LOG.error( "Error getting verified template by name {} from local Gorjun: {}", templateName,
+                    e.getMessage() );
 
-        return null;
+            return null;
+        }
     }
 }
