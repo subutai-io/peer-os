@@ -14,8 +14,6 @@ import org.apache.commons.lang3.time.DateUtils;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
@@ -25,7 +23,6 @@ import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -41,7 +38,7 @@ import io.subutai.hub.share.dto.host.ResourceHostMetricDto;
 import static java.lang.String.format;
 
 
-public class ResourceHostDataProcessor extends HubRequester implements HostListener
+public class ResourceHostDataProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -244,7 +241,6 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
     }
 
 
-    @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
         // TODO: 7/29/16 need optimize
@@ -264,60 +260,5 @@ public class ResourceHostDataProcessor extends HubRequester implements HostListe
 
             processConfigs();
         }
-    }
-
-
-    @Override
-    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
-                                         final ContainerHostState currentState )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
-                                            final String currentHostname )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerCreated( final ContainerHostInfo containerInfo )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel oldNetInterface,
-                                                final HostInterfaceModel newNetInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
-                                              final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
-    {
-
     }
 }
