@@ -941,7 +941,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
 			}
-			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname);
+			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname, container.templateId);
 		}
 		filterPluginsList();
 	}
@@ -1040,7 +1040,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                             if (!imageExists(img)) {
                                 img = 'assets/templates/no-image.jpg';
                             }
-                            addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size);
+                            environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                                addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
+                            });
                         }
 
                     } else {
@@ -1048,7 +1050,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                         if (!imageExists(img)) {
                             img = 'assets/templates/no-image.jpg';
                         }
-                        addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size);
+                        environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                            addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
+                        });
                     }
 
                 }
@@ -1324,7 +1328,7 @@ function drop(event) {
 
     for (var i = 0; i < models.length; i++) {
         if (models[i].attributes.hostId !== undefined) {
-            addContainerToHost(models[i], template, img, null, null, null, templateId);
+            addContainerToHost(models[i], template.toLowerCase(), img, null, null, null, templateId);
         }
     }
 }

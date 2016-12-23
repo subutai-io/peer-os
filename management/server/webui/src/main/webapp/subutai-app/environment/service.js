@@ -22,6 +22,8 @@ function environmentService($http, $q) {
 
 	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
 
+	var VERIFIED_TEMPLATE_URL = ENVIRONMENTS_URL + 'templates/verified/';
+
 	var PEERS_URL = ENVIRONMENTS_URL + 'peers/';
 
 	var RH_URL = ENVIRONMENTS_URL + 'resourcehosts/';
@@ -39,6 +41,7 @@ function environmentService($http, $q) {
 
 	var environmentService = {
 		getTemplates: getTemplates,
+		getVerifiedTemplate: getVerifiedTemplate,
 
 		getStrategies : getStrategies,
 
@@ -104,6 +107,10 @@ function environmentService($http, $q) {
 
 
 	//// Implementation
+
+	function getVerifiedTemplate(name){
+        return $http.get(VERIFIED_TEMPLATE_URL + name, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
 
 	// @todo workaround for kurjun to return categorized templates
 	function getTemplates() {

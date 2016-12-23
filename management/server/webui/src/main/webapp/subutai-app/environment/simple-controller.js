@@ -581,7 +581,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					break;
 				case 'element-tool-copy':
 					addContainer(
-							this.model.attributes.templateName,
+							this.model.attributes.templateName.toLowerCase(),
 							false,
 							this.model.attributes.quotaSize,
 							getTemplateNameById(this.model.attributes.templateName, vm.templatesList),
@@ -686,7 +686,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.selectedPlugin.selected = true;
 	}
 
-	//todo make plugins expose template ids in requirements
 	function setTemplatesByPlugin() {
 
 		if (vm.selectedPlugin.requirement !== undefined) {
@@ -705,11 +704,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 							}
 						}
 						if (!alreadyONWorckspace || templatesCounter == i) {
-							addContainer(template.toLowerCase(), null, vm.selectedPlugin.size);
+                            environmentService.getVerifiedTemplate(template).success(function(verifiedTemplate){
+                                addContainer(template.toLowerCase(), null, vm.selectedPlugin.size, null, verifiedTemplate.id);
+                            });
 						}
-					} else {
-						addContainer(template.toLowerCase(), null, vm.selectedPlugin.size);
-					}
+                    } else {
+                        environmentService.getVerifiedTemplate(template).success(function(verifiedTemplate){
+                            addContainer(template.toLowerCase(), null, vm.selectedPlugin.size, null, verifiedTemplate.id);
+                        });
+                    }
 				}
 			}
 		}
