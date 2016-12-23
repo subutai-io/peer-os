@@ -14,11 +14,17 @@ public class Ram
     @JsonProperty( "free" )
     Double free;
 
+    @Expose
+    @JsonProperty( "cached" )
+    Double cached;
 
-    public Ram( @JsonProperty( "total" ) final Double total, @JsonProperty( "free" ) final Double free )
+
+    public Ram( @JsonProperty( "total" ) final Double total, @JsonProperty( "free" ) final Double free,
+                @JsonProperty( "cached" ) final Double cached )
     {
         this.total = total;
         this.free = free;
+        this.cached = cached;
     }
 
 
@@ -46,9 +52,26 @@ public class Ram
     }
 
 
+    public Double getCached()
+    {
+        return cached;
+    }
+
+
+    public void setCached( final Double cached )
+    {
+        this.cached = cached;
+    }
+
+
     @Override
     public String toString()
     {
-        return "RAM{" + "total=" + total + ", free=" + free + '}';
+        final StringBuffer sb = new StringBuffer( "Ram{" );
+        sb.append( "total=" ).append( total );
+        sb.append( ", free=" ).append( free );
+        sb.append( ", cached=" ).append( cached );
+        sb.append( '}' );
+        return sb.toString();
     }
 }
