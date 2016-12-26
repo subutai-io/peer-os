@@ -137,13 +137,13 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
             // relationLink = trustedObject
             // get list of all relations where trustedObject = relationLink and RelationInfo.ownership = 'User'
-            // select first object where relation.source.context = PermissionObject.IdentityManagement.getName()
+            // select first object where relation.source.context = PermissionObject.IDENTITY_MANAGEMENT.getName()
 
             // Ownership User already defines that trusted object is owned by source or target
             List<Relation> relationList = relationDataService.getTrustedRelationsByOwnership( target, Ownership.USER );
             for ( final Relation relation : relationList )
             {
-                if ( PermissionObject.IdentityManagement.getName().equals( relation.getSource().getContext() ) )
+                if ( PermissionObject.IDENTITY_MANAGEMENT.getName().equals( relation.getSource().getContext() ) )
                 {
                     delegatedUser = identityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() );
                     if ( delegatedUser != null )
@@ -151,7 +151,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                         break;
                     }
                 }
-                if ( PermissionObject.IdentityManagement.getName().equals( relation.getTarget().getContext() ) )
+                if ( PermissionObject.IDENTITY_MANAGEMENT.getName().equals( relation.getTarget().getContext() ) )
                 {
                     delegatedUser = identityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() );
                     if ( delegatedUser != null )
@@ -395,7 +395,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 }
             }
         }
-        logger.error( "No relation exist.", new RuntimeException( "No relation exists" ) );
+        logger.error( "No relation exist." );
         throw new RelationVerificationException( "No relation exist." );
     }
 }

@@ -31,7 +31,12 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Returns hosted container by its hostname
      */
-    ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+    ContainerHost getContainerHostByHostName( String hostname ) throws HostNotFoundException;
+
+    /**
+     * Returns hosted container by its container name
+     */
+    ContainerHost getContainerHostByContainerName( final String containerName ) throws HostNotFoundException;
 
     /**
      * Returns hosted container by its id
@@ -116,4 +121,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     boolean isManagementHost();
 
     RhTemplatesDownloadProgress getTemplateDownloadProgress( String environmentId );
+
+    void removeContainerHost(ContainerHost containerHost);
 }

@@ -17,6 +17,7 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.util.HostUtil;
+import io.subutai.common.util.StringUtil;
 
 
 public class CloneContainerTask extends HostUtil.Task<String>
@@ -83,13 +84,15 @@ public class CloneContainerTask extends HostUtil.Task<String>
         //update hostname to make it unique on this peer
         //VLAN will make it unique on this peer
         //additional suffix (last IP octet) will make it unique inside host environment
-        request.setHostname( String.format( "%s-%d-%s", request.getHostname(), networkResource.getVlan(),
-                StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ) );
+        request.setHostname(
+                String.format( "%s-%d-%s", StringUtil.removeHtmlAndSpecialChars( request.getHostname(), true ),
+                        networkResource.getVlan(),
+                        StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ) );
 
         request.setContainerName( request.getHostname() );
 
         String containerId = resourceHost
-                .cloneContainer( template, request.getHostname(), request.getIp(), networkResource.getVlan(),
+                .cloneContainer( template, request.getContainerName(), request.getIp(), networkResource.getVlan(),
                         networkResource.getEnvironmentId() );
 
         //wait for container connection

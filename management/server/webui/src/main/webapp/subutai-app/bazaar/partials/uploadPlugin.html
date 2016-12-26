@@ -1,141 +1,152 @@
-<div class="b-popup" ng-show = "bazaarCtrl.step === 'upload'">
-	<div class="b-popup__header">
-		Upload new plugin
-		<a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/></a>
-	</div>
-	<div class="b-popup__body">
-		<div class="b-form">
-			<div class="b-form__wrapper">
+<div class="b-popup" ng-show="bazaarCtrl.step === 'upload'">
+  <div class="b-popup__header">
+    Upload new plugin
+    <a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg"
+                                              class="b-icon g-right"/></a>
+  </div>
+  <form ng-submit="bazaarCtrl.uploadPlugin()">
+    <div class="b-popup__body">
+      <div class="b-form">
+        <div class="b-form__wrapper">
 
-				<div class="popup-body-box">
-					<label class="b-popup-body-label">Name</label>
+          <div class="popup-body-box">
+            <label class="b-popup-body-label">Name</label>
 
-					<input type="text" 
-						placeholder="Enter plugin name" 
-						class="b-popup-body-input b-popup-body-input_box" 
-						ng-model="bazaarCtrl.newPlugin.name" required>
-					<div class="clear"></div>
-				</div>
+            <input type="text"
+                   placeholder="Enter plugin name"
+                   class="b-popup-body-input b-popup-body-input_box"
+                   ng-model="bazaarCtrl.newPlugin.name" required>
+            <div class="clear"></div>
+          </div>
 
-				<div class="popup-body-box">
-					<label class="b-popup-body-label">Version</label>
+          <div class="popup-body-box">
+            <label class="b-popup-body-label">Version</label>
 
-					<input type="text" 
-						placeholder="Enter plugin name" 
-						class="b-popup-body-input b-popup-body-input_box" 
-						ng-model="bazaarCtrl.newPlugin.version" required>
-					<div class="clear"></div>
-				</div>
+            <input type="text"
+                   placeholder="Enter plugin version"
+                   class="b-popup-body-input b-popup-body-input_box"
+                   ng-model="bazaarCtrl.newPlugin.version" required>
+            <div class="clear"></div>
+          </div>
 
-				<div style = "height: 26px">
-					<div class="b-file-uploader" style = "float: left">
-						<div class="fileUpload b-btn b-btn_light-grey" style = "width: 82px">
-							<span>Upload</span>
-							<input type="file" class="upload" file-model = "upload"/>
-						</div>
-					</div>
-					<div style = "float: left; display: inline">
-						<input class="b-form-input b-form-input_full" type = "text" id = "filename" style = "color: #04346E; font-family: 'Ubuntu', sans-serif; font-size: 13px; font-style: italic" value = "Choose file" readonly></label>
-					</div>
-				</div>
-				<div>
-					<a href class="b-btn b-btn_blue g-right  b-btn_margin-l" ng-click="bazaarCtrl.editPermissionsWindow(bazaarCtrl.newPlugin, true)" style="margin-top: 20px">Next</a>
-				</div>
-				<div class="clear"></div>
-			</div>
-		</div>
-	</div>
+          <div style="height: 26px">
+            <div class="b-file-uploader" style="float: left">
+              <div class="fileUpload b-btn b-btn_light-grey" style="width: 82px">
+                <span>Upload</span>
+                <input type="file" class="upload" file-model="upload"/>
+              </div>
+            </div>
+            <div style="float: left; display: inline">
+              <input class="b-form-input b-form-input_full" type="text" id="filename"
+                     style="color: #04346E; font-family: 'Ubuntu', sans-serif; font-size: 13px; font-style: italic"
+                     value="Choose file" readonly></label>
+            </div>
+          </div>
+          <div>
+            <button class="b-btn b-btn_blue g-right  b-btn_margin-l"
+                    type="submit" style="margin-top: 20px">Upload
+            </button>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+
 </div>
 
 
+<div class="b-popup b-popup_wide" ng-show="bazaarCtrl.step === 'perms'">
+  <div class="b-popup__header">
+    <span ng-show="!bazaarCtrl.isNew">Edit permissions</span>
+    <span ng-show="bazaarCtrl.isNew">Set permissions</span>
+    <a href ng-click="closeThisDialog()">
+      <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+    </a>
+  </div>
+  <form class="form-horizontal">
 
-<div class="b-popup b-popup_wide" ng-show = "bazaarCtrl.step === 'perms'">
-	<div class="b-popup__header">
-		<span ng-show = "!bazaarCtrl.isNew">Edit permissions</span>
-		<span ng-show = "bazaarCtrl.isNew">Set permissions</span>
-		<a href ng-click="closeThisDialog()">
-			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-		</a>
-	</div>
-	<form class="form-horizontal">
+    <div class="b-popup__header">
+      <input type="text"
+             class="b-popup-body-input b-popup-body-input_role"
+             ng-model="bazaarCtrl.currentPlugin.name" style="color: #04346E"
+             required readonly ng-show="!bazaarCtrl.isNew">
+      <input type="text"
+             class="b-popup-body-input b-popup-body-input_role"
+             ng-model="bazaarCtrl.newPlugin.name" style="color: #04346E"
+             required readonly ng-show="bazaarCtrl.isNew">
+    </div>
 
-		<div class="b-popup__header">
-			<input type="text"
-				   class="b-popup-body-input b-popup-body-input_role"
-				   ng-model="bazaarCtrl.currentPlugin.name" style = "color: #04346E"
-				   required readonly ng-show = "!bazaarCtrl.isNew">
-			<input type="text"
-				   class="b-popup-body-input b-popup-body-input_role"
-				   ng-model="bazaarCtrl.newPlugin.name" style = "color: #04346E"
-				   required readonly ng-show = "bazaarCtrl.isNew">
-		</div>
-
-		<div class="b-popup__body">
-			<div class="b-popup-body b-popup-body_role b-nav_left">
-				<div class="b-popup-body-list-title ">All roles</div>
-				<div class="b-main-table-border">
-					<table class="b-main-table b-main-table_with-header b-main-table_white-header">
-						<tr>
-							<th>Name</th>
-							<th></th>
-						</tr>
-						<tr ng-repeat="permission in bazaarCtrl.permissions">
-							<td class="b-main-table__name">{{permission.name}}</td>
-							<td>
-								<a href
-								   class="b-btn-circle b-btn_green"
-								   ng-click="bazaarCtrl.addPermission2Stack(permission)">
-									<i class="fa fa-plus"></i>
-								</a>
-							</td>
-						</tr>
-					</table>
-				</div>
-			</div>
-			<div class="b-popup-body b-popup-body_role-100">
-				<div class="b-popup-body-list-title ">Role permissions</div>
-				<div class="b-main-table-border">
-					<table class="b-main-table b-main-table_with-header b-main-table_white-header">
-						<tr>
-							<th>Name</th>
-							<th>Read</th>
-							<th>Write</th>
-							<th>Update</th>
-							<th>Delete</th>
-							<th></th>
-						</tr>
-						<tr ng-repeat="(key, permission) in bazaarCtrl.permissions2Add">
-							<td class="b-main-table__name">{{permission.name}}</td>
-							<td class="b-main-table__checkbox">
-								<input type="checkbox" ng-model="permission.read">
-							</td>
-							<td class="b-main-table__checkbox">
-								<input type="checkbox" ng-model="permission.write">
-							</td>
-							<td class="b-main-table__checkbox">
-								<input type="checkbox" ng-model="permission.update">
-							</td>
-							<td class="b-main-table__checkbox">
-								<input type="checkbox" ng-model="permission.delete">
-							</td>
-							<td class="b-main-table__checkbox">
-								<a href
-								   class="b-btn-circle b-btn_red"
-								   ng-click="bazaarCtrl.removePermissionFromStack(key)">
-									<i class="fa fa-times"></i>
-								</a>
-							</td>
-						</tr>
-					</table>
-				</div>
-			</div>
-			<div class="clear"></div>
-		</div>
-		<div class="b-popup__footer">
-			<button class="b-btn b-btn_blue g-right" ng-click = "bazaarCtrl.editPermissions()" ng-show = "!bazaarCtrl.isNew">Save</button>
-			<button class="b-btn b-btn_blue g-left" ng-click = "bazaarCtrl.step = 'upload'" ng-show = "bazaarCtrl.isNew">Back</button>
-			<button class="b-btn b-btn_green g-right" ng-click = "bazaarCtrl.uploadPlugin()" ng-show = "bazaarCtrl.isNew">Upload</button>
-			<div class="clear"></div>
-		</div>
-	</form>
+    <div class="b-popup__body">
+      <div class="b-popup-body b-popup-body_role b-nav_left">
+        <div class="b-popup-body-list-title ">All roles</div>
+        <div class="b-main-table-border">
+          <table class="b-main-table b-main-table_with-header b-main-table_white-header">
+            <tr>
+              <th>Name</th>
+              <th></th>
+            </tr>
+            <tr ng-repeat="permission in bazaarCtrl.permissions">
+              <td class="b-main-table__name">{{permission.name}}</td>
+              <td>
+                <a href
+                   class="b-btn-circle b-btn_green"
+                   ng-click="bazaarCtrl.addPermission2Stack(permission)">
+                  <i class="fa fa-plus"></i>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="b-popup-body b-popup-body_role-100">
+        <div class="b-popup-body-list-title ">Role permissions</div>
+        <div class="b-main-table-border">
+          <table class="b-main-table b-main-table_with-header b-main-table_white-header">
+            <tr>
+              <th>Name</th>
+              <th>Read</th>
+              <th>Write</th>
+              <th>Update</th>
+              <th>Delete</th>
+              <th></th>
+            </tr>
+            <tr ng-repeat="(key, permission) in bazaarCtrl.permissions2Add">
+              <td class="b-main-table__name">{{permission.name}}</td>
+              <td class="b-main-table__checkbox">
+                <input type="checkbox" ng-model="permission.read">
+              </td>
+              <td class="b-main-table__checkbox">
+                <input type="checkbox" ng-model="permission.write">
+              </td>
+              <td class="b-main-table__checkbox">
+                <input type="checkbox" ng-model="permission.update">
+              </td>
+              <td class="b-main-table__checkbox">
+                <input type="checkbox" ng-model="permission.delete">
+              </td>
+              <td class="b-main-table__checkbox">
+                <a href
+                   class="b-btn-circle b-btn_red"
+                   ng-click="bazaarCtrl.removePermissionFromStack(key)">
+                  <i class="fa fa-times"></i>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="b-popup__footer">
+      <button class="b-btn b-btn_blue g-right" ng-click="bazaarCtrl.editPermissions()" ng-show="!bazaarCtrl.isNew">
+        Save
+      </button>
+      <button class="b-btn b-btn_blue g-left" ng-click="bazaarCtrl.step = 'upload'" ng-show="bazaarCtrl.isNew">Back
+      </button>
+      <button class="b-btn b-btn_green g-right" ng-click="bazaarCtrl.uploadPlugin()" ng-show="bazaarCtrl.isNew">Upload
+      </button>
+      <div class="clear"></div>
+    </div>
+  </form>
 </div>

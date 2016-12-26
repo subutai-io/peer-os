@@ -11,7 +11,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.PeerEnvironmentKeyTask;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -20,14 +20,14 @@ import io.subutai.core.security.api.SecurityManager;
 public class PEKGenerationStep
 {
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final PeerManager peerManager;
     private final TrackerOperation trackerOperation;
     private final SecurityManager securityManager;
     protected PeerUtil<Object> pekUtil = new PeerUtil<>();
 
 
-    public PEKGenerationStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
+    public PEKGenerationStep( final Topology topology, final LocalEnvironment environment, final PeerManager peerManager,
                               final SecurityManager securityManager, final TrackerOperation trackerOperation )
     {
         this.topology = topology;

@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;
@@ -69,6 +71,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response getRegisteredPeers()
     {
@@ -80,7 +83,8 @@ public class RestServiceImpl implements RestService
 
             if ( !registrationDatas.isEmpty() )
             {
-                ExecutorService taskExecutor = Executors.newFixedThreadPool( registrationDatas.size() );
+                ExecutorService taskExecutor =
+                        Executors.newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, registrationDatas.size() ) );
 
                 List<CompletableFuture> futures = registrationDatas.stream().map( d -> CompletableFuture.runAsync( () ->
                 {
@@ -112,6 +116,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public Response processRegisterRequest( final String ip, final String keyPhrase )
     {
@@ -135,6 +140,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public Response rejectForRegistrationRequest( final String peerId, Boolean force )
     {
@@ -163,6 +169,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public Response approveForRegistrationRequest( final String peerId, final String keyPhrase )
     {
@@ -191,6 +198,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public Response cancelForRegistrationRequest( final String peerId, Boolean force )
     {
@@ -219,6 +227,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( { "Peer-Management|Update" } )
     @Override
     public Response renamePeer( final String peerId, final String name )
     {
@@ -241,7 +250,7 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
-
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public Response unregisterForRegistrationRequest( final String peerId, Boolean force )
     {
@@ -269,7 +278,7 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
-
+    @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response getResourceHosts()
     {
@@ -282,7 +291,7 @@ public class RestServiceImpl implements RestService
         return new ExecutorCompletionService<>( executor );
     }
 
-
+    @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response checkPeer( String destinationHost )
     {

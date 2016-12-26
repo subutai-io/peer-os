@@ -1,9 +1,12 @@
 <blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
            xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <authz:enable />
 
   <cxf:bus id="cxfBusExecutorUI">
     <cxf:features>
@@ -15,11 +18,16 @@
              interface="io.subutai.core.executor.api.CommandExecutor" />
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
-
+  <reference id="identityManager" availability="mandatory"
+             interface="io.subutai.core.identity.api.IdentityManager" />
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
 
   <bean id="executorRestUIServiceImpl" class="io.subutai.core.executor.rest.ui.RestServiceImpl">
     <argument ref="commandExecutor" />
     <argument ref="environmentManager" />
+    <argument ref="identityManager" />
+    <argument ref="localPeer" />
   </bean>
 
   <jaxrs:server address="/ui/commands" id="executorRestUIService">

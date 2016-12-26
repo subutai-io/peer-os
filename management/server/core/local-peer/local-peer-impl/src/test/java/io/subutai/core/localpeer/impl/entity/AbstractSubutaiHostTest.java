@@ -104,7 +104,7 @@ public class AbstractSubutaiHostTest
         @Override
         public String getContext()
         {
-            return PermissionObject.PeerManagement.getName();
+            return PermissionObject.PEER_MANAGEMENT.getName();
         }
 
 

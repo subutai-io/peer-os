@@ -37,9 +37,13 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.DaoException;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
@@ -54,7 +58,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -64,7 +68,6 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.metric.HistoricalMetrics;
 
 
 /**
@@ -80,7 +83,7 @@ public class MonitorImpl implements Monitor, HostListener
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
 
     private final Commands commands = new Commands();
-    protected MonitorDao monitorDao;
+    protected MonitorDataService monitorDataService;
     protected DaoManager daoManager;
 
     protected ScheduledExecutorService backgroundTasksExecutorService;
@@ -93,6 +96,8 @@ public class MonitorImpl implements Monitor, HostListener
     private PeerManager peerManager;
     protected ObjectMapper mapper = new ObjectMapper();
 
+    private SystemSettings systemSettings;
+
 
     public MonitorImpl( PeerManager peerManager, DaoManager daoManager, HostRegistry hostRegistry )
             throws MonitorException
@@ -103,8 +108,9 @@ public class MonitorImpl implements Monitor, HostListener
 
         try
         {
+            this.systemSettings = new SystemSettings();
             this.daoManager = daoManager;
-            this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
+            this.monitorDataService = new MonitorDataService( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
             this.hostRegistry = hostRegistry;
         }
@@ -179,8 +185,9 @@ public class MonitorImpl implements Monitor, HostListener
         try
         {
 
-            Host c = peerManager.getLocalPeer().bindHost( containerId );
-            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( c.getHostname() );
+            Host c = peerManager.getLocalPeer().findHostByName( containerId.getHostName() );
+            ResourceHost resourceHost =
+                    peerManager.getLocalPeer().getResourceHostByContainerHostName( c.getHostname() );
 
             CommandResult commandResult =
                     resourceHost.execute( commands.getProcessResourceUsageCommand( c.getHostname(), pid ) );
@@ -341,7 +348,8 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    private ResourceHostMetric getResourceHostMetric( final ResourceHost resourceHost )
+    @Override
+    public ResourceHostMetric getResourceHostMetric( final ResourceHost resourceHost )
     {
         ResourceHostMetric resourceHostMetric = null;
 
@@ -569,8 +577,8 @@ public class MonitorImpl implements Monitor, HostListener
                 info.setP2pErrorLogs( errorList );
 
 
-                WebClient client =
-                        RestUtil.createTrustedWebClient( "https://hub.subut.ai:443/rest/v1/system/versions/range" );
+                WebClient client = RestUtil.createTrustedWebClient(
+                        String.format( "https://%s:443/rest/v1/system/versions/range", systemSettings.getHubIp() ) );
                 Response response = client.get();
 
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
@@ -605,7 +613,7 @@ public class MonitorImpl implements Monitor, HostListener
 
                 pojos.add( info );
             }
-            catch ( CommandException | ResourceHostException e )
+            catch ( Exception e )
             {
                 LOG.error( "Error while getting RH version and P2P status. Seems RH is not connected." );
 
@@ -620,7 +628,7 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public HistoricalMetrics getMetricsSeries( final Host host, Date startTime, Date endTime )
     {
-        HistoricalMetrics result = new HistoricalMetrics();
+        HistoricalMetrics result = new HistoricalMetrics( startTime, endTime );
 
         try
         {
@@ -630,6 +638,8 @@ public class MonitorImpl implements Monitor, HostListener
             if ( null != commandResult && commandResult.hasSucceeded() )
             {
                 result = mapper.readValue( commandResult.getStdOut(), HistoricalMetrics.class );
+                result.setStartTime( startTime );
+                result.setEndTime( endTime );
             }
             else
             {
@@ -671,5 +681,60 @@ public class MonitorImpl implements Monitor, HostListener
         }
 
         return commandResult;
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+
     }
 }

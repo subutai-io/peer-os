@@ -34,6 +34,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -45,7 +46,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -62,10 +62,10 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
-import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
+import io.subutai.core.environment.impl.adapter.HubEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
@@ -97,7 +97,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -117,6 +116,7 @@ import static org.mockito.Mockito.verify;
 public class EnvironmentManagerImplTest
 {
 
+    private static final int PORT = 80;
     EnvironmentManagerImpl environmentManager;
 
     @Mock
@@ -149,7 +149,7 @@ public class EnvironmentManagerImplTest
     @Mock
     CancellableWorkflow checkWorkflow;
 
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
 
     @Mock
     EnvironmentPeer environmentPeer;
@@ -170,7 +170,7 @@ public class EnvironmentManagerImplTest
     @Mock
     Map<String, CancellableWorkflow> activeWorkflows;
     @Mock
-    ProxyEnvironment proxyEnvironment;
+    HubEnvironment hubEnvironment;
     @Mock
     KeyManager keyManager;
     @Mock
@@ -222,6 +222,7 @@ public class EnvironmentManagerImplTest
 
         doReturn( Sets.newHashSet( environment ) ).when( environmentService ).getAll();
         doReturn( environment ).when( environmentService ).find( TestHelper.ENV_ID );
+        doReturn( environmentContainer ).when( environmentService ).mergeContainer( environmentContainer );
         doReturn( Sets.newHashSet( environmentPeer ) ).when( environment ).getEnvironmentPeers();
         doReturn( TestHelper.PEER_ID ).when( environmentPeer ).getPeerId();
         doReturn( Lists.newArrayList( environmentContainer ) ).when( localPeer )
@@ -427,7 +428,7 @@ public class EnvironmentManagerImplTest
 
         environmentManager.createEmptyEnvironment( topology );
 
-        verify( environmentManager ).save( any( EnvironmentImpl.class ) );
+        verify( environmentManager ).save( any( LocalEnvironment.class ) );
     }
 
 
@@ -731,11 +732,11 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        doReturn( proxyEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+        doReturn( hubEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         environmentManager.destroyEnvironment( TestHelper.ENV_ID, false );
 
-        verify( environmentAdapter ).removeEnvironment( proxyEnvironment );
+        verify( environmentAdapter ).removeEnvironment( hubEnvironment );
     }
 
 
@@ -803,11 +804,11 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        doReturn( proxyEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+        doReturn( hubEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         environmentManager.destroyContainer( TestHelper.ENV_ID, TestHelper.CONTAINER_ID, false );
 
-        verify( environmentAdapter ).destroyContainer( proxyEnvironment, TestHelper.CONTAINER_ID );
+        verify( environmentAdapter ).destroyContainer( hubEnvironment, TestHelper.CONTAINER_ID );
     }
 
 
@@ -895,6 +896,8 @@ public class EnvironmentManagerImplTest
     @Test
     public void testLoadEnvironment() throws Exception
     {
+        ReservedNetworkResources networkResource = mock( ReservedNetworkResources.class );
+        doReturn( networkResource ).when( localPeer ).getReservedNetworkResources();
         doCallRealMethod().when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         assertNotNull( environmentManager.loadEnvironment( TestHelper.ENV_ID ) );
@@ -902,6 +905,8 @@ public class EnvironmentManagerImplTest
         //-----
 
         doReturn( null ).when( environmentService ).find( TestHelper.ENV_ID );
+
+        doReturn( null ).when( environmentManager ).findRemoteEnvironment( TestHelper.ENV_ID );
 
         try
         {
@@ -914,7 +919,7 @@ public class EnvironmentManagerImplTest
         }
 
 
-        doReturn( proxyEnvironment ).when( environmentAdapter ).get( TestHelper.ENV_ID );
+        doReturn( hubEnvironment ).when( environmentAdapter ).get( TestHelper.ENV_ID );
         reset( environmentService );
 
         environmentManager.loadEnvironment( TestHelper.ENV_ID );
@@ -976,9 +981,11 @@ public class EnvironmentManagerImplTest
     public void testIsContainerInEnvironmentDomain() throws Exception
     {
 
+        doReturn( PORT ).when( environmentContainer ).getDomainPort();
+
         environmentManager.isContainerInEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
 
-        verify( localPeer ).isIpInVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).isIpInVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
         doThrow( new ContainerHostNotFoundException( "" ) ).when( environment )
                                                            .getContainerHostById( TestHelper.CONTAINER_ID );
@@ -990,9 +997,9 @@ public class EnvironmentManagerImplTest
     @Test
     public void testAddContainerToEnvironmentDomain() throws Exception
     {
-        environmentManager.addContainerToEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
+        environmentManager.addContainerToEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT );
 
-        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, true );
+        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
     }
 
 
@@ -1001,26 +1008,29 @@ public class EnvironmentManagerImplTest
     {
         environmentManager.removeContainerFromEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
 
-        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
     }
 
 
     @Test
     public void testToggleContainerDomain() throws Exception
     {
-        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, true );
+        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
 
-        verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
-        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+        doReturn( PORT ).when( environmentContainer ).getDomainPort();
 
-        verify( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
-        doThrow( new PeerException() ).when( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+        verify( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
+
+        doThrow( new PeerException() ).when( localPeer )
+                                      .removeIpFromVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
 
         try
         {
-            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
             fail( "Expected EnvironmentModificationException" );
         }
@@ -1032,7 +1042,7 @@ public class EnvironmentManagerImplTest
 
         try
         {
-            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
 
             fail( "Expected EnvironmentModificationException" );
         }
@@ -1071,8 +1081,8 @@ public class EnvironmentManagerImplTest
 
         environmentManager.createEnvironmentKeyPair( TestHelper.ENVIRONMENT_ID );
 
-        verify( keyManager ).saveSecretKeyRing( TestHelper.ENV_ID, SecurityKeyType.EnvironmentKey.getId(), secRing );
-        verify( keyManager ).savePublicKeyRing( TestHelper.ENV_ID, SecurityKeyType.EnvironmentKey.getId(), pubRing );
+        verify( keyManager ).saveSecretKeyRing( TestHelper.ENV_ID, SecurityKeyType.ENVIRONMENT_KEY.getId(), secRing );
+        verify( keyManager ).savePublicKeyRing( TestHelper.ENV_ID, SecurityKeyType.ENVIRONMENT_KEY.getId(), pubRing );
     }
 
 
@@ -1187,10 +1197,10 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        ProxyEnvironment proxyEnvironment = mock( ProxyEnvironment.class );
+        HubEnvironment hubEnvironment = mock( HubEnvironment.class );
         reset( environmentService );
 
-        environmentManager.update( proxyEnvironment );
+        environmentManager.update( hubEnvironment );
 
         verify( environmentService, never() ).merge( environment );
     }
@@ -1199,6 +1209,7 @@ public class EnvironmentManagerImplTest
     @Test
     public void testRemove() throws Exception
     {
+        doReturn( true ).when( environmentAdapter ).removeEnvironment( environment );
         environmentManager.remove( environment );
 
         verify( environmentService ).remove( TestHelper.ENV_ID );
@@ -1344,23 +1355,11 @@ public class EnvironmentManagerImplTest
 
 
     @Test
-    public void testAddReverseProxy() throws Exception
-    {
-        ReverseProxyConfig config = mock( ReverseProxyConfig.class );
-        doReturn( TestHelper.CONTAINER_ID ).when( config ).getContainerId();
-
-        environmentManager.addReverseProxy( environment, config );
-
-        verify( localPeer ).addReverseProxy( config );
-    }
-
-
-    @Test
     public void testOnRegistrationSucceeded() throws Exception
     {
         environmentManager.onRegistrationSucceeded();
 
-        verify( environmentAdapter ).uploadEnvironments( anySet() );
+        verify( environmentManager ).uploadPeerOwnerEnvironmentsToHub();
     }
 
 
@@ -1369,7 +1368,7 @@ public class EnvironmentManagerImplTest
     {
         doNothing().when( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
 
-        environmentManager.resetP2Pkey();
+        environmentManager.doResetP2Pkeys();
 
         verify( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
     }

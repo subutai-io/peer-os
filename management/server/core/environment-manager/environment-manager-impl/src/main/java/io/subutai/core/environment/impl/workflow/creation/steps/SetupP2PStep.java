@@ -18,7 +18,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupP2PConnectionTask;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTunnelTask;
@@ -31,12 +31,12 @@ import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTun
 public class SetupP2PStep
 {
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
-    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment,
+    public SetupP2PStep( final Topology topology, final LocalEnvironment environment,
                          final TrackerOperation trackerOperation )
     {
         this.topology = topology;

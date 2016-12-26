@@ -29,7 +29,7 @@ import io.subutai.common.peer.PeerException;
 public class MessageSender
 {
     public static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-    private final MessengerDao messengerDao;
+    private final MessengerDataService messengerDataService;
     private final MessengerImpl messenger;
 
     protected static Logger LOG = LoggerFactory.getLogger( MessageSender.class.getName() );
@@ -38,9 +38,9 @@ public class MessageSender
     protected CompletionService<Boolean> completer = new ExecutorCompletionService<>( restExecutor );
 
 
-    public MessageSender( final MessengerDao messengerDao, final MessengerImpl messenger )
+    public MessageSender( final MessengerDataService messengerDataService, final MessengerImpl messenger )
     {
-        this.messengerDao = messengerDao;
+        this.messengerDataService = messengerDataService;
         this.messenger = messenger;
     }
 
@@ -77,14 +77,14 @@ public class MessageSender
 
     protected void purgeExpiredMessages()
     {
-        messengerDao.purgeExpiredMessages();
+        messengerDataService.purgeExpiredMessages();
     }
 
 
     protected void deliverMessages()
     {
         //get next messages to send
-        Set<Envelope> envelopes = messengerDao.getEnvelopes();
+        Set<Envelope> envelopes = messengerDataService.getEnvelopes();
 
         Map<String, Set<Envelope>> peerEnvelopesMap = Maps.newHashMap();
         int maxTimeToLive = 0;
@@ -123,12 +123,13 @@ public class MessageSender
                 if ( targetPeer.isLocal() )
                 {
                     completer.submit(
-                            new LocalPeerMessageSender( messenger, messengerDao, envelopsPerPeer.getValue() ) );
+                            new LocalPeerMessageSender( messenger, messengerDataService, envelopsPerPeer.getValue() ) );
                 }
                 else
                 {
                     completer.submit(
-                            new RemotePeerMessageSender( messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
+                            new RemotePeerMessageSender(
+                                    messengerDataService, targetPeer, envelopsPerPeer.getValue() ) );
                 }
             }
 

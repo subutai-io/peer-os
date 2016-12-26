@@ -3,6 +3,7 @@ package io.subutai.core.registration.rest;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -10,8 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -30,7 +29,6 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     private SecurityManager securityManager;
     private HostRegistrationManager registrationManager;
     private LocalPeer localPeer;
-    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
 
     public RegistrationRestServiceImpl( final SecurityManager securityManager,
@@ -46,6 +44,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     }
 
 
+    @RolesAllowed( "Resource-Management|Write" )
     @Override
     public Response registerPublicKey( final String message )
     {
@@ -70,6 +69,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     }
 
 
+    @RolesAllowed( { "Resource-Management|Write", "Resource-Management|Update" } )
     @Override
     public Response approveRegistrationRequest( final String requestId )
     {
@@ -86,6 +86,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     }
 
 
+    @RolesAllowed( { "Resource-Management|Delete", "Resource-Management|Update" } )
     @Override
     public Response rejectRequest( final String requestId )
     {
@@ -101,6 +102,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     }
 
 
+    @RolesAllowed( { "Resource-Management|Delete", "Resource-Management|Update" } )
     @Override
     public Response removeRequest( final String requestId )
     {
@@ -116,6 +118,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     }
 
 
+    @RolesAllowed( { "Resource-Management|Write", "Resource-Management|Update" } )
     @Override
     public Response verifyContainerToken( final String message )
     {
@@ -146,6 +149,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     }
 
 
+    @RolesAllowed( { "Resource-Management|Read" } )
     @Override
     public Response getRegistrationRequests()
     {

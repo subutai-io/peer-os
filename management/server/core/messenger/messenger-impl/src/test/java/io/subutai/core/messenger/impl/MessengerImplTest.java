@@ -61,7 +61,7 @@ public class MessengerImplTest
     @Mock
     ExecutorService notificationExecutor;
     @Mock
-    MessengerDao messengerDao;
+    MessengerDataService messengerDataService;
     @Mock
     DaoManager daoManager;
     @Mock
@@ -85,7 +85,7 @@ public class MessengerImplTest
         messenger = spy( new MessengerImpl() );
         messenger.messageSender = messageSender;
         messenger.notificationExecutor = notificationExecutor;
-        messenger.messengerDao = messengerDao;
+        messenger.messengerDataService = messengerDataService;
         messenger.setDaoManager( daoManager );
         doReturn( peerManager ).when( messenger ).getPeerManager();
 
@@ -118,9 +118,9 @@ public class MessengerImplTest
     {
         messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE, HEADERS );
 
-        verify( messengerDao ).saveEnvelope( isA( Envelope.class ) );
+        verify( messengerDataService ).saveEnvelope( isA( Envelope.class ) );
 
-        doThrow( new RuntimeException() ).when( messengerDao ).saveEnvelope( any( Envelope.class ) );
+        doThrow( new RuntimeException() ).when( messengerDataService ).saveEnvelope( any( Envelope.class ) );
 
         messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE, HEADERS );
     }
@@ -139,7 +139,7 @@ public class MessengerImplTest
         assertEquals( MessageStatus.NOT_FOUND, status );
 
 
-        when( messengerDao.getEnvelope( MESSAGE_ID ) ).thenReturn( envelope );
+        when( messengerDataService.getEnvelope( MESSAGE_ID ) ).thenReturn( envelope );
 
         //test IN_PROCESS
         when( envelope.getTimeToLive() ).thenReturn( TIME_TO_LIVE );
@@ -167,7 +167,7 @@ public class MessengerImplTest
         assertEquals( MessageStatus.SENT, status );
 
         //test exception
-        doThrow( new RuntimeException() ).when( messengerDao ).getEnvelope( any( UUID.class ) );
+        doThrow( new RuntimeException() ).when( messengerDataService ).getEnvelope( any( UUID.class ) );
 
         messenger.getMessageStatus( MESSAGE_ID );
     }

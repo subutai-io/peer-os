@@ -2,11 +2,13 @@ package io.subutai.common.metric;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.hub.share.dto.metrics.CpuDto;
@@ -19,11 +21,17 @@ import io.subutai.hub.share.dto.metrics.NetDto;
 /**
  * Historical metrics
  */
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class HistoricalMetrics
 {
+    @JsonProperty( "startTime" )
+    private Date startTime;
+
+    @JsonProperty( "endTime" )
+    private Date endTime;
 
     @JsonProperty( "Metrics" )
-    List<SeriesBatch> metrics = new ArrayList<>();
+    private List<SeriesBatch> metrics = new ArrayList<>();
     private Map<SeriesBatch.SeriesType, List<Series>> seriesMap = new HashMap<>();
 
 
@@ -32,9 +40,44 @@ public class HistoricalMetrics
     }
 
 
-    public HistoricalMetrics( @JsonProperty( "Metrics" ) final List<SeriesBatch> metrics )
+    public HistoricalMetrics( @JsonProperty( "startTime" ) final Date startTime,
+                              @JsonProperty( "endTime" ) final Date endTime,
+                              @JsonProperty( "Metrics" ) final List<SeriesBatch> metrics )
     {
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.metrics = metrics;
+    }
+
+
+    public HistoricalMetrics( final Date startTime, final Date endTime )
+    {
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+
+    public Date getStartTime()
+    {
+        return startTime;
+    }
+
+
+    public void setStartTime( final Date startTime )
+    {
+        this.startTime = startTime;
+    }
+
+
+    public Date getEndTime()
+    {
+        return endTime;
+    }
+
+
+    public void setEndTime( final Date endTime )
+    {
+        this.endTime = endTime;
     }
 
 
@@ -48,26 +91,28 @@ public class HistoricalMetrics
     @JsonIgnore
     public HostMetricsDto.HostType getHostType()
     {
-        HostMetricsDto.HostType result = null;
-        if ( !metrics.isEmpty() && !metrics.get( 0 ).getSeries().isEmpty() )
+        HostMetricsDto.HostType result = HostMetricsDto.HostType.UNKNOWN;
+        if ( metrics != null && !metrics.isEmpty() && ( metrics.get( 0 ).getSeries() != null ) && !( metrics.get( 0 )
+                                                                                                            .getSeries()
+                                                                                                            .isEmpty() ) )
         {
-            if ( metrics.get( 0 ).getSeries().get( 0 ).getName().startsWith( "host_" ) )
+            String name = metrics.get( 0 ).getSeries().get( 0 ).getName();
+            if ( name != null )
             {
-                result = HostMetricsDto.HostType.RESOURCE_HOST;
-            }
-            else
-            {
-                if ( metrics.get( 0 ).getSeries().get( 0 ).getName().startsWith( "lxc_" ) )
+                if ( name.startsWith( "host_" ) )
                 {
-                    result = HostMetricsDto.HostType.CONTAINER_HOST;
+                    result = HostMetricsDto.HostType.RESOURCE_HOST;
+                }
+                else
+                {
+                    if ( name.startsWith( "lxc_" ) )
+                    {
+                        result = HostMetricsDto.HostType.CONTAINER_HOST;
+                    }
                 }
             }
         }
 
-        if ( result == null )
-        {
-            throw new IllegalStateException( "Could not determine host type." );
-        }
         return result;
     }
 
@@ -149,12 +194,13 @@ public class HistoricalMetrics
     private Map<String, NetDto> getNetDto( final List<Series> series )
     {
         Map<String, NetDto> result = new HashMap<>();
+        long timeInterval = ( endTime.getTime() - startTime.getTime() ) / 1000;
 
         for ( String iface : HostMetricsDto.RESOURCE_HOST_INTERFACES )
         {
-            NetDto dto = new NetDto( iface,
-                    SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "in" ) ),
-                    SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "out" ) ) );
+            double in = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "in" ) );
+            double out = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "out" ) );
+            NetDto dto = new NetDto( iface, in / timeInterval / 1024, out / timeInterval / 1024 );
 
             result.put( iface, dto );
         }

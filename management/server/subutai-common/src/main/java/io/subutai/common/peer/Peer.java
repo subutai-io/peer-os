@@ -20,6 +20,7 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -28,7 +29,6 @@ import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -36,7 +36,6 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -275,8 +274,6 @@ public interface Peer extends RelationLink
     void addToAuthorizedKeys( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
-
-    void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
 
     void addCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
 

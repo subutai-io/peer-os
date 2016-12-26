@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+
 public interface RestService
 {
     /** Users ***********************************************/
@@ -22,7 +23,7 @@ public interface RestService
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
-    @Path("/all")
+    @Path( "/all" )
     Response getSystemUsers();
 
     @GET
@@ -50,28 +51,28 @@ public interface RestService
                        @FormParam( "trustLevel" ) String trustLevel );
 
     @POST
-    @Path("/new-password")
+    @Path( "/new-password" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response changePassword( @FormParam("old") String oldPass, @FormParam("new") String newPass);
+    Response changePassword( @FormParam( "old" ) String oldPass, @FormParam( "new" ) String newPass );
 
 
     @POST
-    @Path("/approve-delegate")
+    @Path( "/approve-delegate" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response approveDelegatedUser( @FormParam( "signedDocument" ) String trustMessage);
+    Response approveDelegatedUser( @FormParam( "signedDocument" ) String trustMessage );
 
     @POST
-    @Path("/set-public-key")
+    @Path( "/set-public-key" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response setUserPublicKey(@FormParam( "publicKey" ) String publicKey);
+    Response setUserPublicKey( @FormParam( "publicKey" ) String publicKey );
 
     @POST
-    @Path("/delegate-identity")
+    @Path( "/delegate-identity" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response createIdentityDelegationDocument();
 
     @GET
-    @Path("/delegate-identity")
+    @Path( "/delegate-identity" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response getIdentityDelegationDocument();
 
@@ -79,7 +80,6 @@ public interface RestService
     @DELETE
     @Path( "/{userId}" )
     Response deleteUser( @PathParam( "userId" ) Long userId );
-
 
 
     /** Roles ***********************************************/
@@ -92,14 +92,12 @@ public interface RestService
     @POST
     @Path( "roles" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response saveRole( @FormParam( "rolename" ) String rolename,
-                              @FormParam( "permission" ) String permissionJson,
-                              @FormParam( "role_id" ) Long roleId );
+    Response saveRole( @FormParam( "rolename" ) String rolename, @FormParam( "permission" ) String permissionJson,
+                       @FormParam( "role_id" ) Long roleId );
 
     @DELETE
     @Path( "roles/{roleId}" )
     Response deleteRole( @PathParam( "roleId" ) Long roleName );
-
 
 
     /** Permissions ***********************************************/
@@ -116,7 +114,6 @@ public interface RestService
     Response getPermissionScopes();
 
 
-
     /** Tokens ***********************************************/
 
     @GET
@@ -126,16 +123,13 @@ public interface RestService
 
     @POST
     @Path( "users/tokens" )
-    Response createUserToken( @FormParam( "userId" ) Long userId,
-                              @FormParam( "token" ) String token,
+    Response createUserToken( @FormParam( "userId" ) Long userId, @FormParam( "token" ) String token,
                               @FormParam( "period" ) Integer period );
 
     @PUT
     @Path( "users/tokens" )
-    Response updateUserToken( @FormParam( "userId" ) Long userId,
-                              @FormParam( "token" ) String token,
-                              @FormParam( "newToken" ) String newToken,
-                              @FormParam( "period" ) Integer period );
+    Response updateUserToken( @FormParam( "userId" ) Long userId, @FormParam( "token" ) String token,
+                              @FormParam( "newToken" ) String newToken, @FormParam( "period" ) Integer period );
 
 
     @DELETE
@@ -150,4 +144,13 @@ public interface RestService
     Response getTokenTypes();
 
 
+    @GET
+    @Path( "/is-tenant-manager" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response isTenantManager();
+
+    @GET
+    @Path( "/is-admin" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response isAdmin();
 }

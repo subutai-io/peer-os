@@ -176,7 +176,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     protected LocalPeer getLocalPeer()
     {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+        return ServiceLocator.lookup( LocalPeer.class );
     }
 
 
@@ -291,7 +291,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         if ( containerId == null )
         {
-            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId(),
+                    getContainerName() );
         }
         return containerId;
     }
@@ -321,7 +322,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public String getContext()
     {
-        return PermissionObject.PeerManagement.getName();
+        return PermissionObject.PEER_MANAGEMENT.getName();
     }
 
 

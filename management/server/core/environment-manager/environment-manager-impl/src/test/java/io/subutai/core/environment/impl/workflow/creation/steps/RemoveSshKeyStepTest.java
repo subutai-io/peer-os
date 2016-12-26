@@ -11,7 +11,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -22,7 +22,7 @@ public class RemoveSshKeyStepTest
 {
     RemoveSshKeyStep step;
 
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     PeerUtil<Object> peerUtil;
     @Mock

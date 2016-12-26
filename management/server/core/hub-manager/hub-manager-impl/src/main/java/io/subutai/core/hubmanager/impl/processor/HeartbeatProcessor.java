@@ -10,15 +10,15 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.settings.Common;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
 
 
@@ -48,10 +48,9 @@ public class HeartbeatProcessor implements Runnable
 
     private String peerId;
 
-//    private Executor processorPool = new LimitedCachedExecutor( 10, 10 );
-    private ExecutorService processorPool = Executors.newFixedThreadPool( 25 );
+    private ExecutorService processorPool = Executors.newFixedThreadPool( Common.MAX_EXECUTOR_SIZE );
 
-    private volatile boolean isHubReachable = false;
+    private volatile boolean isHubReachable = true;
 
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
@@ -117,17 +116,10 @@ public class HeartbeatProcessor implements Runnable
         try
         {
             sendHeartbeat( false );
-
-            isHubReachable = true;
         }
         catch ( Exception e )
         {
-            log.error( "Error to process heartbeat: ", e.getMessage() );
-
-            if ( ExceptionUtils.getStackTrace( e ).contains( "ConnectException" ) )
-            {
-                isHubReachable = false;
-            }
+            log.error( "Error performing heartbeat: " + e.getMessage() );
         }
     }
 
@@ -141,7 +133,7 @@ public class HeartbeatProcessor implements Runnable
      */
     public void sendHeartbeat( boolean force ) throws HubManagerException
     {
-        if ( !hubManager.isRegistered() )
+        if ( !hubManager.isRegisteredWithHub() )
         {
             return;
         }
@@ -155,7 +147,21 @@ public class HeartbeatProcessor implements Runnable
             log.info( "Sending heartbeat to HUB: interval={}, force={}, fastModeLeft={}", interval, force,
                     fastModeLeft );
 
-            doHeartbeat();
+            try
+            {
+                doHeartbeat();
+
+                isHubReachable = true;
+            }
+            catch ( Exception e )
+            {
+                if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( e.getMessage() ) )
+                {
+                    isHubReachable = false;
+                }
+
+                throw e;
+            }
         }
     }
 
@@ -175,6 +181,11 @@ public class HeartbeatProcessor implements Runnable
             String url = path + RandomStringUtils.randomNumeric( 7 );
 
             RestResult<HeartbeatResponseDto> restResult = restClient.post( url, null, HeartbeatResponseDto.class );
+
+            if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( restResult.getError() ) )
+            {
+                throw new IllegalStateException( HubRestClient.CONNECTION_EXCEPTION_MARKER );
+            }
 
             if ( !restResult.isSuccess() )
             {

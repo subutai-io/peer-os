@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -27,9 +27,9 @@ public class EnvironmentServiceImplTest
     @Mock
     EntityManager entityManager;
     @Mock
-    TypedQuery<EnvironmentImpl> query;
+    TypedQuery<LocalEnvironment> query;
     @Mock
-    EnvironmentImpl environment;
+    LocalEnvironment environment;
     @Mock
     EnvironmentContainerImpl environmentContainer;
 
@@ -42,7 +42,7 @@ public class EnvironmentServiceImplTest
     {
         environmentService = new EnvironmentServiceImpl();
         environmentService.setEntityManager( entityManager );
-        doReturn( query ).when( entityManager ).createQuery( anyString(), eq( EnvironmentImpl.class ) );
+        doReturn( query ).when( entityManager ).createQuery( anyString(), eq( LocalEnvironment.class ) );
     }
 
 
@@ -51,7 +51,7 @@ public class EnvironmentServiceImplTest
     {
         environmentService.find( ID );
 
-        verify( entityManager ).find( EnvironmentImpl.class, ID );
+        verify( entityManager ).find( LocalEnvironment.class, ID );
     }
 
 
@@ -60,7 +60,7 @@ public class EnvironmentServiceImplTest
     {
         environmentService.getAll();
 
-        verify( entityManager ).createQuery( "select e from EnvironmentImpl e", EnvironmentImpl.class );
+        verify( entityManager ).createQuery( "select e from LocalEnvironment e where e.deleted = false", LocalEnvironment.class );
 
         verify( query ).getResultList();
     }

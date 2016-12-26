@@ -13,11 +13,8 @@
   <authz:enable />
   <!-- ***************************************************************** -->
 
-  <bean id="errLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor" />
-  <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
-
-  <bean id="hostLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor" />
-  <service ref="hostLstnr" interface="io.subutai.core.hostregistry.api.HostListener" />
+  <bean id="logListener" scope="singleton" class="io.subutai.core.hubmanager.impl.LogListenerImpl" />
+  <service ref="logListener" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
 
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
@@ -55,8 +52,11 @@
     <property name="hostRegistrationManager" ref="hostRegistrationManager" />
     <property name="monitor" ref="monitor" />
     <property name="commandExecutor" ref="commandExecutor" />
+    <property name="logListener" ref="logListener" />
     <argument ref="daoManagerHub" />
   </bean>
+
+  <service ref="hubImpl" interface="io.subutai.core.hostregistry.api.HostListener" />
 
   <service ref="hubImpl" interface="io.subutai.core.hubmanager.api.HubManager" />
 
@@ -67,7 +67,8 @@
                         bind-method="addListener" unbind-method="removeListener" />
   </reference-list>
 
-  <bean id="hubAdapter" class="io.subutai.core.hubmanager.impl.adapter.HubAdapterImpl" activation="eager">
+  <bean id="hubAdapter" class="io.subutai.core.hubmanager.impl.adapter.HubAdapterImpl" activation="eager"
+        scope="singleton">
     <argument ref="daoManagerHub" />
     <argument ref="securityManager" />
     <argument ref="peerManager" />
@@ -77,5 +78,7 @@
   <service ref="hubAdapter" interface="io.subutai.hub.share.common.HubAdapter" />
 
   <service ref="hubAdapter" interface="io.subutai.core.environment.api.EnvironmentEventListener" />
+
+  <service ref="hubAdapter" interface="io.subutai.core.hostregistry.api.HostListener" />
 
 </blueprint>

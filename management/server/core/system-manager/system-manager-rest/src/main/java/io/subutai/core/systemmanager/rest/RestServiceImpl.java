@@ -1,6 +1,8 @@
 package io.subutai.core.systemmanager.rest;
 
 
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
+import io.subutai.core.systemmanager.api.pojo.UpdateDto;
 
 
 public class RestServiceImpl implements RestService
@@ -161,6 +164,15 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getUpdatesHistory()
+    {
+        List<UpdateDto> updateDtoList = systemManager.getUpdates();
+
+        return Response.status( Response.Status.OK ).entity( JsonUtil.toJson( updateDtoList ) ).build();
+    }
+
+
+    @Override
     public Response update()
     {
         boolean isSuccessful = systemManager.updateManagement();
@@ -171,8 +183,23 @@ public class RestServiceImpl implements RestService
         }
         else
         {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+            //no update available
+            return Response.status( Response.Status.NO_CONTENT ).build();
         }
+    }
+
+
+    @Override
+    public Response isUpdateInProgress()
+    {
+        return Response.status( Response.Status.OK ).entity( systemManager.isUpdateInProgress() ).build();
+    }
+
+
+    @Override
+    public Response getHubIp()
+    {
+        return Response.status( Response.Status.OK ).entity( systemManager.getHubIp() ).build();
     }
 
 

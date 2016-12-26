@@ -25,7 +25,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 import static org.mockito.Mockito.doCallRealMethod;
@@ -42,7 +42,12 @@ public class TestHelper
     public static final String CONTAINER_ID = "123";
     public static final String PEER_NAME = "peer123";
     public static final String ENV_NAME = "env123";
-    public static final String SSH_KEY = "key";
+    public static final String SSH_KEY =
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+KvsKYuzmuy23QNKdciu3zcLzmP4BjPDziXWqyjlARk22BOz2nXd+I5txpxm"
+                    + "/ieM7X8D9tSh8C/dt168kOB14RvobqKMlZrYAJVZ/4jCj6/lUxy0D2c01filLIoMkCs"
+                    + "+1aLPgHFpdzckGQDCPimTgLcWtWccbtqXH3QNQKg8gJHQBrXXtWNdWBPUVh/GxMwCwoSshAeKhbqSoZcitffhyQ0hAKA"
+                    + "+sHEx6Lk22FUPEpDX31x63yWS0pwvx9NhxoqseSXi1U0psmKwuWLUT17KmwQAWSS6pq"
+                    + "/G5yv9atJnfu2EtlJxX5cvV99odRAJojVXb7LmxrRJnOx+CRSfTGaiN dilshat@sol";
     public static final String RH_ID = "123";
     public static final String PEER_ID = "123";
     public static final String ENV_ID = "123";
@@ -55,13 +60,14 @@ public class TestHelper
     public static final EnvironmentId ENVIRONMENT_ID = new EnvironmentId( ENV_ID );
     public static final HostId RES_HOST_ID = new HostId( RH_ID );
     public static final PeerId P_ID = new PeerId( PEER_ID );
-    public static final ContainerId CONT_HOST_ID = new ContainerId( CONTAINER_ID, HOSTNAME, P_ID, ENVIRONMENT_ID );
+    public static final ContainerId CONT_HOST_ID =
+            new ContainerId( CONTAINER_ID, HOSTNAME, P_ID, ENVIRONMENT_ID, CONTAINER_NAME );
     public static final String P2P_SUBNET = "10.10.10.1";
 
 
-    public static EnvironmentImpl ENVIRONMENT()
+    public static LocalEnvironment ENVIRONMENT()
     {
-        EnvironmentImpl ENVIRONMENT = mock( EnvironmentImpl.class );
+        LocalEnvironment ENVIRONMENT = mock( LocalEnvironment.class );
         doReturn( new EnvironmentId( ENV_ID ) ).when( ENVIRONMENT ).getEnvironmentId();
         doReturn( ENV_ID ).when( ENVIRONMENT ).getId();
         doReturn( SUBNET_CIDR ).when( ENVIRONMENT ).getSubnetCidr();

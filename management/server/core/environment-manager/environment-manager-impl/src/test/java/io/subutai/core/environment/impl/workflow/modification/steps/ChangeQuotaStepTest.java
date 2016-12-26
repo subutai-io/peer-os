@@ -17,7 +17,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -30,7 +30,7 @@ public class ChangeQuotaStepTest
     ChangeQuotaStep step;
 
 
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     TaskUtil<Object> taskUtil;
     @Mock

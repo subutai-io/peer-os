@@ -7,15 +7,15 @@ package io.subutai.common.security.objects;
 public enum SecurityKeyType
 {
 
-    UserKey( 1, "User-Key" ),
-    EnvironmentKey( 2, "Environment-Key" ),
-    PeerOwnerKey( 3, "Peer-Owner-Key" ),
-    PeerKey( 4, "Peer-Key" ),
-    PeerEnvironmentKey( 5, "Peer-Environment-Key" ),
-    ManagementHostKey( 6, "Management-Host-Key" ),
-    ResourceHostKey( 8, "Resource-Host-Key" ),
-    ContainerHostKey( 9, "Container-Host-Key" ),
-    TemplateKey( 10, "Template-Key" );
+    USER_KEY( 1, "User-Key" ),
+    ENVIRONMENT_KEY( 2, "Environment-Key" ),
+    PEER_OWNER_KEY( 3, "Peer-Owner-Key" ),
+    PEER_KEY( 4, "Peer-Key" ),
+    PEER_ENVIRONMENT_KEY( 5, "Peer-Environment-Key" ),
+    MANAGEMENT_HOST_KEY( 6, "Management-Host-Key" ),
+    RESOURCE_HOST_KEY( 8, "Resource-Host-Key" ),
+    CONTAINER_HOST_KEY( 9, "Container-Host-Key" ),
+    TEMPLATE_KEY( 10, "Template-Key" );
 
     private String name;
     private int id;
@@ -42,37 +42,37 @@ public enum SecurityKeyType
 
     public static SecurityKeyType getById( int keyId )
     {
-        if ( UserKey.getId() == keyId )
+        if ( USER_KEY.getId() == keyId )
         {
-            return UserKey;
+            return USER_KEY;
         }
-        else if ( EnvironmentKey.getId() == keyId )
+        else if ( ENVIRONMENT_KEY.getId() == keyId )
         {
-            return EnvironmentKey;
+            return ENVIRONMENT_KEY;
         }
-        else if ( PeerOwnerKey.getId() == keyId )
+        else if ( PEER_OWNER_KEY.getId() == keyId )
         {
-            return PeerOwnerKey;
+            return PEER_OWNER_KEY;
         }
-        else if ( PeerKey.getId() == keyId )
+        else if ( PEER_KEY.getId() == keyId )
         {
-            return PeerKey;
+            return PEER_KEY;
         }
-        else if ( PeerEnvironmentKey.getId() == keyId )
+        else if ( PEER_ENVIRONMENT_KEY.getId() == keyId )
         {
-            return PeerEnvironmentKey;
+            return PEER_ENVIRONMENT_KEY;
         }
-        else if ( ManagementHostKey.getId() == keyId )
+        else if ( MANAGEMENT_HOST_KEY.getId() == keyId )
         {
-            return ManagementHostKey;
+            return MANAGEMENT_HOST_KEY;
         }
-        else if ( ResourceHostKey.getId() == keyId )
+        else if ( RESOURCE_HOST_KEY.getId() == keyId )
         {
-            return ResourceHostKey;
+            return RESOURCE_HOST_KEY;
         }
         else
         {
-            return ContainerHostKey;
+            return CONTAINER_HOST_KEY;
         }
     }
 }

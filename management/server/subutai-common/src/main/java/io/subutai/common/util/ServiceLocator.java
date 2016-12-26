@@ -5,9 +5,6 @@
 package io.subutai.common.util;
 
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -29,7 +26,7 @@ public class ServiceLocator
      *
      * @return service reference
      */
-    public static <T> T getServiceNoCache( Class<T> clazz )
+    public static <T> T getServiceOrNull( Class<T> clazz )
     {
         Preconditions.checkNotNull( clazz, "Class is null" );
 
@@ -52,23 +49,16 @@ public class ServiceLocator
     }
 
 
-    /**
-     * Returns service by Interface, bypasses cache
-     *
-     * @param clazz Service Interface class to look up for
-     *
-     * @return service reference
-     *
-     * @throws NamingException thrown if service is not found
-     */
-    public static <T> T getJNDIServiceNoCache( Class<T> clazz ) throws NamingException
+    public static <T> T lookup( Class<T> clazz )
     {
-        Preconditions.checkNotNull( clazz, "Class is null" );
+        T service = getServiceOrNull( clazz );
 
-        String serviceName = clazz.getName();
-        InitialContext ctx = new InitialContext();
-        String jndiName = "osgi:service/" + serviceName;
-        return clazz.cast( ctx.lookup( jndiName ) );
+        if ( service == null )
+        {
+            throw new IllegalStateException( String.format( "Failed to lookup %s service", clazz.getSimpleName() ) );
+        }
+
+        return service;
     }
 
 
@@ -82,6 +72,6 @@ public class ServiceLocator
 
     public <T> T getService( Class<T> clazz )
     {
-        return getServiceNoCache( clazz );
+        return lookup( clazz );
     }
 }

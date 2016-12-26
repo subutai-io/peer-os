@@ -5,20 +5,22 @@ import java.util.Collection;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public interface EnvironmentService
 {
-    EnvironmentImpl find( final String id );
+    LocalEnvironment find( final String id );
 
-    Collection<EnvironmentImpl> getAll();
+    Collection<LocalEnvironment> getAll();
+
+    Collection<LocalEnvironment> getDeleted();
 
     void persist( Environment item );
 
     void remove( final String id );
 
-    EnvironmentImpl merge( EnvironmentImpl item );
+    LocalEnvironment merge( LocalEnvironment item );
 
     EnvironmentContainerImpl mergeContainer( EnvironmentContainerImpl container );
 }

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -25,19 +24,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
@@ -54,10 +57,10 @@ import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.processor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
-import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
@@ -80,9 +83,11 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 // TODO: Replace WebClient with HubRestClient.
-public class HubManagerImpl implements HubManager
+public class HubManagerImpl implements HubManager, HostListener
 {
     private static final long TIME_15_MINUTES = 900;
+
+    public static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -93,6 +98,8 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService resourceHostMonitorExecutorService =
             Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService peerMetricsExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -132,12 +139,9 @@ public class HubManagerImpl implements HubManager
 
     private HeartbeatProcessor heartbeatProcessor;
 
-    //todo inject this as dependency
     private ResourceHostDataProcessor resourceHostDataProcessor;
 
     private ContainerEventProcessor containerEventProcessor;
-
-    private VersionInfoProcessor versionInfoProcessor;
 
     private RegistrationRequestProcessor registrationRequestProcessor;
 
@@ -151,28 +155,14 @@ public class HubManagerImpl implements HubManager
 
     private EnvironmentUserHelper envUserHelper;
 
+    private LogListenerImpl logListener;
+
+    private PeerMetricsProcessor peerMetricsProcessor;
+
 
     public HubManagerImpl( DaoManager daoManager )
     {
         this.daoManager = daoManager;
-    }
-
-
-    public void addListener( HubEventListener listener )
-    {
-        if ( listener != null )
-        {
-            hubEventListeners.add( listener );
-        }
-    }
-
-
-    public void removeListener( HubEventListener listener )
-    {
-        if ( listener != null )
-        {
-            hubEventListeners.remove( listener );
-        }
     }
 
 
@@ -188,45 +178,6 @@ public class HubManagerImpl implements HubManager
 
             restClient = new HubRestClient( configManager );
 
-            resourceHostDataProcessor = new ResourceHostDataProcessor( this, localPeer, monitor, restClient );
-
-            ResourceHostMonitorProcessor resourceHostMonitorProcessor =
-                    new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
-
-            resourceHostConfExecutorService
-                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
-
-            resourceHostMonitorExecutorService
-                    .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
-
-            containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
-
-            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
-
-            //todo inject this as dependency
-            HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
-
-            hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
-
-            TunnelEventProcessor tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
-
-            tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
-
-            versionInfoProcessor = new VersionInfoProcessor( this, peerManager, configManager );
-
-            versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
-
-            registrationRequestProcessor =
-                    new RegistrationRequestProcessor( this, peerManager, hostRegistrationManager, restClient );
-
-            registrationRequestExecutor
-                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 60, TimeUnit.SECONDS );
-
-            EnvironmentTelemetryProcessor environmentTelemetryProcessor =
-                    new EnvironmentTelemetryProcessor( this, peerManager, configManager );
-
-            environmentTelemetryService
-                    .scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
 
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
@@ -241,7 +192,8 @@ public class HubManagerImpl implements HubManager
 
             envUserHelper = new EnvironmentUserHelper( identityManager, configDataService, envManager, restClient );
 
-            initHeartbeatProcessor();
+            initHubRequesters();
+            initHeartbeatProcessors();
         }
         catch ( Exception e )
         {
@@ -251,18 +203,70 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public boolean isHubReachable()
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        if ( heartbeatProcessor != null )
-        {
-            return heartbeatProcessor.isHubReachable();
-        }
-
-        return false;
+        resourceHostDataProcessor.onHeartbeat( resourceHostInfo, alerts );
     }
 
 
-    private void initHeartbeatProcessor()
+    private void initHubRequesters()
+    {
+        resourceHostDataProcessor = new ResourceHostDataProcessor( this, localPeer, monitor, restClient );
+
+        resourceHostConfExecutorService
+                .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
+
+        //***********
+
+        peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient,
+                ( int ) METRICS_SEND_DELAY );
+
+        peerMetricsExecutorService
+                .scheduleWithFixedDelay( peerMetricsProcessor, 30, METRICS_SEND_DELAY, TimeUnit.SECONDS );
+
+        //***********
+
+        containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager, restClient );
+
+        containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
+
+        //***********
+
+        HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this, logListener, restClient );
+
+        hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
+
+        //***********
+
+        TunnelEventProcessor tunnelEventProcessor =
+                new TunnelEventProcessor( this, peerManager, configManager, restClient );
+
+        tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
+
+        //***********
+
+        final VersionInfoProcessor versionInfoProcessor =
+                new VersionInfoProcessor( this, peerManager, configManager, restClient );
+
+        versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
+
+        //***********
+
+        registrationRequestProcessor =
+                new RegistrationRequestProcessor( this, peerManager, hostRegistrationManager, restClient );
+
+        registrationRequestExecutor.scheduleWithFixedDelay( registrationRequestProcessor, 20, 60, TimeUnit.SECONDS );
+
+        //***********
+
+        EnvironmentTelemetryProcessor environmentTelemetryProcessor =
+                new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
+
+        environmentTelemetryService.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
+    }
+
+
+    private void initHeartbeatProcessors()
     {
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
@@ -280,23 +284,25 @@ public class HubManagerImpl implements HubManager
                 new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
-                new EnvironmentTelemetryProcessor( this, peerManager, configManager );
+                new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
 
         StateLinkProcessor resourceHostRegisterProcessor =
                 new ResourceHostRegisterProcessor( hostRegistrationManager, peerManager, restClient );
 
         StateLinkProcessor commandProcessor = new CommandProcessor( ctx );
 
-        heartbeatProcessor = new HeartbeatProcessor( this, restClient, localPeer.getId() )
-                .addProcessor( hubEnvironmentProcessor )
-                .addProcessor( tunnelProcessor )
-                .addProcessor( environmentTelemetryProcessor )
-                .addProcessor( systemConfProcessor )
-                .addProcessor( productProcessor )
-                .addProcessor( vehsProccessor )
-                .addProcessor( appScaleProcessor )
-                .addProcessor( resourceHostRegisterProcessor )
-                .addProcessor( commandProcessor );
+        heartbeatProcessor =
+                new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
+                                                                             .addProcessor( tunnelProcessor )
+                                                                             .addProcessor(
+                                                                                     environmentTelemetryProcessor )
+                                                                             .addProcessor( systemConfProcessor )
+                                                                             .addProcessor( productProcessor )
+                                                                             .addProcessor( vehsProccessor )
+                                                                             .addProcessor( appScaleProcessor )
+                                                                             .addProcessor(
+                                                                                     resourceHostRegisterProcessor )
+                                                                             .addProcessor( commandProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -304,18 +310,10 @@ public class HubManagerImpl implements HubManager
     }
 
 
-    public void destroy()
-    {
-        heartbeatExecutorService.shutdown();
-        resourceHostConfExecutorService.shutdown();
-        resourceHostMonitorExecutorService.shutdown();
-    }
-
-
     @Override
     public void sendHeartbeat() throws HubManagerException
     {
-        resourceHostDataProcessor.process( false );
+        resourceHostDataProcessor.process();
         heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
     }
@@ -348,7 +346,7 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendResourceHostInfo() throws HubManagerException
     {
-        resourceHostDataProcessor.process( true );
+        resourceHostDataProcessor.process();
     }
 
 
@@ -356,6 +354,10 @@ public class HubManagerImpl implements HubManager
     @Override
     public void registerPeer( String hupIp, String email, String password, String peerName ) throws HubManagerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hupIp ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );
+
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password, peerName );
@@ -432,7 +434,7 @@ public class HubManagerImpl implements HubManager
         try
         {
             WebClient client = configManager
-                    .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "hub.subut.ai" );
+                    .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", configManager.getHubIp() );
 
             Response r = client.get();
 
@@ -472,11 +474,9 @@ public class HubManagerImpl implements HubManager
             FileUtils.copyInputStreamToFile( initialStream, targetFile );
             initialStream.close();
 
-            if ( isRegistered() )
+            if ( isRegisteredWithHub() )
             {
                 ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
-                Set<String> links = new HashSet<>();
-                links.add( productProcessor.getProductProcessUrl( uid ) );
                 PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
                 peerProductDataDto.setProductId( uid );
                 peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
@@ -515,7 +515,7 @@ public class HubManagerImpl implements HubManager
             log.debug( file.getName() + " is removed." );
         }
 
-        if ( isRegistered() )
+        if ( isRegisteredWithHub() )
         {
             ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
@@ -537,9 +537,37 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public boolean isRegistered()
+    public boolean isRegisteredWithHub()
     {
-        return configDataService.getHubConfig( configManager.getPeerId() ) != null;
+        return getHubConfiguration() != null;
+    }
+
+
+    @Override
+    public boolean isHubReachable()
+    {
+        return heartbeatProcessor != null && heartbeatProcessor.isHubReachable();
+    }
+
+
+    @Override
+    public boolean canWorkWithHub()
+    {
+        return isHubReachable() && isRegisteredWithHub();
+    }
+
+
+    @Override
+    public String getPeerName()
+    {
+        Config config = getHubConfiguration();
+
+        if ( config != null )
+        {
+            return config.getPeerName();
+        }
+
+        return null;
     }
 
 
@@ -560,7 +588,7 @@ public class HubManagerImpl implements HubManager
                 byte[] encryptedContent = configManager.readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 PeerDto dto = JsonUtil.fromCbor( plainContent, PeerDto.class );
-                result.put( "OwnerId", dto.getOwnerId() );
+                result.put( "OwnerId", dto != null ? dto.getOwnerId() : null );
 
                 log.debug( "PeerDto: " + result.toString() );
             }
@@ -573,78 +601,10 @@ public class HubManagerImpl implements HubManager
     }
 
 
-    public CommandExecutor getCommandExecutor()
-    {
-        return commandExecutor;
-    }
-
-
-    public void setCommandExecutor( final CommandExecutor commandExecutor )
-    {
-        this.commandExecutor = commandExecutor;
-    }
-
-
     @Override
     public Config getHubConfiguration()
     {
         return configDataService.getHubConfig( configManager.getPeerId() );
-    }
-
-
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
-    {
-        this.envManager = environmentManager;
-    }
-
-
-    public void setSecurityManager( final SecurityManager securityManager )
-    {
-        this.securityManager = securityManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }
-
-
-    public ConfigDataService getConfigDataService()
-    {
-        return configDataService;
-    }
-
-
-    public void setConfigDataService( final ConfigDataService configDataService )
-    {
-        this.configDataService = configDataService;
-    }
-
-
-    public void setMonitor( Monitor monitor )
-    {
-        this.monitor = monitor;
-    }
-
-
-    private static ObjectMapper createMapper( JsonFactory factory )
-    {
-        ObjectMapper mapper = new ObjectMapper( factory );
-        mapper.setVisibility( PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY );
-        return mapper;
-    }
-
-
-    public void setIdentityManager( final IdentityManager identityManager )
-    {
-        this.identityManager = identityManager;
-    }
-
-
-    public void setHostRegistrationManager( final HostRegistrationManager hostRegistrationManager )
-    {
-        this.hostRegistrationManager = hostRegistrationManager;
     }
 
 
@@ -658,9 +618,9 @@ public class HubManagerImpl implements HubManager
             byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
             StringBuilder hexString = new StringBuilder();
 
-            for ( int i = 0; i < bytes.length; i++ )
+            for ( final byte aByte : bytes )
             {
-                String hex = Integer.toHexString( 0xFF & bytes[i] );
+                String hex = Integer.toHexString( 0xFF & aByte );
                 if ( hex.length() == 1 )
                 {
                     hexString.append( '0' );
@@ -688,7 +648,7 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendSystemConfiguration( final SystemConfDto dto )
     {
-        if ( isRegistered() )
+        if ( isRegisteredWithHub() )
         {
             try
             {
@@ -729,7 +689,7 @@ public class HubManagerImpl implements HubManager
 
         log.info( "currentUser: id={}, username={}, email={}", currentUser.getId(), currentUser.getUserName(), email );
 
-        if ( !email.contains( "@hub.subut.ai" ) )
+        if ( !email.contains( HUB_EMAIL_SUFFIX ) && isRegisteredWithHub() )
         {
             return getHubConfiguration().getOwnerEmail();
         }
@@ -737,5 +697,152 @@ public class HubManagerImpl implements HubManager
         UserDto userDto = envUserHelper.getUserDataFromHub( StringUtils.substringBefore( email, "@" ) );
 
         return userDto.getEmail();
+    }
+
+
+    public void addListener( HubEventListener listener )
+    {
+        if ( listener != null )
+        {
+            hubEventListeners.add( listener );
+        }
+    }
+
+
+    public void removeListener( HubEventListener listener )
+    {
+        if ( listener != null )
+        {
+            hubEventListeners.remove( listener );
+        }
+    }
+
+
+    public void destroy()
+    {
+        heartbeatExecutorService.shutdown();
+        resourceHostConfExecutorService.shutdown();
+        resourceHostMonitorExecutorService.shutdown();
+    }
+
+
+    public CommandExecutor getCommandExecutor()
+    {
+        return commandExecutor;
+    }
+
+
+    public void setCommandExecutor( final CommandExecutor commandExecutor )
+    {
+        this.commandExecutor = commandExecutor;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.envManager = environmentManager;
+    }
+
+
+    public void setLogListener( final LogListenerImpl logListener )
+    {
+        this.logListener = logListener;
+    }
+
+
+    public void setSecurityManager( final SecurityManager securityManager )
+    {
+        this.securityManager = securityManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
+    public ConfigDataService getConfigDataService()
+    {
+        return configDataService;
+    }
+
+
+    public void setConfigDataService( final ConfigDataService configDataService )
+    {
+        this.configDataService = configDataService;
+    }
+
+
+    public void setMonitor( Monitor monitor )
+    {
+        this.monitor = monitor;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
+    }
+
+
+    public void setHostRegistrationManager( final HostRegistrationManager hostRegistrationManager )
+    {
+        this.hostRegistrationManager = hostRegistrationManager;
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+
     }
 }

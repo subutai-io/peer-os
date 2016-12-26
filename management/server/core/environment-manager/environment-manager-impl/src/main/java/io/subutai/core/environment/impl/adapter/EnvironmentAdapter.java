@@ -1,8 +1,6 @@
 package io.subutai.core.environment.impl.adapter;
 
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,17 +9,15 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.reflect.TypeToken;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
@@ -29,8 +25,9 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.json.JsonUtil;
@@ -44,63 +41,67 @@ public class EnvironmentAdapter
 
     private final ProxyContainerHelper proxyContainerHelper;
 
-    private final PeerManager peerManager;
-
     private final HubAdapter hubAdapter;
+    private final IdentityManager identityManager;
 
 
     public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager,
-                               HubAdapter hubAdapter )
+                               HubAdapter hubAdapter, IdentityManager identityManager )
     {
         this.environmentManager = environmentManager;
 
         proxyContainerHelper = new ProxyContainerHelper( peerManager );
 
-        this.peerManager = peerManager;
-
         this.hubAdapter = hubAdapter;
+
+        this.identityManager = identityManager;
     }
 
 
-    private boolean isHubReachable()
+    public HubEnvironment get( String id )
     {
-        HubManager hubManager = ServiceLocator.getServiceNoCache( HubManager.class );
-
-        return hubManager != null && hubManager.isHubReachable();
-    }
-
-
-    public ProxyEnvironment get( String id )
-    {
-        for ( ProxyEnvironment e : getEnvironments() )
+        try
         {
-            if ( e.getId().equals( id ) )
+            for ( HubEnvironment e : getEnvironments( identityManager.isTenantManager() ) )
             {
-                return e;
+                if ( e.getId().equals( id ) )
+                {
+                    return e;
+                }
             }
+        }
+        catch ( ActionFailedException e )
+        {
+            log.error( e.getMessage() );
         }
 
         return null;
     }
 
 
-    public Set<ProxyEnvironment> getEnvironments()
+    /**
+     * Returns hub environments for this peer. Throws {@code ActionFailedException} if requests to Hub failed for some
+     * reason
+     *
+     * @param all true: returns all environments, false: returns current user environments
+     */
+    public Set<HubEnvironment> getEnvironments( boolean all )
     {
-        if ( !isHubReachable() )
+        if ( !canWorkWithHub() )
         {
-            return Collections.emptySet();
+            throw new ActionFailedException( "Peer is not registered with Hub or connection to Hub failed" );
         }
 
-        String json = hubAdapter.getUserEnvironmentsForPeer();
+        String json = all ? hubAdapter.getAllEnvironmentsForPeer() : hubAdapter.getUserEnvironmentsForPeer();
 
         if ( json == null )
         {
-            return Collections.emptySet();
+            throw new ActionFailedException( "Failed to obtain environments from Hub" );
         }
 
         log.debug( "Json with environments: {}", json );
 
-        HashSet<ProxyEnvironment> envs = new HashSet<>();
+        Set<HubEnvironment> envs = new HashSet<>();
 
         try
         {
@@ -108,39 +109,55 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
+                envs.add( new HubEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
         {
-            log.error( "Error to parse json: ", e );
-        }
+            log.error( "Failed to parse environments from Hub", e );
 
-        printLocalContainers();
+            throw new ActionFailedException( "Failed to parse environments from Hub: " + e.getMessage() );
+        }
 
         return envs;
     }
 
 
-    private void printLocalContainers()
+    public Set<String> getDeletedEnvironmentsIds()
     {
-        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
-        {
-            for ( ContainerHost ch : rh.getContainerHosts() )
-            {
-                final HostInterfaces hostInterfaces = ch.getHostInterfaces();
-                String ip = hostInterfaces.findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
 
-                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip,
-                        ch.getContainerSize() );
-            }
+        if ( !canWorkWithHub() )
+        {
+            throw new ActionFailedException( "Peer is not registered with Hub or connection to Hub failed" );
+        }
+
+        String json = hubAdapter.getDeletedEnvironmentsForPeer();
+
+        if ( json == null )
+        {
+            throw new ActionFailedException( "Failed to obtain deleted environments from Hub" );
+        }
+
+        log.debug( "Json with deleted environments: {}", json );
+
+        try
+        {
+            return io.subutai.common.util.JsonUtil.fromJson( json, new TypeToken<Set<String>>()
+            {
+            }.getType() );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to parse json: ", e );
+
+            throw new ActionFailedException( "Failed to parse deleted environments from Hub: " + e.getMessage() );
         }
     }
 
 
-    public void destroyContainer( ProxyEnvironment env, String containerId )
+    public void destroyContainer( HubEnvironment env, String containerId )
     {
-        if ( !isHubReachable() )
+        if ( !canWorkWithHub() )
         {
             return;
         }
@@ -149,7 +166,7 @@ public class EnvironmentAdapter
         {
             EnvironmentContainerHost ch = env.getContainerHostById( containerId );
 
-            ( ( EnvironmentContainerImpl ) ch ).destroy();
+            ( ( EnvironmentContainerImpl ) ch ).destroy( false );
 
             hubAdapter.destroyContainer( env.getId(), containerId );
         }
@@ -160,41 +177,59 @@ public class EnvironmentAdapter
     }
 
 
-    public void removeEnvironment( EnvironmentImpl env )
+    public boolean removeEnvironment( String envId )
     {
-        if ( !isHubReachable() )
+        if ( !canWorkWithHub() )
         {
-            return;
+            return false;
         }
 
         try
         {
-            hubAdapter.removeEnvironment( env.getId() );
+            hubAdapter.removeEnvironment( envId );
+
+            return true;
         }
         catch ( Exception e )
         {
             log.error( "Error to remove environment: ", e );
         }
+
+        return false;
     }
 
 
-    public void uploadEnvironments( Collection<Environment> envs )
+    public boolean removeEnvironment( LocalEnvironment env )
     {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        for ( Environment env : envs )
-        {
-            uploadEnvironment( ( EnvironmentImpl ) env );
-        }
+        return removeEnvironment( env.getId() );
     }
 
 
-    public void uploadEnvironment( EnvironmentImpl env )
+    public boolean canWorkWithHub()
     {
-        if ( !isHubReachable() )
+        return isHubReachable() && isRegisteredWithHub();
+    }
+
+
+    public boolean isHubReachable()
+    {
+        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
+
+        return hubManager != null && hubManager.isHubReachable();
+    }
+
+
+    public boolean isRegisteredWithHub()
+    {
+        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
+
+        return hubManager != null && hubManager.isRegisteredWithHub();
+    }
+
+
+    public void uploadEnvironment( LocalEnvironment env )
+    {
+        if ( !canWorkWithHub() )
         {
             return;
         }
@@ -221,7 +256,62 @@ public class EnvironmentAdapter
     }
 
 
-    private void environmentContainersToJson( EnvironmentImpl env, ObjectNode json ) throws PeerException
+    public boolean uploadPeerOwnerEnvironment( LocalEnvironment env )
+    {
+        if ( !canWorkWithHub() )
+        {
+            return false;
+        }
+
+        if ( env.getStatus() != EnvironmentStatus.HEALTHY )
+        {
+            return false;
+        }
+
+        try
+        {
+            ObjectNode envJson = environmentToJson( env );
+
+            environmentPeersToJson( env, envJson );
+
+            environmentContainersToJson( env, envJson );
+
+            hubAdapter.uploadPeerOwnerEnvironment( envJson.toString() );
+
+            return true;
+        }
+        catch ( Exception e )
+        {
+            log.debug( "Error to post local environment to Hub: ", e );
+        }
+
+        return false;
+    }
+
+
+    public void removeSshKey( String envId, String sshKey )
+    {
+        if ( !canWorkWithHub() )
+        {
+            return;
+        }
+
+        hubAdapter.removeSshKey( envId, sshKey );
+    }
+
+
+    public void addSshKey( String envId, String sshKey )
+    {
+        if ( !canWorkWithHub() )
+        {
+            return;
+        }
+
+        hubAdapter.addSshKey( envId, sshKey );
+    }
+
+
+    private void environmentContainersToJson( LocalEnvironment env, ObjectNode json ) throws PeerException
     {
         ArrayNode contNode = json.putArray( "containers" );
 
@@ -262,7 +352,7 @@ public class EnvironmentAdapter
     }
 
 
-    private ObjectNode environmentToJson( EnvironmentImpl env )
+    private ObjectNode environmentToJson( LocalEnvironment env )
     {
         ObjectNode json = JsonUtil.createNode( "id", env.getEnvironmentId().getId() );
 
@@ -276,11 +366,13 @@ public class EnvironmentAdapter
 
         json.put( "p2pKey", env.getP2pKey() );
 
+        json.put( "vni", env.getVni() );
+
         return json;
     }
 
 
-    private void environmentPeersToJson( EnvironmentImpl env, ObjectNode json ) throws PeerException
+    private void environmentPeersToJson( LocalEnvironment env, ObjectNode json ) throws PeerException
     {
         ArrayNode peers = json.putArray( "peers" );
 
@@ -309,49 +401,5 @@ public class EnvironmentAdapter
 
             rhs.add( rhJson );
         }
-    }
-
-
-    public void onContainerStart( String envId, String contId )
-    {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        hubAdapter.onContainerStart( envId, contId );
-    }
-
-
-    public void onContainerStop( String envId, String contId )
-    {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        hubAdapter.onContainerStop( envId, contId );
-    }
-
-
-    public void removeSshKey( String envId, String sshKey )
-    {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        hubAdapter.removeSshKey( envId, sshKey );
-    }
-
-
-    public void addSshKey( String envId, String sshKey )
-    {
-        if ( !isHubReachable() )
-        {
-            return;
-        }
-
-        hubAdapter.addSshKey( envId, sshKey );
     }
 }

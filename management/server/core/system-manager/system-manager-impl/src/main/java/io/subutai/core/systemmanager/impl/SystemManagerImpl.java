@@ -4,6 +4,11 @@ package io.subutai.core.systemmanager.impl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.security.RolesAllowed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +18,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -26,6 +33,9 @@ import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
+import io.subutai.core.systemmanager.api.pojo.UpdateDto;
+import io.subutai.core.systemmanager.impl.dao.UpdateDao;
+import io.subutai.core.systemmanager.impl.entity.UpdateEntity;
 import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
@@ -35,11 +45,16 @@ import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 public class SystemManagerImpl implements SystemManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemManagerImpl.class );
+    private static final String UPDATE_IN_PROGRESS_MSG = "Update is in progress";
 
     private IdentityManager identityManager;
     private PeerManager peerManager;
+    private DaoManager daoManager;
+    private UpdateDao updateDao;
 
-    protected SystemSettings systemSettings;
+    private SystemSettings systemSettings;
+
+    private volatile boolean isUpdateInProgress = false;
 
 
     public SystemManagerImpl()
@@ -48,13 +63,14 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    protected SystemSettings getSystemSettings()
+    private SystemSettings getSystemSettings()
     {
         return new SystemSettings();
     }
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public SystemInfo getSystemInfo()
     {
         SystemInfo pojo = new SystemInfoPojo();
@@ -88,6 +104,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Update" )
     public void setPeerSettings()
     {
         identityManager.setPeerOwner( identityManager.getActiveUser() );
@@ -95,6 +112,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public PeerSettings getPeerSettings()
     {
         String peerOwnerId = identityManager.getPeerOwnerId();
@@ -110,6 +128,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public NetworkSettings getNetworkSettings() throws ConfigurationException
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
@@ -124,6 +143,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Update" )
     public void setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
                                     final String endRange ) throws ConfigurationException
     {
@@ -142,6 +162,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public AdvancedSettings getAdvancedSettings()
     {
         AdvancedSettings pojo = new AdvancedSettingsPojo();
@@ -163,6 +184,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Read" )
     public SystemInfo getManagementUpdates()
     {
         SystemInfo info = getSystemInfo();
@@ -200,22 +222,121 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    @RolesAllowed( "System-Management|Update" )
     public boolean updateManagement()
     {
-        try
+        if ( isUpdateInProgress )
         {
-            ResourceHost host = peerManager.getLocalPeer().getManagementHost();
-
-            host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
-
-            return true;
-        }
-        catch ( HostNotFoundException | CommandException e )
-        {
-            LOG.warn( e.getMessage() );
-
             return false;
         }
+
+        isUpdateInProgress = true;
+
+        try
+        {
+
+            ResourceHost host = peerManager.getLocalPeer().getManagementHost();
+
+            UpdateEntity updateEntity = new UpdateEntity( SubutaiInfo.getVersion(), SubutaiInfo.getCommitId() );
+
+            updateDao.persist( updateEntity );
+
+            CommandResult result =
+                    host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
+
+            if ( result.hasSucceeded() )
+            {
+                updateEntity.setCurrentVersion( "No change" );
+
+                updateEntity.setCurrentCommitId( "Other (system) components updated" );
+
+                updateDao.update( updateEntity );
+            }
+            else if ( !result.hasTimedOut() )
+            {
+                updateDao.remove( updateEntity.getId() );
+            }
+
+            return result.hasSucceeded();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error updating Management: {}", e.getMessage() );
+
+            throw new ActionFailedException( "Error updating Management: " + e.getMessage() );
+        }
+        finally
+        {
+            isUpdateInProgress = false;
+        }
+    }
+
+
+    @Override
+    @RolesAllowed( "System-Management|Read" )
+    public boolean isUpdateInProgress()
+    {
+        return isUpdateInProgress;
+    }
+
+
+    @Override
+    public String getHubIp()
+    {
+        return systemSettings.getHubIp();
+    }
+
+
+    public void init()
+    {
+        this.updateDao = new UpdateDao( daoManager.getEntityManagerFactory() );
+
+        UpdateEntity updateEntity = updateDao.getLast();
+
+        if ( updateEntity != null && updateEntity.getCurrentVersion() == null )
+        {
+            if ( Objects.equals( updateEntity.getPrevCommitId(), SubutaiInfo.getCommitId() ) )
+            {
+                updateEntity.setCurrentVersion( "No change" );
+
+                updateEntity.setCurrentCommitId( "Probably update was interrupted" );
+            }
+            else
+            {
+                updateEntity.setCurrentVersion( SubutaiInfo.getVersion() );
+
+                updateEntity.setCurrentCommitId( SubutaiInfo.getCommitId() );
+            }
+            updateDao.update( updateEntity );
+        }
+    }
+
+
+    @Override
+    @RolesAllowed( "System-Management|Read" )
+    public List<UpdateDto> getUpdates()
+    {
+        List<UpdateDto> updateDtos = new ArrayList<>();
+
+        List<UpdateEntity> updateEntities = updateDao.getLast( 20 );
+
+        for ( UpdateEntity updateEntity : updateEntities )
+        {
+            updateDtos.add( new UpdateDto( updateEntity.getUpdateDate(), updateEntity.getPrevVersion(),
+                    updateEntity.getCurrentVersion() == null ? UPDATE_IN_PROGRESS_MSG :
+                    updateEntity.getCurrentVersion(), updateEntity.getPrevCommitId(),
+                    updateEntity.getCurrentCommitId() == null ? UPDATE_IN_PROGRESS_MSG :
+                    updateEntity.getCurrentCommitId() ) );
+        }
+
+
+        return updateDtos;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
     }
 
 

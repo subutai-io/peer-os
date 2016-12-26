@@ -271,7 +271,7 @@ public class PeerManagerImpl implements PeerManager
             Encrypted encryptedPublicKey = registrationData.getPublicKey();
             String publicKey = encryptedPublicKey.decrypt( key, String.class );
             securityManager.getKeyManager()
-                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), SecurityKeyType.PeerKey.getId(),
+                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), SecurityKeyType.PEER_KEY.getId(),
                                    publicKey );
         }
         catch ( GeneralSecurityException e )
@@ -298,7 +298,7 @@ public class PeerManagerImpl implements PeerManager
             User user = identityManager.getActiveUser();
 
             UserToken userToken =
-                    identityManager.createUserToken( user, "", "", "", TokenType.Permanent.getId(), null );
+                    identityManager.createUserToken( user, "", "", "", TokenType.PERMANENT.getId(), null );
 
             return userToken.getFullToken();
         }
@@ -434,6 +434,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public void setName( final String peerId, final String newName ) throws PeerException
     {
@@ -517,6 +518,20 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Peer not found: " + peerId );
         }
         return result;
+    }
+
+
+    @Override
+    public RemotePeer findPeer( final String peerId )
+    {
+        Peer peer = peers.get( peerId );
+
+        if ( peer != null && peer instanceof RemotePeer )
+        {
+            return ( RemotePeer ) peer;
+        }
+
+        return null;
     }
 
 
@@ -794,6 +809,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public void checkHostAvailability( final String destinationHost ) throws PeerException
     {
@@ -1027,7 +1043,7 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( !forceAction )
             {
-                throw new PeerException( "Could not unregister peer. Peer in use." );
+                throw new PeerException( "Could not unregister peer: " + e.getMessage() );
             }
             else
             {

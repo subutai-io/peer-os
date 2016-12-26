@@ -6,7 +6,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.modification.steps.ChangeHostnameStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.UpdateAuthorizedKeysStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.UpdateEtcHostsStep;
@@ -20,7 +20,7 @@ public class HostnameModificationWorkflow
     private final ContainerId containerId;
     private final String newHostname;
 
-    private EnvironmentImpl environment;
+    private LocalEnvironment environment;
     private ChangeHostnameStep changeHostnameStep;
 
 
@@ -30,7 +30,7 @@ public class HostnameModificationWorkflow
     }
 
 
-    public HostnameModificationWorkflow( final EnvironmentImpl environment, final ContainerId containerId,
+    public HostnameModificationWorkflow( final LocalEnvironment environment, final ContainerId containerId,
                                          final String newHostname, final TrackerOperation operationTracker,
                                          final EnvironmentManagerImpl environmentManager )
     {
@@ -68,7 +68,7 @@ public class HostnameModificationWorkflow
 
         try
         {
-            environment = ( EnvironmentImpl ) changeHostnameStep.execute();
+            environment = ( LocalEnvironment ) changeHostnameStep.execute();
 
             saveEnvironment();
 

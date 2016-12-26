@@ -17,7 +17,7 @@ public interface EnvironmentEventListener
      *
      * @param environment - returns new environment
      */
-    public void onEnvironmentCreated( Environment environment );
+    void onEnvironmentCreated( Environment environment );
 
 
     /**
@@ -26,7 +26,7 @@ public interface EnvironmentEventListener
      * @param environment - target environment changed
      * @param newContainers - set of new container hosts
      */
-    public void onEnvironmentGrown( Environment environment, Set<EnvironmentContainerHost> newContainers );
+    void onEnvironmentGrown( Environment environment, Set<EnvironmentContainerHost> newContainers );
 
 
     /**
@@ -35,7 +35,7 @@ public interface EnvironmentEventListener
      * @param environment - target environment
      * @param containerId - destroyed container host id
      */
-    public void onContainerDestroyed( Environment environment, String containerId );
+    void onContainerDestroyed( Environment environment, String containerId );
 
 
     /**
@@ -43,5 +43,21 @@ public interface EnvironmentEventListener
      *
      * @param environmentId - destroyed environment id
      */
-    public void onEnvironmentDestroyed( String environmentId );
+    void onEnvironmentDestroyed( String environmentId );
+
+    /**
+     * Event on environment container start
+     *
+     * @param environment - target environment
+     * @param containerId - container id
+     */
+    void onContainerStarted( Environment environment, String containerId );
+
+    /**
+     * Event on environment container stop
+     *
+     * @param environment - target environment
+     * @param containerId - container id
+     */
+    void onContainerStopped( Environment environment, String containerId );
 }

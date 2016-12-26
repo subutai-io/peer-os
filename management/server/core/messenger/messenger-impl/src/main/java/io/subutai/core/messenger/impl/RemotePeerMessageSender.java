@@ -27,14 +27,14 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     private Peer targetPeer;
     private Set<Envelope> envelopes;
 
-    private MessengerDao messengerDao;
+    private MessengerDataService messengerDataService;
 
 
-    public RemotePeerMessageSender( MessengerDao messengerDao, final Peer targetPeer, final Set<Envelope> envelopes )
+    public RemotePeerMessageSender( MessengerDataService messengerDataService, final Peer targetPeer, final Set<Envelope> envelopes )
     {
         this.targetPeer = targetPeer;
         this.envelopes = envelopes;
-        this.messengerDao = messengerDao;
+        this.messengerDataService = messengerDataService;
     }
 
 
@@ -54,11 +54,11 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 
                     WebClientBuilder.checkResponse( response, Response.Status.ACCEPTED );
 
-                    messengerDao.markAsSent( envelope );
+                    messengerDataService.markAsSent( envelope );
                 }
                 catch ( Exception e )
                 {
-                    messengerDao.incrementDeliveryAttempts( envelope );
+                    messengerDataService.incrementDeliveryAttempts( envelope );
 
                     LOG.error( "Error in RemotePeerMessageSender", e );
 

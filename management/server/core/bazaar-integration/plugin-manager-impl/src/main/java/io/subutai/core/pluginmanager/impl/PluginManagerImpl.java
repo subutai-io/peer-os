@@ -1,11 +1,21 @@
 package io.subutai.core.pluginmanager.impl;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.pluginmanager.api.PluginManager;
 import io.subutai.core.pluginmanager.api.dao.ConfigDataService;
@@ -16,6 +26,8 @@ import io.subutai.core.pluginmanager.impl.dao.ConfigDataServiceImpl;
 
 public class PluginManagerImpl implements PluginManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( PluginManagerImpl.class.getName() );
+
     private IdentityManager identityManager;
     private DaoManager daoManager;
 
@@ -36,17 +48,25 @@ public class PluginManagerImpl implements PluginManager
 
 
     @Override
-    public void register( final String name, final String version, final String pathToKar,
-                          final List<PermissionJson> permissions )
+    @RolesAllowed( "Plugin-Management|Write" )
+    public void register( final String name, final String version, final Attachment kar,
+                          final List<PermissionJson> permissions ) throws IOException
     {
+        File karFile = new File( System.getProperty( "karaf.home" ) + "/deploy/" + name + ".kar" );
+
+        if ( !karFile.createNewFile() )
+        {
+            LOG.info( "Plugin {} already exists. Overwriting", name );
+        }
+
+        kar.transferTo( karFile );
+
         Date newDate = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime( newDate );
         cal.add( Calendar.YEAR, 1 );
 
-
-        configDataService
-                .saveDetails( name, version, pathToKar/*, currentUser.getId(), role.getId(), token.getToken() */ );
+        configDataService.saveDetails( name, version, karFile.getAbsolutePath() );
     }
 
 
@@ -65,6 +85,7 @@ public class PluginManagerImpl implements PluginManager
 
 
     @Override
+    @RolesAllowed( "Plugin-Management|Delete" )
     public void unregister( final Long pluginId )
     {
 
@@ -76,6 +97,14 @@ public class PluginManagerImpl implements PluginManager
     public void setPermissions( final Long pluginId, final String permissionJson )
     {
         //todo implement
+    }
+
+
+    @Override
+    @RolesAllowed( "Plugin-Management|Update" )
+    public void update( final String pluginId, final String name, final String version )
+    {
+        configDataService.update( pluginId, name, version );
     }
 
 

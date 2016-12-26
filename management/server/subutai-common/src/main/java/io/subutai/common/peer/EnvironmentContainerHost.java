@@ -17,4 +17,6 @@ public interface EnvironmentContainerHost extends ContainerHost
     EnvironmentContainerHost setContainerSize( ContainerSize size ) throws PeerException;
 
     SshKeys getAuthorizedKeys() throws PeerException;
+
+    Integer getDomainPort();
 }

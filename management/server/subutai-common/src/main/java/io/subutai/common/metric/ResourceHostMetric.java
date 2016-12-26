@@ -1,6 +1,8 @@
 package io.subutai.common.metric;
 
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.Expose;
@@ -47,6 +49,10 @@ public class ResourceHostMetric extends BaseMetric
     @JsonProperty
     private boolean management;
 
+    @Expose
+    @JsonProperty
+    private Date createdTime = new Date();
+
 
     public ResourceHostMetric()
     {
@@ -81,6 +87,13 @@ public class ResourceHostMetric extends BaseMetric
 
 
     @JsonIgnore
+    public Double getUsedSpace()
+    {
+        return disk != null ? disk.getUsed() : 0;
+    }
+
+
+    @JsonIgnore
     public Double getTotalRam()
     {
         return ram != null && ram.total != null ? ram.total : 0;
@@ -90,7 +103,9 @@ public class ResourceHostMetric extends BaseMetric
     @JsonIgnore
     public Double getAvailableRam()
     {
-        return ram != null && ram.free != null ? ram.free : 0;
+        double free = ram != null && ram.free != null ? ram.free : 0;
+        double cached = ram != null && ram.cached != null ? ram.cached : 0;
+        return free + cached;
     }
 
 
@@ -99,6 +114,14 @@ public class ResourceHostMetric extends BaseMetric
     {
 
         return cpu != null ? 100 - cpu.idle : null;
+    }
+
+
+    @JsonIgnore
+    public Double getCpuIdle()
+    {
+
+        return cpu != null ? cpu.idle : null;
     }
 
 
@@ -113,13 +136,6 @@ public class ResourceHostMetric extends BaseMetric
     public int getCpuCore()
     {
         return cpu != null ? cpu.coreCount : 0;
-    }
-
-
-    @JsonIgnore
-    public Double getFreeRam()
-    {
-        return ram != null && ram.free != null ? ram.free : 0;
     }
 
 
@@ -151,12 +167,25 @@ public class ResourceHostMetric extends BaseMetric
     }
 
 
+    public Date getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public void setCreatedTime( final Date createdTime )
+    {
+        this.createdTime = createdTime;
+    }
+
+
     public void updateMetrics( final ResourceHostMetric resourceHostMetric )
     {
         this.hostName = resourceHostMetric.hostName;
         this.cpu = resourceHostMetric.cpu;
         this.ram = new Ram( resourceHostMetric.ram.total != null ? resourceHostMetric.ram.total : 0.0,
-                resourceHostMetric.ram.free != null ? resourceHostMetric.ram.free : 0.0 );
+                resourceHostMetric.ram.free != null ? resourceHostMetric.ram.free : 0.0,
+                resourceHostMetric.ram.cached != null ? resourceHostMetric.ram.cached : 0.0 );
 
         this.disk = new Disk( resourceHostMetric.ram.total != null ? resourceHostMetric.ram.total : 0.0,
                 resourceHostMetric.disk.used != null ? resourceHostMetric.disk.used : 0.0 );
@@ -169,7 +198,7 @@ public class ResourceHostMetric extends BaseMetric
     {
         return String
                 .format( "%s %s, CPU used:%f, Free ram: %f, Available disk space: %f", super.toString(), getCpuModel(),
-                        getUsedCpu(), getFreeRam(), getAvailableSpace() );
+                        getUsedCpu(), getAvailableRam(), getAvailableSpace() );
     }
 
 

@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.model.UserDelegate;
 
 
@@ -28,7 +29,7 @@ public class UserDelegateEntity implements UserDelegate
     private long userId;
 
     @Column( name = "type" )
-    private int type = 2; // System User
+    private int type = UserType.REGULAR.getId();
 
     @Column( name = "relation_document", length = 3000 )
     private String relationDocument;
@@ -114,7 +115,7 @@ public class UserDelegateEntity implements UserDelegate
     @Override
     public String getContext()
     {
-        return PermissionObject.IdentityManagement.getName();
+        return PermissionObject.IDENTITY_MANAGEMENT.getName();
     }
 
 

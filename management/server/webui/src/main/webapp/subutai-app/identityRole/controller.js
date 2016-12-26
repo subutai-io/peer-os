@@ -220,8 +220,13 @@ function IdentityRoleFormCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 			postData += '&permission=' + JSON.stringify(permissionsArray);
 		}
 
+		LOADING_SCREEN();
 		identitySrv.addRole(postData).success(function (data) {
+			LOADING_SCREEN('none');
 			ngDialog.closeAll();
+		}).error(function(error){
+			LOADING_SCREEN('none');
+			SweetAlert.swal ("ERROR!", "Error: " + error, "error");
 		});
 	}
 	

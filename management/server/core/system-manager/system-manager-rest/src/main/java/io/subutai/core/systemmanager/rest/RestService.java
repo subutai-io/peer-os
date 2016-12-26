@@ -17,62 +17,76 @@ public interface RestService
     @GET
     @Path( "about" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getSubutaiInfo() throws ConfigurationException;
+    Response getSubutaiInfo() throws ConfigurationException;
 
     @GET
     @Path( "peer_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPeerSettings();
+    Response getPeerSettings();
 
     @POST
     @Path( "update_peer_settings" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setPeerSettings();
+    Response setPeerSettings();
 
 
     @GET
     @Path( "peer_policy" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPeerPolicy();
+    Response getPeerPolicy();
 
     @POST
     @Path( "update_peer_policy" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setPeerPolicy( @FormParam( "peerId" ) String peerId,
-                                   @FormParam( "diskUsageLimit" ) String diskUsageLimit,
-                                   @FormParam( "cpuUsageLimit" ) String cpuUsageLimit,
-                                   @FormParam( "memoryUsageLimit" ) String memoryUsageLimit,
-                                   @FormParam( "environmentLimit" ) String environmentLimit,
-                                   @FormParam( "containerLimit" ) String containerLimit );
+    Response setPeerPolicy( @FormParam( "peerId" ) String peerId, @FormParam( "diskUsageLimit" ) String diskUsageLimit,
+                            @FormParam( "cpuUsageLimit" ) String cpuUsageLimit,
+                            @FormParam( "memoryUsageLimit" ) String memoryUsageLimit,
+                            @FormParam( "environmentLimit" ) String environmentLimit,
+                            @FormParam( "containerLimit" ) String containerLimit );
 
 
     @GET
     @Path( "network_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getNetworkSettings() throws ConfigurationException;
+    Response getNetworkSettings() throws ConfigurationException;
 
     @POST
     @Path( "update_network_settings" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setNetworkSettings( @FormParam( "publicUrl" ) String publicUrl,
-                                        @FormParam( "publicSecurePort" ) String publicSecurePort,
-                                        @FormParam( "startRange" ) String startRange,
-                                        @FormParam( "endRange" ) String endRange ) throws ConfigurationException;
+    Response setNetworkSettings( @FormParam( "publicUrl" ) String publicUrl,
+                                 @FormParam( "publicSecurePort" ) String publicSecurePort,
+                                 @FormParam( "startRange" ) String startRange,
+                                 @FormParam( "endRange" ) String endRange ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getAdvancedSettings();
+    Response getAdvancedSettings();
 
 
     @GET
     @Path( "management_updates" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getManagementUpdates();
+    Response getManagementUpdates();
 
 
     @POST
     @Path( "update_management" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response update();
+    Response update();
+
+    @GET
+    @Path( "updates_history" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getUpdatesHistory();
+
+    @GET
+    @Path( "is_update_in_progress" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response isUpdateInProgress();
+
+    @GET
+    @Path( "hub_ip" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response getHubIp();
 }

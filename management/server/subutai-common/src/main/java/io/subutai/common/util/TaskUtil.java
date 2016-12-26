@@ -18,11 +18,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.settings.Common;
+
 
 public class TaskUtil<T>
 {
-    private static final int MAX_EXECUTOR_SIZE = 10;
-
     private static final Logger LOG = LoggerFactory.getLogger( TaskUtil.class );
 
     private final Set<Task<T>> tasks = Sets.newHashSet();
@@ -74,7 +74,8 @@ public class TaskUtil<T>
 
         Set<TaskResult<T>> taskResults = Sets.newHashSet();
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( Math.min( MAX_EXECUTOR_SIZE, tasks.size() ) );
+        ExecutorService taskExecutor =
+                Executors.newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, tasks.size() ) );
 
         CompletionService<T> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
 

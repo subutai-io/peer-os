@@ -11,7 +11,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -24,7 +24,7 @@ public class UpdateAuthorizedKeysStepTest
 
     UpdateAuthorizedKeysStep step;
 
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     private static final String OLD_HOSTNAME = "old";
     private static final String NEW_HOSTNAME = "new";
     TrackerOperation trackerOperation = TestHelper.TRACKER_OPERATION();

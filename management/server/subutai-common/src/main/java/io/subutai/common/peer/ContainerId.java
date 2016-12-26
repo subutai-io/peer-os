@@ -18,6 +18,8 @@ public class ContainerId extends HostId
     private PeerId peerId;
     @JsonProperty( "environmentId" )
     private EnvironmentId environmentId;
+    @JsonProperty( "containerName" )
+    private String containerName;
 
 
     public ContainerId( @JsonProperty( "id" ) final String id )
@@ -26,12 +28,14 @@ public class ContainerId extends HostId
     }
 
 
-    public ContainerId( final String id, final String hostName, final PeerId peerId, final EnvironmentId environmentId )
+    public ContainerId( final String id, final String hostName, final PeerId peerId, final EnvironmentId environmentId,
+                        final String containerName )
     {
         super( id );
         this.hostName = hostName;
         this.peerId = peerId;
         this.environmentId = environmentId;
+        this.containerName = containerName;
     }
 
 
@@ -50,5 +54,11 @@ public class ContainerId extends HostId
     public EnvironmentId getEnvironmentId()
     {
         return environmentId;
+    }
+
+
+    public String getContainerName()
+    {
+        return containerName;
     }
 }

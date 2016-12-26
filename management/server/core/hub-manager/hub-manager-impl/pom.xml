@@ -5,7 +5,7 @@
   <parent>
     <artifactId>hub-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.7-SNAPSHOT</version>
+    <version>4.0.13-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -15,6 +15,10 @@
   <description>Subutai Hub Manager Impl</description>
 
   <dependencies>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>commons-net</groupId>
@@ -26,10 +30,6 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-hub-share</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -76,13 +76,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hub-manager-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>host-registration-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

@@ -32,7 +32,7 @@ import io.subutai.common.task.CloneRequest;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
@@ -87,7 +87,7 @@ public class BuildContainerStateHandler extends StateHandler
     {
         RelationLinkDto envLink =
                 new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
-                        PermissionObject.EnvironmentManagement.getName(), peerDto.getEnvironmentInfo().getId() );
+                        PermissionObject.ENVIRONMENT_MANAGEMENT.getName(), peerDto.getEnvironmentInfo().getId() );
 
         ctx.localPeer.createPeerEnvironmentKeyPair( envLink );
     }

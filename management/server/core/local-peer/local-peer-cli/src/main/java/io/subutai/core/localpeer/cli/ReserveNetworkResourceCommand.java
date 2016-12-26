@@ -41,7 +41,8 @@ public class ReserveNetworkResourceCommand extends SubutaiShellCommandSupport
     {
         try
         {
-            localPeer.reserveNetworkResource( new NetworkResourceImpl( envId, vni, p2pSubnet, containerSubnet ) );
+            localPeer.reserveNetworkResource(
+                    new NetworkResourceImpl( envId, vni, p2pSubnet, containerSubnet, localPeer.getId() ) );
 
             System.out.println( "Network resource reserved" );
         }

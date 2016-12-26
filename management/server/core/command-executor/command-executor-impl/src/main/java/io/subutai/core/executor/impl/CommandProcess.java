@@ -7,9 +7,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.security.auth.Subject;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +27,17 @@ import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
+import io.subutai.common.exception.ActionFailedException;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
  * Represents a single command process, Encapsulates command results
  */
-public class CommandProcess
+class CommandProcess
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcess.class.getName() );
 
@@ -40,21 +46,27 @@ public class CommandProcess
     private StringBuilder stdErr;
     private Integer exitCode;
     private CommandProcessor commandProcessor;
-    protected volatile CommandStatus status;
-    protected Semaphore semaphore;
+    volatile CommandStatus status;
+    Semaphore semaphore;
     protected ExecutorService executor;
     private Request request;
-    protected Session userSession;
+    Session userSession;
     private int expectedResponseNumber = 1;
-    protected Set<Response> queuedResponses;
+    Set<Response> queuedResponses;
+    private String rhId;
+    private AtomicBoolean isSent = new AtomicBoolean( false );
+    private String encryptedRequest;
 
 
-    public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback,
-                           final Request request, final Session userSession )
+    CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback, final Request request,
+                    final String rhId, final Session userSession )
     {
         Preconditions.checkNotNull( commandProcessor );
         Preconditions.checkNotNull( callback );
         Preconditions.checkNotNull( request );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+
+        this.rhId = rhId;
 
         this.commandProcessor = commandProcessor;
         this.callback = callback;
@@ -75,10 +87,27 @@ public class CommandProcess
                 return Integer.compare( o1.getResponseNumber(), o2.getResponseNumber() );
             }
         } );
+
+        this.encryptedRequest = encrypt( request );
     }
 
 
-    public CommandResult waitResult()
+    protected String encrypt( Request request )
+    {
+        SecurityManager securityManager = ServiceLocator.lookup( SecurityManager.class );
+
+        try
+        {
+            return securityManager.signNEncryptRequestToHost( JsonUtil.toJsonMinified( request ), request.getId() );
+        }
+        catch ( PGPException e )
+        {
+            throw new ActionFailedException( String.format( "Failed to encrypt command: %s", e.getMessage() ) );
+        }
+    }
+
+
+    CommandResult waitResult()
     {
         try
         {
@@ -106,7 +135,7 @@ public class CommandProcess
     }
 
 
-    public synchronized void processResponse( final Response response )
+    synchronized void processResponse( final Response response )
     {
 
         if ( expectedResponseNumber == response.getResponseNumber() )
@@ -133,7 +162,7 @@ public class CommandProcess
     }
 
 
-    protected void processNextResponse( final Response response )
+    void processNextResponse( final Response response )
     {
         final CommandProcess THIS = this;
 
@@ -164,7 +193,7 @@ public class CommandProcess
     }
 
 
-    public void start() throws CommandException
+    void start() throws CommandException
     {
         if ( status != CommandStatus.NEW )
         {
@@ -176,13 +205,13 @@ public class CommandProcess
     }
 
 
-    protected boolean isDone()
+    boolean isDone()
     {
         return !( status == CommandStatus.RUNNING || status == CommandStatus.NEW );
     }
 
 
-    protected void appendResponse( Response response )
+    void appendResponse( Response response )
     {
         if ( response != null )
         {
@@ -215,8 +244,32 @@ public class CommandProcess
     }
 
 
-    protected CommandResult getResult()
+    CommandResult getResult()
     {
         return new CommandResultImpl( exitCode, stdOut.toString(), stdErr.toString(), status );
+    }
+
+
+    boolean markAsSent()
+    {
+        return isSent.compareAndSet( false, true );
+    }
+
+
+    boolean isSent()
+    {
+        return isSent.get();
+    }
+
+
+    String getRhId()
+    {
+        return rhId;
+    }
+
+
+    String getEncryptedRequest()
+    {
+        return encryptedRequest;
     }
 }

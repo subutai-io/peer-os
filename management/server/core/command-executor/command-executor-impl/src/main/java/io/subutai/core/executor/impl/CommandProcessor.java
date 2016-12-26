@@ -1,6 +1,7 @@
 package io.subutai.core.executor.impl;
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -10,10 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.NamingException;
 import javax.ws.rs.core.Form;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +21,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.cache.CacheEntry;
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -32,18 +32,15 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.RestProcessor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -53,17 +50,13 @@ public class CommandProcessor implements RestProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
     private static final int NOTIFIER_INTERVAL_MS = 300;
-    private static final long COMMAND_ENTRY_TIMEOUT =
-            ( Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC + Common.DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL ) * 1000
-                    + NOTIFIER_INTERVAL_MS + 1000L;
+    private static final int EXTRA_TIMEOUT_SEC = 60;
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
-    protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
-    protected final ExpiringCache<String, Set<String>> requests = new ExpiringCache<>();
-    protected ScheduledExecutorService notifier = Executors.newSingleThreadScheduledExecutor();
-    protected ExecutorService notifierPool = Executors.newCachedThreadPool();
-    protected Set<HeartbeatListener> listeners =
-            Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
+    ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
+    private ScheduledExecutorService notifier = Executors.newSingleThreadScheduledExecutor();
+    ExecutorService notifierPool = Executors.newCachedThreadPool();
+    Set<HeartbeatListener> listeners = Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
 
     JsonUtil jsonUtil = new JsonUtil();
     IPUtil ipUtil = new IPUtil();
@@ -87,29 +80,13 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    @Override
-    public void handleHeartbeat( final HeartBeat heartBeat )
+    public void dispose()
     {
-        LOG.debug( String.format( "Heartbeat:%n%s", jsonUtil.to( heartBeat ) ) );
+        commands.dispose();
 
-        for ( final HeartbeatListener listener : listeners )
-        {
-            notifierPool.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        listener.onHeartbeat( heartBeat );
-                    }
-                    catch ( Exception e )
-                    {
-                        LOG.error( "Error in handleHeartbeat", e );
-                    }
-                }
-            } );
-        }
+        notifier.shutdown();
+
+        notifierPool.shutdown();
     }
 
 
@@ -139,11 +116,37 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    public void execute( final Request request, CommandCallback callback ) throws CommandException
+    @Override
+    public void handleHeartbeat( final HeartBeat heartBeat )
     {
+        LOG.debug( String.format( "Heartbeat:%n%s", jsonUtil.to( heartBeat ) ) );
 
+        for ( final HeartbeatListener listener : listeners )
+        {
+            notifierPool.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        listener.onHeartbeat( heartBeat );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Error in handleHeartbeat", e );
+                    }
+                }
+            } );
+        }
+    }
+
+
+    void execute( final Request request, CommandCallback callback ) throws CommandException
+    {
         //find target host
         ResourceHostInfo resourceHostInfo;
+
         try
         {
             resourceHostInfo = getResourceHostInfo( request.getId() );
@@ -153,19 +156,13 @@ public class CommandProcessor implements RestProcessor
             throw new CommandException( e );
         }
 
-        //*******Check Usersession *************************
-        Session session = getActiveSession();
-
-        if(session == null)
-        {
-            LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges" );
-        }
-        //**************************************************
 
         //create command process
-        CommandProcess commandProcess = new CommandProcess( this, callback, request, session );
-        boolean queued = commands.put( request.getCommandId(), commandProcess, COMMAND_ENTRY_TIMEOUT,
-                new CommandProcessExpiryCallback() );
+        CommandProcess commandProcess = createCommandProcess( callback, request, resourceHostInfo.getId() );
+
+        boolean queued = commands.put( request.getCommandId(), commandProcess,
+                ( request.getTimeout() + EXTRA_TIMEOUT_SEC ) * 1000L, new CommandProcessExpiryCallback() );
+
         if ( !queued )
         {
             throw new CommandException( "Command id is null " );
@@ -179,9 +176,6 @@ public class CommandProcessor implements RestProcessor
             String command = jsonUtil.to( new RequestWrapper( request ) );
 
             LOG.debug( String.format( "Sending:%n%s", command ) );
-
-            //queue request
-            queueRequest( resourceHostInfo, request );
         }
         catch ( Exception e )
         {
@@ -196,71 +190,77 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected void queueRequest( ResourceHostInfo resourceHostInfo, Request request )
-            throws NamingException, PGPException
+    CommandProcess createCommandProcess( CommandCallback callback, Request request, String rhId )
     {
-        //add request to outgoing agent queue
-        synchronized ( requests )
+        Session session = getActiveSession();
+
+        if ( session == null )
         {
-            Set<String> hostRequests = requests.get( resourceHostInfo.getId() );
-            if ( hostRequests == null )
-            {
-                hostRequests = Sets.newLinkedHashSet();
-                requests.put( resourceHostInfo.getId(), hostRequests,
-                        Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000L );
-            }
-            String encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
-            hostRequests.add( encryptedRequest );
+            LOG.warn( " **** Command:  '" + request.getCommand() + "' is running without user privileges" );
         }
+
+        return new CommandProcess( this, callback, request, rhId, session );
     }
 
 
     @Override
     public Set<String> getRequests( final String hostId )
     {
-        Set<String> hostRequests;
-        synchronized ( requests )
+        Set<String> hostRequests = Sets.newHashSet();
+
+        Collection<CacheEntry<CommandProcess>> commandProcessEntries = commands.getEntries().values();
+
+        for ( CacheEntry<CommandProcess> commandProcessEntry : commandProcessEntries )
         {
-            hostRequests = requests.remove( hostId );
-        }
-        return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
-    }
+            CommandProcess commandProcess = commandProcessEntry.getValue();
 
-
-    protected void notifyAgents()
-    {
-        Set<String> resourceHostIds = requests.getEntries().keySet();
-
-        for ( final String resourceHostId : resourceHostIds )
-        {
-            notifierPool.execute( new Runnable()
+            if ( commandProcess.getRhId().equals( hostId ) && commandProcess.markAsSent() )
             {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        ResourceHostInfo resourceHostInfo = getResourceHostInfo( resourceHostId );
+                hostRequests.add( commandProcess.getEncryptedRequest() );
+            }
+        }
 
-                        notifyAgent( resourceHostInfo );
-                    }
-                    catch ( Exception e )
+        return hostRequests;
+    }
+
+
+    private void notifyAgents()
+    {
+        Collection<CacheEntry<CommandProcess>> commandProcessEntries = commands.getEntries().values();
+
+        Set<String> notifiedRhIds = Sets.newHashSet();
+
+        for ( CacheEntry<CommandProcess> commandProcessEntry : commandProcessEntries )
+        {
+            final CommandProcess commandProcess = commandProcessEntry.getValue();
+
+            if ( !commandProcess.isSent() && !notifiedRhIds.contains( commandProcess.getRhId() ) )
+            {
+                notifiedRhIds.add( commandProcess.getRhId() );
+
+                notifierPool.execute( new Runnable()
+                {
+                    @Override
+                    public void run()
                     {
-                        //ignore
+                        try
+                        {
+                            ResourceHostInfo resourceHostInfo = getResourceHostInfo( commandProcess.getRhId() );
+
+                            notifyAgent( resourceHostInfo );
+                        }
+                        catch ( Exception e )
+                        {
+                            //ignore
+                        }
                     }
-                }
-            } );
+                } );
+            }
         }
     }
 
 
-    protected String encrypt( String message, String hostId ) throws NamingException, PGPException
-    {
-        return getSecurityManager().signNEncryptRequestToHost( message, hostId );
-    }
-
-
-    protected void notifyAgent( ResourceHostInfo resourceHostInfo )
+    void notifyAgent( ResourceHostInfo resourceHostInfo )
     {
         WebClient webClient = null;
         javax.ws.rs.core.Response response = null;
@@ -284,7 +284,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected WebClient getWebClient( ResourceHostInfo resourceHostInfo )
+    WebClient getWebClient( ResourceHostInfo resourceHostInfo )
     {
         return RestUtil.createWebClient(
                 String.format( "http://%s:%d/trigger", hostRegistry.getResourceHostIp( resourceHostInfo ),
@@ -292,7 +292,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected ResourceHostInfo getResourceHostInfo( String requestHostId ) throws HostDisconnectedException
+    ResourceHostInfo getResourceHostInfo( String requestHostId ) throws HostDisconnectedException
     {
         try
         {
@@ -307,29 +307,18 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected SecurityManager getSecurityManager()
-    {
-        return ServiceLocator.getServiceNoCache( SecurityManager.class );
-    }
-
-
-    protected LocalPeer getLocalPeer()
-    {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
-    }
-
-
-    protected Session getActiveSession()
+    Session getActiveSession()
     {
         return identityManager.getActiveSession();
     }
 
 
-    public CommandResult getResult( UUID commandId ) throws CommandException
+    CommandResult getResult( UUID commandId ) throws CommandException
     {
         Preconditions.checkNotNull( commandId );
 
         CommandProcess commandProcess = commands.get( commandId );
+
         if ( commandProcess != null )
         {
             //wait until process completes  & return result
@@ -374,22 +363,10 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected void remove( Request request )
+    void remove( Request request )
     {
         Preconditions.checkNotNull( request );
 
         commands.remove( request.getCommandId() );
-    }
-
-
-    public void dispose()
-    {
-        commands.dispose();
-
-        requests.dispose();
-
-        notifier.shutdown();
-
-        notifierPool.shutdown();
     }
 }

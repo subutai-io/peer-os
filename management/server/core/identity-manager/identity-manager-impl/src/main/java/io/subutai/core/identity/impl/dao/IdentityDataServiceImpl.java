@@ -174,8 +174,15 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
+    @Override
+    public Role findRoleByName( final String name )
+    {
+        return roleDAOService.findByName( name );
+    }
+
+
     /* *************************************************
-     */
+         */
     @Override
     public List<Role> getAllRoles()
     {

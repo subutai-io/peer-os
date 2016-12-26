@@ -15,7 +15,7 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.isA;
@@ -32,7 +32,7 @@ public class RegisterSshStepTest
     RegisterSshStep step;
     @Mock
     Topology topology;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     EnvironmentContainerImpl environmentContainer = TestHelper.ENV_CONTAINER();
     @Mock
     PeerUtil<Object> peerUtil;

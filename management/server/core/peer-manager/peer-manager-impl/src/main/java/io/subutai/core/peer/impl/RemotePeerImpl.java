@@ -61,7 +61,6 @@ import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -179,6 +178,27 @@ public class RemotePeerImpl implements RemotePeer
         }
 
         return response;
+    }
+
+
+    @Override
+    public void excludePeerFromEnvironment( final String environmentId, final String peerId ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+
+        environmentWebClient.excludePeerFromEnvironment( environmentId, peerId );
+    }
+
+
+    @Override
+    public void excludeContainerFromEnvironment( final String environmentId, final String containerId )
+            throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+
+        environmentWebClient.excludeContainerFromEnvironment( environmentId, containerId );
     }
 
 
@@ -645,7 +665,7 @@ public class RemotePeerImpl implements RemotePeer
 
         // TODO: 6/23/16 it is not clear is relation built between container and real owner (user)
         // or container <> peer that hosts it.
-        if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
+        if ( activeUser == null || activeUser.getType() == UserType.SYSTEM.getId() )
         {
             // Since this container is hosted on remote peer owner will be remotePeer
             source = this;
@@ -677,14 +697,14 @@ public class RemotePeerImpl implements RemotePeer
             @Override
             public String getClassPath()
             {
-                return "EnvironmentImpl";
+                return "LocalEnvironment";
             }
 
 
             @Override
             public String getContext()
             {
-                return PermissionObject.EnvironmentManagement.getName();
+                return PermissionObject.ENVIRONMENT_MANAGEMENT.getName();
             }
 
 
@@ -721,7 +741,7 @@ public class RemotePeerImpl implements RemotePeer
             @Override
             public String getContext()
             {
-                return PermissionObject.PeerManagement.getName();
+                return PermissionObject.PEER_MANAGEMENT.getName();
             }
 
 
@@ -972,15 +992,6 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
-    {
-        Preconditions.checkNotNull( reverseProxyConfig, "Invalid proxy config" );
-
-        environmentWebClient.addReverseProxy( reverseProxyConfig );
-    }
-
-
-    @Override
     public void addCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
     {
         Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
@@ -1071,7 +1082,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public String getContext()
     {
-        return PermissionObject.PeerManagement.getName();
+        return PermissionObject.PEER_MANAGEMENT.getName();
     }
 
 

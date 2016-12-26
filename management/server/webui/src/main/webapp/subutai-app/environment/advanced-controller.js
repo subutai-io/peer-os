@@ -637,6 +637,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 case 'b-container-plus-icon':
                     currentTemplate = this.model;
                     $('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
+					if(currentTemplate.get('edited') == true) {
+						$('#js-container-name').prop('disabled', true);
+					} else {
+						$('#js-container-name').prop('disabled', false);
+					}
                     $('#js-container-size').val(currentTemplate.get('quotaSize'));
                     containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
                     var elementPos = this.model.get('position');
@@ -906,7 +911,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     function editEnvironment(environment) {
 
         if (environment.dataSource == "hub") {
-            SweetAlert.swal("Feature coming soon...", "This environment created on Hub. Please use Hub to manage it.", "success");
+            SweetAlert.swal("Feature coming soon...", "This environment is created on Hub. Please use Hub to manage it.", "success");
 
             return;
         }
@@ -921,11 +926,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		for(var i = 0; i < environment.containers.length; i++) {
 			var container = environment.containers[i];
 
-			if( container.name.match(/(\d+)(?!.*\d)/g) != null )
+			if( container.containerName.match(/(\d+)(?!.*\d)/g) != null )
 			{
-				if( containerCounter < parseInt( container.name.match(/(\d+)(?!.*\d)/g) ) + 1 )
+				if( containerCounter < parseInt( container.containerName.match(/(\d+)(?!.*\d)/g) ) + 1 )
 				{
-					containerCounter = parseInt( container.name.match(/(\d+)(?!.*\d)/g) ) + 1;
+					containerCounter = parseInt( container.containerName.match(/(\d+)(?!.*\d)/g) ) + 1;
 				}
 			}
 
@@ -936,7 +941,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
 			}
-			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname);
+			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname, container.templateId);
 		}
 		filterPluginsList();
 	}
@@ -1035,7 +1040,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                             if (!imageExists(img)) {
                                 img = 'assets/templates/no-image.jpg';
                             }
-                            addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size);
+                            environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                                addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
+                            });
                         }
 
                     } else {
@@ -1043,7 +1050,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                         if (!imageExists(img)) {
                             img = 'assets/templates/no-image.jpg';
                         }
-                        addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size);
+                        environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                            addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
+                        });
                     }
 
                 }
@@ -1319,7 +1328,7 @@ function drop(event) {
 
     for (var i = 0; i < models.length; i++) {
         if (models[i].attributes.hostId !== undefined) {
-            addContainerToHost(models[i], template, img, null, null, null, templateId);
+            addContainerToHost(models[i], template.toLowerCase(), img, null, null, null, templateId);
         }
     }
 }
@@ -1331,7 +1340,12 @@ function addContainerToHost(model, template, img, size, containerId, name, templ
 			size = 'HUGE';
 		}
 	}
-	if(containerId == undefined || containerId == null) containerId = false;
+	var edited = false;
+	if(containerId == undefined || containerId == null){
+		containerId = false;
+	} else {
+		edited = true;
+	}
 	checkResourceHost(model);
 	var rPos = model.attributes.position;
 	var gPos = placeRhSimple( model );
@@ -1343,9 +1357,17 @@ function addContainerToHost(model, template, img, size, containerId, name, templ
 		var templateId = getTemplateIdByName(template, templatesList);	
 	}
 
-	var containerName = ( name == undefined || name == null ? 'Container ' + (containerCounter++).toString() : name );
+	var containerName = '';
+	if(name == undefined || name == null) {
+		containerName = 'Container ' + (containerCounter++).toString();
+	} else {
+		var containerNameArray = name.split('-');
+		containerName = containerNameArray[0];
+	}
+
 	var devElement = new joint.shapes.tm.devElement({
 		position: { x: x, y: y },
+		edited: edited,
 		templateName: template,
 		templateId: templateId,
 		parentPeerId: model.get('peerId'),

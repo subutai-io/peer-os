@@ -17,8 +17,18 @@ import com.google.gson.GsonBuilder;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.environment.api.EnvironmentEventListener;
+import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -31,9 +41,13 @@ import static java.lang.String.format;
 
 
 //TODO use HubRestClient and ConfigDataServiceimpl instead of DaoHelper and HttpClient
-public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
+public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, HostListener
 {
-    private static final String ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
+    private static final String USER_ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
+
+    private static final String PEER_ENVIRONMENTS_URL = "/rest/v1/adapter/peer/environments";
+
+    private static final String DELETED_ENVIRONMENTS_URL = "/rest/v1/adapter/peer/deleted/environments";
 
     private static final String CONTAINERS_URL = "/rest/v1/adapter/environments/%s/containers/%s";
 
@@ -55,6 +69,8 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
     private final String peerId;
 
+    private final LocalPeer localPeer;
+
 
     public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager,
                            IdentityManager identityManager ) throws HubManagerException
@@ -65,12 +81,13 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
         this.identityManager = identityManager;
 
+        localPeer = peerManager.getLocalPeer();
+
         peerId = peerManager.getLocalPeer().getId();
     }
 
 
-    @Override
-    public boolean isRegistered()
+    private boolean isRegistered()
     {
         return daoHelper.isPeerRegisteredToHub( peerId );
     }
@@ -86,16 +103,21 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     {
         User user = identityManager.getActiveUser();
 
+        if ( user == null )
+        {
+            return null;
+        }
+
         log.debug( "Active user: username={}, email={}", user.getUserName(), user.getEmail() );
 
         // For the admin, get peer owner data from Hub
-        if ( "admin".equals( user.getUserName() ) )
+        if ( IdentityManager.ADMIN_USERNAME.equals( user.getUserName() ) )
         {
             return getOwnerId();
         }
 
         // Trick to get the user id in Hub. See also: EnvironmentUserHelper.
-        if ( user.getEmail().contains( "@hub.subut.ai" ) )
+        if ( user.getEmail().contains( HubManager.HUB_EMAIL_SUFFIX ) )
         {
             return StringUtils.substringBefore( user.getEmail(), "@" );
         }
@@ -128,8 +150,18 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         {
             log.debug( "json: {}", json );
 
-            httpClient.doPost( format( ENVIRONMENTS_URL, userId ), json );
+            httpClient.doPost( format( USER_ENVIRONMENTS_URL, userId ), json );
         }
+    }
+
+
+    @Override
+    public void uploadPeerOwnerEnvironment( final String json )
+    {
+        //obtain Hub peer owner id
+        String userId = getOwnerId();
+
+        httpClient.doPost( format( USER_ENVIRONMENTS_URL, userId ), json );
     }
 
 
@@ -138,9 +170,16 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     {
         String userId = getUserIdWithCheck();
 
+        // in case user is tenant manager we pass 0 as user id to Hub
+        if ( userId == null && isRegistered() && ( identityManager.isTenantManager() || identityManager
+                .isSystemUser() ) )
+        {
+            userId = "0";
+        }
+
         if ( userId != null )
         {
-            String path = format( ENVIRONMENTS_URL, getUserId() ) + "/" + envId;
+            String path = format( USER_ENVIRONMENTS_URL, getUserId() ) + "/" + envId;
 
             httpClient.doDelete( path );
         }
@@ -173,10 +212,24 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
         {
             log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", userId, peerId );
 
-            return httpClient.doGet( format( ENVIRONMENTS_URL, userId ) );
+            return httpClient.doGet( format( USER_ENVIRONMENTS_URL, userId ) );
         }
 
         return null;
+    }
+
+
+    @Override
+    public String getDeletedEnvironmentsForPeer()
+    {
+        return httpClient.doGet( DELETED_ENVIRONMENTS_URL );
+    }
+
+
+    @Override
+    public String getAllEnvironmentsForPeer()
+    {
+        return httpClient.doGet( PEER_ENVIRONMENTS_URL );
     }
 
 
@@ -299,25 +352,9 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     }
 
 
-    @Override
-    public void onContainerStart( String envId, String contId )
-    {
-        onContainerStateChange( envId, contId, "start" );
-    }
-
-
-    @Override
-    public void onContainerStop( String envId, String contId )
-    {
-        onContainerStateChange( envId, contId, "stop" );
-    }
-
-
     private void onContainerStateChange( String envId, String contId, String state )
     {
-        String userId = getUserIdWithCheck();
-
-        if ( userId == null )
+        if ( !isRegistered() )
         {
             return;
         }
@@ -356,5 +393,103 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
     public void onEnvironmentDestroyed( final String environmentId )
     {
         //not used
+    }
+
+
+    @Override
+    public void onContainerStarted( final Environment environment, final String containerId )
+    {
+        onContainerStateChange( environment.getId(), containerId, "start" );
+    }
+
+
+    @Override
+    public void onContainerStopped( final Environment environment, final String containerId )
+    {
+        onContainerStateChange( environment.getId(), containerId, "stop" );
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+        if ( currentState == ContainerHostState.RUNNING || currentState == ContainerHostState.STOPPED )
+        {
+            try
+            {
+                ContainerHost containerHost = localPeer.getContainerHostById( containerInfo.getId() );
+
+                onContainerStateChange( containerHost.getEnvironmentId().getId(), containerInfo.getId(),
+                        currentState == ContainerHostState.RUNNING ? "start" : "stop" );
+            }
+            catch ( HostNotFoundException e )
+            {
+                //ignore
+            }
+        }
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+        try
+        {
+            ContainerHost containerHost = localPeer.getContainerHostById( containerInfo.getId() );
+
+            destroyContainer( containerHost.getEnvironmentId().getId(), containerInfo.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            //ignore
+        }
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
+    {
+        // todo
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+        // todo
     }
 }

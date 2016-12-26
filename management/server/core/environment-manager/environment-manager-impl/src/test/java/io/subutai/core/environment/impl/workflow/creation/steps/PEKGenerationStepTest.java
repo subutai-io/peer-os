@@ -19,7 +19,7 @@ import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -39,7 +39,7 @@ public class PEKGenerationStepTest
     PEKGenerationStep step;
     @Mock
     Topology topology;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     PeerManager peerManager;
     @Mock

@@ -38,7 +38,7 @@ function consoleService($http, environmentService) {
 	}
 
 	function sendCommand(cmd, peerId, path, daemon, timeOut, environmentId) {
-		var postData = 'command=' + cmd + '&hostId=' + peerId + '&path=' + path;
+		var postData = 'command=' + encodeURIComponent(cmd) + '&hostId=' + peerId + '&path=' + path;
 
 		if(daemon) {
 			postData += '&daemon=true';

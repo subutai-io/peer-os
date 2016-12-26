@@ -7,7 +7,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.7-SNAPSHOT</version>
+    <version>4.0.13-SNAPSHOT</version>
   </parent>
 
   <artifactId>subutai-application</artifactId>
@@ -288,6 +288,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>local-peer-rest</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>local-peer-rest-ui</artifactId>
+    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- bazaar -->
@@ -340,7 +344,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hub-manager-rest</artifactId>
     </dependency>
-
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <!--Karaf-manager -->
@@ -400,8 +403,6 @@
       <version>${project.version}</version>
     </dependency>
 
-
-
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- Template Manager-->
     <dependency>
@@ -412,8 +413,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>template-manager-impl</artifactId>
     </dependency>
-
-
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- tracker -->

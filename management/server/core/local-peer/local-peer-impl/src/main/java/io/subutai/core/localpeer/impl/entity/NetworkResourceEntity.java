@@ -45,6 +45,10 @@ public class NetworkResourceEntity implements NetworkResource
     @JsonProperty( "containerSubnet" )
     private String containerSubnet;
 
+    @Column( name = "initiator_peer_id" )
+    @JsonProperty( "initiatorPeerId" )
+    private String initiatorPeerId;
+
 
     protected NetworkResourceEntity()
     {
@@ -61,6 +65,7 @@ public class NetworkResourceEntity implements NetworkResource
         this.p2pSubnet = IPUtil.getNetworkAddress( networkResource.getP2pSubnet() );
         this.containerSubnet = IPUtil.getNetworkAddress( networkResource.getContainerSubnet() );
         this.vlan = vlan;
+        this.initiatorPeerId = networkResource.getInitiatorPeerId();
     }
 
 
@@ -68,7 +73,8 @@ public class NetworkResourceEntity implements NetworkResource
                                   @JsonProperty( "vni" ) final long vni,
                                   @JsonProperty( "p2pSubnet" ) final String p2pSubnet,
                                   @JsonProperty( "containerSubnet" ) final String containerSubnet,
-                                  @JsonProperty( "vlan" ) final int vlan )
+                                  @JsonProperty( "vlan" ) final int vlan,
+                                  @JsonProperty( "initiatorPeerId" ) final String initiatorPeerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSubnet ) );
@@ -81,6 +87,7 @@ public class NetworkResourceEntity implements NetworkResource
         this.p2pSubnet = p2pSubnet;
         this.containerSubnet = containerSubnet;
         this.vlan = vlan;
+        this.initiatorPeerId = initiatorPeerId;
     }
 
 
@@ -116,6 +123,13 @@ public class NetworkResourceEntity implements NetworkResource
     public int getVlan()
     {
         return vlan;
+    }
+
+
+    @Override
+    public String getInitiatorPeerId()
+    {
+        return initiatorPeerId;
     }
 
 

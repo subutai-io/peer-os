@@ -4,11 +4,38 @@ angular.module("subutai.settings-updates.controller", [])
 .controller("SettingsUpdatesCtrl", SettingsUpdatesCtrl);
 
 
-SettingsUpdatesCtrl.$inject = ["$scope", "SettingsUpdatesSrv", "SweetAlert"];
-function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
+SettingsUpdatesCtrl.$inject = ['$scope', '$rootScope', 'SettingsUpdatesSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
+
+function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile) {
 	var vm = this;
 	vm.config = {isUpdatesAvailable: "waiting"};
+	vm.activeTab = 'update';
 	vm.updateText = 'Checking...';
+	vm.updateInProgress = false;
+
+	checkActiveUpdate();
+
+	function checkActiveUpdate(){
+
+		LOADING_SCREEN();
+
+		SettingsUpdatesSrv.isUpdateInProgress().success(function (data){
+			 if (data == true || data == 'true') {
+				LOADING_SCREEN("none");
+
+				vm.updateInProgress = true;
+				vm.updateText = 'Update is in progress';
+				removeUpdateMessage();
+
+				setTimeout(function() {checkActiveUpdate();}, 30000);
+			 }else{
+				getConfig();
+			 }
+		}).error(function (error) {
+            setTimeout(function() {checkActiveUpdate();}, 30000);
+        });
+	}
+
 
 	function getConfig() {
 		LOADING_SCREEN();
@@ -19,6 +46,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 				vm.updateText = 'Update is available';
 			} else {
 				vm.updateText = 'Your system is already up-to-date';
+				removeUpdateMessage();
 			}
 		}).error(function(error) {
 			LOADING_SCREEN('none');
@@ -26,28 +54,36 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 		});
 	}
 
-	getConfig();
 
+	vm.dtInstance = {};
+	vm.dtOptions = DTOptionsBuilder
+		.fromFnPromise(function() {
+			return $resource( SettingsUpdatesSrv.getHistoryUrl() ).query().$promise;
+		})
+		.withPaginationType('full_numbers')
+		.withOption('createdRow', createdRow)
+		.withOption('order', [[ 0, "desc" ]])
+		.withOption('stateSave', true);
+
+	vm.dtColumns = [
+		DTColumnBuilder.newColumn('updateDate').withTitle('Date').renderWith(dateHTML),
+		DTColumnBuilder.newColumn('prevVersion').withTitle('Previous version'),
+		DTColumnBuilder.newColumn('currentVersion').withTitle('Current version'),
+		DTColumnBuilder.newColumn('prevCommitId').withTitle('Previous Commit Id'),
+		DTColumnBuilder.newColumn('currentCommitId').withTitle('Current commit Id')
+	];
+
+	function createdRow(row, data, dataIndex) {
+		$compile(angular.element(row).contents())($scope);
+	}
+
+	function dateHTML(data, type, full, meta) {
+		return '<div>' + moment( data ).format('YYYY-MM-DD HH:mm:ss') + '</div>';
+	}	
 
 	vm.update = update;
-	function update() {
 
-		LOADING_SCREEN();
-		vm.updateText = 'Please wait, update is in progress. System will restart automatically';
-		SettingsUpdatesSrv.update(vm.config).success(function (data) {
-			LOADING_SCREEN('none');
-			sessionStorage.removeItem('notifications');
-			SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
-			getConfig();
-		}).error(function (error) {
-			//LOADING_SCREEN('none');
-			//SweetAlert.swal("ERROR!", "Save config error: " + error, "error");
-			//getConfig();
-			setInterval(function() {
-				update();
-			}, 120000);
-		});
-
+	function removeUpdateMessage() {
 		var notifications = sessionStorage.getItem('notifications');
 		if (
 			notifications !== null &&
@@ -65,6 +101,22 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 				}
 			}
 		}
+	}
 
+	function update() {
+		LOADING_SCREEN();
+		vm.updateText = 'Please wait, update is in progress. System will restart automatically';
+		SettingsUpdatesSrv.update(vm.config).success(function (data, status) {
+			LOADING_SCREEN('none');
+			sessionStorage.removeItem('notifications');
+			if(status == 200){
+				SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
+			}
+			checkActiveUpdate();
+		}).error(function (error) {
+			setTimeout(function() {checkActiveUpdate();}, 30000);
+		});
+
+		removeUpdateMessage();
 	}
 }

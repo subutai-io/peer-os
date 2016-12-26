@@ -25,6 +25,7 @@ import io.subutai.core.security.rest.model.SecurityKeyData;
 
 /**
  * Implementation of Key Server Rest
+ * TODO determine what permissions plugin use and set appropriate permissions to this modules' methods
  */
 public class SecurityManagerRestImpl implements SecurityManagerRest
 {
@@ -50,7 +51,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response addPublicKeyRing( final String identityId, final String keyText )
     {
-        securityManager.getKeyManager().savePublicKeyRing( identityId, SecurityKeyType.PeerKey.getId(), keyText );
+        securityManager.getKeyManager().savePublicKeyRing( identityId, SecurityKeyType.PEER_KEY.getId(), keyText );
 
         return Response.ok().build();
     }
@@ -164,18 +165,15 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     {
         try
         {
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            User user;
-            if ( identityManager != null )
-            {
-                user = identityManager.getActiveUser();
-                return getKeyTrustTree( user.getSecurityKeyId() );
-            }
+            IdentityManager identityManager = ServiceLocator.lookup( IdentityManager.class );
+            User user = identityManager.getActiveUser();
+            return getKeyTrustTree( user.getSecurityKeyId() );
         }
         catch ( Exception e )
         {
             logger.error( "Error getting identity manager.", e );
         }
+
         return null;
     }
 
@@ -230,7 +228,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.setKeyTrust( sourceFingerprint, targetFingerprint, KeyTrustLevel.Never.getId() );
+            keyManager.setKeyTrust( sourceFingerprint, targetFingerprint, KeyTrustLevel.NEVER.getId() );
         }
         catch ( Exception e )
         {
@@ -268,7 +266,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.setKeyTrust( source, target, KeyTrustLevel.Full.getId() );
+            keyManager.setKeyTrust( source, target, KeyTrustLevel.FULL.getId() );
         }
         catch ( Exception e )
         {

@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.time.DateUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
@@ -41,6 +42,7 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
 import io.subutai.common.security.exception.SystemSecurityException;
+import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -91,8 +93,16 @@ public class IdentityManagerImpl implements IdentityManager
 
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
-    private static final String SYSTEM_USERNAME = "internal";
     private static final int IDENTITY_LIFETIME = 240; //days
+    private static final String SYSTEM_USER_FULL_NAME = "System User";
+    private static final String ADMIN_EMAIL = "admin@subutai.io";
+    private static final String SYSTEM_USER_EMAIL = "system@subutai.io";
+    private static final String ADMIN_USER_FULL_NAME = "Admin User";
+    private static final String ADMIN_ROLE = "Administrator";
+    private static final String KARAF_MANAGER_ROLE = "Karaf-Manager";
+    private static final String PEER_MANAGER_ROLE = "Peer-Manager";
+    private static final String SYSTEM_ROLE = "Internal-System";
+    private static final String ENV_OWNER_ROLE = "Environment-Owner";
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -144,84 +154,77 @@ public class IdentityManagerImpl implements IdentityManager
             Role role;
             Permission per;
 
-            //***Create User ********************************************
-
+            //---------------- internal system user
+            // create system user
             User internal =
-                    createUser( SYSTEM_USERNAME, "", "System User", "internal@subutai.io", UserType.System.getId(), 3,
-                            false, false );
-            User admin =
-                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", UserType.Regular.getId(), 3,
-                            true, true );
-            //***********************************************************
+                    createUser( SYSTEM_USERNAME, "", SYSTEM_USER_FULL_NAME, SYSTEM_USER_EMAIL, UserType.SYSTEM.getId(),
+                            KeyTrustLevel.FULL.getId(), false, false );
 
-            //***Create Token *******************************************
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), null );
-            //***********************************************************
-
-            //****Create Roles ******************************************
-            role = createRole( "Karaf-Manager", UserType.System.getId() );
-            assignUserRole( admin, role );
-
-            per = createPermission( PermissionObject.KarafServerAdministration.getId(), 1, true, true, true, true );
-            assignRolePermission( role, per );
-            //*********************************************
-
-            //*********************************************
-            role = createRole( "Administrator", UserType.Regular.getId() );
-            assignUserRole( admin.getId(), role );
-
-            for ( final PermissionObject aPermsp : permsp )
-            {
-                per = createPermission( aPermsp.getId(), 1, true, true, true, true );
-                assignRolePermission( role, per );
-            }
-            //*********************************************
-
-            //*********************************************
-            role = createRole( "Peer-Manager", UserType.System.getId() );
-
-            //*********************************************
-            for ( final PermissionObject aPermsp : permsp )
-            {
-                if ( aPermsp == PermissionObject.PeerManagement || aPermsp == PermissionObject.ResourceManagement )
-                {
-                    per = createPermission( aPermsp.getId(), 3, true, true, true, true );
-                    assignRolePermission( role, per );
-                }
-            }
-            //*********************************************
-
-            //*********************************************
-            role = createRole( "Environment-Manager", UserType.System.getId() );
-
-            //*********************************************
-            for ( final PermissionObject aPermsp : permsp )
-            {
-                if ( aPermsp != PermissionObject.IdentityManagement
-                        && aPermsp != PermissionObject.KarafServerAdministration
-                        && aPermsp != PermissionObject.PeerManagement
-                        && aPermsp != PermissionObject.ResourceManagement )
-                {
-                    per = createPermission( aPermsp.getId(), 3, true, true, true, true );
-                    assignRolePermission( role, per );
-                }
-            }
-            //*********************************************
-
-            //*********************************************
-            role = createRole( "Internal-System", UserType.System.getId() );
+            // Create System Role for internal user
+            role = createRole( SYSTEM_ROLE, UserType.SYSTEM.getId() );
             assignUserRole( internal, role );
 
-            //*********************************************
+            //assign permission for system role
             for ( final PermissionObject aPermsp : permsp )
             {
-                if ( aPermsp != PermissionObject.IdentityManagement
-                        && aPermsp != PermissionObject.KarafServerAdministration )
+                if ( aPermsp != PermissionObject.IDENTITY_MANAGEMENT
+                        && aPermsp != PermissionObject.KARAF_SERVER_ADMINISTRATION
+                        && aPermsp != PermissionObject.TENANT_MANAGEMENT )
                 {
-                    per = createPermission( aPermsp.getId(), 1, true, true, true, true );
+                    per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true, true, true,
+                            true );
                     assignRolePermission( role, per );
                 }
             }
+
+            // create system token for internal user
+            createUserToken( internal, "", "", "", TokenType.PERMANENT.getId(), null );
+
+
+            //---------------- admin user
+            // create admin user
+            User admin = createUser( ADMIN_USERNAME, ADMIN_DEFAULT_PWD, ADMIN_USER_FULL_NAME, ADMIN_EMAIL,
+                    UserType.REGULAR.getId(), KeyTrustLevel.FULL.getId(), true, true );
+
+
+            // create admin role
+            role = createRole( ADMIN_ROLE, UserType.SYSTEM.getId() );
+
+            // assign to admin user
+            assignUserRole( admin, role );
+
+            for ( final PermissionObject aPermsp : permsp )
+            {
+                per = createPermission( aPermsp.getId(), PermissionScope.ALL_SCOPE.getId(), true, true, true, true );
+                assignRolePermission( role, per );
+            }
+
+            // Create Env Mgr Role (system for hub users only)
+            role = createRole( ENV_MANAGER_ROLE, UserType.SYSTEM.getId() );
+
+            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
+                    true, true, true, true );
+
+            assignRolePermission( role, per );
+
+            // Create Template Mgr Role (system for hub users only)
+            role = createRole( TEMPLATE_MANAGER_ROLE, UserType.SYSTEM.getId() );
+
+            per = createPermission( PermissionObject.TEMPLATE_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
+                    true, true, true, true );
+
+            assignRolePermission( role, per );
+
+            // editable roles -----------------------------
+
+            // pre-create env-owner role for regular users
+            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
+
+            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
+                    true, true, true, true );
+
+            assignRolePermission( role, per );
+
 
             //***** setPeer Owner By Default ***************
             setPeerOwner( admin );
@@ -229,7 +232,8 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else
         {
-            User admin = identityDataService.getUserByUsername( "admin" );
+            //todo do we need this else clause at all?
+            User admin = identityDataService.getUserByUsername( ADMIN_USERNAME );
             //***** setPeer Owner By Default ***************
             setPeerOwner( admin );
             //**********************************************
@@ -239,7 +243,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private CallbackHandler getCalbackHandler( final String userName, final String password )
+    private CallbackHandler getCallbackHandler( final String userName, final String password )
     {
 
         return new CallbackHandler()
@@ -275,7 +279,7 @@ public class IdentityManagerImpl implements IdentityManager
     public Session loginSystemUser()
     {
         String sptoken = getSystemUserToken();
-        Session session = login( "token", sptoken );
+        Session session = login( TOKEN_ID, sptoken );
 
         if ( session != null )
         {
@@ -299,7 +303,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
             Session userSession = null;
 
-            CallbackHandler ch = getCalbackHandler( userName, password );
+            CallbackHandler ch = getCallbackHandler( userName, password );
             Subject subject = new Subject();
             LoginContext loginContext = new LoginContext( "karaf", subject, ch );
             loginContext.login();
@@ -340,7 +344,7 @@ public class IdentityManagerImpl implements IdentityManager
      * Authenticates user and returns Session
      *
      * @param login Login name  or "token" keyword
-     * @param password  Password or JWT
+     * @param password Password or JWT
      *
      * @return Session object
      */
@@ -353,7 +357,7 @@ public class IdentityManagerImpl implements IdentityManager
         User user = null;
 
         //-------------------------------------
-        if ( "token".equalsIgnoreCase( login ) )
+        if ( TOKEN_ID.equalsIgnoreCase( login ) )
         {
             sessionId = password;
         }
@@ -387,7 +391,7 @@ public class IdentityManagerImpl implements IdentityManager
      *
      * @param user input String
      *
-     * @return  JSON Token
+     * @return JSON Token
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
@@ -450,7 +454,7 @@ public class IdentityManagerImpl implements IdentityManager
      * Checks username and password (authenticates), on success returns full token
      *
      * @param userName Login name
-     * @param password  Password
+     * @param password Password
      *
      * @return Full JWT
      */
@@ -468,15 +472,15 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( userToken == null )
             {
-                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                userToken = createUserToken( user, "", "", "", TokenType.SESSION.getId(), null );
             }
             else
             {
-                if ( userToken.getType() == TokenType.Session.getId() )
+                if ( userToken.getType() == TokenType.SESSION.getId() )
                 {
                     removeUserToken( userToken.getTokenId() );
 
-                    userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                    userToken = createUserToken( user, "", "", "", TokenType.SESSION.getId(), null );
                 }
             }
 
@@ -511,7 +515,7 @@ public class IdentityManagerImpl implements IdentityManager
      * Update (renew) Authorization ID of the User (Which is used by RSA keys to authenticate)
      *
      * @param user User
-     * @param authId  Authorization ID
+     * @param authId Authorization ID
      *
      * @return Newly assigned Authorization ID (random string, if authId param is NULL)
      */
@@ -685,7 +689,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         User user;
 
-        if ( "token".equalsIgnoreCase( userName ) )
+        if ( TOKEN_ID.equalsIgnoreCase( userName ) )
         {
             user = authenticateByToken( password );
         }
@@ -701,7 +705,7 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 String pswHash = SecurityUtil.generateSecurePassword( password, user.getSalt() );
 
-                if ( !pswHash.equals( user.getPassword() ) || user.getStatus() == UserStatus.Disabled.getId() )
+                if ( !pswHash.equals( user.getPassword() ) || user.getStatus() == UserStatus.DISABLED.getId() )
                 {
                     throw new InvalidLoginException( "***** Invalid Login for user:" + userName );
                 }
@@ -728,7 +732,6 @@ public class IdentityManagerImpl implements IdentityManager
      * Sets the Owner of the Peer
      *
      * @param user User that will be set as an owner
-     *
      */
     @PermitAll
     @Override
@@ -743,7 +746,6 @@ public class IdentityManagerImpl implements IdentityManager
      * Sets the Owner of the Peer
      *
      * @return Id of the PeerOwner
-     *
      */
     @PermitAll
     @Override
@@ -847,7 +849,8 @@ public class IdentityManagerImpl implements IdentityManager
                 user.setSecurityKeyId( secId );
             }
             publicKeyASCII = publicKeyASCII.trim();
-            securityManager.getKeyManager().savePublicKeyRing( secId, SecurityKeyType.UserKey.getId(), publicKeyASCII );
+            securityManager.getKeyManager()
+                           .savePublicKeyRing( secId, SecurityKeyType.USER_KEY.getId(), publicKeyASCII );
             user.setFingerprint( securityManager.getKeyManager().getFingerprint( secId ) );
             identityDataService.updateUser( user );
         }
@@ -1053,7 +1056,7 @@ public class IdentityManagerImpl implements IdentityManager
         try
         {
             //***************Cannot use TOKEN keyword *******
-            if ( "token".equalsIgnoreCase( userName ) )
+            if ( TOKEN_ID.equalsIgnoreCase( userName ) )
             {
                 throw new IllegalArgumentException( "Cannot use TOKEN keyword." );
             }
@@ -1119,7 +1122,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( genKeyPair )
         {
-            generateKeyPair( id, SecurityKeyType.UserKey.getId() );
+            generateKeyPair( id, SecurityKeyType.USER_KEY.getId() );
         }
 
         return userDelegate;
@@ -1133,13 +1136,10 @@ public class IdentityManagerImpl implements IdentityManager
     {
         try
         {
-            RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
-            if ( relationManager != null )
-            {
-                User activeUser = getActiveUser();
-                UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
-                relationManager.processTrustMessage( trustMessage, delegatedUser.getId() );
-            }
+            RelationManager relationManager = ServiceLocator.lookup( RelationManager.class );
+            User activeUser = getActiveUser();
+            UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
+            relationManager.processTrustMessage( trustMessage, delegatedUser.getId() );
         }
         catch ( RelationVerificationException e )
         {
@@ -1155,7 +1155,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         try
         {
-            RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
+            RelationManager relationManager = ServiceLocator.lookup( RelationManager.class );
             KeyManager keyManager = securityManager.getKeyManager();
             EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
@@ -1168,7 +1168,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( keyManager.getPrivateKey( delegatedUser.getId() ) == null )
             {
-                generateKeyPair( delegatedUser.getId(), SecurityKeyType.UserKey.getId() );
+                generateKeyPair( delegatedUser.getId(), SecurityKeyType.USER_KEY.getId() );
             }
 
             assert relationManager != null;
@@ -1242,6 +1242,11 @@ public class IdentityManagerImpl implements IdentityManager
         isValidPassword( userName, password );
         isValidEmail( email );
 
+        if ( identityDataService.getUserByUsername( userName ) != null )
+        {
+            throw new IllegalArgumentException( String.format( "User with name %s already exists", userName ) );
+        }
+
         try
         {
             String salt = SecurityUtil.generateSecureRandom();
@@ -1264,7 +1269,7 @@ public class IdentityManagerImpl implements IdentityManager
             if ( generateKeyPair )
             {
                 String securityKeyId = user.getId() + "-" + UUID.randomUUID();
-                generateKeyPair( securityKeyId, SecurityKeyType.UserKey.getId() );
+                generateKeyPair( securityKeyId, SecurityKeyType.USER_KEY.getId() );
                 user.setSecurityKeyId( securityKeyId );
                 identityDataService.updateUser( user );
             }
@@ -1302,7 +1307,7 @@ public class IdentityManagerImpl implements IdentityManager
     public User modifyUser( User user, String password ) throws SystemSecurityException
     {
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1404,7 +1409,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1444,7 +1449,7 @@ public class IdentityManagerImpl implements IdentityManager
     public void updateUser( User user )
     {
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1461,7 +1466,7 @@ public class IdentityManagerImpl implements IdentityManager
     public void updateUser( User user, String publicKey )
     {
         //******Cannot update Internal User *************
-        if ( user.getType() == UserType.System.getId() )
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
@@ -1479,11 +1484,11 @@ public class IdentityManagerImpl implements IdentityManager
     {
         //******Cannot remove Internal User *************
         User user = identityDataService.getUser( userId );
-        if ( user.getType() == UserType.System.getId() )
+
+        if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be removed" );
         }
-        //***********************************************
 
         identityDataService.removeUser( userId );
     }
@@ -1498,7 +1503,7 @@ public class IdentityManagerImpl implements IdentityManager
             throw new IllegalArgumentException( "User name cannot be shorter than 4 characters." );
         }
 
-        if ( "token".equalsIgnoreCase( userName ) || "administrator".equalsIgnoreCase( userName ) || "authmessage"
+        if ( TOKEN_ID.equalsIgnoreCase( userName ) || "administrator".equalsIgnoreCase( userName ) || "authmessage"
                 .equalsIgnoreCase( userName ) || "system".equalsIgnoreCase( userName ) )
         {
             throw new IllegalArgumentException( "User name is reserved by the system." );
@@ -1542,13 +1547,61 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @Override
+    public boolean isTenantManager()
+    {
+        return isUserPermitted( getActiveUser(), PermissionObject.TENANT_MANAGEMENT, PermissionScope.ALL_SCOPE,
+                PermissionOperation.READ );
+    }
+
+
+    @Override
+    public boolean isSystemUser()
+    {
+        User user = getActiveUser();
+
+        if ( user == null )
+        {
+            return false;
+        }
+
+        return SYSTEM_USERNAME.equalsIgnoreCase( user.getUserName() );
+    }
+
+
+    @Override
+    public boolean isAdmin()
+    {
+        User user = getActiveUser();
+
+        if ( user == null )
+        {
+            return false;
+        }
+
+        for ( Role role : user.getRoles() )
+        {
+            if ( ADMIN_ROLE.equalsIgnoreCase( role.getName() ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     /* *************************************************
-     */
+             */
     @PermitAll
     @Override
     public boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
                                     PermissionOperation permOp )
     {
+        if ( user == null )
+        {
+            return false;
+        }
 
         List<Role> roles = user.getRoles();
 
@@ -1560,13 +1613,13 @@ public class IdentityManagerImpl implements IdentityManager
                 {
                     switch ( permOp )
                     {
-                        case Read:
+                        case READ:
                             return permission.isRead();
-                        case Write:
+                        case WRITE:
                             return permission.isWrite();
-                        case Update:
+                        case UPDATE:
                             return permission.isUpdate();
-                        case Delete:
+                        case DELETE:
                             return permission.isDelete();
                         default:
                             // no-op
@@ -1586,6 +1639,13 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public Role createRole( String roleName, int roleType )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( roleName ), "Invalid role name" );
+
+        if ( identityDataService.findRoleByName( roleName ) != null )
+        {
+            throw new IllegalArgumentException( String.format( "Role with name %s already exists", roleName ) );
+        }
+
         //*********************************
         // Remove XSS vulnerability code
         roleName = validateInput( roleName, true );
@@ -1628,7 +1688,7 @@ public class IdentityManagerImpl implements IdentityManager
     public void updateRole( Role role )
     {
         //******Cannot update Internal Role *************
-        if ( role.getType() == UserType.System.getId() )
+        if ( role.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal Role cannot be updated" );
         }
@@ -1652,7 +1712,7 @@ public class IdentityManagerImpl implements IdentityManager
         //******Cannot remove Internal Role *************
         Role role = identityDataService.getRole( roleId );
 
-        if ( role.getType() == UserType.System.getId() )
+        if ( role.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal Role cannot be removed" );
         }

@@ -39,7 +39,7 @@
         <option value="" disabled>Select Host</option>
         <option ng-repeat="host in monitoringCtrl.hosts" value="{{ host.id }}"
                 ng-selected="host.id == monitoringCtrl.currentHost">
-          {{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
+          {{ host.hostname }} ({{ host.instanceType }}, {{ host.hostArchitecture }}) {{host.isManagement ? " [MH]" :""}}
         </option>
       </select>
       <div class="clear"></div>
@@ -48,19 +48,6 @@
   </div>
 
   <div class="b-toggle-buttons">
-    <!--<ul>
-     <li class="b-toggle-buttons__item"
-     ng-class="monitoringCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''"
-     ng-click="monitoringCtrl.setCurrentType('peer')">
-     Peer
-     </li>
-     <li class="b-toggle-buttons__item"
-     ng-class="monitoringCtrl.currentType == 'environments' ? 'b-toggle-buttons__item_active' : ''"
-     ng-click="monitoringCtrl.setCurrentType('environments')">
-     Environment
-     </li>
-     </ul>-->
-
     <div class="b-main-form__wrapper b-main-form__wrapper_min">
       <label class="b-popup-body-label b-popup-body-label_inline">Period (h)</label>
       <select class="b-popup-body-input"

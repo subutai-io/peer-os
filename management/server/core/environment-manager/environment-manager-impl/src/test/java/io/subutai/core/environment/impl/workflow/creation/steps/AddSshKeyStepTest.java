@@ -11,7 +11,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -23,7 +23,7 @@ public class AddSshKeyStepTest
 
     AddSshKeyStep step;
 
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     Peer PEER = TestHelper.PEER();
     @Mock
     PeerUtil<Object> PEER_UTIL;

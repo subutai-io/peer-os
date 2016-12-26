@@ -21,6 +21,8 @@ import io.subutai.hub.share.resource.PeerGroupResources;
 
 /**
  * REST endpoint implementation of strategy manager
+ *
+ * TODO seems obsolete, check and delete
  */
 public class RestServiceImpl implements RestService
 {

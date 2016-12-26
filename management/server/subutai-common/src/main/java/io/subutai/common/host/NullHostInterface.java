@@ -1,6 +1,9 @@
 package io.subutai.common.host;
 
 
+import io.subutai.common.settings.Common;
+
+
 /**
  * Null object for interface Interface
  */
@@ -23,13 +26,13 @@ public class NullHostInterface extends HostInterfaceModel
     @Override
     public String getName()
     {
-        throw new UnsupportedOperationException();
+        return Common.DEFAULT_CONTAINER_INTERFACE;
     }
 
 
     @Override
     public String getIp()
     {
-        throw new UnsupportedOperationException();
+        return Common.LOCAL_HOST_IP;
     }
 }

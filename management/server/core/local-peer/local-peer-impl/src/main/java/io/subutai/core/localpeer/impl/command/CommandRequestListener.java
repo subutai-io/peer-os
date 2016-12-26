@@ -30,7 +30,7 @@ public class CommandRequestListener extends RequestListener
 
     protected PeerManager getPeerManager()
     {
-        return ServiceLocator.getServiceNoCache( PeerManager.class );
+        return ServiceLocator.lookup( PeerManager.class );
     }
 
 
@@ -51,7 +51,7 @@ public class CommandRequestListener extends RequestListener
             {
                 Peer sourcePeer = getPeerManager().getPeer( payload.getSourcePeerId() );
                 LocalPeer localPeer = getPeerManager().getLocalPeer();
-                Host host = localPeer.bindHost( commandRequest.getHostId() );
+                Host host = localPeer.findHost( commandRequest.getHostId() );
                 localPeer.executeAsync( commandRequest.getRequestBuilder(), host,
                         new CommandRequestCallback( commandRequest, sourcePeer ) );
             }

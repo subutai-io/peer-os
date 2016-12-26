@@ -8,7 +8,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.modification.steps.helpers.RenameContainerTask;
 
 
@@ -16,7 +16,7 @@ public class ChangeHostnameStep
 {
     private final EnvironmentManagerImpl environmentManager;
 
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final ContainerId containerId;
     private final String newHostname;
 
@@ -26,7 +26,7 @@ public class ChangeHostnameStep
     protected TaskUtil<Object> renameUtil = new TaskUtil<>();
 
 
-    public ChangeHostnameStep( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
+    public ChangeHostnameStep( final EnvironmentManagerImpl environmentManager, final LocalEnvironment environment,
                                final ContainerId containerId, final String newHostname )
     {
         this.environmentManager = environmentManager;

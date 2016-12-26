@@ -17,7 +17,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -26,13 +26,13 @@ public class ReservationStep
 {
 
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final PeerManager peerManager;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
-    public ReservationStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
+    public ReservationStep( final Topology topology, final LocalEnvironment environment, final PeerManager peerManager,
                             final TrackerOperation trackerOperation )
     {
         this.topology = topology;
@@ -112,7 +112,7 @@ public class ReservationStep
                 {
                     return peer.reserveNetworkResource(
                             new NetworkResourceImpl( environment.getId(), environment.getVni(),
-                                    environment.getP2pSubnet(), containerSubnet ) );
+                                    environment.getP2pSubnet(), containerSubnet, peerManager.getLocalPeer().getId() ) );
                 }
             } ) );
         }

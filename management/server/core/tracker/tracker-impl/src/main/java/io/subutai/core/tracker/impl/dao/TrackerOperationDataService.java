@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
@@ -57,7 +56,7 @@ public class TrackerOperationDataService
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             LOGGER.error( "Error getting all TrackerOperations.", e );
             if ( em.getTransaction().isActive() )
@@ -96,7 +95,7 @@ public class TrackerOperationDataService
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             LOGGER.error( "Error .", e );
             if ( em.getTransaction().isActive() )
@@ -129,7 +128,8 @@ public class TrackerOperationDataService
             em.getTransaction().begin();
 
             TypedQuery<TrackerOperationEntity> query =
-                    em.createNamedQuery( TrackerOperationEntity.QUERY_GET_OPERATION, TrackerOperationEntity.class );
+                    em.createNamedQuery( TrackerOperationEntity.QUERY_GET_USER_OPERATION,
+                            TrackerOperationEntity.class );
             query.setParameter( "source", source );
             query.setParameter( "operationTrackId", operationTrackId.toString() );
             query.setParameter( "userId", userId );
@@ -143,7 +143,7 @@ public class TrackerOperationDataService
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             LOGGER.error( "Error .", e );
             if ( em.getTransaction().isActive() )
@@ -190,7 +190,7 @@ public class TrackerOperationDataService
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             LOGGER.error( "Error merging TrackerOperationEntity.", e );
             if ( em.getTransaction().isActive() )
@@ -271,7 +271,7 @@ public class TrackerOperationDataService
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
             LOGGER.error( "Error getting trackerOperationSources.", e );
             if ( em.getTransaction().isActive() )

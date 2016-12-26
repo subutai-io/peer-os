@@ -1,6 +1,8 @@
 package io.subutai.core.hubmanager.impl.tunnel;
 
 
+import java.util.Set;
+
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -26,6 +28,9 @@ public class TunnelHelper
     private static final Logger LOG = LoggerFactory.getLogger( TunnelHelper.class );
 
     private static String COMMAND = "";
+
+    private static final String DELETE_TUNNEL_COMMAND =  "subutai tunnel del %s";
+    private static final String GET_OPENED_TUNNELS_FOR_IP_COMMAND =  "subutai tunnel list | grep %s | awk '{print $2}'";
 
 
     private TunnelHelper()
@@ -134,9 +139,9 @@ public class TunnelHelper
     }
 
 
-    public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager )
+    public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager,
+                                             TunnelInfoDto tunnelInfoDto )
     {
-        TunnelInfoDto tunnelInfoDto = new TunnelInfoDto();
         String[] data = result.split( ":" );
 
         try
@@ -158,5 +163,23 @@ public class TunnelHelper
             return null;
         }
         return tunnelInfoDto;
+    }
+
+
+    public static void deleteAllTunnelsForIp( final Set<ResourceHost> resourceHosts, final String ip )
+    {
+
+        ResourceHost resourceHost = resourceHosts.iterator().next();
+
+        CommandResult result =
+                execute( resourceHost, String.format( GET_OPENED_TUNNELS_FOR_IP_COMMAND, ip ) );
+
+
+        String[] data = result.getStdOut().split( "\n" );
+
+        for ( String tunnel : data )
+        {
+            execute( resourceHost, String.format( DELETE_TUNNEL_COMMAND, tunnel ) );
+        }
     }
 }

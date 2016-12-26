@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -296,8 +295,8 @@ public class LocalPeerImplTest
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_NAME );
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         when( containerHost.getEnvironmentId() ).thenReturn( environmentId );
-        doReturn( resourceHost ).when( localPeer ).getResourceHostByName( RESOURCE_HOST_NAME );
-        doReturn( containerHost ).when( resourceHost ).getContainerHostByName( CONTAINER_HOST_NAME );
+        doReturn( resourceHost ).when( localPeer ).getResourceHostByHostName( RESOURCE_HOST_NAME );
+        doReturn( containerHost ).when( resourceHost ).getContainerHostByHostName( CONTAINER_HOST_NAME );
         when( containerHost.getParent() ).thenReturn( resourceHost );
         when( containerHostInfo.getState() ).thenReturn( ContainerHostState.RUNNING );
         when( containerHost.isConnected() ).thenReturn( true );
@@ -373,11 +372,11 @@ public class LocalPeerImplTest
     @Test( expected = HostNotFoundException.class )
     public void testGetContainerHostByName() throws Exception
     {
-        assertEquals( containerHost, localPeer.getContainerHostByName( CONTAINER_HOST_NAME ) );
+        assertEquals( containerHost, localPeer.getContainerHostByHostName( CONTAINER_HOST_NAME ) );
 
-        doThrow( new HostNotFoundException( "" ) ).when( resourceHost ).getContainerHostByName( CONTAINER_HOST_NAME );
+        doThrow( new HostNotFoundException( "" ) ).when( resourceHost ).getContainerHostByHostName( CONTAINER_HOST_NAME );
 
-        localPeer.getContainerHostByName( CONTAINER_HOST_NAME );
+        localPeer.getContainerHostByHostName( CONTAINER_HOST_NAME );
     }
 
 
@@ -395,9 +394,9 @@ public class LocalPeerImplTest
     @Test( expected = HostNotFoundException.class )
     public void testGetResourceHostByName() throws Exception
     {
-        assertEquals( resourceHost, localPeer.getResourceHostByName( RESOURCE_HOST_NAME ) );
+        assertEquals( resourceHost, localPeer.getResourceHostByHostName( RESOURCE_HOST_NAME ) );
 
-        localPeer.getResourceHostByName( "DUMMY NAME" );
+        localPeer.getResourceHostByHostName( "DUMMY NAME" );
     }
 
 
@@ -413,7 +412,7 @@ public class LocalPeerImplTest
     @Test
     public void testGetResourceHostByContainerName() throws Exception
     {
-        assertEquals( resourceHost, localPeer.getResourceHostByContainerName( CONTAINER_HOST_NAME ) );
+        assertEquals( resourceHost, localPeer.getResourceHostByContainerHostName( CONTAINER_HOST_NAME ) );
     }
 
 
@@ -428,9 +427,9 @@ public class LocalPeerImplTest
     public void testBindHost() throws Exception
     {
 
-        assertEquals( resourceHost, localPeer.bindHost( RESOURCE_HOST_ID ) );
+        assertEquals( resourceHost, localPeer.findHost( RESOURCE_HOST_ID ) );
 
-        assertEquals( containerHost, localPeer.bindHost( CONTAINER_HOST_ID ) );
+        assertEquals( containerHost, localPeer.findHost( CONTAINER_HOST_ID ) );
     }
 
 
@@ -539,7 +538,7 @@ public class LocalPeerImplTest
     {
 
         doThrow( new HostNotFoundException( "" ) ).when( localPeer )
-                                                  .getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
+                                                  .getResourceHostByContainerHostName( Common.MANAGEMENT_HOSTNAME );
 
         localPeer.getManagementHost();
     }

@@ -273,7 +273,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
+        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
 
         try
         {
@@ -312,7 +312,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
+        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
 
         execute( getManagementHost(), commands.getRemoveIpFromVlanDomainCommand( hostIp, vLanId ) );
     }
@@ -398,7 +398,7 @@ public class NetworkManagerImpl implements NetworkManager
                 ProxyLoadBalanceStrategy.NONE,
                 String.format( "/mnt/lib/lxc/%s/rootfs/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
         execute( getManagementHost(), commands.getAddIpToVlanDomainCommand(
-                proxyConfig.getHost() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
+                containerHost.getIp() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
                 proxyConfig.getVlan() ) );
     }
 

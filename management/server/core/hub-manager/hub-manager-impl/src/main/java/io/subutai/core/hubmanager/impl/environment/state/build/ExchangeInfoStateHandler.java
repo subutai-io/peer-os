@@ -33,8 +33,9 @@ public class ExchangeInfoStateHandler extends StateHandler
             UserToken token = ctx.identityManager.getUserToken( user.getId() );
             if ( token == null )
             {
+                //TODO review to make this temporary renewable token
                 token = ctx.identityManager
-                        .createUserToken( user, null, null, null, TokenType.Permanent.getId(), null );
+                        .createUserToken( user, null, null, null, TokenType.PERMANENT.getId(), null );
             }
             resultDto.setEnvOwnerToken( token.getFullToken() );
             resultDto.setEnvOwnerTokenId( user.getAuthId() );

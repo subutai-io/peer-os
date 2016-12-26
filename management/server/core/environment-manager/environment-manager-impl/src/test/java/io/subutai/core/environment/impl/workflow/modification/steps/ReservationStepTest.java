@@ -18,7 +18,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -37,7 +37,7 @@ public class ReservationStepTest
     ReservationStep step;
     @Mock
     Topology topology;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     PeerUtil<Object> peerUtil;
     @Mock

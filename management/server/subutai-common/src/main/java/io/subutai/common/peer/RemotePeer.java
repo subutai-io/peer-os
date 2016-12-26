@@ -7,4 +7,8 @@ package io.subutai.common.peer;
 public interface RemotePeer extends Peer
 {
     PeerInfo check() throws PeerException;
+
+    void excludePeerFromEnvironment( String environmentId, String peerId ) throws PeerException;
+
+    void excludeContainerFromEnvironment( String environmentId, String containerId ) throws PeerException;
 }

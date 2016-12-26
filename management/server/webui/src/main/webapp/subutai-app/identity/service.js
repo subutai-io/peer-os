@@ -31,6 +31,8 @@ function identitySrv($http) {
         getCurrentUser: getCurrentUser,
 
         getConfig: getConfig,
+        isUpdateInProgress: isUpdateInProgress,
+		isAdminCheck: isAdminCheck,
 
         updatePublicKey: updatePublicKey,
         createIdentityDelegateDocument: createIdentityDelegateDocument,
@@ -208,4 +210,18 @@ function identitySrv($http) {
             headers: {'Content-Type': 'application/json'}
         });
     }
+
+    function isUpdateInProgress() {
+        return $http.get(SERVER_URL + "rest/v1/system/is_update_in_progress", {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/json'}
+        });
+    }
+
+	function isAdminCheck() {
+		return $http.get(
+			BASE_URL + 'is-admin',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
+	}
 }

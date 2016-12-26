@@ -17,7 +17,7 @@ import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.PeerInfoDto;
@@ -27,6 +27,7 @@ import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 import static java.lang.String.format;
 
 
+//TODO update peer name from Hub periodically since it can change on Hub side
 public class RegistrationManager
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -76,7 +77,7 @@ public class RegistrationManager
 
     private void registerPeerPubKey() throws HubManagerException
     {
-        log.info( "Registering peer public key to Hub..." );
+        log.info( "Registering peer public key with Hub..." );
 
         Form form = new Form( "keytext", readKeyText( configManager.getPeerPublicKey() ) );
 
@@ -84,7 +85,7 @@ public class RegistrationManager
 
         if ( !restResult.isSuccess() )
         {
-            throw new HubManagerException( "Error to register peer public to Hub: " + restResult.getError() );
+            throw new HubManagerException( "Error registering peer public key with Hub: " + restResult.getError() );
         }
 
         log.info( "Public key successfully registered" );
@@ -117,7 +118,7 @@ public class RegistrationManager
 
     private void register( String email, String password, String peerName ) throws HubManagerException
     {
-        log.info( "Registering peer to Hub..." );
+        log.info( "Registering peer with Hub..." );
 
         String path = format( "/rest/v1/peers/%s", peerId );
 
@@ -127,15 +128,15 @@ public class RegistrationManager
 
         if ( !restResult.isSuccess() )
         {
-            throw new HubManagerException( "Error to register peer: " + restResult.getError() );
+            throw new HubManagerException( "Error registering peer: " + restResult.getError() );
         }
 
 
-        Config config = null;
+        Config config;
         try
         {
             config = new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ),
-                    email );
+                    email, peerName );
         }
         catch ( Exception e )
         {

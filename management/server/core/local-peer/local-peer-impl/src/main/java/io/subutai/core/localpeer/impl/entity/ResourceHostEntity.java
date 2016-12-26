@@ -265,31 +265,31 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     protected NetworkManager getNetworkManager()
     {
-        return ServiceLocator.getServiceNoCache( NetworkManager.class );
+        return ServiceLocator.lookup( NetworkManager.class );
     }
 
 
     protected HostRegistrationManager getRegistrationManager()
     {
-        return ServiceLocator.getServiceNoCache( HostRegistrationManager.class );
+        return ServiceLocator.lookup( HostRegistrationManager.class );
     }
 
 
     protected QuotaManager getQuotaManager()
     {
-        return ServiceLocator.getServiceNoCache( QuotaManager.class );
+        return ServiceLocator.lookup( QuotaManager.class );
     }
 
 
     protected HostRegistry getHostRegistry()
     {
-        return ServiceLocator.getServiceNoCache( HostRegistry.class );
+        return ServiceLocator.lookup( HostRegistry.class );
     }
 
 
     protected LocalPeer getLocalPeer()
     {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+        return ServiceLocator.lookup( LocalPeer.class );
     }
 
 
@@ -313,7 +313,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             result = commandUtil
-                    .execute( resourceHostCommands.getListContainerInfoCommand( containerHost.getHostname() ), this );
+                    .execute( resourceHostCommands.getListContainerInfoCommand( containerHost.getContainerName() ),
+                            this );
         }
         catch ( CommandException e )
         {
@@ -367,7 +368,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getStartContainerCommand( containerHost.getHostname() ), this );
+            commandUtil
+                    .execute( resourceHostCommands.getStartContainerCommand( containerHost.getContainerName() ), this );
         }
         catch ( CommandException e )
         {
@@ -417,7 +419,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getStopContainerCommand( containerHost.getHostname() ), this );
+            commandUtil
+                    .execute( resourceHostCommands.getStopContainerCommand( containerHost.getContainerName() ), this );
         }
         catch ( CommandException e )
         {
@@ -446,7 +449,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getHostname() ), this );
+            //todo use commandExecutor.execute to avoid exception in case container does not exist
+            //todo check if exception is due to not existing container and ignore such exception
+            commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getId() ), this );
         }
         catch ( CommandException e )
         {
@@ -493,7 +498,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ContainerHost getContainerHostByName( final String hostname ) throws HostNotFoundException
+    public ContainerHost getContainerHostByHostName( final String hostname ) throws HostNotFoundException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
@@ -511,7 +516,28 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    private void removeContainerHost( final ContainerHost containerHost )
+    @Override
+    public ContainerHost getContainerHostByContainerName( final String containerName ) throws HostNotFoundException
+    {
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
+
+        for ( ContainerHost containerHost : getContainerHosts() )
+        {
+
+            if ( containerHost.getContainerName().equalsIgnoreCase( containerName ) )
+            {
+                return containerHost;
+            }
+        }
+
+        throw new HostNotFoundException(
+                String.format( "Container host not found by container name %s", containerName ) );
+    }
+
+
+    @Override
+    public void removeContainerHost( final ContainerHost containerHost )
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
@@ -816,11 +842,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public String cloneContainer( final Template template, final String hostname, final String ip, final int vlan,
+    public String cloneContainer( final Template template, final String containerName, final String ip, final int vlan,
                                   final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid ip" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions
@@ -833,7 +859,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             String token = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
 
             CommandResult result = commandUtil.execute( resourceHostCommands
-                    .getCloneContainerCommand( template.getId(), hostname, ip, vlan, environmentId, token ), this );
+                            .getCloneContainerCommand( template.getId(), containerName, ip, vlan, environmentId,
+                                    token ),
+                    this );
 
             //parse ID from output
 
@@ -868,7 +896,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( Exception e )
         {
             throw new ResourceHostException(
-                    String.format( "Error cloning container %s: %s", hostname, e.getMessage() ), e );
+                    String.format( "Error cloning container %s: %s", containerName, e.getMessage() ), e );
         }
     }
 
@@ -893,70 +921,48 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             catch ( HostNotFoundException e )
             {
 
-                LocalPeer localPeer = getLocalPeer();
-
                 //check that MH container is already registered
                 boolean mhAlreadyRegistered = false;
 
-                if ( localPeer != null )
+                try
+                {
+                    LocalPeer localPeer = getLocalPeer();
+
+                    localPeer.getManagementHost();
+
+                    mhAlreadyRegistered = true;
+                }
+                catch ( Exception ex )
+                {
+                    //ignore
+                }
+
+                if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
                 {
                     try
                     {
-                        localPeer.getManagementHost();
+                        containerHost =
+                                new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
+                                        info.getHostInterfaces(), info.getContainerName(),
+                                        getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
+                                        Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
 
-                        mhAlreadyRegistered = true;
+                        addContainerHost( containerHost );
                     }
-                    catch ( HostNotFoundException ex )
+                    catch ( PeerException e1 )
                     {
-                        //ignore
+                        LOG.warn( "Could not register management host, error obtaining management template info", e );
                     }
-
-                    if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
-                    {
-                        try
-                        {
-                            containerHost =
-                                    new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                                            info.getHostInterfaces(), info.getContainerName(),
-                                            getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
-                                            Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
-
-                            addContainerHost( containerHost );
-                        }
-                        catch ( PeerException e1 )
-                        {
-                            LOG.warn( "Could not register management host, error obtaining management template info",
-                                    e );
-                        }
-                    }
-                    else
-                    {
-                        LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
-                                info.getHostname() ) );
-                    }
+                }
+                else
+                {
+                    LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
+                            info.getHostname() ) );
                 }
             }
             catch ( Exception e )
             {
                 LOG.warn( "Error updating container info {}", e.getMessage() );
-            }
-        }
-
-        //remove containers that are missing in heartbeat
-        for ( ContainerHost containerHost : getContainerHosts() )
-        {
-            boolean found = false;
-            for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
-            {
-                if ( info.getId().equals( containerHost.getId() ) )
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if ( !found )
-            {
-                removeContainerHost( containerHost );
             }
         }
 
@@ -1038,7 +1044,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             try
             {
                 commandUtil.execute( resourceHostCommands
-                        .getGetSetContainerHostnameCommand( containerHost.getContainerName(), hostname ), this );
+                        .getSetContainerHostnameCommand( containerHost.getContainerName(), hostname ), this );
             }
             catch ( CommandException e )
             {
@@ -1114,7 +1120,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public String getContext()
     {
-        return PermissionObject.ResourceManagement.getName();
+        return PermissionObject.RESOURCE_MANAGEMENT.getName();
     }
 
 

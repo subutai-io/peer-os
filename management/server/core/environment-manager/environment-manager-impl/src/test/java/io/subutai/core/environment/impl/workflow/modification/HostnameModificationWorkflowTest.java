@@ -11,7 +11,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -25,7 +25,7 @@ public class HostnameModificationWorkflowTest
 
     class HostnameModificationWorkflowSUT extends HostnameModificationWorkflow
     {
-        public HostnameModificationWorkflowSUT( final EnvironmentImpl environment, final ContainerId containerId,
+        public HostnameModificationWorkflowSUT( final LocalEnvironment environment, final ContainerId containerId,
                                                 final String newHostname, final TrackerOperation operationTracker,
                                                 final EnvironmentManagerImpl environmentManager )
         {
@@ -41,7 +41,7 @@ public class HostnameModificationWorkflowTest
 
 
     HostnameModificationWorkflow workflow;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     EnvironmentManagerImpl environmentManager;
     TrackerOperation trackerOperation = TestHelper.TRACKER_OPERATION();

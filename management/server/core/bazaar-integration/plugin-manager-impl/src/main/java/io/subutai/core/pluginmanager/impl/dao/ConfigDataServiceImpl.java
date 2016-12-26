@@ -46,6 +46,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
             daoManager.startTransaction( em );
             em.merge( pluginDetails );
             daoManager.commitTransaction( em );
+            LOG.info( String.format( "Plugin: %s ; %s installed from Plugin Manager", name, version ) );
         }
         catch ( Exception e )
         {
@@ -102,6 +103,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
                 em.flush();
                 daoManager.commitTransaction( em );
             }
+            LOG.info( String.format( "Plugin: %s ; %s deleted from Plugin Manager", entity.getName(), entity.getVersion() ) );
         }
         catch ( Exception ex )
         {
@@ -129,6 +131,26 @@ public class ConfigDataServiceImpl implements ConfigDataService
         {
             daoManager.closeEntityManager( em );
             return null;
+        }
+    }
+
+
+    @Override
+    public void update( final String pluginId, final String name, final String version )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            PluginDetailsEntity entity = em.find( PluginDetailsEntity.class, pluginId );
+            entity.setName( name );
+            entity.setVersion( version );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.closeEntityManager( em );
         }
     }
 }

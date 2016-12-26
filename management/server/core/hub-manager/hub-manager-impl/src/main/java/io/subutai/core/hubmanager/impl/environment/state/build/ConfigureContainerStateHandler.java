@@ -17,10 +17,11 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
+import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
@@ -86,7 +87,7 @@ public class ConfigureContainerStateHandler extends StateHandler
                 log.info( e.getMessage() );
             }
 
-            boolean isSsEnv = environment != null && !"hub".equals( environment.getPeerId() );
+            boolean isSsEnv = environment != null && !Common.HUB_ID.equals( environment.getPeerId() );
 
 
             Set<String> peerSshKeys = getCurrentSshKeys( envId, isSsEnv );

@@ -9,6 +9,7 @@ environmentService.$inject = ['$http', '$q'];
 function environmentService($http, $q) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
+	var NOT_REGISTERED_CONTAINERS_URL = SERVER_URL + 'rest/ui/local/containers/notregistered';
 
 	var ENVIRONMENT_START_BUILD = ENVIRONMENTS_URL + 'build/';
 	var ENVIRONMENT_ADVANCED_BUILD = ENVIRONMENTS_URL + 'build/advanced';
@@ -21,10 +22,13 @@ function environmentService($http, $q) {
 
 	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
 
+	var VERIFIED_TEMPLATE_URL = ENVIRONMENTS_URL + 'templates/verified/';
+
 	var PEERS_URL = ENVIRONMENTS_URL + 'peers/';
 
 	var RH_URL = ENVIRONMENTS_URL + 'resourcehosts/';
 
+	var TENANTS_URL = ENVIRONMENTS_URL + 'tenants';
 
 	// @todo workaround for kurjun to return categorized templates
 	var categories = {
@@ -37,6 +41,7 @@ function environmentService($http, $q) {
 
 	var environmentService = {
 		getTemplates: getTemplates,
+		getVerifiedTemplate: getVerifiedTemplate,
 
 		getStrategies : getStrategies,
 
@@ -62,8 +67,8 @@ function environmentService($http, $q) {
 		getContainerStatus : getContainerStatus,
 		destroyContainer : destroyContainer,
 		switchContainer : switchContainer,
-		getContainerDomain : getContainerDomain,
-		checkDomain : checkDomain,
+		getContainerDomainNPort : getContainerDomainNPort,
+		setContainerDomainNPort : setContainerDomainNPort,
 		setContainerName : setContainerName,
 
 
@@ -90,7 +95,11 @@ function environmentService($http, $q) {
 
 		getInstalledPlugins: getInstalledPlugins,
 
-		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
+		getNotRegisteredContainers: getNotRegisteredContainers,
+		deleteNotRegisteredContainer: deleteNotRegisteredContainer,
+
+		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; },
+		getTenantsUrl : function getTenantsUrl() { return TENANTS_URL; }
 	};
 
 	return environmentService;
@@ -98,6 +107,10 @@ function environmentService($http, $q) {
 
 
 	//// Implementation
+
+	function getVerifiedTemplate(name){
+        return $http.get(VERIFIED_TEMPLATE_URL + name, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
 
 	// @todo workaround for kurjun to return categorized templates
 	function getTemplates() {
@@ -229,16 +242,17 @@ function environmentService($http, $q) {
 		);
 	}
 
-	function getContainerDomain(container) {
-		return $http.get(
-			ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain',
-			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
-		);
+
+	function setContainerDomainNPort(container, state, port) {
+		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domainnport' +
+			'?state=' + state + '&port=' + port);
 	}
 
-	function checkDomain(container, state) {
-		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain' +
-			'?state=' + state);
+	function getContainerDomainNPort(container, state) {
+		return $http.get(
+			ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domainnport',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
 	}
 
 
@@ -352,5 +366,13 @@ function environmentService($http, $q) {
 
 	function getInstalledPlugins() {
 		return $http.get(SERVER_URL + 'js/plugins.json', {headers: {'Content-Type': 'application/json'}});
+	}
+
+	function getNotRegisteredContainers() {
+		return $http.get(NOT_REGISTERED_CONTAINERS_URL, {headers: {'Content-Type': 'application/json'}});
+	}
+
+	function deleteNotRegisteredContainer(containerId) {
+		return $http.delete(NOT_REGISTERED_CONTAINERS_URL + '/' + containerId);
 	}
 }

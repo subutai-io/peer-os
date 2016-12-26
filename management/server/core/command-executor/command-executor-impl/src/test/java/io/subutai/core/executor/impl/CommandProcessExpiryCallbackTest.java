@@ -1,20 +1,26 @@
 package io.subutai.core.executor.impl;
 
 
+import org.junit.Before;
 import org.junit.Test;
-
-import io.subutai.core.executor.impl.CommandProcess;
-import io.subutai.core.executor.impl.CommandProcessExpiryCallback;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 
+@RunWith( MockitoJUnitRunner.class )
 public class CommandProcessExpiryCallbackTest
 {
 
-    CommandProcessExpiryCallback callback = new CommandProcessExpiryCallback();
+    CommandProcessExpiryCallback callback;
 
+    @Before
+    public void setUp() throws Exception
+    {
+        callback = new CommandProcessExpiryCallback();
+    }
 
     @Test
     public void testOnEntryExpiry() throws Exception

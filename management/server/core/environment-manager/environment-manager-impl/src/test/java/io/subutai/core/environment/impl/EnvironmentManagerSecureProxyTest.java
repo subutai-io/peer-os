@@ -28,7 +28,7 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -71,7 +71,7 @@ public class EnvironmentManagerSecureProxyTest
     Tracker tracker;
     @Mock
     RelationManager relationManager;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     Topology topology;
     EnvironmentContainerImpl environmentContainer = TestHelper.ENV_CONTAINER();

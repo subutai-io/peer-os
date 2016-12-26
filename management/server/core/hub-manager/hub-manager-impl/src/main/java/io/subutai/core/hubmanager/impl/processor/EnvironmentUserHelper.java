@@ -7,10 +7,11 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
@@ -143,7 +144,7 @@ public class EnvironmentUserHelper
     {
         for ( Role role : identityManager.getAllRoles() )
         {
-            if ( role.getName().equals( roleName ) )
+            if ( role.getName().equalsIgnoreCase( roleName ) )
             {
                 return role;
             }
@@ -158,16 +159,16 @@ public class EnvironmentUserHelper
         log.info( "Creating new user: {}", userDto.getEmail() );
 
         // Trick to get later the user id in Hub
-        String email = userDto.getId() + "@hub.subut.ai";
+        String email = userDto.getId() + HubManager.HUB_EMAIL_SUFFIX;
 
         try
         {
             User user = identityManager.createUser( userDto.getFingerprint(), null, "[Hub] " + userDto.getName(), email,
-                    UserType.Regular.getId(), KeyTrustLevel.Marginal.getId(), false, true );
+                    UserType.REGULAR.getId(), KeyTrustLevel.MARGINAL.getId(), false, true );
 
             identityManager.setUserPublicKey( user.getId(), userDto.getPublicKey() );
-            identityManager.assignUserRole( user, getRole( "Environment-Manager" ) );
-            identityManager.assignUserRole( user, getRole( "Template-Management" ) );
+            identityManager.assignUserRole( user, getRole( IdentityManager.ENV_MANAGER_ROLE ) );
+            identityManager.assignUserRole( user, getRole( IdentityManager.TEMPLATE_MANAGER_ROLE ) );
 
             log.info( "User created successfully" );
 

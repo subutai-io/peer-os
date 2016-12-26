@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
@@ -67,7 +68,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            hubManager.registerPeer( hubIp, email, password, peerName );
+            hubManager.registerPeer( hubIp, email, password, StringUtil.removeHtml( peerName ) );
+
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -148,14 +150,16 @@ public class RestServiceImpl implements RestService
     {
         RegistrationPojo pojo = new RegistrationPojo();
 
-        if ( hubManager.isRegistered() )
+        if ( hubManager.isRegisteredWithHub() )
         {
             pojo.setOwnerId( hubManager.getHubConfiguration().getOwnerId() );
 
             pojo.setCurrentUserEmail( hubManager.getCurrentUserEmail() );
+
+            pojo.setPeerName( hubManager.getPeerName() );
         }
 
-        pojo.setRegisteredToHub( hubManager.isRegistered() );
+        pojo.setRegisteredToHub( hubManager.isRegisteredWithHub() );
 
         String hubRegistrationInfo = JsonUtil.GSON.toJson( pojo );
 

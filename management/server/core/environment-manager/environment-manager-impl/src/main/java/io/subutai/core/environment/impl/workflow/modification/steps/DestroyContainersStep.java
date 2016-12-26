@@ -11,7 +11,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.modification.steps.helpers.ContainerDestroyTask;
 
 
@@ -20,14 +20,14 @@ import io.subutai.core.environment.impl.workflow.modification.steps.helpers.Cont
  */
 public class DestroyContainersStep
 {
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final EnvironmentManagerImpl environmentManager;
     private final List<String> removedContainers;
     private final TrackerOperation trackerOperation;
     protected TaskUtil<Object> destroyUtil = new TaskUtil<>();
 
 
-    public DestroyContainersStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
+    public DestroyContainersStep( final LocalEnvironment environment, final EnvironmentManagerImpl environmentManager,
                                   final List<String> removedContainers, TrackerOperation trackerOperation )
     {
         this.environment = environment;
@@ -57,6 +57,8 @@ public class DestroyContainersStep
 
                 if ( destroyResult.hasSucceeded() )
                 {
+                    environmentManager.getRelationManager().removeRelation( containerHost );
+
                     trackerOperation.addLog( String.format( "Container %s destroyed", containerHost.getHostname() ) );
                 }
                 else

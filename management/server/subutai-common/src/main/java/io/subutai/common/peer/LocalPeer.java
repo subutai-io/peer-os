@@ -4,6 +4,7 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
@@ -20,27 +21,36 @@ public interface LocalPeer extends Peer
 
 
     /**
-     * Binds host with given ID
+     * Finds host with given ID
      *
      * @param id ID of the host
      *
-     * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
+     * @return if host is registered then returns implementation of this host, otherwise throws exception.
      */
-    Host bindHost( String id ) throws HostNotFoundException;
-
-    Host bindHost( ContainerId id ) throws HostNotFoundException;
-
+    Host findHost( String id ) throws HostNotFoundException;
 
     /**
-     * Returns implementation of ResourceHost interface.
+     * Finds host with given hostname
      *
-     * @param hostname name of the resource host
+     * @param hostname hostname
+     *
+     * @return if host is registered then returns implementation of this host, otherwise throws exception.
      */
+    Host findHostByName( String hostname ) throws HostNotFoundException;
+
+    /**
+     * Returns not registered container hosts
+     *
+     * @return {@code ContainerHostInfo}
+     */
+    Set<ContainerHostInfo> getNotRegisteredContainers();
+
+    Set<ContainerHost> getRegisteredContainers();
 
     /**
      * Returns resource host instance by its hostname
      */
-    ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
+    ResourceHost getResourceHostByHostName( String hostname ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by its id
@@ -49,6 +59,11 @@ public interface LocalPeer extends Peer
 
     /**
      * Returns resource host instance by hostname of its container
+     */
+    ResourceHost getResourceHostByContainerHostName( String containerName ) throws HostNotFoundException;
+
+    /**
+     * Returns resource host instance by name of its container
      */
     ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
 
@@ -61,10 +76,18 @@ public interface LocalPeer extends Peer
     /**
      * Returns implementation of ContainerHost interface.
      *
-     * @param hostname name of the container
+     * @param hostname hostname of the container
      */
 
-    ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+    ContainerHost getContainerHostByHostName( String hostname ) throws HostNotFoundException;
+
+    /**
+     * Returns implementation of ContainerHost interface.
+     *
+     * @param containerName name of the container
+     */
+
+    ContainerHost getContainerHostByContainerName( String containerName ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ContainerHost interface.
@@ -86,8 +109,6 @@ public interface LocalPeer extends Peer
 
 
     void addRequestListener( RequestListener listener );
-
-    void removeRequestListener( RequestListener listener );
 
     Set<RequestListener> getRequestListeners();
 
@@ -137,8 +158,6 @@ public interface LocalPeer extends Peer
 
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 
-    Set<ContainerHost> findContainersByOwnerId( final String ownerId );
-
     PeerResources getResources();
 
     Set<Template> getTemplates();
@@ -147,7 +166,6 @@ public interface LocalPeer extends Peer
 
     List<ContainerHost> getPeerContainers( String peerId );
 
-    Host findHostByName( String hostname ) throws HostNotFoundException;
 
     Set<HostUtil.Task> getTasks();
 
@@ -169,12 +187,14 @@ public interface LocalPeer extends Peer
      */
     boolean isMHPresent();
 
-    Set<ContainerHost> listOrphanContainers();
+    Set<ContainerHost> getOrphanContainers();
 
     void removeOrphanContainers();
 
     Template getTemplateByName( String templateName ) throws PeerException;
 
     Template getTemplateById( String templateId ) throws PeerException;
+
+    boolean destroyNotRegisteredContainer( String containerId ) throws PeerException;
 }
 

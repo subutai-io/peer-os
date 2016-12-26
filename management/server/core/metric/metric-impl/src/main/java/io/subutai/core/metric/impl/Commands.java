@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 
 
@@ -27,14 +28,14 @@ public class Commands
         DateFormat df = new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" );
         String startTimestamp = df.format( start );
         String endTimestamp = df.format( end );
-        return new RequestBuilder(
-                String.format( "subutai metrics %s -s \"%s\" -e \"%s\"", host.getHostname(), startTimestamp,
-                        endTimestamp ) );
+        return new RequestBuilder( String.format( "subutai metrics %s -s \"%s\" -e \"%s\"",
+                host instanceof ContainerHost ? ( ( ContainerHost ) host ).getContainerName() : host.getHostname(),
+                startTimestamp, endTimestamp ) );
     }
 
 
-    public RequestBuilder getProcessResourceUsageCommand( String hostname, int pid )
+    public RequestBuilder getProcessResourceUsageCommand( String containerName, int pid )
     {
-        return new RequestBuilder( String.format( "subutai monitor -i %s %s", pid, hostname ) );
+        return new RequestBuilder( String.format( "subutai monitor -i %s %s", pid, containerName ) );
     }
 }

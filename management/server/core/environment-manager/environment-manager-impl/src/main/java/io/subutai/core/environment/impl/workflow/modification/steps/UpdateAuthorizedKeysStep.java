@@ -9,19 +9,19 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 
 public class UpdateAuthorizedKeysStep
 {
-    private final EnvironmentImpl environment;
+    private final LocalEnvironment environment;
     private final String oldHostname;
     private final String newHostname;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
-    public UpdateAuthorizedKeysStep( final EnvironmentImpl environment, final String oldHostname,
+    public UpdateAuthorizedKeysStep( final LocalEnvironment environment, final String oldHostname,
                                      final String newHostname, TrackerOperation trackerOperation )
     {
         this.environment = environment;

@@ -392,9 +392,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function addSshKey(key){
-		var enviroment = vm.environments[vm.enviromentSSHKey.environmentKey];
+		var environment = vm.environments[vm.enviromentSSHKey.environmentKey];
 		environmentService.setSshKey(vm.enviromentSSHKey.key, enviroment.id).success(function (data) {
-			SweetAlert.swal("Success!", "You have successfully added SSH key for " + enviroment.id + " environment!", "success");
+			SweetAlert.swal("Success!", "You have successfully added SSH key for " + environment.name + " environment!", "success");
 		}).error(function (error) {
 			SweetAlert.swal("Cancelled", "Error: " + error.ERROR, "error");
 		});
@@ -519,6 +519,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function showDomainForm(environmentId) {
+
+		if ( alertForHubEnvironment( environmentId ) )
+		{
+			return;
+		}
+
 		vm.environmentForDomain = environmentId;
 		vm.currentDomain = {};
 		LOADING_SCREEN();
@@ -534,12 +540,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function setDomain(domain) {
 		var file = fileUploader;
+		var environment = getEnvironment(vm.environmentForDomain);
 		LOADING_SCREEN();
 		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
-			SweetAlert.swal("Success!", "You have successfully added domain for " + vm.environmentForDomain + " environment!", "success");
+			fileUploader = {};
+			SweetAlert.swal("Success!", "You have successfully added domain for '" + environment.name + "' environment!", "success");
 			ngDialog.closeAll();
 			LOADING_SCREEN('none');
 		}).error(function (data) {
+			fileUploader = {};
 			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");
 			ngDialog.closeAll();
 			LOADING_SCREEN('none');
@@ -575,9 +584,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function setSSHKey(sshKey) {
 		if(sshKey === undefined || sshKey.length <= 0 || sshKey === null) return;
+        var environment = getEnvironment(vm.sshKeyForEnvironment);
 		LOADING_SCREEN();
 		environmentService.setSshKey(sshKey, vm.sshKeyForEnvironment).success(function (data) {
-			SweetAlert.swal("Success!", "You have successfully added SSH key for " + vm.sshKeyForEnvironment + " environment!", "success");
+			SweetAlert.swal("Success!", "You have successfully added SSH key for '" + environment.name + "' environment!", "success");
 			ngDialog.closeAll();
 			LOADING_SCREEN('none');
 		}).error(function (data) {

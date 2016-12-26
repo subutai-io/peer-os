@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
-
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
+import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
@@ -23,7 +22,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -33,6 +31,15 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 
 public interface EnvironmentManager
 {
+
+    String getEnvironmentOwnerName( Environment environment );
+
+    /**
+     * Returns a set of DTO objects of all local environments
+     * Used by users with Tenant-Management role
+     */
+    Set<EnvironmentDto> getTenantEnvironments();
+
 
     /**
      * Returns all existing environments
@@ -44,7 +51,6 @@ public interface EnvironmentManager
     Set<Environment> getEnvironmentsByOwnerId( long userId );
 
 
-    @RolesAllowed( "Environment-Management|Write" )
     EnvironmentCreationRef createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
     //used in plugins, kept for backward compatibility
@@ -52,7 +58,6 @@ public interface EnvironmentManager
                                                    final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
-    @RolesAllowed( "Environment-Management|Write" )
     EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology, List<String> removedContainers,
                                               Map<String, ContainerSize> changedContainers, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
@@ -197,7 +202,10 @@ public interface EnvironmentManager
             throws EnvironmentManagerException, EnvironmentNotFoundException;
 
 
-    void addContainerToEnvironmentDomain( String containerHostId, String environmentId )
+    void addContainerToEnvironmentDomain( String containerHostId, String environmentId, int port )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+    void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     /**
@@ -212,8 +220,6 @@ public interface EnvironmentManager
     SshTunnel setupSshTunnelForContainer( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
-    void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void notifyOnContainerDestroyed( Environment environment, String containerId );
 
@@ -235,10 +241,6 @@ public interface EnvironmentManager
     void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
             throws EnvironmentManagerException;
 
-    void addReverseProxy( final Environment environment, final ReverseProxyConfig reverseProxyConfig )
-            throws EnvironmentModificationException;
-
-
     void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
@@ -248,4 +250,11 @@ public interface EnvironmentManager
      * should reload environment using EnvironmentManager@loadEnvironment
      */
     void addSshKeyToEnvironmentEntity( String environmentId, String sshKey ) throws EnvironmentNotFoundException;
+
+    void excludePeerFromEnvironment( String environmentId, String peerId ) throws EnvironmentNotFoundException;
+
+    void excludeContainerFromEnvironment( String environmentId, String containerId )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+    Set<String> getDeletedEnvironmentsFromHub();
 }

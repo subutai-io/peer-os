@@ -22,8 +22,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
@@ -44,7 +43,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
                                Set<String> localContainerIds )
     {
 
-        super( "hub", json.get( "peerId" ).asText(),
+        super( Common.HUB_ID, json.get( "peerId" ).asText(),
                 new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
                         json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
                         ContainerHostState.RUNNING ), templateId, json.get( "domainName" ).asText(), parseSize( json ),
@@ -53,13 +52,6 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         local = localContainerIds.contains( getId() );
 
         setEnvironmentManager( environmentManager );
-    }
-
-
-    @Override
-    protected LocalPeer getLocalPeer()
-    {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 
@@ -108,7 +100,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         String ip = json.get( "ipAddress" ).asText();
         String id = json.get( "id" ).asText();
 
-        HostInterfaceModel him = new HostInterfaceModel( "eth0", ip );
+        HostInterfaceModel him = new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, ip );
 
         Set<HostInterfaceModel> set = Sets.newHashSet();
         set.add( him );

@@ -25,6 +25,15 @@ import io.subutai.core.identity.api.model.UserToken;
  */
 public interface IdentityManager
 {
+    String SYSTEM_USERNAME = "internal";
+    String ADMIN_USERNAME = "admin";
+    String TOKEN_ID = "token";
+    String ADMIN_DEFAULT_PWD = "secret";
+
+    public static final String ENV_MANAGER_ROLE = "Environment-Manager";
+    public static final String TEMPLATE_MANAGER_ROLE = "Template-Manager";
+
+
     /* *************************************************
      */
     void removeRolePermission( long roleId, Permission permission );
@@ -224,7 +233,8 @@ public interface IdentityManager
     /* *************************************************
      */
     @PermitAll
-    boolean changeUserPassword( String userName, String oldPassword, String newPassword ) throws SystemSecurityException;
+    boolean changeUserPassword( String userName, String oldPassword, String newPassword )
+            throws SystemSecurityException;
 
     /* *************************************************
          */
@@ -256,6 +266,21 @@ public interface IdentityManager
     boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
                              PermissionOperation permOp );
 
+
+    /**
+     * Returns true if user is tenant manager, false otherwise
+     */
+    boolean isTenantManager();
+
+    /**
+     * Returns true if user is internal system user, false otherwise
+     */
+    boolean isSystemUser();
+
+    /**
+     * Returns true if user has admin role, false otherwise
+     */
+    boolean isAdmin();
 
     /* *************************************************
      *

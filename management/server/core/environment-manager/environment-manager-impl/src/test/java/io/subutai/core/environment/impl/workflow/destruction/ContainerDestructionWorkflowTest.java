@@ -15,7 +15,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -34,7 +34,7 @@ public class ContainerDestructionWorkflowTest
 
     @Mock
     EnvironmentManagerImpl environmentManager;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     EnvironmentContainerImpl container = TestHelper.ENV_CONTAINER();
     TrackerOperation trackerOperation = TestHelper.TRACKER_OPERATION();
 
@@ -44,7 +44,7 @@ public class ContainerDestructionWorkflowTest
 
 
         public ContainerDestructionWorkflowSUT( final EnvironmentManagerImpl environmentManager,
-                                                final EnvironmentImpl environment, final ContainerHost containerHost,
+                                                final LocalEnvironment environment, final ContainerHost containerHost,
                                                 final TrackerOperation operationTracker )
         {
             super( environmentManager, environment, containerHost, operationTracker );
@@ -95,7 +95,7 @@ public class ContainerDestructionWorkflowTest
 
         workflow.DESTROY_CONTAINER();
 
-        verify( environmentManager, atLeastOnce() ).update( any( EnvironmentImpl.class ) );
+        verify( environmentManager, atLeastOnce() ).update( any( LocalEnvironment.class ) );
     }
 
 

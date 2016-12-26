@@ -20,6 +20,7 @@ import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 
 
@@ -132,26 +133,35 @@ public class IPUtil
 
     public static HostInterface findAddressableInterface( Set<HostInterface> allInterfaces, String hostId )
     {
-        LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
-
-        HostInterface result = NullHostInterface.getInstance();
+        ResourceHost management = null;
 
         try
         {
-            //try to obtain MNG-NET interface first
-            for ( HostInterface hostInterface : allInterfaces )
-            {
-                if ( Common.MNG_NET_INTERFACE.equals( hostInterface.getName() ) )
-                {
-                    //check if this is not an RH-with-MH and MNG-NET IP ends with 254
-                    //in this case we need skip and use WAN ip
-                    if ( localPeer != null && !localPeer.getManagementHost().getId().equals( hostId ) && hostInterface
-                            .getIp().endsWith( "254" ) )
-                    {
-                        break;
-                    }
+            management = ServiceLocator.lookup( LocalPeer.class ).getManagementHost();
+        }
+        catch ( Exception e )
+        {
+            //ignore
+        }
 
-                    return hostInterface;
+        try
+        {
+            if ( management != null )
+            {
+                //try to obtain MNG-NET interface first
+                for ( HostInterface hostInterface : allInterfaces )
+                {
+                    if ( Common.MNG_NET_INTERFACE.equals( hostInterface.getName() ) )
+                    {
+                        //check if this is not an RH-with-MH and MNG-NET IP ends with 254
+                        //in this case we need skip and use WAN ip
+                        if ( !management.getId().equals( hostId ) && hostInterface.getIp().endsWith( "254" ) )
+                        {
+                            break;
+                        }
+
+                        return hostInterface;
+                    }
                 }
             }
 
@@ -169,7 +179,7 @@ public class IPUtil
             throw new ActionFailedException( "Error obtaining addressable net interface", e );
         }
 
-        return result;
+        return NullHostInterface.getInstance();
     }
 }
 

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -49,16 +50,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            File karFile = new File( System.getProperty( "karaf.home" ) + "/deploy/" + name + ".kar" );
-
-            if ( !karFile.createNewFile() )
-            {
-                LOG.info( "Plugin {} already exists. Overwriting", name );
-            }
-
-            kar.transferTo( karFile );
-
-            pluginManager.register( name, version, karFile.getAbsolutePath(), permissions );
+            pluginManager.register( name, version, kar, permissions );
         }
         catch ( IOException e )
         {
@@ -97,7 +89,8 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( "Error deleting profile {}", e.getMessage() );
 
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+            return javax.ws.rs.core.Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                                            .build();
         }
 
         return Response.status( Response.Status.OK ).build();
@@ -109,6 +102,14 @@ public class RestServiceImpl implements RestService
     public Response setPermissions( final String pluginId, final String permissionJson )
     {
         return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response updatePlugin( final String pluginId, final String name, final String version )
+    {
+        pluginManager.update( pluginId, name, version );
+        return null;
     }
 
 

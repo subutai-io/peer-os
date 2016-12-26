@@ -13,12 +13,10 @@ import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -32,14 +30,14 @@ public class EnvironmentDestructionWorkflowTest
 
     @Mock
     EnvironmentManagerImpl environmentManager;
-    EnvironmentImpl environment = TestHelper.ENVIRONMENT();
+    LocalEnvironment environment = TestHelper.ENVIRONMENT();
     TrackerOperation trackerOperation = TestHelper.TRACKER_OPERATION();
 
 
     class EnvironmentDestructionWorkflowSUT extends EnvironmentDestructionWorkflow
     {
         public EnvironmentDestructionWorkflowSUT( final EnvironmentManagerImpl environmentManager,
-                                                  final EnvironmentImpl environment,
+                                                  final LocalEnvironment environment,
                                                   final TrackerOperation operationTracker )
         {
             super( environmentManager, environment, operationTracker );

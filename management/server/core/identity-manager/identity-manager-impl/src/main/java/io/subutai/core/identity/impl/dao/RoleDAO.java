@@ -4,6 +4,7 @@ package io.subutai.core.identity.impl.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.impl.model.RoleEntity;
 
@@ -58,6 +60,35 @@ class RoleDAO
     }
 
 
+    Role findByName( String name )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        Role result = null;
+        try
+        {
+            TypedQuery<RoleEntity> query =
+                    em.createQuery( "select u from RoleEntity u where u.name = :name", RoleEntity.class );
+            query.setParameter( "name", name.toLowerCase() );
+
+            List<RoleEntity> users = query.getResultList();
+            if ( !users.isEmpty() )
+            {
+                result = users.iterator().next();
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
+        return result;
+    }
+
+
     /* *************************************************
      *
      */
@@ -99,6 +130,8 @@ class RoleDAO
             daoManager.rollBackTransaction( em );
 
             LOG.error( e.getMessage() );
+
+            throw new ActionFailedException( e.getMessage() );
         }
         finally
         {
