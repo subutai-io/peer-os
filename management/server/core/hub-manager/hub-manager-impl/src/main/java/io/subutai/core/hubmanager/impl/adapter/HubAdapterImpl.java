@@ -55,6 +55,8 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
     private static final String CONTAINERS_STATE_URL = "/rest/v1/adapter/environments/%s/containers/%s/%s";
 
+    private static final String CONTAINERS_HOSTNAME_URL = "/rest/v1/adapter/environments/%s/containers/%s/hostname/%s";
+
     private static final String PLUGIN_DATA_URL = "/rest/v1/adapter/users/%s/peers/%s/plugins/%s";
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -365,6 +367,19 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     }
 
 
+    private void onContainerHostnameChange( String envId, String contId, String hostname )
+    {
+        if ( !isRegistered() )
+        {
+            return;
+        }
+
+        log.info( "onContainerHostnameChange: envId={}, contId={}, hostname={}", envId, contId, hostname );
+
+        httpClient.doPost( format( CONTAINERS_HOSTNAME_URL, envId, contId, hostname ), null );
+    }
+
+
     //environment events
 
 
@@ -451,7 +466,17 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
                                             final String currentHostname )
     {
-        // todo
+        try
+        {
+            ContainerHost containerHost = localPeer.getContainerHostById( containerInfo.getId() );
+
+            onContainerHostnameChange( containerHost.getEnvironmentId().getId(), containerInfo.getId(),
+                    currentHostname );
+        }
+        catch ( HostNotFoundException e )
+        {
+            //ignore
+        }
     }
 
 
