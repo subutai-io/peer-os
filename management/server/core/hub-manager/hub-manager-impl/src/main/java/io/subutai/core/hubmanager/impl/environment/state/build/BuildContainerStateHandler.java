@@ -29,10 +29,10 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
@@ -244,9 +244,8 @@ public class BuildContainerStateHandler extends StateHandler
     {
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-        return new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
-                nodeDto.getContainerName(), nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64,
-                contSize );
+        return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
+                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, contSize );
     }
 
 
