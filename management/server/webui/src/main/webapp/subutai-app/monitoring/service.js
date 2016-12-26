@@ -24,7 +24,7 @@ function monitoringSrv($http, environmentService, peerRegistrationService) {
 	}
 
 	function getResourceHosts() {
-		return peerRegistrationService.getResourceHosts();
+		return environmentService.getResourceHosts();
 	}
 
 	function getP2Pstatus() {
