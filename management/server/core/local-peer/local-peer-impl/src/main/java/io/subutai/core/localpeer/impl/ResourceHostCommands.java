@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.impl;
 
 
-import com.google.common.collect.Lists;
-
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 
@@ -52,13 +50,13 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getCloneContainerCommand( final String templateId, String containerName, String ip, int vlan,
-                                                    String environmentId, String token )
+    public RequestBuilder getCloneContainerCommand( final String templateId, String containerName, String hostname,
+                                                    String ip, int vlan, String environmentId, String token )
     {
-        return new RequestBuilder( "subutai clone" ).withCmdArgs(
-                Lists.newArrayList( String.format( "id:%s", templateId ), containerName, "-i",
-                        String.format( "\"%s %d\"", ip, vlan ), "-e", environmentId, "-t", token ) )
-                                                    .withTimeout( Common.CLONE_TIMEOUT_SEC );
+        return new RequestBuilder(
+                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -t %s && subutai hostname %s %s", templateId,
+                        containerName, ip, vlan, environmentId, token, containerName, hostname ) )
+                .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
 
