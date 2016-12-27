@@ -536,6 +536,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
 
             EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 

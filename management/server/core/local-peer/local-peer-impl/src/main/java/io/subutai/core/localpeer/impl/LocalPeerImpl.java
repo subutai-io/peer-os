@@ -1419,13 +1419,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             //update host info from heartbeat
-            //todo make updateHostInfo void
-            if ( host.updateHostInfo( resourceHostInfo ) )
-            {
-                resourceHostDataService.update( host );
+            host.updateHostInfo( resourceHostInfo );
 
-                LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
-            }
+            resourceHostDataService.update( host );
+
+            LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
 
             if ( firstMhRegistration )
             {
