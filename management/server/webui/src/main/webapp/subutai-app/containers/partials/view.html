@@ -1,164 +1,165 @@
 <div ng-controller="ContainerViewCtrl as containerViewCtrl">
 
-	<div class="b-workspace__header">
+  <div class="b-workspace__header">
 
-		<h1 class="b-title">Containers</h1>
-	</div>
+    <h1 class="b-title">Containers</h1>
+  </div>
 
-	<div class="b-workspace__content containers-list">
+  <div class="b-workspace__content containers-list">
 
-		<div class="b-main-form">
-			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
-				<label class="b-popup-body-label b-popup-body-label_inline">
-					Environment
-				</label>
-				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.filterContainersList()" 
-					id="subt_select__containers-environment" 
-					ng-model="containerViewCtrl.environmentId">
-					<option value="">All</option>
-					<option 
-						ng-repeat="environment in containerViewCtrl.environments" 
-						value="{{ environment.id }}"
-						ng-selected="containerViewCtrl.environmentId == environment.id">
-						{{ environment.name }}
-					</option>
-					<option value="NOT_REGISTERED">Standalone</option>
-				</select>
-				<div class="clear"></div>
-			</div>
+    <div class="b-main-form">
+      <div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+        <label class="b-popup-body-label b-popup-body-label_inline">
+          Environment
+        </label>
+        <select class="b-popup-body-input b-popup-body-input_min"
+                ng-change="containerViewCtrl.filterContainersList()"
+                id="subt_select__containers-environment"
+                ng-model="containerViewCtrl.environmentId">
+          <option value="">All</option>
+          <option
+              ng-repeat="environment in containerViewCtrl.environments"
+              value="{{ environment.id }}"
+              ng-selected="containerViewCtrl.environmentId == environment.id">
+            {{ environment.name }}
+          </option>
+          <option value="NOT_REGISTERED">Standalone</option>
+        </select>
+        <div class="clear"></div>
+      </div>
 
-			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
-				<label class="b-popup-body-label b-popup-body-label_inline">
-					Container Type
-				</label>
-				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.filterContainersList()" 
-					id="subt_select__containers-type" 
-					ng-model="containerViewCtrl.containersTypeId">
-					<option value="">All</option>
-					<option ng-repeat="type in containerViewCtrl.containersType" value="{{ type }}">
-						{{ type }}
-					</option>
-				</select>
-				<div class="clear"></div>
-			</div>
+      <div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+        <label class="b-popup-body-label b-popup-body-label_inline">
+          Container Type
+        </label>
+        <select class="b-popup-body-input b-popup-body-input_min"
+                ng-change="containerViewCtrl.filterContainersList()"
+                id="subt_select__containers-type"
+                ng-model="containerViewCtrl.containersTypeId">
+          <option value="">All</option>
+          <option ng-repeat="type in containerViewCtrl.containersType" value="{{ type }}">
+            {{ type }}
+          </option>
+        </select>
+        <div class="clear"></div>
+      </div>
 
-			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
-				<label class="b-popup-body-label b-popup-body-label_inline">
-					Container Status
-				</label>
-				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.filterContainersList()" 
-					id="subt_select__containers-status" 
-					ng-model="containerViewCtrl.containerState">
-					<option value="">All</option>
-					<option value="RUNNING">RUNNING</option>
-					<option value="STOPPED">STOPPED</option>
-				</select>
-				<div class="clear"></div>
-			</div>
-		</div>
+      <div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+        <label class="b-popup-body-label b-popup-body-label_inline">
+          Container Status
+        </label>
+        <select class="b-popup-body-input b-popup-body-input_min"
+                ng-change="containerViewCtrl.filterContainersList()"
+                id="subt_select__containers-status"
+                ng-model="containerViewCtrl.containerState">
+          <option value="">All</option>
+          <option value="RUNNING">RUNNING</option>
+          <option value="STOPPED">STOPPED</option>
+        </select>
+        <div class="clear"></div>
+      </div>
+    </div>
 
-		<div class="b-main-table-border">
+    <div class="b-main-table-border">
 
-			<table 
-				class="b-main-table b-main-table_with-header ez-ssh-table subt_table-containers-table">
-				<thead>
-					<tr>
-						<th>Status</th>
-						<th>Name</th>
-						<th></th>
-						<th>IP</th>
-						<th>Tags</th>
-						<th>Domain</th>
-						<th></th>
-						<th>SSH</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="(key, container) in containerViewCtrl.containers">
-						<td class="b-main-table__container-status">
-							<div 
-								class="b-status-icon b-status-icon_{{ container.state }}" 
-								tooltips 
-								tooltip-template="{{ container.state.length > 0 ? container.state : 'UNCHECKED' }}"
-								tooltip-side="right">
-							</div>
-						</td>
-						<td>
-							<a  ui-sref="console({ containerId: container.id,  environmentId: container.environmentId })" 
-								tooltips 
-								tooltip-template='
-									<span class="b-nowrap">Environment: {{ containerViewCtrl.environments | getEnvById: container.environmentId }}</span><br>
-									<span class="b-nowrap">ID: {{ container.id }}</span><br>
-									<span class="b-nowrap">Template: {{ container.templateName }}</span>
-								' 
-								tooltip-side="right"
-								env-id="{{ container.environmentId }}"
-								container-id="{{ container.id }}"
-								env-data-source="{{ container.dataSource }}"
-							>
-								{{ container.hostname }}
-							</a>
-						</td>
-						<td>
-							<a href
-							   class="b-icon b-icon_edit"
-							   tooltips
-							   tooltip-template='Change name'
-							   ng-click="containerViewCtrl.changeNamePopup( container )" style = "visibility: visible">
-							</a>
-						</td>
-						<td class="subt_text__container-ip">
-							<span 
-								tooltips 
-								tooltip-template='<span class="b-nowrap">mac: {{ container.environmentId }}</span>'>
+      <table
+          class="b-main-table b-main-table_with-header ez-ssh-table subt_table-containers-table">
+        <thead>
+        <tr>
+          <th>Status</th>
+          <th>Name</th>
+          <th></th>
+          <th>IP</th>
+          <th>Tags</th>
+          <th>Domain</th>
+          <th></th>
+          <th>SSH</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="(key, container) in containerViewCtrl.containers">
+          <td class="b-main-table__container-status">
+            <div
+                class="b-status-icon b-status-icon_{{ container.state }}"
+                tooltips
+                tooltip-template="{{ container.state.length > 0 ? container.state : 'UNCHECKED' }}"
+                tooltip-side="right">
+            </div>
+          </td>
+          <td>
+            <a ui-sref="console({ containerId: container.id,  environmentId: container.environmentId })"
+               tooltips
+               tooltip-template='
+									<span class="b-nowrap">Environment: {{ containerViewCtrl.environments | getEnvById: container.environmentId }}</span><br/>
+									<span class="b-nowrap">ID: {{ container.id }}</span><br/>
+									<span class="b-nowrap">Template: {{ container.templateName }}</span><br/>
+									<span class="b-nowrap">Container: {{ container.containerName }}</span>
+								'
+               tooltip-side="right"
+               env-id="{{ container.environmentId }}"
+               container-id="{{ container.id }}"
+               env-data-source="{{ container.dataSource }}"
+            >
+              {{ containerViewCtrl.getContainerNameFromHostName(container.hostname) }}
+            </a>
+          </td>
+          <td>
+            <a href
+               class="b-icon b-icon_edit"
+               tooltips
+               tooltip-template='Change name'
+               ng-click="containerViewCtrl.changeNamePopup( container )" style="visibility: visible">
+            </a>
+          </td>
+          <td class="subt_text__container-ip">
+							<span
+                  tooltips
+                  tooltip-template='<span class="b-nowrap">mac: {{ container.environmentId }}</span>'>
 								{{ container.ip }}
 							</span>
-						</td>
-						<td class="b-main-table__tags">
+          </td>
+          <td class="b-main-table__tags">
 							<span class="b-tags b-tags_grey" ng-repeat="(key, tag) in container.tags">
 								{{ tag }} 
 								<a href ng-click="containerViewCtrl.removeTag(container, tag, key)">
 									<i class="fa fa-times"></i>
 								</a>
 							</span>
-							<span class="b-tags b-tags_grey" ng-click="containerViewCtrl.addTagForm(container)">
+            <span class="b-tags b-tags_grey" ng-click="containerViewCtrl.addTagForm(container)">
 								Add 
 								<i class="fa fa-plus"></i>
 							</span>
-						</td>
-						<td>
-							<button class="b-btn b-btn_grey" 
-							ng-click="containerViewCtrl.showDomainForm(container)">
-								Configure
-							</button>
-						</td>
-						<td>
-							<button ng-show="container.state == undefined" class="b-btn" 
-							ng-click="containerViewCtrl.getContainerStatus(container)">
-								Check
-							</button>
-							<button ng-show="container.state == 'RUNNING'" class="b-btn b-btn_red subt_button__container-stop" 
-							ng-click="containerViewCtrl.containerAction(key)">
-								Stop
-							</button>
-							<button ng-show="container.state == 'STOPPED'" class="b-btn b-btn_green subt_button__container-start" 
-							ng-click="containerViewCtrl.containerAction(key)">
-								Start
-							</button>
-							<span class="b-load-icon" title="{{ container.state }}" 
-								ng-show="container.state != 'STOPPED' && container.state != 'RUNNING' && container.state != undefined">
+          </td>
+          <td>
+            <button class="b-btn b-btn_grey"
+                    ng-click="containerViewCtrl.showDomainForm(container)">
+              Configure
+            </button>
+          </td>
+          <td>
+            <button ng-show="container.state == undefined" class="b-btn"
+                    ng-click="containerViewCtrl.getContainerStatus(container)">
+              Check
+            </button>
+            <button ng-show="container.state == 'RUNNING'" class="b-btn b-btn_red subt_button__container-stop"
+                    ng-click="containerViewCtrl.containerAction(key)">
+              Stop
+            </button>
+            <button ng-show="container.state == 'STOPPED'" class="b-btn b-btn_green subt_button__container-start"
+                    ng-click="containerViewCtrl.containerAction(key)">
+              Start
+            </button>
+            <span class="b-load-icon" title="{{ container.state }}"
+                  ng-show="container.state != 'STOPPED' && container.state != 'RUNNING' && container.state != undefined">
 							</span>
-						</td>
-						<td>
-							<div>
-							<!--<div ng-if="container.dataSource === 'hub'">-->
-							<button class="b-btn b-btn_blue ez-ssh-btn" disabled>
-								<div class="ssh-key-button_block">
-									<svg class="ssh-key-button" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 28 26" enable-background="new 0 0 28 26" xml:space="preserve">
+          </td>
+          <td>
+            <div>
+              <!--<div ng-if="container.dataSource === 'hub'">-->
+              <button class="b-btn b-btn_blue ez-ssh-btn" disabled>
+                <div class="ssh-key-button_block">
+                  <svg class="ssh-key-button" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 28 26" enable-background="new 0 0 28 26" xml:space="preserve">
 										<g>
 										<path fill="#FFFFFF" d="M21,23.4H7.4c-1.6,0-3-1.3-3-3v-6.3h2.5v4.4c0,0.3,0.2,0.5,0.5,0.5h1.5c0.3,0,0.5-0.2,0.5-0.5v-4.4h4.4
 											l0.1,0.3c0.7,3.2,3.6,5.4,6.8,5.4c3.9,0,7-3.1,7-7c0-3.9-3.1-7-7-7c-3.2,0-6.1,2.3-6.8,5.4l-0.1,0.3l-12.1,0
@@ -170,82 +171,85 @@
 											C26.2,6,26.5,5.8,26.5,5.6z"/>
 										</g>
 									</svg>
-								</div>
-								<div class="ssh-key-button_title">SSH</div>
-							</button>
-							<span class="ssh-info-button" ng-if="!containerViewCtrl.hubStatus || !containerViewCtrl.hasPGPplugin">
+                </div>
+                <div class="ssh-key-button_title">SSH</div>
+              </button>
+              <span class="ssh-info-button" ng-if="!containerViewCtrl.hubStatus || !containerViewCtrl.hasPGPplugin">
 								?
 								<div class="ssh-plugin-info-tooltip tooltip" ng-if="!containerViewCtrl.hasPGPplugin">
-									<div style="padding-bottom: 10px">EZ ssh access to your environment container, use it with ease, pz.</div>
+									<div
+                      style="padding-bottom: 10px">EZ ssh access to your environment container, use it with ease, pz.</div>
 									<a href="https://github.com/subutai-io/browsers/releases/latest" target="_blank">Download</a>
 								</div>
-								<div class="ssh-plugin-info-tooltip tooltip" style="height: auto;" ng-if="!containerViewCtrl.hubStatus && containerViewCtrl.hasPGPplugin">
+								<div class="ssh-plugin-info-tooltip tooltip" style="height: auto;"
+                     ng-if="!containerViewCtrl.hubStatus && containerViewCtrl.hasPGPplugin">
 									Please register your peer with Hub to access you environment.
 								</div>
 							</span>
-							</div>
-						</td>
-						<td>
-							<a href 
-								class="b-icon b-icon_remove" 
-								ng-click="containerViewCtrl.destroyContainer(container.id, key)">
-							</a>
-						</td>
-					</tr>
+            </div>
+          </td>
+          <td>
+            <a href
+               class="b-icon b-icon_remove"
+               ng-click="containerViewCtrl.destroyContainer(container.id, key)">
+            </a>
+          </td>
+        </tr>
 
-					<tr ng-repeat="(key, container) in containerViewCtrl.notRegisteredContainers" ng-if="containerViewCtrl.environmentId == 'NOT_REGISTERED' || containerViewCtrl.environmentId.length == 0">
-						<td class="b-main-table__container-status">
-							<div 
-								class="b-status-icon b-status-icon_{{ container.status }}" 
-								tooltips 
-								tooltip-template="{{ container.status.length > 0 ? container.status : 'UNCHECKED' }}"
-								tooltip-side="right">
-							</div>
-						</td>
-						<td>
-							<span 
-								tooltips 
-								tooltip-template='
+        <tr ng-repeat="(key, container) in containerViewCtrl.notRegisteredContainers"
+            ng-if="containerViewCtrl.environmentId == 'NOT_REGISTERED' || containerViewCtrl.environmentId.length == 0">
+          <td class="b-main-table__container-status">
+            <div
+                class="b-status-icon b-status-icon_{{ container.status }}"
+                tooltips
+                tooltip-template="{{ container.status.length > 0 ? container.status : 'UNCHECKED' }}"
+                tooltip-side="right">
+            </div>
+          </td>
+          <td>
+							<span
+                  tooltips
+                  tooltip-template='
 									<span class="b-nowrap">ID: {{ container.id }}</span><br>
-								' 
-								tooltip-side="right"
-								container-id="{{ container.id }}"
-							>
+								'
+                  tooltip-side="right"
+                  container-id="{{ container.id }}"
+              >
 								{{ container.hostname }}
 							</span>
-						</td>
-						<td>
-						</td>
-						<td class="subt_text__container-ip">
-							<span 
-								ng-repeat="interfaces in container.interfaces" 
-								tooltips 
-								tooltip-template='<span class="b-nowrap">interfaceName: {{ interfaces.interfaceName }}</span>'>
+          </td>
+          <td>
+          </td>
+          <td class="subt_text__container-ip">
+							<span
+                  ng-repeat="interfaces in container.interfaces"
+                  tooltips
+                  tooltip-template='<span class="b-nowrap">interfaceName: {{ interfaces.interfaceName }}</span>'>
 								{{ interfaces.ip }}
 							</span><br/>
-						</td>
+          </td>
 
-						<td class="b-main-table__tags">
-						</td>
-						<td>
-						</td>
-						<td>
-						</td>
+          <td class="b-main-table__tags">
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
 
-						<td>
-						</td>
-						<td>
-							<a href 
-								class="b-icon b-icon_remove" 
-								ng-click="containerViewCtrl.destroyNotRegisteredContainer(container.id, key)">
-							</a>
-						</td>
-					</tr>
+          <td>
+          </td>
+          <td>
+            <a href
+               class="b-icon b-icon_remove"
+               ng-click="containerViewCtrl.destroyNotRegisteredContainer(container.id, key)">
+            </a>
+          </td>
+        </tr>
 
-				</tbody>
-			</table>
+        </tbody>
+      </table>
 
-		</div>
-	</div>
+    </div>
+  </div>
 
 </div>

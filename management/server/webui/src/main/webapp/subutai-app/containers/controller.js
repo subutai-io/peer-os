@@ -57,6 +57,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.getContainerStatus = getContainerStatus;
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
+	vm.getContainerNameFromHostName=getContainerNameFromHostName;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;

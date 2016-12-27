@@ -835,9 +835,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 ContainerHostEntity containerHostEntity =
                         new ContainerHostEntity( getId(), ( ( CloneContainerTask ) cloneTask ).getResult(),
-                                request.getHostname(), request.getTemplateArch(), interfaces, request.getHostname(),
-                                request.getTemplateId(), requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
-                                requestGroup.getInitiatorPeerId(), request.getContainerSize() );
+                                request.getHostname(), request.getTemplateArch(), interfaces,
+                                request.getContainerName(), request.getTemplateId(), requestGroup.getEnvironmentId(),
+                                requestGroup.getOwnerId(), requestGroup.getInitiatorPeerId(),
+                                request.getContainerSize() );
 
                 registerContainer( request.getResourceHostId(), containerHostEntity );
 

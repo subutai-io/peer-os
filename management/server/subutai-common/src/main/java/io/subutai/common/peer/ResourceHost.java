@@ -100,8 +100,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
      *
      * @return ID of container
      */
-    String cloneContainer( Template template, String hostname, String ip, int vlan, String environmentId )
-            throws ResourceHostException;
+    String cloneContainer( Template template, String containerName, String hostname, String ip, int vlan,
+                           String environmentId ) throws ResourceHostException;
 
     void setContainerSize( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
 
@@ -122,5 +122,5 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     RhTemplatesDownloadProgress getTemplateDownloadProgress( String environmentId );
 
-    void removeContainerHost(ContainerHost containerHost);
+    void removeContainerHost( ContainerHost containerHost );
 }

@@ -81,19 +81,17 @@ public class CloneContainerTask extends HostUtil.Task<String>
     @Override
     public String call() throws Exception
     {
+        //cleanse hostname
+        request.setHostname( StringUtil.removeHtmlAndSpecialChars( request.getHostname(), true ) );
         //update hostname to make it unique on this peer
         //VLAN will make it unique on this peer
         //additional suffix (last IP octet) will make it unique inside host environment
-        request.setHostname(
-                String.format( "%s-%d-%s", StringUtil.removeHtmlAndSpecialChars( request.getHostname(), true ),
-                        networkResource.getVlan(),
-                        StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ) );
-
-        request.setContainerName( request.getHostname() );
+        request.setContainerName( String.format( "%s-%d-%s", request.getHostname(), networkResource.getVlan(),
+                StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ) );
 
         String containerId = resourceHost
-                .cloneContainer( template, request.getContainerName(), request.getIp(), networkResource.getVlan(),
-                        networkResource.getEnvironmentId() );
+                .cloneContainer( template, request.getContainerName(), request.getHostname(), request.getIp(),
+                        networkResource.getVlan(), networkResource.getEnvironmentId() );
 
         //wait for container connection
         boolean connected = false;
