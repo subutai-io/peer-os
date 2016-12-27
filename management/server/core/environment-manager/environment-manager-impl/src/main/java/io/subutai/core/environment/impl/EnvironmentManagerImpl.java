@@ -1944,12 +1944,37 @@ public class EnvironmentManagerImpl
     public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
             throws EnvironmentNotFoundException, PeerException
     {
-        LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         EnvironmentContainerImpl containerHost =
                 ( EnvironmentContainerImpl ) environment.getContainerHostById( containerId );
 
+        String oldHostname = containerHost.getHostname();
+
+        if ( oldHostname.equalsIgnoreCase( hostname ) )
+        {
+            return;
+        }
+
         containerHost.setHostname( hostname, true );
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Propagating container hostname change in environment %s", environment.getName() ) );
+
+        final HostnameModificationWorkflow hostnameModificationWorkflow =
+                new HostnameModificationWorkflow( environment, containerHost.getContainerId(), hostname,
+                        operationTracker, this, oldHostname );
+
+        registerActiveWorkflow( environment, hostnameModificationWorkflow );
+
+        hostnameModificationWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeActiveWorkflow( environment.getId() );
+            }
+        } );
     }
 
 
@@ -2445,13 +2470,11 @@ public class EnvironmentManagerImpl
     }
 
 
-    private Set<Environment> getAllNoHubEnvironments()
+    private Set<Environment> getLocalEnvironments()
     {
         Set<Environment> environments = Sets.newHashSet();
-        // add local env-s
+
         environments.addAll( environmentService.getAll() );
-        // get all remote no-hub environments
-        environments.addAll( getRemoteEnvironments( false ) );
 
         setTransientFields( environments );
 
@@ -2472,8 +2495,7 @@ public class EnvironmentManagerImpl
             return;
         }
 
-        // exclude Hub env-s, b/c they are handled in HubAdapter
-        Set<Environment> environments = getAllNoHubEnvironments();
+        Set<Environment> environments = getLocalEnvironments();
 
         for ( Environment environment : environments )
         {
@@ -2484,19 +2506,21 @@ public class EnvironmentManagerImpl
 
                 environmentFound = true;
 
-                environmentContainerHost.setHostname( currentHostname, true );
+                updateContainerHostname( environment.getId(), environmentContainerHost.getId(), currentHostname );
             }
             catch ( ContainerHostNotFoundException e )
             {
                 //ignore
             }
-            catch ( PeerException e )
+            catch ( EnvironmentNotFoundException | PeerException e )
             {
+                LOG.error( "Error updating container hostname: {}", e.getMessage() );
+
                 break;
             }
         }
 
-        if ( !environmentFound )
+        if ( !environmentFound && !Common.HUB_ID.equals( containerHost.getInitiatorPeerId() ) )
         {
             try
             {
@@ -2529,8 +2553,7 @@ public class EnvironmentManagerImpl
             return;
         }
 
-        // exclude Hub env-s, b/c they are handled in HubAdapter
-        Set<Environment> environments = getAllNoHubEnvironments();
+        Set<Environment> environments = getLocalEnvironments();
 
         for ( Environment environment : environments )
         {
@@ -2564,11 +2587,13 @@ public class EnvironmentManagerImpl
             }
             catch ( PeerException e )
             {
+                LOG.error( "Error processing container destroy event: {}", e.getMessage() );
+
                 break;
             }
         }
 
-        if ( !environmentFound )
+        if ( !environmentFound && !Common.HUB_ID.equals( containerHost.getInitiatorPeerId() ) )
         {
             try
             {
