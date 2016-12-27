@@ -234,11 +234,11 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public boolean updateHostInfo( final HostInfo hostInfo )
+    public void updateHostInfo( final HostInfo hostInfo )
     {
-        this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
+        super.updateHostInfo( hostInfo );
 
-        return super.updateHostInfo( hostInfo );
+        this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
     }
 
 

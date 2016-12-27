@@ -860,9 +860,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             String token = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
 
             CommandResult result = commandUtil.execute( resourceHostCommands
-                            .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
-                                    token ),
-                    this );
+                    .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
+                            token ), this );
 
             //parse ID from output
 
@@ -903,7 +902,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public boolean updateHostInfo( final HostInfo hostInfo )
+    public void updateHostInfo( final HostInfo hostInfo )
     {
         super.updateHostInfo( hostInfo );
 
@@ -966,8 +965,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 LOG.warn( "Error updating container info {}", e.getMessage() );
             }
         }
-
-        return true;
     }
 
 

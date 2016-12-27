@@ -203,6 +203,18 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
+            throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        environmentWebClient.updateContainerHostname( environmentId, containerId, hostname );
+    }
+
+
+    @Override
     public boolean isOnline()
     {
         return peerWebClient.ping();

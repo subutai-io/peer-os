@@ -9,12 +9,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -47,7 +48,7 @@ public class RenameContainerTaskTest
     {
         task.call();
 
-        verify( environmentContainer ).setHostname( anyString() );
+        verify( environmentContainer ).setHostname( anyString(), eq( false ) );
     }
 
 

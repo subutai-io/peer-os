@@ -11,4 +11,6 @@ public interface RemotePeer extends Peer
     void excludePeerFromEnvironment( String environmentId, String peerId ) throws PeerException;
 
     void excludeContainerFromEnvironment( String environmentId, String containerId ) throws PeerException;
+
+    void updateContainerHostname( String environmentId, String containerId, String hostname ) throws PeerException;
 }

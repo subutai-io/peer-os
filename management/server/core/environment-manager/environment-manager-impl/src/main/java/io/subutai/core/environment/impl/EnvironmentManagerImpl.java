@@ -67,7 +67,6 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -1942,6 +1941,19 @@ public class EnvironmentManagerImpl
 
 
     @Override
+    public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
+            throws EnvironmentNotFoundException, PeerException
+    {
+        LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
+
+        EnvironmentContainerImpl containerHost =
+                ( EnvironmentContainerImpl ) environment.getContainerHostById( containerId );
+
+        containerHost.setHostname( hostname, true );
+    }
+
+
+    @Override
     public Set<EnvironmentDto> getTenantEnvironments()
     {
         Set<Environment> environments = Sets.newHashSet();
@@ -2396,14 +2408,6 @@ public class EnvironmentManagerImpl
 
 
     @Override
-    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
-                                            final String currentHostname )
-    {
-        // todo implement
-    }
-
-
-    @Override
     public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
                                                 final HostInterfaceModel oldNetInterface,
                                                 final HostInterfaceModel newNetInterface )
@@ -2428,34 +2432,105 @@ public class EnvironmentManagerImpl
     }
 
 
+    private ContainerHost getContainerHost( String containerId )
+    {
+        try
+        {
+            return peerManager.getLocalPeer().getContainerHostById( containerId );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return null;
+        }
+    }
+
+
+    private Set<Environment> getAllNoHubEnvironments()
+    {
+        Set<Environment> environments = Sets.newHashSet();
+        // add local env-s
+        environments.addAll( environmentService.getAll() );
+        // get all remote no-hub environments
+        environments.addAll( getRemoteEnvironments( false ) );
+
+        setTransientFields( environments );
+
+        return environments;
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+        boolean environmentFound = false;
+
+        ContainerHost containerHost = getContainerHost( containerInfo.getId() );
+
+        if ( containerHost == null )
+        {
+            return;
+        }
+
+        // exclude Hub env-s, b/c they are handled in HubAdapter
+        Set<Environment> environments = getAllNoHubEnvironments();
+
+        for ( Environment environment : environments )
+        {
+            try
+            {
+                EnvironmentContainerImpl environmentContainerHost =
+                        ( EnvironmentContainerImpl ) environment.getContainerHostById( containerInfo.getId() );
+
+                environmentFound = true;
+
+                environmentContainerHost.setHostname( currentHostname, true );
+            }
+            catch ( ContainerHostNotFoundException e )
+            {
+                //ignore
+            }
+            catch ( PeerException e )
+            {
+                break;
+            }
+        }
+
+        if ( !environmentFound )
+        {
+            try
+            {
+                Peer peer = containerHost.getPeer();
+
+                if ( peer instanceof RemotePeer )
+                {
+                    ( ( RemotePeer ) peer )
+                            .updateContainerHostname( containerHost.getEnvironmentId().getId(), containerHost.getId(),
+                                    currentHostname );
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error updating container hostname on remote peer: {}", e.getMessage() );
+            }
+        }
+    }
+
+
     @Override
     public void onContainerDestroyed( final ContainerHostInfo containerInfo )
     {
         boolean environmentFound = false;
 
-        ContainerHost containerHost;
+        ContainerHost containerHost = getContainerHost( containerInfo.getId() );
 
-        try
-        {
-            containerHost = peerManager.getLocalPeer().getContainerHostById( containerInfo.getId() );
-
-            ResourceHost resourceHost =
-                    peerManager.getLocalPeer().getResourceHostById( containerHost.getResourceHostId().getId() );
-
-            resourceHost.removeContainerHost( containerHost );
-        }
-        catch ( HostNotFoundException e )
+        if ( containerHost == null )
         {
             return;
         }
 
-        Set<Environment> environments = Sets.newHashSet();
-        // add local env-s
-        environments.addAll( environmentService.getAll() );
         // exclude Hub env-s, b/c they are handled in HubAdapter
-        environments.addAll( getRemoteEnvironments( false ) );
-
-        setTransientFields( environments );
+        Set<Environment> environments = getAllNoHubEnvironments();
 
         for ( Environment environment : environments )
         {
