@@ -778,4 +778,33 @@ public class EnvironmentWebClient
 
         WebClientBuilder.checkResponse( response );
     }
+
+
+    public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
+            throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/containers/%s/hostname/%s", environmentId, containerId, hostname );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error updating container hostname: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
 }

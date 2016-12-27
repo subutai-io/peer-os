@@ -41,6 +41,7 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.Ownership;
@@ -873,6 +874,15 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         environmentManager.excludeContainerFromEnvironment( environmentId, containerId );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
+            throws EnvironmentNotFoundException, PeerException
+    {
+        environmentManager.updateContainerHostname( environmentId, containerId, hostname );
     }
 
 

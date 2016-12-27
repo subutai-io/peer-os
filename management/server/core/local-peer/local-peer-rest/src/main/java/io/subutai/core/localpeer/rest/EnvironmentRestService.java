@@ -175,4 +175,12 @@ public interface EnvironmentRestService
     @Produces( MediaType.APPLICATION_JSON )
     Response excludeContainerFromEnvironment( @PathParam( "environmentId" ) String environmentId,
                                               @PathParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "{environmentId}/containers/{containerId}/hostname/{hostname}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response updateContainerHostname( @PathParam( "environmentId" ) String environmentId,
+                                      @PathParam( "containerId" ) String containerId,
+                                      @PathParam( "hostname" ) String hostname );
 }

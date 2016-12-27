@@ -1419,6 +1419,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             //update host info from heartbeat
+            //todo make updateHostInfo void
             if ( host.updateHostInfo( resourceHostInfo ) )
             {
                 resourceHostDataService.update( host );
@@ -3057,7 +3058,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
                                             final String currentHostname )
     {
-
+        //not needed
     }
 
 
