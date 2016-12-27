@@ -52,6 +52,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
@@ -164,6 +165,11 @@ public class LocalEnvironment implements Environment, Serializable
     @Column
     @JsonIgnore
     private boolean deleted = false;
+
+    @Enumerated( EnumType.STRING )
+    @Column( name = "ssh_key_type", nullable = false )
+    @JsonProperty( "sshKeyType" )
+    private SshEncryptionType sshKeyType = SshEncryptionType.RSA;
 
 
     protected LocalEnvironment()
@@ -289,6 +295,18 @@ public class LocalEnvironment implements Environment, Serializable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
 
         this.name = name;
+    }
+
+
+    public SshEncryptionType getSshKeyType()
+    {
+        return sshKeyType == null ? SshEncryptionType.RSA : sshKeyType;
+    }
+
+
+    public void setSshKeyType( final SshEncryptionType sshKeyType )
+    {
+        this.sshKeyType = sshKeyType;
     }
 
 

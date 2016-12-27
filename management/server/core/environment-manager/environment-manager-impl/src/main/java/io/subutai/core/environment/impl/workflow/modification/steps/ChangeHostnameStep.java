@@ -18,10 +18,9 @@ public class ChangeHostnameStep
 
     private final LocalEnvironment environment;
     private final ContainerId containerId;
-    private final String newHostname;
+    private String newHostname;
 
     private String oldHostname;
-    private String newFullHostname;
 
     protected TaskUtil<Object> renameUtil = new TaskUtil<>();
 
@@ -53,7 +52,7 @@ public class ChangeHostnameStep
         {
             oldHostname = task.getOldHostname();
 
-            newFullHostname = task.getNewHostname();
+            newHostname = task.getNewHostname();
         }
         else
         {
@@ -74,6 +73,6 @@ public class ChangeHostnameStep
 
     public String getNewHostname()
     {
-        return newFullHostname;
+        return newHostname;
     }
 }

@@ -111,6 +111,7 @@ public class HostnameModificationWorkflowTest
         verify( trackerOperation ).addLogFailed( anyString() );
     }
 
+
     @Test
     public void testOnCancellation() throws Exception
     {

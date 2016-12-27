@@ -472,6 +472,9 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
             onContainerHostnameChange( containerHost.getEnvironmentId().getId(), containerInfo.getId(),
                     currentHostname );
+
+            //TODO implement update of /etc/hosts and /root/.ssh/authorized_keys files on all the rest environment
+            // containers in case this is Hub environment
         }
         catch ( HostNotFoundException e )
         {
@@ -485,7 +488,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
                                                 final HostInterfaceModel oldNetInterface,
                                                 final HostInterfaceModel newNetInterface )
     {
-        // todo
+        //not used
     }
 
 
@@ -493,7 +496,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
                                               final HostInterfaceModel netInterface )
     {
-        // todo
+        //not used
     }
 
 
@@ -508,13 +511,13 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        // todo
+        //not used
     }
 
 
     @Override
     public void onContainerCreated( final ContainerHostInfo containerInfo )
     {
-        // todo
+        //not used
     }
 }
