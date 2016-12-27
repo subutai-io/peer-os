@@ -200,7 +200,8 @@ public interface Peer extends RelationLink
             throws PeerException;
 
     void updateAuthorizedKeysWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
-                                                       String newHostname ) throws PeerException;
+                                                       String newHostname, SshEncryptionType sshEncryptionType )
+            throws PeerException;
 
 
     /**

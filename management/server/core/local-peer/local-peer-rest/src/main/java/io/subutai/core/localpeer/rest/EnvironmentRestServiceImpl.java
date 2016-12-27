@@ -428,6 +428,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
     @Override
     public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final SshEncryptionType sshEncryptionType,
                                                               final String oldHostname, final String newHostname )
     {
         try
@@ -435,8 +436,10 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( environmentId );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+            Preconditions.checkNotNull( sshEncryptionType );
 
-            localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
+            localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname,
+                    sshEncryptionType );
         }
         catch ( Exception e )
         {

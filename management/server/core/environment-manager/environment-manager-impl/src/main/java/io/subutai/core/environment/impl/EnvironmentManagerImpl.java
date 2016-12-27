@@ -491,6 +491,8 @@ public class EnvironmentManagerImpl
 
         environment.setUserId( delegatedUser.getUserId() );
 
+        environment.setSshKeyType( topology.getSshKeyType() );
+
         save( environment );
 
         createEnvironmentKeyPair( environment.getEnvironmentId() );

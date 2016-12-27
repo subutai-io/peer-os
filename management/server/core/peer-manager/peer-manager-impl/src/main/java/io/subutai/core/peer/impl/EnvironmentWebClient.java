@@ -603,14 +603,16 @@ public class EnvironmentWebClient
 
 
     public void updateAuthorizedKeysWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
-                                                              String newHostname ) throws PeerException
+                                                              String newHostname, SshEncryptionType sshEncryptionType )
+            throws PeerException
     {
         WebClient client = null;
         Response response;
         try
         {
-            String path = String.format( "/%s/containers/authorizedkeys/%s/%s", environmentId.getId(), oldHostname,
-                    newHostname );
+            String path =
+                    String.format( "/%s/containers/authorizedkeys/%s/%s/%s", environmentId.getId(), sshEncryptionType,
+                            oldHostname, newHostname );
 
             client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 

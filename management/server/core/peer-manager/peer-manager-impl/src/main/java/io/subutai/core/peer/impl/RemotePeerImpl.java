@@ -897,14 +897,17 @@ public class RemotePeerImpl implements RemotePeer
 
     @Override
     public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
-                                                              final String oldHostname, final String newHostname )
+                                                              final String oldHostname, final String newHostname,
+                                                              final SshEncryptionType sshEncryptionType )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+        Preconditions.checkNotNull( sshEncryptionType );
 
-        environmentWebClient.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
+        environmentWebClient.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname,
+                sshEncryptionType );
     }
 
 

@@ -144,8 +144,9 @@ public interface EnvironmentRestService
                                                  @PathParam( "newHostname" ) String newHostname );
 
     @POST
-    @Path( "{environmentId}/containers/authorizedkeys/{oldHostname}/{newHostname}" )
+    @Path( "{environmentId}/containers/authorizedkeys/{encType}/{oldHostname}/{newHostname}" )
     void updateAuthorizedKeysWithNewContainerHostname( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                                       @PathParam( "encType" ) SshEncryptionType sshEncryptionType,
                                                        @PathParam( "oldHostname" ) String oldHostname,
                                                        @PathParam( "newHostname" ) String newHostname );
 
