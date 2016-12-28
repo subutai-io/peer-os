@@ -2543,7 +2543,7 @@ public class EnvironmentManagerImpl
         {
             try
             {
-                Peer peer = containerHost.getPeer();
+                Peer peer = peerManager.getPeer( containerHost.getInitiatorPeerId() );
 
                 if ( peer instanceof RemotePeer )
                 {
@@ -2616,7 +2616,7 @@ public class EnvironmentManagerImpl
         {
             try
             {
-                Peer peer = containerHost.getPeer();
+                Peer peer = peerManager.getPeer( containerHost.getInitiatorPeerId() );
 
                 if ( peer instanceof RemotePeer )
                 {
@@ -2640,8 +2640,7 @@ public class EnvironmentManagerImpl
 
 
     @Override
-    public void placeEnvironmentInfoByContainerIp( final String containerIp )
-            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
+    public void placeEnvironmentInfoByContainerIp( final String containerIp ) throws PeerException, CommandException
     {
         ContainerHost containerHost = getContainerHostByIp( containerIp );
 
@@ -2671,19 +2670,19 @@ public class EnvironmentManagerImpl
 
         try
         {
-            Peer peer = containerHost.getPeer();
+            RemotePeer peer = peerManager.findPeer( containerHost.getInitiatorPeerId() );
 
-            if ( peer instanceof RemotePeer )
+            if ( peer != null )
             {
-                ( ( RemotePeer ) peer ).placeEnvironmentInfoByContainerId( containerHost.getEnvironmentId().getId(),
+                peer.placeEnvironmentInfoByContainerId( containerHost.getEnvironmentId().getId(),
                         containerHost.getId() );
             }
         }
-        catch ( Exception e )
+        catch ( PeerException e )
         {
             LOG.error( "Error requesting placement of environment info on remote peer: {}", e.getMessage() );
 
-            throw new EnvironmentNotFoundException();
+            throw e;
         }
     }
 
@@ -2718,7 +2717,16 @@ public class EnvironmentManagerImpl
     private void placeInfoIntoContainer( EnvironmentDto environmentDto, ContainerHost containerHost )
             throws CommandException
     {
-        containerHost.execute( new RequestBuilder(
-                String.format( "rm /root/env ; echo '%s' > /root/env", JsonUtil.toJson( environmentDto ) ) ) );
+        if ( containerHost instanceof EnvironmentContainerImpl )
+        {
+            // workaround to disable security checks for this call
+            ( ( EnvironmentContainerImpl ) containerHost ).executeUnsafe( new RequestBuilder(
+                    String.format( "rm /root/env ; echo '%s' > /root/env", JsonUtil.toJson( environmentDto ) ) ) );
+        }
+        else
+        {
+            containerHost.execute( new RequestBuilder(
+                    String.format( "rm /root/env ; echo '%s' > /root/env", JsonUtil.toJson( environmentDto ) ) ) );
+        }
     }
 }

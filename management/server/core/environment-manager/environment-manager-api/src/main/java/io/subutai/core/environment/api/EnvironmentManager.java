@@ -264,8 +264,7 @@ public interface EnvironmentManager
     Set<String> getDeletedEnvironmentsFromHub();
 
     //called by client
-    void placeEnvironmentInfoByContainerIp( String containerIp )
-            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
+    void placeEnvironmentInfoByContainerIp( String containerIp ) throws PeerException, CommandException;
 
     //called by remote peer
     void placeEnvironmentInfoByContainerId( String environmentId, String containerIp )

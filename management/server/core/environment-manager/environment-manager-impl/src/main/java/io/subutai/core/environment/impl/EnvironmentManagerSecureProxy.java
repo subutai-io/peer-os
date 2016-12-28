@@ -972,8 +972,7 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    public void placeEnvironmentInfoByContainerIp( final String containerIp )
-            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
+    public void placeEnvironmentInfoByContainerIp( final String containerIp ) throws PeerException, CommandException
     {
         environmentManager.placeEnvironmentInfoByContainerIp( containerIp );
     }

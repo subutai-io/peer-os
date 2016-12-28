@@ -490,6 +490,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     }
 
 
+    public CommandResult executeUnsafe( final RequestBuilder requestBuilder ) throws CommandException
+    {
+        return getPeer().execute( requestBuilder, this );
+    }
+
+
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
