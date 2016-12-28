@@ -122,4 +122,21 @@ public class RestServiceImpl implements RestService
             throw new WebApplicationException( e.getMessage() );
         }
     }
+
+
+    @Override
+    public Response placeEnvironmentInfoByContainerIp( String containerIp )
+    {
+        try
+        {
+            environmentManager.placeEnvironmentInfoByContainerIp( containerIp );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new WebApplicationException( e.getMessage() );
+        }
+    }
 }

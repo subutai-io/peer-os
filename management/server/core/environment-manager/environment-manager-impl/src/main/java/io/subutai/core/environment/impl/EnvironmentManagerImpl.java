@@ -32,6 +32,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
@@ -137,6 +140,7 @@ public class EnvironmentManagerImpl
     protected static final String MODULE_NAME = "Environment Manager";
     private static final long RESET_ENVS_P2P_KEYS_INTERVAL_MIN = 60;
     private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 30;
+    private static final String REMOTE_OWNER_NAME = "remote";
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
@@ -2035,7 +2039,7 @@ public class EnvironmentManagerImpl
             }
             else
             {
-                return "remote";
+                return REMOTE_OWNER_NAME;
             }
         }
         else if ( environment instanceof HubEnvironment )
@@ -2459,11 +2463,24 @@ public class EnvironmentManagerImpl
     }
 
 
-    private ContainerHost getContainerHost( String containerId )
+    private ContainerHost getContainerHostById( String containerId )
     {
         try
         {
             return peerManager.getLocalPeer().getContainerHostById( containerId );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return null;
+        }
+    }
+
+
+    private ContainerHost getContainerHostByIp( String containerIp )
+    {
+        try
+        {
+            return peerManager.getLocalPeer().getContainerHostByIp( containerIp );
         }
         catch ( HostNotFoundException e )
         {
@@ -2490,7 +2507,7 @@ public class EnvironmentManagerImpl
     {
         boolean environmentFound = false;
 
-        ContainerHost containerHost = getContainerHost( containerInfo.getId() );
+        ContainerHost containerHost = getContainerHostById( containerInfo.getId() );
 
         if ( containerHost == null )
         {
@@ -2526,7 +2543,7 @@ public class EnvironmentManagerImpl
         {
             try
             {
-                Peer peer = containerHost.getPeer();
+                Peer peer = peerManager.getPeer( containerHost.getInitiatorPeerId() );
 
                 if ( peer instanceof RemotePeer )
                 {
@@ -2548,7 +2565,7 @@ public class EnvironmentManagerImpl
     {
         boolean environmentFound = false;
 
-        ContainerHost containerHost = getContainerHost( containerInfo.getId() );
+        ContainerHost containerHost = getContainerHostById( containerInfo.getId() );
 
         if ( containerHost == null )
         {
@@ -2599,7 +2616,14 @@ public class EnvironmentManagerImpl
         {
             try
             {
-                Peer peer = containerHost.getPeer();
+                Peer peer = peerManager.getPeer( containerHost.getInitiatorPeerId() );
+
+                //todo check if we have remote environment
+                //if yes then we call excludeContainerFromEnvironment
+                //otherwise we dont call it, b/c it was destroyed
+                //also
+                //if remote environment exists and this is the only container in it
+                //we need to remove the network registration and we need to cleanup local peer cache
 
                 if ( peer instanceof RemotePeer )
                 {
@@ -2619,5 +2643,97 @@ public class EnvironmentManagerImpl
     public Set<String> getDeletedEnvironmentsFromHub()
     {
         return environmentAdapter.getDeletedEnvironmentsIds();
+    }
+
+
+    @Override
+    public void placeEnvironmentInfoByContainerIp( final String containerIp ) throws PeerException, CommandException
+    {
+        ContainerHost containerHost = getContainerHostByIp( containerIp );
+
+        if ( containerHost == null )
+        {
+            throw new ContainerHostNotFoundException( "Container not found by ip " + containerIp );
+        }
+
+        Set<EnvironmentDto> environmentDtos = getTenantEnvironments();
+
+        for ( EnvironmentDto environmentDto : environmentDtos )
+        {
+            //skip remote env-s
+            if ( !REMOTE_OWNER_NAME.equalsIgnoreCase( environmentDto.getUsername() ) )
+            {
+                for ( ContainerDto containerDto : environmentDto.getContainers() )
+                {
+                    if ( containerIp.equals( containerDto.getIp() ) )
+                    {
+                        placeInfoIntoContainer( environmentDto, containerHost );
+
+                        return;
+                    }
+                }
+            }
+        }
+
+        try
+        {
+            RemotePeer peer = peerManager.findPeer( containerHost.getInitiatorPeerId() );
+
+            if ( peer != null )
+            {
+                peer.placeEnvironmentInfoByContainerId( containerHost.getEnvironmentId().getId(),
+                        containerHost.getId() );
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error requesting placement of environment info on remote peer: {}", e.getMessage() );
+
+            throw e;
+        }
+    }
+
+
+    @Override
+    public void placeEnvironmentInfoByContainerId( final String environmentId, final String containerId )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
+    {
+        final LocalEnvironment environment = environmentService.find( environmentId );
+
+
+        if ( environment == null )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        EnvironmentContainerImpl containerHost =
+                ( EnvironmentContainerImpl ) environment.getContainerHostById( containerId );
+
+        setTransientFields( Sets.<Environment>newHashSet( environment ) );
+
+
+        EnvironmentDto environmentDto =
+                new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                        environment.getContainerDtos(), environment.getClass().getName(),
+                        getEnvironmentOwnerName( environment ) );
+
+        placeInfoIntoContainer( environmentDto, containerHost );
+    }
+
+
+    private void placeInfoIntoContainer( EnvironmentDto environmentDto, ContainerHost containerHost )
+            throws CommandException
+    {
+        if ( containerHost instanceof EnvironmentContainerImpl )
+        {
+            // workaround to disable security checks for this call
+            ( ( EnvironmentContainerImpl ) containerHost ).executeUnsafe( new RequestBuilder(
+                    String.format( "rm /root/env ; echo '%s' > /root/env", JsonUtil.toJson( environmentDto ) ) ) );
+        }
+        else
+        {
+            containerHost.execute( new RequestBuilder(
+                    String.format( "rm /root/env ; echo '%s' > /root/env", JsonUtil.toJson( environmentDto ) ) ) );
+        }
     }
 }

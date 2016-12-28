@@ -106,4 +106,10 @@ public class EnvironmentDto
     {
         return dataSource;
     }
+
+
+    public String getUsername()
+    {
+        return username;
+    }
 }

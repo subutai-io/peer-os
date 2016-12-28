@@ -570,6 +570,23 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public ContainerHost getContainerHostByIp( final String ip ) throws HostNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid container ip" );
+
+        for ( ContainerHost containerHost : getContainerHosts() )
+        {
+            if ( containerHost.getIp().equals( ip ) )
+            {
+                return containerHost;
+            }
+        }
+
+        throw new HostNotFoundException( String.format( "Container host not found by ip %s", ip ) );
+    }
+
+
+    @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final String environmentId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );

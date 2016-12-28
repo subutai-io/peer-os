@@ -472,9 +472,6 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
             onContainerHostnameChange( containerHost.getEnvironmentId().getId(), containerInfo.getId(),
                     currentHostname );
-
-            //TODO implement update of /etc/hosts and /root/.ssh/authorized_keys files on all the rest environment
-            // containers in case this is Hub environment
         }
         catch ( HostNotFoundException e )
         {
