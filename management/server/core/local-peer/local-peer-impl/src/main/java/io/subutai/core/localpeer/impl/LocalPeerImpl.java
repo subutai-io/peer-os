@@ -1419,12 +1419,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             //update host info from heartbeat
-            if ( host.updateHostInfo( resourceHostInfo ) )
-            {
-                resourceHostDataService.update( host );
+            host.updateHostInfo( resourceHostInfo );
 
-                LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
-            }
+            resourceHostDataService.update( host );
+
+            LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
 
             if ( firstMhRegistration )
             {
@@ -2726,12 +2725,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @Override
     public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
-                                                              final String oldHostname, final String newHostname )
+                                                              final String oldHostname, final String newHostname,
+                                                              final SshEncryptionType sshEncryptionType )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+        Preconditions.checkNotNull( sshEncryptionType );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -2740,6 +2741,25 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( hosts.isEmpty() )
         {
             return;
+        }
+
+        for ( Host containerHost : hosts )
+        {
+            if ( containerHost.getHostname().equalsIgnoreCase( newHostname ) )
+            {
+                try
+                {
+                    commandUtil.execute( localPeerCommands
+                                    .getChangeHostnameInSshPubKeyCommand( oldHostname, newHostname, sshEncryptionType ),
+                            containerHost );
+                }
+                catch ( CommandException e )
+                {
+                    LOG.error( "Error updating ssh pub key with hostname change: {}", e.getMessage() );
+                }
+
+                break;
+            }
         }
 
         CommandUtil.HostCommandResults results = commandUtil
@@ -3057,7 +3077,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
                                             final String currentHostname )
     {
-
+        //not needed
     }
 
 

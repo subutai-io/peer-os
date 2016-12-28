@@ -203,6 +203,18 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
+            throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        environmentWebClient.updateContainerHostname( environmentId, containerId, hostname );
+    }
+
+
+    @Override
     public boolean isOnline()
     {
         return peerWebClient.ping();
@@ -885,14 +897,17 @@ public class RemotePeerImpl implements RemotePeer
 
     @Override
     public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
-                                                              final String oldHostname, final String newHostname )
+                                                              final String oldHostname, final String newHostname,
+                                                              final SshEncryptionType sshEncryptionType )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+        Preconditions.checkNotNull( sshEncryptionType );
 
-        environmentWebClient.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
+        environmentWebClient.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname,
+                sshEncryptionType );
     }
 
 

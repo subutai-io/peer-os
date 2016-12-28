@@ -44,7 +44,7 @@ public class UpdateAuthorizedKeysStep
                 public Object call() throws Exception
                 {
                     peer.updateAuthorizedKeysWithNewContainerHostname( environment.getEnvironmentId(), oldHostname,
-                            newHostname );
+                            newHostname, environment.getSshKeyType() );
 
                     return null;
                 }

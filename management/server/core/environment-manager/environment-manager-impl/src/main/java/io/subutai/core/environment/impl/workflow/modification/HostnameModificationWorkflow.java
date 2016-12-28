@@ -18,15 +18,26 @@ public class HostnameModificationWorkflow
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
     private final ContainerId containerId;
-    private final String newHostname;
+    private String newHostname;
+    private boolean skipHostnameUpdate = false;
+    private String oldHostname;
 
     private LocalEnvironment environment;
-    private ChangeHostnameStep changeHostnameStep;
 
 
     public enum HostnameModificationPhase
     {
         INIT, CHANGE_HOSTNAME, UPDATE_ETC_HOSTS_FILE, UPDATE_AUTHORIZED_KEYS_FILE, FINALIZE
+    }
+
+
+    public HostnameModificationWorkflow( final LocalEnvironment environment, final ContainerId containerId,
+                                         final String newHostname, final TrackerOperation operationTracker,
+                                         final EnvironmentManagerImpl environmentManager, final String oldHostname )
+    {
+        this( environment, containerId, newHostname, operationTracker, environmentManager );
+        this.skipHostnameUpdate = true;
+        this.oldHostname = oldHostname;
     }
 
 
@@ -55,7 +66,8 @@ public class HostnameModificationWorkflow
 
         saveEnvironment();
 
-        return HostnameModificationPhase.CHANGE_HOSTNAME;
+        return skipHostnameUpdate ? HostnameModificationPhase.UPDATE_ETC_HOSTS_FILE :
+               HostnameModificationPhase.CHANGE_HOSTNAME;
     }
 
 
@@ -64,11 +76,15 @@ public class HostnameModificationWorkflow
 
         operationTracker.addLog( "Modifying container hostname" );
 
-        changeHostnameStep = new ChangeHostnameStep( environmentManager, environment, containerId, newHostname );
+        ChangeHostnameStep changeHostnameStep =
+                new ChangeHostnameStep( environmentManager, environment, containerId, newHostname );
 
         try
         {
             environment = ( LocalEnvironment ) changeHostnameStep.execute();
+
+            oldHostname = changeHostnameStep.getOldHostname();
+            newHostname = changeHostnameStep.getNewHostname();
 
             saveEnvironment();
 
@@ -90,8 +106,7 @@ public class HostnameModificationWorkflow
 
         try
         {
-            new UpdateEtcHostsStep( environment, changeHostnameStep.getOldHostname(),
-                    changeHostnameStep.getNewHostname(), operationTracker ).execute();
+            new UpdateEtcHostsStep( environment, oldHostname, newHostname, operationTracker ).execute();
 
             saveEnvironment();
 
@@ -113,8 +128,7 @@ public class HostnameModificationWorkflow
 
         try
         {
-            new UpdateAuthorizedKeysStep( environment, changeHostnameStep.getOldHostname(),
-                    changeHostnameStep.getNewHostname(), operationTracker ).execute();
+            new UpdateAuthorizedKeysStep( environment, oldHostname, newHostname, operationTracker ).execute();
 
             saveEnvironment();
 

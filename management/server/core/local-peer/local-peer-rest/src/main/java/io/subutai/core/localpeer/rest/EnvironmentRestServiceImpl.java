@@ -428,6 +428,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
     @Override
     public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final SshEncryptionType sshEncryptionType,
                                                               final String oldHostname, final String newHostname )
     {
         try
@@ -435,8 +436,10 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( environmentId );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+            Preconditions.checkNotNull( sshEncryptionType );
 
-            localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
+            localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname,
+                    sshEncryptionType );
         }
         catch ( Exception e )
         {
@@ -517,6 +520,30 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 
             environmentManager.excludeContainerFromEnvironment( environmentId, containerId );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response updateContainerHostname( final String environmentId, final String containerId,
+                                             final String hostname )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+
+            EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
+
+            environmentManager.updateContainerHostname( environmentId, containerId, hostname );
 
             return Response.ok().build();
         }

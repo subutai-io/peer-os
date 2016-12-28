@@ -144,8 +144,9 @@ public interface EnvironmentRestService
                                                  @PathParam( "newHostname" ) String newHostname );
 
     @POST
-    @Path( "{environmentId}/containers/authorizedkeys/{oldHostname}/{newHostname}" )
+    @Path( "{environmentId}/containers/authorizedkeys/{encType}/{oldHostname}/{newHostname}" )
     void updateAuthorizedKeysWithNewContainerHostname( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                                       @PathParam( "encType" ) SshEncryptionType sshEncryptionType,
                                                        @PathParam( "oldHostname" ) String oldHostname,
                                                        @PathParam( "newHostname" ) String newHostname );
 
@@ -175,4 +176,12 @@ public interface EnvironmentRestService
     @Produces( MediaType.APPLICATION_JSON )
     Response excludeContainerFromEnvironment( @PathParam( "environmentId" ) String environmentId,
                                               @PathParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "{environmentId}/containers/{containerId}/hostname/{hostname}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response updateContainerHostname( @PathParam( "environmentId" ) String environmentId,
+                                      @PathParam( "containerId" ) String containerId,
+                                      @PathParam( "hostname" ) String hostname );
 }

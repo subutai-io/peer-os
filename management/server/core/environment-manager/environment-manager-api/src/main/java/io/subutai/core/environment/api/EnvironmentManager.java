@@ -22,6 +22,7 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -255,6 +256,9 @@ public interface EnvironmentManager
 
     void excludeContainerFromEnvironment( String environmentId, String containerId )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+    void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
+            throws EnvironmentNotFoundException, PeerException;
 
     Set<String> getDeletedEnvironmentsFromHub();
 }

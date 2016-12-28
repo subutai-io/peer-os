@@ -262,7 +262,7 @@ public class EnvironmentContainerImplTest
     @Test
     public void testSetHostname() throws Exception
     {
-        environmentContainer.setHostname( "NEWHOSTNAME" );
+        environmentContainer.setHostname( "NEWHOSTNAME", false );
 
         verify( peer ).setContainerHostname( environmentContainer.getContainerId(), "NEWHOSTNAME" );
     }

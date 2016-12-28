@@ -166,7 +166,7 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public boolean updateHostInfo( final HostInfo hostInfo )
+    public void updateHostInfo( final HostInfo hostInfo )
     {
         Preconditions.checkNotNull( hostInfo );
 
@@ -175,8 +175,6 @@ public abstract class AbstractSubutaiHost implements Host
         this.hostInterfaces = hostInfo.getHostInterfaces();
 
         this.hostname = hostInfo.getHostname();
-
-        return false;
     }
 
 

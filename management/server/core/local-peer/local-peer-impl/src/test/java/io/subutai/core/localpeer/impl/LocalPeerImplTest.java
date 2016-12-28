@@ -46,6 +46,7 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
@@ -374,7 +375,8 @@ public class LocalPeerImplTest
     {
         assertEquals( containerHost, localPeer.getContainerHostByHostName( CONTAINER_HOST_NAME ) );
 
-        doThrow( new HostNotFoundException( "" ) ).when( resourceHost ).getContainerHostByHostName( CONTAINER_HOST_NAME );
+        doThrow( new HostNotFoundException( "" ) ).when( resourceHost )
+                                                  .getContainerHostByHostName( CONTAINER_HOST_NAME );
 
         localPeer.getContainerHostByHostName( CONTAINER_HOST_NAME );
     }

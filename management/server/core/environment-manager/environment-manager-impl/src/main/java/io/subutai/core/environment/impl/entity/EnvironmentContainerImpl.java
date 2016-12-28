@@ -436,13 +436,16 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     }
 
 
-    public EnvironmentContainerHost setHostname( final String hostname ) throws PeerException
+    public EnvironmentContainerHost setHostname( final String hostname, boolean metadataOnly ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
         Preconditions
                 .checkArgument( !StringUtils.equalsIgnoreCase( this.hostname, hostname ), "No change in hostname" );
 
-        getPeer().setContainerHostname( getContainerId(), hostname );
+        if ( !metadataOnly )
+        {
+            getPeer().setContainerHostname( getContainerId(), hostname );
+        }
 
         this.hostname = hostname;
 
