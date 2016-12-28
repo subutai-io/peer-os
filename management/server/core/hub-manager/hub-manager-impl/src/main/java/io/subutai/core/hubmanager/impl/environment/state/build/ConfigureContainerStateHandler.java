@@ -18,10 +18,10 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
@@ -69,9 +69,12 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
-    private EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
+    private EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto,
+                                             EnvironmentDto envDto )
             throws HubManagerException
     {
+        log.info( "[1] #####################################################" );
+
         try
         {
             EnvironmentId envId = new EnvironmentId( envDto.getId() );
@@ -89,8 +92,9 @@ public class ConfigureContainerStateHandler extends StateHandler
 
             boolean isSsEnv = environment != null && !Common.HUB_ID.equals( environment.getPeerId() );
 
-
             Set<String> peerSshKeys = getCurrentSshKeys( envId, isSsEnv );
+
+            log.info( "peerSshKeys: {}", peerSshKeys );
 
             Set<String> hubSshKeys = new HashSet<>();
 
@@ -105,12 +109,16 @@ public class ConfigureContainerStateHandler extends StateHandler
                 }
             }
 
+            log.info( "hubSshKeys: {}", hubSshKeys );
+
             //remove obsolete keys
             Set<String> obsoleteKeys = new HashSet<>();
 
             obsoleteKeys.addAll( peerSshKeys );
 
             obsoleteKeys.removeAll( hubSshKeys );
+
+            log.info( "obsoleteKeys: {}", obsoleteKeys );
 
             removeKeys( envId, obsoleteKeys, isSsEnv );
 
@@ -119,7 +127,10 @@ public class ConfigureContainerStateHandler extends StateHandler
 
             newKeys.addAll( hubSshKeys );
 
-            newKeys.removeAll( peerSshKeys );
+            // Fix for https://github.com/optdyn/hub/issues/2671: "newly added containers do not have the previously installed env SSH keys installed".
+            // newKeys.removeAll( peerSshKeys );
+
+            log.info( "newKeys_: {}", newKeys );
 
             if ( newKeys.isEmpty() )
             {
@@ -169,6 +180,10 @@ public class ConfigureContainerStateHandler extends StateHandler
         catch ( Exception e )
         {
             throw new HubManagerException( e );
+        }
+        finally
+        {
+            log.info( "[2] #################################################" );
         }
     }
 
