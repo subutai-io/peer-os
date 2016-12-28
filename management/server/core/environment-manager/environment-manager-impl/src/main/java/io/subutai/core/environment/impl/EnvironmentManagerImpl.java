@@ -2618,6 +2618,13 @@ public class EnvironmentManagerImpl
             {
                 Peer peer = peerManager.getPeer( containerHost.getInitiatorPeerId() );
 
+                //todo check if we have remote environment
+                //if yes then we call excludeContainerFromEnvironment
+                //otherwise we dont call it, b/c it was destroyed
+                //also
+                //if remote environment exists and this is the only container in it
+                //we need to remove the network registration and we need to cleanup local peer cache
+
                 if ( peer instanceof RemotePeer )
                 {
                     ( ( RemotePeer ) peer ).excludeContainerFromEnvironment( containerHost.getEnvironmentId().getId(),
