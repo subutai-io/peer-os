@@ -73,8 +73,6 @@ public class ConfigureContainerStateHandler extends StateHandler
                                              EnvironmentDto envDto )
             throws HubManagerException
     {
-        log.info( "[1] #####################################################" );
-
         try
         {
             EnvironmentId envId = new EnvironmentId( envDto.getId() );
@@ -94,8 +92,6 @@ public class ConfigureContainerStateHandler extends StateHandler
 
             Set<String> peerSshKeys = getCurrentSshKeys( envId, isSsEnv );
 
-            log.info( "peerSshKeys: {}", peerSshKeys );
-
             Set<String> hubSshKeys = new HashSet<>();
 
             for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
@@ -109,16 +105,12 @@ public class ConfigureContainerStateHandler extends StateHandler
                 }
             }
 
-            log.info( "hubSshKeys: {}", hubSshKeys );
-
             //remove obsolete keys
             Set<String> obsoleteKeys = new HashSet<>();
 
             obsoleteKeys.addAll( peerSshKeys );
 
             obsoleteKeys.removeAll( hubSshKeys );
-
-            log.info( "obsoleteKeys: {}", obsoleteKeys );
 
             removeKeys( envId, obsoleteKeys, isSsEnv );
 
@@ -129,8 +121,6 @@ public class ConfigureContainerStateHandler extends StateHandler
 
             // Fix for https://github.com/optdyn/hub/issues/2671: "newly added containers do not have the previously installed env SSH keys installed".
             // newKeys.removeAll( peerSshKeys );
-
-            log.info( "newKeys_: {}", newKeys );
 
             if ( newKeys.isEmpty() )
             {
@@ -180,10 +170,6 @@ public class ConfigureContainerStateHandler extends StateHandler
         catch ( Exception e )
         {
             throw new HubManagerException( e );
-        }
-        finally
-        {
-            log.info( "[2] #################################################" );
         }
     }
 
