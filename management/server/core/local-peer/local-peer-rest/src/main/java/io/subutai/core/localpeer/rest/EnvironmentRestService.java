@@ -184,4 +184,11 @@ public interface EnvironmentRestService
     Response updateContainerHostname( @PathParam( "environmentId" ) String environmentId,
                                       @PathParam( "containerId" ) String containerId,
                                       @PathParam( "hostname" ) String hostname );
+
+    @POST
+    @Path( "{environmentId}/info/{containerId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response placeEnvironmentInfoByContainerId( @PathParam( "environmentId" ) String environmentId,
+                                                @PathParam( "containerId" ) String containerId );
 }

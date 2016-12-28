@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
@@ -261,4 +262,12 @@ public interface EnvironmentManager
             throws EnvironmentNotFoundException, PeerException;
 
     Set<String> getDeletedEnvironmentsFromHub();
+
+    //called by client
+    void placeEnvironmentInfoByContainerIp( String containerIp )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
+
+    //called by remote peer
+    void placeEnvironmentInfoByContainerId( String environmentId, String containerIp )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
 }

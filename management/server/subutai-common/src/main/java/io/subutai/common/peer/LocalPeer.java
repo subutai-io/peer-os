@@ -96,6 +96,13 @@ public interface LocalPeer extends Peer
      */
     ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
 
+    /**
+     * Returns implementation of ContainerHost interface.
+     *
+     * @param hostIp IP of the container (eth0 interface)
+     */
+    ContainerHost getContainerHostByIp( final String hostIp ) throws HostNotFoundException;
+
 
     /**
      * Returns instance of management host

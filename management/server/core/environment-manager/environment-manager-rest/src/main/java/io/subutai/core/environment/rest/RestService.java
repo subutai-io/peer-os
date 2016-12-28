@@ -47,4 +47,9 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     Response getEnvironment( @PathParam( "environmentId" ) String environmentId );
 
+    @Path( "/{containerIp}/info" )
+    @POST
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response placeEnvironmentInfoByContainerIp( @PathParam( "containerIp" ) String containerIp );
 }

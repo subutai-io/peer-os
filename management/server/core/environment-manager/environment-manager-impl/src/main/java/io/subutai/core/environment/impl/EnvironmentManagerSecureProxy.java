@@ -17,6 +17,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
@@ -967,5 +968,21 @@ public class EnvironmentManagerSecureProxy
     public Set<String> getDeletedEnvironmentsFromHub()
     {
         return environmentManager.getDeletedEnvironmentsFromHub();
+    }
+
+
+    @Override
+    public void placeEnvironmentInfoByContainerIp( final String containerIp )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
+    {
+        environmentManager.placeEnvironmentInfoByContainerIp( containerIp );
+    }
+
+
+    @Override
+    public void placeEnvironmentInfoByContainerId( final String environmentId, final String containerId )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
+    {
+        environmentManager.placeEnvironmentInfoByContainerId( environmentId, containerId );
     }
 }

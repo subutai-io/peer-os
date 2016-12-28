@@ -375,6 +375,23 @@ public class LocalEnvironment implements Environment, Serializable
 
 
     @Override
+    public EnvironmentContainerHost getContainerHostByIp( String ip ) throws ContainerHostNotFoundException
+    {
+        Preconditions.checkNotNull( ip, "Invalid ip" );
+
+        for ( final EnvironmentContainerHost containerHost : getContainerHosts() )
+        {
+            if ( containerHost.getIp().equals( ip ) )
+            {
+                return containerHost;
+            }
+        }
+
+        throw new ContainerHostNotFoundException( String.format( "Container host not found by ip %s", ip ) );
+    }
+
+
+    @Override
     public Set<EnvironmentContainerHost> getContainerHostsByPeerId( String id )
     {
         Preconditions.checkNotNull( id, "Invalid id" );

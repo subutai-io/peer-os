@@ -44,6 +44,11 @@ public interface ResourceHost extends Host, ResourceHostInfo
     ContainerHost getContainerHostById( String id ) throws HostNotFoundException;
 
     /**
+     * Returns hosted container by its eth0 ip
+     */
+    ContainerHost getContainerHostByIp( String hostIp ) throws HostNotFoundException;
+
+    /**
      * Starts hosted container
      */
     void startContainerHost( ContainerHost containerHost ) throws ResourceHostException;

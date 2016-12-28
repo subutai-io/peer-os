@@ -981,6 +981,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @PermitAll
     @Override
+    public ContainerHost getContainerHostByIp( final String hostIp ) throws HostNotFoundException
+    {
+        Preconditions.checkNotNull( hostIp, "Invalid container host id" );
+
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            try
+            {
+                return resourceHost.getContainerHostByIp( hostIp );
+            }
+            catch ( HostNotFoundException e )
+            {
+                //ignore
+            }
+        }
+
+        throw new HostNotFoundException( String.format( "Container host not found by ip %s", hostIp ) );
+    }
+
+
+    @PermitAll
+    @Override
     public ResourceHost getResourceHostByHostName( String hostname ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid resource host hostname" );

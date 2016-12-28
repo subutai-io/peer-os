@@ -105,6 +105,8 @@ public interface Environment extends RelationLink
      */
     EnvironmentContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException;
 
+    EnvironmentContainerHost getContainerHostByIp( String ip ) throws ContainerHostNotFoundException;
+
     Set<EnvironmentContainerHost> getContainerHostsByPeerId( String id );
 
     /**
