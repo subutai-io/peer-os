@@ -600,7 +600,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						$('#js-container-name').prop('disabled', false);
 					}
 					$('#js-container-size').val(currentTemplate.get('quotaSize')).trigger('change');
-					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
+					containerSettingMenu.find('.header').html('Settings for <b>' + this.model.get('templateName') + '</b> container');
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({
 						'left': (elementPos.x + 12) + 'px',
