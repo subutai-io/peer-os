@@ -263,7 +263,7 @@ public interface EnvironmentManager
 
     Set<String> getDeletedEnvironmentsFromHub();
 
-    //called by client
+    //called by local client
     void placeEnvironmentInfoByContainerIp( String containerIp ) throws PeerException, CommandException;
 
     //called by remote peer

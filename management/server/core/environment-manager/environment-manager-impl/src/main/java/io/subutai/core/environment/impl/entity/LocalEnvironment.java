@@ -42,6 +42,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.HubEnvironment;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -563,8 +564,9 @@ public class LocalEnvironment implements Environment, Serializable
 
             containerDtos.add( new ContainerDto( host.getId(), getId(), host.getHostname(), host.getIp(),
                     host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
-                    host.getPeerId(), host.getResourceHostId().getId(), isLocalContainer, Common.SUBUTAI_ID,
-                    containerHostState, host.getTemplateId(), host.getContainerName() ) );
+                    host.getPeerId(), host.getResourceHostId().getId(), isLocalContainer,
+                    this instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID, containerHostState,
+                    host.getTemplateId(), host.getContainerName() ) );
         }
 
         return containerDtos;

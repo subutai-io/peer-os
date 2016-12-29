@@ -2018,7 +2018,8 @@ public class EnvironmentManagerImpl
         {
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            environment.getContainerDtos(), environment.getClass().getName(),
+                            environment.getContainerDtos(),
+                            environment instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID,
                             getEnvironmentOwnerName( environment ) );
 
             environmentDtos.add( environmentDto );
@@ -2646,6 +2647,7 @@ public class EnvironmentManagerImpl
     }
 
 
+    //called by local client
     @Override
     public void placeEnvironmentInfoByContainerIp( final String containerIp ) throws PeerException, CommandException
     {
@@ -2694,12 +2696,12 @@ public class EnvironmentManagerImpl
     }
 
 
+    //called by remote peer
     @Override
     public void placeEnvironmentInfoByContainerId( final String environmentId, final String containerId )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
     {
         final LocalEnvironment environment = environmentService.find( environmentId );
-
 
         if ( environment == null )
         {
@@ -2711,10 +2713,10 @@ public class EnvironmentManagerImpl
 
         setTransientFields( Sets.<Environment>newHashSet( environment ) );
 
-
         EnvironmentDto environmentDto =
                 new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                        environment.getContainerDtos(), environment.getClass().getName(),
+                        environment.getContainerDtos(),
+                        environment instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID,
                         getEnvironmentOwnerName( environment ) );
 
         placeInfoIntoContainer( environmentDto, containerHost );
