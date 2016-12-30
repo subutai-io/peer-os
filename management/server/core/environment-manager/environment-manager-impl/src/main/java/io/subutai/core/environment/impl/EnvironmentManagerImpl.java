@@ -71,7 +71,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.RhP2pIpImpl;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -2830,9 +2829,8 @@ public class EnvironmentManagerImpl
 
     private void destroyTunnelToPeer( EnvironmentPeer environmentPeer, Environment environment )
     {
-        Set<RhP2pIpImpl> rhP2pIps = Sets.newHashSet();
-        rhP2pIps.addAll( ( Collection<? extends RhP2pIpImpl> ) environmentPeer.getRhP2pIps() );
-        P2pIps p2pIps = new P2pIps( rhP2pIps );
+        P2pIps p2pIps = new P2pIps();
+        p2pIps.addP2pIps( environmentPeer.getRhP2pIps() );
 
         try
         {

@@ -2255,7 +2255,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( results.hasFailures() )
         {
-            String errMsg = "Error deleting tunnels across all RHs";
+            String errMsg = "Error deleting tunnels across all RHs: " + results.getFirstFailedTask().getFailureReason();
 
             LOG.error( errMsg );
 

@@ -265,7 +265,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public void deleteTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException
     {
-        //TODO
+        Tunnels tunnels = getTunnels();
+
+        for ( RhP2pIp rhP2pIp : p2pIps.getP2pIps() )
+        {
+            Tunnel tunnel = tunnels.findByIp( rhP2pIp.getP2pIp() );
+
+            if ( tunnel != null )
+            {
+                deleteTunnel( tunnel );
+            }
+        }
     }
 
 
@@ -797,6 +807,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             getNetworkManager().createTunnel( this, tunnel.getTunnelName(), tunnel.getTunnelIp(), tunnel.getVlan(),
                     tunnel.getVni() );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to create tunnel: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    public void deleteTunnel( final Tunnel tunnel ) throws ResourceHostException
+    {
+        Preconditions.checkNotNull( tunnel, "Invalid tunnel" );
+
+        try
+        {
+            getNetworkManager().deleteTunnel( this, tunnel.getTunnelName() );
         }
         catch ( NetworkManagerException e )
         {

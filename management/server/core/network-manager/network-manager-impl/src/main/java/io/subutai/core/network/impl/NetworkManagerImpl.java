@@ -190,6 +190,16 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void deleteTunnel( final Host host, final String tunnelName ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelName ), "Invalid tunnel name" );
+
+        execute( host, commands.getDeleteTunnelCommand( tunnelName ) );
+    }
+
+
+    @Override
     public Tunnels getTunnels( final Host host ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
