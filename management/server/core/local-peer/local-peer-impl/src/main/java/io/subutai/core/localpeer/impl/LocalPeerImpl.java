@@ -2373,6 +2373,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( reservedNetworkResource == null )
         {
             LOG.warn( "Network reservation for environment {} not found", environmentId.getId() );
+
             return;
         }
 
@@ -2426,11 +2427,36 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //remove reservation
         try
         {
+            removeNetworkReservation( environmentId.getId() );
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+    }
+
+
+    @Override
+    public void removeNetworkReservation( String environmentId ) throws PeerException
+    {
+        final NetworkResource reservedNetworkResource =
+                getReservedNetworkResources().findByEnvironmentId( environmentId );
+
+        if ( reservedNetworkResource == null )
+        {
+            LOG.warn( "Network reservation for environment {} not found", environmentId );
+
+            return;
+        }
+
+        try
+        {
             networkResourceDao.delete( ( NetworkResourceEntity ) reservedNetworkResource );
         }
         catch ( DaoException e )
         {
-            LOG.error( "Failed to delete network reservation for environment {}", environmentId.getId(), e );
+            throw new PeerException(
+                    String.format( "Failed to delete network reservation for environment %s", environmentId ), e );
         }
     }
 

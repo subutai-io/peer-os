@@ -2553,7 +2553,7 @@ public class EnvironmentManagerImpl
                                     currentHostname );
                 }
             }
-            catch ( Exception e )
+            catch ( PeerException e )
             {
                 LOG.error( "Error updating container hostname on remote peer: {}", e.getMessage() );
             }
@@ -2579,6 +2579,7 @@ public class EnvironmentManagerImpl
         {
             try
             {
+                //remote container metadata
                 EnvironmentContainerImpl environmentContainerHost =
                         ( EnvironmentContainerImpl ) environment.getContainerHostById( containerInfo.getId() );
 
@@ -2586,6 +2587,7 @@ public class EnvironmentManagerImpl
 
                 Environment env = environmentContainerHost.destroy( true );
 
+                //if environment got empty, remove environment metadata
                 if ( env.getContainerHosts().isEmpty() )
                 {
                     remove( ( LocalEnvironment ) env );
@@ -2597,6 +2599,7 @@ public class EnvironmentManagerImpl
                     notifyOnContainerDestroyed( env, containerInfo.getId() );
                 }
 
+                //remove security relation
                 relationManager.removeRelation( containerHost );
 
                 break;
@@ -2613,18 +2616,57 @@ public class EnvironmentManagerImpl
             }
         }
 
+        //remove container from local peer cache
+        try
+        {
+            peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId() )
+                       .removeContainerHost( containerHost );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.warn( e.getMessage() );
+        }
+
+        //process an x-peer environment
+        RemoteEnvironment xPeerEnvironment = null;
+
         if ( !environmentFound && !Common.HUB_ID.equals( containerHost.getInitiatorPeerId() ) )
         {
+            Set<RemoteEnvironment> remoteEnvironments = getRemoteEnvironments( false );
+
+            for ( RemoteEnvironment remoteEnvironment : remoteEnvironments )
+            {
+                if ( remoteEnvironment.getId().equals( containerHost.getEnvironmentId().getId() ) )
+                {
+                    xPeerEnvironment = remoteEnvironment;
+
+                    break;
+                }
+            }
+        }
+
+        if ( xPeerEnvironment != null )
+        {
+            //if this is the only container in a remote environment
+            //we need to remove the environment
+            //environment.getContainerDtos() is used b/c getContainers exposes containers to owner only
+            if ( xPeerEnvironment.getContainerDtos().isEmpty() || ( xPeerEnvironment.getContainerDtos().size() == 1
+                    && containerHost.getId().equals( xPeerEnvironment.getContainerDtos().iterator().next().getId() ) ) )
+            {
+                try
+                {
+                    peerManager.getLocalPeer().removeNetworkReservation( containerHost.getEnvironmentId().getId() );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( "Error removing network reservation for remote environment: {}", e.getMessage() );
+                }
+            }
+
+            //notify remote peer about container destruction
             try
             {
                 Peer peer = peerManager.getPeer( containerHost.getInitiatorPeerId() );
-
-                //todo check if we have remote environment
-                //if yes then we call excludeContainerFromEnvironment
-                //otherwise we dont call it, b/c it was destroyed
-                //also
-                //if remote environment exists and this is the only container in it
-                //we need to remove the network registration and we need to cleanup local peer cache
 
                 if ( peer instanceof RemotePeer )
                 {
@@ -2632,7 +2674,7 @@ public class EnvironmentManagerImpl
                             containerHost.getId() );
                 }
             }
-            catch ( Exception e )
+            catch ( PeerException e )
             {
                 LOG.error( "Error excluding container from environment on remote peer: {}", e.getMessage() );
             }
@@ -2692,6 +2734,8 @@ public class EnvironmentManagerImpl
             LOG.error( "Error requesting placement of environment info on remote peer: {}", e.getMessage() );
 
             throw e;
+
+            // TODO in case of connection error we could place information about local containers of remote env only
         }
     }
 

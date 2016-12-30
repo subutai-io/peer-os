@@ -24,7 +24,7 @@ function TenantsViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTO
 		DTColumnBuilder.newColumn('name').withTitle('Name'),
 		DTColumnBuilder.newColumn('username').withTitle('User'),
 		DTColumnBuilder.newColumn('id').withTitle('ID'),
-		DTColumnBuilder.newColumn('dataSource').withTitle('Source').renderWith(parseSource),
+		DTColumnBuilder.newColumn('dataSource').withTitle('Source'),
 		DTColumnBuilder.newColumn('status').withTitle('Status').renderWith(actionStatus),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
@@ -40,17 +40,6 @@ function TenantsViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTO
 			'tooltip-side="right">',
 		'</div> ' + data].join('');
 		return statusString;
-	}
-
-	function parseSource(data, type, full, meta) {
-		if(data.endsWith("LocalEnvironment")){
-		    return "Local";
-		}
-		else if(data.endsWith("RemoteEnvironment")){
-		    return "Remote";
-		}else{
-		    return "Hub";
-		}
 	}
 
 	function actionDelete(data, type, full, meta) {

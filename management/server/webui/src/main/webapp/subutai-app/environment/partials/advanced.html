@@ -287,7 +287,7 @@
             <td class="b-word-break-all">
               <a tooltips
                  ui-sref="containers({ environmentId: environment.id })"
-                 tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}. Source: {{ environment.dataSource == "hub" ? "Hub" : "Local" }}</span>'
+                 tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}. Source: {{ environment.dataSource }}</span>'
                  tooltip-side="right"
                  env-data-source="{{ environment.dataSource }}">
                 {{ environment.name }}
