@@ -203,7 +203,5 @@ public interface LocalPeer extends Peer
     Template getTemplateById( String templateId ) throws PeerException;
 
     boolean destroyNotRegisteredContainer( String containerId ) throws PeerException;
-
-    void removeNetworkReservation( String environmentId ) throws PeerException;
 }
 

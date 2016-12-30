@@ -1899,6 +1899,12 @@ public class EnvironmentManagerImpl
     {
         LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
+        Set<EnvironmentContainerHost> peerContainers = environment.getContainerHostsByPeerId( peerId );
+
+        EnvironmentPeer environmentPeer = environment.getEnvironmentPeer( peerId );
+
+        destroyTunnelToPeer( environmentPeer );
+
         environment.excludePeerFromEnvironment( peerId );
 
         if ( environment.getEnvironmentPeers().isEmpty() )
@@ -1910,6 +1916,11 @@ public class EnvironmentManagerImpl
         else
         {
             update( environment );
+
+            for ( EnvironmentContainerHost containerHost : peerContainers )
+            {
+                notifyOnContainerDestroyed( environment, containerHost.getId() );
+            }
         }
     }
 
@@ -1922,11 +1933,16 @@ public class EnvironmentManagerImpl
 
         EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
+
         environment.removeContainer( containerHost );
 
         if ( environment.getContainerHostsByPeerId( containerHost.getPeerId() ).isEmpty() )
         {
+            EnvironmentPeer environmentPeer = environment.getEnvironmentPeer( containerHost.getPeerId() );
+
             environment.removeEnvironmentPeer( containerHost.getPeerId() );
+
+            destroyTunnelToPeer( environmentPeer );
         }
 
         if ( environment.getEnvironmentPeers().isEmpty() )
@@ -2583,6 +2599,9 @@ public class EnvironmentManagerImpl
                 EnvironmentContainerImpl environmentContainerHost =
                         ( EnvironmentContainerImpl ) environment.getContainerHostById( containerInfo.getId() );
 
+                EnvironmentPeer environmentPeer =
+                        ( ( LocalEnvironment ) environment ).getEnvironmentPeer( environmentContainerHost.getPeerId() );
+
                 environmentFound = true;
 
                 Environment env = environmentContainerHost.destroy( true );
@@ -2593,6 +2612,8 @@ public class EnvironmentManagerImpl
                     remove( ( LocalEnvironment ) env );
 
                     notifyOnEnvironmentDestroyed( env.getId() );
+
+                    destroyTunnelToPeer( environmentPeer );
                 }
                 else
                 {
@@ -2650,16 +2671,17 @@ public class EnvironmentManagerImpl
             //if this is the only container in a remote environment
             //we need to remove the environment
             //environment.getContainerDtos() is used b/c getContainers exposes containers to owner only
+
             if ( xPeerEnvironment.getContainerDtos().isEmpty() || ( xPeerEnvironment.getContainerDtos().size() == 1
                     && containerHost.getId().equals( xPeerEnvironment.getContainerDtos().iterator().next().getId() ) ) )
             {
                 try
                 {
-                    peerManager.getLocalPeer().removeNetworkReservation( containerHost.getEnvironmentId().getId() );
+                    peerManager.getLocalPeer().cleanupEnvironment( xPeerEnvironment.getEnvironmentId() );
                 }
                 catch ( PeerException e )
                 {
-                    LOG.error( "Error removing network reservation for remote environment: {}", e.getMessage() );
+                    LOG.error( "Error cleaning up remote environment: {}", e.getMessage() );
                 }
             }
 
@@ -2781,5 +2803,11 @@ public class EnvironmentManagerImpl
             containerHost.execute( new RequestBuilder(
                     String.format( "rm /root/env ; echo '%s' > /root/env", JsonUtil.toJson( environmentDto ) ) ) );
         }
+    }
+
+
+    private void destroyTunnelToPeer( EnvironmentPeer environmentPeer )
+    {
+        //TODO destroy tunnel, catch and log exceptions
     }
 }
