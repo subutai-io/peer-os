@@ -461,6 +461,9 @@ public class LocalEnvironment implements Environment, Serializable
             if ( environmentPeer.getPeerId().equals( peerId ) )
             {
                 iterator.remove();
+
+                ( ( EnvironmentPeerImpl ) environmentPeer ).setEnvironment( null );
+
                 break;
             }
         }
@@ -643,7 +646,16 @@ public class LocalEnvironment implements Environment, Serializable
     {
         Preconditions.checkNotNull( container );
 
-        this.containers.remove( container );
+        try
+        {
+            EnvironmentContainerHost environmentContainerHost = getContainerHostById( container.getId() );
+            ( ( EnvironmentContainerImpl ) environmentContainerHost ).nullEnvironment();
+            this.containers.remove( container );
+        }
+        catch ( ContainerHostNotFoundException e )
+        {
+            //ignore
+        }
     }
 
 

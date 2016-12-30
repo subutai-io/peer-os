@@ -70,6 +70,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -1903,7 +1904,7 @@ public class EnvironmentManagerImpl
 
         EnvironmentPeer environmentPeer = environment.getEnvironmentPeer( peerId );
 
-        destroyTunnelToPeer( environmentPeer );
+        destroyTunnelToPeer( environmentPeer, environment );
 
         environment.excludePeerFromEnvironment( peerId );
 
@@ -1945,7 +1946,7 @@ public class EnvironmentManagerImpl
 
             environment.removeEnvironmentPeer( containerHost.getPeerId() );
 
-            destroyTunnelToPeer( environmentPeer );
+            destroyTunnelToPeer( environmentPeer, environment );
         }
 
         if ( environment.getEnvironmentPeers().isEmpty() )
@@ -2826,8 +2827,18 @@ public class EnvironmentManagerImpl
     }
 
 
-    private void destroyTunnelToPeer( EnvironmentPeer environmentPeer )
+    private void destroyTunnelToPeer( EnvironmentPeer environmentPeer, Environment environment )
     {
-        //TODO destroy vxlan tunnel and p2p connection, catch and log exceptions
+        P2pIps p2pIps = new P2pIps();
+        p2pIps.addP2pIps( environmentPeer.getRhP2pIps() );
+
+        try
+        {
+            peerManager.getLocalPeer().deleteTunnels( p2pIps, environment.getEnvironmentId() );
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error destroying tunnels to peer {}: {}", environmentPeer.getPeerId(), e.getMessage() );
+        }
     }
 }
