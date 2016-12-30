@@ -317,11 +317,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
         Environment env = environmentManager.update( ( LocalEnvironment ) parent );
 
-        environment = null;
-
         environmentManager.notifyOnContainerDestroyed( env, getId() );
 
         return env;
+    }
+
+
+    public void nullEnvironment()
+    {
+        environment = null;
     }
 
 

@@ -263,6 +263,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    public void deleteTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException
+    {
+        //TODO
+    }
+
+
     protected NetworkManager getNetworkManager()
     {
         return ServiceLocator.lookup( NetworkManager.class );

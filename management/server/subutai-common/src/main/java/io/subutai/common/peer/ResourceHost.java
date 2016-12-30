@@ -75,6 +75,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
 
+    void deleteTunnels(P2pIps p2pIps, NetworkResource networkResource) throws ResourceHostException;
+
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 
     Set<ContainerHost> getContainerHostsByOwnerId( String ownerId );
