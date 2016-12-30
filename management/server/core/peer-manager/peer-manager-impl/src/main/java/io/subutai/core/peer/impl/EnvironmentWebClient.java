@@ -820,7 +820,7 @@ public class EnvironmentWebClient
         {
             remotePeer.checkRelation();
             String path = String.format( "/%s/info/%s", environmentId, containerId );
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );

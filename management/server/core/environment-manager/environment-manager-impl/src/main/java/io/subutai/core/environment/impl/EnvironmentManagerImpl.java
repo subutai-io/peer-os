@@ -2755,9 +2755,24 @@ public class EnvironmentManagerImpl
         {
             LOG.error( "Error requesting placement of environment info on remote peer: {}", e.getMessage() );
 
-            throw e;
+            for ( EnvironmentDto environmentDto : environmentDtos )
+            {
+                if ( REMOTE_OWNER_NAME.equalsIgnoreCase( environmentDto.getUsername() ) )
+                {
+                    for ( ContainerDto containerDto : environmentDto.getContainers() )
+                    {
+                        if ( containerIp.equals( containerDto.getIp() ) )
+                        {
+                            placeInfoIntoContainer( environmentDto, containerHost );
 
-            // TODO in case of connection error we could place information about local containers of remote env only
+                            return;
+                        }
+                    }
+                }
+            }
+
+            //rethrow error if env metadata not found
+            throw e;
         }
     }
 
