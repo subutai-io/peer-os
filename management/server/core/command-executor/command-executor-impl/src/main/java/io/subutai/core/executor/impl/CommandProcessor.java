@@ -247,7 +247,10 @@ public class CommandProcessor implements RestProcessor
                         {
                             ResourceHostInfo resourceHostInfo = getResourceHostInfo( commandProcess.getRhId() );
 
-                            notifyAgent( resourceHostInfo );
+                            if ( !notifyAgent( resourceHostInfo, null ) )
+                            {
+                                notifyAgent( resourceHostInfo, Common.WAN_INTERFACE );
+                            }
                         }
                         catch ( Exception e )
                         {
@@ -260,14 +263,14 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    void notifyAgent( ResourceHostInfo resourceHostInfo )
+    boolean notifyAgent( ResourceHostInfo resourceHostInfo, String interfaceName )
     {
         WebClient webClient = null;
         javax.ws.rs.core.Response response = null;
 
         try
         {
-            webClient = getWebClient( resourceHostInfo );
+            webClient = getWebClient( resourceHostInfo, interfaceName );
 
             response = webClient.form( new Form() );
 
@@ -276,6 +279,15 @@ public class CommandProcessor implements RestProcessor
             {
                 hostRegistry.updateResourceHostEntryTimestamp( resourceHostInfo.getId() );
             }
+
+            return true;
+        }
+        catch ( Exception e )
+        {
+
+            LOG.error( "Error notifying agent: {}", e.getMessage() );
+
+            return false;
         }
         finally
         {
@@ -284,11 +296,11 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    WebClient getWebClient( ResourceHostInfo resourceHostInfo )
+    WebClient getWebClient( ResourceHostInfo resourceHostInfo, String interfaceName )
     {
-        return RestUtil.createWebClient(
-                String.format( "http://%s:%d/trigger", hostRegistry.getResourceHostIp( resourceHostInfo ),
-                        Common.DEFAULT_AGENT_PORT ), 3000, 5000, 1 );
+        return RestUtil.createWebClient( String.format( "http://%s:%d/trigger",
+                hostRegistry.getResourceHostIp( resourceHostInfo, interfaceName ), Common.DEFAULT_AGENT_PORT ), 3000,
+                5000, 1 );
     }
 
 

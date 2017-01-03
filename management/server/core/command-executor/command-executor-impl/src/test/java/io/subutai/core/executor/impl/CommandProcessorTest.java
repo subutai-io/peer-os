@@ -246,12 +246,12 @@ public class CommandProcessorTest
         WebClient webClient = mock( WebClient.class );
         Response response = mock( Response.class );
 
-        doReturn( "IP" ).when( hostRegistry ).getResourceHostIp( resourceHostInfo );
-        doReturn( webClient ).when( commandProcessor ).getWebClient( resourceHostInfo );
+        doReturn( "IP" ).when( hostRegistry ).getResourceHostIp( resourceHostInfo, null );
+        doReturn( webClient ).when( commandProcessor ).getWebClient( resourceHostInfo ,null);
         doReturn( response ).when( webClient ).form( any( Form.class ) );
         doReturn( Response.Status.ACCEPTED.getStatusCode() ).when( response ).getStatus();
 
-        commandProcessor.notifyAgent( resourceHostInfo );
+        commandProcessor.notifyAgent( resourceHostInfo, null );
 
         verify( hostRegistry ).updateResourceHostEntryTimestamp( HOST_ID );
     }
