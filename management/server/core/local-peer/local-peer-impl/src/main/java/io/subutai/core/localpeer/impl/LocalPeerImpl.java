@@ -127,9 +127,10 @@ import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.NetworkResourceEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 import io.subutai.core.localpeer.impl.tasks.CleanupEnvironmentTask;
+import io.subutai.core.localpeer.impl.tasks.DeleteTunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
 import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
-import io.subutai.core.localpeer.impl.tasks.TunnelsTask;
+import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
@@ -2206,7 +2207,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             //setup tunnel only if this RH participates in the swarm
             if ( p2pIps.findByRhId( resourceHost.getId() ) != null )
             {
-                tasks.addTask( resourceHost, new TunnelsTask( resourceHost, p2pIps, reservedNetworkResource ) );
+                tasks.addTask( resourceHost, new SetupTunnelsTask( resourceHost, p2pIps, reservedNetworkResource ) );
             }
         }
 
@@ -2222,6 +2223,43 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( errMsg );
 
             throw new PeerException( errMsg, task.getException() );
+        }
+    }
+
+
+    @Override
+    public void deleteTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final NetworkResource reservedNetworkResource =
+                getReservedNetworkResources().findByEnvironmentId( environmentId.getId() );
+
+        if ( reservedNetworkResource == null )
+        {
+            throw new PeerException(
+                    String.format( "No reserved network resources found for environment %s", environmentId ) );
+        }
+
+        Set<ResourceHost> resourceHostSet = getResourceHosts();
+
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
+
+        for ( final ResourceHost resourceHost : resourceHostSet )
+        {
+            tasks.addTask( resourceHost, new DeleteTunnelsTask( resourceHost, p2pIps, reservedNetworkResource ) );
+        }
+
+        HostUtil.Results results = hostUtil.execute( tasks, reservedNetworkResource.getEnvironmentId() );
+
+        if ( results.hasFailures() )
+        {
+            String errMsg = "Error deleting tunnels across all RHs: " + results.getFirstFailedTask().getFailureReason();
+
+            LOG.error( errMsg );
+
+            throw new PeerException( errMsg );
         }
     }
 

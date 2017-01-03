@@ -20,8 +20,8 @@ public interface NetworkManager
     /**
      * Sets up an P2P connection on specified host with explicit IP.
      */
-    public void joinP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
-                              long secretKeyTtlSec ) throws NetworkManagerException;
+    void joinP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
+                       long secretKeyTtlSec ) throws NetworkManagerException;
 
 
     /**
@@ -32,7 +32,7 @@ public interface NetworkManager
      * @param newSecretKey - new secret key to set
      * @param ttlSeconds - time-to-live for the new secret key
      */
-    public void resetSwarmSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
+    void resetSwarmSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
 
@@ -42,17 +42,18 @@ public interface NetworkManager
      * @param host - host
      */
 
-    public P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
+    P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
 
-    public String getP2pVersion( Host host ) throws NetworkManagerException;
+    String getP2pVersion( Host host ) throws NetworkManagerException;
 
-    public P2pLogs getP2pLogs( Host host, JournalCtlLevel logLevel, Date from, Date till )
+    P2pLogs getP2pLogs( Host host, JournalCtlLevel logLevel, Date from, Date till ) throws NetworkManagerException;
+
+    void createTunnel( Host host, String tunnelName, String tunnelIp, int vlan, long vni )
             throws NetworkManagerException;
 
-    public void createTunnel( Host host, String tunnelName, String tunnelIp, int vlan, long vni )
-            throws NetworkManagerException;
+    void deleteTunnel( Host host, String tunnelName ) throws NetworkManagerException;
 
-    public Tunnels getTunnels( Host host ) throws NetworkManagerException;
+    Tunnels getTunnels( Host host ) throws NetworkManagerException;
 
 
     /**
@@ -62,7 +63,7 @@ public interface NetworkManager
      *
      * @return - domain or null if not assigned
      */
-    public String getVlanDomain( int vLanId ) throws NetworkManagerException;
+    String getVlanDomain( int vLanId ) throws NetworkManagerException;
 
 
     /**
@@ -70,7 +71,7 @@ public interface NetworkManager
      *
      * @param vLanId - vlan id
      */
-    public void removeVlanDomain( int vLanId ) throws NetworkManagerException;
+    void removeVlanDomain( int vLanId ) throws NetworkManagerException;
 
     /**
      * Assigns reverse proxy domain to vlan
@@ -79,8 +80,8 @@ public interface NetworkManager
      * @param proxyLoadBalanceStrategy - strategy to load balance requests to the domain
      * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
-    public void setVlanDomain( int vLanId, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                               String sslCertPath ) throws NetworkManagerException;
+    void setVlanDomain( int vLanId, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
+                        String sslCertPath ) throws NetworkManagerException;
 
 
     /**
@@ -91,7 +92,7 @@ public interface NetworkManager
      *
      * @return - true if ip is in vlan domain, false otherwise
      */
-    public boolean isIpInVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
+    boolean isIpInVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
 
     /**
      * Adds ip to vlan reverse proxy domain
@@ -99,7 +100,7 @@ public interface NetworkManager
      * @param hostIp - ip to add
      * @param vLanId - vlan id
      */
-    public void addIpToVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
+    void addIpToVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
 
     /**
      * Removes ip from reverse proxy domain
@@ -107,7 +108,7 @@ public interface NetworkManager
      * @param hostIp - ip to remove
      * @param vLanId - vlan id
      */
-    public void removeIpFromVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
+    void removeIpFromVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
 
     /**
      * Sets up SSH connectivity for container identified by @param containerIp
