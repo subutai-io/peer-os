@@ -338,27 +338,27 @@ public class HostRegistryImplTest
     public void testUpdateHost() throws Exception
     {
         WebClient webClient = mock( WebClient.class );
-        doReturn( webClient ).when( registry ).getWebClient( any( ResourceHostInfo.class ), anyString() );
+        doReturn( webClient ).when( registry ).getWebClient( any( ResourceHostInfo.class ), anyString(), anyString() );
         Response response = mock( Response.class );
         doReturn( response ).when( webClient ).get();
         doReturn( Response.Status.OK.getStatusCode() ).when( response ).getStatus();
 
-        registry.updateHost( resourceHostInfo );
+        registry.updateHost( resourceHostInfo, null );
 
         verify( registry ).updateResourceHostEntryTimestamp( HOST_ID );
 
         ResourceHost resourceHost = mock( ResourceHost.class );
         doReturn( HOST_ID ).when( resourceHost ).getId();
 
-        registry.updateHost( resourceHost );
+        registry.updateHost( resourceHost, null );
 
         verify( registry ).getResourceHostInfoById( HOST_ID );
 
         doThrow( new HostDisconnectedException( null ) ).when( registry ).getResourceHostInfoById( HOST_ID );
 
-        registry.updateHost( resourceHost );
+        registry.updateHost( resourceHost, null );
 
-        verify( registry ).requestHeartbeat( resourceHost );
+        verify( registry ).requestHeartbeat( resourceHost, null );
     }
 
 
@@ -371,14 +371,14 @@ public class HostRegistryImplTest
         doReturn( hostInterfaces ).when( resourceHostInfo ).getHostInterfaces();
         doReturn( hostInterface ).when( ipUtil ).findAddressableIface( anySet(), anyString() );
 
-        registry.getResourceHostIp( resourceHostInfo );
+        registry.getResourceHostIp( resourceHostInfo, null );
 
         verify( hostInterface ).getIp();
 
         ResourceHost resourceHost = mock( ResourceHost.class );
         doReturn( hostInterfaces ).when( resourceHost ).getHostInterfaces();
 
-        registry.getResourceHostIp( resourceHost );
+        registry.getResourceHostIp( resourceHost, null );
 
         verify( hostInterface, times( 2 ) ).getIp();
     }

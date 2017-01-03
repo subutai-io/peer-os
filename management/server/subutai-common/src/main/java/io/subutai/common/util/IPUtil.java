@@ -124,10 +124,30 @@ public class IPUtil
     }
 
 
+    public HostInterface findInterfaceByName( Set<HostInterface> allInterfaces, String interfaceName )
+    {
+        return findInterfaceByName( allInterfaces, interfaceName );
+    }
+
+
     public static boolean isIpValid( HostInterface hostInterface )
     {
         return hostInterface != null && !( hostInterface instanceof NullHostInterface ) && !Strings
                 .isNullOrEmpty( hostInterface.getIp() ) && !hostInterface.getIp().trim().isEmpty();
+    }
+
+
+    public static HostInterface getInterfaceByName( Set<HostInterface> allInterfaces, String interfaceName )
+    {
+        for ( HostInterface hostInterface : allInterfaces )
+        {
+            if ( interfaceName.equals( hostInterface.getName() ) )
+            {
+                return hostInterface;
+            }
+        }
+
+        return NullHostInterface.getInstance();
     }
 
 

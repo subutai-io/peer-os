@@ -312,17 +312,7 @@ public class HostRegistryImpl implements HostRegistry
             //we need to re-request heartbeat from agent based on cache entries
             if ( cachedResourceHosts.size() > registeredResourceHosts.size() )
             {
-                for ( final ResourceHostInfo resourceHostInfo : cachedResourceHosts )
-                {
-                    threadPool.execute( new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            requestHeartbeat( resourceHostInfo );
-                        }
-                    } );
-                }
+                requestHeartbeats( cachedResourceHosts );
 
                 return;
             }
@@ -347,17 +337,7 @@ public class HostRegistryImpl implements HostRegistry
 
                     allHosts.addAll( cachedResourceHosts );
 
-                    for ( final ResourceHostInfo resourceHostInfo : allHosts )
-                    {
-                        threadPool.execute( new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                requestHeartbeat( resourceHostInfo );
-                            }
-                        } );
-                    }
+                    requestHeartbeats( allHosts );
 
                     return;
                 }
@@ -389,21 +369,43 @@ public class HostRegistryImpl implements HostRegistry
                 @Override
                 public void run()
                 {
-                    updateHost( resourceHostInfo );
+                    if ( !updateHost( resourceHostInfo, null ) )
+                    {
+                        updateHost( resourceHostInfo, Common.WAN_INTERFACE );
+                    }
                 }
             } );
         }
     }
 
 
-    void updateHost( ResourceHostInfo resourceHostInfo )
+    void requestHeartbeats( Set<ResourceHostInfo> resourceHosts )
+    {
+        for ( final ResourceHostInfo resourceHostInfo : resourceHosts )
+        {
+            threadPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if ( !requestHeartbeat( resourceHostInfo, null ) )
+                    {
+                        requestHeartbeat( resourceHostInfo, Common.WAN_INTERFACE );
+                    }
+                }
+            } );
+        }
+    }
+
+
+    boolean updateHost( ResourceHostInfo resourceHostInfo, String interfaceName )
     {
         WebClient webClient = null;
         Response response = null;
 
         try
         {
-            webClient = getWebClient( resourceHostInfo, "ping" );
+            webClient = getWebClient( resourceHostInfo, "ping", interfaceName );
 
             response = webClient.get();
 
@@ -417,7 +419,7 @@ public class HostRegistryImpl implements HostRegistry
                     }
                     catch ( HostDisconnectedException e )
                     {
-                        requestHeartbeat( resourceHostInfo );
+                        return requestHeartbeat( resourceHostInfo, interfaceName );
                     }
                 }
                 else
@@ -425,10 +427,14 @@ public class HostRegistryImpl implements HostRegistry
                     updateResourceHostEntryTimestamp( resourceHostInfo.getId() );
                 }
             }
+
+            return true;
         }
         catch ( Exception e )
         {
             LOG.error( "Error checking host {}: {}", resourceHostInfo, e.getMessage() );
+
+            return false;
         }
         finally
         {
@@ -437,19 +443,23 @@ public class HostRegistryImpl implements HostRegistry
     }
 
 
-    void requestHeartbeat( ResourceHostInfo resourceHostInfo )
+    boolean requestHeartbeat( ResourceHostInfo resourceHostInfo, String interfaceName )
     {
         WebClient webClient = null;
         Response response = null;
 
         try
         {
-            webClient = getWebClient( resourceHostInfo, "heartbeat" );
+            webClient = getWebClient( resourceHostInfo, "heartbeat", interfaceName );
             response = webClient.get();
+
+            return true;
         }
         catch ( Exception e )
         {
             LOG.warn( "Error requesting heartbeat: {}", e.getMessage() );
+
+            return false;
         }
         finally
         {
@@ -458,16 +468,16 @@ public class HostRegistryImpl implements HostRegistry
     }
 
 
-    WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action )
+    WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action, String interfaceName )
     {
         return RestUtil.createWebClient(
-                String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ), Common.DEFAULT_AGENT_PORT,
-                        action ), 3000, 5000, 1 );
+                String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo, interfaceName ),
+                        Common.DEFAULT_AGENT_PORT, action ), 3000, 5000, 1 );
     }
 
 
     @Override
-    public String getResourceHostIp( ResourceHostInfo resourceHostInfo )
+    public String getResourceHostIp( ResourceHostInfo resourceHostInfo, String interfaceName )
     {
 
         HostInterface hostInterface;
@@ -476,14 +486,18 @@ public class HostRegistryImpl implements HostRegistry
         {
             Set<HostInterface> hostInterfaces = ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces();
 
-            hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
+            hostInterface =
+                    interfaceName == null ? ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() ) :
+                    ipUtil.findInterfaceByName( hostInterfaces, interfaceName );
         }
         else
         {
             Set<HostInterface> hostInterfaces = Sets.newHashSet();
             hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
 
-            hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
+            hostInterface =
+                    interfaceName == null ? ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() ) :
+                    ipUtil.findInterfaceByName( hostInterfaces, interfaceName );
         }
 
         if ( hostInterface instanceof NullHostInterface )
