@@ -100,11 +100,11 @@ public class PeerMetricsProcessor extends HubRequester
 
             try
             {
-                hostMetrics.getMemory().setMemFree( resourceHostMetric.getAvailableRam() );
+                hostMetrics.getMemory().setAvailable( resourceHostMetric.getAvailableRam() );
             }
             catch ( Exception e )
             {
-                hostMetrics.getMemory().setMemFree( 0.0 );
+                hostMetrics.getMemory().setAvailable( 0.0 );
                 log.info( e.getMessage(), "No info about available RAM" );
             }
 
