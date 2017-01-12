@@ -10,12 +10,12 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 	var vm = this;
 	vm.config = {isUpdatesAvailable: "waiting"};
 	vm.activeTab = 'update';
-	vm.updateText = 'Checking...';
 	vm.updateInProgress = false;
-
-	checkActiveUpdate();
+	vm.checkActiveUpdate = checkActiveUpdate;
 
 	function checkActiveUpdate(){
+
+	    vm.updateText = 'Checking...';
 
 		LOADING_SCREEN();
 

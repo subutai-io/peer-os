@@ -1,49 +1,48 @@
 <div ng-controller="SettingsUpdatesCtrl as settingsUpdatesCtrl">
 
-	<div class="b-workspace__header b-workspace__header_tabs">
-		<div class="b-tabs-menu b-tabs-menu_header">
-			<ul>
-				<li class="b-tabs-menu__item"
-					ng-class="settingsUpdatesCtrl.activeTab == 'update' ? 'b-tabs-menu__item_active' : ''"
-					ng-click="settingsUpdatesCtrl.activeTab = 'update'">
-					Updates
-				</li>
-				<li class="b-tabs-menu__item"
-					ng-class="settingsUpdatesCtrl.activeTab == 'history' ? 'b-tabs-menu__item_active' : ''"
-					ng-click="settingsUpdatesCtrl.activeTab = 'history'">
-					History
-				</li>
-			</ul>
-		</div>
-	</div>
+  <div class="b-workspace__header">
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Updates</span></h1>
+  </div>
 
-<div class="b-workspace__content">
+  <div class="b-workspace__content">
 
-	<div class="b-workspace-content__row" ng-if="settingsUpdatesCtrl.activeTab == 'update'">
-		<p>{{ settingsUpdatesCtrl.updateText }}</p>
+    <div class="b-workspace-content__row">
 
-		<div ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable == true">
-			<br>
-			<button
-				class="b-btn b-btn_blue g-left g-margin-bottom"
-				ng-click="settingsUpdatesCtrl.update()"
-				tabindex=6
-				style="margin-top: 15px">
-				<i class="fa fa-refresh"></i>&#160;&#160;Update
-			</button>
-		</div>
-	</div>
+      <div>
+        <table>
+          <tr>
+            <td>
+              <button
+                  class="b-btn b-btn_blue g-left g-margin-bottom"
+                  ng-click="settingsUpdatesCtrl.checkActiveUpdate()"
+                  tabindex=6
+                  style="margin-top: 15px" ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable == false || settingsUpdatesCtrl.config.isUpdatesAvailable == 'waiting'">
+                <i class="fa fa-refresh"></i>&#160;&#160;Check
+              </button>
+              <button
+                  class="b-btn b-btn_blue g-left g-margin-bottom"
+                  ng-click="settingsUpdatesCtrl.update()"
+                  tabindex=6
+                  style="margin-top: 15px" ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable == true">
+                <i class="fa fa-refresh"></i>&#160;&#160;Update
+              </button>
+            </td>
+            <td>
+              &nbsp;&nbsp;&nbsp;{{ settingsUpdatesCtrl.updateText }}
+            </td>
+          </tr>
+        </table>
+      </div>
 
-	<div class="b-workspace-content__row" ng-if="settingsUpdatesCtrl.activeTab == 'history'">
-		<div class="b-data-table">
-			<table datatable="" 
-				dt-options="settingsUpdatesCtrl.dtOptions" 
-				dt-columns="settingsUpdatesCtrl.dtColumns" 
-				dt-instance="settingsUpdatesCtrl.dtInstance" 
-				class="row-border hover">
-			</table>
-		</div>
-	</div>
+      <div class="b-data-table">
+        <table datatable=""
+               dt-options="settingsUpdatesCtrl.dtOptions"
+               dt-columns="settingsUpdatesCtrl.dtColumns"
+               dt-instance="settingsUpdatesCtrl.dtInstance"
+               class="row-border hover">
+        </table>
+      </div>
+    </div>
 
-</div>
+  </div>
 </div>
