@@ -346,6 +346,11 @@ public class RestServiceImpl implements RestService
 
             environmentManager.destroyEnvironment( environmentId, false );
         }
+        catch ( EnvironmentNotFoundException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, "Environment is already destroyed" ) )
+                           .build();
+        }
         catch ( Exception e )
         {
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
