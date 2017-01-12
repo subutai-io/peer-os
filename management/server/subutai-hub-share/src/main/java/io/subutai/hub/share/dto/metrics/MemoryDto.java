@@ -9,6 +9,9 @@ public class MemoryDto
     @JsonProperty( "total" )
     private Double total= 0.0D;
 
+    @JsonProperty( "available" )
+    private Double available= 0.0D;
+
     @JsonProperty( "active" )
     private double active = 0.0D;
 
@@ -37,6 +40,18 @@ public class MemoryDto
     public double getActive()
     {
         return active;
+    }
+
+
+    public Double getAvailable()
+    {
+        return available;
+    }
+
+
+    public void setAvailable( final Double available )
+    {
+        this.available = available;
     }
 
 
