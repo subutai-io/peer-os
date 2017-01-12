@@ -369,7 +369,7 @@ public class HostRegistryImplTest
         HostInterface hostInterface = mock( HostInterface.class );
         doReturn( Sets.newHashSet( hostInterface ) ).when( hostInterfaces ).getAll();
         doReturn( hostInterfaces ).when( resourceHostInfo ).getHostInterfaces();
-        doReturn( hostInterface ).when( ipUtil ).findAddressableIface( anySet(), anyString() );
+        doReturn( hostInterface ).when( ipUtil ).findInterfaceByName( anySet(), anyString() );
 
         registry.getResourceHostIp( resourceHostInfo );
 

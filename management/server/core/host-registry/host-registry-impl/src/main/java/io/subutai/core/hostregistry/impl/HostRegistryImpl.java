@@ -312,17 +312,7 @@ public class HostRegistryImpl implements HostRegistry
             //we need to re-request heartbeat from agent based on cache entries
             if ( cachedResourceHosts.size() > registeredResourceHosts.size() )
             {
-                for ( final ResourceHostInfo resourceHostInfo : cachedResourceHosts )
-                {
-                    threadPool.execute( new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            requestHeartbeat( resourceHostInfo );
-                        }
-                    } );
-                }
+                requestHeartbeats( cachedResourceHosts );
 
                 return;
             }
@@ -347,17 +337,7 @@ public class HostRegistryImpl implements HostRegistry
 
                     allHosts.addAll( cachedResourceHosts );
 
-                    for ( final ResourceHostInfo resourceHostInfo : allHosts )
-                    {
-                        threadPool.execute( new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                requestHeartbeat( resourceHostInfo );
-                            }
-                        } );
-                    }
+                    requestHeartbeats( allHosts );
 
                     return;
                 }
@@ -376,6 +356,22 @@ public class HostRegistryImpl implements HostRegistry
         catch ( Exception e )
         {
             LOG.error( "Error checking hosts: {}", e.getMessage() );
+        }
+    }
+
+
+    void requestHeartbeats( Set<ResourceHostInfo> resourceHosts )
+    {
+        for ( final ResourceHostInfo resourceHostInfo : resourceHosts )
+        {
+            threadPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    requestHeartbeat( resourceHostInfo );
+                }
+            } );
         }
     }
 
@@ -476,14 +472,14 @@ public class HostRegistryImpl implements HostRegistry
         {
             Set<HostInterface> hostInterfaces = ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces();
 
-            hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
+            hostInterface = ipUtil.findInterfaceByName( hostInterfaces, Common.WAN_INTERFACE );
         }
         else
         {
             Set<HostInterface> hostInterfaces = Sets.newHashSet();
             hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
 
-            hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
+            hostInterface = ipUtil.findInterfaceByName( hostInterfaces, Common.WAN_INTERFACE );
         }
 
         if ( hostInterface instanceof NullHostInterface )
