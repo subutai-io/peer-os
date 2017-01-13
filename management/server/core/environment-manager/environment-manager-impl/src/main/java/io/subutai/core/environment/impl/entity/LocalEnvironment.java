@@ -183,7 +183,7 @@ public class LocalEnvironment implements Environment, Serializable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
-        this.name = name;
+        this.name = name.trim();
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
             sshKeys.add( sshKey.trim() );
