@@ -157,6 +157,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid environment name" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( topologyJson ), "Invalid environment topology" );
+
             checkName( name );
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
@@ -1075,11 +1078,13 @@ public class RestServiceImpl implements RestService
 
     private void checkName( final String name ) throws EnvironmentCreationException
     {
-        if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals( name ) ).count() > 0 )
+        if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equalsIgnoreCase( name.trim() ) )
+                               .count() > 0 )
         {
             throw new EnvironmentCreationException( "Duplicated environment name" );
         }
-        if ( name.length() > 50 )
+
+        if ( name.trim().length() > 50 )
         {
             throw new EnvironmentCreationException( "Environment name is too long, it should be 50 chars max" );
         }
