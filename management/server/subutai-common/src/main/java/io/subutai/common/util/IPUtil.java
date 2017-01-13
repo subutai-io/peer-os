@@ -16,11 +16,8 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.NullHostInterface;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 
 
@@ -118,9 +115,23 @@ public class IPUtil
     }
 
 
-    public HostInterface findAddressableIface( Set<HostInterface> allInterfaces, String hostId )
+    public HostInterface findInterfaceByName( Set<HostInterface> allInterfaces, String interfaceName )
     {
-        return findAddressableInterface( allInterfaces, hostId );
+        return getInterfaceByName( allInterfaces, interfaceName );
+    }
+
+
+    public static HostInterface getInterfaceByName( Set<HostInterface> allInterfaces, String interfaceName )
+    {
+        for ( HostInterface hostInterface : allInterfaces )
+        {
+            if ( interfaceName.equals( hostInterface.getName() ) )
+            {
+                return hostInterface;
+            }
+        }
+
+        return NullHostInterface.getInstance();
     }
 
 
@@ -128,58 +139,6 @@ public class IPUtil
     {
         return hostInterface != null && !( hostInterface instanceof NullHostInterface ) && !Strings
                 .isNullOrEmpty( hostInterface.getIp() ) && !hostInterface.getIp().trim().isEmpty();
-    }
-
-
-    public static HostInterface findAddressableInterface( Set<HostInterface> allInterfaces, String hostId )
-    {
-        ResourceHost management = null;
-
-        try
-        {
-            management = ServiceLocator.lookup( LocalPeer.class ).getManagementHost();
-        }
-        catch ( Exception e )
-        {
-            //ignore
-        }
-
-        try
-        {
-            if ( management != null )
-            {
-                //try to obtain MNG-NET interface first
-                for ( HostInterface hostInterface : allInterfaces )
-                {
-                    if ( Common.MNG_NET_INTERFACE.equals( hostInterface.getName() ) )
-                    {
-                        //check if this is not an RH-with-MH and MNG-NET IP ends with 254
-                        //in this case we need skip and use WAN ip
-                        if ( !management.getId().equals( hostId ) && hostInterface.getIp().endsWith( "254" ) )
-                        {
-                            break;
-                        }
-
-                        return hostInterface;
-                    }
-                }
-            }
-
-            //otherwise return WAN interface ip
-            for ( HostInterface hostInterface : allInterfaces )
-            {
-                if ( Common.WAN_INTERFACE.equals( hostInterface.getName() ) )
-                {
-                    return hostInterface;
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new ActionFailedException( "Error obtaining addressable net interface", e );
-        }
-
-        return NullHostInterface.getInstance();
     }
 }
 
