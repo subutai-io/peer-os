@@ -14,6 +14,7 @@
         <tr>
           <th>Status</th>
           <th>Name</th>
+          <th>IP</th>
           <th>Approved</th>
           <th>Action</th>
         </tr>
@@ -31,6 +32,7 @@
           <td>{{ clusterNode.hostname }}
             <span ng-if="clusterNode.isManagement"> [ Management ]</span>
           </td>
+          <td>{{ nodeRegCtrl.findIp(clusterNode.interfaces) }}</td>
           <td>{{ clusterNode.status == 'APPROVED' ? 'Yes' : 'No' }}</td>
           <td>
             <button ng-if="clusterNode.status == 'REQUESTED'" class="b-btn b-btn_green"
