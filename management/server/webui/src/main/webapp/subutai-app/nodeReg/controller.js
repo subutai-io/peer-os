@@ -20,6 +20,7 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 	vm.approve = approve;
 	vm.reject = reject;
 	vm.remove = remove;
+	vm.findIp = findIp;
 
 	vm.dtOptions = DTOptionsBuilder
 			.newOptions()
@@ -33,6 +34,15 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 		DTColumnDefBuilder.newColumnDef(2)
 	];
 
+    function findIp(interfaces){
+        var i=0, len=interfaces.length;
+        for (; i<len; i++) {
+          if (interfaces[i].interfaceName == 'wan') {
+            return interfaces[i].ip;
+          }
+        }
+        return 'No WAN IP detected';
+    }
 
 	function getNodes() {
 		nodeRegSrv.getData().success(function(data){
