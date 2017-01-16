@@ -14,6 +14,7 @@
         <tr>
           <th>Status</th>
           <th>Name</th>
+          <th></th>
           <th>IP</th>
           <th>Approved</th>
           <th>Action</th>
@@ -31,6 +32,14 @@
           </td>
           <td>{{ clusterNode.hostname }}
             <span ng-if="clusterNode.isManagement"> [ Management ]</span>
+          </td>
+          <td>
+            <a href
+               class="b-icon b-icon_edit"
+               tooltips
+               tooltip-template='Change hostname'
+               ng-click="nodeRegCtrl.changeNamePopup( clusterNode )" style="visibility: visible">
+            </a>
           </td>
           <td>{{ nodeRegCtrl.findIp(clusterNode.interfaces) }}</td>
           <td>{{ clusterNode.status == 'APPROVED' ? 'Yes' : 'No' }}</td>
