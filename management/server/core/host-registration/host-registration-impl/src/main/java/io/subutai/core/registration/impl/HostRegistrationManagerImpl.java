@@ -28,6 +28,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
@@ -44,7 +45,6 @@ import io.subutai.core.security.api.crypto.KeyManager;
 
 
 //TODO add security annotation
-//TODO implement hostListener to handle rh hostname change!
 public class HostRegistrationManagerImpl implements HostRegistrationManager, HostListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostRegistrationManagerImpl.class );
@@ -75,6 +75,26 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     protected RequestDataService getRequestDataService()
     {
         return requestDataService;
+    }
+
+
+    @Override
+    public void changeRhHostname( final String rhId, String hostname ) throws HostRegistrationException
+    {
+        try
+        {
+            LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
+
+            hostname = StringUtil.removeHtmlAndSpecialChars( hostname, true );
+
+            localPeer.setRhHostname( rhId, hostname );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error changing RH hostname", e );
+
+            throw new HostRegistrationException( e );
+        }
     }
 
 

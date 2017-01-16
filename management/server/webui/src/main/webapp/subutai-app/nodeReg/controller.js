@@ -122,7 +122,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 
     function setHostName( rh, name ) {
         LOADING_SCREEN();
-        nodeRegSrv.setHostName( rh, name ).success( function (data) {
+        nodeRegSrv.changeHostName( rh.id, name ).success( function (data) {
             location.reload();
         } ).error( function (data) {
             SweetAlert.swal ("ERROR!", data);

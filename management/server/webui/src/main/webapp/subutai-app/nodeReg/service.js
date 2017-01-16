@@ -36,7 +36,7 @@ function nodeRegSrv($http) {
 		return $http.post(NODES_URL + nodeId + '/remove');
 	}
 
-	function changeHostName(rh, name){
-	    //todo
+	function changeHostName(rhId, name){
+	    return $http.post(BASE_URL + rhId + '/hostname/' + name);
 	}
 }
