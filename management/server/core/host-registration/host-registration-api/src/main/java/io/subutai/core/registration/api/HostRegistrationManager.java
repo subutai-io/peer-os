@@ -26,4 +26,6 @@ public interface HostRegistrationManager
 
     ContainerToken verifyToken( String token, String containerHostId, String publicKey )
             throws HostRegistrationException;
+
+    void changeRhHostname( String rhId, String hostname ) throws HostRegistrationException;
 }

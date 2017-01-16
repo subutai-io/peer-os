@@ -1111,6 +1111,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             try
             {
                 commandUtil.execute( resourceHostCommands.getGetSetRhHostnameCommand( hostname ), this );
+
+                this.hostname = hostname; //not updating db record b/c heartbeat will handle that
             }
             catch ( CommandException e )
             {

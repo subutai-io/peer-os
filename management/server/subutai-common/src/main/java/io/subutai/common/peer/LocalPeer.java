@@ -207,5 +207,7 @@ public interface LocalPeer extends Peer
 
     //deletes tunnels to the given p2p ips from local RHs
     void deleteTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
+
+    void setRhHostname( String rhId, String hostname ) throws PeerException;
 }
 
