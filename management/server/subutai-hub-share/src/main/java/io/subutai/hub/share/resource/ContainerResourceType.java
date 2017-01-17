@@ -57,6 +57,6 @@ public enum ContainerResourceType
             return ROOTFS;
         }
 
-        throw new IllegalArgumentException( "No such key for container resoutce type enum." );
+        throw new IllegalArgumentException( "No such key for container resource type enum." );
     }
 }

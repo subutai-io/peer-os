@@ -1189,7 +1189,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             resourceHost.destroyContainerHost( host );
-            quotaManager.removeQuota( containerId );
         }
         catch ( ResourceHostException e )
         {
