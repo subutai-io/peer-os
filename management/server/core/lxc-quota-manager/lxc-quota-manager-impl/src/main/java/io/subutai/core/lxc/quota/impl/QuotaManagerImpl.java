@@ -62,14 +62,14 @@ import io.subutai.hub.share.resource.ResourceValueParser;
 public class QuotaManagerImpl implements QuotaManager
 {
 
-    public static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf( 100 );
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf( 100 );
     private static final long QUOTA_TTL_MIN = 5;
 
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
     private LocalPeer localPeer;
     private PeerManager peerManager;
     private CommandUtil commandUtil;
-    protected Commands commands = new Commands();
+    private Commands commands = new Commands();
     private EnumMap<ContainerSize, ContainerQuota> containerQuotas = new EnumMap<>( ContainerSize.class );
     private String defaultQuota;
     private ObjectMapper mapper = new ObjectMapper();
@@ -116,7 +116,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    protected void initDefaultQuotas() throws QuotaException
+    private void initDefaultQuotas() throws QuotaException
     {
         LOGGER.info( "Parsing default quota settings..." );
         String[] settings = defaultQuota.split( ":" );
@@ -331,22 +331,25 @@ public class QuotaManagerImpl implements QuotaManager
                         {
                             ContainerQuota containerQuota = new ContainerQuota();
 
-                            //TODO use batch command or chained command
-                            for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
-                            {
-                                CommandResult result = executeOnContainersResourceHost( containerId,
-                                        commands.getReadQuotaCommand( containerId.getContainerName(),
-                                                containerResourceType ) );
+                            CommandResult result = executeOnContainersResourceHost( containerId,
+                                    commands.getReadQuotaCommand( containerId.getContainerName() ) );
 
-                                QuotaOutput quotaOutput = mapper.readValue( result.getStdOut(), QuotaOutput.class );
+                            QuotaOutput[] outputs = mapper.readValue( result.getStdOut(), QuotaOutput[].class );
+
+                            for ( int i = 0; i < outputs.length; i++ )
+                            {
+                                QuotaOutput quotaOutput = outputs[i];
+
+                                ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
 
                                 ResourceValue resourceValue = CommonResourceValueParser
-                                        .parse( quotaOutput.getQuota(), containerResourceType );
+                                        .parse( quotaOutput.getOutput().getQuota(), containerResourceType );
 
                                 ContainerResource containerResource = ContainerResourceFactory
                                         .createContainerResource( containerResourceType, resourceValue );
 
-                                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
+                                containerQuota
+                                        .add( new Quota( containerResource, quotaOutput.getOutput().getThreshold() ) );
                             }
 
                             return containerQuota;
