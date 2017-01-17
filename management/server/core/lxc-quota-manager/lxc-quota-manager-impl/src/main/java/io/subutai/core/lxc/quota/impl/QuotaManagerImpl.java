@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
@@ -57,6 +63,7 @@ public class QuotaManagerImpl implements QuotaManager
 {
 
     public static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf( 100 );
+    private static final long QUOTA_TTL_MIN = 5;
 
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
     private LocalPeer localPeer;
@@ -66,6 +73,7 @@ public class QuotaManagerImpl implements QuotaManager
     private EnumMap<ContainerSize, ContainerQuota> containerQuotas = new EnumMap<>( ContainerSize.class );
     private String defaultQuota;
     private ObjectMapper mapper = new ObjectMapper();
+    private ScheduledExecutorService quotaCachePopulator = Executors.newSingleThreadScheduledExecutor();
 
 
     public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer )
@@ -80,7 +88,31 @@ public class QuotaManagerImpl implements QuotaManager
 
     public void init() throws QuotaException
     {
+        startCachePopulator();
         initDefaultQuotas();
+    }
+
+
+    private void startCachePopulator()
+    {
+        quotaCachePopulator.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    for ( ContainerHost containerHost : localPeer.getRegisteredContainers() )
+                    {
+                        containerQuotasCache.refresh( containerHost.getContainerId() );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    LOGGER.warn( "Error updating cache: {}", e.getMessage() );
+                }
+            }
+        }, 1, QUOTA_TTL_MIN, TimeUnit.MINUTES );
     }
 
 
@@ -276,31 +308,50 @@ public class QuotaManagerImpl implements QuotaManager
     {
         Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
 
-        ContainerQuota containerQuota = new ContainerQuota();
-        for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
+        try
         {
-            CommandResult result = executeOnContainersResourceHost( containerId,
-                    commands.getReadQuotaCommand( containerId.getContainerName(), containerResourceType ) );
-
-            try
-            {
-                QuotaOutput quotaOutput = mapper.readValue( result.getStdOut(), QuotaOutput.class );
-                ResourceValue resourceValue =
-                        CommonResourceValueParser.parse( quotaOutput.getQuota(), containerResourceType );
-
-
-                ContainerResource containerResource =
-                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
-            }
-            catch ( Exception e )
-            {
-                LOGGER.error( e.getMessage(), e );
-            }
+            return containerQuotasCache.get( containerId );
         }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting quota for container {}: {}", containerId.getContainerName(), e.getMessage() );
 
-        return containerQuota;
+            throw new QuotaException( e.getMessage() );
+        }
     }
+
+
+    private LoadingCache<ContainerId, ContainerQuota> containerQuotasCache =
+            CacheBuilder.newBuilder().maximumSize( 1000 ).expireAfterWrite( QUOTA_TTL_MIN, TimeUnit.MINUTES ).build(
+
+                    new CacheLoader<ContainerId, ContainerQuota>()
+                    {
+                        @Override
+                        public ContainerQuota load( final ContainerId containerId ) throws Exception
+                        {
+                            ContainerQuota containerQuota = new ContainerQuota();
+
+                            //TODO use batch command or chained command
+                            for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
+                            {
+                                CommandResult result = executeOnContainersResourceHost( containerId,
+                                        commands.getReadQuotaCommand( containerId.getContainerName(),
+                                                containerResourceType ) );
+
+                                QuotaOutput quotaOutput = mapper.readValue( result.getStdOut(), QuotaOutput.class );
+
+                                ResourceValue resourceValue = CommonResourceValueParser
+                                        .parse( quotaOutput.getQuota(), containerResourceType );
+
+                                ContainerResource containerResource = ContainerResourceFactory
+                                        .createContainerResource( containerResourceType, resourceValue );
+
+                                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
+                            }
+
+                            return containerQuota;
+                        }
+                    } );
 
 
     @Override
@@ -311,13 +362,6 @@ public class QuotaManagerImpl implements QuotaManager
 
         executeOnContainersResourceHost( containerId,
                 commands.getSetQuotaCommand( containerId.getContainerName(), containerQuota ) );
-    }
-
-
-    @Override
-    public void removeQuota( final ContainerId containerId )
-    {
-        //no-op
     }
 
 

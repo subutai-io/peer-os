@@ -51,7 +51,7 @@ public class GetQuota extends SubutaiShellCommandSupport
         }
         catch ( HostNotFoundException | QuotaException e )
         {
-            System.out.println( "Error getting quota for container" );
+            System.out.println( "Error getting quota for container: " + e.getMessage() );
             LOGGER.error( "Error getting quota for container", e );
         }
         return null;
