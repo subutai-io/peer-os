@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import io.subutai.hub.share.parser.DiskValueResourceParser;
+import io.subutai.hub.share.parser.DiskResourceValueParser;
 import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
@@ -61,6 +61,6 @@ public class ContainerDiskResource extends ContainerResource<ByteValueResource>
     @Override
     protected ByteValueResource parse( final String value )
     {
-        return DiskValueResourceParser.getInstance().parse( value );
+        return DiskResourceValueParser.getInstance().parse( value );
     }
 }

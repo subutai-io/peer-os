@@ -26,9 +26,6 @@
 
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <reference id="quotaManager" availability="mandatory"
-             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
-
   <reference id="monitor" availability="optional"
              interface="io.subutai.core.metric.api.Monitor" />
 
@@ -45,7 +42,6 @@
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="daoManagerPeer" />
     <argument ref="templateManager" />
-    <argument ref="quotaManager" />
     <argument ref="commandExecutor" />
     <argument ref="hostRegistry" />
     <argument ref="monitor" />

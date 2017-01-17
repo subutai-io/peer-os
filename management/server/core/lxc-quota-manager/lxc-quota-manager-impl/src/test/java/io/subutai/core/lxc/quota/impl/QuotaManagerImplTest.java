@@ -20,7 +20,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.parser.CpuResourceValueParser;
-import io.subutai.hub.share.parser.DiskValueResourceParser;
+import io.subutai.hub.share.parser.DiskResourceValueParser;
 import io.subutai.hub.share.quota.ContainerCpuResource;
 import io.subutai.hub.share.quota.ContainerHomeResource;
 import io.subutai.hub.share.quota.ContainerRamResource;
@@ -51,7 +51,7 @@ public class QuotaManagerImplTest
 
     private ContainerRamResource ramQuotaInfo =
             new ContainerRamResource( new ByteValueResource( ByteValueResource.toBytes( "16", ByteUnit.MB ) ) );
-    private ByteValueResource ramQuotaValue = DiskValueResourceParser.getInstance().parse( ByteValueResource
+    private ByteValueResource ramQuotaValue = DiskResourceValueParser.getInstance().parse( ByteValueResource
             .toBytes( "16", ByteUnit.MB ).toPlainString() );
     private ContainerCpuResource cpuQuota =
             new ContainerCpuResource( CpuResourceValueParser.getInstance().parse( quotaResult ) );
@@ -94,23 +94,23 @@ public class QuotaManagerImplTest
         when( localPeer.getResourceHostByContainerId( CONTAINER_HOST_ID ) ).thenReturn( resourceHost );
         when( containerHost.getHostname() ).thenReturn( containerHostname );
 
-        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.RAM ) ) )
-                .thenReturn( commandResultRam );
-
-        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.CPU ) ) )
-                .thenReturn( commandResultCpu );
-
-        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.HOME ) ) )
-                .thenReturn( commandResultDisk );
-
-        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.OPT ) ) )
-                .thenReturn( commandResultDisk );
-
-        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.VAR ) ) )
-                .thenReturn( commandResultDisk );
-
-        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.ROOTFS ) ) )
-                .thenReturn( commandResultDisk );
+//        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.RAM ) ) )
+//                .thenReturn( commandResultRam );
+//
+//        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.CPU ) ) )
+//                .thenReturn( commandResultCpu );
+//
+//        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.HOME ) ) )
+//                .thenReturn( commandResultDisk );
+//
+//        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.OPT ) ) )
+//                .thenReturn( commandResultDisk );
+//
+//        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.VAR ) ) )
+//                .thenReturn( commandResultDisk );
+//
+//        when( resourceHost.execute( commands.getReadQuotaCommand( containerHostname, ContainerResourceType.ROOTFS ) ) )
+//                .thenReturn( commandResultDisk );
 
 
         when( resourceHost.execute( commands.getReadCpuSetCommand( containerHostname ) ) )

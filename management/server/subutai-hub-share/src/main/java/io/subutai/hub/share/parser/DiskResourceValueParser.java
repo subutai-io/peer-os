@@ -16,25 +16,25 @@ import io.subutai.hub.share.resource.ResourceValueParser;
 /**
  * Byte value resource parser
  */
-public class DiskValueResourceParser implements ResourceValueParser
+public class DiskResourceValueParser implements ResourceValueParser
 {
     private static final String QUOTA_REGEX = "(\\d+(?:[\\.,]\\d+)?)(KiB|MiB|GiB|TiB|PiB|EiB)?";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
 
-    private static DiskValueResourceParser instance;
+    private static DiskResourceValueParser instance;
 
 
-    private DiskValueResourceParser()
+    private DiskResourceValueParser()
     {
     }
 
 
-    public static DiskValueResourceParser getInstance()
+    public static DiskResourceValueParser getInstance()
     {
 
         if ( instance == null )
         {
-            instance = new DiskValueResourceParser();
+            instance = new DiskResourceValueParser();
         }
         return instance;
     }
@@ -51,10 +51,9 @@ public class DiskValueResourceParser implements ResourceValueParser
             String value = quotaMatcher.group( 1 );
             String acronym = quotaMatcher.group( 2 );
             ByteUnit byteUnit = ByteUnit.parseFromAcronym( acronym );
-            ByteValueResource result = new ByteValueResource(
-                    ByteValueResource.toBytes( new BigDecimal( value ), byteUnit == null ? ByteUnit.GB : byteUnit ) );
 
-            return result;
+            return new ByteValueResource(
+                    ByteValueResource.toBytes( new BigDecimal( value ), byteUnit == null ? ByteUnit.GB : byteUnit ) );
         }
         else
         {

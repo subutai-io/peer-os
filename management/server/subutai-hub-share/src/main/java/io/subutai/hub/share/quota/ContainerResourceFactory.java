@@ -23,6 +23,8 @@ public class ContainerResourceFactory
     {
         switch ( containerResourceType )
         {
+            case NET:
+                return new ContainerNetResource( ( NumericValueResource ) resourceValue );
             case CPU:
                 return new ContainerCpuResource( ( NumericValueResource ) resourceValue );
             case RAM:

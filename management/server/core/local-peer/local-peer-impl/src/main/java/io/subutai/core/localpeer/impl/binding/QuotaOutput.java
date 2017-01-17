@@ -1,4 +1,4 @@
-package io.subutai.core.lxc.quota.impl;
+package io.subutai.core.localpeer.impl.binding;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
