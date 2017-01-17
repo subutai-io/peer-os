@@ -2747,6 +2747,39 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public void setRhHostname( final String rhId, final String hostname ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ), "Invalid RH id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        ResourceHost resourceHost = getResourceHostById( rhId );
+
+        //check if RH with new hostname already exists on peer
+        try
+        {
+            getResourceHostByHostName( hostname );
+
+            throw new PeerException( String.format( "RH with hostname %s already exists", hostname ) );
+        }
+        catch ( HostNotFoundException ignore )
+        {
+            //ignore since all is ok
+        }
+
+        try
+        {
+            resourceHost.setHostname( hostname );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException(
+                    String.format( "Error setting RH %s hostname: %s", resourceHost.getId(), e.getMessage() ) );
+        }
+    }
+
+
+    @Override
     public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
                                                         final String newHostname ) throws PeerException
     {

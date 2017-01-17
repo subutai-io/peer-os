@@ -80,6 +80,6 @@ public class ResourceHostCommands
 
     public RequestBuilder getGetSetRhHostnameCommand( final String newHostname )
     {
-        return new RequestBuilder( String.format( "subutai hostname %s ", newHostname ) );
+        return new RequestBuilder( String.format( "hostnamectl set-hostname %s ", newHostname ) );
     }
 }

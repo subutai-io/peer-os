@@ -14,7 +14,8 @@ function nodeRegSrv($http) {
 		getData : getData,
 		approveReq : approveReq,
 		rejectReq : rejectReq,
-		removeReq : removeReq
+		removeReq : removeReq,
+		changeHostName : changeHostName
 	};
 
 	return nodeRegSrv;
@@ -33,5 +34,9 @@ function nodeRegSrv($http) {
 
 	function removeReq(nodeId) {
 		return $http.post(NODES_URL + nodeId + '/remove');
+	}
+
+	function changeHostName(rhId, name){
+	    return $http.post(BASE_URL + rhId + '/hostname/' + name);
 	}
 }
