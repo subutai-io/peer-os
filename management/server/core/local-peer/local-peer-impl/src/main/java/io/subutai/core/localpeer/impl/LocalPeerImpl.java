@@ -20,6 +20,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -2696,15 +2697,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
-        /*
-        ContainerQuota containerQuota = new ContainerQuota();
-        for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
-        {
-            Quota quota = getQuota( containerId, containerResourceType );
-            containerQuota.add( quota );
-        }
-        return containerQuota;
-          */
         ContainerQuota containerQuota = new ContainerQuota();
         try
         {
@@ -2712,22 +2704,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             CommandResult result =
                     resourceHost.execute( Commands.getReadQuotaCommand( containerId.getContainerName() ) );
 
-            BatchOutput[] outputs = mapper.readValue( result.getStdOut(), BatchOutput[].class );
+            JavaType type = mapper.getTypeFactory().constructCollectionType( List.class, BatchOutput.class );
+            List<BatchOutput> outputs = mapper.readValue( result.getStdOut(), type );
 
-
-            for ( int i = 0; i < outputs.length; i++ )
+            for ( int i = 0; i < outputs.size(); i++ )
             {
-                BatchOutput<QuotaOutput> quotaOutput = outputs[i];
+                QuotaOutput quotaOutput = outputs.get( i ).getOutput();
 
                 ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
 
                 ResourceValue resourceValue =
-                        CommonResourceValueParser.parse( quotaOutput.getOutput().getQuota(), containerResourceType );
+                        CommonResourceValueParser.parse( quotaOutput.getQuota(), containerResourceType );
 
                 ContainerResource containerResource =
                         ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
 
-                containerQuota.add( new Quota( containerResource, quotaOutput.getOutput().getThreshold() ) );
+                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
             }
         }
         catch ( Exception e )

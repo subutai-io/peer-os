@@ -7,22 +7,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Commands batch output
  */
-public class BatchOutput<T>
+public class BatchOutput
 {
     @JsonProperty( "output" )
-    private T output;
+    private QuotaOutput output;
     @JsonProperty( "exitcode" )
     private Integer exitcode;
 
 
-    public BatchOutput( @JsonProperty( "output" ) final T output, @JsonProperty( "exitcode" ) Integer exitcode )
+    public BatchOutput( @JsonProperty( "output" ) final QuotaOutput output,
+                        @JsonProperty( "exitcode" ) Integer exitcode )
     {
         this.output = output;
         this.exitcode = exitcode;
     }
 
 
-    public T getOutput()
+    public QuotaOutput getOutput()
     {
         return output;
     }
