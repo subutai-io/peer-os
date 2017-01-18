@@ -8,33 +8,34 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.hub.share.resource.NumericValueResource;
 import io.subutai.hub.share.resource.ResourceValueParser;
+import io.subutai.hub.share.resource.StringValueResource;
 
 
 /**
- * Cpu value resource parser
+ * Cpu set value resource parser
  */
-public class CpuResourceValueParser implements ResourceValueParser
+public class CpuSetResourceValueParser implements ResourceValueParser
 {
-    private static final String QUOTA_REGEX = "(\\d+)(%)?";
+    private static final String QUOTA_REGEX = "(\\d+-\\d+)";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
-    private static CpuResourceValueParser instance;
+    private static CpuSetResourceValueParser instance;
 
 
-    public static CpuResourceValueParser getInstance()
+    public static CpuSetResourceValueParser getInstance()
     {
         if ( instance == null )
         {
-            instance = new CpuResourceValueParser();
+            instance = new CpuSetResourceValueParser();
         }
         return instance;
     }
 
 
-    private CpuResourceValueParser() {}
+    private CpuSetResourceValueParser() {}
 
 
     @Override
-    public NumericValueResource parse( String resource )
+    public StringValueResource parse( String resource )
     {
         Preconditions.checkNotNull( resource );
 
@@ -42,12 +43,7 @@ public class CpuResourceValueParser implements ResourceValueParser
         if ( quotaMatcher.matches() )
         {
             String value = quotaMatcher.group( 1 );
-            String acronym = quotaMatcher.group( 2 );
-            if ( acronym != null && !"%".equals( acronym.trim() ) )
-            {
-                throw new IllegalArgumentException( String.format( "Invalid measure unit %s.", acronym.trim() ) );
-            }
-            return new NumericValueResource( value );
+            return new StringValueResource( value );
         }
         else
         {

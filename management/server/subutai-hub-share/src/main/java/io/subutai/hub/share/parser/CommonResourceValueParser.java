@@ -25,6 +25,9 @@ public final class CommonResourceValueParser
             case CPU:
                 result = CpuResourceValueParser.getInstance();
                 break;
+            case CPUSET:
+                result = CpuSetResourceValueParser.getInstance();
+                break;
             case RAM:
                 result = RamResourceValueParser.getInstance();
                 break;

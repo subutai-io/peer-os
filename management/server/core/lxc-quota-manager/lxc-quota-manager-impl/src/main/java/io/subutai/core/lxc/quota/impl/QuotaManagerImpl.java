@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -59,7 +58,6 @@ import io.subutai.hub.share.resource.ResourceValueParser;
 
 public class QuotaManagerImpl implements QuotaManager
 {
-
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf( 100 );
     private static final long QUOTA_TTL_MIN = 5;
 
@@ -70,7 +68,6 @@ public class QuotaManagerImpl implements QuotaManager
     private Commands commands = new Commands();
     private EnumMap<ContainerSize, ContainerQuota> containerQuotas = new EnumMap<>( ContainerSize.class );
     private String defaultQuota;
-    private ObjectMapper mapper = new ObjectMapper();
     private ScheduledExecutorService quotaCachePopulator = Executors.newSingleThreadScheduledExecutor();
 
 
@@ -327,29 +324,6 @@ public class QuotaManagerImpl implements QuotaManager
                         @Override
                         public ContainerQuota load( final ContainerId containerId ) throws Exception
                         {
-
-                            /*
-                            CommandResult result = executeOnContainersResourceHost( containerId,
-                                    commands.getReadQuotaCommand( containerId.getContainerName() ) );
-
-                            QuotaOutput[] outputs = mapper.readValue( result.getStdOut(), QuotaOutput[].class );
-
-                            for ( int i = 0; i < outputs.length; i++ )
-                            {
-                                QuotaOutput quotaOutput = outputs[i];
-
-                                ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
-
-                                ResourceValue resourceValue = CommonResourceValueParser
-                                        .parse( quotaOutput.getOutput().getQuota(), containerResourceType );
-
-                                ContainerResource containerResource = ContainerResourceFactory
-                                        .createContainerResource( containerResourceType, resourceValue );
-
-                                containerQuota
-                                        .add(localPeer.getQuota( containerId ) );
-                            }
-  */
                             return localPeer.getQuota( containerId );
                         }
                     } );

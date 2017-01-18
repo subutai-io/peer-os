@@ -21,10 +21,12 @@ public class Quota
                   @JsonProperty( "threshold" ) final Integer threshold )
     {
         Preconditions.checkNotNull( resource );
-        Preconditions.checkNotNull( threshold );
-        Preconditions.checkArgument( threshold >= 0 );
-        Preconditions.checkArgument( threshold <= 100 );
-
+        if ( threshold != null )
+        {
+            Preconditions.checkArgument( threshold >= 0 );
+            Preconditions.checkArgument( threshold <= 100 );
+        }
+        
         this.resource = resource;
         this.threshold = threshold;
     }
