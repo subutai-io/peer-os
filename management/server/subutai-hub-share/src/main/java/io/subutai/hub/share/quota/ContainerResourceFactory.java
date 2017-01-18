@@ -5,6 +5,7 @@ import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.NumericValueResource;
 import io.subutai.hub.share.resource.ResourceValue;
+import io.subutai.hub.share.resource.StringValueResource;
 
 
 /**
@@ -27,6 +28,8 @@ public class ContainerResourceFactory
                 return new ContainerNetResource( ( NumericValueResource ) resourceValue );
             case CPU:
                 return new ContainerCpuResource( ( NumericValueResource ) resourceValue );
+            case CPUSET:
+                return new ContainerCpuSetResource( ( StringValueResource ) resourceValue );
             case RAM:
                 return new ContainerRamResource( ( ByteValueResource ) resourceValue );
             case HOME:

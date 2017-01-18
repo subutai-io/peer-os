@@ -58,7 +58,8 @@ public abstract class Commands
             quotaCommand.addArgument( r.getResource().getContainerResourceType().getKey() );
             quotaCommand.addArgument( "-s" );
             quotaCommand.addArgument( r.getResource().getWriteValue() );
-            if ( r.getThreshold() != null )
+            if ( r.getThreshold() != null
+                    && r.getResource().getContainerResourceType() != ContainerResourceType.CPUSET )
             {
                 quotaCommand.addArgument( "-t" );
                 quotaCommand.addArgument( r.getThreshold().toString() );

@@ -6,7 +6,8 @@ package io.subutai.hub.share.resource;
  */
 public enum ContainerResourceType
 {
-    RAM( "ram" ), CPU( "cpu" ), OPT( "opt" ), HOME( "home" ), VAR( "var" ), ROOTFS( "rootfs" ), NET( "network" );
+    RAM( "ram" ), CPU( "cpu" ), OPT( "opt" ), HOME( "home" ), VAR( "var" ), ROOTFS( "rootfs" ), NET( "network" ),
+    CPUSET( "cpuset" );
 
     private String key;
 
@@ -57,6 +58,10 @@ public enum ContainerResourceType
         if ( key.equals( NET.getKey() ) )
         {
             return NET;
+        }
+        if ( key.equals( CPUSET.getKey() ) )
+        {
+            return CPUSET;
         }
 
         throw new IllegalArgumentException( "No such container resource type key." );
