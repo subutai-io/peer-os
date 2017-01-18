@@ -1,11 +1,18 @@
 package io.subutai.core.lxc.quota.impl;
 
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,42 +21,59 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerId;
+import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerResource;
 import io.subutai.hub.share.quota.ContainerResourceFactory;
 import io.subutai.hub.share.quota.Quota;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.hub.share.resource.CpuResource;
+import io.subutai.hub.share.resource.DiskResource;
+import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
+import io.subutai.hub.share.resource.RamResource;
+import io.subutai.hub.share.resource.ResourceValue;
 import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 public class QuotaManagerImpl implements QuotaManager
 {
+
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf( 100 );
+    private static final long QUOTA_TTL_MIN = 5;
+
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
     private LocalPeer localPeer;
     private PeerManager peerManager;
     private CommandUtil commandUtil;
-    protected Commands commands = new Commands();
+    private Commands commands = new Commands();
     private EnumMap<ContainerSize, ContainerQuota> containerQuotas = new EnumMap<>( ContainerSize.class );
     private String defaultQuota;
     private ObjectMapper mapper = new ObjectMapper();
+    private ScheduledExecutorService quotaCachePopulator = Executors.newSingleThreadScheduledExecutor();
 
 
     public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer )
@@ -64,11 +88,35 @@ public class QuotaManagerImpl implements QuotaManager
 
     public void init() throws QuotaException
     {
+        startCachePopulator();
         initDefaultQuotas();
     }
 
 
-    protected void initDefaultQuotas() throws QuotaException
+    private void startCachePopulator()
+    {
+        quotaCachePopulator.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    for ( ContainerHost containerHost : localPeer.getRegisteredContainers() )
+                    {
+                        containerQuotasCache.refresh( containerHost.getContainerId() );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    LOGGER.warn( "Error updating cache: {}", e.getMessage() );
+                }
+            }
+        }, 1, QUOTA_TTL_MIN, TimeUnit.MINUTES );
+    }
+
+
+    private void initDefaultQuotas() throws QuotaException
     {
         LOGGER.info( "Parsing default quota settings..." );
         String[] settings = defaultQuota.split( ":" );
@@ -143,17 +191,115 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
+    /**
+     * Returns limits for requested peer
+     *
+     * @param peerId peer id
+     */
     @Override
-    public PeerResources getResourceLimits( final String peerId ) throws QuotaException
+    public PeerResources getResourceLimits( String peerId )
     {
+        PeerPolicy policy = peerManager.getPolicy( peerId );
+
+        int environmentLimit = policy.getEnvironmentLimit();
+        int containerLimit = policy.getContainerLimit();
+        int networkLimit = policy.getNetworkUsageLimit();
+
+        Set<String> environments = new HashSet<>();
+        final List<ContainerHost> peerContainers = localPeer.getPeerContainers( peerId );
+        for ( ContainerHost containerHost : peerContainers )
+        {
+            environments.add( containerHost.getEnvironmentId().getId() );
+        }
+
+        environmentLimit -= environments.size();
+        containerLimit -= peerContainers.size();
+
+        ResourceHostMetrics metrics = null;
+
         try
         {
-            return localPeer.getResourceLimits( new PeerId( peerId ) );
+            metrics = localPeer.getResourceHostMetrics();
         }
         catch ( PeerException e )
         {
-            throw new QuotaException( e.getMessage() );
+            LOGGER.error( e.getMessage() );
         }
+
+        List<HostResources> resources = new ArrayList<>();
+
+        if ( metrics != null )
+        {
+            for ( ResourceHostMetric resourceHostMetric : metrics.getResources() )
+            {
+                try
+                {
+                    ResourceHost resourceHost = localPeer.getResourceHostByHostName( resourceHostMetric.getHostName() );
+                    BigDecimal[] usedResources = getUsedResources();
+
+                    BigDecimal cpuLimit = getCpuLimit( policy );
+
+                    BigDecimal ramLimit = getRamLimit( new BigDecimal( resourceHostMetric.getTotalRam() ), policy );
+
+                    BigDecimal diskLimit = getDiskLimit( new BigDecimal( resourceHostMetric.getTotalSpace() ), policy );
+
+                    CpuResource cpuResource = new CpuResource( cpuLimit.subtract( usedResources[0] ), 0.0, "UNKNOWN",
+                            resourceHostMetric.getCpuCore(), 0, 0, 0, resourceHostMetric.getCpuFrequency(), 0 );
+
+                    RamResource ramResource = new RamResource( ramLimit.subtract( usedResources[1] ), 0.0 );
+
+                    DiskResource diskResource =
+                            new DiskResource( diskLimit.subtract( usedResources[2] ), 0.0, "UNKNOWN", 0.0, 0.0, false );
+
+
+                    HostResources hostResources =
+                            new HostResources( resourceHost.getId(), cpuResource, ramResource, diskResource );
+                    resources.add( hostResources );
+                }
+                catch ( Exception e )
+                {
+                    // ignore
+                    LOGGER.warn( e.getMessage() );
+                }
+            }
+        }
+
+        return new PeerResources( localPeer.getId(), environmentLimit, containerLimit, networkLimit, resources );
+    }
+
+
+    private BigDecimal getRamLimit( final BigDecimal total, final PeerPolicy peerPolicy )
+    {
+        return percentage( total, new BigDecimal( peerPolicy.getMemoryUsageLimit() ) );
+    }
+
+
+    private BigDecimal getDiskLimit( final BigDecimal total, final PeerPolicy peerPolicy )
+    {
+        return percentage( total, new BigDecimal( peerPolicy.getDiskUsageLimit() ) );
+    }
+
+
+    private BigDecimal getCpuLimit( final PeerPolicy peerPolicy )
+    {
+        return percentage( ONE_HUNDRED, new BigDecimal( peerPolicy.getCpuUsageLimit() ) );
+    }
+
+
+    private BigDecimal[] getUsedResources() throws QuotaException
+    {
+        BigDecimal cpuAccumulo = BigDecimal.ZERO;
+        BigDecimal ramAccumulo = BigDecimal.ZERO;
+        BigDecimal diskAccumulo = BigDecimal.ZERO;
+        // todo: extract from DB
+
+        return new BigDecimal[] { cpuAccumulo, ramAccumulo, diskAccumulo };
+    }
+
+
+    private static BigDecimal percentage( BigDecimal base, BigDecimal pct )
+    {
+        return base.multiply( pct ).divide( ONE_HUNDRED, BigDecimal.ROUND_UP );
     }
 
 
@@ -164,13 +310,51 @@ public class QuotaManagerImpl implements QuotaManager
 
         try
         {
-            return localPeer.getQuota( containerId );
+            return containerQuotasCache.get( containerId );
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting quota for container {}: {}", containerId.getContainerName(), e.getMessage() );
+
             throw new QuotaException( e.getMessage() );
         }
     }
+
+
+    private LoadingCache<ContainerId, ContainerQuota> containerQuotasCache =
+            CacheBuilder.newBuilder().maximumSize( 1000 ).expireAfterWrite( QUOTA_TTL_MIN, TimeUnit.MINUTES ).build(
+
+                    new CacheLoader<ContainerId, ContainerQuota>()
+                    {
+                        @Override
+                        public ContainerQuota load( final ContainerId containerId ) throws Exception
+                        {
+                            ContainerQuota containerQuota = new ContainerQuota();
+
+                            CommandResult result = executeOnContainersResourceHost( containerId,
+                                    commands.getReadQuotaCommand( containerId.getContainerName() ) );
+
+                            QuotaOutput[] outputs = mapper.readValue( result.getStdOut(), QuotaOutput[].class );
+
+                            for ( int i = 0; i < outputs.length; i++ )
+                            {
+                                QuotaOutput quotaOutput = outputs[i];
+
+                                ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
+
+                                ResourceValue resourceValue = CommonResourceValueParser
+                                        .parse( quotaOutput.getOutput().getQuota(), containerResourceType );
+
+                                ContainerResource containerResource = ContainerResourceFactory
+                                        .createContainerResource( containerResourceType, resourceValue );
+
+                                containerQuota
+                                        .add( new Quota( containerResource, quotaOutput.getOutput().getThreshold() ) );
+                            }
+
+                            return containerQuota;
+                        }
+                    } );
 
 
     @Override
@@ -179,21 +363,8 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
         Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
 
-        try
-        {
-            localPeer.setQuota( containerId, containerQuota );
-        }
-        catch ( PeerException e )
-        {
-            throw new QuotaException( e.getMessage() );
-        }
-    }
-
-
-    @Override
-    public void removeQuota( final ContainerId containerId )
-    {
-        localPeer.removeQuota( containerId );
+        executeOnContainersResourceHost( containerId,
+                commands.getSetQuotaCommand( containerId.getContainerName(), containerQuota ) );
     }
 
 

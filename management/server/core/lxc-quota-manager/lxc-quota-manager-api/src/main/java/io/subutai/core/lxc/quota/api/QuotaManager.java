@@ -43,7 +43,6 @@ public interface QuotaManager
 
     ResourceValueParser getResourceValueParser( ContainerResourceType containerResourceType ) throws QuotaException;
 
-
     /**
      * Returns predefined quotas of container type
      *
@@ -53,6 +52,7 @@ public interface QuotaManager
      */
     ContainerQuota getDefaultContainerQuota( ContainerSize containerSize );
 
+    Map<ContainerSize, ContainerQuota> getDefaultQuotas();
 
     /**
      * Returns allowed cpus/cores ids on container
@@ -61,7 +61,8 @@ public interface QuotaManager
      *
      * @return - allowed cpu set
      */
-    public Set<Integer> getCpuSet( ContainerId containerId ) throws QuotaException;
+    @Deprecated
+    Set<Integer> getCpuSet( ContainerId containerId ) throws QuotaException;
 
     /**
      * Sets allowed cpus/cores on container
@@ -69,12 +70,6 @@ public interface QuotaManager
      * @param containerId - name of container
      * @param cpuSet - allowed cpu set
      */
-    public void setCpuSet( ContainerId containerId, Set<Integer> cpuSet ) throws QuotaException;
-
-    /**
-     * Removes quota setting when container destroyed
-     */
-    void removeQuota( ContainerId containerId );
-
-    Map<ContainerSize, ContainerQuota> getDefaultQuotas();
+    @Deprecated
+    void setCpuSet( ContainerId containerId, Set<Integer> cpuSet ) throws QuotaException;
 }
