@@ -117,6 +117,7 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.localpeer.impl.binding.BatchOutput;
 import io.subutai.core.localpeer.impl.binding.Commands;
 import io.subutai.core.localpeer.impl.binding.QuotaOutput;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
@@ -2695,11 +2696,44 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
+        /*
         ContainerQuota containerQuota = new ContainerQuota();
         for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
         {
             Quota quota = getQuota( containerId, containerResourceType );
             containerQuota.add( quota );
+        }
+        return containerQuota;
+          */
+        ContainerQuota containerQuota = new ContainerQuota();
+        try
+        {
+            ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
+            CommandResult result =
+                    resourceHost.execute( Commands.getReadQuotaCommand( containerId.getContainerName() ) );
+
+            BatchOutput[] outputs = mapper.readValue( result.getStdOut(), BatchOutput[].class );
+
+
+            for ( int i = 0; i < outputs.length; i++ )
+            {
+                BatchOutput<QuotaOutput> quotaOutput = outputs[i];
+
+                ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
+
+                ResourceValue resourceValue =
+                        CommonResourceValueParser.parse( quotaOutput.getOutput().getQuota(), containerResourceType );
+
+                ContainerResource containerResource =
+                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
+
+                containerQuota.add( new Quota( containerResource, quotaOutput.getOutput().getThreshold() ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Could not obtain quota values of %s.", containerId.getId() ) );
         }
         return containerQuota;
     }

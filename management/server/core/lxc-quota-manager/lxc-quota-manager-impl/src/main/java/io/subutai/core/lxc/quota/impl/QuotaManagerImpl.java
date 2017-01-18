@@ -45,7 +45,6 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerResource;
 import io.subutai.hub.share.quota.ContainerResourceFactory;
 import io.subutai.hub.share.quota.Quota;
 import io.subutai.hub.share.quota.QuotaException;
@@ -55,7 +54,6 @@ import io.subutai.hub.share.resource.DiskResource;
 import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
 import io.subutai.hub.share.resource.RamResource;
-import io.subutai.hub.share.resource.ResourceValue;
 import io.subutai.hub.share.resource.ResourceValueParser;
 
 
@@ -329,8 +327,8 @@ public class QuotaManagerImpl implements QuotaManager
                         @Override
                         public ContainerQuota load( final ContainerId containerId ) throws Exception
                         {
-                            ContainerQuota containerQuota = new ContainerQuota();
 
+                            /*
                             CommandResult result = executeOnContainersResourceHost( containerId,
                                     commands.getReadQuotaCommand( containerId.getContainerName() ) );
 
@@ -349,10 +347,10 @@ public class QuotaManagerImpl implements QuotaManager
                                         .createContainerResource( containerResourceType, resourceValue );
 
                                 containerQuota
-                                        .add( new Quota( containerResource, quotaOutput.getOutput().getThreshold() ) );
+                                        .add(localPeer.getQuota( containerId ) );
                             }
-
-                            return containerQuota;
+  */
+                            return localPeer.getQuota( containerId );
                         }
                     } );
 

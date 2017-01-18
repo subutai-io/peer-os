@@ -1,82 +1,35 @@
 package io.subutai.core.localpeer.impl.binding;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class QuotaOutput
 {
-    @JsonProperty( "output" )
-    private Output output;
-    @JsonProperty( "exitcode" )
-    private Integer exitcode;
+
+    @JsonProperty( "quota" )
+    private String quota;
+    @JsonProperty( "threshold" )
+    private Integer threshold;
 
 
-    public QuotaOutput( @JsonProperty( "output" ) final Output output, @JsonProperty( "exitcode" ) Integer exitcode )
+    public QuotaOutput( @JsonProperty( "quota" ) final String quota,
+                        @JsonProperty( "threshold" ) final Integer threshold )
     {
-        this.output = output;
-        this.exitcode = exitcode;
+        this.quota = quota;
+        this.threshold = threshold;
     }
 
 
-    public Output getOutput()
+    public String getQuota()
     {
-        return output;
+        return quota;
     }
 
 
-    public Integer getExitcode()
+    public Integer getThreshold()
     {
-        return exitcode;
-    }
-
-
-    public static class Output
-    {
-        @JsonProperty( "quota" )
-        private String quota;
-        @JsonProperty( "threshold" )
-        private Integer threshold;
-
-
-        @JsonCreator
-        public static Output create( String jsonString )
-        {
-            Output output = null;
-
-            try
-            {
-                output = new ObjectMapper().readValue( jsonString, Output.class );
-            }
-            catch ( Exception e )
-            {
-                // handle
-            }
-
-            return output;
-        }
-
-
-        public Output( @JsonProperty( "quota" ) final String quota,
-                       @JsonProperty( "threshold" ) final Integer threshold )
-        {
-            this.quota = quota;
-            this.threshold = threshold;
-        }
-
-
-        public String getQuota()
-        {
-            return quota;
-        }
-
-
-        public Integer getThreshold()
-        {
-            return threshold;
-        }
+        return threshold;
     }
 }
 

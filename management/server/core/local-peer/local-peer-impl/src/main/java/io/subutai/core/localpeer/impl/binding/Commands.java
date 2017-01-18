@@ -27,6 +27,24 @@ public abstract class Commands
     }
 
 
+    public static RequestBuilder getReadQuotaCommand( String containerName )
+    {
+
+        CommandBatch result = new CommandBatch( CommandBatch.Type.JSON );
+
+        for ( ContainerResourceType resourceType : ContainerResourceType.values() )
+        {
+
+            Command quotaCommand = new Command( "quota" );
+            quotaCommand.addArgument( containerName );
+            quotaCommand.addArgument( resourceType.getKey() );
+            result.addCommand( quotaCommand );
+        }
+
+        return new RequestBuilder( result.toString() );
+    }
+
+
     public static RequestBuilder getSetQuotaCommand( String containerName, ContainerQuota quota )
     {
 
