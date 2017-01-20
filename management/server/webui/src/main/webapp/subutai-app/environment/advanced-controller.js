@@ -52,6 +52,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.editingEnv = false;
     vm.isEditing = false;
     vm.downloadProgress = '';
+    vm.rhId = '';
 
     // functions
 
@@ -84,13 +85,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 vm.templatesList = vm.templatesList.concat(vm.templates[i]);
             }
         }
-		templatesList = vm.templatesList;
+        templatesList = vm.templatesList;
     }
 
     function getPeers() {
         $('.js-peer-load-screen').show();
         environmentService.getPeers().success(function (data) {
             vm.peerIds = data;
+            console.log(vm.peerIds);
             $('.js-peer-load-screen').hide();
         }).error(function (error) {
             $('.js-peer-load-screen').hide();
@@ -156,53 +158,51 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         trackerSrv.getDownloadProgress(envId)
             .success(function (data) {
 
-                if( data.length > 0 ) {
+                if (data.length > 0) {
 
-					data.sort();
+                    data.sort();
 
-					var output = '<table class="b-main-table b-main-table_progrss">';
-					var checker = false;
-					for( var i = 0; i < data.length; i++ ) {
+                    var output = '<table class="b-main-table b-main-table_progrss">';
+                    var checker = false;
+                    for (var i = 0; i < data.length; i++) {
 
-						output += [
-							'<tr>',
-								'<th colspan="2">',
-									'Peer ' + shortenIdName(data[i].peerId, 3),
-								'</th>',
-							'</tr>',
-						].join('');
-						for( var j = 0; j < data[i].templatesDownloadProgress.length; j++ ) {
-							var p = data[i].templatesDownloadProgress[j];
+                        output += [
+                            '<tr>',
+                            '<th colspan="2">',
+                            'Peer ' + shortenIdName(data[i].peerId, 3),
+                            '</th>',
+                            '</tr>',
+                        ].join('');
+                        for (var j = 0; j < data[i].templatesDownloadProgress.length; j++) {
+                            var p = data[i].templatesDownloadProgress[j];
 
-							for (var tpl in p.templatesDownloadProgress) {
-								output += [
-									'<tr>',
-										'<td>',
-											'RH ' + shortenIdName(p.rhId, 3),
-										'</td>',
-										'<td>',
-											'<div class="b-progress-cloud b-progress-cloud_white b-progress-cloud_big">',
-												'<div class="b-progress-cloud-fill" style="width: ' + p.templatesDownloadProgress[tpl] + '%;"></div>',
-												'<span class="b-progress-cloud-text">' + tpl + '</span>',
-											'</div>',
-										'</td>',
-									'</tr>'
-								].join('');
-								if( p.templatesDownloadProgress[tpl] != 100 ) {
-									checker = true;
-								}
-							}
-						}
-					}
-					output += '</table>';
+                            for (var tpl in p.templatesDownloadProgress) {
+                                output += [
+                                    '<tr>',
+                                    '<td>',
+                                    'RH ' + shortenIdName(p.rhId, 3),
+                                    '</td>',
+                                    '<td>',
+                                    '<div class="b-progress-cloud b-progress-cloud_white b-progress-cloud_big">',
+                                    '<div class="b-progress-cloud-fill" style="width: ' + p.templatesDownloadProgress[tpl] + '%;"></div>',
+                                    '<span class="b-progress-cloud-text">' + tpl + '</span>',
+                                    '</div>',
+                                    '</td>',
+                                    '</tr>'
+                                ].join('');
+                                if (p.templatesDownloadProgress[tpl] != 100) {
+                                    checker = true;
+                                }
+                            }
+                        }
+                    }
+                    output += '</table>';
 
 
-                    if( checker == true )
-                    {
+                    if (checker == true) {
                         $('.js-download-progress').html(output);
                     }
-                    else
-                    {
+                    else {
                         $('.js-download-progress').html('');
                     }
                 }
@@ -363,7 +363,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         var quotaContainers = [];
 
         for (var key in vm.editingEnv.changingContainers) {
-            quotaContainers.push({ "key" : key, "value" : vm.editingEnv.changingContainers[key] });
+            quotaContainers.push({"key": key, "value": vm.editingEnv.changingContainers[key]});
         }
 
         var conteiners = {
@@ -405,16 +405,17 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     function addResource2Build(currentResource, peerId, index) {
 
         var isManagement = false;
-
-        for (var i in vm.currentResourceHosts)
-        {
-            var rh  = vm.currentResourceHosts[i];
-
-            if(rh.id == currentResource && rh.isManagement){
-
-               isManagement = true;
-
-               break;
+        var peerName = '';
+        for (var i in vm.peerIds) {
+            var peer = vm.peerIds[i];
+            if ( peer.id == peerId ) {
+                peerName = peer.name;
+                for ( var j in peer.resourceHosts) {
+                    var rh = peer.resourceHosts[j];
+                    if ( rh.id == currentResource && rh.isManagement ) {
+                        isManagement = true;
+                    }
+                }
             }
         }
 
@@ -447,8 +448,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             children: 0,
             grid: [],
             gridSize: {size: 2},
-            'resourceHostName': 'RH' + (index + 1) + (isManagement ? " [MH]" : ""),
-            'peerName': 'Peer ' + (vm.currentPeerIndex + 1),
+            'resourceHostName': 'RH ' + (currentResource.substr(vm.rhId.length - 3)) + (isManagement ? " [MH]" : ""),
+            'peerName': /*'Peer ' + */peerName/*peerId.substr(peerId.length - 3)*/,
             'addClass': 'b-resource-host_last'
         });
 
@@ -637,11 +638,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 case 'b-container-plus-icon':
                     currentTemplate = this.model;
                     $('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
-					if(currentTemplate.get('edited') == true) {
-						$('#js-container-name').prop('disabled', true);
-					} else {
-						$('#js-container-name').prop('disabled', false);
-					}
+                    if (currentTemplate.get('edited') == true) {
+                        $('#js-container-name').prop('disabled', true);
+                    } else {
+                        $('#js-container-name').prop('disabled', false);
+                    }
                     $('#js-container-size').val(currentTemplate.get('quotaSize'));
                     containerSettingMenu.find('.header').html('Settings for <b>' + this.model.get('templateName') + '</b> container');
                     var elementPos = this.model.get('position');
@@ -900,9 +901,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             scope: $scope,
             className: 'b-build-environment-info',
             preCloseCallback: function (value) {
-				if(vm.buildCompleted) {
-					resetPlugin();
-				}
+                if (vm.buildCompleted) {
+                    resetPlugin();
+                }
                 vm.buildCompleted = false;
             }
         });
@@ -916,35 +917,34 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             return;
         }
 
-		clearWorkspace();
+        clearWorkspace();
         vm.isEditing = true;
-		vm.editingEnv = environment;
+        vm.editingEnv = environment;
         vm.editingEnv.changingContainers = [];
-		vm.environment2BuildName = environment.name;
-		vm.excludedContainers = [];
-		vm.currentPeerIndex = 0;
-		for(var i = 0; i < environment.containers.length; i++) {
-			var container = environment.containers[i];
+        vm.environment2BuildName = environment.name;
+        vm.excludedContainers = [];
+        vm.currentPeerIndex = 0;
+        for (var i = 0; i < environment.containers.length; i++) {
+            var container = environment.containers[i];
 
-			if( container.containerName.match(/(\d+)(?!.*\d)/g) != null )
-			{
-				if( containerCounter < parseInt( container.containerName.match(/(\d+)(?!.*\d)/g) ) + 1 )
-				{
-					containerCounter = parseInt( container.containerName.match(/(\d+)(?!.*\d)/g) ) + 1;
-				}
-			}
-
-			var resourceHostItemId = addResource2Build(container.hostId, container.peerId, i);
-			var resourceHost = graph.getCell(resourceHostItemId);
-			vm.currentPeerIndex++;
-			var img = 'assets/templates/' + container.templateName + '.jpg';
-			if(!imageExists(img)) {
-				img = 'assets/templates/no-image.jpg';
-			}
-			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname, container.templateId);
-		}
-		filterPluginsList();
-	}
+            if (container.containerName.match(/(\d+)(?!.*\d)/g) != null) {
+                if (containerCounter < parseInt(container.containerName.match(/(\d+)(?!.*\d)/g)) + 1) {
+                    containerCounter = parseInt(container.containerName.match(/(\d+)(?!.*\d)/g)) + 1;
+                }
+            }
+            console.log(container);
+            vm.rhId = container.rhId;
+            var resourceHostItemId = addResource2Build(container.rhId, container.peerId, i);
+            var resourceHost = graph.getCell(resourceHostItemId);
+            vm.currentPeerIndex++;
+            var img = 'assets/templates/' + container.templateName + '.jpg';
+            if (!imageExists(img)) {
+                img = 'assets/templates/no-image.jpg';
+            }
+            addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname, container.templateId);
+        }
+        filterPluginsList();
+    }
 
     vm.plugins = [];
     vm.filteredPlugins = {};
@@ -1040,7 +1040,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                             if (!imageExists(img)) {
                                 img = 'assets/templates/no-image.jpg';
                             }
-                            environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                            environmentService.getVerifiedTemplate(template.toLowerCase()).success(function (verifiedTemplate) {
                                 addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
                             });
                         }
@@ -1050,7 +1050,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                         if (!imageExists(img)) {
                             img = 'assets/templates/no-image.jpg';
                         }
-                        environmentService.getVerifiedTemplate(template.toLowerCase()).success(function(verifiedTemplate){
+                        environmentService.getVerifiedTemplate(template.toLowerCase()).success(function (verifiedTemplate) {
                             addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
                         });
                     }
@@ -1129,7 +1129,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         vm.editingEnv = false;
         graph.resetCells();
         $('.b-resource-host').remove();
-		filterPluginsList();
+        filterPluginsList();
     }
 
     function addSettingsToTemplate(settings) {
@@ -1139,25 +1139,21 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         //ngDialog.closeAll();
         containerSettingMenu.hide();
 
-        if( vm.isEditing )
-        {
+        if (vm.isEditing) {
             var id = currentTemplate.attributes.containerId;
 
-            var res = $.grep( vm.editingEnv.containers, function( e, i ) {
+            var res = $.grep(vm.editingEnv.containers, function (e, i) {
                 return e.id == id;
             });
 
-            if( res[0] )
-            {
+            if (res[0]) {
                 res = res[0];
 
-                if( res.type == settings.quotaSize && vm.editingEnv.changingContainers[id] )
-                {
+                if (res.type == settings.quotaSize && vm.editingEnv.changingContainers[id]) {
                     delete vm.editingEnv.changingContainers[id];
                 }
 
-                if( res.type != settings.quotaSize )
-                {
+                if (res.type != settings.quotaSize) {
                     vm.editingEnv.changingContainers[id] = settings.quotaSize;
                 }
             }
@@ -1334,58 +1330,58 @@ function drop(event) {
 }
 
 function addContainerToHost(model, template, img, size, containerId, name, templateId) {
-	if(size === undefined || size === null) {
-		size = 'SMALL';
-		if(template == 'appscale') {
-			size = 'HUGE';
-		}
-	}
-	var edited = false;
-	if(containerId == undefined || containerId == null){
-		containerId = false;
-	} else {
-		edited = true;
-	}
-	checkResourceHost(model);
-	var rPos = model.attributes.position;
-	var gPos = placeRhSimple( model );
+    if (size === undefined || size === null) {
+        size = 'SMALL';
+        if (template == 'appscale') {
+            size = 'HUGE';
+        }
+    }
+    var edited = false;
+    if (containerId == undefined || containerId == null) {
+        containerId = false;
+    } else {
+        edited = true;
+    }
+    checkResourceHost(model);
+    var rPos = model.attributes.position;
+    var gPos = placeRhSimple(model);
 
     var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
     var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
 
-	if(templateId == undefined || templateId == null) {
-		var templateId = getTemplateIdByName(template, templatesList);	
-	}
+    if (templateId == undefined || templateId == null) {
+        var templateId = getTemplateIdByName(template, templatesList);
+    }
 
-	var containerName = '';
-	if(name == undefined || name == null) {
-		containerName = 'Container ' + (containerCounter++).toString();
-	} else {
-		var containerNameArray = name.split('-');
-		containerName = containerNameArray[0];
-	}
+    var containerName = '';
+    if (name == undefined || name == null) {
+        containerName = 'Container ' + (containerCounter++).toString();
+    } else {
+        var containerNameArray = name.split('-');
+        containerName = containerNameArray[0];
+    }
 
-	var devElement = new joint.shapes.tm.devElement({
-		position: { x: x, y: y },
-		edited: edited,
-		templateName: template,
-		templateId: templateId,
-		parentPeerId: model.get('peerId'),
-		parentHostId: model.get('hostId'),
-		quotaSize: size,
-		containerId: containerId,
-		containerName: containerName,
-		attrs: {
-			image: { 'xlink:href': img },
-			'rect.b-magnet': {fill: quotaColors[size]},
-			title: {text: containerName + " ('" + template + "') " + size}
-		},
-		rh: {
-			model: model.id,
-			x: gPos.x,
-			y: gPos.y
-		}
-	});
+    var devElement = new joint.shapes.tm.devElement({
+        position: {x: x, y: y},
+        edited: edited,
+        templateName: template,
+        templateId: templateId,
+        parentPeerId: model.get('peerId'),
+        parentHostId: model.get('hostId'),
+        quotaSize: size,
+        containerId: containerId,
+        containerName: containerName,
+        attrs: {
+            image: {'xlink:href': img},
+            'rect.b-magnet': {fill: quotaColors[size]},
+            title: {text: containerName + " ('" + template + "') " + size}
+        },
+        rh: {
+            model: model.id,
+            x: gPos.x,
+            y: gPos.y
+        }
+    });
 
     graph.addCell(devElement);
     model.embed(devElement);
@@ -1394,7 +1390,6 @@ function addContainerToHost(model, template, img, size, containerId, name, templ
     angular.element(document.getElementById('js-environment-creation')).scope().filterPluginsList();
 }
 
-function shortenIdName( name, factor )
-{
+function shortenIdName(name, factor) {
     return name.substring(0, factor) + '..' + name.substring(name.length - factor, name.length);
 }

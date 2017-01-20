@@ -107,7 +107,7 @@ public class RestServiceImpl implements RestService
                 containers.add( new ContainerDto( host.getId(), environmentId, host.getHostname(), host.getIp(),
                         host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
                         host.getPeerId(), host.getResourceHostId().getId(), host.isLocal(), dataSource, host.getState(),
-                        host.getTemplateId(), host.getContainerName() ) );
+                        host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() ) );
             }
 
             EnvironmentDto environmentDto =
