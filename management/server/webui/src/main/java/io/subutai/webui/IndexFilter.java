@@ -49,39 +49,35 @@ public class IndexFilter implements Filter
             {
                 RequestDispatcher view = servletRequest.getRequestDispatcher( "index.html" );
                 HttpServletResponse response = ( HttpServletResponse ) servletResponse;
+                boolean isCookieSet = isCookieSet( ( HttpServletRequest ) servletRequest,
+                        Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME );
                 try
                 {
                     IdentityManager identityManager = ServiceLocator.getServiceOrNull( IdentityManager.class );
-                    if ( identityManager != null )
+                    if ( !isCookieSet && identityManager != null )
                     {
+                        //identityManager.getActiveUser() returns always null here
                         User user = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+
                         if ( Strings.isNullOrEmpty( user.getFingerprint() ) )
                         {
                             throw new IllegalStateException( "No Peer owner is set yet..." );
                         }
 
-                        if ( !isCookieSet( ( HttpServletRequest ) servletRequest,
-                                Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME ) )
-                        {
-                            Cookie fingerprint =
-                                    new Cookie( Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME, user.getFingerprint() );
-                            fingerprint.setSecure( true );
-                            response.addCookie( fingerprint );
-                        }
+                        setCookie( response, Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME, user.getFingerprint() );
                     }
                 }
                 catch ( Exception ex )
                 {
-                    if ( !isCookieSet( ( HttpServletRequest ) servletRequest,
-                            Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME ) )
+                    if ( !isCookieSet )
                     {
-                        Cookie fingerprint = new Cookie( Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME, "no owner" );
-                        fingerprint.setSecure( true );
-                        response.addCookie( fingerprint );
+                        setCookie( response, Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME, "no owner" );
                     }
                 }
+
                 view.forward( servletRequest, response );
             }
+
             if ( !( url.startsWith( "/rest" ) || url.startsWith( "/subutai" ) || url.startsWith( "/fav" ) || url
                     .startsWith( "/plugin" ) || url.startsWith( "/assets" ) || url.startsWith( "/css" ) || url
                     .startsWith( "/fonts" ) || url.startsWith( "/scripts" ) || url.startsWith( "/login" ) ) && !url
@@ -101,6 +97,14 @@ public class IndexFilter implements Filter
                 filterChain.doFilter( servletRequest, servletResponse );
             }
         }
+    }
+
+
+    private void setCookie( HttpServletResponse response, String cookieName, String cookieValue )
+    {
+        Cookie fingerprint = new Cookie( cookieName, cookieValue );
+        fingerprint.setSecure( true );
+        response.addCookie( fingerprint );
     }
 
 

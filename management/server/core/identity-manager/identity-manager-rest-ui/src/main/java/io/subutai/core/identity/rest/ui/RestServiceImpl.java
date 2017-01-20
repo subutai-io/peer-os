@@ -2,8 +2,6 @@ package io.subutai.core.identity.rest.ui;
 
 
 import java.security.AccessControlException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -638,8 +636,7 @@ public class RestServiceImpl implements RestService
     private String getFingerprint()
     {
         User user = identityManager.getActiveUser();
-        PGPPublicKeyRing pubRing = securityManager.getKeyManager().getPublicKeyRing( user.getSecurityKeyId() );
-        return PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint() ).toLowerCase();
+        return user.getFingerprint().toLowerCase();
     }
 
 
