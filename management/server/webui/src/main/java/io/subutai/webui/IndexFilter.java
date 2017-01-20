@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -58,16 +59,26 @@ public class IndexFilter implements Filter
                         {
                             throw new IllegalStateException( "No Peer owner is set yet..." );
                         }
-                        Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
-                        fingerprint.setSecure( true );
-                        response.addCookie( fingerprint );
+
+                        if ( !isCookieSet( ( HttpServletRequest ) servletRequest,
+                                Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME ) )
+                        {
+                            Cookie fingerprint =
+                                    new Cookie( Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME, user.getFingerprint() );
+                            fingerprint.setSecure( true );
+                            response.addCookie( fingerprint );
+                        }
                     }
                 }
                 catch ( Exception ex )
                 {
-                    Cookie fingerprint = new Cookie( "su_fingerprint", "no owner" );
-                    fingerprint.setSecure( true );
-                    response.addCookie( fingerprint );
+                    if ( !isCookieSet( ( HttpServletRequest ) servletRequest,
+                            Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME ) )
+                    {
+                        Cookie fingerprint = new Cookie( Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME, "no owner" );
+                        fingerprint.setSecure( true );
+                        response.addCookie( fingerprint );
+                    }
                 }
                 view.forward( servletRequest, response );
             }
@@ -90,6 +101,25 @@ public class IndexFilter implements Filter
                 filterChain.doFilter( servletRequest, servletResponse );
             }
         }
+    }
+
+
+    private boolean isCookieSet( HttpServletRequest request, String cookieName )
+    {
+        if ( request.getCookies() == null )
+        {
+            return false;
+        }
+
+        for ( Cookie cookie : request.getCookies() )
+        {
+            if ( cookie.getName().equalsIgnoreCase( cookieName ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

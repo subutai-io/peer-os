@@ -217,4 +217,38 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 			};
 		});
 	};
+
+    vm.getKurjunAuthToken = getKurjunAuthToken;
+    function getKurjunAuthToken(){
+
+        identitySrv.getKurjunAuthId().success(function (authId) {
+
+            console.log(authId);
+
+            var signedAuthIdTextArea = document.createElement("textarea");
+            signedAuthIdTextArea.setAttribute('class', 'bp-sign-target');
+            signedAuthIdTextArea.style.display = 'hidden';
+            signedAuthIdTextArea.value = authId;
+            document.body.appendChild(signedAuthIdTextArea);
+
+            $(signedAuthIdTextArea).on('change', function() {
+
+               var signedAuthId = $(this).val();
+               console.log(signedAuthId);
+
+               identitySrv.getKurjunToken(signedAuthId).success(function (kurjunToken) {
+
+                 console.log(kurjunToken);
+
+               }).error(function(error) {
+                 console.log(error);
+               });
+
+               $(this).remove();
+            });
+
+        }).error(function(error) {
+            console.log(error);
+        });
+    }
 }

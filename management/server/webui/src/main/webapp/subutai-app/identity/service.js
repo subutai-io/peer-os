@@ -50,7 +50,9 @@ function identitySrv($http) {
         },
         getTokensUrl: function () {
             return TOKENS_URL
-        }
+        },
+        getKurjunAuthId:getKurjunAuthId,
+        getKurjunToken:getKurjunToken
     };
 
     return identitySrv;
@@ -224,4 +226,24 @@ function identitySrv($http) {
 			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
 		);
 	}
+
+    function getKurjunAuthId(){
+
+        return $http.get(BASE_URL + "kurjun/authid",
+        {
+            withCredentials: true
+        });
+    }
+
+    function getKurjunToken(signedAuthId){
+
+        var postData = "signedAuthId=" + signedAuthId;
+
+        return $http.post(BASE_URL + "kurjun/token",
+        postData,
+        {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        });
+    }
 }

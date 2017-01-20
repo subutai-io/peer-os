@@ -15,6 +15,18 @@ import javax.ws.rs.core.Response;
 
 public interface RestService
 {
+
+    /** Kurjun ***********/
+    @GET
+    @Produces( { MediaType.TEXT_PLAIN } )
+    @Path( "kurjun/authid" )
+    Response getKurjunAuthId();
+
+    @POST
+    @Produces( { MediaType.TEXT_PLAIN } )
+    @Path( "/kurjun/token" )
+    Response getKurjunAuthToken( @FormParam( "signedAuthId" ) String signedAuthId );
+
     /** Users ***********************************************/
 
     @GET
