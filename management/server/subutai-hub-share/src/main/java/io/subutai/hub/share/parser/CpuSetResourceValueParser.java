@@ -16,7 +16,7 @@ import io.subutai.hub.share.resource.StringValueResource;
  */
 public class CpuSetResourceValueParser implements ResourceValueParser
 {
-    private static final String QUOTA_REGEX = "(\\d+-\\d+)";
+    private static final String QUOTA_REGEX = "((\\d+-\\d+)|(0))";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
     private static CpuSetResourceValueParser instance;
 
