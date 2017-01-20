@@ -57,13 +57,10 @@
           <li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
               ng-click="advEnvCtrl.showResources(peerId, peersResources.resourceHosts, $index)">
 					<span class="b-tools-menu__item" class="b-cloud-item-text g-margin-bottom-half">
-						Peer {{$index + 1}}
+						Peer {{peerId.substr(peerId.length - 3)}}
 					</span>
 
             <div class="b-progress__cloud">
-              <!--<div class="b-progress-cloud g-margin-bottom-half">
-              <div class="b-progress-cloud-fill" style="width: 0%"></div>
-              </div>-->
               <div class="b-progress-text">
                 <span class="g-text-blue">{{ peersResources.name }}</span>
               </div>
@@ -89,7 +86,7 @@
                 ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
               <div class="g-margin-bottom">
 							<span class="b-cloud-item-resource-name">
-								RH{{$index + 1}} <span ng-show="resourceHost.isManagement"> [MH]</span>
+								RH {{resourceHost.id.substr(resourceHost.length - 3)}} <span ng-show="resourceHost.isManagement"> [MH]</span>
 							</span>
                 <span class="b-progress-text ">({{resourceHost.hostname}})</span>
               </div>
