@@ -11,26 +11,26 @@ import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 /**
- * Cpu value resource parser
+ * Network value resource parser
  */
-public class CpuResourceValueParser implements ResourceValueParser
+public class NetResourceValueParser implements ResourceValueParser
 {
-    private static final String QUOTA_REGEX = "(\\d+)(%)?";
+    private static final String QUOTA_REGEX = "(\\d+)";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
-    private static CpuResourceValueParser instance;
+    private static NetResourceValueParser instance;
 
 
-    public static CpuResourceValueParser getInstance()
+    public static NetResourceValueParser getInstance()
     {
         if ( instance == null )
         {
-            instance = new CpuResourceValueParser();
+            instance = new NetResourceValueParser();
         }
         return instance;
     }
 
 
-    private CpuResourceValueParser() {}
+    private NetResourceValueParser() {}
 
 
     @Override
@@ -42,16 +42,11 @@ public class CpuResourceValueParser implements ResourceValueParser
         if ( quotaMatcher.matches() )
         {
             String value = quotaMatcher.group( 1 );
-            String acronym = quotaMatcher.group( 2 );
-            if ( acronym != null && !"%".equals( acronym.trim() ) )
-            {
-                throw new IllegalArgumentException( String.format( "Invalid measure unit %s.", acronym.trim() ) );
-            }
             return new NumericValueResource( value );
         }
         else
         {
-            throw new IllegalArgumentException( String.format( "Could not parse resource: %s", resource ) );
+            throw new IllegalArgumentException( String.format( "Could not parse network resource: %s", resource ) );
         }
     }
 }

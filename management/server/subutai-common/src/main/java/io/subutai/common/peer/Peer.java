@@ -36,6 +36,7 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -247,6 +248,12 @@ public interface Peer extends RelationLink
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
+
+    /**
+     * Returns limits for requested peer
+     *
+     * @param peerId peer ID
+     */
     PeerResources getResourceLimits( PeerId peerId ) throws PeerException;
 
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;

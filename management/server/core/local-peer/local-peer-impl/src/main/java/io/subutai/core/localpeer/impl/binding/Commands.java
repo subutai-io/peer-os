@@ -1,4 +1,4 @@
-package io.subutai.core.lxc.quota.impl;
+package io.subutai.core.localpeer.impl.binding;
 
 
 import com.google.common.collect.Lists;
@@ -12,21 +12,22 @@ import io.subutai.hub.share.resource.ContainerResourceType;
 
 
 /**
- * Quota manager commands
+ * Subutai command bindings
  */
-public class Commands
+public abstract class Commands
 {
     private static final String QUOTA_BINDING = "subutai quota";
 
 
-    public RequestBuilder getReadQuotaCommand( String containerName, ContainerResourceType containerResourceType )
+    public static RequestBuilder getReadQuotaCommand( String containerName,
+                                                      ContainerResourceType containerResourceType )
     {
         return new RequestBuilder( QUOTA_BINDING )
                 .withCmdArgs( Lists.newArrayList( containerName, containerResourceType.getKey() ) );
     }
 
 
-    public RequestBuilder getReadQuotaCommand( String containerName )
+    public static RequestBuilder getReadQuotaCommand( String containerName )
     {
 
         CommandBatch result = new CommandBatch( CommandBatch.Type.JSON );
@@ -44,7 +45,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetQuotaCommand( String containerName, ContainerQuota quota )
+    public static RequestBuilder getSetQuotaCommand( String containerName, ContainerQuota quota )
     {
 
         CommandBatch result = new CommandBatch( CommandBatch.Type.JSON );
@@ -57,22 +58,15 @@ public class Commands
             quotaCommand.addArgument( r.getResource().getContainerResourceType().getKey() );
             quotaCommand.addArgument( "-s" );
             quotaCommand.addArgument( r.getResource().getWriteValue() );
+            if ( r.getThreshold() != null
+                    && r.getResource().getContainerResourceType() != ContainerResourceType.CPUSET )
+            {
+                quotaCommand.addArgument( "-t" );
+                quotaCommand.addArgument( r.getThreshold().toString() );
+            }
             result.addCommand( quotaCommand );
         }
 
         return new RequestBuilder( result.toString() );
-    }
-
-
-    public RequestBuilder getReadCpuSetCommand( String containerName )
-    {
-        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerName, "cpuset" ) );
-    }
-
-
-    public RequestBuilder getWriteCpuSetCommand( String containerName, String cpuset )
-    {
-        return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "cpuset", "-s", cpuset ) );
     }
 }

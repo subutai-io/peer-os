@@ -4,6 +4,7 @@ package io.subutai.core.lxc.quota.cli;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -73,6 +74,7 @@ public class GetQuotaTest
 
 
     @Test
+    @Ignore
     public void testDoExecute() throws Exception
     {
         getQuota.doExecute();

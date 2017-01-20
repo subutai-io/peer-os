@@ -235,7 +235,7 @@ public class LocalPeerImplTest
                                      final HostRegistry hostRegistry, final Monitor monitor,
                                      final SecurityManager securityManager )
         {
-            super( daoManager, templateManager, quotaManager, commandExecutor, hostRegistry, monitor, securityManager );
+            super( daoManager, templateManager, commandExecutor, hostRegistry, monitor, securityManager );
         }
 
 
