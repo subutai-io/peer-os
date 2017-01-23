@@ -64,13 +64,18 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         return vm.isRegistrationFormVisible;
     };
 
-    identitySrv.isKurjunTokenObtained().success(function(data){
-        if ( !( data == true || data == 'true' ) ) {
+    identitySrv.getObtainedKurjunToken().success(function(data){
+
+        if (!$.trim(data)){
             getKurjunAuthToken();
+        }else{
+            localStorage.setItem('kurjunToken', data);
         }
     });
 
     function getKurjunAuthToken(){
+
+        localStorage.removeItem('kurjunToken');
 
         identitySrv.getKurjunAuthId().success(function (authId) {
 

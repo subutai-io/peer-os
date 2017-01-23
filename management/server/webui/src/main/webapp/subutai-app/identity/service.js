@@ -53,7 +53,7 @@ function identitySrv($http) {
         },
         getKurjunAuthId:getKurjunAuthId,
         getKurjunToken:getKurjunToken,
-        isKurjunTokenObtained:isKurjunTokenObtained
+        getObtainedKurjunToken:getObtainedKurjunToken
     };
 
     return identitySrv;
@@ -248,7 +248,7 @@ function identitySrv($http) {
         });
     }
 
-    function isKurjunTokenObtained(){
+    function getObtainedKurjunToken(){
 
         return $http.get(BASE_URL + "kurjun/token",
         {

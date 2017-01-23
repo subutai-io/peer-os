@@ -25,7 +25,7 @@ public interface RestService
     @GET
     @Produces( { MediaType.TEXT_PLAIN } )
     @Path( "kurjun/token" )
-    Response isKurjunAuthTokenObtained();
+    Response getObtainedKurjunToken();
 
     @POST
     @Produces( { MediaType.TEXT_PLAIN } )

@@ -730,10 +730,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response isKurjunAuthTokenObtained()
+    public Response getObtainedKurjunToken()
     {
-        return Response.status( Response.Status.OK ).entity( identityManager.getActiveSession() != null
-                && identityManager.getActiveSession().getKurjunToken() != null ).build();
+        String token = null;
+
+        if ( identityManager.getActiveSession() != null )
+        {
+            token = identityManager.getActiveSession().getKurjunToken();
+        }
+
+        return Response.status( Response.Status.OK ).entity( token ).build();
     }
 
 
