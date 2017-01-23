@@ -700,6 +700,9 @@ public class RestServiceImpl implements RestService
                     HttpEntity entity = response.getEntity();
                     String token = IOUtils.toString( entity.getContent() );
                     EntityUtils.consume( entity );
+
+                    identityManager.getActiveSession().setKurjunToken( token );
+
                     return Response.ok( token ).build();
                 }
                 else
@@ -723,6 +726,14 @@ public class RestServiceImpl implements RestService
         {
             IOUtils.closeQuietly( client );
         }
+    }
+
+
+    @Override
+    public Response isKurjunAuthTokenObtained()
+    {
+        return Response.status( Response.Status.OK ).entity( identityManager.getActiveSession() != null
+                && identityManager.getActiveSession().getKurjunToken() != null ).build();
     }
 
 

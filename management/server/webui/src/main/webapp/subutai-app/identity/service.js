@@ -52,7 +52,8 @@ function identitySrv($http) {
             return TOKENS_URL
         },
         getKurjunAuthId:getKurjunAuthId,
-        getKurjunToken:getKurjunToken
+        getKurjunToken:getKurjunToken,
+        isKurjunTokenObtained:isKurjunTokenObtained
     };
 
     return identitySrv;
@@ -244,6 +245,14 @@ function identitySrv($http) {
         {
             withCredentials: true,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        });
+    }
+
+    function isKurjunTokenObtained(){
+
+        return $http.get(BASE_URL + "kurjun/token",
+        {
+            withCredentials: true
         });
     }
 }

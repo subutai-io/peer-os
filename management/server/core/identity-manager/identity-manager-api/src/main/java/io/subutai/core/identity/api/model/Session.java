@@ -34,4 +34,8 @@ public interface Session
     Subject getSubject();
 
     void setSubject( Subject subject );
+
+    void setKurjunToken(String token);
+
+    String getKurjunToken();
 }
