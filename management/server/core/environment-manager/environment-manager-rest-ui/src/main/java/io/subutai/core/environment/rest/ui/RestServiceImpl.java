@@ -1069,7 +1069,7 @@ public class RestServiceImpl implements RestService
                     containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                     containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
                     datasource, containerHost.getState(), containerHost.getTemplateId(),
-                    containerHost.getContainerName() ) );
+                    containerHost.getContainerName(), containerHost.getResourceHostId().getId() ) );
         }
 
         return containerDtos;

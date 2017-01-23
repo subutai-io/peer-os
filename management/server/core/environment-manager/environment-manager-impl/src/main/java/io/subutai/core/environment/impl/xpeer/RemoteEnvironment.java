@@ -50,7 +50,7 @@ public class RemoteEnvironment extends LocalEnvironment
                     host.getTemplateName(), host.getContainerSize(), host.getArch().name(), Sets.<String>newHashSet(),
                     host.getPeerId(), host.getResourceHostId().getId(), true,
                     Common.HUB_ID.equals( initiatorPeerId ) ? Common.HUB_ID : Common.SUBUTAI_ID, host.getState(),
-                    host.getTemplateId(), host.getContainerName() ) );
+                    host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() ) );
         }
 
 

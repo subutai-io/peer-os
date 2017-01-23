@@ -569,7 +569,7 @@ public class LocalEnvironment implements Environment, Serializable
                     host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
                     host.getPeerId(), host.getResourceHostId().getId(), isLocalContainer,
                     this instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID, containerHostState,
-                    host.getTemplateId(), host.getContainerName() ) );
+                    host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() ) );
         }
 
         return containerDtos;
