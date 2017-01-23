@@ -687,7 +687,7 @@ public class RestServiceImpl implements RestService
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
             entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
             entityBuilder.addTextBody( "user", getFingerprint() );
-            entityBuilder.addTextBody( "message", signedAuthId.trim() );
+            entityBuilder.addTextBody( "message", signedAuthId );
             HttpEntity httpEntity = entityBuilder.build();
 
             post.setEntity( httpEntity );

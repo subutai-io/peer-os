@@ -237,7 +237,7 @@ function identitySrv($http) {
 
     function getKurjunToken(signedAuthId){
 
-        var postData = "signedAuthId=" + signedAuthId;
+        var postData = "signedAuthId=" + encodeURIComponent(signedAuthId);
 
         return $http.post(BASE_URL + "kurjun/token",
         postData,
