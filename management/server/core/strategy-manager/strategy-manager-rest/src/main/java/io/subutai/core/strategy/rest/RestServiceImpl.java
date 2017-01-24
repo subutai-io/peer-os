@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;

@@ -1,4 +1,4 @@
-package io.subutai.common.peer;
+package io.subutai.hub.share.quota;
 
 
 import java.io.FileInputStream;
@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public enum ContainerSize
 {
-    TINY, SMALL, MEDIUM, LARGE, HUGE;
+    TINY, SMALL, MEDIUM, LARGE, HUGE, CUSTOM;
 
 
     @JsonIgnore

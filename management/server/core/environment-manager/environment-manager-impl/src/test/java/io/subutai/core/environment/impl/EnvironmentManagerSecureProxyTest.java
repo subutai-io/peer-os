@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLink;
