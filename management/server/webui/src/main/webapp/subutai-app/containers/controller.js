@@ -58,6 +58,8 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
 	vm.getContainerNameFromHostName=getContainerNameFromHostName;
+	vm.createTemplatePopup=createTemplatePopup;
+	vm.createTemplate=createTemplate;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;
@@ -364,4 +366,27 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 		return name.replace( regex, "" );
 	}
+
+	function createTemplatePopup(container){
+
+		vm.editingContainer = container;
+
+		ngDialog.open({
+			template: 'subutai-app/containers/partials/createTemplate.html',
+			scope: $scope,
+			className: 'b-build-environment-info'
+		});
+	}
+
+    function createTemplate( container, isPrivate ) {
+        console.log(container.containerName);
+        console.log(isPrivate);
+//        LOADING_SCREEN();
+//        environmentService.setContainerName( container, name ).success( function (data) {
+//            location.reload();
+//        } ).error( function (data) {
+//            SweetAlert.swal ("ERROR!", data);
+//        } );
+    }
+
 }
