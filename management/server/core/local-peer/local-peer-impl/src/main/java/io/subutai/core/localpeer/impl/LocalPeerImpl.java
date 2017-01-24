@@ -2697,7 +2697,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
-        ContainerQuota containerQuota = new ContainerQuota();
+        final ContainerHost containerHost = getContainerHostById( containerId.getId() );
+        ContainerQuota containerQuota = new ContainerQuota( containerHost.getContainerSize() );
         try
         {
             ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );

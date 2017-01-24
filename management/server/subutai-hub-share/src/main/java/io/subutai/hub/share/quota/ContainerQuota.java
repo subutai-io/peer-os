@@ -17,22 +17,28 @@ import io.subutai.hub.share.resource.ContainerResourceType;
 public class ContainerQuota
 {
     @JsonProperty
+    private ContainerSize containerSize;
+
+    @JsonProperty
     private EnumMap<ContainerResourceType, Quota> resources = new EnumMap<>( ContainerResourceType.class );
 
 
-    public ContainerQuota()
+    public ContainerQuota( ContainerSize containerSize )
     {
+        this.containerSize = containerSize;
     }
 
 
-    public ContainerQuota( Quota quota )
+    public ContainerQuota( ContainerSize containerSize, Quota quota )
     {
+        this.containerSize = containerSize;
         add( quota );
     }
 
 
-    public ContainerQuota( Quota... quotas )
+    public ContainerQuota( ContainerSize containerSize, Quota... quotas )
     {
+        this.containerSize = containerSize;
         for ( final Quota quota : quotas )
         {
             add( quota );
@@ -53,6 +59,12 @@ public class ContainerQuota
     public Quota get( ContainerResourceType containerResourceType )
     {
         return resources.get( containerResourceType );
+    }
+
+
+    public ContainerSize getContainerSize()
+    {
+        return containerSize;
     }
 
 
