@@ -18,6 +18,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
 import io.subutai.common.security.exception.SessionBlockedException;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -127,7 +128,7 @@ public class Login extends HttpServlet
         logger.info( user.getFullName() );
         logger.info( user.getSecurityKeyId() );
         logger.info( user.getUserName() );
-        Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+        Cookie fingerprint = new Cookie( Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME, user.getFingerprint() );
         fingerprint.setSecure( true );
 
 

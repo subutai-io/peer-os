@@ -26,11 +26,11 @@ var app = angular.module('subutai-app', [
 
     .run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog', 'trackerSrv'];
+CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog', 'trackerSrv', 'identitySrv'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
-function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv) {
+function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv, identitySrv) {
     var vm = this;
     vm.currentUser = localStorage.getItem('currentUser');
     vm.hubStatus = false;
@@ -63,6 +63,53 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.getRegistrationFormVisibilityStatus = function () {
         return vm.isRegistrationFormVisible;
     };
+
+    identitySrv.getObtainedKurjunToken().success(function(data){
+
+        if (!$.trim(data)){
+            getKurjunAuthToken();
+        }else{
+            localStorage.setItem('kurjunToken', data);
+        }
+    });
+
+    function getKurjunAuthToken(){
+
+        localStorage.removeItem('kurjunToken');
+
+        identitySrv.getKurjunAuthId().success(function (authId) {
+
+            console.log(authId);
+
+            var signedAuthIdTextArea = document.createElement("textarea");
+            signedAuthIdTextArea.setAttribute('class', 'bp-sign-target');
+//            signedAuthIdTextArea.style.visibility = 'hidden';
+            signedAuthIdTextArea.style.display = 'none';
+            signedAuthIdTextArea.value = authId;
+            document.body.appendChild(signedAuthIdTextArea);
+
+            $(signedAuthIdTextArea).on('change', function() {
+
+               var signedAuthId = $(this).val();
+               console.log(signedAuthId);
+
+               identitySrv.getKurjunToken(signedAuthId).success(function (kurjunToken) {
+
+                 console.log(kurjunToken);
+
+                 localStorage.setItem('kurjunToken', kurjunToken);
+
+               }).error(function(error) {
+                 console.log(error);
+               });
+
+               $(this).remove();
+            });
+
+        }).error(function(error) {
+            console.log(error);
+        });
+    }
 
     if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null
         || localStorage.getItem('currentUserToken') != getCookie('sptoken')) && getCookie('sptoken')) {

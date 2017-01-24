@@ -40,7 +40,7 @@ public class SessionEntity implements Session
     private Date endDate = new Date( System.currentTimeMillis() );
 
     //************************************
-    @ManyToOne(targetEntity = UserEntity.class)
+    @ManyToOne( targetEntity = UserEntity.class )
     @JoinColumn( name = "user_id" )
     private User user;
     //************************************
@@ -50,6 +50,7 @@ public class SessionEntity implements Session
     @Transient
     private Subject subject;
     //************************************
+    private String kurjunToken;
 
 
     @Override
@@ -133,5 +134,19 @@ public class SessionEntity implements Session
     public void setSubject( final Subject subject )
     {
         this.subject = subject;
+    }
+
+
+    @Override
+    public void setKurjunToken( final String token )
+    {
+        kurjunToken = token;
+    }
+
+
+    @Override
+    public String getKurjunToken()
+    {
+        return kurjunToken;
     }
 }

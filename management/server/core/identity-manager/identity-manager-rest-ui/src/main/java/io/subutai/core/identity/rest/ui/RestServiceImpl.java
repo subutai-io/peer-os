@@ -16,6 +16,22 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.util.EntityUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -612,5 +628,141 @@ public class RestServiceImpl implements RestService
     public Response isAdmin()
     {
         return Response.status( Response.Status.OK ).entity( identityManager.isAdmin() ).build();
+    }
+
+    //****** Kurjun ***********/
+
+
+    private String getFingerprint()
+    {
+        User user = identityManager.getActiveUser();
+        return user.getFingerprint().toLowerCase();
+    }
+
+
+    //TODO extract Kurjun url into a setting or constant
+    //or find out if local Kurjun can proxy these requests
+    @Override
+    public Response getKurjunAuthId()
+    {
+        CloseableHttpClient client = getHttpsClient( 3000 );
+        try
+        {
+            HttpGet httpGet =
+                    new HttpGet( "https://cdn.subut.ai:8338/kurjun/rest/auth/token?user=" + getFingerprint() );
+            CloseableHttpResponse response = client.execute( httpGet );
+            HttpEntity entity = response.getEntity();
+            try
+            {
+                String authId = IOUtils.toString( entity.getContent() );
+                EntityUtils.consume( entity );
+                return Response.ok( authId ).build();
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+    }
+
+
+    @Override
+    public Response getKurjunAuthToken( final String signedAuthId )
+    {
+
+        CloseableHttpClient client = getHttpsClient( 3000 );
+        try
+        {
+
+            HttpPost post = new HttpPost( "https://cdn.subut.ai:8338/kurjun/rest/auth/token" );
+
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+            entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
+            entityBuilder.addTextBody( "user", getFingerprint() );
+            entityBuilder.addTextBody( "message", signedAuthId );
+            HttpEntity httpEntity = entityBuilder.build();
+
+            post.setEntity( httpEntity );
+            CloseableHttpResponse response = client.execute( post );
+
+            try
+            {
+                if ( response.getStatusLine().getStatusCode() == 200 )
+                {
+                    HttpEntity entity = response.getEntity();
+                    String token = IOUtils.toString( entity.getContent() );
+                    EntityUtils.consume( entity );
+
+                    identityManager.getActiveSession().setKurjunToken( token );
+
+                    return Response.ok( token ).build();
+                }
+                else
+                {
+                    return Response.serverError().entity( "Http code: " + response.getStatusLine().getStatusCode() )
+                                   .build();
+                }
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage() );
+
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+    }
+
+
+    @Override
+    public Response getObtainedKurjunToken()
+    {
+        String token = null;
+
+        if ( identityManager.getActiveSession() != null )
+        {
+            token = identityManager.getActiveSession().getKurjunToken();
+        }
+
+        return Response.status( Response.Status.OK ).entity( token ).build();
+    }
+
+
+    public CloseableHttpClient getHttpsClient( int timeout )
+    {
+        try
+        {
+            RequestConfig config =
+                    RequestConfig.custom().setSocketTimeout( timeout ).setConnectTimeout( timeout ).build();
+
+            SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+            sslContextBuilder.loadTrustMaterial( null, ( TrustStrategy ) ( x509Certificates, s ) -> true );
+            SSLConnectionSocketFactory sslSocketFactory =
+                    new SSLConnectionSocketFactory( sslContextBuilder.build(), NoopHostnameVerifier.INSTANCE );
+
+            return HttpClients.custom().setDefaultRequestConfig( config ).setSSLSocketFactory( sslSocketFactory )
+                              .build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage() );
+        }
+
+        return HttpClients.createDefault();
     }
 }

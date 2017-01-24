@@ -217,4 +217,5 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 			};
 		});
 	};
+
 }

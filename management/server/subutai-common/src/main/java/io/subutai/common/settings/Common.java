@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class Common
 {
+    public static final String E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME = "su_fingerprint";
     public static final String HUB_ID = "hub";
     public static final String SUBUTAI_ID = "subutai";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
