@@ -50,7 +50,6 @@ import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -73,6 +72,7 @@ import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerGroupResources;
 
 
@@ -143,6 +143,21 @@ public class RestServiceImpl implements RestService
             return Response.serverError().entity(
                     JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
+    }
+
+
+    @Override
+    public Response createTemplate( final String environmentId, final String containerId, final String templateName,
+                                    final Boolean privateTemplate )
+    {
+        // subutai clone ubuntu16 c1
+        // subutai promote c2 -s c1
+        // subutai export c2 -t 123123123
+
+        LOG.debug( "Env id {}, Container id {}, template name {}, is private {}", environmentId, containerId,
+                templateName, privateTemplate );
+
+        return Response.ok().build();
     }
 
 

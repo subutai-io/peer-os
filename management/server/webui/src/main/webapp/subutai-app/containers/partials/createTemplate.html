@@ -1,22 +1,32 @@
 <div class="b-popup b-popup_min">
 	<div class="b-popup__header">
-		Create template from container {{ containerViewCtrl.editingContainer.containerName }}
+		Create template from container
 		<a href ng-click="closeThisDialog()">
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
 	</div>
 
-	<form ng-submit="containerViewCtrl.createTemplate(containerViewCtrl.editingContainer, isPrivate)">
+	<form ng-submit="containerViewCtrl.createTemplate(containerViewCtrl.editingContainer, name, isPrivate)">
 		<div class="b-popup__body">
 
 			<div class="popup-body-box b-popup-checkbox">
 				<label class="b-popup-body-label" for="subt_checkbox__container-private-template">
-					Create private template
+					Private template
 				</label>
 				<input type="checkbox"
 							 id="subt_checkbox__container-private-template"
 							 class="b-popup-checkbox__input"
 							 ng-model="isPrivate">
+				<div class="clear"></div>
+			</div>
+			<div class="popup-body-box b-popup-checkbox">
+				<label class="b-popup-body-label" for="subt_inp__container-template-name">
+					Template name
+				</label>
+				<input
+							 id="subt_inp__container-template-name"
+							 ng-model="name"
+							 ng-init="name=containerViewCtrl.editingContainer.hostname">
 				<div class="clear"></div>
 			</div>
 

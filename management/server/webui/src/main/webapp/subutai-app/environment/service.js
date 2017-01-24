@@ -70,6 +70,7 @@ function environmentService($http, $q) {
 		getContainerDomainNPort : getContainerDomainNPort,
 		setContainerDomainNPort : setContainerDomainNPort,
 		setContainerName : setContainerName,
+		createTemplate : createTemplate,
 
 
 		getContainersType : getContainersType,
@@ -258,7 +259,12 @@ function environmentService($http, $q) {
 
 	function setContainerName( container, name ) {
 		return $http.put( ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/name' +
-			'?name=' + name )
+			'?name=' + name );
+	}
+
+	function createTemplate( container, name, isPrivate ) {
+	    var URL = ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/template/' + name + "/private/" + ($.trim(isPrivate) ? "true" : "false") ;
+		return $http.post( URL );
 	}
 
 

@@ -378,15 +378,21 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		});
 	}
 
-    function createTemplate( container, isPrivate ) {
-        console.log(container.containerName);
-        console.log(isPrivate);
-//        LOADING_SCREEN();
-//        environmentService.setContainerName( container, name ).success( function (data) {
-//            location.reload();
-//        } ).error( function (data) {
-//            SweetAlert.swal ("ERROR!", data);
-//        } );
+    function createTemplate( container, name, isPrivate ) {
+
+        LOADING_SCREEN();
+
+        environmentService.createTemplate( container, name, isPrivate )
+        .success( function (data) {
+            LOADING_SCREEN('none');
+            ngDialog.closeAll();
+            SweetAlert.swal ("Success!", "Template has been created", "success");
+        } )
+        .error( function (data) {
+            LOADING_SCREEN('none');
+            ngDialog.closeAll();
+            SweetAlert.swal ("ERROR!", data, "error");
+        } );
     }
 
 }
