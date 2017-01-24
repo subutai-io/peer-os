@@ -14,7 +14,6 @@ import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;

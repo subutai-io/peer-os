@@ -13,7 +13,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;

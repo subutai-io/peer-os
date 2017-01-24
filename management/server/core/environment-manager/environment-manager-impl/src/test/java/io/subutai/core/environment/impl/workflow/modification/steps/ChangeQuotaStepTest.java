@@ -11,7 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Maps;
 
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.TaskUtil;

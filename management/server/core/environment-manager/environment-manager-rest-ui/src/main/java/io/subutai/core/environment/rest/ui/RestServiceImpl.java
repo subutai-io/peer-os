@@ -50,7 +50,7 @@ import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;

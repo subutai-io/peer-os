@@ -7,8 +7,7 @@ import java.util.List;
 
 import com.google.common.collect.Iterators;
 
-import io.subutai.common.peer.ContainerSize;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
 

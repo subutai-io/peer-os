@@ -22,7 +22,7 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.PermissionObject;

@@ -38,7 +38,7 @@ import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;

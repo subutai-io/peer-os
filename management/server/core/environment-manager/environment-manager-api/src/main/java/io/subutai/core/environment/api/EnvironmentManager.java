@@ -19,7 +19,7 @@ import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
