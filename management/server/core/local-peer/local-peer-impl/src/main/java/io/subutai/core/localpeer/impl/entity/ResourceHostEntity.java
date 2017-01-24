@@ -55,7 +55,7 @@ import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;

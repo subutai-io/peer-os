@@ -7,7 +7,7 @@ import java.util.Map;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;

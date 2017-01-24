@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.ContainerResourceType;

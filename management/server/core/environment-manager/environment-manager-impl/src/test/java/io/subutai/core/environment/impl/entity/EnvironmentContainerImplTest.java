@@ -21,7 +21,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
