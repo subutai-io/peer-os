@@ -160,6 +160,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
                     getKurjunAuthToken(identitySrv);
                 }else{
                     localStorage.setItem('kurjunToken', data);
+                    kurjunCheckInProgress = false;
                 }
             }).error(function(){
                 kurjunCheckInProgress = false;

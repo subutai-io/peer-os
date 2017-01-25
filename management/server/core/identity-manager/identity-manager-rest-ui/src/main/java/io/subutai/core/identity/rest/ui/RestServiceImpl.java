@@ -1,6 +1,7 @@
 package io.subutai.core.identity.rest.ui;
 
 
+import java.io.IOException;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -632,19 +633,26 @@ public class RestServiceImpl implements RestService
         CloseableHttpClient client = getHttpsClient();
         try
         {
-            HttpGet httpGet = new HttpGet(
-                    String.format( "%s/auth/token?user=%s", Common.GLOBAL_KURJUN_BASE_URL, getFingerprint() ) );
-            CloseableHttpResponse response = client.execute( httpGet );
-            HttpEntity entity = response.getEntity();
-            try
+            if ( isRegisteredWithGorjun() )
             {
-                String authId = IOUtils.toString( entity.getContent() );
-                EntityUtils.consume( entity );
-                return Response.ok( authId ).build();
+                HttpGet httpGet = new HttpGet(
+                        String.format( "%s/auth/token?user=%s", Common.GLOBAL_KURJUN_BASE_URL, getFingerprint() ) );
+                CloseableHttpResponse response = client.execute( httpGet );
+                HttpEntity entity = response.getEntity();
+                try
+                {
+                    String authId = IOUtils.toString( entity.getContent() );
+                    EntityUtils.consume( entity );
+                    return Response.ok( authId ).build();
+                }
+                finally
+                {
+                    IOUtils.closeQuietly( response );
+                }
             }
-            finally
+            else
             {
-                IOUtils.closeQuietly( response );
+                return Response.status( Response.Status.UNAUTHORIZED ).build();
             }
         }
         catch ( Exception e )
@@ -730,6 +738,19 @@ public class RestServiceImpl implements RestService
     @Override
     public Response isRegisteredWithKurjun()
     {
+        try
+        {
+            return Response.ok( isRegisteredWithGorjun() ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+    }
+
+
+    private boolean isRegisteredWithGorjun() throws IOException
+    {
         CloseableHttpClient client = getHttpsClient();
         try
         {
@@ -738,17 +759,14 @@ public class RestServiceImpl implements RestService
             CloseableHttpResponse response = client.execute( httpGet );
             try
             {
-                return Response.ok( response.getStatusLine().getStatusCode() == 200 ).build();
+                return response.getStatusLine().getStatusCode() == 200;
             }
             finally
             {
                 IOUtils.closeQuietly( response );
             }
         }
-        catch ( Exception e )
-        {
-            return Response.serverError().entity( e.getMessage() ).build();
-        }
+
         finally
         {
             IOUtils.closeQuietly( client );
