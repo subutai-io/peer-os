@@ -70,6 +70,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -118,6 +119,7 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
@@ -147,6 +149,7 @@ public class EnvironmentManagerImpl
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
     private final PeerManager peerManager;
+    private final TemplateManager templateManager;
     private final Tracker tracker;
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor;
@@ -165,17 +168,19 @@ public class EnvironmentManagerImpl
     private volatile long lastEnvSyncTs = 0L;
 
 
-    public EnvironmentManagerImpl( final PeerManager peerManager, SecurityManager securityManager,
-                                   final IdentityManager identityManager, final Tracker tracker,
-                                   final RelationManager relationManager, HubAdapter hubAdapter,
+    public EnvironmentManagerImpl( final TemplateManager templateManager, final PeerManager peerManager,
+                                   SecurityManager securityManager, final IdentityManager identityManager,
+                                   final Tracker tracker, final RelationManager relationManager, HubAdapter hubAdapter,
                                    final EnvironmentService environmentService )
     {
+        Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( tracker );
 
+        this.templateManager = templateManager;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.identityManager = identityManager;
@@ -1081,14 +1086,24 @@ public class EnvironmentManagerImpl
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         String kurjunToken = identityManager.getActiveSession().getKurjunToken();
-        Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing" );
+        Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing or expired" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         //check that container exists in the environment
         EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
-        //TODO check if template with such name already exists among user's templates !!!
+        List<Template> ownerTemplates =
+                templateManager.getTemplatesByOwner( identityManager.getActiveUser().getFingerprint() );
+
+        for ( Template template : ownerTemplates )
+        {
+            if ( template.getName().equalsIgnoreCase( templateName ) )
+            {
+                throw new IllegalStateException(
+                        String.format( "Template with name %s already exists in your repository", templateName ) );
+            }
+        }
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating template %s from container %s", templateName, containerHost.getHostname() ) );

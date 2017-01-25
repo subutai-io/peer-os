@@ -27,6 +27,11 @@ public interface RestService
     @Path( "kurjun/token" )
     Response getObtainedKurjunToken();
 
+    @GET
+    @Produces( { MediaType.TEXT_PLAIN } )
+    @Path( "kurjun/isRegistered" )
+    Response isRegisteredWithKurjun();
+
     @POST
     @Produces( { MediaType.TEXT_PLAIN } )
     @Path( "/kurjun/token" )

@@ -74,6 +74,7 @@ import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
@@ -92,11 +93,12 @@ public class EnvironmentManagerSecureProxy
     private RelationManager relationManager;
 
 
-    public EnvironmentManagerSecureProxy( final PeerManager peerManager, SecurityManager securityManager,
-                                          final IdentityManager identityManager, final Tracker tracker,
-                                          final RelationManager relationManager, HubAdapter hubAdapter,
-                                          final EnvironmentService environmentService )
+    public EnvironmentManagerSecureProxy( final TemplateManager templateManager, final PeerManager peerManager,
+                                          SecurityManager securityManager, final IdentityManager identityManager,
+                                          final Tracker tracker, final RelationManager relationManager,
+                                          HubAdapter hubAdapter, final EnvironmentService environmentService )
     {
+        Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
@@ -106,16 +108,17 @@ public class EnvironmentManagerSecureProxy
         this.relationManager = relationManager;
         this.tracker = tracker;
         this.identityManager = identityManager;
-        this.environmentManager = getEnvironmentManager( peerManager, securityManager, hubAdapter, environmentService );
+        this.environmentManager =
+                getEnvironmentManager( templateManager, peerManager, securityManager, hubAdapter, environmentService );
     }
 
 
-    protected EnvironmentManagerImpl getEnvironmentManager( PeerManager peerManager, SecurityManager securityManager,
-                                                            HubAdapter hubAdapter,
+    protected EnvironmentManagerImpl getEnvironmentManager( TemplateManager templateManager, PeerManager peerManager,
+                                                            SecurityManager securityManager, HubAdapter hubAdapter,
                                                             EnvironmentService environmentService )
     {
-        return new EnvironmentManagerImpl( peerManager, securityManager, identityManager, tracker, relationManager,
-                hubAdapter, environmentService );
+        return new EnvironmentManagerImpl( templateManager, peerManager, securityManager, identityManager, tracker,
+                relationManager, hubAdapter, environmentService );
     }
 
 
@@ -883,7 +886,12 @@ public class EnvironmentManagerSecureProxy
     public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
             throws EnvironmentNotFoundException, PeerException
     {
-        environmentManager.updateContainerHostname( environmentId, containerId, hostname );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+
+        environmentManager.updateContainerHostname( environmentId, containerId,
+                StringUtil.removeHtmlAndSpecialChars( hostname, true ) );
     }
 
 
