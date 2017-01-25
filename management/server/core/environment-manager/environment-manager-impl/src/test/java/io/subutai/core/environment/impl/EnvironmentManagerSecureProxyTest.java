@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.relation.RelationInfoManager;
@@ -230,8 +231,8 @@ public class EnvironmentManagerSecureProxyTest
     @Test
     public void testModifyEnvironment() throws Exception
     {
-        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
+        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
 
         proxy.modifyEnvironment( TestHelper.ENV_ID, topology, Lists.newArrayList( TestHelper.CONTAINER_ID ),
                 changedContainers, true );

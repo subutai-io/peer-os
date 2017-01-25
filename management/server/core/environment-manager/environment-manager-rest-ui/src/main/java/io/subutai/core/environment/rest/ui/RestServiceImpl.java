@@ -50,7 +50,6 @@ import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -73,6 +72,7 @@ import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerGroupResources;
 
 
@@ -165,8 +165,7 @@ public class RestServiceImpl implements RestService
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
@@ -205,8 +204,7 @@ public class RestServiceImpl implements RestService
             checkName( name );
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             Topology topology = new Topology( name );
 
@@ -247,24 +245,22 @@ public class RestServiceImpl implements RestService
 
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {
-            }.getType() );
+            {}.getType() );
 
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {
-            }.getType() );
+            {}.getType() );
 
 
-            Map<String, ContainerSize> changedContainersFiltered = new HashMap<>();
+            Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {
-                    }.getType() );
+                    {}.getType() );
 
             for ( Map<String, String> cont : changingContainers )
             {
-                changedContainersFiltered.put( cont.get( "key" ), ContainerSize.valueOf( cont.get( "value" ) ) );
+                changedContainersFiltered
+                        .put( cont.get( "key" ), new ContainerQuota( ContainerSize.valueOf( cont.get( "value" ) ) ) );
             }
 
 
@@ -303,22 +299,20 @@ public class RestServiceImpl implements RestService
             String name = environmentManager.loadEnvironment( environmentId ).getName();
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {
-            }.getType() );
+            {}.getType() );
 
-            Map<String, ContainerSize> changedContainersFiltered = new HashMap<>();
+            Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {
-                    }.getType() );
+                    {}.getType() );
 
             for ( Map<String, String> cont : changingContainers )
             {
-                changedContainersFiltered.put( cont.get( "key" ), ContainerSize.valueOf( cont.get( "value" ) ) );
+                changedContainersFiltered
+                        .put( cont.get( "key" ), new ContainerQuota( ContainerSize.valueOf( cont.get( "value" ) ) ) );
             }
 
             Topology topology = new Topology( name );
@@ -868,8 +862,7 @@ public class RestServiceImpl implements RestService
             EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             for ( String tag : tags )
             {

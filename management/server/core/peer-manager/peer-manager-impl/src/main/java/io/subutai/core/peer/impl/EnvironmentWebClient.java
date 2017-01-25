@@ -288,7 +288,7 @@ public class EnvironmentWebClient
     }
 
 
-    public void setContainerSize( final ContainerId containerId, final ContainerSize containerSize )
+    /*public void setContainerSize( final ContainerId containerId, final ContainerSize containerSize )
             throws PeerException
     {
         WebClient client = null;
@@ -316,7 +316,7 @@ public class EnvironmentWebClient
         }
 
         WebClientBuilder.checkResponse( response );
-    }
+    }*/
 
 
     public HostId getResourceHostIdByContainerId( final ContainerId containerId ) throws PeerException

@@ -16,6 +16,7 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
 
@@ -111,7 +112,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     String cloneContainer( Template template, String containerName, String hostname, String ip, int vlan,
                            String environmentId ) throws ResourceHostException;
 
-    void setContainerSize( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
+    void setContainerQuota( ContainerHost containerHost, ContainerQuota containerQuota ) throws ResourceHostException;
 
 
     String getRhVersion() throws ResourceHostException;

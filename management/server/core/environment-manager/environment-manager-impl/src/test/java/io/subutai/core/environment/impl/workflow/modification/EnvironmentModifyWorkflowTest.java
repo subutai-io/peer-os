@@ -14,7 +14,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
@@ -25,6 +24,8 @@ import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -43,7 +44,7 @@ public class EnvironmentModifyWorkflowTest
         public EnvironmentModifyWorkflowSUT( final String defaultDomain, final PeerManager peerManager,
                                              final SecurityManager securityManager, final LocalEnvironment environment,
                                              final Topology topology, final List<String> removedContainers,
-                                             final Map<String, ContainerSize> changedContainers,
+                                             final Map<String, ContainerQuota> changedContainers,
                                              final TrackerOperation operationTracker,
                                              final EnvironmentManagerImpl environmentManager )
         {
@@ -84,8 +85,8 @@ public class EnvironmentModifyWorkflowTest
     @Before
     public void setUp() throws Exception
     {
-        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
+        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
 
         workflow =
                 new EnvironmentModifyWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,

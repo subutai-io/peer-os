@@ -38,6 +38,7 @@ import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -244,7 +245,7 @@ public class EnvironmentManagerSecureProxy
     @RolesAllowed( "Environment-Management|Write" )
     public EnvironmentCreationRef modifyEnvironment( final String environmentId, final Topology topology,
                                                      final List<String> removedContainers,
-                                                     final Map<String, ContainerSize> changedContainers,
+                                                     final Map<String, ContainerQuota> changedContainers,
                                                      final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {

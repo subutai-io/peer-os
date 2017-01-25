@@ -7,6 +7,7 @@ import java.util.Map;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
@@ -32,7 +33,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     private LocalEnvironment environment;
     private final Topology topology;
     private List<String> removedContainers;
-    private Map<String, ContainerSize> changedContainers;
+    private Map<String, ContainerQuota> changedContainers;
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
@@ -64,7 +65,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
     public EnvironmentModifyWorkflow( String defaultDomain, PeerManager peerManager, SecurityManager securityManager,
                                       LocalEnvironment environment, Topology topology, List<String> removedContainers,
-                                      Map<String, ContainerSize> changedContainers, TrackerOperation operationTracker,
+                                      Map<String, ContainerQuota> changedContainers, TrackerOperation operationTracker,
                                       EnvironmentManagerImpl environmentManager )
     {
 

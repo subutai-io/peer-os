@@ -850,7 +850,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                 request.getHostname(), request.getTemplateArch(), interfaces,
                                 request.getContainerName(), request.getTemplateId(), requestGroup.getEnvironmentId(),
                                 requestGroup.getOwnerId(), requestGroup.getInitiatorPeerId(),
-                                request.getContainerSize() );
+                                request.getContainerQuota() );
 
                 registerContainer( request.getResourceHostId(), containerHostEntity );
 
@@ -2731,7 +2731,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return containerQuota;
     }
 
-
+/*
     @Override
     public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
     {
@@ -2747,15 +2747,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Could not set quota values of %s", containerId.getId() ) );
         }
-    }
+    }*/
 
 
     @Override
-    public void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize )
+    public void setContainerQuota( final ContainerId containerHostId, final ContainerQuota containerQuota )
             throws PeerException
     {
         Preconditions.checkNotNull( containerHostId );
-        Preconditions.checkNotNull( containerSize );
+        Preconditions.checkNotNull( containerQuota );
 
         try
         {
@@ -2763,7 +2763,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
 
-            resourceHost.setContainerSize( containerHost, containerSize );
+            resourceHost.setContainerQuota( containerHost, containerQuota );
 
             resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
         }

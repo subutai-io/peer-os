@@ -169,13 +169,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
     public EnvironmentContainerImpl( final String initiatorPeerId, final String peerId,
                                      final ContainerHostInfoModel hostInfo, final String templateId, String domainName,
-                                     ContainerSize containerSize, String resourceHostId )
+                                     ContainerQuota containerQuota, String resourceHostId )
     {
         Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( templateId );
-        Preconditions.checkNotNull( containerSize );
+        Preconditions.checkNotNull( containerQuota );
+        Preconditions.checkNotNull( containerQuota.getContainerSize() );
 
         this.initiatorPeerId = initiatorPeerId;
         this.peerId = peerId;
@@ -185,7 +186,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         this.hostArchitecture = hostInfo.getArch();
         this.templateId = templateId;
         this.domainName = domainName;
-        this.containerSize = containerSize;
+        this.containerSize = containerQuota.getContainerSize();
         this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
@@ -591,7 +592,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
-        getPeer().setQuota( this.getContainerId(), containerQuota );
+        getPeer().setContainerQuota( this.getContainerId(), containerQuota );
     }
 
 
@@ -601,15 +602,24 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         return containerSize;
     }
 
+    //
+    //    @Override
+    //    public EnvironmentContainerHost setContainerQuota( final ContainerSize size ) throws PeerException
+    //    {
+    //        getPeer().setContainerQuota( this.getContainerId(), size );
+    //
+    //        this.containerSize = size;
+    //
+    //        return environmentManager.update( this );
+    //    }
+
 
     @Override
-    public EnvironmentContainerHost setContainerSize( final ContainerSize size ) throws PeerException
+    public void setContainerQuota( final ContainerQuota containerQuota ) throws PeerException
     {
-        getPeer().setContainerSize( this.getContainerId(), size );
-
-        this.containerSize = size;
-
-        return environmentManager.update( this );
+        this.containerSize = containerQuota.getContainerSize();
+        getPeer().setContainerQuota( getContainerId(), containerQuota );
+        environmentManager.update( this );
     }
 
 

@@ -180,7 +180,7 @@ public interface Peer extends RelationLink
 
     //******** Quota functions ***********
 
-    void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize ) throws PeerException;
+    void setContainerQuota( final ContainerId containerHostId, final ContainerQuota containerQuota ) throws PeerException;
 
     /**
      * Returns resource usage of process on container by its PID
@@ -258,7 +258,7 @@ public interface Peer extends RelationLink
 
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
 
-    void setQuota( ContainerId containerId, ContainerQuota quota ) throws PeerException;
+//    void setQuota( ContainerId containerId, ContainerQuota quota ) throws PeerException;
 
     void alert( AlertEvent alert ) throws PeerException;
 

@@ -75,11 +75,13 @@ public interface EnvironmentRestService
     @Produces( MediaType.APPLICATION_JSON )
     Response setQuota( @PathParam( "containerId" ) ContainerId containerId, ContainerQuota containerQuota );
 
+/*
     @POST
     @Path( "{environmentId}/container/{containerId}/size" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response setContainerSize( @PathParam( "containerId" ) ContainerId containerId, ContainerSize containerSize );
+*/
 
     @GET
     @Path( "{environmentId}/container/{containerId}/rhId" )

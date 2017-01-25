@@ -295,7 +295,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( containerQuota );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
-            localPeer.setQuota( containerId, containerQuota );
+            localPeer.setContainerQuota( containerId, containerQuota );
 
             return Response.ok().build();
         }
@@ -307,7 +307,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     }
 
 
-    @Override
+/*    @Override
     public Response setContainerSize( final ContainerId containerId, ContainerSize containerSize )
     {
         try
@@ -325,7 +325,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
-    }
+    }*/
 
 
     @Override

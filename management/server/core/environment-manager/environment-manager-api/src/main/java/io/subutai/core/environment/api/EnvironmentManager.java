@@ -19,6 +19,7 @@ import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -61,7 +62,7 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology, List<String> removedContainers,
-                                              Map<String, ContainerSize> changedContainers, boolean async )
+                                              Map<String, ContainerQuota> changedContainers, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 

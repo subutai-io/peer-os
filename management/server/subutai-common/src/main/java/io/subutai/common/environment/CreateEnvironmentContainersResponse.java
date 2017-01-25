@@ -33,7 +33,7 @@ public class CreateEnvironmentContainersResponse
                 responses.add( new CloneResponse( task.getHost().getId(), request.getHostname(),
                         request.getContainerName(), request.getTemplateId(), request.getTemplateArch(),
                         request.getIp(), cloneContainerTask.getResult(), task.getDuration(),
-                        request.getContainerSize() ) );
+                        request.getContainerQuota() ) );
 
                 this.messages.add( String
                         .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getHostname(),

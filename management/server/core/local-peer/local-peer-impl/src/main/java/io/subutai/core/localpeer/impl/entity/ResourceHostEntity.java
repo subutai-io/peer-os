@@ -481,11 +481,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setContainerSize( final ContainerHost containerHost, final ContainerSize containerSize )
+    public void setContainerQuota( final ContainerHost containerHost, final ContainerQuota containerQuota )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
-        Preconditions.checkNotNull( containerSize );
+        Preconditions.checkNotNull( containerQuota );
 
         try
         {
@@ -496,19 +496,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException(
                     String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
-
-        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerSize );
+        // TODO: 1/25/17 implement me
+        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerQuota.getContainerSize() );
 
         try
         {
             getQuotaManager().setQuota( containerHost.getContainerId(), quota );
 
-            ( ( ContainerHostEntity ) containerHost ).setContainerSize( containerSize );
+            ( ( ContainerHostEntity ) containerHost ).setContainerSize( containerQuota.getContainerSize() );
         }
         catch ( QuotaException e )
         {
-            throw new ResourceHostException( String.format( "Error setting quota %s to container %s: %s", containerSize,
-                    containerHost.getHostname(), e.getMessage() ), e );
+            throw new ResourceHostException(
+                    String.format( "Error setting quota %s to container %s: %s", containerQuota,
+                            containerHost.getHostname(), e.getMessage() ), e );
         }
     }
 
@@ -993,7 +994,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                 new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
                                         info.getHostInterfaces(), info.getContainerName(),
                                         getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
-                                        Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
+                                        Common.MANAGEMENT_HOSTNAME, null, null,
+                                        new ContainerQuota( ContainerSize.SMALL ) );
 
                         addContainerHost( containerHost );
                     }

@@ -101,7 +101,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ContainerHostEntity( final String peerId, final String hostId, final String hostname,
                                 HostArchitecture architecture, HostInterfaces hostInterfaces,
                                 final String containerName, final String templateId, final String environmentId,
-                                final String ownerId, final String initiatorPeerId, final ContainerSize containerSize )
+                                final String ownerId, final String initiatorPeerId,
+                                final ContainerQuota containerQuota )
     {
         super( peerId, hostId, hostname, architecture, hostInterfaces );
         this.containerName = containerName;
@@ -109,7 +110,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
-        this.containerSize = containerSize;
+        this.containerSize = containerQuota.getContainerSize();
     }
 
 
@@ -260,7 +261,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
-        getPeer().setQuota( this.getContainerId(), containerQuota );
+        getPeer().setContainerQuota( this.getContainerId(), containerQuota );
     }
 
 
@@ -268,6 +269,14 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ContainerSize getContainerSize()
     {
         return containerSize;
+    }
+
+
+    @Override
+    public void setContainerQuota( final ContainerQuota containerQuota ) throws PeerException
+    {
+        this.containerSize = containerQuota.getContainerSize();
+        setQuota( containerQuota );
     }
 
 

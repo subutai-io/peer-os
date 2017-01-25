@@ -43,7 +43,6 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -454,7 +453,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
+    public void setContainerQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
@@ -463,7 +462,7 @@ public class RemotePeerImpl implements RemotePeer
         environmentWebClient.setQuota( containerId, containerQuota );
     }
 
-
+/*
     @Override
     public void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize )
             throws PeerException
@@ -473,7 +472,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerSize, "Container size is null" );
 
         environmentWebClient.setContainerSize( containerHostId, containerSize );
-    }
+    }*/
 
 
     @Override

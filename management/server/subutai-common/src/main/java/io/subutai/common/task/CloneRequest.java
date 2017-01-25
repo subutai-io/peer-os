@@ -5,8 +5,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.settings.Common;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 public class CloneRequest
@@ -17,12 +17,12 @@ public class CloneRequest
     private final String ip;
     private final String templateId;
     private final HostArchitecture templateArch;
-    private final ContainerSize containerSize;
+    private final ContainerQuota containerQuota;
 
 
     public CloneRequest( final String resourceHostId, final String hostname, final String containerName,
                          final String ip, final String templateId, HostArchitecture templateArch,
-                         final ContainerSize containerSize )
+                         final ContainerQuota containerQuota )
     {
         Preconditions.checkNotNull( resourceHostId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -35,7 +35,7 @@ public class CloneRequest
         this.ip = ip;
         this.templateId = templateId;
         this.templateArch = templateArch;
-        this.containerSize = containerSize;
+        this.containerQuota = containerQuota;
     }
 
 
@@ -87,9 +87,9 @@ public class CloneRequest
     }
 
 
-    public ContainerSize getContainerSize()
+    public ContainerQuota getContainerQuota()
     {
-        return containerSize;
+        return containerQuota;
     }
 
 
@@ -98,6 +98,6 @@ public class CloneRequest
     {
         return "CloneRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
                 + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", templateId='" + templateId
-                + '\'' + ", templateArch=" + templateArch + ", containerSize=" + containerSize + '}';
+                + '\'' + ", templateArch=" + templateArch + ", containerQuota=" + containerQuota + '}';
     }
 }
