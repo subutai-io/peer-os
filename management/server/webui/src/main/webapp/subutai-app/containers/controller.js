@@ -60,6 +60,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.getContainerNameFromHostName=getContainerNameFromHostName;
 	vm.createTemplatePopup=createTemplatePopup;
 	vm.createTemplate=createTemplate;
+	vm.hasKurjunToken=hasKurjunToken;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;
@@ -393,6 +394,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
             ngDialog.closeAll();
             SweetAlert.swal ("ERROR!", data, "error");
         } );
+    }
+
+    function hasKurjunToken(){
+        return !(localStorage.getItem('kurjunToken') == undefined || localStorage.getItem('kurjunToken') == null);
     }
 
 }
