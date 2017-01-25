@@ -61,7 +61,6 @@ import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -106,6 +105,7 @@ import io.subutai.core.environment.impl.workflow.modification.HostnameModificati
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.TemplateCreationWorkflow;
 import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
@@ -122,6 +122,7 @@ import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -1071,6 +1072,56 @@ public class EnvironmentManagerImpl
     }
 
 
+    @Override
+    public void createTemplate( final String environmentId, final String containerId, final String templateName,
+                                final boolean privateTemplate, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        String kurjunToken = identityManager.getActiveSession().getKurjunToken();
+        Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing" );
+
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
+
+        //check that container exists in the environment
+        EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
+
+        //TODO check if template with such name already exists among user's templates !!!
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Creating template %s from container %s", templateName, containerHost.getHostname() ) );
+
+        final TemplateCreationWorkflow templateCreationWorkflow =
+                getTemplateCreationWorkflow( environment, containerId, templateName, privateTemplate,
+                        operationTracker );
+
+        registerActiveWorkflow( environment, templateCreationWorkflow );
+
+        templateCreationWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeActiveWorkflow( environment.getId() );
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            templateCreationWorkflow.join();
+
+            if ( templateCreationWorkflow.isFailed() )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( templateCreationWorkflow.getFailedException() ) );
+            }
+        }
+    }
+
+
     protected void registerActiveWorkflow( Environment environment, CancellableWorkflow newWorkflow )
     {
         Preconditions.checkNotNull( environment );
@@ -1510,6 +1561,16 @@ public class EnvironmentManagerImpl
                                                                             final TrackerOperation operationTracker )
     {
         return new HostnameModificationWorkflow( environment, containerId, newHostname, operationTracker, this );
+    }
+
+
+    protected TemplateCreationWorkflow getTemplateCreationWorkflow( final LocalEnvironment environment,
+                                                                    final String containerId, final String templateName,
+                                                                    final boolean isPrivateTemplate,
+                                                                    final TrackerOperation operationTracker )
+    {
+        return new TemplateCreationWorkflow( environment, containerId, templateName, isPrivateTemplate,
+                operationTracker );
     }
 
     //-- workflow factories end

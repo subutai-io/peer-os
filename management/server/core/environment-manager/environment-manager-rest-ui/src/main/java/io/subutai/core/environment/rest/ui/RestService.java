@@ -36,7 +36,7 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response createTemplate( @PathParam( "environmentId" ) String environmentId,
                              @PathParam( "containerId" ) String containerId, @PathParam( "name" ) String templateName,
-                             @PathParam( "private" ) Boolean privateTemplate );
+                             @PathParam( "private" ) boolean privateTemplate );
 
     /** Environments **************************************************** */
 

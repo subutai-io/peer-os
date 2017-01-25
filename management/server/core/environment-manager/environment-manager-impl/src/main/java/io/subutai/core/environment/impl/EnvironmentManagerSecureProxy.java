@@ -38,7 +38,6 @@ import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -79,6 +78,7 @@ import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 @PermitAll
@@ -983,5 +983,14 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
     {
         environmentManager.placeEnvironmentInfoByContainerId( environmentId, containerId );
+    }
+
+
+    @Override
+    public void createTemplate( final String environmentId, final String containerId, final String templateName,
+                                final boolean privateTemplate, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate, async );
     }
 }

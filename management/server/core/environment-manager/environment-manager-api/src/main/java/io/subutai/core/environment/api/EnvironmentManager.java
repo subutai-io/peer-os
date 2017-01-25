@@ -19,7 +19,6 @@ import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -29,6 +28,7 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 public interface EnvironmentManager
@@ -269,4 +269,8 @@ public interface EnvironmentManager
     //called by remote peer
     void placeEnvironmentInfoByContainerId( String environmentId, String containerIp )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
+
+    void createTemplate( String environmentId, String containerId, String templateName, boolean privateTemplate,
+                         boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 }

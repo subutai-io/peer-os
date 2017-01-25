@@ -16,7 +16,6 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.CustomProxyConfig;
@@ -27,6 +26,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -566,6 +566,49 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 
             environmentManager.placeEnvironmentInfoByContainerId( environmentId, containerId );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response promoteTemplate( final ContainerId containerId, final String templateName )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+
+
+            localPeer.promoteTemplate( containerId, templateName );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response exportTemplate( final ContainerId containerId, final String templateName,
+                                    final boolean isPrivateTemplate )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+
+
+            localPeer.exportTemplate( containerId, templateName, isPrivateTemplate );
 
             return Response.ok().build();
         }

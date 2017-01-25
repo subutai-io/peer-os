@@ -16,12 +16,12 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 public interface EnvironmentRestService
@@ -191,4 +191,20 @@ public interface EnvironmentRestService
     @Produces( MediaType.APPLICATION_JSON )
     Response placeEnvironmentInfoByContainerId( @PathParam( "environmentId" ) String environmentId,
                                                 @PathParam( "containerId" ) String containerId );
+
+
+    @POST
+    @Path( "{environmentId}/containers/{containerId}/template/{templateName}/promote" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response promoteTemplate( @PathParam( "containerId" ) ContainerId containerId,
+                              @PathParam( "templateName" ) String templateName );
+
+    @POST
+    @Path( "{environmentId}/containers/{containerId}/template/{templateName}/export/{isPrivateTemplate}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response exportTemplate( @PathParam( "containerId" ) ContainerId containerId,
+                             @PathParam( "templateName" ) String templateName,
+                             @PathParam( "isPrivateTemplate" ) boolean isPrivateTemplate );
 }

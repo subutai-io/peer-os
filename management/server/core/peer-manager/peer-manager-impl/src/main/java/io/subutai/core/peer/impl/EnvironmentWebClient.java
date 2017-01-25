@@ -17,7 +17,6 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -27,6 +26,7 @@ import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -830,6 +830,69 @@ public class EnvironmentWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error requesting environment info: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void promoteTemplate( final ContainerId containerId, final String templateName ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/containers/%s/template/%s/promote", containerId.getEnvironmentId(),
+                    containerId.getId(), templateName );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000,
+                     // 1 min for promote
+                    60 * 1000, 1 );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error promoting container to template: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void exportTemplate( final ContainerId containerId, final String templateName,
+                                final boolean isPrivateTemplate ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/containers/%s/template/%s/export/%s", containerId.getEnvironmentId(),
+                    containerId.getId(), templateName, isPrivateTemplate );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000,
+                     // 1 hour for export
+                    60 * 60 * 1000, 1 );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error exporting template: " + e.getMessage() );
         }
         finally
         {

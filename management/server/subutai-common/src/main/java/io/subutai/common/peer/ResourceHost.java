@@ -76,7 +76,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
 
-    void deleteTunnels(P2pIps p2pIps, NetworkResource networkResource) throws ResourceHostException;
+    void deleteTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
 
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 
@@ -131,4 +131,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     RhTemplatesDownloadProgress getTemplateDownloadProgress( String environmentId );
 
     void removeContainerHost( ContainerHost containerHost );
+
+    void promoteTemplate( String containerName, String templateName ) throws ResourceHostException;
+
+    void exportTemplate( String templateName, boolean isPrivateTemplate ) throws ResourceHostException;
 }

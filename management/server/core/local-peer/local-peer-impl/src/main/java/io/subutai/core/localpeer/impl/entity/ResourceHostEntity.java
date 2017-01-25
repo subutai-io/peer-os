@@ -55,7 +55,6 @@ import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -83,6 +82,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.QuotaException;
 
 
@@ -1120,6 +1120,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                         String.format( "Error setting resource host hostname: %s", e.getMessage() ), e );
             }
         }
+    }
+
+
+    @Override
+    public void promoteTemplate( final String containerName, final String templateName ) throws ResourceHostException
+    {
+        //TODO
+    }
+
+
+    @Override
+    public void exportTemplate( final String templateName, final boolean isPrivateTemplate )
+            throws ResourceHostException
+    {
+        //TODO
     }
 
 

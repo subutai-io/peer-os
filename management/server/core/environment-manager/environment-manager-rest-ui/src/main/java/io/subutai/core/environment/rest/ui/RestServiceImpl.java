@@ -148,16 +148,21 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response createTemplate( final String environmentId, final String containerId, final String templateName,
-                                    final Boolean privateTemplate )
+                                    final boolean privateTemplate )
     {
-        // subutai clone ubuntu16 c1
-        // subutai promote c2 -s c1
-        // subutai export c2 -t 123123123
 
         LOG.debug( "Env id {}, Container id {}, template name {}, is private {}", environmentId, containerId,
                 templateName, privateTemplate );
+        try
+        {
+            environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate, false );
 
-        return Response.ok().build();
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
     }
 
 

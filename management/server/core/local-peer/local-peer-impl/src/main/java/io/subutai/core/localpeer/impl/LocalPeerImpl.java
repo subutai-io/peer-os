@@ -65,7 +65,6 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -152,6 +151,7 @@ import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerResource;
 import io.subutai.hub.share.quota.ContainerResourceFactory;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.Quota;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.ContainerResourceType;
@@ -3245,6 +3245,48 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return peerProgress;
     }
 
+
+    @Override
+    public void promoteTemplate( final ContainerId containerId, final String templateName ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
+
+        ResourceHost resourceHost = containerHost.getParent();
+
+        try
+        {
+            resourceHost.promoteTemplate( containerHost.getContainerName(), templateName );
+        }
+        catch ( ResourceHostException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error promoting template: %s", e.getMessage() ) );
+        }
+    }
+
+
+    @Override
+    public void exportTemplate( final ContainerId containerId, final String templateName,
+                                final boolean isPrivateTemplate ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+
+        ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
+
+        try
+        {
+            resourceHost.exportTemplate( templateName, isPrivateTemplate );
+        }
+        catch ( ResourceHostException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error exporting template: %s", e.getMessage() ) );
+        }
+    }
 
     //**************************
 
