@@ -55,7 +55,6 @@ import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -83,6 +82,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.QuotaException;
 
 
@@ -831,17 +831,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( final Template template, final String environmentId ) throws ResourceHostException
+    public void importTemplate( final Template template, final String environmentId, final String kurjunToken )
+            throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
 
         try
         {
             updateTemplateDownloadProgress( environmentId, template.getName(), 0 );
 
-            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId() ), this,
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId(), kurjunToken ), this,
                     new TemplateDownloadTracker( this, environmentId ) );
         }
         catch ( Exception e )
@@ -891,8 +891,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public String cloneContainer( final Template template, final String containerName, final String hostname,
-                                  final String ip, final int vlan, final String environmentId )
-            throws ResourceHostException
+                                  final String ip, final int vlan, final String environmentId,
+                                  final String kurjunToken ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
@@ -905,11 +905,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             //generate registration token for container for 30 min
-            String token = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
+            String containerToken = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
 
             CommandResult result = commandUtil.execute( resourceHostCommands
                     .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
-                            token ), this );
+                            containerToken, kurjunToken ), this );
 
             //parse ID from output
 
@@ -934,9 +934,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
             if ( Strings.isNullOrEmpty( containerId ) )
             {
-                LOG.error( "Container ID not found in output of subutai clone command" );
+                LOG.error( "Container ID not found in the output of subutai clone command" );
 
-                throw new CommandException( "Container ID not found in output of subutai clone command" );
+                throw new CommandException( "Container ID not found in the output of subutai clone command" );
             }
 
             return containerId;
@@ -1119,6 +1119,51 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 throw new ResourceHostException(
                         String.format( "Error setting resource host hostname: %s", e.getMessage() ), e );
             }
+        }
+    }
+
+
+    @Override
+    public void promoteTemplate( final String containerName, final String templateName ) throws ResourceHostException
+    {
+        try
+        {
+            commandUtil.execute( resourceHostCommands.getPromoteTemplateCommand( containerName, templateName ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error promoting container to template: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String exportTemplate( final String templateName, final boolean isPrivateTemplate, final String token )
+            throws ResourceHostException
+    {
+        try
+        {
+            CommandResult result = commandUtil
+                    .execute( resourceHostCommands.getExportTemplateCommand( templateName, isPrivateTemplate, token ),
+                            this );
+
+            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*]" );
+
+            Matcher m = p.matcher( result.getStdOut() );
+
+            if ( m.find() && m.groupCount() == 1 )
+            {
+                return m.group( 1 );
+            }
+            else
+            {
+                throw new ResourceHostException( "Template hash is not found in the output of subutai export command" );
+            }
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error exporting template: %s", e.getMessage() ), e );
         }
     }
 

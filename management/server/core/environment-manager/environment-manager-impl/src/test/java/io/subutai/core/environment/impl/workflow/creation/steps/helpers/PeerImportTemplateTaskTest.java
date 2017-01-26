@@ -39,7 +39,7 @@ public class PeerImportTemplateTaskTest
         PEER = TestHelper.PEER();
 
         task = new PeerImportTemplateTask( TestHelper.ENV_ID, PEER, Sets.newHashSet( TestHelper.NODE() ),
-                TestHelper.TRACKER_OPERATION() );
+                TestHelper.KURJUN_TOKEN, TestHelper.TRACKER_OPERATION() );
 
         doReturn( response ).when( PEER ).prepareTemplates( any( PrepareTemplatesRequest.class ) );
         doReturn( Sets.newHashSet( TestHelper.MESSAGE ) ).when( response ).getMessages();

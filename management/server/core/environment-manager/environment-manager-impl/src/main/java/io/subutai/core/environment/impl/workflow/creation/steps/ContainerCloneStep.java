@@ -31,6 +31,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerEnvironmentContainersTask;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -43,6 +44,7 @@ public class ContainerCloneStep
     private final String defaultDomain;
     private final Topology topology;
     private final LocalEnvironment environment;
+    private final IdentityManager identityManager;
     private final TrackerOperation operationTracker;
     private final String localPeerId;
     private PeerManager peerManager;
@@ -50,12 +52,14 @@ public class ContainerCloneStep
 
 
     public ContainerCloneStep( final String defaultDomain, final Topology topology, final LocalEnvironment environment,
-                               final PeerManager peerManager, final TrackerOperation operationTracker )
+                               final PeerManager peerManager, final IdentityManager identityManager,
+                               final TrackerOperation operationTracker )
     {
         this.defaultDomain = defaultDomain;
         this.topology = topology;
         this.environment = environment;
         this.peerManager = peerManager;
+        this.identityManager = identityManager;
         this.operationTracker = operationTracker;
         this.localPeerId = peerManager.getLocalPeer().getId();
     }
@@ -107,7 +111,8 @@ public class ContainerCloneStep
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
 
             cloneUtil.addPeerTask( new PeerUtil.PeerTask<>( peer,
-                    new CreatePeerEnvironmentContainersTask( peer, peerManager.getLocalPeer(), environment,
+                    new CreatePeerEnvironmentContainersTask( identityManager, peer, peerManager.getLocalPeer(),
+                            environment,
                             addresses.subList( currentOffset, currentOffset + peerPlacement.getValue().size() ),
                             peerPlacement.getValue(), operationTracker ) ) );
 
@@ -119,8 +124,7 @@ public class ContainerCloneStep
         //collect results
         boolean succeeded = true;
 
-        for ( PeerUtil.PeerTaskResult<CreateEnvironmentContainersResponse> cloneResult : cloneResults
-                .getResults() )
+        for ( PeerUtil.PeerTaskResult<CreateEnvironmentContainersResponse> cloneResult : cloneResults.getResults() )
         {
             CreateEnvironmentContainersResponse response = cloneResult.getResult();
             String peerId = cloneResult.getPeer().getId();

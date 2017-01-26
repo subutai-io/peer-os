@@ -19,7 +19,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLink;
@@ -32,8 +31,10 @@ import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
+import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -70,6 +71,8 @@ public class EnvironmentManagerSecureProxyTest
     @Mock
     Tracker tracker;
     @Mock
+    TemplateManager templateManager;
+    @Mock
     RelationManager relationManager;
     LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
@@ -84,12 +87,13 @@ public class EnvironmentManagerSecureProxyTest
                                                  final RelationManager relationManager, final HubAdapter hubAdapter,
                                                  final EnvironmentService environmentService )
         {
-            super( peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
+            super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
                     environmentService );
         }
 
 
-        protected EnvironmentManagerImpl getEnvironmentManager( PeerManager peerManager,
+        protected EnvironmentManagerImpl getEnvironmentManager( TemplateManager templateManager,
+                                                                PeerManager peerManager,
                                                                 SecurityManager securityManager, HubAdapter hubAdapter,
                                                                 EnvironmentService environmentService )
         {

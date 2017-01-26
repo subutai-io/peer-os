@@ -22,15 +22,26 @@ public interface RestService
     @Path( "kurjun/authid" )
     Response getKurjunAuthId();
 
+    @POST
+    @Produces( { MediaType.TEXT_PLAIN } )
+    @Path( "kurjun/token" )
+    Response obtainKurjunToken( @FormParam( "signedAuthId" ) String signedAuthId );
+
     @GET
     @Produces( { MediaType.TEXT_PLAIN } )
     @Path( "kurjun/token" )
     Response getObtainedKurjunToken();
 
+    @GET
+    @Produces( { MediaType.TEXT_PLAIN } )
+    @Path( "kurjun/isRegistered" )
+    Response isRegisteredWithKurjun();
+
+
     @POST
     @Produces( { MediaType.TEXT_PLAIN } )
-    @Path( "/kurjun/token" )
-    Response getKurjunAuthToken( @FormParam( "signedAuthId" ) String signedAuthId );
+    @Path( "kurjun/sign" )
+    Response submitSignedTemplateHash( @FormParam( "signedHash" ) String signedTemplateHash );
 
     /** Users ***********************************************/
 

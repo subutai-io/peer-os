@@ -43,7 +43,6 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -90,6 +89,7 @@ import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -1053,6 +1053,28 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         return environmentWebClient.getTemplateDownloadProgress( environmentId );
+    }
+
+
+    @Override
+    public void promoteTemplate( final ContainerId containerId, final String templateName ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+
+        environmentWebClient.promoteTemplate( containerId, templateName );
+    }
+
+
+    @Override
+    public String exportTemplate( final ContainerId containerId, final String templateName,
+                                  final boolean isPrivateTemplate, final String token ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
+
+        return environmentWebClient.exportTemplate( containerId, templateName, isPrivateTemplate, token );
     }
 
 

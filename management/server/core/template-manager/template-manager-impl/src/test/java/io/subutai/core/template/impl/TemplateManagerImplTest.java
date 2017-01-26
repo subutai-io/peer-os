@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -17,6 +16,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.cache.LoadingCache;
 
 import io.subutai.common.protocol.Template;
+import io.subutai.core.identity.api.IdentityManager;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
@@ -46,13 +46,15 @@ public class TemplateManagerImplTest
     LoadingCache<String, Template> cache;
     @Mock
     Template template;
+    @Mock
+    IdentityManager identityManager;
 
 
     @Before
     public void setUp() throws Exception
     {
 
-        templateManager = spy( new TemplateManagerImpl() );
+        templateManager = spy( new TemplateManagerImpl( identityManager ) );
 
         doReturn( webClient ).when( templateManager ).getWebClient( anyString() );
         doReturn( response ).when( webClient ).get();
@@ -78,6 +80,7 @@ public class TemplateManagerImplTest
 
         assertNotNull( template );
     }
+
 
     @Test
     public void testGetTemplateByName() throws Exception

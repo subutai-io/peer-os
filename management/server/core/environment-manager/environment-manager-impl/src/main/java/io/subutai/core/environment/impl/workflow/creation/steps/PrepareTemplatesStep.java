@@ -25,16 +25,18 @@ public class PrepareTemplatesStep
     private final Environment environment;
     private final Topology topology;
     private final PeerManager peerManager;
+    private final String kurjunToken;
     private final TrackerOperation operationTracker;
     protected PeerUtil<PrepareTemplatesResponse> templateUtil = new PeerUtil<>();
 
 
     public PrepareTemplatesStep( final Environment environment, final PeerManager peerManager, final Topology topology,
-                                 final TrackerOperation operationTracker )
+                                 final String kurjunToken, final TrackerOperation operationTracker )
     {
         this.environment = environment;
         this.topology = topology;
         this.peerManager = peerManager;
+        this.kurjunToken = kurjunToken;
         this.operationTracker = operationTracker;
     }
 
@@ -49,7 +51,7 @@ public class PrepareTemplatesStep
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
 
             templateUtil.addPeerTask( new PeerUtil.PeerTask<>( peer,
-                    new PeerImportTemplateTask( environment.getId(), peer, peerPlacement.getValue(),
+                    new PeerImportTemplateTask( environment.getId(), peer, peerPlacement.getValue(), kurjunToken,
                             operationTracker ) ) );
         }
 
