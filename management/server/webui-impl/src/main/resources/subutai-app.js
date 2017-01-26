@@ -32,8 +32,6 @@ startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', '
 
 function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv, identitySrv) {
 
-    checkKurjunAuthToken(identitySrv);
-
     var vm = this;
     vm.currentUser = localStorage.getItem('currentUser');
     vm.hubStatus = false;
@@ -126,6 +124,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             }
         });
     }
+
+    checkKurjunAuthToken(identitySrv);
 
     checkIfRegistered();
 
