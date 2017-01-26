@@ -381,7 +381,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		});
 	}
 
+    vm.disabled = false;
+
     function createTemplate( container, name, isPrivate ) {
+
+        vm.disabled = true;
 
         LOADING_SCREEN();
 
@@ -401,10 +405,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
                // submit signed hash
                identitySrv.submitSignedHash(signedHash).success(function(){
+                   vm.disabled = false;
                    LOADING_SCREEN('none');
                    ngDialog.closeAll();
                    SweetAlert.swal ("Success!", "Template has been created", "success");
                }).error(function(error){
+                   vm.disabled = false;
                    LOADING_SCREEN('none');
                    ngDialog.closeAll();
                    SweetAlert.swal ("ERROR!", error, "error");
@@ -415,6 +421,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
         } )
         .error( function (error) {
+            vm.disabled = false;
             LOADING_SCREEN('none');
             ngDialog.closeAll();
             SweetAlert.swal ("ERROR!", error, "error");
