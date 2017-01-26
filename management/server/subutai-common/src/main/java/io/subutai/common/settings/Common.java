@@ -40,6 +40,8 @@ public class Common
     public static final int CLONE_TIMEOUT_SEC = 60 * 5; // 5 min
 
     public static final int TEMPLATE_DOWNLOAD_TIMEOUT_SEC = 60 * 60 * 5; // 5 hour
+    public static final int TEMPLATE_EXPORT_TIMEOUT_SEC = 60 * 60 * 5; // 5 hour
+    public static final int TEMPLATE_PROMOTE_TIMEOUT_SEC = 60 * 10; // 10 min
 
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
     public static final String IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}"

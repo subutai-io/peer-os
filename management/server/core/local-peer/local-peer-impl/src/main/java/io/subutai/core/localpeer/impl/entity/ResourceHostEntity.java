@@ -1126,15 +1126,32 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void promoteTemplate( final String containerName, final String templateName ) throws ResourceHostException
     {
-        //TODO
+        try
+        {
+            commandUtil.execute( resourceHostCommands.getPromoteTemplateCommand( containerName, templateName ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error promoting container to template: %s", e.getMessage() ), e );
+        }
     }
 
 
     @Override
-    public void exportTemplate( final String templateName, final boolean isPrivateTemplate )
+    public void exportTemplate( final String templateName, final boolean isPrivateTemplate, final String token )
             throws ResourceHostException
     {
-        //TODO
+        try
+        {
+            commandUtil
+                    .execute( resourceHostCommands.getExportTemplateCommand( templateName, isPrivateTemplate, token ),
+                            this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error exporting template: %s", e.getMessage() ), e );
+        }
     }
 
 

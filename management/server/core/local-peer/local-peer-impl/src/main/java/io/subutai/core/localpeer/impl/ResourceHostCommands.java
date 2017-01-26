@@ -82,4 +82,22 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( String.format( "subutai hostname %s", newHostname ) );
     }
+
+
+    public RequestBuilder getPromoteTemplateCommand( final String containerName, final String templateName )
+    {
+        // subutai promote c2 -s c1
+        return new RequestBuilder( String.format( "subutai promote %s -s %s", templateName, containerName ) )
+                .withTimeout( Common.TEMPLATE_PROMOTE_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getExportTemplateCommand( final String templateName, final boolean isPrivateTemplate,
+                                                    final String token )
+    {
+        // subutai export c2 -t 123123123 [-p]
+        return new RequestBuilder(
+                String.format( "subutai export %s -t %s %s", templateName, token, isPrivateTemplate ? "-p" : "" ) )
+                .withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
+    }
 }

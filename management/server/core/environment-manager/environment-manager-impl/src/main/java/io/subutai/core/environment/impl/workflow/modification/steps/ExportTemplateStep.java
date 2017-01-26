@@ -13,15 +13,17 @@ public class ExportTemplateStep
     private final String containerId;
     private final String templateName;
     private final boolean isPrivateTemplate;
+    private final String token;
 
 
     public ExportTemplateStep( final LocalEnvironment environment, final String containerId, final String templateName,
-                               final boolean isPrivateTemplate )
+                               final boolean isPrivateTemplate, final String token )
     {
         this.environment = environment;
         this.containerId = containerId;
         this.templateName = templateName;
         this.isPrivateTemplate = isPrivateTemplate;
+        this.token = token;
     }
 
 
@@ -31,6 +33,6 @@ public class ExportTemplateStep
 
         final Peer peer = environmentContainerHost.getPeer();
 
-        peer.exportTemplate( environmentContainerHost.getContainerId(), templateName, isPrivateTemplate );
+        peer.exportTemplate( environmentContainerHost.getContainerId(), templateName, isPrivateTemplate, token );
     }
 }

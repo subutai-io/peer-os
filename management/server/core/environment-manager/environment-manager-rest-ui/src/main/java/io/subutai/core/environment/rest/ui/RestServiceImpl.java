@@ -155,7 +155,7 @@ public class RestServiceImpl implements RestService
                 templateName, privateTemplate );
         try
         {
-            environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate, false );
+            environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate, true );
 
             return Response.ok().build();
         }

@@ -134,5 +134,5 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void promoteTemplate( String containerName, String templateName ) throws ResourceHostException;
 
-    void exportTemplate( String templateName, boolean isPrivateTemplate ) throws ResourceHostException;
+    void exportTemplate( String templateName, boolean isPrivateTemplate, String token ) throws ResourceHostException;
 }

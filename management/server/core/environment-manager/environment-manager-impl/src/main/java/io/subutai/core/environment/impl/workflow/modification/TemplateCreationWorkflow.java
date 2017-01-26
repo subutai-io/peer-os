@@ -15,22 +15,19 @@ public class TemplateCreationWorkflow
     private final String containerId;
     private final String templateName;
     private final boolean isPrivateTemplate;
+    private final String token;
 
     private LocalEnvironment environment;
 
 
     public enum TemplateCreationWorkflowPhase
     {
-        // subutai clone ubuntu16 c1
-        // subutai promote c2 -s c1
-        // subutai export c2 -t 123123123 [-p]
-
         INIT, PROMOTE_TEMPLATE, EXPORT_TEMPLATE, FINALIZE
     }
 
 
     public TemplateCreationWorkflow( final LocalEnvironment environment, final String containerId,
-                                     final String templateName, final boolean isPrivateTemplate,
+                                     final String templateName, final boolean isPrivateTemplate, final String token,
                                      final TrackerOperation operationTracker )
     {
         super( TemplateCreationWorkflowPhase.INIT );
@@ -40,6 +37,7 @@ public class TemplateCreationWorkflow
         this.containerId = containerId;
         this.templateName = templateName;
         this.isPrivateTemplate = isPrivateTemplate;
+        this.token = token;
     }
 
 
@@ -81,7 +79,7 @@ public class TemplateCreationWorkflow
 
         try
         {
-            new ExportTemplateStep( environment, containerId, templateName, isPrivateTemplate ).execute();
+            new ExportTemplateStep( environment, containerId, templateName, isPrivateTemplate, token ).execute();
 
             return TemplateCreationWorkflowPhase.FINALIZE;
         }

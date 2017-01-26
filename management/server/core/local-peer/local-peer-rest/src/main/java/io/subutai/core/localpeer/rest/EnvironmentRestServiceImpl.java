@@ -600,15 +600,16 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
     @Override
     public Response exportTemplate( final ContainerId containerId, final String templateName,
-                                    final boolean isPrivateTemplate )
+                                    final boolean isPrivateTemplate, final String token )
     {
         try
         {
             Preconditions.checkNotNull( containerId );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( token ) );
 
 
-            localPeer.exportTemplate( containerId, templateName, isPrivateTemplate );
+            localPeer.exportTemplate( containerId, templateName, isPrivateTemplate, token );
 
             return Response.ok().build();
         }

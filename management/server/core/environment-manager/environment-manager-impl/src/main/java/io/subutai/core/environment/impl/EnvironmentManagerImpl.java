@@ -1109,7 +1109,7 @@ public class EnvironmentManagerImpl
                 String.format( "Creating template %s from container %s", templateName, containerHost.getHostname() ) );
 
         final TemplateCreationWorkflow templateCreationWorkflow =
-                getTemplateCreationWorkflow( environment, containerId, templateName, privateTemplate,
+                getTemplateCreationWorkflow( environment, containerId, templateName, privateTemplate, kurjunToken,
                         operationTracker );
 
         registerActiveWorkflow( environment, templateCreationWorkflow );
@@ -1581,10 +1581,10 @@ public class EnvironmentManagerImpl
 
     protected TemplateCreationWorkflow getTemplateCreationWorkflow( final LocalEnvironment environment,
                                                                     final String containerId, final String templateName,
-                                                                    final boolean isPrivateTemplate,
+                                                                    final boolean isPrivateTemplate, final String token,
                                                                     final TrackerOperation operationTracker )
     {
-        return new TemplateCreationWorkflow( environment, containerId, templateName, isPrivateTemplate,
+        return new TemplateCreationWorkflow( environment, containerId, templateName, isPrivateTemplate, token,
                 operationTracker );
     }
 

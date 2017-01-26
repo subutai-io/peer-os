@@ -201,10 +201,11 @@ public interface EnvironmentRestService
                               @PathParam( "templateName" ) String templateName );
 
     @POST
-    @Path( "{environmentId}/containers/{containerId}/template/{templateName}/export/{isPrivateTemplate}" )
+    @Path( "{environmentId}/containers/{containerId}/template/{templateName}/export/{isPrivateTemplate}/token/{token}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response exportTemplate( @PathParam( "containerId" ) ContainerId containerId,
                              @PathParam( "templateName" ) String templateName,
-                             @PathParam( "isPrivateTemplate" ) boolean isPrivateTemplate );
+                             @PathParam( "isPrivateTemplate" ) boolean isPrivateTemplate,
+                             @PathParam( "token" ) String token );
 }

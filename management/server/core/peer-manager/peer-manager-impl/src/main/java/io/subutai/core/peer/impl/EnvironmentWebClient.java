@@ -25,6 +25,7 @@ import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.WebClientBuilder;
+import io.subutai.common.settings.Common;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
@@ -850,8 +851,8 @@ public class EnvironmentWebClient
             String path = String.format( "/%s/containers/%s/template/%s/promote", containerId.getEnvironmentId(),
                     containerId.getId(), templateName );
             client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000,
-                     // 1 min for promote
-                    60 * 1000, 1 );
+                    // 1 min for promote
+                    Common.TEMPLATE_PROMOTE_TIMEOUT_SEC * 1000, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -872,18 +873,18 @@ public class EnvironmentWebClient
 
 
     public void exportTemplate( final ContainerId containerId, final String templateName,
-                                final boolean isPrivateTemplate ) throws PeerException
+                                final boolean isPrivateTemplate, final String token ) throws PeerException
     {
         WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
-            String path = String.format( "/%s/containers/%s/template/%s/export/%s", containerId.getEnvironmentId(),
-                    containerId.getId(), templateName, isPrivateTemplate );
+            String path =
+                    String.format( "/%s/containers/%s/template/%s/export/%s/token/%s", containerId.getEnvironmentId(),
+                            containerId.getId(), templateName, isPrivateTemplate, token );
             client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000,
-                     // 1 hour for export
-                    60 * 60 * 1000, 1 );
+                    Common.TEMPLATE_EXPORT_TIMEOUT_SEC * 1000, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );

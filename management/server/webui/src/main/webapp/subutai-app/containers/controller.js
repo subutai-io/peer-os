@@ -389,7 +389,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
         .success( function (data) {
             LOADING_SCREEN('none');
             ngDialog.closeAll();
-            SweetAlert.swal ("Success!", "Template has been created", "success");
+            SweetAlert.swal ("Success!", "Template creation has been started", "success");
         } )
         .error( function (data) {
             LOADING_SCREEN('none');
