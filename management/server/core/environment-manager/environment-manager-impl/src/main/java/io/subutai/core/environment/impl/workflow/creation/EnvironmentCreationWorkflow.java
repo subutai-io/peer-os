@@ -167,7 +167,8 @@ public class EnvironmentCreationWorkflow
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, identityManager,
+                    operationTracker ).execute();
 
             saveEnvironment();
 

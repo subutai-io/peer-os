@@ -8,16 +8,16 @@ import java.util.Set;
 public class PrepareTemplatesRequest
 {
     private final String environmentId;
-    private final String token;
+    private final String kurjunToken;
     private Map<String, Set<String>> templates;
 
 
-    public PrepareTemplatesRequest( final String environmentId, final String token,
+    public PrepareTemplatesRequest( final String environmentId, final String kurjunToken,
                                     final Map<String, Set<String>> templates )
     {
         this.environmentId = environmentId;
         this.templates = templates;
-        this.token = token;
+        this.kurjunToken = kurjunToken;
     }
 
 
@@ -27,9 +27,9 @@ public class PrepareTemplatesRequest
     }
 
 
-    public String getToken()
+    public String getKurjunToken()
     {
-        return token;
+        return kurjunToken;
     }
 
 

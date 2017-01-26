@@ -18,6 +18,8 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.TestHelper;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
@@ -32,6 +34,10 @@ public class CreatePeerEnvironmentContainersTaskTest
     @Mock
     CreateEnvironmentContainersResponse response;
 
+    @Mock
+    IdentityManager identityManager;
+    @Mock
+    Session session;
 
     CreatePeerEnvironmentContainersTask task;
 
@@ -48,8 +54,10 @@ public class CreatePeerEnvironmentContainersTaskTest
                             .createEnvironmentContainers( any( CreateEnvironmentContainersRequest.class ) );
         doReturn( Sets.newHashSet( TestHelper.MESSAGE ) ).when( response ).getMessages();
 
-        task = new CreatePeerEnvironmentContainersTask( PEER, LOCAL_PEER, ENVIRONMENT,
+        task = new CreatePeerEnvironmentContainersTask( identityManager, PEER, LOCAL_PEER, ENVIRONMENT,
                 Lists.newArrayList( Common.LOCAL_HOST_IP ), Sets.newHashSet( NODE ), TestHelper.TRACKER_OPERATION() );
+
+        doReturn( session ).when( identityManager ).getActiveSession();
     }
 
 

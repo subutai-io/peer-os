@@ -246,7 +246,8 @@ public class BuildContainerStateHandler extends StateHandler
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
         return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, contSize );
+                //todo pass user kurjun token
+                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, contSize, null );
     }
 
 

@@ -831,7 +831,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( final Template template, final String environmentId, final String token )
+    public void importTemplate( final Template template, final String environmentId, final String kurjunToken )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
@@ -841,7 +841,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             updateTemplateDownloadProgress( environmentId, template.getName(), 0 );
 
-            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId(), token ), this,
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId(), kurjunToken ), this,
                     new TemplateDownloadTracker( this, environmentId ) );
         }
         catch ( Exception e )
@@ -891,8 +891,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public String cloneContainer( final Template template, final String containerName, final String hostname,
-                                  final String ip, final int vlan, final String environmentId )
-            throws ResourceHostException
+                                  final String ip, final int vlan, final String environmentId,
+                                  final String kurjunToken ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
@@ -905,11 +905,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             //generate registration token for container for 30 min
-            String token = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
+            String containerToken = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
 
             CommandResult result = commandUtil.execute( resourceHostCommands
                     .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
-                            token ), this );
+                            containerToken, kurjunToken ), this );
 
             //parse ID from output
 

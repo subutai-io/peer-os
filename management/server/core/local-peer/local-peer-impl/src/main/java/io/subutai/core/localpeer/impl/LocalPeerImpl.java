@@ -785,7 +785,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 HostUtil.Task<Object> importTask =
                         new ImportTemplateTask( template, resourceHost, request.getEnvironmentId(),
-                                request.getToken() );
+                                request.getKurjunToken() );
 
                 tasks.addTask( resourceHost, importTask );
             }

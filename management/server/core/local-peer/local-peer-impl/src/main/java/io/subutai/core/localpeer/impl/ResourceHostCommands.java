@@ -45,20 +45,22 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getImportTemplateCommand( final String templateId, final String token )
+    public RequestBuilder getImportTemplateCommand( final String templateId, final String kurjunToken )
     {
         return new RequestBuilder( String.format( "subutai import id:%s %s", templateId,
-                Strings.isNullOrEmpty( token ) ? "" : "-t " + token ) )
+                Strings.isNullOrEmpty( kurjunToken ) ? "" : "-t " + kurjunToken ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 
 
     public RequestBuilder getCloneContainerCommand( final String templateId, String containerName, String hostname,
-                                                    String ip, int vlan, String environmentId, String token )
+                                                    String ip, int vlan, String environmentId, String containerToken,
+                                                    String kurjunToken )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -t %s && subutai hostname %s %s", templateId,
-                        containerName, ip, vlan, environmentId, token, containerName, hostname ) )
+                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -t %s %s && subutai hostname %s %s",
+                        templateId, containerName, ip, vlan, environmentId, containerToken,
+                        Strings.isNullOrEmpty( kurjunToken ) ? "" : "-k " + kurjunToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
