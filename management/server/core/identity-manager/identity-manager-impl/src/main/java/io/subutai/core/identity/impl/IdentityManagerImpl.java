@@ -853,6 +853,19 @@ public class IdentityManagerImpl implements IdentityManager
                            .savePublicKeyRing( secId, SecurityKeyType.USER_KEY.getId(), publicKeyASCII );
             user.setFingerprint( securityManager.getKeyManager().getFingerprint( secId ) );
             identityDataService.updateUser( user );
+
+            //update cached user
+            Session activeSession = getActiveSession();
+            if ( activeSession != null )
+            {
+                User activeUser = activeSession.getUser();
+
+                if ( user.getId().equals( activeUser.getId() ) )
+                {
+                    activeUser.setFingerprint( user.getFingerprint() );
+                    activeUser.setSecurityKeyId( user.getSecurityKeyId() );
+                }
+            }
         }
     }
 

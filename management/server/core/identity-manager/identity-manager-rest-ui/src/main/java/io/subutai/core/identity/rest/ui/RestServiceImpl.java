@@ -652,7 +652,7 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                return Response.status( Response.Status.UNAUTHORIZED ).build();
+                return Response.status( Response.Status.NOT_FOUND).build();
             }
         }
         catch ( Exception e )

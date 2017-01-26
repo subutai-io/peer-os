@@ -76,6 +76,8 @@ public class IndexFilter implements Filter
                 }
 
                 view.forward( servletRequest, response );
+
+                return;
             }
 
             if ( !( url.startsWith( "/rest" ) || url.startsWith( "/subutai" ) || url.startsWith( "/fav" ) || url
