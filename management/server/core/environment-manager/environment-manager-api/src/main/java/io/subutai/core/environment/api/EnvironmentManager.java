@@ -270,7 +270,6 @@ public interface EnvironmentManager
     void placeEnvironmentInfoByContainerId( String environmentId, String containerIp )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
 
-    void createTemplate( String environmentId, String containerId, String templateName, boolean privateTemplate,
-                         boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+    String createTemplate( String environmentId, String containerId, String templateName, boolean privateTemplate )
+            throws PeerException, EnvironmentNotFoundException;
 }

@@ -1067,14 +1067,14 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void exportTemplate( final ContainerId containerId, final String templateName,
-                                final boolean isPrivateTemplate, final String token ) throws PeerException
+    public String exportTemplate( final ContainerId containerId, final String templateName,
+                                  final boolean isPrivateTemplate, final String token ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
 
-        environmentWebClient.exportTemplate( containerId, templateName, isPrivateTemplate, token );
+        return environmentWebClient.exportTemplate( containerId, templateName, isPrivateTemplate, token );
     }
 
 

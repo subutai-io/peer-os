@@ -995,10 +995,9 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    public void createTemplate( final String environmentId, final String containerId, final String templateName,
-                                final boolean privateTemplate, final boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    public String createTemplate( final String environmentId, final String containerId, final String templateName,
+                                  final boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException
     {
-        environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate, async );
+        return environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate );
     }
 }

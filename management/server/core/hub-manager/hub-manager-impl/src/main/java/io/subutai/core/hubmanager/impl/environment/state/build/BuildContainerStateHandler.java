@@ -22,7 +22,6 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.PermissionObject;
@@ -37,6 +36,7 @@ import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.hub.share.quota.ContainerSize;
 
 import static io.subutai.hub.share.dto.environment.ContainerStateDto.BUILDING;
 
@@ -138,7 +138,8 @@ public class BuildContainerStateHandler extends StateHandler
         try
         {
             ctx.localPeer.prepareTemplates(
-                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
+                    //todo pass user kurjun token
+                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), null, rhTemplates ) );
         }
         catch ( PeerException e )
         {

@@ -101,7 +101,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 
-    void importTemplate( Template template, String environmentId ) throws ResourceHostException;
+    void importTemplate( Template template, String environmentId, String token ) throws ResourceHostException;
 
     /**
      * Clones container based on the specified arguments
@@ -134,5 +134,5 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void promoteTemplate( String containerName, String templateName ) throws ResourceHostException;
 
-    void exportTemplate( String templateName, boolean isPrivateTemplate, String token ) throws ResourceHostException;
+    String exportTemplate( String templateName, boolean isPrivateTemplate, String token ) throws ResourceHostException;
 }

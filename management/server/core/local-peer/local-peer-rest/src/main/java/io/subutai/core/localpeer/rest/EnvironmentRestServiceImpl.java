@@ -608,10 +608,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( token ) );
 
-
-            localPeer.exportTemplate( containerId, templateName, isPrivateTemplate, token );
-
-            return Response.ok().build();
+            return Response.ok( localPeer.exportTemplate( containerId, templateName, isPrivateTemplate, token ) )
+                           .build();
         }
         catch ( Exception e )
         {

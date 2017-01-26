@@ -831,17 +831,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( final Template template, final String environmentId ) throws ResourceHostException
+    public void importTemplate( final Template template, final String environmentId, final String token )
+            throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
 
         try
         {
             updateTemplateDownloadProgress( environmentId, template.getName(), 0 );
 
-            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId() ), this,
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId(), token ), this,
                     new TemplateDownloadTracker( this, environmentId ) );
         }
         catch ( Exception e )
@@ -934,9 +934,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
             if ( Strings.isNullOrEmpty( containerId ) )
             {
-                LOG.error( "Container ID not found in output of subutai clone command" );
+                LOG.error( "Container ID not found in the output of subutai clone command" );
 
-                throw new CommandException( "Container ID not found in output of subutai clone command" );
+                throw new CommandException( "Container ID not found in the output of subutai clone command" );
             }
 
             return containerId;
@@ -1139,14 +1139,27 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void exportTemplate( final String templateName, final boolean isPrivateTemplate, final String token )
+    public String exportTemplate( final String templateName, final boolean isPrivateTemplate, final String token )
             throws ResourceHostException
     {
         try
         {
-            commandUtil
+            CommandResult result = commandUtil
                     .execute( resourceHostCommands.getExportTemplateCommand( templateName, isPrivateTemplate, token ),
                             this );
+
+            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*]" );
+
+            Matcher m = p.matcher( result.getStdOut() );
+
+            if ( m.find() && m.groupCount() == 1 )
+            {
+                return m.group( 1 );
+            }
+            else
+            {
+                throw new ResourceHostException( "Template hash is not found in the output of subutai export command" );
+            }
         }
         catch ( CommandException e )
         {

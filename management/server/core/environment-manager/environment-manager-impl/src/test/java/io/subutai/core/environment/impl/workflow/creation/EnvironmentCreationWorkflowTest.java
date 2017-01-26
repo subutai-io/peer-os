@@ -13,6 +13,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -35,22 +36,22 @@ public class EnvironmentCreationWorkflowTest
     LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
     Topology topology;
-
-
+    @Mock
+    IdentityManager identityManager;
 
 
     class EnvironmentCreationWorkflowSUT extends EnvironmentCreationWorkflow
     {
 
 
-        public EnvironmentCreationWorkflowSUT( final String defaultDomain,
+        public EnvironmentCreationWorkflowSUT( final String defaultDomain, final IdentityManager identityManager,
                                                final EnvironmentManagerImpl environmentManager,
                                                final PeerManager peerManager, final SecurityManager securityManager,
                                                final LocalEnvironment environment, final Topology topology,
                                                final String sshKey, final TrackerOperation operationTracker )
         {
-            super( defaultDomain, environmentManager, peerManager, securityManager, environment, topology, sshKey,
-                    operationTracker );
+            super( defaultDomain, identityManager, environmentManager, peerManager, securityManager, environment,
+                    topology, sshKey, operationTracker );
         }
 
 
@@ -64,8 +65,9 @@ public class EnvironmentCreationWorkflowTest
     @Before
     public void setUp() throws Exception
     {
-        workflow = new EnvironmentCreationWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, environmentManager, peerManager,
-                securityManager, environment, topology, TestHelper.SSH_KEY, TestHelper.TRACKER_OPERATION() );
+        workflow = new EnvironmentCreationWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, identityManager, environmentManager,
+                peerManager, securityManager, environment, topology, TestHelper.SSH_KEY,
+                TestHelper.TRACKER_OPERATION() );
         doReturn( environment ).when( environmentManager ).update( environment );
     }
 

@@ -302,6 +302,6 @@ public interface Peer extends RelationLink
 
     void promoteTemplate( ContainerId containerId, String templateName ) throws PeerException;
 
-    void exportTemplate( ContainerId containerId, String templateName, boolean isPrivateTemplate, String token )
+    String exportTemplate( ContainerId containerId, String templateName, boolean isPrivateTemplate, String token )
             throws PeerException;
 }

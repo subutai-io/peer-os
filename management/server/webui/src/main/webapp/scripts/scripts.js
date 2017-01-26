@@ -157,7 +157,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
             identitySrv.getObtainedKurjunToken().success(function(data){
                 if (!$.trim(data)){
-                    getKurjunAuthToken(identitySrv);
+                    obtainKurjunAuthToken(identitySrv);
                 }else{
                     localStorage.setItem('kurjunToken', data);
                     kurjunCheckInProgress = false;
@@ -168,7 +168,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
         }
     }
 
-    function getKurjunAuthToken(identitySrv){
+    function obtainKurjunAuthToken(identitySrv){
 
         localStorage.removeItem('kurjunToken');
 
@@ -188,7 +188,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
                var signedAuthId = $(this).val();
                console.log(signedAuthId);
 
-               identitySrv.getKurjunToken(signedAuthId).success(function (kurjunToken) {
+               identitySrv.obtainKurjunToken(signedAuthId).success(function (kurjunToken) {
 
                  console.log(kurjunToken);
 

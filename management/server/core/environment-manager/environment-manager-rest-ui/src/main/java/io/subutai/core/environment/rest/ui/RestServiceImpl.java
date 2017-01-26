@@ -151,13 +151,10 @@ public class RestServiceImpl implements RestService
                                     final boolean privateTemplate )
     {
 
-        LOG.debug( "Env id {}, Container id {}, template name {}, is private {}", environmentId, containerId,
-                templateName, privateTemplate );
         try
         {
-            environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate, true );
-
-            return Response.ok().build();
+            return Response.ok( environmentManager
+                    .createTemplate( environmentId, containerId, templateName, privateTemplate ) ).build();
         }
         catch ( Exception e )
         {

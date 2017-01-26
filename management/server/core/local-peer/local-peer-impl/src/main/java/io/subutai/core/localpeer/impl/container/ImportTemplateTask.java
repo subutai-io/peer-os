@@ -14,9 +14,11 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
     private final Template template;
     private final ResourceHost resourceHost;
     private final String environmentId;
+    private final String token;
 
 
-    public ImportTemplateTask( final Template template, final ResourceHost resourceHost, final String environmentId )
+    public ImportTemplateTask( final Template template, final ResourceHost resourceHost, final String environmentId,
+                               final String token )
     {
         Preconditions.checkNotNull( template );
         Preconditions.checkNotNull( resourceHost );
@@ -25,6 +27,7 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
         this.template = template;
         this.resourceHost = resourceHost;
         this.environmentId = environmentId;
+        this.token = token;
     }
 
 
@@ -45,7 +48,7 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
     @Override
     public Object call() throws Exception
     {
-        resourceHost.importTemplate( template, environmentId );
+        resourceHost.importTemplate( template, environmentId, token );
 
         return null;
     }

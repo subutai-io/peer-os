@@ -106,7 +106,6 @@ import io.subutai.core.environment.impl.workflow.modification.HostnameModificati
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.TemplateCreationWorkflow;
 import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
@@ -1078,9 +1077,8 @@ public class EnvironmentManagerImpl
 
 
     @Override
-    public void createTemplate( final String environmentId, final String containerId, final String templateName,
-                                final boolean privateTemplate, final boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    public String createTemplate( final String environmentId, final String containerId, final String templateName,
+                                  final boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
@@ -1105,35 +1103,11 @@ public class EnvironmentManagerImpl
             }
         }
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Creating template %s from container %s", templateName, containerHost.getHostname() ) );
+        Peer targetPeer = containerHost.getPeer();
 
-        final TemplateCreationWorkflow templateCreationWorkflow =
-                getTemplateCreationWorkflow( environment, containerId, templateName, privateTemplate, kurjunToken,
-                        operationTracker );
+        targetPeer.promoteTemplate( containerHost.getContainerId(), templateName );
 
-        registerActiveWorkflow( environment, templateCreationWorkflow );
-
-        templateCreationWorkflow.onStop( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                removeActiveWorkflow( environment.getId() );
-            }
-        } );
-
-        //wait
-        if ( !async )
-        {
-            templateCreationWorkflow.join();
-
-            if ( templateCreationWorkflow.isFailed() )
-            {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( templateCreationWorkflow.getFailedException() ) );
-            }
-        }
+        return targetPeer.exportTemplate( containerHost.getContainerId(), templateName, privateTemplate, kurjunToken );
     }
 
 
@@ -1544,8 +1518,8 @@ public class EnvironmentManagerImpl
                                                                           final Topology topology, final String sshKey,
                                                                           final TrackerOperation operationTracker )
     {
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, this, peerManager, securityManager,
-                environment, topology, sshKey, operationTracker );
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, identityManager, this, peerManager,
+                securityManager, environment, topology, sshKey, operationTracker );
     }
 
 
@@ -1557,8 +1531,8 @@ public class EnvironmentManagerImpl
                                                                                  changedContainers )
 
     {
-        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
-                topology, removedContainers, changedContainers, operationTracker, this );
+        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, identityManager, peerManager, securityManager,
+                environment, topology, removedContainers, changedContainers, operationTracker, this );
     }
 
 
@@ -1578,15 +1552,6 @@ public class EnvironmentManagerImpl
         return new HostnameModificationWorkflow( environment, containerId, newHostname, operationTracker, this );
     }
 
-
-    protected TemplateCreationWorkflow getTemplateCreationWorkflow( final LocalEnvironment environment,
-                                                                    final String containerId, final String templateName,
-                                                                    final boolean isPrivateTemplate, final String token,
-                                                                    final TrackerOperation operationTracker )
-    {
-        return new TemplateCreationWorkflow( environment, containerId, templateName, isPrivateTemplate, token,
-                operationTracker );
-    }
 
     //-- workflow factories end
 

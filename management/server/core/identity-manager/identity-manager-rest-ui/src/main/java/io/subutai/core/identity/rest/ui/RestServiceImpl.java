@@ -667,7 +667,58 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getKurjunAuthToken( final String signedAuthId )
+    public Response submitSignedTemplateHash( final String signedTemplateHash )
+    {
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+
+            HttpPost post = new HttpPost( String.format( "%s/auth/sign", Common.GLOBAL_KURJUN_BASE_URL ) );
+
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+            entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
+            entityBuilder.addTextBody( "signature", signedTemplateHash );
+            entityBuilder.addTextBody( "token", identityManager.getActiveSession().getKurjunToken() );
+            HttpEntity httpEntity = entityBuilder.build();
+            post.setEntity( httpEntity );
+            CloseableHttpResponse response = client.execute( post );
+
+            try
+            {
+                if ( response.getStatusLine().getStatusCode() != 200 )
+                {
+                    HttpEntity entity = response.getEntity();
+                    String errMsg = IOUtils.toString( entity.getContent() );
+                    EntityUtils.consume( entity );
+
+                    return Response.serverError().entity(
+                            "Http code: " + response.getStatusLine().getStatusCode() + " Msg: " + errMsg ).build();
+                }
+                else
+                {
+                    return Response.ok().build();
+                }
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage() );
+
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+    }
+
+
+    @Override
+    public Response obtainKurjunToken( final String signedAuthId )
     {
 
         CloseableHttpClient client = getHttpsClient();
@@ -681,26 +732,25 @@ public class RestServiceImpl implements RestService
             entityBuilder.addTextBody( "user", getFingerprint() );
             entityBuilder.addTextBody( "message", signedAuthId );
             HttpEntity httpEntity = entityBuilder.build();
-
             post.setEntity( httpEntity );
             CloseableHttpResponse response = client.execute( post );
 
             try
             {
+                HttpEntity entity = response.getEntity();
+                String content = IOUtils.toString( entity.getContent() );
+                EntityUtils.consume( entity );
+
                 if ( response.getStatusLine().getStatusCode() == 200 )
                 {
-                    HttpEntity entity = response.getEntity();
-                    String token = IOUtils.toString( entity.getContent() );
-                    EntityUtils.consume( entity );
+                    identityManager.getActiveSession().setKurjunToken( content );
 
-                    identityManager.getActiveSession().setKurjunToken( token );
-
-                    return Response.ok( token ).build();
+                    return Response.ok( content ).build();
                 }
                 else
                 {
-                    return Response.serverError().entity( "Http code: " + response.getStatusLine().getStatusCode() )
-                                   .build();
+                    return Response.serverError().entity(
+                            "Http code: " + response.getStatusLine().getStatusCode() + " Msg: " + content ).build();
                 }
             }
             finally

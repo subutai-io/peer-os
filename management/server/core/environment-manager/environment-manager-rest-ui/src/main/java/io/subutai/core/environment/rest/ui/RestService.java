@@ -33,7 +33,7 @@ public interface RestService
 
     @POST
     @Path( "{environmentId}/containers/{containerId}/template/{name}/private/{private}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response createTemplate( @PathParam( "environmentId" ) String environmentId,
                              @PathParam( "containerId" ) String containerId, @PathParam( "name" ) String templateName,
                              @PathParam( "private" ) boolean privateTemplate );

@@ -784,7 +784,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 Template template = templateManager.getTemplate( templateId );
 
                 HostUtil.Task<Object> importTask =
-                        new ImportTemplateTask( template, resourceHost, request.getEnvironmentId() );
+                        new ImportTemplateTask( template, resourceHost, request.getEnvironmentId(),
+                                request.getToken() );
 
                 tasks.addTask( resourceHost, importTask );
             }
@@ -3269,8 +3270,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void exportTemplate( final ContainerId containerId, final String templateName,
-                                final boolean isPrivateTemplate, final String token ) throws PeerException
+    public String exportTemplate( final ContainerId containerId, final String templateName,
+                                  final boolean isPrivateTemplate, final String token ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
@@ -3280,7 +3281,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            resourceHost.exportTemplate( templateName, isPrivateTemplate, token );
+            return resourceHost.exportTemplate( templateName, isPrivateTemplate, token );
         }
         catch ( ResourceHostException e )
         {

@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl;
 
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 
@@ -43,9 +45,10 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getImportTemplateCommand( final String templateId )
+    public RequestBuilder getImportTemplateCommand( final String templateId, final String token )
     {
-        return new RequestBuilder( String.format( "subutai import id:%s", templateId ) )
+        return new RequestBuilder( String.format( "subutai import id:%s %s", templateId,
+                Strings.isNullOrEmpty( token ) ? "" : "-t " + token ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 

@@ -386,15 +386,38 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
         LOADING_SCREEN();
 
         environmentService.createTemplate( container, name, isPrivate )
-        .success( function (data) {
-            LOADING_SCREEN('none');
-            ngDialog.closeAll();
-            SweetAlert.swal ("Success!", "Template creation has been started", "success");
+        .success( function (hash) {
+
+            var signedHashTextArea = document.createElement("textarea");
+            signedHashTextArea.setAttribute('class', 'bp-sign-target');
+            signedHashTextArea.style.visibility = 'hidden';
+            signedHashTextArea.value = hash;
+            document.body.appendChild(signedHashTextArea);
+
+            $(signedHashTextArea).on('change', function() {
+
+               var signedHash = $(this).val();
+               console.log(signedHash);
+
+               // submit signed hash
+               identitySrv.submitSignedHash(signedHash).success(function(){
+                   LOADING_SCREEN('none');
+                   ngDialog.closeAll();
+                   SweetAlert.swal ("Success!", "Template has been created", "success");
+               }).error(function(error){
+                   LOADING_SCREEN('none');
+                   ngDialog.closeAll();
+                   SweetAlert.swal ("ERROR!", error, "error");
+               });
+
+              $(this).remove();
+           });
+
         } )
-        .error( function (data) {
+        .error( function (error) {
             LOADING_SCREEN('none');
             ngDialog.closeAll();
-            SweetAlert.swal ("ERROR!", data, "error");
+            SweetAlert.swal ("ERROR!", error, "error");
         } );
     }
 

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
@@ -22,12 +21,15 @@ import io.subutai.core.environment.impl.workflow.modification.steps.DestroyConta
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
 {
+    private final IdentityManager identityManager;
     private final PeerManager peerManager;
     private LocalEnvironment environment;
     private final Topology topology;
@@ -47,29 +49,21 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     //environment creation phases
     public enum EnvironmentGrowingPhase
     {
-        INIT,
-        MODIFY_CONTAINERS_QUOTA,
-        DESTROY_CONTAINERS,
-        GENERATE_KEYS,
-        RESERVE_NET,
-        SETUP_P2P,
-        PREPARE_TEMPLATES,
-        CLONE_CONTAINERS,
-        CONFIGURE_HOSTS,
-        CONFIGURE_SSH,
-        FINALIZE
+        INIT, MODIFY_CONTAINERS_QUOTA, DESTROY_CONTAINERS, GENERATE_KEYS, RESERVE_NET, SETUP_P2P, PREPARE_TEMPLATES,
+        CLONE_CONTAINERS, CONFIGURE_HOSTS, CONFIGURE_SSH, FINALIZE
 
     }
 
 
-    public EnvironmentModifyWorkflow( String defaultDomain, PeerManager peerManager, SecurityManager securityManager,
-                                      LocalEnvironment environment, Topology topology, List<String> removedContainers,
-                                      Map<String, ContainerSize> changedContainers, TrackerOperation operationTracker,
-                                      EnvironmentManagerImpl environmentManager )
+    public EnvironmentModifyWorkflow( String defaultDomain, IdentityManager identityManager, PeerManager peerManager,
+                                      SecurityManager securityManager, LocalEnvironment environment, Topology topology,
+                                      List<String> removedContainers, Map<String, ContainerSize> changedContainers,
+                                      TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
 
         super( EnvironmentGrowingPhase.INIT );
 
+        this.identityManager = identityManager;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.environment = environment;
@@ -224,7 +218,8 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            new PrepareTemplatesStep( environment, peerManager, topology, operationTracker ).execute();
+            new PrepareTemplatesStep( environment, peerManager, topology,
+                    identityManager.getActiveSession().getKurjunToken(), operationTracker ).execute();
 
             saveEnvironment();
 

@@ -872,8 +872,8 @@ public class EnvironmentWebClient
     }
 
 
-    public void exportTemplate( final ContainerId containerId, final String templateName,
-                                final boolean isPrivateTemplate, final String token ) throws PeerException
+    public String exportTemplate( final ContainerId containerId, final String templateName,
+                                  final boolean isPrivateTemplate, final String token ) throws PeerException
     {
         WebClient client = null;
         Response response;
@@ -900,6 +900,6 @@ public class EnvironmentWebClient
             WebClientBuilder.close( client );
         }
 
-        WebClientBuilder.checkResponse( response );
+        return WebClientBuilder.checkResponse( response, String.class );
     }
 }
