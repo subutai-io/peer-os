@@ -371,10 +371,10 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         {
             RequestedHostImpl registrationRequest = requestDataService.find( resourceHostInfo.getId() );
 
-            if ( registrationRequest != null && !resourceHostInfo.getHostname().equalsIgnoreCase(
-                    registrationRequest.getHostname() ) )
+            if ( registrationRequest != null )
             {
                 registrationRequest.setHostname( resourceHostInfo.getHostname() );
+                registrationRequest.setInterfaces( resourceHostInfo.getHostInterfaces() );
 
                 requestDataService.update( registrationRequest );
             }
