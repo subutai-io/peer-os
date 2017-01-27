@@ -363,7 +363,7 @@ public class EnvironmentContainerImplTest
     {
         environmentContainer.setQuota( QUOTA );
 
-        verify( peer ).setContainerQuota( environmentContainer.getContainerId(), QUOTA );
+        verify( peer ).setQuota( environmentContainer.getContainerId(), QUOTA );
     }
 
 

@@ -453,7 +453,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setContainerQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
+    public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );

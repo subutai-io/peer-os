@@ -295,7 +295,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( containerQuota );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
-            localPeer.setContainerQuota( containerId, containerQuota );
+            localPeer.setQuota( containerId, containerQuota );
 
             return Response.ok().build();
         }

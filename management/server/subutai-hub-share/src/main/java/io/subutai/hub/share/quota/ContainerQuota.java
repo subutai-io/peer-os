@@ -56,6 +56,16 @@ public class ContainerQuota
     }
 
 
+    public void copyValues( final ContainerQuota containerQuota )
+    {
+        this.containerSize = containerQuota.getContainerSize();
+        for ( Quota quota : containerQuota.getAll() )
+        {
+            add( quota );
+        }
+    }
+
+
     public Quota get( ContainerResourceType containerResourceType )
     {
         return resources.get( containerResourceType );

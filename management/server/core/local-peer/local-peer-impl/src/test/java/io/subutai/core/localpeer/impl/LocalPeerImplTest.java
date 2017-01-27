@@ -525,13 +525,13 @@ public class LocalPeerImplTest
     {
         ContainerQuota quotaInfo = mock( ContainerQuota.class );
 
-        localPeer.setContainerQuota( containerId, quotaInfo );
+        localPeer.setQuota( containerId, quotaInfo );
 
         verify( quotaManager ).setQuota( containerId, quotaInfo );
 
         doThrow( new QuotaException( "" ) ).when( quotaManager ).setQuota( containerId, quotaInfo );
 
-        localPeer.setContainerQuota( containerId, quotaInfo );
+        localPeer.setQuota( containerId, quotaInfo );
     }
 
 

@@ -16,6 +16,8 @@ public interface ContainerHost extends Host, ContainerHostInfo
 {
     ContainerSize getContainerSize();
 
+    void setContainerSize( ContainerSize containerSize );
+
     ContainerId getContainerId();
 
     String getInitiatorPeerId();

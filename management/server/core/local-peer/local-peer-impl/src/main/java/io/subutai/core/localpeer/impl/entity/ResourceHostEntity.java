@@ -55,6 +55,7 @@ import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.core.localpeer.impl.binding.Commands;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
@@ -489,27 +490,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            getContainerHostById( containerHost.getId() );
+            commandUtil
+                    .execute( Commands.getSetQuotaCommand( containerHost.getContainerName(), containerQuota ), this );
         }
-        catch ( HostNotFoundException e )
+        catch ( CommandException e )
         {
+            LOG.error( e.getMessage(), e );
             throw new ResourceHostException(
-                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
-        }
-        // TODO: 1/25/17 implement me
-        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerQuota.getContainerSize() );
-
-        try
-        {
-            getQuotaManager().setQuota( containerHost.getContainerId(), quota );
-
-            ( ( ContainerHostEntity ) containerHost ).setContainerSize( containerQuota.getContainerSize() );
-        }
-        catch ( QuotaException e )
-        {
-            throw new ResourceHostException(
-                    String.format( "Error setting quota %s to container %s: %s", containerQuota,
-                            containerHost.getHostname(), e.getMessage() ), e );
+                    String.format( "Could not set quota values of %s", containerHost.getId() ) );
         }
     }
 

@@ -2731,35 +2731,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return containerQuota;
     }
 
-/*
+
     @Override
     public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
     {
+        //        ContainerQuota quota = .getDefaultContainerQuota( containerQuota.getContainerSize() );
+        //        // CUSTOM value of container size returns null quota
+        //        if ( quota == null )
+        //        {
+        //            quota = getQuotaManager().getDefaultContainerQuota( ContainerSize.SMALL );
+        //            quota.copyValues( containerQuota );
+        //        }
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( containerQuota );
-        try
-        {
-            ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
-            resourceHost.execute( Commands.getSetQuotaCommand( containerId.getContainerName(), containerQuota ) );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Could not set quota values of %s", containerId.getId() ) );
-        }
-    }*/
-
-
-    @Override
-    public void setContainerQuota( final ContainerId containerHostId, final ContainerQuota containerQuota )
-            throws PeerException
-    {
-        Preconditions.checkNotNull( containerHostId );
-        Preconditions.checkNotNull( containerQuota );
 
         try
         {
-            ContainerHost containerHost = getContainerHostById( containerHostId.getId() );
+            ContainerHost containerHost = getContainerHostById( containerId.getId() );
 
             ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
 
@@ -2770,8 +2758,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
-            throw new PeerException( String.format( "Could not set container size for %s: %s", containerHostId.getId(),
-                    e.getMessage() ) );
+            throw new PeerException(
+                    String.format( "Could not set container quota for %s: %s", containerId.getId(), e.getMessage() ) );
         }
     }
 

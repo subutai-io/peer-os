@@ -197,6 +197,6 @@ public class ContainerHostEntityTest
         ContainerQuota ramQuota = mock( ContainerQuota.class );
         containerHostEntity.setQuota( ramQuota );
 
-        verify( peer ).setContainerQuota( containerHostEntity.getContainerId(), ramQuota );
+        verify( peer ).setQuota( containerHostEntity.getContainerId(), ramQuota );
     }
 }
