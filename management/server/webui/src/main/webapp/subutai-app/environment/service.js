@@ -263,7 +263,7 @@ function environmentService($http, $q) {
 	}
 
 	function createTemplate( container, name, isPrivate ) {
-	    var URL = ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/template/' + name + "/private/" + ($.trim(isPrivate) ? "true" : "false") ;
+	    var URL = ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/template/' + name + "/private/" + ( isPrivate == true ? "true" : "false" ) ;
 		return $http.post( URL );
 	}
 

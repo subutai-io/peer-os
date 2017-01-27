@@ -251,15 +251,7 @@ public class EnvironmentManagerSecureProxy
                                                      final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=Group;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
+        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=Group;update=true" ) );
 
         return environmentManager
                 .modifyEnvironment( environmentId, topology, removedContainers, changedContainers, async );
@@ -272,16 +264,7 @@ public class EnvironmentManagerSecureProxy
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
-
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=Group;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
+        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=Group;update=true" ) );
 
         return environmentManager.growEnvironment( environmentId, topology, async );
     }
@@ -292,15 +275,8 @@ public class EnvironmentManagerSecureProxy
     public void addSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Environment environment = loadEnvironment( environmentId );
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
+        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;update=true" ) );
+
         environmentManager.addSshKey( environmentId, sshKey, async );
     }
 
@@ -310,15 +286,8 @@ public class EnvironmentManagerSecureProxy
     public void removeSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Environment environment = loadEnvironment( environmentId );
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
+        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;update=true" ) );
+
         environmentManager.removeSshKey( environmentId, sshKey, async );
     }
 
@@ -328,13 +297,13 @@ public class EnvironmentManagerSecureProxy
     {
         try
         {
-            Environment environment = loadEnvironment( environmentId );
-            check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
+            checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;read=true" ) );
         }
-        catch ( RelationVerificationException | EnvironmentNotFoundException e )
+        catch ( EnvironmentNotFoundException e )
         {
             return null;
         }
+
         return environmentManager.getSshKeys( environmentId, encType );
     }
 
@@ -344,13 +313,13 @@ public class EnvironmentManagerSecureProxy
     {
         try
         {
-            Environment environment = loadEnvironment( environmentId );
-            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
+            checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;update=true" ) );
         }
-        catch ( RelationVerificationException | EnvironmentNotFoundException e )
+        catch ( EnvironmentNotFoundException e )
         {
             return null;
         }
+
         return environmentManager.createSshKey( environmentId, hostname, encType );
     }
 
@@ -361,15 +330,8 @@ public class EnvironmentManagerSecureProxy
                                    final long p2pSecretKeyTtlSec, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Environment environment = loadEnvironment( environmentId );
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
+        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;update=true" ) );
+
         environmentManager.resetP2PSecretKey( environmentId, newP2pSecretKey, p2pSecretKeyTtlSec, async );
     }
 
@@ -429,22 +391,13 @@ public class EnvironmentManagerSecureProxy
 
         try
         {
-            check( null, environment, traitsBuilder( "ownership=All;delete=true" ) );
+            checkContainerPermission( environmentId, containerId, traitsBuilder( "ownership=All;delete=true" ) );
         }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-
-        try
-        {
-            EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
-            check( null, containerHost, traitsBuilder( "ownership=All;delete=true" ) );
-        }
-        catch ( RelationVerificationException | ContainerHostNotFoundException e )
+        catch ( ContainerHostNotFoundException e )
         {
             throw new EnvironmentModificationException( e );
         }
+
 
         environmentManager.destroyContainer( environmentId, containerId, async );
     }
@@ -479,14 +432,7 @@ public class EnvironmentManagerSecureProxy
         // tenant manager can view any environment
         if ( !identityManager.isTenantManager() )
         {
-            try
-            {
-                check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
-            }
-            catch ( RelationVerificationException e )
-            {
-                throw new EnvironmentNotFoundException();
-            }
+            checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;read=true" ) );
         }
 
         return environment;
@@ -498,16 +444,7 @@ public class EnvironmentManagerSecureProxy
     public void removeEnvironmentDomain( final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
-
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
+        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;update=true" ) );
 
         environmentManager.removeEnvironmentDomain( environmentId );
     }
@@ -520,15 +457,8 @@ public class EnvironmentManagerSecureProxy
                                          final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
+        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;update=true" ) );
+
         environmentManager.assignEnvironmentDomain( environmentId, newDomain, proxyLoadBalanceStrategy, sslCertPath );
     }
 
@@ -538,15 +468,8 @@ public class EnvironmentManagerSecureProxy
     public String getEnvironmentDomain( final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
+        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;read=true" ) );
+
         return environmentManager.getEnvironmentDomain( environmentId );
     }
 
@@ -556,24 +479,15 @@ public class EnvironmentManagerSecureProxy
     public boolean isContainerInEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
         try
         {
-            check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
+            checkContainerPermission( environmentId, containerHostId, traitsBuilder( "ownership=All;read=true" ) );
         }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-        try
-        {
-            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
-            check( null, containerHost, traitsBuilder( "ownership=All;read=true" ) );
-        }
-        catch ( ContainerHostNotFoundException | RelationVerificationException e )
+        catch ( ContainerHostNotFoundException e )
         {
             throw new EnvironmentManagerException( e.getMessage(), e );
         }
+
         return environmentManager.isContainerInEnvironmentDomain( containerHostId, environmentId );
     }
 
@@ -584,24 +498,15 @@ public class EnvironmentManagerSecureProxy
                                                  final int port )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
         try
         {
-            check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
+            checkContainerPermission( environmentId, containerHostId, traitsBuilder( "ownership=All;update=true" ) );
         }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-        try
-        {
-            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
-            check( null, containerHost, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( ContainerHostNotFoundException | RelationVerificationException e )
+        catch ( ContainerHostNotFoundException e )
         {
             throw new ContainerHostNotFoundException( e.getMessage() );
         }
+
         environmentManager.addContainerToEnvironmentDomain( containerHostId, environmentId, port );
     }
 
@@ -611,24 +516,15 @@ public class EnvironmentManagerSecureProxy
     public SshTunnel setupSshTunnelForContainer( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
         try
         {
-            check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
+            checkContainerPermission( environmentId, containerHostId, traitsBuilder( "ownership=All;update=true" ) );
         }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-        try
-        {
-            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
-            check( null, containerHost, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( ContainerHostNotFoundException | RelationVerificationException e )
+        catch ( ContainerHostNotFoundException e )
         {
             throw new ContainerHostNotFoundException( e.getMessage() );
         }
+
         return environmentManager.setupSshTunnelForContainer( containerHostId, environmentId );
     }
 
@@ -638,25 +534,58 @@ public class EnvironmentManagerSecureProxy
     public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        Environment environment = loadEnvironment( environmentId );
         try
         {
-            check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
+            checkContainerPermission( environmentId, containerHostId, traitsBuilder( "ownership=All;update=true" ) );
+        }
+        catch ( ContainerHostNotFoundException e )
+        {
+            throw new ContainerHostNotFoundException( e.getMessage() );
+        }
+
+        environmentManager.removeContainerFromEnvironmentDomain( containerHostId, environmentId );
+    }
+
+
+    protected void checkEnvironmentPermission( String environmentId, Map<String, String> traits )
+            throws EnvironmentNotFoundException
+    {
+        Environment environment = environmentManager.loadEnvironment( environmentId );
+
+        try
+        {
+            check( null, environment, traits );
         }
         catch ( RelationVerificationException e )
         {
             throw new EnvironmentNotFoundException();
         }
+    }
+
+
+    protected void checkContainerPermission( String environmentId, String containerId, Map<String, String> traits )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        Environment environment = environmentManager.loadEnvironment( environmentId );
+
         try
         {
-            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
-            check( null, containerHost, traitsBuilder( "ownership=All;update=true" ) );
+            check( null, environment, traits );
+        }
+        catch ( RelationVerificationException e )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        try
+        {
+            ContainerHost containerHost = environment.getContainerHostById( containerId );
+            check( null, containerHost, traits );
         }
         catch ( ContainerHostNotFoundException | RelationVerificationException e )
         {
             throw new ContainerHostNotFoundException( e.getMessage() );
         }
-        environmentManager.removeContainerFromEnvironmentDomain( containerHostId, environmentId );
     }
 
 
@@ -890,6 +819,8 @@ public class EnvironmentManagerSecureProxy
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
 
+        checkContainerPermission( environmentId, containerId, traitsBuilder( "ownership=All;update=true" ) );
+
         environmentManager.updateContainerHostname( environmentId, containerId,
                 StringUtil.removeHtmlAndSpecialChars( hostname, true ) );
     }
@@ -998,6 +929,8 @@ public class EnvironmentManagerSecureProxy
     public String createTemplate( final String environmentId, final String containerId, final String templateName,
                                   final boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException
     {
+        checkContainerPermission( environmentId, containerId, traitsBuilder( "ownership=All;read=true" ) );
+
         return environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate );
     }
 }

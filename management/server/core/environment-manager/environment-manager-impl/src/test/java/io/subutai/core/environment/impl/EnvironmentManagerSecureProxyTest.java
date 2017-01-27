@@ -43,6 +43,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -341,6 +342,6 @@ public class EnvironmentManagerSecureProxyTest
     {
         proxy.loadEnvironment( TestHelper.ENV_ID );
 
-        verify( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+        verify( environmentManager, atLeastOnce() ).loadEnvironment( TestHelper.ENV_ID );
     }
 }
