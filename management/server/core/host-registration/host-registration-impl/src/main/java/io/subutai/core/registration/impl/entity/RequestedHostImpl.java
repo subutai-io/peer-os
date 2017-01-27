@@ -23,6 +23,7 @@ import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -221,9 +222,16 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     }
 
 
-    public void setInterfaces( final Set<HostInterface> interfaces )
+    public void setInterfaces( final HostInterfaces hostInterfaces )
     {
-        this.interfaces = interfaces;
+        this.interfaces.clear();
+
+        for ( final HostInterface netHostInterface : hostInterfaces.getAll() )
+        {
+            HostInterfaceImpl hostInterfaceImpl = new HostInterfaceImpl( netHostInterface );
+
+            this.interfaces.add( hostInterfaceImpl );
+        }
     }
 
 
