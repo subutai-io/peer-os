@@ -22,6 +22,7 @@ import io.subutai.common.task.CloneRequest;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvironmentContainersResponse>
@@ -79,7 +80,7 @@ public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvir
 
             CloneRequest cloneRequest =
                     new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
-                            node.getTemplateId(), HostArchitecture.AMD64, node.getType(),
+                            node.getTemplateId(), HostArchitecture.AMD64, new ContainerQuota( node.getType() ),
                             identityManager.getActiveSession().getKurjunToken() );
 
             request.addRequest( cloneRequest );

@@ -6,6 +6,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
 
@@ -17,13 +18,13 @@ public class CloneRequest
     private final String ip;
     private final String templateId;
     private final HostArchitecture templateArch;
-    private final ContainerSize containerSize;
+    private final ContainerQuota containerSize;
     private final String kurjunToken;
 
 
     public CloneRequest( final String resourceHostId, final String hostname, final String containerName,
                          final String ip, final String templateId, HostArchitecture templateArch,
-                         final ContainerSize containerSize, final String kurjunToken )
+                         final ContainerQuota containerSize, final String kurjunToken )
     {
         Preconditions.checkNotNull( resourceHostId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -89,7 +90,7 @@ public class CloneRequest
     }
 
 
-    public ContainerSize getContainerSize()
+    public ContainerQuota getContainerQuota()
     {
         return containerSize;
     }
