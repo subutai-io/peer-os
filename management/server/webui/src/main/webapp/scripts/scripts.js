@@ -146,3 +146,69 @@ function accordionInit() {
 
 var UPDATE_NIGHTLY_BUILD_STATUS;
 
+
+    var kurjunCheckInProgress = false;
+
+    function checkKurjunAuthToken(identitySrv){
+
+        if(!kurjunCheckInProgress){
+
+            kurjunCheckInProgress = true;
+
+            identitySrv.getObtainedKurjunToken().success(function(data){
+                if (!$.trim(data)){
+                    obtainKurjunAuthToken(identitySrv);
+                }else{
+                    localStorage.setItem('kurjunToken', data);
+                    kurjunCheckInProgress = false;
+                }
+            }).error(function(){
+                kurjunCheckInProgress = false;
+            });
+        }
+    }
+
+    function obtainKurjunAuthToken(identitySrv){
+
+        localStorage.removeItem('kurjunToken');
+
+        identitySrv.getKurjunAuthId().success(function (authId) {
+
+            console.log(authId);
+
+            var signedAuthIdTextArea = document.createElement("textarea");
+            signedAuthIdTextArea.setAttribute('class', 'bp-sign-target');
+//            signedAuthIdTextArea.style.visibility = 'hidden';
+            signedAuthIdTextArea.style.display = 'none';
+            signedAuthIdTextArea.value = authId;
+            document.body.appendChild(signedAuthIdTextArea);
+
+            $(signedAuthIdTextArea).on('change', function() {
+
+               var signedAuthId = $(this).val();
+               console.log(signedAuthId);
+
+               identitySrv.obtainKurjunToken(signedAuthId).success(function (kurjunToken) {
+
+                 console.log(kurjunToken);
+
+                 localStorage.setItem('kurjunToken', kurjunToken);
+
+               }).error(function(error) {
+                 console.log(error);
+               });
+
+               $(this).remove();
+            });
+
+            kurjunCheckInProgress = false;
+
+        }).error(function(error) {
+
+            kurjunCheckInProgress = false;
+
+            console.log(error);
+        });
+    }
+
+

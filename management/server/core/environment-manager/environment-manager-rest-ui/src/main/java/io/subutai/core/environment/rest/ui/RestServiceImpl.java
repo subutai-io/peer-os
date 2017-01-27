@@ -146,6 +146,23 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response createTemplate( final String environmentId, final String containerId, final String templateName,
+                                    final boolean privateTemplate )
+    {
+
+        try
+        {
+            return Response.ok( environmentManager
+                    .createTemplate( environmentId, containerId, templateName, privateTemplate ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+    }
+
+
     /** Environments **************************************************** */
 
 

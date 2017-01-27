@@ -85,8 +85,10 @@ import io.subutai.core.peer.api.PeerActionType;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
+import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -176,16 +178,18 @@ public class EnvironmentManagerImplTest
     KeyManager keyManager;
     @Mock
     PGPKeyUtil pgpKeyUtil;
+    @Mock
+    TemplateManager templateManager;
 
 
     class EnvironmentManagerImplSUT extends EnvironmentManagerImpl
     {
-        public EnvironmentManagerImplSUT( final PeerManager peerManager, final SecurityManager securityManager,
-                                          final IdentityManager identityManager, final Tracker tracker,
-                                          final RelationManager relationManager, final HubAdapter hubAdapter,
-                                          final EnvironmentService environmentService )
+        public EnvironmentManagerImplSUT( final TemplateManager templateManager, final PeerManager peerManager,
+                                          final SecurityManager securityManager, final IdentityManager identityManager,
+                                          final Tracker tracker, final RelationManager relationManager,
+                                          final HubAdapter hubAdapter, final EnvironmentService environmentService )
         {
-            super( peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
+            super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
                     environmentService );
         }
 
@@ -215,8 +219,9 @@ public class EnvironmentManagerImplTest
         doReturn( session ).when( identityManager ).loginSystemUser();
         doReturn( systemUser ).when( session ).getSubject();
 
-        environmentManager = spy( new EnvironmentManagerImplSUT( peerManager, securityManager, identityManager, tracker,
-                relationManager, hubAdapter, environmentService ) );
+        environmentManager =
+                spy( new EnvironmentManagerImplSUT( templateManager, peerManager, securityManager, identityManager,
+                        tracker, relationManager, hubAdapter, environmentService ) );
         environmentManager.jsonUtil = jsonUtil;
         environmentManager.pgpKeyUtil = pgpKeyUtil;
         environmentManager.activeWorkflows = activeWorkflows;

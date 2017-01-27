@@ -1,6 +1,7 @@
 package io.subutai.core.template.impl;
 
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -17,26 +18,40 @@ import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.template.api.TemplateManager;
 
 
 public class TemplateManagerImpl implements TemplateManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( TemplateManagerImpl.class.getName() );
-    private static final String GORJUN_LIST_TEMPLATES_URL = "http://localhost:8338/kurjun/rest/template/list";
+    private static final String GORJUN_LIST_TEMPLATES_URL = Common.LOCAL_KURJUN_BASE_URL + "/template/info?token=%s";
     private static final String GORJUN_GET_VERIFIED_TEMPLATE_URL =
-            "http://localhost:8338/kurjun/rest/template/info?name=%s&verified=true";
+            Common.LOCAL_KURJUN_BASE_URL + "/template/info?name=%s&verified=true";
     private static final int TEMPLATE_CACHE_TTL_SEC = 30;
     private Set<Template> templatesCache = Sets.newHashSet();
     private volatile long lastTemplatesFetchTime = 0L;
     private final ReentrantLock lock = new ReentrantLock( true );
+
+    private final IdentityManager identityManager;
+
+
+    public TemplateManagerImpl( final IdentityManager identityManager )
+    {
+        Preconditions.checkNotNull( identityManager );
+
+        this.identityManager = identityManager;
+    }
 
 
     WebClient getWebClient( String url )
@@ -48,6 +63,15 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public Set<Template> getTemplates()
     {
+        String kurjunToken = null;
+
+        Session session = identityManager.getActiveSession();
+
+        if ( session != null )
+        {
+            kurjunToken = session.getKurjunToken();
+        }
+
         boolean needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
                 .toMillis( TEMPLATE_CACHE_TTL_SEC );
 
@@ -77,7 +101,8 @@ public class TemplateManagerImpl implements TemplateManager
 
             try
             {
-                webClient = getWebClient( GORJUN_LIST_TEMPLATES_URL );
+                webClient = getWebClient(
+                        String.format( GORJUN_LIST_TEMPLATES_URL, kurjunToken == null ? "" : kurjunToken ) );
 
                 response = webClient.get();
 
@@ -149,6 +174,25 @@ public class TemplateManagerImpl implements TemplateManager
         }
 
         return null;
+    }
+
+
+    @Override
+    public List<Template> getTemplatesByOwner( final String owner )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( owner ) );
+
+        List<Template> templates = Lists.newArrayList();
+
+        for ( Template template : getTemplates() )
+        {
+            if ( template.getOwners().contains( owner.toLowerCase() ) )
+            {
+                templates.add( template );
+            }
+        }
+
+        return templates;
     }
 
 

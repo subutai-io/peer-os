@@ -72,6 +72,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -119,10 +120,12 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -147,6 +150,7 @@ public class EnvironmentManagerImpl
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
     private final PeerManager peerManager;
+    private final TemplateManager templateManager;
     private final Tracker tracker;
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor;
@@ -165,17 +169,19 @@ public class EnvironmentManagerImpl
     private volatile long lastEnvSyncTs = 0L;
 
 
-    public EnvironmentManagerImpl( final PeerManager peerManager, SecurityManager securityManager,
-                                   final IdentityManager identityManager, final Tracker tracker,
-                                   final RelationManager relationManager, HubAdapter hubAdapter,
+    public EnvironmentManagerImpl( final TemplateManager templateManager, final PeerManager peerManager,
+                                   SecurityManager securityManager, final IdentityManager identityManager,
+                                   final Tracker tracker, final RelationManager relationManager, HubAdapter hubAdapter,
                                    final EnvironmentService environmentService )
     {
+        Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( tracker );
 
+        this.templateManager = templateManager;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.identityManager = identityManager;
@@ -1072,6 +1078,41 @@ public class EnvironmentManagerImpl
     }
 
 
+    @Override
+    public String createTemplate( final String environmentId, final String containerId, final String templateName,
+                                  final boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        String kurjunToken = identityManager.getActiveSession().getKurjunToken();
+        Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing or expired" );
+
+        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
+
+        //check that container exists in the environment
+        EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
+
+        List<Template> ownerTemplates =
+                templateManager.getTemplatesByOwner( identityManager.getActiveUser().getFingerprint() );
+
+        for ( Template template : ownerTemplates )
+        {
+            if ( template.getName().equalsIgnoreCase( templateName ) )
+            {
+                throw new IllegalStateException(
+                        String.format( "Template with name %s already exists in your repository", templateName ) );
+            }
+        }
+
+        Peer targetPeer = containerHost.getPeer();
+
+        targetPeer.promoteTemplate( containerHost.getContainerId(), templateName );
+
+        return targetPeer.exportTemplate( containerHost.getContainerId(), templateName, privateTemplate, kurjunToken );
+    }
+
+
     protected void registerActiveWorkflow( Environment environment, CancellableWorkflow newWorkflow )
     {
         Preconditions.checkNotNull( environment );
@@ -1479,8 +1520,8 @@ public class EnvironmentManagerImpl
                                                                           final Topology topology, final String sshKey,
                                                                           final TrackerOperation operationTracker )
     {
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, this, peerManager, securityManager,
-                environment, topology, sshKey, operationTracker );
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, identityManager, this, peerManager,
+                securityManager, environment, topology, sshKey, operationTracker );
     }
 
 
@@ -1492,8 +1533,8 @@ public class EnvironmentManagerImpl
                                                                                  changedContainers )
 
     {
-        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
-                topology, removedContainers, changedContainers, operationTracker, this );
+        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, identityManager, peerManager, securityManager,
+                environment, topology, removedContainers, changedContainers, operationTracker, this );
     }
 
 
@@ -1512,6 +1553,7 @@ public class EnvironmentManagerImpl
     {
         return new HostnameModificationWorkflow( environment, containerId, newHostname, operationTracker, this );
     }
+
 
     //-- workflow factories end
 

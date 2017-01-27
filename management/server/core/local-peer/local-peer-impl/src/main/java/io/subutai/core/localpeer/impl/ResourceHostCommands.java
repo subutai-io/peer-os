@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl;
 
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 
@@ -43,19 +45,22 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getImportTemplateCommand( final String templateId )
+    public RequestBuilder getImportTemplateCommand( final String templateId, final String kurjunToken )
     {
-        return new RequestBuilder( String.format( "subutai import id:%s", templateId ) )
+        return new RequestBuilder( String.format( "subutai import id:%s %s", templateId,
+                Strings.isNullOrEmpty( kurjunToken ) ? "" : "-t " + kurjunToken ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 
 
     public RequestBuilder getCloneContainerCommand( final String templateId, String containerName, String hostname,
-                                                    String ip, int vlan, String environmentId, String token )
+                                                    String ip, int vlan, String environmentId, String containerToken,
+                                                    String kurjunToken )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -t %s && subutai hostname %s %s", templateId,
-                        containerName, ip, vlan, environmentId, token, containerName, hostname ) )
+                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -t %s %s && subutai hostname %s %s",
+                        templateId, containerName, ip, vlan, environmentId, containerToken,
+                        Strings.isNullOrEmpty( kurjunToken ) ? "" : "-k " + kurjunToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
@@ -81,5 +86,23 @@ public class ResourceHostCommands
     public RequestBuilder getGetSetRhHostnameCommand( final String newHostname )
     {
         return new RequestBuilder( String.format( "subutai hostname %s", newHostname ) );
+    }
+
+
+    public RequestBuilder getPromoteTemplateCommand( final String containerName, final String templateName )
+    {
+        // subutai promote c2 -s c1
+        return new RequestBuilder( String.format( "subutai promote %s -s %s", templateName, containerName ) )
+                .withTimeout( Common.TEMPLATE_PROMOTE_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getExportTemplateCommand( final String templateName, final boolean isPrivateTemplate,
+                                                    final String token )
+    {
+        // subutai export c2 -t 123123123 [-p]
+        return new RequestBuilder(
+                String.format( "subutai export %s -t %s %s", templateName, token, isPrivateTemplate ? "-p" : "" ) )
+                .withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
 }

@@ -139,7 +139,8 @@ public class BuildContainerStateHandler extends StateHandler
         try
         {
             ctx.localPeer.prepareTemplates(
-                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
+                    //todo pass user kurjun token
+                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), null, rhTemplates ) );
         }
         catch ( PeerException e )
         {
@@ -246,7 +247,8 @@ public class BuildContainerStateHandler extends StateHandler
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
         return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, new ContainerQuota( contSize ));
+                //todo pass user kurjun token
+                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, contSize, null );
     }
 
 

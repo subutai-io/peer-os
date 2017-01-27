@@ -14,6 +14,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsSte
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -22,6 +23,7 @@ public class EnvironmentCreationWorkflow
         extends CancellableWorkflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
     private final PeerManager peerManager;
+    private final IdentityManager identityManager;
     private final SecurityManager securityManager;
     private LocalEnvironment environment;
     private final Topology topology;
@@ -34,26 +36,20 @@ public class EnvironmentCreationWorkflow
     //environment creation phases
     public enum EnvironmentCreationPhase
     {
-        INIT,
-        GENERATE_KEYS,
-        RESERVE_NET,
-        SETUP_P2P,
-        PREPARE_TEMPLATES,
-        CLONE_CONTAINERS,
-        CONFIGURE_HOSTS,
-        CONFIGURE_SSH,
-        FINALIZE
+        INIT, GENERATE_KEYS, RESERVE_NET, SETUP_P2P, PREPARE_TEMPLATES, CLONE_CONTAINERS, CONFIGURE_HOSTS,
+        CONFIGURE_SSH, FINALIZE
 
     }
 
 
-    public EnvironmentCreationWorkflow( String defaultDomain, EnvironmentManagerImpl environmentManager,
-                                        PeerManager peerManager, SecurityManager securityManager,
-                                        LocalEnvironment environment, Topology topology, String sshKey,
-                                        TrackerOperation operationTracker )
+    public EnvironmentCreationWorkflow( String defaultDomain, IdentityManager identityManager,
+                                        EnvironmentManagerImpl environmentManager, PeerManager peerManager,
+                                        SecurityManager securityManager, LocalEnvironment environment,
+                                        Topology topology, String sshKey, TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );
 
+        this.identityManager = identityManager;
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
@@ -149,7 +145,8 @@ public class EnvironmentCreationWorkflow
 
         try
         {
-            new PrepareTemplatesStep( environment, peerManager, topology, operationTracker ).execute();
+            new PrepareTemplatesStep( environment, peerManager, topology,
+                    identityManager.getActiveSession().getKurjunToken(), operationTracker ).execute();
 
             saveEnvironment();
 
@@ -170,7 +167,8 @@ public class EnvironmentCreationWorkflow
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, identityManager,
+                    operationTracker ).execute();
 
             saveEnvironment();
 

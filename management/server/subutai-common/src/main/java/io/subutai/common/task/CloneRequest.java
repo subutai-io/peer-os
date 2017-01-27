@@ -6,7 +6,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 public class CloneRequest
@@ -17,12 +17,13 @@ public class CloneRequest
     private final String ip;
     private final String templateId;
     private final HostArchitecture templateArch;
-    private final ContainerQuota containerQuota;
+    private final ContainerSize containerSize;
+    private final String kurjunToken;
 
 
     public CloneRequest( final String resourceHostId, final String hostname, final String containerName,
                          final String ip, final String templateId, HostArchitecture templateArch,
-                         final ContainerQuota containerQuota )
+                         final ContainerSize containerSize, final String kurjunToken )
     {
         Preconditions.checkNotNull( resourceHostId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -35,7 +36,8 @@ public class CloneRequest
         this.ip = ip;
         this.templateId = templateId;
         this.templateArch = templateArch;
-        this.containerQuota = containerQuota;
+        this.containerSize = containerSize;
+        this.kurjunToken = kurjunToken;
     }
 
 
@@ -87,9 +89,15 @@ public class CloneRequest
     }
 
 
-    public ContainerQuota getContainerQuota()
+    public ContainerSize getContainerSize()
     {
-        return containerQuota;
+        return containerSize;
+    }
+
+
+    public String getKurjunToken()
+    {
+        return kurjunToken;
     }
 
 
@@ -98,6 +106,7 @@ public class CloneRequest
     {
         return "CloneRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
                 + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", templateId='" + templateId
-                + '\'' + ", templateArch=" + templateArch + ", containerQuota=" + containerQuota + '}';
+                + '\'' + ", templateArch=" + templateArch + ", containerSize=" + containerSize + ", kurjunToken="
+                + kurjunToken + '}';
     }
 }

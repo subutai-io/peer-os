@@ -52,8 +52,10 @@ function identitySrv($http) {
             return TOKENS_URL
         },
         getKurjunAuthId:getKurjunAuthId,
-        getKurjunToken:getKurjunToken,
-        getObtainedKurjunToken:getObtainedKurjunToken
+        obtainKurjunToken:obtainKurjunToken,
+        getObtainedKurjunToken:getObtainedKurjunToken,
+        isUserRegisteredWithKurjun:isUserRegisteredWithKurjun,
+        submitSignedHash:submitSignedHash
     };
 
     return identitySrv;
@@ -236,7 +238,7 @@ function identitySrv($http) {
         });
     }
 
-    function getKurjunToken(signedAuthId){
+    function obtainKurjunToken(signedAuthId){
 
         var postData = "signedAuthId=" + encodeURIComponent(signedAuthId);
 
@@ -253,6 +255,25 @@ function identitySrv($http) {
         return $http.get(BASE_URL + "kurjun/token",
         {
             withCredentials: true
+        });
+    }
+
+    function isUserRegisteredWithKurjun(){
+
+        return $http.get(BASE_URL + "kurjun/isRegistered",
+        {
+            withCredentials: true
+        });
+    }
+
+    function submitSignedHash(signedHash){
+        var postData = "signedHash=" + encodeURIComponent(signedHash);
+
+        return $http.post(BASE_URL + "kurjun/sign",
+        postData,
+        {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         });
     }
 }

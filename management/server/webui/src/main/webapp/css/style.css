@@ -949,6 +949,10 @@ tip.description-tooltip {
     background-image: url('../assets/elements/buttons/b-icon-edit.svg');
 }
 
+.b-icon_template{
+    background-image: url('../assets/templates/no-image.jpg');
+}
+
 .b-icon_info {
     background-image: url('../assets/elements/buttons/Info_icon-01.svg');
 }
