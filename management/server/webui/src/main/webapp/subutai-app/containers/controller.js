@@ -383,13 +383,13 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
     vm.disabled = false;
 
-    function createTemplate( container, name, isPrivate ) {
+    function createTemplate( container, name, isPublic ) {
 
         vm.disabled = true;
 
         LOADING_SCREEN();
 
-        environmentService.createTemplate( container, name, isPrivate )
+        environmentService.createTemplate( container, name, !isPublic )
         .success( function (hash) {
 
             var signedHashTextArea = document.createElement("textarea");
