@@ -35,6 +35,7 @@ function environmentService($http, $q) {
 		'apps' : [ 'zabbix', 'webdemo', 'kurjun', 'mysite', 'apache', 'ceph', 'management' ],
 		'bigdata' : [ 'mongo', 'storm', 'zookeeper', 'kurjun', 'elasticsearch', 'ceph', 'cassandra', 'solr', 'hadoop' ],
 		'packages' : [ 'master', 'openjre7', 'debian' ],
+		'own' : [],
 		'other' : [ 'master' ]
 	};
 
@@ -127,7 +128,7 @@ function environmentService($http, $q) {
 
 				for( var i = 0; i < data.length; i++ )
 				{
-					res[ getCategory( data[i].name )].push( data[i] );
+					res[ getCategory( data[i] )].push( data[i] );
 				}
 
 				callF.resolve(res);
@@ -142,7 +143,7 @@ function environmentService($http, $q) {
 		for (var key in categories) {
 			for( var i = 0; i < categories[key].length; i++ )
 			{
-				if( categories[key][i] == data )
+				if( categories[key][i] == data.name )
 				{
 					cat = key;
 					break;
@@ -152,7 +153,13 @@ function environmentService($http, $q) {
 			if( cat !== null ) break;
 		}
 
-		if( cat === null ) return 'other';
+		if( cat === null ) {
+		    if(data.owner.indexOf(getCookie('su_fingerprint').toLowerCase()) > -1){
+		        return 'own';
+		    }else{
+		        return 'other';
+		    }
+		}
 
 		return cat;
 	}
