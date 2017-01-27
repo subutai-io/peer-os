@@ -63,11 +63,15 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.createTemplatePopup=createTemplatePopup;
 	vm.createTemplate=createTemplate;
 	vm.hasKurjunToken=hasKurjunToken;
+    vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;
 	});
 
+    function isAdmin(){
+        return localStorage.getItem('isAdmin') == 'true';
+    }
 
 	function alertForHubContainer( container )
 	{
