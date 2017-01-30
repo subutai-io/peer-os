@@ -47,7 +47,7 @@ public class TrackerOperationImpl implements TrackerOperation
     /**
      * State of operation
      */
-    private OperationState state;
+    private volatile OperationState state;
 
 
     public TrackerOperationImpl( String source, String description, TrackerImpl tracker )
