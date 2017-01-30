@@ -22,6 +22,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.template.api.TemplateManager;
 
 
 public class Login extends HttpServlet
@@ -70,7 +71,7 @@ public class Login extends HttpServlet
                 return;
             }
 
-            authenticateUser( request, response, user, sptoken );
+            setUserAttributes( request, response, user, sptoken );
         }
         catch ( IdentityExpiredException e )
         {
@@ -112,8 +113,8 @@ public class Login extends HttpServlet
     }
 
 
-    private void authenticateUser( HttpServletRequest request, HttpServletResponse response, User user, String sptoken )
-            throws InvalidLoginException
+    private void setUserAttributes( HttpServletRequest request, HttpServletResponse response, User user,
+                                    String sptoken ) throws InvalidLoginException
     {
         if ( user == null )
         {
@@ -147,6 +148,12 @@ public class Login extends HttpServlet
 
         response.addCookie( ctoken );
         response.addCookie( fingerprint );
+
+        TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
+        if ( templateManager != null )
+        {
+            templateManager.resetTemplateCache();
+        }
     }
 
 

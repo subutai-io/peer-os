@@ -60,6 +60,12 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
+    public void resetTemplateCache()
+    {
+        lastTemplatesFetchTime = 0L;
+    }
+
+
     @Override
     public Set<Template> getTemplates()
     {
