@@ -35,7 +35,6 @@ public class ChangeQuotaStep
     {
         if ( !CollectionUtil.isMapEmpty( changedContainers ) )
         {
-
             for ( final Map.Entry<String, ContainerQuota> entry : changedContainers.entrySet() )
             {
                 final EnvironmentContainerHost containerHost = environment.getContainerHostById( entry.getKey() );
@@ -46,7 +45,6 @@ public class ChangeQuotaStep
                     @Override
                     public Object call() throws Exception
                     {
-                        //                        containerHost.setContainerQuota( containerSize );
                         containerHost.setContainerQuota( containerQuota );
 
                         return null;

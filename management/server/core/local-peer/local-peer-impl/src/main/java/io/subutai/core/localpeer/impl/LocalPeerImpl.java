@@ -137,6 +137,7 @@ import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
 import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
@@ -2736,16 +2737,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
     {
-        //        ContainerQuota quota = .getDefaultContainerQuota( containerQuota.getContainerSize() );
-        //        // CUSTOM value of container size returns null quota
-        //        if ( quota == null )
-        //        {
-        //            quota = getQuotaManager().getDefaultContainerQuota( ContainerSize.SMALL );
-        //            quota.copyValues( containerQuota );
-        //        }
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( containerQuota );
 
+        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerQuota.getContainerSize() );
+        // CUSTOM value of container size returns null quota
+        if ( quota == null )
+        {
+            quota = getQuotaManager().getDefaultContainerQuota( ContainerSize.SMALL );
+            quota.copyValues( containerQuota );
+        }
         try
         {
             ContainerHost containerHost = getContainerHostById( containerId.getId() );
@@ -3394,6 +3395,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onContainerDestroyed( final ContainerHostInfo containerInfo )
     {
 
+    }
+
+
+    protected QuotaManager getQuotaManager()
+    {
+        return ServiceLocator.lookup( QuotaManager.class );
     }
 }
 

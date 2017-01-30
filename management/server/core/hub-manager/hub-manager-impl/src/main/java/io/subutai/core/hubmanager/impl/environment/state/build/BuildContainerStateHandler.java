@@ -110,12 +110,12 @@ public class BuildContainerStateHandler extends StateHandler
 
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
-            ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
+            ContainerQuota quota = nodeDto.getContainerQuota();
 
             log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
                     nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
-            Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), contSize, peerDto.getPeerId(),
+            Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), quota, peerDto.getPeerId(),
                     nodeDto.getHostId(), nodeDto.getTemplateId() );
 
             nodes.add( node );
@@ -244,12 +244,9 @@ public class BuildContainerStateHandler extends StateHandler
 
     private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws HubManagerException
     {
-        ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
-
         return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
                 //todo pass user kurjun token
-                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, new ContainerQuota( contSize ),
-                null );
+                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota(), null );
     }
 
 

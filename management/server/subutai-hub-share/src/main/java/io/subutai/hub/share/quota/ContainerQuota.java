@@ -2,7 +2,8 @@ package io.subutai.hub.share.quota;
 
 
 import java.util.Collection;
-import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,11 +17,19 @@ import io.subutai.hub.share.resource.ContainerResourceType;
  */
 public class ContainerQuota
 {
-    @JsonProperty
+    @JsonProperty( value = "containerSize" )
     private ContainerSize containerSize;
 
-    @JsonProperty
-    private EnumMap<ContainerResourceType, Quota> resources = new EnumMap<>( ContainerResourceType.class );
+    @JsonProperty( value = "resources" )
+    private Map<ContainerResourceType, Quota> resources;
+
+
+    public ContainerQuota( @JsonProperty( value = "containerSize" ) final ContainerSize containerSize,
+                           @JsonProperty( value = "resources" ) final Map<ContainerResourceType, Quota> resources )
+    {
+        this.containerSize = containerSize;
+        this.resources = resources;
+    }
 
 
     public ContainerQuota( ContainerSize containerSize )
@@ -46,13 +55,23 @@ public class ContainerQuota
     }
 
 
+    protected Map<ContainerResourceType, Quota> getResources()
+    {
+        if ( this.resources == null )
+        {
+            this.resources = new HashMap<>();
+        }
+        return this.resources;
+    }
+
+
     public void add( Quota quota )
     {
         Preconditions.checkNotNull( quota );
         Preconditions.checkNotNull( quota.getResource() );
         Preconditions.checkNotNull( quota.getResource().getContainerResourceType() );
 
-        resources.put( quota.getResource().getContainerResourceType(), quota );
+        getResources().put( quota.getResource().getContainerResourceType(), quota );
     }
 
 
@@ -68,7 +87,7 @@ public class ContainerQuota
 
     public Quota get( ContainerResourceType containerResourceType )
     {
-        return resources.get( containerResourceType );
+        return getResources().get( containerResourceType );
     }
 
 
@@ -81,13 +100,13 @@ public class ContainerQuota
     @JsonIgnore
     public Collection<Quota> getAll()
     {
-        return resources.values();
+        return getResources().values();
     }
 
 
     @Override
     public String toString()
     {
-        return "ContainerQuota{" + "resources=" + resources + '}';
+        return "ContainerQuota{" + "resources=" + getResources() + '}';
     }
 }

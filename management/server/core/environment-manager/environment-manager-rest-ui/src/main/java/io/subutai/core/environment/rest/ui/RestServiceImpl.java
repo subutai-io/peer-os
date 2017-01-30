@@ -225,7 +225,19 @@ public class RestServiceImpl implements RestService
 
             Topology topology = new Topology( name );
 
-            schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
+            schema.forEach( s ->
+            {
+                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( s.getQuota().getContainerSize() );
+                if ( defaultQuota == null )
+                {
+                    // selected CUSTOM container size
+                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
+                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                }
+                s.getQuota().copyValues( defaultQuota );
+                topology.addNodePlacement( s.getPeerId(), s );
+            } );
+
 
             EnvironmentCreationRef ref = environmentManager.createEnvironment( topology, true );
 

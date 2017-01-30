@@ -4,6 +4,8 @@ package io.subutai.common.task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.hub.share.quota.ContainerQuota;
 
@@ -12,20 +14,43 @@ public class CloneResponse implements TaskResponse
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneResponse.class );
 
+    @JsonProperty( value = "resourceHostId" )
     private String resourceHostId;
+
+    @JsonProperty( value = "hostname" )
     private String hostname;
+
+    @JsonProperty( value = "templateId" )
     private String templateId;
+
+    @JsonProperty( value = "templateArch" )
     private HostArchitecture templateArch;
+
+    @JsonProperty( value = "containerName" )
     private String containerName;
+
+    @JsonProperty( value = "ip" )
     private String ip;
+
+    @JsonProperty( value = "containerId" )
     private String containerId;
+
+    @JsonProperty( value = "elapsedTime" )
     private long elapsedTime;
+
+    @JsonProperty( value = "containerQuota" )
     private ContainerQuota containerQuota;
 
 
-    public CloneResponse( final String resourceHostId, final String hostname, final String containerName,
-                          final String templateId, final HostArchitecture templateArch, final String ip,
-                          final String containerId, final long elapsedTime, final ContainerQuota containerQuota )
+    public CloneResponse( @JsonProperty( value = "resourceHostId" ) final String resourceHostId,
+                          @JsonProperty( value = "hostname" ) final String hostname,
+                          @JsonProperty( value = "containerName" ) final String containerName,
+                          @JsonProperty( value = "templateId" ) final String templateId,
+                          @JsonProperty( value = "templateArch" ) final HostArchitecture templateArch,
+                          @JsonProperty( value = "ip" ) final String ip,
+                          @JsonProperty( value = "containerId" ) final String containerId,
+                          @JsonProperty( value = "elapsedTime" ) final long elapsedTime,
+                          @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
