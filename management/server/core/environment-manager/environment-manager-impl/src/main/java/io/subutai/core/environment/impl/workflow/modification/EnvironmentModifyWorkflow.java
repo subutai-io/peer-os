@@ -49,8 +49,8 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     //environment creation phases
     public enum EnvironmentGrowingPhase
     {
-        INIT, MODIFY_CONTAINERS_QUOTA, DESTROY_CONTAINERS, GENERATE_KEYS, RESERVE_NET, SETUP_P2P, PREPARE_TEMPLATES,
-        CLONE_CONTAINERS, CONFIGURE_HOSTS, CONFIGURE_SSH, FINALIZE
+        INIT, GENERATE_KEYS, RESERVE_NET, SETUP_P2P, PREPARE_TEMPLATES, CLONE_CONTAINERS, CONFIGURE_HOSTS,
+        CONFIGURE_SSH, MODIFY_CONTAINERS_QUOTA, DESTROY_CONTAINERS, FINALIZE
 
     }
 
@@ -86,66 +86,15 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
         hasContainerDestruction = !CollectionUtil.isCollectionEmpty( removedContainers );
         hasContainerCreation = topology != null && !CollectionUtil.isCollectionEmpty( topology.getAllPeers() );
 
-        operationTracker.addLog( "Initializing environment growth" );
+        operationTracker.addLog( "Initializing environment modification" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
         saveEnvironment();
 
-        return hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA :
-               ( hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
-                 EnvironmentGrowingPhase.GENERATE_KEYS );
-    }
-
-
-    public EnvironmentGrowingPhase MODIFY_CONTAINERS_QUOTA()
-    {
-        operationTracker.addLog( "Changing quota sizes" );
-
-        try
-        {
-            new ChangeQuotaStep( environment, changedContainers, operationTracker ).execute();
-
-            environment = ( LocalEnvironment ) environmentManager.loadEnvironment( environment.getId() );
-
-            return hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
-                   ( hasContainerCreation ? EnvironmentGrowingPhase.GENERATE_KEYS : EnvironmentGrowingPhase.FINALIZE );
-        }
-        catch ( Exception e )
-        {
-            fail( e.getMessage(), e );
-        }
-
-        return null;
-    }
-
-
-    public EnvironmentGrowingPhase DESTROY_CONTAINERS()
-    {
-        operationTracker.addLog( "Destroying containers" );
-
-        try
-        {
-            if ( !hasContainerCreation && environment.getContainerHosts().size() <= removedContainers.size() )
-            {
-                throw new IllegalStateException(
-                        "Environment will have 0 containers after modification. Please, destroy environment instead" );
-            }
-
-            environment =
-                    ( LocalEnvironment ) new DestroyContainersStep( environment, environmentManager, removedContainers,
-                            operationTracker ).execute();
-
-            saveEnvironment();
-
-            return hasContainerCreation ? EnvironmentGrowingPhase.GENERATE_KEYS : EnvironmentGrowingPhase.FINALIZE;
-        }
-        catch ( Exception e )
-        {
-            fail( e.getMessage(), e );
-
-            return null;
-        }
+        return hasContainerCreation ? EnvironmentGrowingPhase.GENERATE_KEYS :
+               ( hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA :
+                 EnvironmentGrowingPhase.DESTROY_CONTAINERS );
     }
 
 
@@ -286,6 +235,70 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
+            return hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA :
+                   ( hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
+                     EnvironmentGrowingPhase.FINALIZE );
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+
+            return null;
+        }
+    }
+
+
+    public EnvironmentGrowingPhase MODIFY_CONTAINERS_QUOTA()
+    {
+        operationTracker.addLog( "Changing container quotas" );
+
+        try
+        {
+            new ChangeQuotaStep( environment, changedContainers, operationTracker ).execute();
+
+            environment = ( LocalEnvironment ) environmentManager.loadEnvironment( environment.getId() );
+
+            return hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
+                   EnvironmentGrowingPhase.FINALIZE;
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+        }
+
+        return null;
+    }
+
+
+    public EnvironmentGrowingPhase DESTROY_CONTAINERS()
+    {
+        operationTracker.addLog( "Destroying containers" );
+
+        try
+        {
+            if ( environment.getContainerHosts().size() <= removedContainers.size() )
+            {
+                String errMsg =
+                        "Environment will have 0 containers after modification. Please, destroy environment instead. "
+                                + "Container destruction has been skipped";
+                if ( !( hasContainerCreation || hasQuotaModification ) )
+                {
+                    operationTracker.addLogFailed( errMsg );
+                }
+                else
+                {
+                    operationTracker.addLog( errMsg );
+                }
+            }
+            else
+            {
+
+                environment = ( LocalEnvironment ) new DestroyContainersStep( environment, environmentManager,
+                        removedContainers, operationTracker ).execute();
+
+                saveEnvironment();
+            }
+
             return EnvironmentGrowingPhase.FINALIZE;
         }
         catch ( Exception e )
@@ -303,7 +316,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         saveEnvironment();
 
-        operationTracker.addLogDone( "Environment is grown" );
+        operationTracker.addLogDone( "Environment has been modified" );
 
         //this is a must have call
         stop();
@@ -330,7 +343,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         saveEnvironment();
 
-        operationTracker.addLogFailed( "Environment modification was cancelled" );
+        operationTracker.addLogFailed( "Environment modification has been cancelled" );
     }
 
 

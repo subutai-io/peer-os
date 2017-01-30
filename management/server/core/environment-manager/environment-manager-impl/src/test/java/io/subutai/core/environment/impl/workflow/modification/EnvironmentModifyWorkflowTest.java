@@ -29,6 +29,7 @@ import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -124,7 +125,7 @@ public class EnvironmentModifyWorkflowTest
     {
         workflow.DESTROY_CONTAINERS();
 
-        verify( environmentManager ).update( environment );
+        verify( trackerOperation, atLeastOnce() ).addLog( anyString() );
     }
 
 
