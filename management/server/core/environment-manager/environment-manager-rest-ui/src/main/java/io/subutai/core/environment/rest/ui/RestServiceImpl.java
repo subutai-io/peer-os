@@ -55,6 +55,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
@@ -856,12 +857,10 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
 
-            Collection<ResourceHostMetric> collection = localPeer.getResourceHostMetrics().getResources();
-
-            for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+            for ( ResourceHost resourceHost : localPeer.getResourceHosts() )
             {
-                resourceHostDtos.add( new ResourceHostDto( metric.getHostInfo().getId(), metric.getHostName(),
-                        metric.getInstanceType(), metric.isManagement(), metric.getHostInfo().getArch() ) );
+                resourceHostDtos.add( new ResourceHostDto( resourceHost.getId(), resourceHost.getHostname(),
+                        resourceHost.getInstanceType(), resourceHost.isManagementHost(), resourceHost.getArch() ) );
             }
         }
         catch ( Exception e )

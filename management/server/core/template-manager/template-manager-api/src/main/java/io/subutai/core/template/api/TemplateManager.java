@@ -23,4 +23,6 @@ public interface TemplateManager
     Template getVerifiedTemplateByName( final String name );
 
     List<Template> getTemplatesByOwner( final String owner );
+
+    void resetTemplateCache();
 }
