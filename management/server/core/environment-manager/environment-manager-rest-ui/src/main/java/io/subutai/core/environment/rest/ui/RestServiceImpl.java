@@ -288,8 +288,16 @@ public class RestServiceImpl implements RestService
 
             for ( Map<String, String> cont : changingContainers )
             {
-                changedContainersFiltered
-                        .put( cont.get( "key" ), new ContainerQuota( ContainerSize.valueOf( cont.get( "value" ) ) ) );
+                ContainerSize containerSize = ContainerSize.valueOf( cont.get( "value" ) );
+                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( containerSize );
+                if ( defaultQuota == null )
+                {
+                    // selected CUSTOM container size
+                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
+                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                }
+
+                changedContainersFiltered.put( cont.get( "key" ), defaultQuota );
             }
 
 
@@ -340,8 +348,16 @@ public class RestServiceImpl implements RestService
 
             for ( Map<String, String> cont : changingContainers )
             {
-                changedContainersFiltered
-                        .put( cont.get( "key" ), new ContainerQuota( ContainerSize.valueOf( cont.get( "value" ) ) ) );
+                ContainerSize containerSize = ContainerSize.valueOf( cont.get( "value" ) );
+                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( containerSize );
+                if ( defaultQuota == null )
+                {
+                    // selected CUSTOM container size
+                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
+                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                }
+
+                changedContainersFiltered.put( cont.get( "key" ), defaultQuota );
             }
 
             Topology topology = new Topology( name );

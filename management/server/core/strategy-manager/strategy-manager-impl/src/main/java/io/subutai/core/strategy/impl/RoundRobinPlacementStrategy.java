@@ -70,8 +70,8 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             if ( quota != null )
             {
                 quota = quotas.get( ContainerSize.SMALL );
-                nodeSchema.getQuota().copyValues( quota );
             }
+            nodeSchema.getQuota().copyValues( quota );
         }
     }
 
