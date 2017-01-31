@@ -4,12 +4,15 @@
              interface="io.subutai.core.environment.api.EnvironmentManager" />
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="quotaManager" availability="mandatory"
+             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/build-local">
       <action class="io.subutai.core.environment.cli.BuildLocalEnvironmentCommand">
         <argument ref="environmentManager" />
         <argument ref="peerManager" />
+        <argument ref="quotaManager" />
       </action>
     </command>
   </command-bundle>
@@ -19,6 +22,7 @@
       <action class="io.subutai.core.environment.cli.GrowLocalEnvironmentCommand">
         <argument ref="environmentManager" />
         <argument ref="peerManager" />
+        <argument ref="quotaManager" />
       </action>
     </command>
   </command-bundle>

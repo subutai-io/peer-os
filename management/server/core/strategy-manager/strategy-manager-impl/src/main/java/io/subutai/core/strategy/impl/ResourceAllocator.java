@@ -27,7 +27,7 @@ public class ResourceAllocator extends PeerResources
     }
 
 
-    public boolean allocate( final String containerName, final String templateId, final ContainerSize size,
+    public boolean allocate( final String containerName, final String templateId,
                              ContainerQuota containerQuota )
     {
         final Collection<HostResources> preferredHosts = getPreferredHosts();
@@ -35,7 +35,7 @@ public class ResourceAllocator extends PeerResources
         {
             if ( hostResources.allocate( containerQuota ) )
             {
-                AllocatedContainer container = new AllocatedContainer( containerName, templateId, size, getPeerId(),
+                AllocatedContainer container = new AllocatedContainer( containerName, templateId, containerQuota, getPeerId(),
                         hostResources.getHostId() );
                 containers.add( container );
                 return true;

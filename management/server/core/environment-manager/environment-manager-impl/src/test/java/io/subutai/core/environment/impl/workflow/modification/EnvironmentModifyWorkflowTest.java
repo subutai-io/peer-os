@@ -25,6 +25,7 @@ import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
 import static org.mockito.Matchers.anyString;
@@ -46,7 +47,7 @@ public class EnvironmentModifyWorkflowTest
                                              final PeerManager peerManager, final SecurityManager securityManager,
                                              final LocalEnvironment environment, final Topology topology,
                                              final List<String> removedContainers,
-                                             final Map<String, ContainerSize> changedContainers,
+                                             final Map<String, ContainerQuota> changedContainers,
                                              final TrackerOperation operationTracker,
                                              final EnvironmentManagerImpl environmentManager )
         {
@@ -89,8 +90,8 @@ public class EnvironmentModifyWorkflowTest
     @Before
     public void setUp() throws Exception
     {
-        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
+        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
 
         workflow = new EnvironmentModifyWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, identityManager, peerManager,
                 securityManager, environment, topology, Lists.newArrayList( TestHelper.CONTAINER_ID ),

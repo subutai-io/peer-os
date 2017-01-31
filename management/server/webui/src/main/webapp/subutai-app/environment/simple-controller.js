@@ -378,7 +378,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		var includedContainers = [];
 		for (var i = 0; i < vm.currentEnvironment.includedContainers.length; i++) {
 			includedContainers.push({
-				"size": vm.currentEnvironment.includedContainers[i].get('quotaSize'),
+                "quota": {
+                    "containerSize": vm.currentEnvironment.includedContainers[i].get('quotaSize')
+                },
 				"templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
 				"name": vm.currentEnvironment.includedContainers[i].get('containerName'),
 				"position": vm.currentEnvironment.includedContainers[i].get('position'),
@@ -897,7 +899,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		for (var i = 0; i < allElements.length; i++) {
 			var currentElement = allElements[i];
 			var container2Build = {
-				"size": currentElement.get('quotaSize'),
+				"quota": {
+					"containerSize":currentElement.get('quotaSize')
+				},
 				"templateName": currentElement.get('templateName'),
 				"name": currentElement.get('containerName'),
 				"templateId" : currentElement.get('templateId'),
