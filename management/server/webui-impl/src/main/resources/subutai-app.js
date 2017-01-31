@@ -372,7 +372,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             }
             else {
                 if (localStorage.getItem("bazaarMD5") !== data) {
-                    ;
                     localStorage.setItem("bazaarMD5", data);
                     bazaarUpdate = true;
                 }
