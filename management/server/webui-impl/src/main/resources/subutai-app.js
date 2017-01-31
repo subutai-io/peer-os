@@ -248,8 +248,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     function logout() {
         removeCookie('sptoken');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isAdmin');
+        localStorage.removeItem('kurjunToken');
+        localStorage.removeItem('currentUserToken');
         $location.path('login');
     }
 
