@@ -398,7 +398,9 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
             var signedHashTextArea = document.createElement("textarea");
             signedHashTextArea.setAttribute('class', 'bp-sign-target');
-            signedHashTextArea.style.visibility = 'hidden';
+            signedHashTextArea.style.width = '1px';
+            signedHashTextArea.style.position = 'absolute';
+            signedHashTextArea.style.left = '-100px';
             signedHashTextArea.value = hash;
             document.body.appendChild(signedHashTextArea);
 
