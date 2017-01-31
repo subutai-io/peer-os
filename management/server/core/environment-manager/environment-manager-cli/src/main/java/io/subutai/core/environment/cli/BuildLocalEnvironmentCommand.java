@@ -11,7 +11,6 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -56,18 +55,15 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
-    private final QuotaManager quotaManager;
 
 
-    public BuildLocalEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager,
-                                         final QuotaManager quotaManager )
+    public BuildLocalEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
 
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
-        this.quotaManager = quotaManager;
     }
 
 
@@ -85,8 +81,8 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
         String hostId = resourceHosts.iterator().next().getId();
         String containerName = String.format( "Container%d", new Random().nextInt( 999 ) );
 
-        Node node = new Node( containerName, containerName, quotaManager.getDefaultContainerQuota( ContainerSize.TINY ),
-                peerId, hostId, peerManager.getLocalPeer().getTemplateByName( templateName ).getId() );
+        Node node = new Node( containerName, containerName, ContainerSize.TINY, peerId, hostId,
+                peerManager.getLocalPeer().getTemplateByName( templateName ).getId() );
 
         Topology topology = new Topology( "Dummy environment name" );
         topology.addNodePlacement( peerId, node );

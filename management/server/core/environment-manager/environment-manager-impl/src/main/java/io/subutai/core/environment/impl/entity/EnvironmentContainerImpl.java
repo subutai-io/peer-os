@@ -169,14 +169,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
     public EnvironmentContainerImpl( final String initiatorPeerId, final String peerId,
                                      final ContainerHostInfoModel hostInfo, final String templateId, String domainName,
-                                     ContainerQuota containerQuota, String resourceHostId )
+                                     ContainerSize containerSize, String resourceHostId )
     {
         Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( templateId );
-        Preconditions.checkNotNull( containerQuota );
-        Preconditions.checkNotNull( containerQuota.getContainerSize() );
+        Preconditions.checkNotNull( containerSize );
 
         this.initiatorPeerId = initiatorPeerId;
         this.peerId = peerId;
@@ -186,7 +185,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         this.hostArchitecture = hostInfo.getArch();
         this.templateId = templateId;
         this.domainName = domainName;
-        this.containerSize = containerQuota.getContainerSize();
+        this.containerSize = containerSize;
         this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
@@ -604,18 +603,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
 
     @Override
-    public void setContainerSize( final ContainerSize size )
+    public EnvironmentContainerHost setContainerSize( final ContainerSize size ) throws PeerException
     {
+        getPeer().setContainerSize( this.getContainerId(), size );
+
         this.containerSize = size;
-    }
 
-
-    @Override
-    public void setContainerQuota( final ContainerQuota containerQuota ) throws PeerException
-    {
-        this.containerSize = containerQuota.getContainerSize();
-        getPeer().setQuota( getContainerId(), containerQuota );
-        environmentManager.update( this );
+        return environmentManager.update( this );
     }
 
 

@@ -12,7 +12,6 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerResource;
 import io.subutai.hub.share.quota.ContainerResourceFactory;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.Quota;
 import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.ResourceValue;
@@ -50,7 +49,7 @@ public class SetQuota extends SubutaiShellCommandSupport
     {
         ContainerResourceType type = ContainerResourceType.parse( resourceType );
 
-        ContainerQuota containerQuota = new ContainerQuota( ContainerSize.CUSTOM );
+        ContainerQuota containerQuota = new ContainerQuota();
 
         final ResourceValueParser parser = quotaManager.getResourceValueParser( type );
 

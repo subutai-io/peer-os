@@ -3,7 +3,6 @@ package io.subutai.common.environment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
 
@@ -15,8 +14,8 @@ public class NodeSchema
     @JsonProperty( "name" )
     private String name;
 
-    @JsonProperty( "quota" )
-    private ContainerQuota quota;
+    @JsonProperty( "size" )
+    private ContainerSize size;
 
     @JsonProperty( "templateName" )
     private String templateName;
@@ -25,12 +24,12 @@ public class NodeSchema
     private String templateId;
 
 
-    public NodeSchema( @JsonProperty( "name" ) final String name, @JsonProperty( "quota" ) final ContainerQuota quota,
+    public NodeSchema( @JsonProperty( "name" ) final String name, @JsonProperty( "size" ) final ContainerSize size,
                        @JsonProperty( "templateName" ) final String templateName,
                        @JsonProperty( "templateId" ) final String templateId )
     {
         this.name = name;
-        this.quota = quota;
+        this.size = size;
         this.templateName = templateName;
         this.templateId = templateId;
     }
@@ -42,9 +41,9 @@ public class NodeSchema
     }
 
 
-    public ContainerQuota getQuota()
+    public ContainerSize getSize()
     {
-        return quota;
+        return size;
     }
 
 

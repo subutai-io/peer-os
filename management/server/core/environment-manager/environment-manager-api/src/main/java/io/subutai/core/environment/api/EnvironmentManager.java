@@ -28,7 +28,7 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 public interface EnvironmentManager
@@ -61,7 +61,7 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology, List<String> removedContainers,
-                                              Map<String, ContainerQuota> changedContainers, boolean async )
+                                              Map<String, ContainerSize> changedContainers, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 

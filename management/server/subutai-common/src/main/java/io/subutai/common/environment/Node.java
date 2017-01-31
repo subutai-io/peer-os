@@ -7,7 +7,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.gson.required.GsonRequired;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -22,8 +22,8 @@ public class Node
 
 
     @GsonRequired
-    @JsonProperty( "quota" )
-    private ContainerQuota quota;
+    @JsonProperty( "type" )
+    private ContainerSize type = ContainerSize.SMALL;
 
     @GsonRequired
     @JsonProperty( "peerId" )
@@ -47,18 +47,18 @@ public class Node
 
 
     public Node( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
-                 @JsonProperty( "quota" ) ContainerQuota quota, @JsonProperty( "peerId" ) final String peerId,
+                 @JsonProperty( "type" ) ContainerSize type, @JsonProperty( "peerId" ) final String peerId,
                  @JsonProperty( "hostId" ) final String hostId, @JsonProperty( "templateId" ) String templateId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateId ), "Invalid template id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ), "Resource host id is null" );
-        Preconditions.checkNotNull( quota );
+        Preconditions.checkNotNull( type );
 
         this.hostname = hostname.replaceAll( "\\s+", "" );
         this.name = name;
-        this.quota = quota;
+        this.type = type;
         this.peerId = peerId;
         this.hostId = hostId;
         this.templateId = templateId;
@@ -71,9 +71,9 @@ public class Node
     }
 
 
-    public ContainerQuota getQuota()
+    public ContainerSize getType()
     {
-        return quota;
+        return type;
     }
 
 
@@ -92,8 +92,8 @@ public class Node
     @Override
     public String toString()
     {
-        return "Node{" + "name='" + name + '\'' + ", templateId='" + templateId + '\'' + ", quota=" + quota
-                + ", peerId='" + peerId + '\'' + ", hostId='" + hostId + '\'' + ", hostname='" + hostname + '\'' + '}';
+        return "Node{" + "name='" + name + '\'' + ", templateId='" + templateId + '\'' + ", type=" + type + ", peerId='"
+                + peerId + '\'' + ", hostId='" + hostId + '\'' + ", hostname='" + hostname + '\'' + '}';
     }
 
 

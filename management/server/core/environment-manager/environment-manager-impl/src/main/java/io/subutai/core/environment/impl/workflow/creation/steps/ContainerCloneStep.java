@@ -176,6 +176,6 @@ public class ContainerCloneStep
                         ContainerHostState.RUNNING );
 
         return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateId(),
-                defaultDomain, cloneResponse.getContainerQuota(), cloneResponse.getResourceHostId() );
+                defaultDomain, cloneResponse.getContainerSize(), cloneResponse.getResourceHostId() );
     }
 }

@@ -34,7 +34,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
-import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
@@ -236,8 +235,8 @@ public class EnvironmentManagerSecureProxyTest
     @Test
     public void testModifyEnvironment() throws Exception
     {
-        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
+        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
 
         proxy.modifyEnvironment( TestHelper.ENV_ID, topology, Lists.newArrayList( TestHelper.CONTAINER_ID ),
                 changedContainers, true );

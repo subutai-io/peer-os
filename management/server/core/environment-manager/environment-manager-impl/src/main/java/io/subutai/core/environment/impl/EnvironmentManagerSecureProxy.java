@@ -79,7 +79,7 @@ import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 @PermitAll
@@ -247,7 +247,7 @@ public class EnvironmentManagerSecureProxy
     @RolesAllowed( "Environment-Management|Write" )
     public EnvironmentCreationRef modifyEnvironment( final String environmentId, final Topology topology,
                                                      final List<String> removedContainers,
-                                                     final Map<String, ContainerQuota> changedContainers,
+                                                     final Map<String, ContainerSize> changedContainers,
                                                      final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {

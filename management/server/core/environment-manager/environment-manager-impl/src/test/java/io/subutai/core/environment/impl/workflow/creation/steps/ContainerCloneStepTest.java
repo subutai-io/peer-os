@@ -122,7 +122,7 @@ public class ContainerCloneStepTest
     {
         doReturn( TestHelper.TEMPLATE_ID ).when( cloneResponse ).getTemplateId();
         doReturn( TestHelper.RH_ID ).when( cloneResponse ).getResourceHostId();
-        doReturn( ContainerSize.SMALL ).when( cloneResponse ).getContainerQuota();
+        doReturn( ContainerSize.SMALL ).when( cloneResponse ).getContainerSize();
 
         assertNotNull( step.buildContainerEntity( TestHelper.PEER_ID, cloneResponse ) );
     }

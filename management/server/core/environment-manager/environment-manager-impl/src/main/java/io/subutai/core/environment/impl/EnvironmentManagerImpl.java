@@ -61,8 +61,6 @@ import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -542,7 +540,7 @@ public class EnvironmentManagerImpl
     @Override
     public EnvironmentCreationRef modifyEnvironment( final String environmentId, final Topology topology,
                                                      final List<String> removedContainers,
-                                                     final Map<String, ContainerQuota> changedContainers,
+                                                     final Map<String, ContainerSize> changedContainers,
                                                      final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -1529,7 +1527,7 @@ public class EnvironmentManagerImpl
                                                                          final Topology topology,
                                                                          final TrackerOperation operationTracker,
                                                                          final List<String> removedContainers,
-                                                                         final Map<String, ContainerQuota>
+                                                                         final Map<String, ContainerSize>
                                                                                  changedContainers )
 
     {

@@ -38,8 +38,6 @@ import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -457,8 +455,8 @@ public class EnvironmentManagerImplTest
     public void testModifyEnvironment() throws Exception
     {
         List<String> removedContainers = Lists.newArrayList( TestHelper.CONTAINER_ID );
-        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
+        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
         EnvironmentModifyWorkflow environmentModifyWorkflow = mock( EnvironmentModifyWorkflow.class );
         doReturn( environmentModifyWorkflow ).when( environmentManager )
                                              .getEnvironmentModifyingWorkflow( environment, topology, trackerOperation,
