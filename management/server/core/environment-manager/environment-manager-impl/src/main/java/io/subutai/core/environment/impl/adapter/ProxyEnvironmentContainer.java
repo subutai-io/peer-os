@@ -20,12 +20,11 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.Host;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 
 class ProxyEnvironmentContainer extends EnvironmentContainerImpl
@@ -47,8 +46,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         super( Common.HUB_ID, json.get( "peerId" ).asText(),
                 new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
                         json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
-                        ContainerHostState.RUNNING ), templateId, json.get( "domainName" ).asText(),
-                new ContainerQuota( parseSize( json ) ), json.get( "hostId" ).asText() );
+                        ContainerHostState.RUNNING ), templateId, json.get( "domainName" ).asText(), parseSize( json ),
+                json.get( "hostId" ).asText() );
 
         local = localContainerIds.contains( getId() );
 

@@ -1,13 +1,10 @@
 package io.subutai.common.util;
 
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,7 +16,6 @@ public class JsonUtil
 {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final Gson GSON_MINIFIED = new GsonBuilder().create();
-    public static final ObjectMapper mapper = new ObjectMapper();
 
 
     public static <T, V> String toJson( T key, V value )
@@ -34,21 +30,8 @@ public class JsonUtil
 
     public static <T> T fromJson( String value, Class<T> clazz )
     {
+
         return GSON.fromJson( value, clazz );
-    }
-
-
-    public static <T> T fromJsonString( String value, Class<T> clazz )
-    {
-        try
-        {
-            return mapper.readValue( value, clazz );
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalArgumentException(
-                    String.format( "Could not convert string %s to %s object: %s", value, clazz, e.getMessage() ) );
-        }
     }
 
 
@@ -78,22 +61,8 @@ public class JsonUtil
 
     public static <T> String toJson( T value, Type type )
     {
+
         return GSON.toJson( value, type );
-    }
-
-
-    public static <T> String toJsonString( T value )
-    {
-        try
-        {
-            return mapper.writeValueAsString( value );
-        }
-        catch ( JsonProcessingException e )
-        {
-            throw new IllegalArgumentException(
-                    String.format( "Illegal argument. Could not convert object %s to JSON string: (%s)", value,
-                            e.getMessage() ) );
-        }
     }
 
 

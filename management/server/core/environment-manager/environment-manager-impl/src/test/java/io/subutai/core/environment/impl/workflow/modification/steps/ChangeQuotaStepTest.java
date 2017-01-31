@@ -11,7 +11,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Maps;
 
-import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
@@ -45,8 +44,8 @@ public class ChangeQuotaStepTest
     @Before
     public void setUp() throws Exception
     {
-        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
+        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
         TestHelper.bind( taskUtil, taskResults, taskResult );
         doReturn( environmentContainer ).when( environment ).getContainerHostById( TestHelper.CONTAINER_ID );
 

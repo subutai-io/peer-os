@@ -51,7 +51,6 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
     {
         Topology result = new Topology( environmentName );
 
-        initQuotas( nodeSchema, quotas );
         Set<Node> ng = distribute( nodeSchema, peerGroupResources );
         for ( Node node : ng )
         {
@@ -59,20 +58,6 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
         }
 
         return result;
-    }
-
-
-    private void initQuotas( final List<NodeSchema> nodeSchemaList, final Map<ContainerSize, ContainerQuota> quotas )
-    {
-        for ( NodeSchema nodeSchema : nodeSchemaList )
-        {
-            ContainerQuota quota = quotas.get( nodeSchema.getQuota().getContainerSize() );
-            if ( quota != null )
-            {
-                quota = quotas.get( ContainerSize.SMALL );
-            }
-            nodeSchema.getQuota().copyValues( quota );
-        }
     }
 
 
@@ -112,7 +97,7 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
 
                 final RoundRobinAllocator resourceAllocator = iterator.next();
                 allocated =
-                        resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getQuota() );
+                        resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize() );
                 if ( allocated )
                 {
                     break;
@@ -136,7 +121,7 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             {
                 for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), container.getQuota(),
+                    Node node = new Node( container.getName(), container.getName(), container.getSize(),
                             container.getPeerId(), container.getHostId(), container.getTemplateId() );
 
                     nodes.add( node );

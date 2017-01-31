@@ -137,7 +137,6 @@ import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
 import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
@@ -852,7 +851,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                 request.getHostname(), request.getTemplateArch(), interfaces,
                                 request.getContainerName(), request.getTemplateId(), requestGroup.getEnvironmentId(),
                                 requestGroup.getOwnerId(), requestGroup.getInitiatorPeerId(),
-                                request.getContainerQuota() );
+                                request.getContainerSize() );
 
                 registerContainer( request.getResourceHostId(), containerHostEntity );
 
@@ -2699,8 +2698,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
-        final ContainerHost containerHost = getContainerHostById( containerId.getId() );
-        ContainerQuota containerQuota = new ContainerQuota( containerHost.getContainerSize() );
+        ContainerQuota containerQuota = new ContainerQuota();
         try
         {
             ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
@@ -2739,31 +2737,41 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( containerQuota );
-
-        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerQuota.getContainerSize() );
-        // CUSTOM value of container size returns null quota
-        if ( quota == null )
-        {
-            quota = getQuotaManager().getDefaultContainerQuota( ContainerSize.SMALL );
-            quota.copyValues( containerQuota );
-        }
         try
         {
-            ContainerHost containerHost = getContainerHostById( containerId.getId() );
+            ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
+            resourceHost.execute( Commands.getSetQuotaCommand( containerId.getContainerName(), containerQuota ) );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Could not set quota values of %s", containerId.getId() ) );
+        }
+    }
+
+
+    @Override
+    public void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerHostId );
+        Preconditions.checkNotNull( containerSize );
+
+        try
+        {
+            ContainerHost containerHost = getContainerHostById( containerHostId.getId() );
 
             ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
 
-            resourceHost.setContainerQuota( containerHost, containerQuota );
-
-            containerHost.setContainerSize( containerQuota.getContainerSize() );
+            resourceHost.setContainerSize( containerHost, containerSize );
 
             resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
-            throw new PeerException(
-                    String.format( "Could not set container quota for %s: %s", containerId.getId(), e.getMessage() ) );
+            throw new PeerException( String.format( "Could not set container size for %s: %s", containerHostId.getId(),
+                    e.getMessage() ) );
         }
     }
 
@@ -3397,12 +3405,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onContainerDestroyed( final ContainerHostInfo containerInfo )
     {
 
-    }
-
-
-    protected QuotaManager getQuotaManager()
-    {
-        return ServiceLocator.lookup( QuotaManager.class );
     }
 }
 

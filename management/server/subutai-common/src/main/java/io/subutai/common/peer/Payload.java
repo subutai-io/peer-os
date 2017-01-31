@@ -14,7 +14,7 @@ public class Payload
 
     public Payload( final Object request, String sourcePeerId )
     {
-        this.request = JsonUtil.toJsonString( request );
+        this.request = JsonUtil.toJson( request );
         this.sourcePeerId = sourcePeerId;
     }
 
@@ -23,7 +23,7 @@ public class Payload
     {
         if ( !Strings.isNullOrEmpty( request ) )
         {
-            return JsonUtil.fromJsonString( request, clazz );
+            return JsonUtil.fromJson( request, clazz );
         }
         return null;
     }

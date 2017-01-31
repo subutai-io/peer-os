@@ -4,8 +4,6 @@ package io.subutai.hub.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.subutai.hub.share.quota.ContainerQuota;
-
 
 public class EnvironmentNodeDto
 {
@@ -25,7 +23,7 @@ public class EnvironmentNodeDto
 
     private String templateArch;
 
-    private ContainerQuota containerQuota;
+    private String containerSize;
 
     private String ip;
 
@@ -47,6 +45,7 @@ public class EnvironmentNodeDto
     public EnvironmentNodeDto()
     {
     }
+
 
 
     public void setHostId( final String hostId )
@@ -109,15 +108,15 @@ public class EnvironmentNodeDto
     }
 
 
-    public ContainerQuota getContainerQuota()
+    public void setContainerSize( final String containerSize )
     {
-        return containerQuota;
+        this.containerSize = containerSize;
     }
 
 
-    public void setContainerQuota( final ContainerQuota containerQuota )
+    public String getContainerSize()
     {
-        this.containerQuota = containerQuota;
+        return containerSize;
     }
 
 
@@ -242,7 +241,6 @@ public class EnvironmentNodeDto
         this.ipAddressOffset = ipAddressOffset;
     }
 
-
     public String getPort()
     {
         return port;
@@ -254,7 +252,6 @@ public class EnvironmentNodeDto
         this.port = port;
     }
 
-
     public boolean isHasDomain()
     {
         return hasDomain;
@@ -265,4 +262,5 @@ public class EnvironmentNodeDto
     {
         this.hasDomain = hasDomain;
     }
+
 }

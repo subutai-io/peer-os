@@ -101,7 +101,7 @@ public class TestHelper
     public static Node NODE()
     {
         Node NODE = mock( Node.class );
-        doReturn( ContainerSize.SMALL ).when( NODE ).getQuota().getContainerSize();
+        doReturn( ContainerSize.SMALL ).when( NODE ).getType();
         doReturn( TEMPLATE_ID ).when( NODE ).getTemplateId();
         doReturn( RH_ID ).when( NODE ).getHostId();
         doReturn( HOSTNAME ).when( NODE ).getHostname();

@@ -408,11 +408,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         var peerName = '';
         for (var i in vm.peerIds) {
             var peer = vm.peerIds[i];
-            if (peer.id == peerId) {
+            if ( peer.id == peerId ) {
                 peerName = peer.name;
-                for (var j in peer.resourceHosts) {
+                for ( var j in peer.resourceHosts) {
                     var rh = peer.resourceHosts[j];
-                    if (rh.id == currentResource && rh.isManagement) {
+                    if ( rh.id == currentResource && rh.isManagement ) {
                         isManagement = true;
                     }
                 }
@@ -578,8 +578,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     rx: 50,
                     ry: 50
                 },
-                //'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 50, ry: 50, magnet: true, transform:
-                // 'translate(16,28)'},
+                //'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 50, ry: 50, magnet: true, transform: 'translate(16,28)'},
                 'rect.b-magnet': {
                     fill: '#04346E',
                     width: 10,
@@ -1080,9 +1079,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     result.containersList.push(currentElement.get('containerId'));
                 } else {
                     var container2Build = {
-                        "quota": {
-                            "containerSize": currentElement.get('quotaSize')
-                        },
+                        "type": currentElement.get('quotaSize'),
                         "templateName": currentElement.get('templateName'),
                         "templateId": currentElement.get('templateId'),
                         "name": currentElement.get('containerName'),
