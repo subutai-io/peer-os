@@ -11,6 +11,7 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -61,6 +62,7 @@ public class TestHelper
     public static final EnvironmentId ENVIRONMENT_ID = new EnvironmentId( ENV_ID );
     public static final HostId RES_HOST_ID = new HostId( RH_ID );
     public static final PeerId P_ID = new PeerId( PEER_ID );
+    public static final ContainerQuota CONTAINER_QUOTA = new ContainerQuota( ContainerSize.LARGE );
     public static final ContainerId CONT_HOST_ID =
             new ContainerId( CONTAINER_ID, HOSTNAME, P_ID, ENVIRONMENT_ID, CONTAINER_NAME );
     public static final String P2P_SUBNET = "10.10.10.1";
@@ -101,7 +103,7 @@ public class TestHelper
     public static Node NODE()
     {
         Node NODE = mock( Node.class );
-        doReturn( ContainerSize.SMALL ).when( NODE ).getType();
+        doReturn( CONTAINER_QUOTA ).when( NODE ).getQuota();
         doReturn( TEMPLATE_ID ).when( NODE ).getTemplateId();
         doReturn( RH_ID ).when( NODE ).getHostId();
         doReturn( HOSTNAME ).when( NODE ).getHostname();

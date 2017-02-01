@@ -39,14 +39,14 @@ public class SetQuotaTask extends HostUtil.Task
     @Override
     public String name()
     {
-        return String.format( "Set quota %s to container %s", request.getContainerSize(), request.getHostname() );
+        return String.format( "Set quota %s to container %s", request.getContainerQuota(), request.getHostname() );
     }
 
 
     @Override
     public Object call() throws Exception
     {
-        resourceHost.setContainerSize( containerHost, request.getContainerSize() );
+        resourceHost.setContainerQuota( containerHost, request.getContainerQuota() );
 
         return null;
     }

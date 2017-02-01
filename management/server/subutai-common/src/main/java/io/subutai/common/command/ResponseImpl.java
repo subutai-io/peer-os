@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
 
@@ -15,14 +16,49 @@ import com.google.common.base.Preconditions;
  */
 public class ResponseImpl implements Response
 {
+    @JsonProperty( value = "type" )
     private ResponseType type;
+
+    @JsonProperty( value = "id" )
     private String id;
+
+    @JsonProperty( value = "commandId" )
     private UUID commandId;
+
+    @JsonProperty( value = "pid" )
     private Integer pid;
+
+    @JsonProperty( value = "responseNumber" )
     private Integer responseNumber;
+
+    @JsonProperty( value = "stdOut" )
     private String stdOut;
+
+    @JsonProperty( value = "stdErr" )
     private String stdErr;
+
+    @JsonProperty( value = "exitCode" )
     private Integer exitCode;
+
+
+    public ResponseImpl( @JsonProperty( value = "type" ) final ResponseType type,
+                         @JsonProperty( value = "id" ) final String id,
+                         @JsonProperty( value = "commandId" ) final UUID commandId,
+                         @JsonProperty( value = "pid" ) final Integer pid,
+                         @JsonProperty( value = "responseNumber" ) final Integer responseNumber,
+                         @JsonProperty( value = "stdOut" ) final String stdOut,
+                         @JsonProperty( value = "stdErr" ) final String stdErr,
+                         @JsonProperty( value = "exitCode" ) final Integer exitCode )
+    {
+        this.type = type;
+        this.id = id;
+        this.commandId = commandId;
+        this.pid = pid;
+        this.responseNumber = responseNumber;
+        this.stdOut = stdOut;
+        this.stdErr = stdErr;
+        this.exitCode = exitCode;
+    }
 
 
     public ResponseImpl( final Response response )
@@ -99,15 +135,13 @@ public class ResponseImpl implements Response
     @Override
     public String toString()
     {
-        return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE )
-                .append( "type", type )
-                .append( "id", id )
-                .append( "commandId", commandId )
-                .append( "pid", pid )
-                .append( "responseNumber", responseNumber )
-                .append( "stdOut", StringUtils.abbreviate( stdOut, 500 ) )
-                .append( "stdErr", stdErr )
-                .append( "exitCode", exitCode )
-                .toString();
+        return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE ).append( "type", type ).append( "id", id )
+                                                                            .append( "commandId", commandId )
+                                                                            .append( "pid", pid )
+                                                                            .append( "responseNumber", responseNumber )
+                                                                            .append( "stdOut", StringUtils
+                                                                                    .abbreviate( stdOut, 500 ) )
+                                                                            .append( "stdErr", stdErr )
+                                                                            .append( "exitCode", exitCode ).toString();
     }
 }

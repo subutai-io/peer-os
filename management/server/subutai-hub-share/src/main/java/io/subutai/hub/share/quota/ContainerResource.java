@@ -18,7 +18,7 @@ import io.subutai.hub.share.resource.ResourceValue;
         @JsonSubTypes.Type( value = ContainerVarResource.class, name = "var" ),
         @JsonSubTypes.Type( value = ContainerRootfsResource.class, name = "rootfs" ),
         @JsonSubTypes.Type( value = ContainerNetResource.class, name = "net" ),
-        @JsonSubTypes.Type( value = ContainerNetResource.class, name = "cpuset" ),
+        @JsonSubTypes.Type( value = ContainerCpuSetResource.class, name = "cpuset" ),
 } )
 
 
