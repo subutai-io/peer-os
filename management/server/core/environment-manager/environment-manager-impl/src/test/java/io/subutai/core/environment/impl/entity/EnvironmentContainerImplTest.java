@@ -155,14 +155,6 @@ public class EnvironmentContainerImplTest
     }
 
 
-    @Test
-    public void testDispose() throws Exception
-    {
-        environmentContainer.dispose();
-
-        verify( environmentManager ).destroyContainer( ENV_ID, CONTAINER_ID, false );
-    }
-
 
     @Test
     public void testDestroy() throws Exception

@@ -36,8 +36,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentModificationException;
-import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -49,7 +47,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -68,6 +65,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -275,20 +273,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     public String getContainerName()
     {
         return containerName;
-    }
-
-
-    @Override
-    public void dispose() throws PeerException
-    {
-        try
-        {
-            environmentManager.destroyContainer( parent.getId(), this.getId(), false );
-        }
-        catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
-        {
-            throw new PeerException( e );
-        }
     }
 
 
