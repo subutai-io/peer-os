@@ -136,7 +136,6 @@ import io.subutai.core.localpeer.impl.tasks.DeleteTunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
 import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
-import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
@@ -1211,6 +1210,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
+
+        //if this container is the last one in its host environment
+        //then cleanup the host environment on local peer to release its reserved resources
+        if ( findContainersByEnvironmentId( host.getEnvironmentId().getId() ).isEmpty() )
+        {
+            //don't remove local peer PEK, it is used for communication with remote peers
+            cleanupEnvironment( host.getEnvironmentId(), !getId().equals( host.getInitiatorPeerId() ) );
+        }
     }
 
 
@@ -2161,29 +2168,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
 
-        Set<ResourceHost> resourceHostSet = getResourceHosts();
-
-        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
-
-        for ( final ResourceHost resourceHost : resourceHostSet )
-        {
-            hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
-        }
-
-        HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
-
-        if ( results.hasFailures() )
-        {
-            HostUtil.Task task = results.getFirstFailedTask();
-
-            String errMsg =
-                    String.format( "Error gathering reserved net resources on host %s: %s", task.getHost().getId(),
-                            task.getFailureReason() );
-
-            LOG.error( errMsg );
-
-            throw new PeerException( errMsg, task.getException() );
-        }
+        //todo uncomment (commented out until reserved resources are properly cleaned up on subos level)
+        //        Set<ResourceHost> resourceHostSet = getResourceHosts();
+        //
+        //        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
+        //
+        //        for ( final ResourceHost resourceHost : resourceHostSet )
+        //        {
+        //            hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost,
+        // usedNetworkResources ) );
+        //        }
+        //
+        //        HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
+        //
+        //        if ( results.hasFailures() )
+        //        {
+        //            HostUtil.Task task = results.getFirstFailedTask();
+        //
+        //            String errMsg =
+        //                    String.format( "Error gathering reserved net resources on host %s: %s", task.getHost()
+        // .getId(),
+        //                            task.getFailureReason() );
+        //
+        //            LOG.error( errMsg );
+        //
+        //            throw new PeerException( errMsg, task.getException() );
+        //        }
 
 
         //add reserved ones too
@@ -2422,6 +2432,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
     {
+        cleanupEnvironment( environmentId, true );
+    }
+
+
+    private void cleanupEnvironment( EnvironmentId environmentId, boolean removePEK ) throws PeerException
+    {
         Preconditions.checkNotNull( environmentId );
 
         final NetworkResource reservedNetworkResource =
@@ -2463,9 +2479,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             //remove PEK
             KeyManager keyManager = securityManager.getKeyManager();
 
-            keyManager.removeKeyData( environmentId.getId() );
+            if ( removePEK )
+            {
+                keyManager.removeKeyData( environmentId.getId() );
 
-            keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
+                keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
+            }
 
             //remove container keys
             Containers containers = getEnvironmentContainers( environmentId );

@@ -138,15 +138,6 @@ public class ContainerHostEntityTest
 
 
     @Test
-    public void testDispose() throws Exception
-    {
-        containerHostEntity.dispose();
-
-        verify( peer ).destroyContainer( containerHostEntity.getContainerId() );
-    }
-
-
-    @Test
     public void testStart() throws Exception
     {
         containerHostEntity.start();
