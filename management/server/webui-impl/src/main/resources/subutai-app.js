@@ -248,8 +248,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     function logout() {
         removeCookie('sptoken');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isAdmin');
+        localStorage.removeItem('kurjunToken');
+        localStorage.removeItem('currentUserToken');
         $location.path('login');
     }
 
@@ -372,7 +372,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             }
             else {
                 if (localStorage.getItem("bazaarMD5") !== data) {
-                    ;
                     localStorage.setItem("bazaarMD5", data);
                     bazaarUpdate = true;
                 }
