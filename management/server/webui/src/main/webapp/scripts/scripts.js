@@ -178,8 +178,9 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
             var signedAuthIdTextArea = document.createElement("textarea");
             signedAuthIdTextArea.setAttribute('class', 'bp-sign-target');
-//            signedAuthIdTextArea.style.visibility = 'hidden';
-            signedAuthIdTextArea.style.display = 'none';
+            signedAuthIdTextArea.style.width = '1px';
+            signedAuthIdTextArea.style.position = 'absolute';
+            signedAuthIdTextArea.style.left = '-100px';
             signedAuthIdTextArea.value = authId;
             document.body.appendChild(signedAuthIdTextArea);
 
