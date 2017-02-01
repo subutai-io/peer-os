@@ -2168,7 +2168,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
 
-        //todo uncomment (commented out until reserved resources are properly cleaned up on subos level)
+        // todo uncomment (commented out until reserved resources are properly cleaned up on subos level)
+        // see https://github.com/subutai-io/p2p/issues/174
         //        Set<ResourceHost> resourceHostSet = getResourceHosts();
         //
         //        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
