@@ -26,8 +26,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     EnvironmentId getEnvironmentId();
 
-    void dispose() throws PeerException;
-
     void start() throws PeerException;
 
     void stop() throws PeerException;
