@@ -3,6 +3,7 @@ package io.subutai.common.environment;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
@@ -13,9 +14,24 @@ import io.subutai.common.util.HostUtil;
 
 public class CreateEnvironmentContainersResponse
 {
+    @JsonProperty( value = "messages" )
     private Set<String> messages = Sets.newHashSet();
+
+    @JsonProperty( value = "responses" )
     private Set<CloneResponse> responses = Sets.newHashSet();
+
+    @JsonProperty( value = "hasSucceeded" )
     private boolean hasSucceeded;
+
+
+    public CreateEnvironmentContainersResponse( @JsonProperty( value = "messages" ) final Set<String> messages,
+                                                @JsonProperty( value = "responses" ) final Set<CloneResponse> responses,
+                                                @JsonProperty( value = "hasSucceeded" ) final boolean hasSucceeded )
+    {
+        this.messages = messages;
+        this.responses = responses;
+        this.hasSucceeded = hasSucceeded;
+    }
 
 
     public CreateEnvironmentContainersResponse( HostUtil.Results results )
@@ -31,9 +47,8 @@ public class CreateEnvironmentContainersResponse
             if ( task.getTaskState() == HostUtil.Task.TaskState.SUCCEEDED )
             {
                 responses.add( new CloneResponse( task.getHost().getId(), request.getHostname(),
-                        request.getContainerName(), request.getTemplateId(), request.getTemplateArch(),
-                        request.getIp(), cloneContainerTask.getResult(), task.getDuration(),
-                        request.getContainerSize() ) );
+                        request.getContainerName(), request.getTemplateId(), request.getTemplateArch(), request.getIp(),
+                        cloneContainerTask.getResult(), task.getDuration(), request.getContainerQuota() ) );
 
                 this.messages.add( String
                         .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getHostname(),

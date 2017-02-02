@@ -463,7 +463,7 @@ public class RemotePeerImpl implements RemotePeer
         environmentWebClient.setQuota( containerId, containerQuota );
     }
 
-
+/*
     @Override
     public void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize )
             throws PeerException
@@ -473,7 +473,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerSize, "Container size is null" );
 
         environmentWebClient.setContainerSize( containerHostId, containerSize );
-    }
+    }*/
 
 
     @Override

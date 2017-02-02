@@ -86,6 +86,7 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
@@ -455,8 +456,8 @@ public class EnvironmentManagerImplTest
     public void testModifyEnvironment() throws Exception
     {
         List<String> removedContainers = Lists.newArrayList( TestHelper.CONTAINER_ID );
-        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
+        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
         EnvironmentModifyWorkflow environmentModifyWorkflow = mock( EnvironmentModifyWorkflow.class );
         doReturn( environmentModifyWorkflow ).when( environmentManager )
                                              .getEnvironmentModifyingWorkflow( environment, topology, trackerOperation,

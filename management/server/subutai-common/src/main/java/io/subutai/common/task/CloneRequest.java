@@ -1,29 +1,50 @@
 package io.subutai.common.task;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 public class CloneRequest
 {
+    @JsonProperty( value = "resourceHostId" )
     private final String resourceHostId;
+
+    @JsonProperty( value = "hostname" )
     private String hostname;
+
+    @JsonProperty( value = "containerName" )
     private String containerName;
+
+    @JsonProperty( value = "ip" )
     private final String ip;
+
+    @JsonProperty( value = "templateId" )
     private final String templateId;
+
+    @JsonProperty( value = "templateArch" )
     private final HostArchitecture templateArch;
-    private final ContainerSize containerSize;
+
+    @JsonProperty( value = "containerQuota" )
+    private final ContainerQuota containerQuota;
+
+    @JsonProperty( value = "kurjunToken" )
     private final String kurjunToken;
 
 
-    public CloneRequest( final String resourceHostId, final String hostname, final String containerName,
-                         final String ip, final String templateId, HostArchitecture templateArch,
-                         final ContainerSize containerSize, final String kurjunToken )
+    public CloneRequest( @JsonProperty( value = "resourceHostId" ) final String resourceHostId,
+                         @JsonProperty( value = "hostname" ) final String hostname,
+                         @JsonProperty( value = "containerName" ) final String containerName,
+                         @JsonProperty( value = "ip" ) final String ip,
+                         @JsonProperty( value = "templateId" ) final String templateId,
+                         @JsonProperty( value = "templateArch" ) HostArchitecture templateArch,
+                         @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota,
+                         @JsonProperty( value = "kurjunToken" ) final String kurjunToken )
     {
         Preconditions.checkNotNull( resourceHostId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -36,7 +57,7 @@ public class CloneRequest
         this.ip = ip;
         this.templateId = templateId;
         this.templateArch = templateArch;
-        this.containerSize = containerSize;
+        this.containerQuota = containerQuota;
         this.kurjunToken = kurjunToken;
     }
 
@@ -89,9 +110,9 @@ public class CloneRequest
     }
 
 
-    public ContainerSize getContainerSize()
+    public ContainerQuota getContainerQuota()
     {
-        return containerSize;
+        return containerQuota;
     }
 
 
@@ -106,7 +127,7 @@ public class CloneRequest
     {
         return "CloneRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
                 + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", templateId='" + templateId
-                + '\'' + ", templateArch=" + templateArch + ", containerSize=" + containerSize + ", kurjunToken="
+                + '\'' + ", templateArch=" + templateArch + ", containerQuota=" + containerQuota + ", kurjunToken="
                 + kurjunToken + '}';
     }
 }

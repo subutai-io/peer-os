@@ -39,13 +39,19 @@ public class ContainerNetResource extends ContainerResource<NumericValueResource
     }
 
 
+    public double doubleValue()
+    {
+        return resource.getValue().doubleValue();
+    }
+
+
     /**
      * Usually used to write value to CLI
      */
     @Override
     public String getWriteValue()
     {
-        return String.format( "%d", resource.getValue().intValue() );
+        return String.format( "%f", resource.getValue().doubleValue() );
     }
 
 
@@ -55,7 +61,7 @@ public class ContainerNetResource extends ContainerResource<NumericValueResource
     @Override
     public String getPrintValue()
     {
-        return String.format( "%sKbps", resource.getValue().intValue() );
+        return String.format( "%fKbps", resource.getValue().doubleValue() );
     }
 
 

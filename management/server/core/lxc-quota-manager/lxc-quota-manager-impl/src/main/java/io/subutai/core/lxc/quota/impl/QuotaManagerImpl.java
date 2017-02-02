@@ -137,7 +137,7 @@ public class QuotaManagerImpl implements QuotaManager
 
             try
             {
-                final ContainerQuota quota = new ContainerQuota();
+                final ContainerQuota quota = new ContainerQuota( containerSize );
 
                 ResourceValueParser quotaParser = getResourceValueParser( ContainerResourceType.RAM );
                 quota.add( new Quota( ContainerResourceFactory
