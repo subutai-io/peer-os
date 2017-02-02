@@ -3,11 +3,14 @@
 angular.module('subutai.environment.simple-controller', [])
 .controller('EnvironmentSimpleViewCtrl', EnvironmentSimpleViewCtrl);
 
-EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout'];
+EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout', 'identitySrv'];
 
-function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout) {
+function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout, identitySrv) {
 
 	var vm = this;
+
+	checkKurjunAuthToken(identitySrv, $rootScope);
+
 	var GRID_CELL_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
@@ -53,21 +56,40 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.selectPlugin = selectPlugin;
 	vm.setTemplatesByPlugin = setTemplatesByPlugin;
 
-	// @todo workaround
-	environmentService.getTemplates()
-		.then(function (data) {
-			vm.templates = data;
-			getFilteredTemplates();
-		});
+    function loadTemplates(callback){
+        // @todo workaround
+        environmentService.getTemplates()
+            .then(function (data) {
+                vm.templates = data;
+                getFilteredTemplates(callback);
+            });
+    }
 
-	function getFilteredTemplates() {
-		vm.templatesList = [];
-		for (var i in vm.templates) {
-			if (vm.templatesType == 'all' || i == vm.templatesType) {
-				vm.templatesList = vm.templatesList.concat(vm.templates[i]);
-			}
-		}
-	}
+    loadTemplates();
+
+    $rootScope.$on('kurjunTokenSet', function(event, data){
+
+        //reload page to show also private templates
+        loadTemplates(function(){
+            window.location.reload();
+        });
+
+    });
+
+
+    function getFilteredTemplates(callback) {
+        var templatesLst = [];
+
+        for (var i in vm.templates) {
+            if (vm.templatesType == 'all' || i == vm.templatesType) {
+                templatesLst = templatesLst.concat(vm.templates[i]);
+            }
+        }
+
+        vm.templatesList = templatesLst;
+
+        if(callback) callback();
+    }
 
 	function resetPlugin() {
 		if (vm.selectedPlugin.selected !== undefined) vm.selectedPlugin.selected = false;

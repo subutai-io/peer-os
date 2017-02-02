@@ -149,7 +149,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
     var kurjunCheckInProgress = false;
 
-    function checkKurjunAuthToken(identitySrv){
+    function checkKurjunAuthToken(identitySrv, $scope){
 
         if(!kurjunCheckInProgress){
 
@@ -157,18 +157,36 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
             identitySrv.getObtainedKurjunToken().success(function(data){
                 if (!$.trim(data)){
-                    obtainKurjunAuthToken(identitySrv);
+
+                    obtainKurjunAuthToken(identitySrv, $scope);
+
                 }else{
-                    localStorage.setItem('kurjunToken', data);
+
+                    if(data != localStorage.getItem('kurjunToken')){
+
+                        localStorage.setItem('kurjunToken', data);
+
+                        notifyKurjunTokenListeners($scope);
+                    }
+
                     kurjunCheckInProgress = false;
                 }
             }).error(function(){
+
                 kurjunCheckInProgress = false;
             });
         }
     }
 
-    function obtainKurjunAuthToken(identitySrv){
+    function notifyKurjunTokenListeners($scope){
+
+        if($scope){
+
+            $scope.$broadcast('kurjunTokenSet', {});
+        }
+    }
+
+    function obtainKurjunAuthToken(identitySrv, $scope){
 
         localStorage.removeItem('kurjunToken');
 
@@ -191,9 +209,11 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
                identitySrv.obtainKurjunToken(signedAuthId).success(function (kurjunToken) {
 
-                 console.log(kurjunToken);
+                   console.log(kurjunToken);
 
-                 localStorage.setItem('kurjunToken', kurjunToken);
+                   localStorage.setItem('kurjunToken', kurjunToken);
+
+                   notifyKurjunTokenListeners($scope);
 
                }).error(function(error) {
                  console.log(error);
