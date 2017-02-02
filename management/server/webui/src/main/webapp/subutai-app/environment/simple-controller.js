@@ -3,11 +3,14 @@
 angular.module('subutai.environment.simple-controller', [])
 .controller('EnvironmentSimpleViewCtrl', EnvironmentSimpleViewCtrl);
 
-EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout'];
+EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout', 'identitySrv'];
 
-function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout) {
+function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout, identitySrv) {
 
 	var vm = this;
+
+	checkKurjunAuthToken(identitySrv, $rootScope);
+
 	var GRID_CELL_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
@@ -64,7 +67,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
     loadTemplates();
 
-    $scope.$on('kurjunTokenSet', function(event, data){
+    $rootScope.$on('kurjunTokenSet', function(event, data){
 
         //reload page to show also private templates
         loadTemplates(function(){

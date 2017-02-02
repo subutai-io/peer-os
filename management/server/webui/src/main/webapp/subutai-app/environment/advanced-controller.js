@@ -3,7 +3,7 @@
 angular.module('subutai.environment.adv-controller', [])
     .controller('AdvancedEnvironmentCtrl', AdvancedEnvironmentCtrl);
 
-AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
+AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', 'identitySrv'];
 
 var graph = new joint.dia.Graph;
 var paper;
@@ -17,9 +17,11 @@ var PEER_SPACE = 30;
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
 
-function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
+function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, identitySrv) {
 
     var vm = this;
+
+	checkKurjunAuthToken(identitySrv, $rootScope);
 
     vm.buildEnvironment = buildEnvironment;
     vm.buildEditedEnvironment = buildEditedEnvironment;
@@ -83,7 +85,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     loadTemplates();
 
-    $scope.$on('kurjunTokenSet', function(event, data){
+    $rootScope.$on('kurjunTokenSet', function(event, data){
 
         //reload page to show also private templates
         loadTemplates(function(){
