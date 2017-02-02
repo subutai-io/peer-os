@@ -26,7 +26,6 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
@@ -38,6 +37,7 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -208,13 +208,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public Template getTemplate() throws PeerException
     {
         return getLocalPeer().getTemplateById( templateId );
-    }
-
-
-    @Override
-    public void dispose() throws PeerException
-    {
-        getPeer().destroyContainer( getContainerId() );
     }
 
 
