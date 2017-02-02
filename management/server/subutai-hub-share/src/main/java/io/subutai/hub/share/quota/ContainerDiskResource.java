@@ -52,6 +52,12 @@ public class ContainerDiskResource extends ContainerResource<ByteValueResource>
     }
 
 
+    public long longValue( final ByteUnit unit )
+    {
+        return getResource().convert( unit ).longValue();
+    }
+
+
     public double doubleValue( ByteUnit unit )
     {
         return getResource().getValue( unit ).doubleValue();

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
@@ -26,7 +27,7 @@ public class RandomAllocator extends PeerResources
     }
 
 
-    public boolean allocate( final String containerName, final String templateId, final ContainerSize size )
+    public boolean allocate( final String containerName, final String templateId, final ContainerQuota quota )
     {
         final Collection<HostResources> preferredHosts = getPreferredHosts();
 
@@ -35,7 +36,7 @@ public class RandomAllocator extends PeerResources
             return false;
         }
 
-        AllocatedContainer container = new AllocatedContainer( containerName, templateId, size, getPeerId(),
+        AllocatedContainer container = new AllocatedContainer( containerName, templateId, quota, getPeerId(),
                 getPreferredHosts().iterator().next().getHostId() );
         containers.add( container );
 

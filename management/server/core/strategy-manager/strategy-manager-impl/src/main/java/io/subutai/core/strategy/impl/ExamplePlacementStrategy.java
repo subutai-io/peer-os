@@ -80,11 +80,24 @@ public class ExamplePlacementStrategy implements ExampleStrategy
         return scheme;
     }
 
+    private void initQuotas( final List<NodeSchema> nodeSchemaList, final Map<ContainerSize, ContainerQuota> quotas )
+     {
+         for ( NodeSchema nodeSchema : nodeSchemaList )
+         {
+             ContainerQuota quota = quotas.get( nodeSchema.getQuota().getContainerSize() );
+             if ( quota != null )
+             {
+                 quota = quotas.get( ContainerSize.SMALL );
+                 nodeSchema.getQuota().copyValues( quota );
+             }
+         }
+     }
 
     protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
                                     Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
 
+        initQuotas( nodeSchemas, quotas );
         // build list of allocators
         List<ResourceAllocator> allocators = new ArrayList<>();
         for ( PeerResources peerResources : peerGroupResources.getResources() )
@@ -107,8 +120,7 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             boolean allocated = false;
             for ( ResourceAllocator resourceAllocator : preferredAllocators )
             {
-                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize(),
-                        quotas.get( nodeSchema.getSize() ) );
+                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getQuota());
                 if ( allocated )
                 {
                     break;
@@ -131,7 +143,7 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             {
                 for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), container.getSize(),
+                    Node node = new Node( container.getName(), container.getName(), container.getQuota(),
                             container.getPeerId(), container.getHostId(), container.getTemplateId() );
 
                     nodes.add( node );

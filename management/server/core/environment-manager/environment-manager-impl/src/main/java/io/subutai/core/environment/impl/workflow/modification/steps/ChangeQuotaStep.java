@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.Map;
 
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.PeerException;
@@ -16,12 +17,12 @@ public class ChangeQuotaStep
 {
 
     private final LocalEnvironment environment;
-    private final Map<String, ContainerSize> changedContainers;
+    private final Map<String, ContainerQuota> changedContainers;
     private final TrackerOperation trackerOperation;
     protected TaskUtil<Object> quotaUtil = new TaskUtil<>();
 
 
-    public ChangeQuotaStep( final LocalEnvironment environment, final Map<String, ContainerSize> changedContainers,
+    public ChangeQuotaStep( final LocalEnvironment environment, final Map<String, ContainerQuota> changedContainers,
                             final TrackerOperation trackerOperation )
     {
         this.environment = environment;
@@ -34,18 +35,17 @@ public class ChangeQuotaStep
     {
         if ( !CollectionUtil.isMapEmpty( changedContainers ) )
         {
-
-            for ( final Map.Entry<String, ContainerSize> entry : changedContainers.entrySet() )
+            for ( final Map.Entry<String, ContainerQuota> entry : changedContainers.entrySet() )
             {
                 final EnvironmentContainerHost containerHost = environment.getContainerHostById( entry.getKey() );
-                final ContainerSize containerSize = entry.getValue();
+                final ContainerQuota containerQuota = entry.getValue();
 
                 quotaUtil.addTask( new TaskUtil.Task<Object>()
                 {
                     @Override
                     public Object call() throws Exception
                     {
-                        containerHost.setContainerSize( containerSize );
+                        containerHost.setContainerQuota( containerQuota );
 
                         return null;
                     }

@@ -79,7 +79,7 @@ public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvir
 
             CloneRequest cloneRequest =
                     new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
-                            node.getTemplateId(), HostArchitecture.AMD64, node.getType(),
+                            node.getTemplateId(), HostArchitecture.AMD64, node.getQuota(),
                             identityManager.getActiveSession().getKurjunToken() );
 
             request.addRequest( cloneRequest );

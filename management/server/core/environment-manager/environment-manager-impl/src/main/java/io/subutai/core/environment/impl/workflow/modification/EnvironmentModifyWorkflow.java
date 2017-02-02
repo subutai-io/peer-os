@@ -24,7 +24,7 @@ import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
@@ -34,7 +34,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     private LocalEnvironment environment;
     private final Topology topology;
     private List<String> removedContainers;
-    private Map<String, ContainerSize> changedContainers;
+    private Map<String, ContainerQuota> changedContainers;
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
@@ -57,7 +57,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
     public EnvironmentModifyWorkflow( String defaultDomain, IdentityManager identityManager, PeerManager peerManager,
                                       SecurityManager securityManager, LocalEnvironment environment, Topology topology,
-                                      List<String> removedContainers, Map<String, ContainerSize> changedContainers,
+                                      List<String> removedContainers, Map<String, ContainerQuota> changedContainers,
                                       TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
 

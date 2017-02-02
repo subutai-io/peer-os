@@ -55,6 +55,8 @@ import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.core.localpeer.impl.binding.Commands;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -481,34 +483,22 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setContainerSize( final ContainerHost containerHost, final ContainerSize containerSize )
+    public void setContainerQuota( final ContainerHost containerHost, final ContainerQuota containerQuota )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
-        Preconditions.checkNotNull( containerSize );
+        Preconditions.checkNotNull( containerQuota );
 
         try
         {
-            getContainerHostById( containerHost.getId() );
+            commandUtil
+                    .execute( Commands.getSetQuotaCommand( containerHost.getContainerName(), containerQuota ), this );
         }
-        catch ( HostNotFoundException e )
+        catch ( CommandException e )
         {
+            LOG.error( e.getMessage(), e );
             throw new ResourceHostException(
-                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
-        }
-
-        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerSize );
-
-        try
-        {
-            getQuotaManager().setQuota( containerHost.getContainerId(), quota );
-
-            ( ( ContainerHostEntity ) containerHost ).setContainerSize( containerSize );
-        }
-        catch ( QuotaException e )
-        {
-            throw new ResourceHostException( String.format( "Error setting quota %s to container %s: %s", containerSize,
-                    containerHost.getHostname(), e.getMessage() ), e );
+                    String.format( "Could not set quota values of %s", containerHost.getId() ) );
         }
     }
 
@@ -993,7 +983,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                 new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
                                         info.getHostInterfaces(), info.getContainerName(),
                                         getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
-                                        Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
+                                        Common.MANAGEMENT_HOSTNAME, null, null,
+                                        new ContainerQuota( ContainerSize.SMALL ) );
 
                         addContainerHost( containerHost );
                     }

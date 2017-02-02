@@ -1,6 +1,7 @@
 package io.subutai.common.command;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
 
@@ -9,13 +10,23 @@ import com.google.common.base.MoreObjects;
  */
 public class CommandResultImpl implements CommandResult
 {
+    @JsonProperty( value = "exitCode" )
     private final Integer exitCode;
+
+    @JsonProperty( value = "stdOut" )
     private final String stdOut;
+
+    @JsonProperty( value = "stdErr" )
     private final String stdErr;
+
+    @JsonProperty( value = "status" )
     private final CommandStatus status;
 
 
-    public CommandResultImpl( final Integer exitCode, final String stdOut, final String stdErr, CommandStatus status )
+    public CommandResultImpl( @JsonProperty( value = "exitCode" ) final Integer exitCode,
+                              @JsonProperty( value = "stdOut" ) final String stdOut,
+                              @JsonProperty( value = "stdErr" ) final String stdErr,
+                              @JsonProperty( value = "status" ) CommandStatus status )
     {
         this.exitCode = exitCode;
         this.stdOut = stdOut;
