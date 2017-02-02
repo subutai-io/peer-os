@@ -30,7 +30,7 @@ var fileUploader = {};
 
 function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder, $state) {
 
-	checkKurjunAuthToken(identitySrv);
+	checkKurjunAuthToken(identitySrv, $scope);
 
 	var vm = this;
 

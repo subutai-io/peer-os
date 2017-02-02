@@ -16,7 +16,6 @@ var PEER_SPACE = 30;
 
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
-var templatesList = [];
 
 function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
@@ -41,6 +40,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.nodeList = [];
     vm.colors = quotaColors;
     vm.templates = [];
+    vm.templatesList = [];
+
 
     vm.excludedContainers = [];
     vm.cubeGrowth = 1;
@@ -71,21 +72,38 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.selectPlugin = selectPlugin;
     vm.setTemplatesByPlugin = setTemplatesByPlugin;
 
-    // @todo workaround
-    environmentService.getTemplates()
-        .then(function (data) {
-            vm.templates = data;
-            getFilteredTemplates();
+    function loadTemplates(callback){
+        // @todo workaround
+        environmentService.getTemplates()
+            .then(function (data) {
+                vm.templates = data;
+                getFilteredTemplates(callback);
+            });
+    }
+
+    loadTemplates();
+
+    $scope.$on('kurjunTokenSet', function(event, data){
+
+        //reload page to show also private templates
+        loadTemplates(function(){
+            window.location.reload();
         });
 
-    function getFilteredTemplates() {
-        vm.templatesList = [];
+    });
+
+    function getFilteredTemplates(callback) {
+        var templatesLst = [];
+
         for (var i in vm.templates) {
             if (vm.templatesType == 'all' || i == vm.templatesType) {
-                vm.templatesList = vm.templatesList.concat(vm.templates[i]);
+                templatesLst = templatesLst.concat(vm.templates[i]);
             }
         }
-        templatesList = vm.templatesList;
+
+        vm.templatesList = templatesLst;
+
+        if(callback) callback();
     }
 
     function getPeers() {
