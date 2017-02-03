@@ -35,14 +35,11 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 
         vm.errorMessage="";
 
-		var postData = 'username=' + vm.name + '&password=' + vm.pass;
-
 		if( vm.newPass.length > 0 || vm.resetPwd) {
+
 			if( vm.newPass !== vm.passConf ) {
 				vm.errorMessage = "New password doesn't match the 'Confirm password' field";
 			} else {
-				postData += '&newpassword=' + vm.newPass;
-
                 if(vm.resetPwd){
                     if(!$.trim(vm.name)){
                         vm.errorMessage="Empty username";
@@ -52,10 +49,22 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
                     }else if(!$.trim(vm.requestSign)){
                         vm.errorMessage="Empty request sign";
                     }else{
-                        console.log("reset pwd");
-                        //TODO post to open! REST endpoint where by username obtain pub key and verify sign ,then update pwd and login
+
+                        var postData = 'username=' + vm.name + '&password=' + vm.newPass + '&sign=' + encodeURIComponent(vm.requestSign);
+
+                        loginSrv.changePass(postData).success(function(data){
+                             $rootScope.currentUser = vm.name;
+                             $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+                             //$state.go('home');
+                             checkUserPermissions();
+                         }).error(function(error){
+                             vm.errorMessage = error;
+                         });
                     }
                 }else{
+
+		            var postData = 'username=' + vm.name + '&password=' + vm.pass+'&newpassword=' + vm.newPass;
+
                     loginSrv.login( postData ).success(function(data){
                         $rootScope.currentUser = vm.name;
                         $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
@@ -67,6 +76,9 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 				}
 			}
 		} else {
+
+			var postData = 'username=' + vm.name + '&password=' + vm.pass;
+
 			loginSrv.login( postData ).success(function(data){
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');

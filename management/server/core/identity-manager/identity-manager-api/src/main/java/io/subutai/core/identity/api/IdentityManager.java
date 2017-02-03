@@ -246,6 +246,9 @@ public interface IdentityManager
     @PermitAll
     boolean changeUserPassword( User user, String oldPassword, String newPassword ) throws SystemSecurityException;
 
+    void resetPassword( String username, String newPassword, String sign ) throws SystemSecurityException;
+
+
     /* *************************************************
          */
     void updateUser( User user );

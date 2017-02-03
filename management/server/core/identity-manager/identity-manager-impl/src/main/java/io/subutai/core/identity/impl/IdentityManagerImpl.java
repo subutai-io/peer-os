@@ -27,6 +27,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
@@ -1452,6 +1453,47 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         return true;
+    }
+
+
+    public void resetPassword( String username, String newPassword, String sign ) throws SystemSecurityException
+    {
+        User user = getUserByUsername( username );
+
+        if ( user == null )
+        {
+            throw new InvalidLoginException( "User not found" );
+        }
+
+        isValidPassword( user.getUserName(), newPassword );
+
+        try
+        {
+            if ( !securityManager.getEncryptionTool().verifyClearSign( sign.getBytes(),
+                    securityManager.getKeyManager().getPublicKeyRingByFingerprint( user.getFingerprint() ) ) )
+            {
+                throw new InvalidLoginException( "Sign is invalid" );
+            }
+        }
+        catch ( PGPException e )
+        {
+            throw new SystemSecurityException( "Sign is invalid" );
+        }
+
+        try
+        {
+            String salt = SecurityUtil.generateSecureRandom();
+            newPassword = SecurityUtil.generateSecurePassword( newPassword, salt );
+            user.setSalt( salt );
+            user.setPassword( newPassword );
+            //user.setAuthId( UUID.randomUUID().toString() ); //Update AuthID also
+            user.setValidDate( DateUtils.addDays( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            identityDataService.updateUser( user );
+        }
+        catch ( NoSuchAlgorithmException | NoSuchProviderException e )
+        {
+            throw new SystemSecurityException( "Internal error" );
+        }
     }
 
 
