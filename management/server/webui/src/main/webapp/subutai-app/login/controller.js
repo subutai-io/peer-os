@@ -1,9 +1,31 @@
 'use strict';
 
 angular.module('subutai.login.controller', [])
-	.controller('LoginCtrl', LoginCtrl);
+	.controller('LoginCtrl', LoginCtrl)
+	.controller('ChangePassCtrl', ChangePassCtrl);
 
 LoginCtrl.$inject = ['$scope', 'loginSrv', '$http', '$rootScope'];
+ChangePassCtrl.$inject = ['$scope', 'loginSrv', 'SweetAlert'];
+
+function ChangePassCtrl( $scope, loginSrv, SweetAlert) {
+	var vm = this;
+
+	vm.changePass = changePass;
+
+	function changePass(passObj) {
+		if ($scope.changePassForm.$valid) {
+			LOADING_SCREEN();
+			loginSrv.changePass(passObj).success(function(data){
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("Success!", "You have successfully changed password.", "success");
+			}).error(function(error){
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
+			});
+		}
+	}
+}
+
 
 function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 {
@@ -52,7 +74,7 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 
                         var postData = 'username=' + vm.name + '&password=' + vm.newPass + '&sign=' + encodeURIComponent(vm.requestSign);
 
-                        loginSrv.changePass(postData).success(function(data){
+                        loginSrv.resetPass(postData).success(function(data){
                              $rootScope.currentUser = vm.name;
                              $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
                              //$state.go('home');
