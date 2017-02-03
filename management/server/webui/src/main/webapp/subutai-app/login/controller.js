@@ -1,45 +1,9 @@
 'use strict';
 
 angular.module('subutai.login.controller', [])
-	.controller('LoginCtrl', LoginCtrl)
-	.controller('ChangePassCtrl', ChangePassCtrl)
-	.directive('pwCheck', pwCheck);
+	.controller('LoginCtrl', LoginCtrl);
 
 LoginCtrl.$inject = ['$scope', 'loginSrv', '$http', '$rootScope'];
-ChangePassCtrl.$inject = ['$scope', 'loginSrv', 'SweetAlert'];
-
-function ChangePassCtrl( $scope, loginSrv, SweetAlert) {
-	var vm = this;
-
-	vm.changePass = changePass;
-
-	function changePass(passObj) {
-		if ($scope.changePassForm.$valid) {		
-			LOADING_SCREEN();
-			loginSrv.changePass(passObj).success(function(data){
-				LOADING_SCREEN('none');
-				SweetAlert.swal ("Success!", "You have successfully changed password.", "success");
-			}).error(function(error){
-				LOADING_SCREEN('none');
-				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
-			});
-		}
-	}
-}
-
-function pwCheck() {
-	return {
-		require: 'ngModel',
-		link: function (scope, elem, attrs, ctrl) {
-			var firstPassword = '#' + attrs.pwCheck;
-			elem.add(firstPassword).on('keyup', function () {
-				scope.$apply(function () {
-					ctrl.$setValidity('pwmatch', elem.val() === $(firstPassword).val());
-				});
-			});
-		}
-	}
-};
 
 function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 {
@@ -57,24 +21,50 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 	//functions
 	vm.login = login;
 
+	vm.requestSign = "";
+	vm.resetPwd=false;
+	vm.requestPwdReset=requestPwdReset;
+
+    function requestPwdReset(){
+        vm.errorMessage="";
+        vm.resetPwd = true;
+    }
+
+
 	function login() {
+
+        vm.errorMessage="";
 
 		var postData = 'username=' + vm.name + '&password=' + vm.pass;
 
-		if( vm.newPass.length > 0 ) {
+		if( vm.newPass.length > 0 || vm.resetPwd) {
 			if( vm.newPass !== vm.passConf ) {
 				vm.errorMessage = "New password doesn't match the 'Confirm password' field";
 			} else {
 				postData += '&newpassword=' + vm.newPass;
 
-				loginSrv.login( postData ).success(function(data){
-					$rootScope.currentUser = vm.name;
-					$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
-					//$state.go('home');
-					checkUserPermissions();
-				}).error(function(error){
-					vm.errorMessage = error;
-				});
+                if(vm.resetPwd){
+                    if(!$.trim(vm.name)){
+                        vm.errorMessage="Empty username";
+                    }
+                    else if(!$.trim(vm.newPass)){
+                        vm.errorMessage="Empty password";
+                    }else if(!$.trim(vm.requestSign)){
+                        vm.errorMessage="Empty request sign";
+                    }else{
+                        console.log("reset pwd");
+                        //TODO post to open! REST endpoint where by username obtain pub key and verify sign ,then update pwd and login
+                    }
+                }else{
+                    loginSrv.login( postData ).success(function(data){
+                        $rootScope.currentUser = vm.name;
+                        $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+                        //$state.go('home');
+                        checkUserPermissions();
+                    }).error(function(error){
+                        vm.errorMessage = error;
+                    });
+				}
 			}
 		} else {
 			loginSrv.login( postData ).success(function(data){
