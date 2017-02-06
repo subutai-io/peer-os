@@ -142,13 +142,13 @@ public class AppScaleManager
     }
 
 
-    private ContainerHost getContainerHost( String hostname )
+    private ContainerHost getContainerHost( String containerName )
     {
         ContainerHost ch = null;
 
         try
         {
-            ch = localPeer.getContainerHostByContainerName( hostname );
+            ch = localPeer.getContainerHostByContainerName( containerName );
         }
         catch ( HostNotFoundException e )
         {
