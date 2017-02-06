@@ -89,11 +89,17 @@ public class TunnelEventProcessor extends HubRequester
 
     private void updateTunnelIpPort( final CommandResult result )
     {
-        Map<Long, String> map = parseResult( result.getStdOut() );
+        TunnelInfoDto tunnelInfoDto = TunnelHelper
+                .getPeerTunnelState( format( REST_GET_TUNNEL_DATA_URL, configManager.getPeerId() ), configManager );
 
-        if ( OPENED_IP_PORT == null || !map.containsValue( OPENED_IP_PORT ) )
+        if ( tunnelInfoDto != null && tunnelInfoDto.getTunnelStatus().equals( READY ) )
         {
-            sendDataToHub( map );
+            Map<Long, String> map = parseResult( result.getStdOut() );
+
+            if ( OPENED_IP_PORT == null || !map.containsValue( OPENED_IP_PORT ) )
+            {
+                sendDataToHub( map );
+            }
         }
     }
 
