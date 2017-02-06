@@ -47,11 +47,14 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 	vm.resetPwd=false;
 	vm.requestPwdReset=requestPwdReset;
 
-    loginSrv.getSignToken().success(function(data){
-        vm.requestSign = data;
-    });
+    function getSignToken(){
+        loginSrv.getSignToken().success(function(data){
+            vm.requestSign = data;
+        });
+    }
 
     function requestPwdReset(){
+        getSignToken();
         vm.errorMessage="";
         vm.resetPwd = true;
     }
