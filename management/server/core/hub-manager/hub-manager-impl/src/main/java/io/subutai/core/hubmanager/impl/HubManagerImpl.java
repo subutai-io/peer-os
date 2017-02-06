@@ -240,7 +240,7 @@ public class HubManagerImpl implements HubManager, HostListener
         TunnelEventProcessor tunnelEventProcessor =
                 new TunnelEventProcessor( this, peerManager, configManager, restClient );
 
-        tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 20, TimeUnit.SECONDS );
+        tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
         //***********
 
