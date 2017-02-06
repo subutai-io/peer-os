@@ -14,7 +14,6 @@ function loginSrv($http)
 		login: login,
 		changePass: changePass,
 		resetPass: resetPass,
-		getHubIp: getHubIp,
 		getSignToken: getSignToken
 	};
 
@@ -25,12 +24,8 @@ function loginSrv($http)
 		return $http.post(LOGIN_URL, postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
 	}
 
-    function getHubIp() {
-		return $http.get(SERVER_URL + '/rest/v1/system/hub_ip', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-    }
-
     function getSignToken() {
-		return $http.get(SERVER_URL + '/rest/v1/identity/signtoken', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get(SERVER_URL + 'rest/v1/identity/signtoken', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
     }
 
 	function changePass (passObj) {

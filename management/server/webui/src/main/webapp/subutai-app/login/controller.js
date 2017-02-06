@@ -47,10 +47,7 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 	vm.resetPwd=false;
 	vm.requestPwdReset=requestPwdReset;
 
-    $http.get('https://192.168.0.104:8443/rest/v1/identity/signtoken', {
-        withCredentials: true,
-        headers: {'Content-Type': 'application/json'}
-    }).success(function (data) {
+    loginSrv.getSignToken().success(function(data){
         vm.requestSign = data;
     });
 
@@ -58,7 +55,6 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
         vm.errorMessage="";
         vm.resetPwd = true;
     }
-
 
 	function login() {
 
@@ -84,7 +80,7 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
                         loginSrv.resetPass(postData).success(function(data){
                              $rootScope.currentUser = vm.name;
                              $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
-                             //$state.go('home');
+
                              checkUserPermissions();
                          }).error(function(error){
                              vm.errorMessage = error;
@@ -97,7 +93,7 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
                     loginSrv.login( postData ).success(function(data){
                         $rootScope.currentUser = vm.name;
                         $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
-                        //$state.go('home');
+
                         checkUserPermissions();
                     }).error(function(error){
                         vm.errorMessage = error;
@@ -113,14 +109,6 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 				sessionStorage.removeItem('notifications');
 
-				loginSrv.getHubIp().success(function(data){
-					localStorage.setItem('getHubIp', data);
-				}).error(function(error){
-					console.log(error);
-					localStorage.setItem('getHubIp', 'hub.subut.ai');
-				});
-
-				//$state.go('home');
 				checkUserPermissions();
 			}).error(function(error, status){
 				vm.errorMessage = error;
