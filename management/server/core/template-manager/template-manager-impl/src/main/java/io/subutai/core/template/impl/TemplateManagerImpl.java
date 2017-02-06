@@ -212,7 +212,48 @@ public class TemplateManagerImpl implements TemplateManager
 
         if ( user != null )
         {
-            templates.addAll( getTemplatesByOwner( user.getFingerprint() ) );
+            String kurjunToken = null;
+
+            Session session = identityManager.getActiveSession();
+
+            if ( session != null )
+            {
+                kurjunToken = session.getKurjunToken();
+            }
+
+            WebClient webClient = null;
+            Response response = null;
+
+            try
+            {
+                webClient = getWebClient(
+                        String.format( GORJUN_LIST_TEMPLATES_URL, kurjunToken == null ? "" : kurjunToken ) );
+
+                response = webClient.get();
+
+                Set<Template> allTemplates =
+                        JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<Template>>()
+                        {
+                        }.getType() );
+
+                for ( Template template : allTemplates )
+                {
+                    if ( template.getOwners().contains( user.getFingerprint().toLowerCase() ) )
+                    {
+                        templates.add( template );
+                    }
+                }
+
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error getting private templates from local Gorjun", e );
+            }
+            finally
+            {
+                RestUtil.close( response, webClient );
+            }
+
         }
 
         return templates;

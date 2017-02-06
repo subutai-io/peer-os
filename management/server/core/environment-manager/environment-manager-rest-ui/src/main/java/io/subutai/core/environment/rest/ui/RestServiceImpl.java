@@ -126,8 +126,6 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listPrivateTemplates()
     {
-        templateManager.resetTemplateCache();
-
         return Response.ok().entity( gson.toJson( templateManager.getUserPrivateTemplates() ) ).build();
     }
 

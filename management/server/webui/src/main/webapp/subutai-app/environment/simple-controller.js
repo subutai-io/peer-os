@@ -55,6 +55,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	//plugins actions
 	vm.selectPlugin = selectPlugin;
 	vm.setTemplatesByPlugin = setTemplatesByPlugin;
+    vm.loadPrivateTemplates = loadPrivateTemplates;
+
+    function loadPrivateTemplates(){
+        environmentService.getPrivateTemplates()
+            .then(function (data) {
+                vm.templates['own'] = data;
+                getFilteredTemplates();
+            });
+    }
 
     function loadTemplates(callback){
         // @todo workaround
@@ -68,15 +77,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     loadTemplates();
 
     $rootScope.$on('kurjunTokenSet', function(event, data){
-
-        environmentService.getPrivateTemplates()
-            .then(function (data) {
-                vm.templates['own'] = data;
-                getFilteredTemplates();
-            });
-
+        loadPrivateTemplates();
     });
-
 
     function getFilteredTemplates(callback) {
         var templatesLst = [];

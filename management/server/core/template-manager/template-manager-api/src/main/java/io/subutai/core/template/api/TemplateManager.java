@@ -24,6 +24,10 @@ public interface TemplateManager
 
     List<Template> getTemplatesByOwner( final String owner );
 
+    /**
+     * Returns active users templates (templates that contain active user fingerprint in owners list)
+     * Returns always fresh list without caching
+     */
     List<Template> getUserPrivateTemplates();
 
     void resetTemplateCache();
