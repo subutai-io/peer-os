@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -37,6 +38,8 @@ import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.KeyPair;
@@ -104,12 +107,16 @@ public class IdentityManagerImpl implements IdentityManager
     private static final String PEER_MANAGER_ROLE = "Peer-Manager";
     private static final String SYSTEM_ROLE = "Internal-System";
     private static final String ENV_OWNER_ROLE = "Environment-Owner";
+    private static final long SIGN_TOKEN_TTL_SEC = 30;
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
     private DaoManager daoManager = null;
     private SecurityManager securityManager = null;
     private SessionManager sessionManager = null;
+
+    private Cache<String, Boolean> signTokensCache =
+            CacheBuilder.newBuilder().expireAfterWrite( SIGN_TOKEN_TTL_SEC, TimeUnit.SECONDS ).build();
 
 
     /* *************************************************
@@ -1456,6 +1463,7 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @Override
     public void resetPassword( String username, String newPassword, String sign ) throws SystemSecurityException
     {
         User user = getUserByUsername( username );
@@ -1469,6 +1477,14 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
+            String signToken =
+                    new String( securityManager.getEncryptionTool().extractClearSignContent( sign.getBytes() ) );
+
+            if ( signTokensCache.getIfPresent( signToken.toLowerCase().trim() ) == null )
+            {
+                throw new InvalidLoginException( "Sign token is invalid" );
+            }
+
             if ( !securityManager.getEncryptionTool().verifyClearSign( sign.getBytes(),
                     securityManager.getKeyManager().getPublicKeyRingByFingerprint( user.getFingerprint() ) ) )
             {
@@ -1494,6 +1510,17 @@ public class IdentityManagerImpl implements IdentityManager
         {
             throw new SystemSecurityException( "Internal error" );
         }
+    }
+
+
+    @Override
+    public String getSignToken()
+    {
+        String token = UUID.randomUUID().toString();
+
+        signTokensCache.put( token.toLowerCase(), true );
+
+        return token;
     }
 
 

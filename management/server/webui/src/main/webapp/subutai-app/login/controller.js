@@ -47,6 +47,13 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 	vm.resetPwd=false;
 	vm.requestPwdReset=requestPwdReset;
 
+    $http.get('https://192.168.0.104:8443/rest/v1/identity/signtoken', {
+        withCredentials: true,
+        headers: {'Content-Type': 'application/json'}
+    }).success(function (data) {
+        vm.requestSign = data;
+    });
+
     function requestPwdReset(){
         vm.errorMessage="";
         vm.resetPwd = true;
