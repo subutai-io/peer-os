@@ -26,7 +26,7 @@ public class Quota
             Preconditions.checkArgument( threshold >= 0 );
             Preconditions.checkArgument( threshold <= 100 );
         }
-        
+
         this.resource = resource;
         this.threshold = threshold;
     }
@@ -56,6 +56,17 @@ public class Quota
 
 
     @JsonIgnore
+    public ContainerCpuSetResource getAsCpuSetResource()
+    {
+        if ( resource.getContainerResourceType() == ContainerResourceType.CPUSET )
+        {
+            return ( ContainerCpuSetResource ) resource;
+        }
+        throw new IllegalStateException( "Could not get as CPU resource." );
+    }
+
+
+    @JsonIgnore
     public ContainerRamResource getAsRamResource()
     {
         if ( resource.getContainerResourceType() == ContainerResourceType.RAM )
@@ -63,6 +74,17 @@ public class Quota
             return ( ContainerRamResource ) resource;
         }
         throw new IllegalStateException( "Could not get as RAM resource." );
+    }
+
+
+    @JsonIgnore
+    public ContainerNetResource getAsNetResource()
+    {
+        if ( resource.getContainerResourceType() == ContainerResourceType.NET )
+        {
+            return ( ContainerNetResource ) resource;
+        }
+        throw new IllegalStateException( "Could not get as NET resource." );
     }
 
 

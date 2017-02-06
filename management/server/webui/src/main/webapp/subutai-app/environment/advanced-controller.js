@@ -3,7 +3,7 @@
 angular.module('subutai.environment.adv-controller', [])
     .controller('AdvancedEnvironmentCtrl', AdvancedEnvironmentCtrl);
 
-AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
+AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', 'identitySrv'];
 
 var graph = new joint.dia.Graph;
 var paper;
@@ -16,11 +16,12 @@ var PEER_SPACE = 30;
 
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
-var templatesList = [];
 
-function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
+function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, identitySrv) {
 
     var vm = this;
+
+	checkKurjunAuthToken(identitySrv, $rootScope);
 
     vm.buildEnvironment = buildEnvironment;
     vm.buildEditedEnvironment = buildEditedEnvironment;
@@ -41,6 +42,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.nodeList = [];
     vm.colors = quotaColors;
     vm.templates = [];
+    vm.templatesList = [];
+
 
     vm.excludedContainers = [];
     vm.cubeGrowth = 1;
@@ -71,21 +74,38 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.selectPlugin = selectPlugin;
     vm.setTemplatesByPlugin = setTemplatesByPlugin;
 
-    // @todo workaround
-    environmentService.getTemplates()
-        .then(function (data) {
-            vm.templates = data;
-            getFilteredTemplates();
+    function loadTemplates(callback){
+        // @todo workaround
+        environmentService.getTemplates()
+            .then(function (data) {
+                vm.templates = data;
+                getFilteredTemplates(callback);
+            });
+    }
+
+    loadTemplates();
+
+    $rootScope.$on('kurjunTokenSet', function(event, data){
+
+        //reload page to show also private templates
+        loadTemplates(function(){
+            window.location.reload();
         });
 
-    function getFilteredTemplates() {
-        vm.templatesList = [];
+    });
+
+    function getFilteredTemplates(callback) {
+        var templatesLst = [];
+
         for (var i in vm.templates) {
             if (vm.templatesType == 'all' || i == vm.templatesType) {
-                vm.templatesList = vm.templatesList.concat(vm.templates[i]);
+                templatesLst = templatesLst.concat(vm.templates[i]);
             }
         }
-        templatesList = vm.templatesList;
+
+        vm.templatesList = templatesLst;
+
+        if(callback) callback();
     }
 
     function getPeers() {
@@ -408,11 +428,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         var peerName = '';
         for (var i in vm.peerIds) {
             var peer = vm.peerIds[i];
-            if ( peer.id == peerId ) {
+            if (peer.id == peerId) {
                 peerName = peer.name;
-                for ( var j in peer.resourceHosts) {
+                for (var j in peer.resourceHosts) {
                     var rh = peer.resourceHosts[j];
-                    if ( rh.id == currentResource && rh.isManagement ) {
+                    if (rh.id == currentResource && rh.isManagement) {
                         isManagement = true;
                     }
                 }
@@ -578,7 +598,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     rx: 50,
                     ry: 50
                 },
-                //'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 50, ry: 50, magnet: true, transform: 'translate(16,28)'},
+                //'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 50, ry: 50, magnet: true, transform:
+                // 'translate(16,28)'},
                 'rect.b-magnet': {
                     fill: '#04346E',
                     width: 10,
@@ -1079,7 +1100,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     result.containersList.push(currentElement.get('containerId'));
                 } else {
                     var container2Build = {
-                        "type": currentElement.get('quotaSize'),
+                        "quota": {
+                            "containerSize": currentElement.get('quotaSize')
+                        },
                         "templateName": currentElement.get('templateName'),
                         "templateId": currentElement.get('templateId'),
                         "name": currentElement.get('containerName'),

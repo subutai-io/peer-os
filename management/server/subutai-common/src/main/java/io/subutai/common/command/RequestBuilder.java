@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -24,35 +25,68 @@ import io.subutai.common.util.NumUtil;
 public class RequestBuilder
 {
 
+    @JsonProperty( value = "command" )
     //the command to execute, e.g. ls
     private final String command;
 
+    @JsonProperty( value = "cwd" )
     //current working directory
     private String cwd = "/";
 
+    @JsonProperty( value = "type" )
     //type of command
     private RequestType type = RequestType.EXECUTE_REQUEST;
 
+    @JsonProperty( value = "outputRedirection" )
     //std out redirection
     private OutputRedirection outputRedirection = OutputRedirection.RETURN;
 
+    @JsonProperty( value = "errRedirection" )
     //std err redirection
     private OutputRedirection errRedirection = OutputRedirection.RETURN;
 
+    @JsonProperty( value = "timeout" )
     //command timeout interval
     private Integer timeout = Common.DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC;
 
+    @JsonProperty( value = "runAs" )
     //user under which to run the command
     private String runAs = "root";
 
+    @JsonProperty( value = "cmdArgs" )
     //command arguments
     private List<String> cmdArgs;
 
+    @JsonProperty( value = "envVars" )
     //environment variables
     private Map<String, String> envVars;
 
-
+    @JsonProperty( value = "isDaemon" )
     private int isDaemon = 0;
+
+
+    public RequestBuilder( @JsonProperty( value = "command" ) final String command,
+                           @JsonProperty( value = "cwd" ) final String cwd,
+                           @JsonProperty( value = "type" ) final RequestType type,
+                           @JsonProperty( value = "outputRedirection" ) final OutputRedirection outputRedirection,
+                           @JsonProperty( value = "errRedirection" ) final OutputRedirection errRedirection,
+                           @JsonProperty( value = "timeout" ) final Integer timeout,
+                           @JsonProperty( value = "runAs" ) final String runAs,
+                           @JsonProperty( value = "cmdArgs" ) final List<String> cmdArgs,
+                           @JsonProperty( value = "envVars" ) final Map<String, String> envVars,
+                           @JsonProperty( value = "isDaemon" ) final int isDaemon )
+    {
+        this.command = command;
+        this.cwd = cwd;
+        this.type = type;
+        this.outputRedirection = outputRedirection;
+        this.errRedirection = errRedirection;
+        this.timeout = timeout;
+        this.runAs = runAs;
+        this.cmdArgs = cmdArgs;
+        this.envVars = envVars;
+        this.isDaemon = isDaemon;
+    }
 
 
     /**

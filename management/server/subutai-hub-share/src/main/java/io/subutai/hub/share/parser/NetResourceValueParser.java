@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.hub.share.resource.ByteUnit;
+import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.NumericValueResource;
 import io.subutai.hub.share.resource.ResourceValueParser;
 
@@ -15,7 +17,7 @@ import io.subutai.hub.share.resource.ResourceValueParser;
  */
 public class NetResourceValueParser implements ResourceValueParser
 {
-    private static final String QUOTA_REGEX = "(\\d+)";
+    private static final String QUOTA_REGEX = "(\\d+)(\\.\\d+)?(Kbps)?";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
     private static NetResourceValueParser instance;
 
@@ -39,10 +41,22 @@ public class NetResourceValueParser implements ResourceValueParser
         Preconditions.checkNotNull( resource );
 
         Matcher quotaMatcher = QUOTA_PATTERN.matcher( resource.trim() );
+
         if ( quotaMatcher.matches() )
         {
-            String value = quotaMatcher.group( 1 );
-            return new NumericValueResource( value );
+            String intPart = quotaMatcher.group( 1 );
+            String decPart = quotaMatcher.group( 2 );
+            String acronym = quotaMatcher.group( 3 );
+
+            if ( acronym != null )
+            {
+                if ( !"Kbps".equals( acronym ) )
+                {
+                    throw new IllegalArgumentException(
+                            String.format( "Illegal acronym of network resource: %s", resource ) );
+                }
+            }
+            return new NumericValueResource( intPart + ( decPart != null ? decPart : "" ) );
         }
         else
         {

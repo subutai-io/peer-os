@@ -16,6 +16,8 @@ public interface ContainerHost extends Host, ContainerHostInfo
 {
     ContainerSize getContainerSize();
 
+    void setContainerSize( ContainerSize containerSize );
+
     ContainerId getContainerId();
 
     String getInitiatorPeerId();
@@ -23,8 +25,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
     String getOwnerId();
 
     EnvironmentId getEnvironmentId();
-
-    void dispose() throws PeerException;
 
     void start() throws PeerException;
 
@@ -60,6 +60,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      */
     void setQuota( ContainerQuota containerQuota ) throws PeerException;
 
+    void setContainerQuota( ContainerQuota containerQuota ) throws PeerException;
 
     HostId getResourceHostId();
 
