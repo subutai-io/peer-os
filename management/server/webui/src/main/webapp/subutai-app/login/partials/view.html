@@ -1,80 +1,89 @@
 <div class="b-login">
-	<div class="b-login__form b-login__form_center">
-		<div class="b-login-form-header">
-			<a><img src="assets/elements/logo.svg" width="323px" alt=""></a>
-		</div>
-		<div class="b-workspace b-workspace_login" ng-controller="LoginCtrl as loginCtrl">
+  <div class="b-login__form b-login__form_center">
+    <div class="b-login-form-header">
+      <a><img src="assets/elements/logo.svg" width="323px" alt=""></a>
+    </div>
+    <div class="b-workspace b-workspace_login" ng-controller="LoginCtrl as loginCtrl">
 
-			<div class="b-workspace__header">
-				<h1 class="b-title b-title_by">Log in</h1>
-				<div class="clear"></div>
-			</div>
+      <div class="b-workspace__header">
+        <h1 class="b-title b-title_by">Log in</h1>
+        <div class="clear"></div>
+      </div>
 
-			<div class="b-workspace__content">
-				<div class="b-form">
-					<div class="b-form__error-message" ng-if="loginCtrl.errorMessage">
-						{{ loginCtrl.errorMessage }}
-					</div>
-					<form ng-submit="loginCtrl.login()">
-						<div class="b-form__wrapper g-margin-bottom-half">
-							<label class="b-form-label">Username</label>
-							<input
-								class="b-form-input b-form-input_full"
-								ng-model="loginCtrl.name"
-								name="login"
-								focus-input="true"
-								tabindex=1
-								type="text">
-						</div>
-						<div ng-hide="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
-							<label class="b-form-label">Password</label>
-							<input
-								class="b-form-input b-form-input_full" 
-								id="subt-input__password" 
-								ng-model="loginCtrl.pass" 
-								name="password" 
-								tabindex=2 
-								type="password">
-						</div>
+      <div class="b-workspace__content">
+        <div class="b-form">
+          <div class="b-form__error-message" ng-if="loginCtrl.errorMessage">
+            {{ loginCtrl.errorMessage }}
+          </div>
+          <form ng-submit="loginCtrl.login()">
+            <div class="b-form__wrapper g-margin-bottom-half">
+              <label class="b-form-label">Username</label>
+              <input
+                  class="b-form-input b-form-input_full"
+                  ng-model="loginCtrl.name"
+                  name="login"
+                  focus-input="true"
+                  tabindex=1
+                  type="text">
+            </div>
+            <div ng-hide="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
+              <label class="b-form-label">Password</label>
+              <input
+                  class="b-form-input b-form-input_full"
+                  id="subt-input__password"
+                  ng-model="loginCtrl.pass"
+                  name="password"
+                  tabindex=2
+                  type="password">
+            </div>
 
-						<div ng-show="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
-							<label class="b-form-label">New Password</label>
-							<input
-									class="b-form-input b-form-input_full"
-									ng-model="loginCtrl.newPass"
-									name="new-password"
-									tabindex=2 
-									id="js-new-focus" 
-									autofocus 
-									type="password">
-						</div>
+            <div ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
+              <label class="b-form-label">New Password</label>
+              <input
+                  class="b-form-input b-form-input_full"
+                  ng-model="loginCtrl.newPass"
+                  name="new-password"
+                  tabindex=2
+                  id="js-new-focus"
+                  autofocus
+                  type="password">
+            </div>
 
-						<div ng-show="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
-							<label class="b-form-label">Confirm Password</label>
-							<input
-									class="b-form-input b-form-input_full"
-									ng-model="loginCtrl.passConf"
-									name="confirm-password"
-									tabindex=2
-									type="password">
-						</div>
+            <div ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
+              <label class="b-form-label">Confirm Password</label>
+              <input
+                  class="b-form-input b-form-input_full"
+                  ng-model="loginCtrl.passConf"
+                  name="confirm-password"
+                  tabindex=2
+                  type="password">
+            </div>
 
-						<div class="b-login-form-btn">
-							<button ng-hide="loginCtrl.passExpired" type="submit" class="b-btn b-btn_green b-btn_full-width" id="subt-button__login" tabindex=3>
-								Login
-							</button>
-							<button ng-show="loginCtrl.passExpired" type="submit" class="b-btn b-btn_green b-btn_full-width" tabindex=3>
-								Save and login
-							</button>
-						</div>
-					</form>
-				</div>
-			</div>
-<!--			<div class="b-workspace__footer b-workspace__footer_login">
-				<div class="b-login-form-btn" ng-controller = "SignupCtrl as signupCtrl">
-					<a href class = "b-btn b-btn_blue b-btn_full-width" ng-click = "signupCtrl.signUpWindow()">Sign Up</a>
-				</div>
-			</div>-->
-		</div>
-	</div>
+            <div ng-show="loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
+              <label class="b-form-label">Sign Request</label>
+              <textarea
+                  class="b-form-input b-form-input_full b-form-input_textarea e2e-sign-message"
+                  ng-model="loginCtrl.requestSign">
+              </textarea>
+            </div>
+
+            <div class="b-login-form-btn">
+              <button ng-hide="loginCtrl.passExpired || loginCtrl.resetPwd" type="submit"
+                      class="b-btn b-btn_green b-btn_full-width" id="subt-button__login" tabindex=3>
+                Login
+              </button>
+              <button ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" type="submit" class="b-btn b-btn_green b-btn_full-width"
+                      tabindex=3>
+                Save and login
+              </button>
+            </div>
+
+            <div class="reset-pwd" ng-if="loginCtrl.errorMessage && !loginCtrl.resetPwd">
+              <a ng-click="loginCtrl.requestPwdReset()">Reset password</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

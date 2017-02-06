@@ -54,6 +54,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public String getSignToken()
+    {
+        return identityManager.getSignToken();
+    }
+
+
+    @Override
     public Response authenticate( int type, String userName, String password )
     {
         try
@@ -64,7 +71,7 @@ public class RestServiceImpl implements RestService
             {
                 AuthMessage authM = new AuthMessage();
                 authM.setToken( token );
-                return Response.ok( JsonUtil.toJson( authM ) ) .build();
+                return Response.ok( JsonUtil.toJson( authM ) ).build();
             }
             else
             {
@@ -77,9 +84,13 @@ public class RestServiceImpl implements RestService
             User user;
 
             if ( userName.length() == 40 )
+            {
                 user = identityManager.getUserByFingerprint( userName );
+            }
             else
+            {
                 user = identityManager.getUserByUsername( userName );
+            }
 
             if ( user != null )
             {
@@ -126,9 +137,13 @@ public class RestServiceImpl implements RestService
             User user;
 
             if ( userName.length() == 40 )
+            {
                 user = identityManager.getUserByFingerprint( userName );
+            }
             else
+            {
                 user = identityManager.getUserByUsername( userName );
+            }
 
             if ( user != null )
             {
