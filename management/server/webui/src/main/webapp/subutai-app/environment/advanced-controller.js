@@ -87,10 +87,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     $rootScope.$on('kurjunTokenSet', function(event, data){
 
-        //reload page to show also private templates
-        loadTemplates(function(){
-            window.location.reload();
-        });
+        environmentService.getPrivateTemplates()
+            .then(function (data) {
+                vm.templates['own'] = data;
+                getFilteredTemplates();
+            });
 
     });
 

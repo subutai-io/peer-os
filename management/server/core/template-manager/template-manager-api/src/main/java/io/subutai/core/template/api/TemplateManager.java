@@ -24,5 +24,7 @@ public interface TemplateManager
 
     List<Template> getTemplatesByOwner( final String owner );
 
+    List<Template> getUserPrivateTemplates();
+
     void resetTemplateCache();
 }

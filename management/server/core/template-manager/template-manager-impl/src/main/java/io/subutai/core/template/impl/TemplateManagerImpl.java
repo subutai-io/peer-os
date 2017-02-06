@@ -29,6 +29,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.template.api.TemplateManager;
 
 
@@ -60,6 +61,7 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
+    @Override
     public void resetTemplateCache()
     {
         lastTemplatesFetchTime = 0L;
@@ -196,6 +198,21 @@ public class TemplateManagerImpl implements TemplateManager
             {
                 templates.add( template );
             }
+        }
+
+        return templates;
+    }
+
+
+    public List<Template> getUserPrivateTemplates()
+    {
+        List<Template> templates = Lists.newArrayList();
+
+        User user = identityManager.getActiveUser();
+
+        if ( user != null )
+        {
+            templates.addAll( getTemplatesByOwner( user.getFingerprint() ) );
         }
 
         return templates;
