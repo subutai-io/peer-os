@@ -73,6 +73,15 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     //plugins actions
     vm.selectPlugin = selectPlugin;
     vm.setTemplatesByPlugin = setTemplatesByPlugin;
+    vm.loadPrivateTemplates = loadPrivateTemplates;
+
+    function loadPrivateTemplates(){
+        environmentService.getPrivateTemplates()
+            .then(function (data) {
+                vm.templates['own'] = data;
+                getFilteredTemplates();
+            });
+    }
 
     function loadTemplates(callback){
         // @todo workaround
@@ -86,12 +95,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     loadTemplates();
 
     $rootScope.$on('kurjunTokenSet', function(event, data){
-
-        //reload page to show also private templates
-        loadTemplates(function(){
-            window.location.reload();
-        });
-
+        loadPrivateTemplates();
     });
 
     function getFilteredTemplates(callback) {
@@ -112,7 +116,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         $('.js-peer-load-screen').show();
         environmentService.getPeers().success(function (data) {
             vm.peerIds = data;
-            console.log(vm.peerIds);
             $('.js-peer-load-screen').hide();
         }).error(function (error) {
             $('.js-peer-load-screen').hide();

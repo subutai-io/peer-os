@@ -36,6 +36,8 @@ public class TemplateManagerImpl implements TemplateManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( TemplateManagerImpl.class.getName() );
     private static final String GORJUN_LIST_TEMPLATES_URL = Common.LOCAL_KURJUN_BASE_URL + "/template/info?token=%s";
+    private static final String GORJUN_LIST_PRIVATE_TEMPLATES_URL =
+            Common.LOCAL_KURJUN_BASE_URL + "/template/info?owner=%s&token=%s";
     private static final String GORJUN_GET_VERIFIED_TEMPLATE_URL =
             Common.LOCAL_KURJUN_BASE_URL + "/template/info?name=%s&verified=true";
     private static final int TEMPLATE_CACHE_TTL_SEC = 30;
@@ -60,6 +62,7 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
+    @Override
     public void resetTemplateCache()
     {
         lastTemplatesFetchTime = 0L;
@@ -112,10 +115,23 @@ public class TemplateManagerImpl implements TemplateManager
 
                 response = webClient.get();
 
-                Set<Template> freshTemplateList =
-                        JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<Template>>()
-                        {
-                        }.getType() );
+                Set<Template> freshTemplateList = Sets.newHashSet();
+
+                String json = response.readEntity( String.class ).trim();
+
+                if ( json.startsWith( "[" ) )
+                {
+                    Set<Template> templates = JsonUtil.fromJson( json, new TypeToken<Set<Template>>()
+                    {
+                    }.getType() );
+
+                    freshTemplateList.addAll( templates );
+                }
+                else
+                {
+                    freshTemplateList.add( JsonUtil.fromJson( json, Template.class ) );
+                }
+
 
                 if ( !CollectionUtil.isCollectionEmpty( freshTemplateList ) )
                 {
@@ -195,6 +211,58 @@ public class TemplateManagerImpl implements TemplateManager
             if ( template.getOwners().contains( owner.toLowerCase() ) )
             {
                 templates.add( template );
+            }
+        }
+
+        return templates;
+    }
+
+
+    public List<Template> getUserPrivateTemplates()
+    {
+        List<Template> templates = Lists.newArrayList();
+
+        Session session = identityManager.getActiveSession();
+
+        if ( session != null )
+        {
+            String kurjunToken = session.getKurjunToken();
+
+            if ( kurjunToken != null )
+            {
+                WebClient webClient = null;
+                Response response = null;
+
+                try
+                {
+                    webClient = getWebClient( String.format( GORJUN_LIST_PRIVATE_TEMPLATES_URL,
+                            session.getUser().getFingerprint().toLowerCase(), kurjunToken ) );
+
+                    response = webClient.get();
+
+                    String json = response.readEntity( String.class ).trim();
+
+                    if ( json.startsWith( "[" ) )
+                    {
+                        Set<Template> privateTemplates = JsonUtil.fromJson( json, new TypeToken<Set<Template>>()
+                        {
+                        }.getType() );
+
+                        templates.addAll( privateTemplates );
+                    }
+                    else
+                    {
+                        templates.add( JsonUtil.fromJson( json, Template.class ) );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error getting private templates from local Gorjun", e );
+                }
+                finally
+                {
+                    RestUtil.close( response, webClient );
+                }
             }
         }
 

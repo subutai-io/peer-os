@@ -124,6 +124,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response listPrivateTemplates()
+    {
+        return Response.ok().entity( gson.toJson( templateManager.getUserPrivateTemplates() ) ).build();
+    }
+
+
+    @Override
     public Response getVerifiedTemplate( final String templateName )
     {
         try
@@ -183,7 +190,8 @@ public class RestServiceImpl implements RestService
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
@@ -222,7 +230,8 @@ public class RestServiceImpl implements RestService
             checkName( name );
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             Topology topology = new Topology( name );
 
@@ -275,17 +284,20 @@ public class RestServiceImpl implements RestService
 
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {}.getType() );
+            {
+            }.getType() );
 
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
 
             Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {}.getType() );
+                    {
+                    }.getType() );
 
             for ( Map<String, String> cont : changingContainers )
             {
@@ -337,15 +349,18 @@ public class RestServiceImpl implements RestService
             String name = environmentManager.loadEnvironment( environmentId ).getName();
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {}.getType() );
+                    {
+                    }.getType() );
 
             for ( Map<String, String> cont : changingContainers )
             {
@@ -906,7 +921,8 @@ public class RestServiceImpl implements RestService
             EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             for ( String tag : tags )
             {
