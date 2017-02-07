@@ -7,10 +7,20 @@ import java.util.Set;
 import io.subutai.common.protocol.Template;
 
 
+/**
+ * Exposes API to work with templates.
+ * All methods use caching except those that explicitly mention otherwise
+ */
 public interface TemplateManager
 {
+    /**
+     * Returns all templates visible to current user
+     */
     Set<Template> getTemplates();
 
+    /**
+     * Returns template by its id
+     */
     Template getTemplate( String id );
 
     /**
@@ -20,15 +30,25 @@ public interface TemplateManager
      */
     Template getTemplateByName( String name );
 
+    /**
+     * Returns template by name from the verified repository. Verified repo contains official templates, not user
+     * templates.
+     */
     Template getVerifiedTemplateByName( final String name );
 
+    /**
+     * Returns template by owner. Owner is user PGP public key fingerprint
+     */
     List<Template> getTemplatesByOwner( final String owner );
 
     /**
-     * Returns active users templates (templates that contain active user fingerprint in owners list)
-     * Returns always fresh list without caching
+     * Returns active user's templates.
+     * Does NOT use caching!
      */
     List<Template> getUserPrivateTemplates();
 
+    /**
+     * Resets template cache
+     */
     void resetTemplateCache();
 }
