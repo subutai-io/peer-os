@@ -1478,9 +1478,9 @@ public class IdentityManagerImpl implements IdentityManager
         try
         {
             String signToken =
-                    new String( securityManager.getEncryptionTool().extractClearSignContent( sign.getBytes() ) );
+                    new String( securityManager.getEncryptionTool().extractClearSignContent( sign.getBytes() ) ).trim().toLowerCase();
 
-            if ( signTokensCache.getIfPresent( signToken.toLowerCase().trim() ) == null )
+            if ( signTokensCache.getIfPresent( signToken ) == null )
             {
                 throw new InvalidLoginException( "Sign token is invalid" );
             }
@@ -1490,6 +1490,9 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 throw new InvalidLoginException( "Sign is invalid" );
             }
+
+            //remove token from cache
+            signTokensCache.invalidate( signToken );
         }
         catch ( PGPException e )
         {
@@ -1502,7 +1505,6 @@ public class IdentityManagerImpl implements IdentityManager
             newPassword = SecurityUtil.generateSecurePassword( newPassword, salt );
             user.setSalt( salt );
             user.setPassword( newPassword );
-            //user.setAuthId( UUID.randomUUID().toString() ); //Update AuthID also
             user.setValidDate( DateUtils.addDays( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
             identityDataService.updateUser( user );
         }
@@ -1516,9 +1518,9 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public String getSignToken()
     {
-        String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString().toLowerCase();
 
-        signTokensCache.put( token.toLowerCase(), true );
+        signTokensCache.put( token, true );
 
         return token;
     }
