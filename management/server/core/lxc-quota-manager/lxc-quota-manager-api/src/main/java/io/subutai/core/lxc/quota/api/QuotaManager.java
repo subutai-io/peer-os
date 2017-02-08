@@ -18,6 +18,7 @@ import io.subutai.hub.share.resource.ResourceValueParser;
 public interface QuotaManager
 {
 
+    @Deprecated
     PeerResources getResourceLimits( String peerId ) throws QuotaException;
 
 
