@@ -45,6 +45,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.Quota;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -187,6 +188,22 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         this.containerSize = containerQuota.getContainerSize();
         this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
+    }
+
+
+    @Override
+    public Quota getRawQuota()
+    {
+        try
+        {
+            return getPeer().getRawQuota( getContainerId() );
+        }
+        catch ( PeerException e )
+        {
+            logger.error( "Failed to get quota: {}", e.getMessage() );
+        }
+
+        return null;
     }
 
 

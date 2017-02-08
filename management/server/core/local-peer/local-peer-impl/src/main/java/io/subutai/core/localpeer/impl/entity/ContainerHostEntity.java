@@ -23,6 +23,7 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.Quota;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -111,6 +112,22 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
         this.containerSize = containerQuota.getContainerSize();
+    }
+
+
+    @Override
+    public Quota getRawQuota()
+    {
+        try
+        {
+            return getPeer().getRawQuota( getContainerId() );
+        }
+        catch ( PeerException e )
+        {
+            logger.error( "Failed to get quota: {}", e.getMessage() );
+        }
+
+        return null;
     }
 
 
@@ -271,6 +288,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         this.containerSize = containerQuota.getContainerSize();
         setQuota( containerQuota );
     }
+
 
     @Override
     public void setContainerSize( final ContainerSize containerSize )

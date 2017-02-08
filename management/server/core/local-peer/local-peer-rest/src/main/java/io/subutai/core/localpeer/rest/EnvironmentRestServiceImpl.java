@@ -14,6 +14,7 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
+import io.subutai.common.host.Quota;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -26,7 +27,6 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -124,6 +124,23 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( containerId );
             Preconditions.checkNotNull( containerId.getId() );
             return localPeer.getContainerState( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Quota getRawQuota( final ContainerId containerId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerId.getId() );
+            return localPeer.getRawQuota( containerId );
         }
         catch ( Exception e )
         {
