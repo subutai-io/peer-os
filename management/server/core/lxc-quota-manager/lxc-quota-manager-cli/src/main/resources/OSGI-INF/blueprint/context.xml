@@ -14,24 +14,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="quota/get">
-      <action class="io.subutai.core.lxc.quota.cli.GetQuota">
-        <argument ref="quotaManager" />
-        <argument ref="localPeer" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="quota/set">
-      <action class="io.subutai.core.lxc.quota.cli.SetQuota">
-        <argument ref="quotaManager" />
-        <argument ref="localPeer" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="quota/limits">
       <action class="io.subutai.core.lxc.quota.cli.GetResourceLimits">
         <argument ref="quotaManager" />

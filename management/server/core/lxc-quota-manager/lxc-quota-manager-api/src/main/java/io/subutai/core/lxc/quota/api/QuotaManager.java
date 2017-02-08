@@ -2,11 +2,9 @@ package io.subutai.core.lxc.quota.api;
 
 
 import java.util.Map;
-import java.util.Set;
 
-import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.PeerResources;
@@ -22,24 +20,6 @@ public interface QuotaManager
 
     PeerResources getResourceLimits( String peerId ) throws QuotaException;
 
-    /**
-     * Returns current quota values of container.
-     *
-     * @param containerId container id
-     *
-     * @return quota value
-     */
-    ContainerQuota getQuota( final ContainerId containerId ) throws QuotaException;
-
-
-    /**
-     * Sets quota values of container.
-     *
-     * @param containerId container id
-     * @param containerQuota new quota value
-     */
-
-    void setQuota( ContainerId containerId, ContainerQuota containerQuota ) throws QuotaException;
 
     ResourceValueParser getResourceValueParser( ContainerResourceType containerResourceType ) throws QuotaException;
 
@@ -53,23 +33,4 @@ public interface QuotaManager
     ContainerQuota getDefaultContainerQuota( ContainerSize containerSize );
 
     Map<ContainerSize, ContainerQuota> getDefaultQuotas();
-
-    /**
-     * Returns allowed cpus/cores ids on container
-     *
-     * @param containerId - id of container
-     *
-     * @return - allowed cpu set
-     */
-    @Deprecated
-    Set<Integer> getCpuSet( ContainerId containerId ) throws QuotaException;
-
-    /**
-     * Sets allowed cpus/cores on container
-     *
-     * @param containerId - name of container
-     * @param cpuSet - allowed cpu set
-     */
-    @Deprecated
-    void setCpuSet( ContainerId containerId, Set<Integer> cpuSet ) throws QuotaException;
 }

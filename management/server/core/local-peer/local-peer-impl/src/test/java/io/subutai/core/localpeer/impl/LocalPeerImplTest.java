@@ -73,7 +73,6 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.ByteValueResource;
 
 import static junit.framework.TestCase.assertEquals;
@@ -678,18 +677,5 @@ public class LocalPeerImplTest
         doThrow( new MonitorException( "" ) ).when( monitor ).getProcessResourceUsage( containerId, PID );
 
         localPeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetRamQuota() throws Exception
-    {
-        localPeer.getQuota( containerId );
-
-        verify( quotaManager ).getQuota( containerId );
-
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId );
-
-        localPeer.getQuota( containerId );
     }
 }

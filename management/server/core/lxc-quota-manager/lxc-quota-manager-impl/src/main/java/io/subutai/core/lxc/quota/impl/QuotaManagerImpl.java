@@ -9,42 +9,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerSize;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerResourceFactory;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.Quota;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.ContainerResourceType;
@@ -56,19 +39,17 @@ import io.subutai.hub.share.resource.RamResource;
 import io.subutai.hub.share.resource.ResourceValueParser;
 
 
+// TODO
+// when custom quota is done, remove Quota Manager
 public class QuotaManagerImpl implements QuotaManager
 {
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf( 100 );
-    private static final long QUOTA_TTL_MIN = 5;
 
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
     private LocalPeer localPeer;
     private PeerManager peerManager;
-    private CommandUtil commandUtil;
-    private Commands commands = new Commands();
     private EnumMap<ContainerSize, ContainerQuota> containerQuotas = new EnumMap<>( ContainerSize.class );
     private String defaultQuota;
-    private ScheduledExecutorService quotaCachePopulator = Executors.newSingleThreadScheduledExecutor();
 
 
     public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer )
@@ -77,37 +58,12 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( localPeer );
         this.peerManager = peerManager;
         this.localPeer = localPeer;
-        this.commandUtil = new CommandUtil();
     }
 
 
     public void init() throws QuotaException
     {
-        startCachePopulator();
         initDefaultQuotas();
-    }
-
-
-    private void startCachePopulator()
-    {
-        quotaCachePopulator.scheduleWithFixedDelay( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    for ( ContainerHost containerHost : localPeer.getRegisteredContainers() )
-                    {
-                        containerQuotasCache.refresh( containerHost.getContainerId() );
-                    }
-                }
-                catch ( Exception e )
-                {
-                    LOGGER.warn( "Error updating cache: {}", e.getMessage() );
-                }
-            }
-        }, 1, QUOTA_TTL_MIN, TimeUnit.MINUTES );
     }
 
 
@@ -303,48 +259,6 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public ContainerQuota getQuota( final ContainerId containerId ) throws QuotaException
-    {
-        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
-
-        try
-        {
-            return containerQuotasCache.get( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting quota for container {}: {}", containerId.getContainerName(), e.getMessage() );
-
-            throw new QuotaException( e.getMessage() );
-        }
-    }
-
-
-    private LoadingCache<ContainerId, ContainerQuota> containerQuotasCache =
-            CacheBuilder.newBuilder().maximumSize( 1000 ).expireAfterWrite( QUOTA_TTL_MIN, TimeUnit.MINUTES ).build(
-
-                    new CacheLoader<ContainerId, ContainerQuota>()
-                    {
-                        @Override
-                        public ContainerQuota load( final ContainerId containerId ) throws Exception
-                        {
-                            return localPeer.getQuota( containerId );
-                        }
-                    } );
-
-
-    @Override
-    public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws QuotaException
-    {
-        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
-        Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
-
-        executeOnContainersResourceHost( containerId,
-                commands.getSetQuotaCommand( containerId.getContainerName(), containerQuota ) );
-    }
-
-
-    @Override
     public ContainerQuota getDefaultContainerQuota( final ContainerSize containerSize )
     {
         return containerQuotas.get( containerSize );
@@ -355,74 +269,5 @@ public class QuotaManagerImpl implements QuotaManager
     public Map<ContainerSize, ContainerQuota> getDefaultQuotas()
     {
         return Collections.unmodifiableMap( containerQuotas );
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet( final ContainerId containerId ) throws QuotaException
-    {
-        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
-
-        CommandResult result = executeOnContainersResourceHost( containerId,
-                commands.getReadCpuSetCommand( containerId.getContainerName() ) );
-
-        Pattern p = Pattern.compile( "(\\s*\\d+\\s*-\\s*\\d+\\s*)" );
-        StringTokenizer st = new StringTokenizer( result.getStdOut().trim(), "," );
-        Set<Integer> cpuSet = Sets.newHashSet();
-
-        while ( st.hasMoreTokens() )
-        {
-            String token = st.nextToken();
-            Matcher m = p.matcher( token );
-            if ( m.find() )
-            {
-                String[] range = m.group( 1 ).split( "-" );
-
-                for ( int i = Integer.parseInt( range[0].trim() ); i <= Integer.parseInt( range[1].trim() ); i++ )
-                {
-                    cpuSet.add( i );
-                }
-            }
-            else
-            {
-                cpuSet.add( Integer.valueOf( token.trim() ) );
-            }
-        }
-
-        return cpuSet;
-    }
-
-
-    @Override
-    public void setCpuSet( final ContainerId containerId, final Set<Integer> cpuSet ) throws QuotaException
-    {
-        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ) );
-
-        StringBuilder cpuSetString = new StringBuilder();
-        for ( Integer cpuIdx : cpuSet )
-        {
-            cpuSetString.append( cpuIdx ).append( "," );
-        }
-
-        cpuSetString.replace( cpuSetString.length() - 1, cpuSetString.length(), "" );
-
-        executeOnContainersResourceHost( containerId,
-                commands.getWriteCpuSetCommand( containerId.getContainerName(), cpuSetString.toString() ) );
-    }
-
-
-    private CommandResult executeOnContainersResourceHost( ContainerId containerId, RequestBuilder command )
-            throws QuotaException
-    {
-        try
-        {
-            ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerId.getId() );
-            return commandUtil.execute( command, resourceHost );
-        }
-        catch ( HostNotFoundException | CommandException e )
-        {
-            throw new QuotaException( e );
-        }
     }
 }
