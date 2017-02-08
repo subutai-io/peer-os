@@ -104,6 +104,7 @@ node() {
 				if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
 				if test -f /mnt/lib/lxc/tmpdir/management-subutai-template_*; then rm /mnt/lib/lxc/tmpdir/management-subutai-template_*; fi
 				/apps/subutai/current/bin/curl https://cdn.subut.ai:8338/kurjun/rest/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
+				if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
 				snappy install --allow-unauthenticated /tmp/subutai-latest.snap
 			EOF"""
 
@@ -128,11 +129,11 @@ node() {
 				set +x
 				ssh root@${env.SS_TEST_NODE} <<- EOF
 				set -e
-				echo -e '[template]\nbranch = ${env.BRANCH_NAME}' > /var/lib/apps/subutai/current/agent.gcfg
-				echo -e '[cdn]\nurl = cdn.local' >> /var/lib/apps/subutai/current/agent.gcfg
+				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/apps/subutai/current/agent.gcfg
+				sed 's/cdn.subut.ai/cdn.local/g' -i /var/lib/apps/subutai/current/agent.gcfg
 				echo y | subutai import management
-				sed -i -e 's/cdn.local/cdn.subut.ai/g' /mnt/lib/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
-				if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
+				sed 's/cdn.local/cdn.subut.ai/g' -i /mnt/lib/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
+				sed 's/cdn.local/cdn.subut.ai/g' -i /var/lib/apps/subutai/current/agent.gcfg
 			EOF"""
 
 			/* wait until SS starts */
