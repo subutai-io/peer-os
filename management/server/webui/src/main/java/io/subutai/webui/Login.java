@@ -18,9 +18,11 @@ import com.google.common.base.Strings;
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
 import io.subutai.common.security.exception.SessionBlockedException;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.template.api.TemplateManager;
 
 
 public class Login extends HttpServlet
@@ -38,6 +40,7 @@ public class Login extends HttpServlet
             String password = request.getParameter( "password" );
             String sptoken = request.getParameter( "sptoken" );
             String newPassword = request.getParameter( "newpassword" );
+            String sign = request.getParameter( "sign" );
             User user;
 
             IdentityManager identityManager = ServiceLocator.getServiceOrNull( IdentityManager.class );
@@ -48,6 +51,10 @@ public class Login extends HttpServlet
             {
                 identityManager.changeUserPassword( username, password, newPassword );
                 password = newPassword;
+            }
+            else if ( !Strings.isNullOrEmpty( sign ) )
+            {
+                identityManager.resetPassword( username, password, sign );
             }
 
             if ( !Strings.isNullOrEmpty( username ) )
@@ -69,7 +76,7 @@ public class Login extends HttpServlet
                 return;
             }
 
-            authenticateUser( request, response, user, sptoken );
+            setUserAttributes( request, response, user, sptoken );
         }
         catch ( IdentityExpiredException e )
         {
@@ -111,8 +118,8 @@ public class Login extends HttpServlet
     }
 
 
-    private void authenticateUser( HttpServletRequest request, HttpServletResponse response, User user, String sptoken )
-            throws InvalidLoginException
+    private void setUserAttributes( HttpServletRequest request, HttpServletResponse response, User user,
+                                    String sptoken ) throws InvalidLoginException
     {
         if ( user == null )
         {
@@ -127,7 +134,7 @@ public class Login extends HttpServlet
         logger.info( user.getFullName() );
         logger.info( user.getSecurityKeyId() );
         logger.info( user.getUserName() );
-        Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+        Cookie fingerprint = new Cookie( Common.E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME, user.getFingerprint() );
         fingerprint.setSecure( true );
 
 
@@ -146,6 +153,12 @@ public class Login extends HttpServlet
 
         response.addCookie( ctoken );
         response.addCookie( fingerprint );
+
+        TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
+        if ( templateManager != null )
+        {
+            templateManager.resetTemplateCache();
+        }
     }
 
 

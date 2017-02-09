@@ -23,7 +23,7 @@
               ng-selected="containerViewCtrl.environmentId == environment.id">
             {{ environment.name }}
           </option>
-          <option value="NOT_REGISTERED">Standalone</option>
+          <option value="NOT_REGISTERED" ng-if="containerViewCtrl.isAdmin()">Standalone</option>
         </select>
         <div class="clear"></div>
       </div>
@@ -67,14 +67,14 @@
         <thead>
         <tr>
           <th>Status</th>
-          <th>Name</th>
-          <th></th>
+          <th>Hostname</th>
+          <th>Options</th>
           <th>IP</th>
           <th>Tags</th>
           <th>Domain</th>
-          <th></th>
+          <th>Action</th>
           <th>SSH</th>
-          <th></th>
+          <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -108,16 +108,19 @@
             <a href
                class="b-icon b-icon_edit"
                tooltips
-               tooltip-template='Change name'
+               tooltip-template='Change hostname'
                ng-click="containerViewCtrl.changeNamePopup( container )" style="visibility: visible">
+            </a>
+            <a href
+               class="b-icon b-icon_template"
+               tooltips
+               tooltip-template='Create template'
+               ng-show="containerViewCtrl.hasKurjunToken()"
+               ng-click="containerViewCtrl.createTemplatePopup( container )" style="visibility: visible">
             </a>
           </td>
           <td class="subt_text__container-ip">
-							<span
-                  tooltips
-                  tooltip-template='<span class="b-nowrap">mac: {{ container.environmentId }}</span>'>
 								{{ container.ip }}
-							</span>
           </td>
           <td class="b-main-table__tags">
 							<span class="b-tags b-tags_grey" ng-repeat="(key, tag) in container.tags">
@@ -197,7 +200,7 @@
         </tr>
 
         <tr ng-repeat="(key, container) in containerViewCtrl.notRegisteredContainers"
-            ng-if="containerViewCtrl.environmentId == 'NOT_REGISTERED' || containerViewCtrl.environmentId.length == 0">
+            ng-if="containerViewCtrl.isAdmin() && (containerViewCtrl.environmentId == 'NOT_REGISTERED' || containerViewCtrl.environmentId.length == 0)">
           <td class="b-main-table__container-status">
             <div
                 class="b-status-icon b-status-icon_{{ container.status }}"

@@ -2,6 +2,7 @@ package io.subutai.core.identity.impl.model;
 
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -40,7 +41,7 @@ public class SessionEntity implements Session
     private Date endDate = new Date( System.currentTimeMillis() );
 
     //************************************
-    @ManyToOne(targetEntity = UserEntity.class)
+    @ManyToOne( targetEntity = UserEntity.class )
     @JoinColumn( name = "user_id" )
     private User user;
     //************************************
@@ -50,6 +51,8 @@ public class SessionEntity implements Session
     @Transient
     private Subject subject;
     //************************************
+    private long kurjunTokenSetTime;
+    private String kurjunToken;
 
 
     @Override
@@ -133,5 +136,26 @@ public class SessionEntity implements Session
     public void setSubject( final Subject subject )
     {
         this.subject = subject;
+    }
+
+
+    @Override
+    public synchronized void setKurjunToken( final String token )
+    {
+        kurjunToken = token;
+        kurjunTokenSetTime = System.currentTimeMillis();
+    }
+
+
+    @Override
+    public synchronized String getKurjunToken()
+    {
+        //invalidate token after 30 min
+        if ( System.currentTimeMillis() - kurjunTokenSetTime > TimeUnit.MINUTES.toMillis( 30 ) )
+        {
+            kurjunToken = null;
+        }
+
+        return kurjunToken;
     }
 }

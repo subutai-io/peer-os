@@ -18,13 +18,11 @@
 
 	<div class="b-workspace__content b-workspace__content_cloud-env">
 		<div
-				ng-if="environmentViewCtrl.activeMode == 'simple'"
-				ng-include="'subutai-app/environment/partials/simple.html'">
+				ng-include="environmentViewCtrl.activeMode == 'simple' ? 'subutai-app/environment/partials/simple.html' : null">
 		</div>
 
 		<div
-				ng-if="environmentViewCtrl.activeMode == 'advanced'"
-				ng-include="'subutai-app/environment/partials/advanced.html'">
+				ng-include="environmentViewCtrl.activeMode == 'advanced' ? 'subutai-app/environment/partials/advanced.html' : null">
 		</div>
 
 	</div>

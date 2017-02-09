@@ -27,10 +27,21 @@ public interface RestService
     Response listTemplates();
 
     @GET
+    @Path( "templates/private" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response listPrivateTemplates();
+
+    @GET
     @Path( "templates/verified/{templateName}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getVerifiedTemplate( @PathParam( "templateName" ) String templateName );
 
+    @POST
+    @Path( "{environmentId}/containers/{containerId}/template/{name}/private/{private}" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response createTemplate( @PathParam( "environmentId" ) String environmentId,
+                             @PathParam( "containerId" ) String containerId, @PathParam( "name" ) String templateName,
+                             @PathParam( "private" ) boolean privateTemplate );
 
     /** Environments **************************************************** */
 

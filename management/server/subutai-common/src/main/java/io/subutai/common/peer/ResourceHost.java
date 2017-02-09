@@ -16,6 +16,8 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -75,6 +77,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
 
+    void deleteTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
+
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 
     Set<ContainerHost> getContainerHostsByOwnerId( String ownerId );
@@ -98,7 +102,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 
-    void importTemplate( Template template, String environmentId ) throws ResourceHostException;
+    void importTemplate( Template template, String environmentId, String kurjunToken ) throws ResourceHostException;
 
     /**
      * Clones container based on the specified arguments
@@ -106,9 +110,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @return ID of container
      */
     String cloneContainer( Template template, String containerName, String hostname, String ip, int vlan,
-                           String environmentId ) throws ResourceHostException;
+                           String environmentId, String kurjunToken ) throws ResourceHostException;
 
-    void setContainerSize( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
+    void setContainerQuota( ContainerHost containerHost, ContainerQuota containerQuota ) throws ResourceHostException;
 
 
     String getRhVersion() throws ResourceHostException;
@@ -128,4 +132,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     RhTemplatesDownloadProgress getTemplateDownloadProgress( String environmentId );
 
     void removeContainerHost( ContainerHost containerHost );
+
+    void promoteTemplate( String containerName, String templateName ) throws ResourceHostException;
+
+    String exportTemplate( String templateName, boolean isPrivateTemplate, String token ) throws ResourceHostException;
 }

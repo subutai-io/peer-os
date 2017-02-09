@@ -20,6 +20,9 @@
   <reference id="peerManager"
              interface="io.subutai.core.peer.api.PeerManager" />
 
+  <reference id="templateManager"
+             interface="io.subutai.core.template.api.TemplateManager"/>
+
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
 
@@ -76,6 +79,7 @@
 
   <bean id="environmentManager" scope="singleton" destroy-method="dispose"
         class="io.subutai.core.environment.impl.EnvironmentManagerSecureProxy">
+    <argument ref="templateManager" />
     <argument ref="peerManager" />
     <argument ref="securityManager" />
     <argument ref="identityManager" />

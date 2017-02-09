@@ -183,7 +183,7 @@ public class LocalEnvironment implements Environment, Serializable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
-        this.name = name;
+        this.name = name.trim();
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
             sshKeys.add( sshKey.trim() );
@@ -461,6 +461,9 @@ public class LocalEnvironment implements Environment, Serializable
             if ( environmentPeer.getPeerId().equals( peerId ) )
             {
                 iterator.remove();
+
+                ( ( EnvironmentPeerImpl ) environmentPeer ).setEnvironment( null );
+
                 break;
             }
         }
@@ -566,7 +569,7 @@ public class LocalEnvironment implements Environment, Serializable
                     host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
                     host.getPeerId(), host.getResourceHostId().getId(), isLocalContainer,
                     this instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID, containerHostState,
-                    host.getTemplateId(), host.getContainerName() ) );
+                    host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() ) );
         }
 
         return containerDtos;
@@ -643,7 +646,16 @@ public class LocalEnvironment implements Environment, Serializable
     {
         Preconditions.checkNotNull( container );
 
-        this.containers.remove( container );
+        try
+        {
+            EnvironmentContainerHost environmentContainerHost = getContainerHostById( container.getId() );
+            ( ( EnvironmentContainerImpl ) environmentContainerHost ).nullEnvironment();
+            this.containers.remove( container );
+        }
+        catch ( ContainerHostNotFoundException e )
+        {
+            //ignore
+        }
     }
 
 

@@ -36,6 +36,7 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -179,7 +180,7 @@ public interface Peer extends RelationLink
 
     //******** Quota functions ***********
 
-    void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize ) throws PeerException;
+//    void setContainerQuota( final ContainerId containerHostId, final ContainerQuota containerQuota ) throws PeerException;
 
     /**
      * Returns resource usage of process on container by its PID
@@ -247,6 +248,12 @@ public interface Peer extends RelationLink
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
+
+    /**
+     * Returns limits for requested peer
+     *
+     * @param peerId peer ID
+     */
     PeerResources getResourceLimits( PeerId peerId ) throws PeerException;
 
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
@@ -292,4 +299,9 @@ public interface Peer extends RelationLink
     RegistrationStatus getStatus();
 
     PeerTemplatesDownloadProgress getTemplateDownloadProgress( EnvironmentId environmentId ) throws PeerException;
+
+    void promoteTemplate( ContainerId containerId, String templateName ) throws PeerException;
+
+    String exportTemplate( ContainerId containerId, String templateName, boolean isPrivateTemplate, String token )
+            throws PeerException;
 }

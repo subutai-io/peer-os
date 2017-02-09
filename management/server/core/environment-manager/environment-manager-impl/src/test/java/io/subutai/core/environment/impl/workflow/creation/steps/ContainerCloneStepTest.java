@@ -16,7 +16,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;
@@ -26,7 +25,9 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -62,6 +63,8 @@ public class ContainerCloneStepTest
     CreateEnvironmentContainersResponse response;
     @Mock
     CloneResponse cloneResponse;
+    @Mock
+    IdentityManager identityManager;
 
 
     @Before
@@ -71,7 +74,7 @@ public class ContainerCloneStepTest
         doReturn( LOCAL_PEER ).when( peerManager ).getLocalPeer();
 
         step = spy( new ContainerCloneStep( Common.DEFAULT_DOMAIN_NAME, topology, ENVIRONMENT, peerManager,
-                TestHelper.TRACKER_OPERATION() ) );
+                identityManager, TestHelper.TRACKER_OPERATION() ) );
         step.cloneUtil = PEER_UTIL;
 
         TestHelper.bind( ENVIRONMENT, PEER, PEER_UTIL, peerTaskResults, peerTaskResult );
@@ -119,7 +122,7 @@ public class ContainerCloneStepTest
     {
         doReturn( TestHelper.TEMPLATE_ID ).when( cloneResponse ).getTemplateId();
         doReturn( TestHelper.RH_ID ).when( cloneResponse ).getResourceHostId();
-        doReturn( ContainerSize.SMALL ).when( cloneResponse ).getContainerSize();
+        doReturn( TestHelper.CONTAINER_QUOTA ).when( cloneResponse ).getContainerQuota();
 
         assertNotNull( step.buildContainerEntity( TestHelper.PEER_ID, cloneResponse ) );
     }

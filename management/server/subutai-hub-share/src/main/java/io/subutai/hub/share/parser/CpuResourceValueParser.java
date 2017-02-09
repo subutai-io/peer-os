@@ -11,7 +11,7 @@ import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 /**
- * Percent value resource parser
+ * Cpu value resource parser
  */
 public class CpuResourceValueParser implements ResourceValueParser
 {

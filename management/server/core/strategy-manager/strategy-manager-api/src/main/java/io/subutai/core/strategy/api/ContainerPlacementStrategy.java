@@ -6,7 +6,7 @@ import java.util.Map;
 
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.resource.PeerGroupResources;
 

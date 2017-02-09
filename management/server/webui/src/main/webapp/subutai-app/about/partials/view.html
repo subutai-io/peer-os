@@ -1,20 +1,14 @@
 <div ng-controller="AboutCtrl as aboutCtrl">
 
-	<div class="b-workspace__header">
-		<h1 class="b-title"><span class="b-title_breadcrumbs">About</span></h1>
-	</div>
+  <div class="b-workspace__header">
+    <h1 class="b-title"><span class="b-title_breadcrumbs">About</span></h1>
+  </div>
 
-	<div class="b-workspace__content">
+  <div class="b-workspace__content">
 
-		<div
-				ng-if="aboutCtrl.currentType == 'about'"
-				ng-include="'subutai-app/about/partials/about.html'">
-		</div>
+    <div
+        ng-include="'subutai-app/about/partials/about.html'">
+    </div>
 
-		<div
-				ng-if="aboutCtrl.currentType == 'p2p'"
-				ng-include="'subutai-app/about/partials/p2p.html'">
-		</div>
-
-	</div>
+  </div>
 </div>

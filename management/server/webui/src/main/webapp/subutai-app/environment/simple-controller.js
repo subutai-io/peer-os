@@ -3,11 +3,14 @@
 angular.module('subutai.environment.simple-controller', [])
 .controller('EnvironmentSimpleViewCtrl', EnvironmentSimpleViewCtrl);
 
-EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout'];
+EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout', 'identitySrv'];
 
-function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout) {
+function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout, identitySrv) {
 
 	var vm = this;
+
+	checkKurjunAuthToken(identitySrv, $rootScope);
+
 	var GRID_CELL_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
@@ -52,22 +55,44 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	//plugins actions
 	vm.selectPlugin = selectPlugin;
 	vm.setTemplatesByPlugin = setTemplatesByPlugin;
+    vm.loadPrivateTemplates = loadPrivateTemplates;
 
-	// @todo workaround
-	environmentService.getTemplates()
-		.then(function (data) {
-			vm.templates = data;
-			getFilteredTemplates();
-		});
+    function loadPrivateTemplates(){
+        environmentService.getPrivateTemplates()
+            .then(function (data) {
+                vm.templates['own'] = data;
+                getFilteredTemplates();
+            });
+    }
 
-	function getFilteredTemplates() {
-		vm.templatesList = [];
-		for (var i in vm.templates) {
-			if (vm.templatesType == 'all' || i == vm.templatesType) {
-				vm.templatesList = vm.templatesList.concat(vm.templates[i]);
-			}
-		}
-	}
+    function loadTemplates(callback){
+        // @todo workaround
+        environmentService.getTemplates()
+            .then(function (data) {
+                vm.templates = data;
+                getFilteredTemplates(callback);
+            });
+    }
+
+    loadTemplates();
+
+    $rootScope.$on('kurjunTokenSet', function(event, data){
+        loadPrivateTemplates();
+    });
+
+    function getFilteredTemplates(callback) {
+        var templatesLst = [];
+
+        for (var i in vm.templates) {
+            if (vm.templatesType == 'all' || i == vm.templatesType) {
+                templatesLst = templatesLst.concat(vm.templates[i]);
+            }
+        }
+
+        vm.templatesList = templatesLst;
+
+        if(callback) callback();
+    }
 
 	function resetPlugin() {
 		if (vm.selectedPlugin.selected !== undefined) vm.selectedPlugin.selected = false;
@@ -378,7 +403,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		var includedContainers = [];
 		for (var i = 0; i < vm.currentEnvironment.includedContainers.length; i++) {
 			includedContainers.push({
-				"size": vm.currentEnvironment.includedContainers[i].get('quotaSize'),
+                "quota": {
+                    "containerSize": vm.currentEnvironment.includedContainers[i].get('quotaSize')
+                },
 				"templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
 				"name": vm.currentEnvironment.includedContainers[i].get('containerName'),
 				"position": vm.currentEnvironment.includedContainers[i].get('position'),
@@ -600,7 +627,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						$('#js-container-name').prop('disabled', false);
 					}
 					$('#js-container-size').val(currentTemplate.get('quotaSize')).trigger('change');
-					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
+					containerSettingMenu.find('.header').html('Settings for <b>' + this.model.get('templateName') + '</b> container');
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({
 						'left': (elementPos.x + 12) + 'px',
@@ -897,7 +924,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		for (var i = 0; i < allElements.length; i++) {
 			var currentElement = allElements[i];
 			var container2Build = {
-				"size": currentElement.get('quotaSize'),
+				"quota": {
+					"containerSize":currentElement.get('quotaSize')
+				},
 				"templateName": currentElement.get('templateName'),
 				"name": currentElement.get('containerName'),
 				"templateId" : currentElement.get('templateId'),

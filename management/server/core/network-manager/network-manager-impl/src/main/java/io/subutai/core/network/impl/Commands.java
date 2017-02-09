@@ -69,6 +69,12 @@ public class Commands
     }
 
 
+    public RequestBuilder getDeleteTunnelCommand( final String tunnelName )
+    {
+        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( Lists.newArrayList( "-delete", tunnelName ) );
+    }
+
+
     public RequestBuilder getGetTunnelsCommand()
     {
         return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( Lists.newArrayList( "-list" ) );

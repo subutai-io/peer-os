@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import static junit.framework.TestCase.assertEquals;
 
 
@@ -20,10 +22,23 @@ public class PayloadTest
 
     static class Request
     {
+        @JsonProperty( value = "peerId" )
         private String peerId;
 
 
-        public Request( final String peerId )
+        public Request( @JsonProperty( value = "peerId" ) final String peerId )
+        {
+            this.peerId = peerId;
+        }
+
+
+        public String getPeerId()
+        {
+            return peerId;
+        }
+
+
+        public void setPeerId( final String peerId )
         {
             this.peerId = peerId;
         }
@@ -76,13 +91,13 @@ public class PayloadTest
     }
 
 
-//    @Test
-//    public void testGetMessage2() throws Exception
-//    {
-//        payload.request = null;
-//
-//        assertNull( payload.getMessage( Request.class ) );
-//    }
+    //    @Test
+    //    public void testGetMessage2() throws Exception
+    //    {
+    //        payload.request = null;
+    //
+    //        assertNull( payload.getMessage( Request.class ) );
+    //    }
 
 
     @Test

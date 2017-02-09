@@ -68,6 +68,23 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         }
     }
 
+    @RolesAllowed( { "Resource-Management|Write", "Resource-Management|Update" } )
+    @Override
+    public Response changeRhHostname( final String rhId, final String hostname )
+    {
+        try
+        {
+            registrationManager.changeRhHostname( rhId, hostname );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error changing RH hostname", e );
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+    }
+
 
     @RolesAllowed( { "Resource-Management|Write", "Resource-Management|Update" } )
     @Override

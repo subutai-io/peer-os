@@ -11,7 +11,8 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
@@ -42,6 +43,7 @@ public class TestHelper
     public static final String CONTAINER_ID = "123";
     public static final String PEER_NAME = "peer123";
     public static final String ENV_NAME = "env123";
+    public static final String KURJUN_TOKEN = "TOKEN";
     public static final String SSH_KEY =
             "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+KvsKYuzmuy23QNKdciu3zcLzmP4BjPDziXWqyjlARk22BOz2nXd+I5txpxm"
                     + "/ieM7X8D9tSh8C/dt168kOB14RvobqKMlZrYAJVZ/4jCj6/lUxy0D2c01filLIoMkCs"
@@ -60,6 +62,7 @@ public class TestHelper
     public static final EnvironmentId ENVIRONMENT_ID = new EnvironmentId( ENV_ID );
     public static final HostId RES_HOST_ID = new HostId( RH_ID );
     public static final PeerId P_ID = new PeerId( PEER_ID );
+    public static final ContainerQuota CONTAINER_QUOTA = new ContainerQuota( ContainerSize.LARGE );
     public static final ContainerId CONT_HOST_ID =
             new ContainerId( CONTAINER_ID, HOSTNAME, P_ID, ENVIRONMENT_ID, CONTAINER_NAME );
     public static final String P2P_SUBNET = "10.10.10.1";
@@ -100,7 +103,7 @@ public class TestHelper
     public static Node NODE()
     {
         Node NODE = mock( Node.class );
-        doReturn( ContainerSize.SMALL ).when( NODE ).getType();
+        doReturn( CONTAINER_QUOTA ).when( NODE ).getQuota();
         doReturn( TEMPLATE_ID ).when( NODE ).getTemplateId();
         doReturn( RH_ID ).when( NODE ).getHostId();
         doReturn( HOSTNAME ).when( NODE ).getHostname();

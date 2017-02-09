@@ -33,8 +33,6 @@ public class RenameContainerTask extends TaskUtil.Task<Object>
 
         oldHostname = environmentContainer.getHostname();
 
-        newHostname = StringUtil.removeHtmlAndSpecialChars( newHostname, true );
-
         return ( EnvironmentContainerImpl ) environmentContainer.setHostname( newHostname, false );
     }
 

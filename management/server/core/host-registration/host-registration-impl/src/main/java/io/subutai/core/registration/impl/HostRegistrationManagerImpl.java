@@ -16,13 +16,20 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.exception.HostRegistrationException;
@@ -38,7 +45,7 @@ import io.subutai.core.security.api.crypto.KeyManager;
 
 
 //TODO add security annotation
-public class HostRegistrationManagerImpl implements HostRegistrationManager
+public class HostRegistrationManagerImpl implements HostRegistrationManager, HostListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostRegistrationManagerImpl.class );
     private SecurityManager securityManager;
@@ -68,6 +75,26 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager
     protected RequestDataService getRequestDataService()
     {
         return requestDataService;
+    }
+
+
+    @Override
+    public void changeRhHostname( final String rhId, String hostname ) throws HostRegistrationException
+    {
+        try
+        {
+            LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
+
+            hostname = StringUtil.removeHtmlAndSpecialChars( hostname, true );
+
+            localPeer.setRhHostname( rhId, hostname );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error changing RH hostname", e );
+
+            throw new HostRegistrationException( e );
+        }
     }
 
 
@@ -334,5 +361,82 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager
         }
 
         return false;
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
+    {
+        try
+        {
+            RequestedHostImpl registrationRequest = requestDataService.find( resourceHostInfo.getId() );
+
+            if ( registrationRequest != null )
+            {
+                registrationRequest.setHostname( resourceHostInfo.getHostname() );
+                registrationRequest.setInterfaces( resourceHostInfo.getHostInterfaces() );
+
+                requestDataService.update( registrationRequest );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error updating host registration data", e );
+        }
+    }
+
+
+    @Override
+    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
+                                         final ContainerHostState currentState )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
+                                            final String currentHostname )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel oldNetInterface,
+                                                final HostInterfaceModel newNetInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
+                                              final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
+                                                final HostInterfaceModel netInterface )
+    {
+
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+
     }
 }

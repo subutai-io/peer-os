@@ -1,4 +1,4 @@
-<div class="b-cloud" ng-controller="EnvironmentSimpleViewCtrl as environmentSimpleViewCtrl">
+<div class="b-cloud" ng-controller="EnvironmentSimpleViewCtrl as environmentSimpleViewCtrl" ng-init="environmentSimpleViewCtrl.loadPrivateTemplates()">
   <div class="b-cloud__tools g-right">
     <div class="b-cloud-tools">
       <div class="b-tabs-menu b-tabs-menu_cloud-env">
@@ -108,7 +108,7 @@
               <form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings)">
                 <div class="body">
                   <div class="b-form-group">
-                    <div class="b-form-group__label">Container name</div>
+                    <div class="b-form-group__label">Container hostname</div>
                     <input type="text"
                            id="js-container-name"
                            class="b-form-input b-form-input_full"
@@ -193,7 +193,7 @@
             <td class="b-word-break-all">
               <a tooltips
                  ui-sref="containers({ environmentId: environment.id })"
-                 tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}. Source: {{ environment.dataSource == "hub" ? "Hub" : "Local" }}</span>'
+                 tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}. Source: {{ environment.dataSource }}</span>'
                  tooltip-side="right"
                  env-data-source="{{ environment.dataSource }}"
               >

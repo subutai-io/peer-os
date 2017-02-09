@@ -50,12 +50,12 @@ import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
@@ -73,6 +73,7 @@ import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerGroupResources;
 
 
@@ -123,6 +124,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response listPrivateTemplates()
+    {
+        return Response.ok().entity( gson.toJson( templateManager.getUserPrivateTemplates() ) ).build();
+    }
+
+
+    @Override
     public Response getVerifiedTemplate( final String templateName )
     {
         try
@@ -146,6 +154,23 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response createTemplate( final String environmentId, final String containerId, final String templateName,
+                                    final boolean privateTemplate )
+    {
+
+        try
+        {
+            return Response.ok( environmentManager
+                    .createTemplate( environmentId, containerId, templateName, privateTemplate ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+    }
+
+
     /** Environments **************************************************** */
 
 
@@ -157,6 +182,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid environment name" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( topologyJson ), "Invalid environment topology" );
+
             checkName( name );
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
@@ -207,7 +235,19 @@ public class RestServiceImpl implements RestService
 
             Topology topology = new Topology( name );
 
-            schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
+            schema.forEach( s ->
+            {
+                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( s.getQuota().getContainerSize() );
+                if ( defaultQuota == null )
+                {
+                    // selected CUSTOM container size
+                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
+                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                }
+                s.getQuota().copyValues( defaultQuota );
+                topology.addNodePlacement( s.getPeerId(), s );
+            } );
+
 
             EnvironmentCreationRef ref = environmentManager.createEnvironment( topology, true );
 
@@ -253,7 +293,7 @@ public class RestServiceImpl implements RestService
             }.getType() );
 
 
-            Map<String, ContainerSize> changedContainersFiltered = new HashMap<>();
+            Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
                     {
@@ -261,7 +301,16 @@ public class RestServiceImpl implements RestService
 
             for ( Map<String, String> cont : changingContainers )
             {
-                changedContainersFiltered.put( cont.get( "key" ), ContainerSize.valueOf( cont.get( "value" ) ) );
+                ContainerSize containerSize = ContainerSize.valueOf( cont.get( "value" ) );
+                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( containerSize );
+                if ( defaultQuota == null )
+                {
+                    // selected CUSTOM container size
+                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
+                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                }
+
+                changedContainersFiltered.put( cont.get( "key" ), defaultQuota );
             }
 
 
@@ -307,7 +356,7 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-            Map<String, ContainerSize> changedContainersFiltered = new HashMap<>();
+            Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
                     {
@@ -315,7 +364,16 @@ public class RestServiceImpl implements RestService
 
             for ( Map<String, String> cont : changingContainers )
             {
-                changedContainersFiltered.put( cont.get( "key" ), ContainerSize.valueOf( cont.get( "value" ) ) );
+                ContainerSize containerSize = ContainerSize.valueOf( cont.get( "value" ) );
+                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( containerSize );
+                if ( defaultQuota == null )
+                {
+                    // selected CUSTOM container size
+                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
+                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                }
+
+                changedContainersFiltered.put( cont.get( "key" ), defaultQuota );
             }
 
             Topology topology = new Topology( name );
@@ -345,6 +403,11 @@ public class RestServiceImpl implements RestService
             environmentManager.cancelEnvironmentWorkflow( environmentId );
 
             environmentManager.destroyEnvironment( environmentId, false );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, "Environment is already destroyed" ) )
+                           .build();
         }
         catch ( Exception e )
         {
@@ -831,12 +894,10 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
 
-            Collection<ResourceHostMetric> collection = localPeer.getResourceHostMetrics().getResources();
-
-            for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+            for ( ResourceHost resourceHost : localPeer.getResourceHosts() )
             {
-                resourceHostDtos.add( new ResourceHostDto( metric.getHostInfo().getId(), metric.getHostName(),
-                        metric.getInstanceType(), metric.isManagement(), metric.getHostInfo().getArch() ) );
+                resourceHostDtos.add( new ResourceHostDto( resourceHost.getId(), resourceHost.getHostname(),
+                        resourceHost.getInstanceType(), resourceHost.isManagementHost(), resourceHost.getArch() ) );
             }
         }
         catch ( Exception e )
@@ -1061,7 +1122,7 @@ public class RestServiceImpl implements RestService
                     containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                     containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
                     datasource, containerHost.getState(), containerHost.getTemplateId(),
-                    containerHost.getContainerName() ) );
+                    containerHost.getContainerName(), containerHost.getResourceHostId().getId() ) );
         }
 
         return containerDtos;
@@ -1070,11 +1131,13 @@ public class RestServiceImpl implements RestService
 
     private void checkName( final String name ) throws EnvironmentCreationException
     {
-        if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals( name ) ).count() > 0 )
+        if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equalsIgnoreCase( name.trim() ) )
+                               .count() > 0 )
         {
             throw new EnvironmentCreationException( "Duplicated environment name" );
         }
-        if ( name.length() > 50 )
+
+        if ( name.trim().length() > 50 )
         {
             throw new EnvironmentCreationException( "Environment name is too long, it should be 50 chars max" );
         }

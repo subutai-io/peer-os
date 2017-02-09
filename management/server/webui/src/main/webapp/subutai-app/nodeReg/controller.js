@@ -3,9 +3,9 @@
 angular.module('subutai.nodeReg.controller', [])
     .controller('NodeRegCtrl', NodeRegCtrl);
 
-NodeRegCtrl.$inject = [ 'nodeRegSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'cfpLoadingBar'];
+NodeRegCtrl.$inject = [ '$scope', 'nodeRegSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'cfpLoadingBar', 'ngDialog'];
 
-function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, cfpLoadingBar) {
+function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, cfpLoadingBar, ngDialog) {
     var vm = this;
 
 	cfpLoadingBar.start();
@@ -20,6 +20,10 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 	vm.approve = approve;
 	vm.reject = reject;
 	vm.remove = remove;
+	vm.findIp = findIp;
+	vm.editingRh = {};
+	vm.changeNamePopup = changeNamePopup;
+	vm.setHostName = setHostName;
 
 	vm.dtOptions = DTOptionsBuilder
 			.newOptions()
@@ -33,6 +37,15 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 		DTColumnDefBuilder.newColumnDef(2)
 	];
 
+    function findIp(interfaces){
+        var i=0, len=interfaces.length;
+        for (; i<len; i++) {
+          if (interfaces[i].interfaceName == 'wan') {
+            return interfaces[i].ip;
+          }
+        }
+        return 'No WAN IP detected';
+    }
 
 	function getNodes() {
 		nodeRegSrv.getData().success(function(data){
@@ -96,5 +109,25 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 			LOADING_SCREEN('none');
 		});
 	}
+
+    function changeNamePopup( rh ) {
+        vm.editingRh = rh;
+
+        ngDialog.open({
+            template: 'subutai-app/nodeReg/partials/changeName.html',
+            scope: $scope,
+            className: 'b-build-environment-info'
+        });
+    }
+
+    function setHostName( rh, name ) {
+        LOADING_SCREEN();
+        nodeRegSrv.changeHostName( rh.id, name ).success( function (data) {
+            location.reload();
+        } ).error( function (data) {
+            SweetAlert.swal ("ERROR!", data);
+        } );
+    }
+
 };
 

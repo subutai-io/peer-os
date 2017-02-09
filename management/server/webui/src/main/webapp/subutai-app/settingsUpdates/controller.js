@@ -10,12 +10,13 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 	var vm = this;
 	vm.config = {isUpdatesAvailable: "waiting"};
 	vm.activeTab = 'update';
-	vm.updateText = 'Checking...';
 	vm.updateInProgress = false;
-
-	checkActiveUpdate();
+	vm.checkActiveUpdate = checkActiveUpdate;
+    vm.update = update;
 
 	function checkActiveUpdate(){
+
+	    vm.updateText = 'Checking...';
 
 		LOADING_SCREEN();
 
@@ -81,8 +82,6 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 		return '<div>' + moment( data ).format('YYYY-MM-DD HH:mm:ss') + '</div>';
 	}	
 
-	vm.update = update;
-
 	function removeUpdateMessage() {
 		var notifications = sessionStorage.getItem('notifications');
 		if (
@@ -110,6 +109,7 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 			LOADING_SCREEN('none');
 			sessionStorage.removeItem('notifications');
 			if(status == 200){
+			    reloadHistory();
 				SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
 			}
 			checkActiveUpdate();
@@ -119,4 +119,8 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 
 		removeUpdateMessage();
 	}
+
+    function reloadHistory(){
+        vm.dtInstance.reloadData(null, false);
+    }
 }

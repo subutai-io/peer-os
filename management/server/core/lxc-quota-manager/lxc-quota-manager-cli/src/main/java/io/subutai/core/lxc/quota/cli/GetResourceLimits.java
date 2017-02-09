@@ -9,6 +9,7 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.lxc.quota.api.QuotaManager;
+import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.HostResources;
 import io.subutai.hub.share.resource.PeerResources;
 
@@ -30,7 +31,7 @@ public class GetResourceLimits extends SubutaiShellCommandSupport
 
 
     @Override
-    protected Object doExecute()
+    protected Object doExecute() throws QuotaException
     {
         final PeerResources limits = quotaManager.getResourceLimits( localPeer.getId() );
 

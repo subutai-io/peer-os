@@ -80,6 +80,7 @@ public class PeerMetricsProcessor extends HubRequester
         for ( ResourceHost host : peerManager.getLocalPeer().getResourceHosts() )
         {
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
+            log.info( "{}", resourceHostMetric );
             final HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startTime, endTime );
             final HostMetricsDto hostMetrics = historicalMetrics.getHostMetrics();
 
@@ -100,18 +101,18 @@ public class PeerMetricsProcessor extends HubRequester
 
             try
             {
-                hostMetrics.getMemory().setMemFree( resourceHostMetric.getAvailableRam() );
+                hostMetrics.getMemory().setAvailable( resourceHostMetric.getAvailableRam() );
             }
             catch ( Exception e )
             {
-                hostMetrics.getMemory().setMemFree( 0.0 );
+                hostMetrics.getMemory().setAvailable( 0.0 );
                 log.info( e.getMessage(), "No info about available RAM" );
             }
 
-            DiskDto mntPartition = new DiskDto();
-            mntPartition.setTotal( resourceHostMetric.getTotalSpace() );
-            mntPartition.setUsed( resourceHostMetric.getUsedSpace() );
-
+            DiskDto diskDto = new DiskDto();
+            diskDto.setTotal( resourceHostMetric.getTotalSpace() );
+            diskDto.setUsed( resourceHostMetric.getUsedSpace() );
+            hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, diskDto );
             try
             {
                 hostMetrics.getCpu().setIdle( resourceHostMetric.getCpuIdle() );

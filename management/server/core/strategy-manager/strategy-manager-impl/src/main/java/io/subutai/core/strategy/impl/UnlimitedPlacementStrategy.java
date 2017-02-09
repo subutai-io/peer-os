@@ -11,10 +11,10 @@ import java.util.Set;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.UnlimitedStrategy;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerGroupResources;
 import io.subutai.hub.share.resource.PeerResources;
 
@@ -42,6 +42,20 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     }
 
 
+    private void initQuotas( final List<NodeSchema> nodeSchemaList, final Map<ContainerSize, ContainerQuota> quotas )
+    {
+        for ( NodeSchema nodeSchema : nodeSchemaList )
+        {
+            ContainerQuota quota = quotas.get( nodeSchema.getQuota().getContainerSize() );
+            if ( quota == null )
+            {
+                quota = quotas.get( ContainerSize.SMALL );
+            }
+            nodeSchema.getQuota().copyValues( quota );
+        }
+    }
+
+
     @Override
     public Topology distribute( final String environmentName, final List<NodeSchema> nodeSchema,
                                 final PeerGroupResources peerGroupResources,
@@ -49,6 +63,7 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     {
         Topology result = new Topology( environmentName );
 
+        initQuotas( nodeSchema, quotas );
         Set<Node> ng = distribute( nodeSchema, peerGroupResources );
         for ( Node node : ng )
         {
@@ -94,7 +109,7 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             for ( RandomAllocator resourceAllocator : preferredAllocators )
             {
                 allocated =
-                        resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize() );
+                        resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getQuota() );
                 if ( allocated )
                 {
                     break;
@@ -117,7 +132,7 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             {
                 for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), container.getSize(),
+                    Node node = new Node( container.getName(), container.getName(), container.getQuota(),
                             container.getPeerId(), container.getHostId(), container.getTemplateId() );
 
                     nodes.add( node );

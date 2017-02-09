@@ -146,3 +146,90 @@ function accordionInit() {
 
 var UPDATE_NIGHTLY_BUILD_STATUS;
 
+
+    var kurjunCheckInProgress = false;
+
+    function checkKurjunAuthToken(identitySrv, $scope){
+
+        if(!kurjunCheckInProgress){
+
+            kurjunCheckInProgress = true;
+
+            identitySrv.getObtainedKurjunToken().success(function(data){
+                if (!$.trim(data)){
+
+                    obtainKurjunAuthToken(identitySrv, $scope);
+
+                }else{
+
+                    if(data != localStorage.getItem('kurjunToken')){
+
+                        localStorage.setItem('kurjunToken', data);
+
+                        notifyKurjunTokenListeners($scope);
+                    }
+
+                    kurjunCheckInProgress = false;
+                }
+            }).error(function(){
+
+                kurjunCheckInProgress = false;
+            });
+        }
+    }
+
+    function notifyKurjunTokenListeners($scope){
+
+        if($scope){
+
+            $scope.$broadcast('kurjunTokenSet', {});
+        }
+    }
+
+    function obtainKurjunAuthToken(identitySrv, $scope){
+
+        localStorage.removeItem('kurjunToken');
+
+        identitySrv.getKurjunAuthId().success(function (authId) {
+
+            console.log(authId);
+
+            var signedAuthIdTextArea = document.createElement("textarea");
+            signedAuthIdTextArea.setAttribute('class', 'bp-sign-target');
+            signedAuthIdTextArea.style.width = '1px';
+            signedAuthIdTextArea.style.position = 'absolute';
+            signedAuthIdTextArea.style.left = '-100px';
+            signedAuthIdTextArea.value = authId;
+            document.body.appendChild(signedAuthIdTextArea);
+
+            $(signedAuthIdTextArea).on('change', function() {
+
+               var signedAuthId = $(this).val();
+               console.log(signedAuthId);
+
+               identitySrv.obtainKurjunToken(signedAuthId).success(function (kurjunToken) {
+
+                   console.log(kurjunToken);
+
+                   localStorage.setItem('kurjunToken', kurjunToken);
+
+                   notifyKurjunTokenListeners($scope);
+
+               }).error(function(error) {
+                 console.log(error);
+               });
+
+               $(this).remove();
+            });
+
+            kurjunCheckInProgress = false;
+
+        }).error(function(error) {
+
+            kurjunCheckInProgress = false;
+
+            console.log(error);
+        });
+    }
+
+

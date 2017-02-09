@@ -1,7 +1,8 @@
 package io.subutai.core.strategy.impl;
 
 
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -11,17 +12,17 @@ public class AllocatedContainer
     {
         private final String name;
         private String templateId;
-        private ContainerSize size;
+        private ContainerQuota quota;
         private String hostId;
         private String peerId;
 
 
-        public AllocatedContainer( final String name, final String templateId, final ContainerSize size,
+        public AllocatedContainer( final String name, final String templateId, final ContainerQuota quota,
                                    final String peerId, final String hostId )
         {
             this.name = name;
             this.templateId = templateId;
-            this.size = size;
+            this.quota = quota;
             this.hostId = hostId;
             this.peerId = peerId;
         }
@@ -39,9 +40,9 @@ public class AllocatedContainer
         }
 
 
-        public ContainerSize getSize()
+        public ContainerQuota getQuota()
         {
-            return size;
+            return quota;
         }
 
 

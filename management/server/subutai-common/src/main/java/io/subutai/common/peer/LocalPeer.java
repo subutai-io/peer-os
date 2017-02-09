@@ -8,8 +8,11 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.util.HostUtil;
+import io.subutai.hub.share.quota.Quota;
+import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -203,5 +206,15 @@ public interface LocalPeer extends Peer
     Template getTemplateById( String templateId ) throws PeerException;
 
     boolean destroyNotRegisteredContainer( String containerId ) throws PeerException;
+
+    //deletes tunnels to the given p2p ips from local RHs
+    void deleteTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
+
+    Quota getQuota( ContainerId containerId, ContainerResourceType containerResourceType )
+            throws PeerException;
+
+    void setRhHostname( String rhId, String hostname ) throws PeerException;
+
+    void removeQuota( ContainerId containerId );
 }
 

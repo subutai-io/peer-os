@@ -6,9 +6,12 @@ import java.util.regex.Pattern;
 
 public class Common
 {
+    public static final String E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME = "su_fingerprint";
     public static final String HUB_ID = "hub";
     public static final String SUBUTAI_ID = "subutai";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
+    public static final String LOCAL_KURJUN_BASE_URL = "http://localhost:8338/kurjun/rest";
+    public static final String GLOBAL_KURJUN_BASE_URL = "https://cdn.subut.ai:8338/kurjun/rest";
     public static final int DEFAULT_PUBLIC_PORT = 8443;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
     public static final int DEFAULT_AGENT_PORT = 7070;
@@ -37,6 +40,8 @@ public class Common
     public static final int CLONE_TIMEOUT_SEC = 60 * 5; // 5 min
 
     public static final int TEMPLATE_DOWNLOAD_TIMEOUT_SEC = 60 * 60 * 5; // 5 hour
+    public static final int TEMPLATE_EXPORT_TIMEOUT_SEC = 60 * 60 * 5; // 5 hour
+    public static final int TEMPLATE_PROMOTE_TIMEOUT_SEC = 60 * 10; // 10 min
 
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
     public static final String IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}"

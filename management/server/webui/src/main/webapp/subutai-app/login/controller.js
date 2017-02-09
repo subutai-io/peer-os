@@ -2,8 +2,7 @@
 
 angular.module('subutai.login.controller', [])
 	.controller('LoginCtrl', LoginCtrl)
-	.controller('ChangePassCtrl', ChangePassCtrl)
-	.directive('pwCheck', pwCheck);
+	.controller('ChangePassCtrl', ChangePassCtrl);
 
 LoginCtrl.$inject = ['$scope', 'loginSrv', '$http', '$rootScope'];
 ChangePassCtrl.$inject = ['$scope', 'loginSrv', 'SweetAlert'];
@@ -14,7 +13,7 @@ function ChangePassCtrl( $scope, loginSrv, SweetAlert) {
 	vm.changePass = changePass;
 
 	function changePass(passObj) {
-		if ($scope.changePassForm.$valid) {		
+		if ($scope.changePassForm.$valid) {
 			LOADING_SCREEN();
 			loginSrv.changePass(passObj).success(function(data){
 				LOADING_SCREEN('none');
@@ -27,19 +26,6 @@ function ChangePassCtrl( $scope, loginSrv, SweetAlert) {
 	}
 }
 
-function pwCheck() {
-	return {
-		require: 'ngModel',
-		link: function (scope, elem, attrs, ctrl) {
-			var firstPassword = '#' + attrs.pwCheck;
-			elem.add(firstPassword).on('keyup', function () {
-				scope.$apply(function () {
-					ctrl.$setValidity('pwmatch', elem.val() === $(firstPassword).val());
-				});
-			});
-		}
-	}
-};
 
 function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 {
@@ -57,39 +43,75 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 	//functions
 	vm.login = login;
 
+	vm.requestSign = "";
+	vm.resetPwd=false;
+	vm.requestPwdReset=requestPwdReset;
+
+    function getSignToken(){
+        loginSrv.getSignToken().success(function(data){
+            vm.requestSign = data;
+        });
+    }
+
+    function requestPwdReset(){
+        getSignToken();
+        vm.errorMessage="";
+        vm.resetPwd = true;
+    }
+
 	function login() {
 
-		var postData = 'username=' + vm.name + '&password=' + vm.pass;
+        vm.errorMessage="";
 
-		if( vm.newPass.length > 0 ) {
+		if( vm.newPass.length > 0 || vm.resetPwd) {
+
 			if( vm.newPass !== vm.passConf ) {
 				vm.errorMessage = "New password doesn't match the 'Confirm password' field";
 			} else {
-				postData += '&newpassword=' + vm.newPass;
+                if(vm.resetPwd){
+                    if(!$.trim(vm.name)){
+                        vm.errorMessage="Empty username";
+                    }
+                    else if(!$.trim(vm.newPass)){
+                        vm.errorMessage="Empty password";
+                    }else if(!$.trim(vm.requestSign)){
+                        vm.errorMessage="Empty request sign";
+                    }else{
 
-				loginSrv.login( postData ).success(function(data){
-					$rootScope.currentUser = vm.name;
-					$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
-					//$state.go('home');
-					checkUserPermissions();
-				}).error(function(error){
-					vm.errorMessage = error;
-				});
+                        var postData = 'username=' + vm.name + '&password=' + vm.newPass + '&sign=' + encodeURIComponent(vm.requestSign);
+
+                        loginSrv.resetPass(postData).success(function(data){
+                             $rootScope.currentUser = vm.name;
+                             $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+
+                             checkUserPermissions();
+                         }).error(function(error){
+                             vm.errorMessage = error;
+                         });
+                    }
+                }else{
+
+		            var postData = 'username=' + vm.name + '&password=' + vm.pass+'&newpassword=' + vm.newPass;
+
+                    loginSrv.login( postData ).success(function(data){
+                        $rootScope.currentUser = vm.name;
+                        $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+
+                        checkUserPermissions();
+                    }).error(function(error){
+                        vm.errorMessage = error;
+                    });
+				}
 			}
 		} else {
+
+			var postData = 'username=' + vm.name + '&password=' + vm.pass;
+
 			loginSrv.login( postData ).success(function(data){
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 				sessionStorage.removeItem('notifications');
 
-				loginSrv.getHubIp().success(function(data){
-					localStorage.setItem('getHubIp', data);
-				}).error(function(error){
-					console.log(error);
-					localStorage.setItem('getHubIp', 'hub.subut.ai');
-				});
-
-				//$state.go('home');
 				checkUserPermissions();
 			}).error(function(error, status){
 				vm.errorMessage = error;

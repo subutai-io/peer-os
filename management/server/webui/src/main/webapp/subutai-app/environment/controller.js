@@ -125,7 +125,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					vm.containersTypeInfo[type] = {};
 				}
 
-				vm.containersTypeInfo[type][property] = data[i].value;
+				vm.containersTypeInfo[type][property] = data[i].value.replace(/iB/ig,"B");
 			}
 		});
 

@@ -26,11 +26,12 @@ var app = angular.module('subutai-app', [
 
     .run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog', 'trackerSrv'];
+CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog', 'trackerSrv', 'identitySrv'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
-function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv) {
+function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv, identitySrv) {
+
     var vm = this;
     vm.currentUser = localStorage.getItem('currentUser');
     vm.hubStatus = false;
@@ -245,8 +246,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     function logout() {
         removeCookie('sptoken');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isAdmin');
+        localStorage.removeItem('kurjunToken');
+        localStorage.removeItem('currentUserToken');
         $location.path('login');
     }
 
@@ -369,7 +370,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             }
             else {
                 if (localStorage.getItem("bazaarMD5") !== data) {
-                    ;
                     localStorage.setItem("bazaarMD5", data);
                     bazaarUpdate = true;
                 }

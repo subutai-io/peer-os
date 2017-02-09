@@ -21,12 +21,14 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.core.identity.api.IdentityManager;
 
 
 public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvironmentContainersResponse>
 {
     private static final Logger LOG = LoggerFactory.getLogger( CreatePeerEnvironmentContainersTask.class );
 
+    private final IdentityManager identityManager;
     private final Peer peer;
     private final Set<Node> nodes;
     private final LocalPeer localPeer;
@@ -35,10 +37,12 @@ public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvir
     private final TrackerOperation trackerOperation;
 
 
-    public CreatePeerEnvironmentContainersTask( final Peer peer, final LocalPeer localPeer,
-                                                final Environment environment, final List<String> ipAddresses,
-                                                final Set<Node> nodes, final TrackerOperation trackerOperation )
+    public CreatePeerEnvironmentContainersTask( final IdentityManager identityManager, final Peer peer,
+                                                final LocalPeer localPeer, final Environment environment,
+                                                final List<String> ipAddresses, final Set<Node> nodes,
+                                                final TrackerOperation trackerOperation )
     {
+        Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( peer );
         Preconditions.checkNotNull( localPeer );
         Preconditions.checkNotNull( environment );
@@ -46,6 +50,7 @@ public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvir
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodes ) );
         Preconditions.checkArgument( ipAddresses.size() == nodes.size() );
 
+        this.identityManager = identityManager;
         this.peer = peer;
         this.nodes = nodes;
         this.localPeer = localPeer;
@@ -74,7 +79,8 @@ public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvir
 
             CloneRequest cloneRequest =
                     new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
-                            node.getTemplateId(), HostArchitecture.AMD64, node.getType() );
+                            node.getTemplateId(), HostArchitecture.AMD64, node.getQuota(),
+                            identityManager.getActiveSession().getKurjunToken() );
 
             request.addRequest( cloneRequest );
         }

@@ -36,8 +36,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentModificationException;
-import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -49,7 +47,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -68,6 +65,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -169,13 +167,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
     public EnvironmentContainerImpl( final String initiatorPeerId, final String peerId,
                                      final ContainerHostInfoModel hostInfo, final String templateId, String domainName,
-                                     ContainerSize containerSize, String resourceHostId )
+                                     ContainerQuota containerQuota, String resourceHostId )
     {
         Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( templateId );
-        Preconditions.checkNotNull( containerSize );
+        Preconditions.checkNotNull( containerQuota );
+        Preconditions.checkNotNull( containerQuota.getContainerSize() );
 
         this.initiatorPeerId = initiatorPeerId;
         this.peerId = peerId;
@@ -185,7 +184,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         this.hostArchitecture = hostInfo.getArch();
         this.templateId = templateId;
         this.domainName = domainName;
-        this.containerSize = containerSize;
+        this.containerSize = containerQuota.getContainerSize();
         this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
@@ -278,20 +277,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     }
 
 
-    @Override
-    public void dispose() throws PeerException
-    {
-        try
-        {
-            environmentManager.destroyContainer( parent.getId(), this.getId(), false );
-        }
-        catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
     public Environment destroy( boolean removeMetadataOnly ) throws PeerException
     {
         if ( !removeMetadataOnly )
@@ -317,11 +302,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
         Environment env = environmentManager.update( ( LocalEnvironment ) parent );
 
-        environment = null;
-
         environmentManager.notifyOnContainerDestroyed( env, getId() );
 
         return env;
+    }
+
+
+    public void nullEnvironment()
+    {
+        environment = null;
     }
 
 
@@ -599,13 +588,18 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
 
     @Override
-    public EnvironmentContainerHost setContainerSize( final ContainerSize size ) throws PeerException
+    public void setContainerSize( final ContainerSize size )
     {
-        getPeer().setContainerSize( this.getContainerId(), size );
-
         this.containerSize = size;
+    }
 
-        return environmentManager.update( this );
+
+    @Override
+    public void setContainerQuota( final ContainerQuota containerQuota ) throws PeerException
+    {
+        this.containerSize = containerQuota.getContainerSize();
+        getPeer().setQuota( getContainerId(), containerQuota );
+        environmentManager.update( this );
     }
 
 

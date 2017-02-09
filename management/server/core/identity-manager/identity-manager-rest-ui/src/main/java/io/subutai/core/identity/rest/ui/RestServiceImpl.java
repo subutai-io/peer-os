@@ -1,6 +1,7 @@
 package io.subutai.core.identity.rest.ui;
 
 
+import java.io.IOException;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,6 +17,22 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.util.EntityUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -26,6 +43,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserType;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
@@ -41,7 +59,7 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private SecurityManager securityManager = null;
-    protected JsonUtil jsonUtil = new JsonUtil();
+    private JsonUtil jsonUtil = new JsonUtil();
     private IdentityManager identityManager;
 
 
@@ -122,9 +140,9 @@ public class RestServiceImpl implements RestService
             keyData.setKey( PGPEncryptionUtil.armorByteArrayToString( pubRing.getEncoded() ) );
             keyData.setAuthId( user.getAuthId() );
 
-            for ( Iterator<String> iter = pubRing.getPublicKey().getUserIDs(); iter.hasNext(); )
+            for ( Iterator iter = pubRing.getPublicKey().getUserIDs(); iter.hasNext(); )
             {
-                String id = iter.next();
+                String id = ( String ) iter.next();
 
                 if ( !Strings.isNullOrEmpty( id ) )
                 {
@@ -213,8 +231,7 @@ public class RestServiceImpl implements RestService
                     }.getType() );
 
 
-                    roleIds.stream()
-                           .forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
+                    roleIds.forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
                 }
             }
             else
@@ -570,20 +587,6 @@ public class RestServiceImpl implements RestService
     @Override
     public Response removeUserToken( final String tokenId )
     {
-        try
-        {
-            //Preconditions.checkArgument( !Strings.isNullOrEmpty( tokenId ), "Invalid tokenId" );
-
-            //identityManager.removeUserToken( tokenId );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error updating new user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) )
-                           .build();
-        }
-
-
         return Response.ok().build();
     }
 
@@ -612,5 +615,234 @@ public class RestServiceImpl implements RestService
     public Response isAdmin()
     {
         return Response.status( Response.Status.OK ).entity( identityManager.isAdmin() ).build();
+    }
+
+    //****** Kurjun ***********/
+
+
+    private String getFingerprint()
+    {
+        User user = identityManager.getActiveUser();
+        return user.getFingerprint().toLowerCase();
+    }
+
+
+    @Override
+    public Response getKurjunAuthId()
+    {
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+            if ( isRegisteredWithGorjun() )
+            {
+                HttpGet httpGet = new HttpGet(
+                        String.format( "%s/auth/token?user=%s", Common.GLOBAL_KURJUN_BASE_URL, getFingerprint() ) );
+                CloseableHttpResponse response = client.execute( httpGet );
+                HttpEntity entity = response.getEntity();
+                try
+                {
+                    String authId = IOUtils.toString( entity.getContent() );
+                    EntityUtils.consume( entity );
+                    return Response.ok( authId ).build();
+                }
+                finally
+                {
+                    IOUtils.closeQuietly( response );
+                }
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND).build();
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+    }
+
+
+    @Override
+    public Response submitSignedTemplateHash( final String signedTemplateHash )
+    {
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+
+            HttpPost post = new HttpPost( String.format( "%s/auth/sign", Common.GLOBAL_KURJUN_BASE_URL ) );
+
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+            entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
+            entityBuilder.addTextBody( "signature", signedTemplateHash );
+            entityBuilder.addTextBody( "token", identityManager.getActiveSession().getKurjunToken() );
+            HttpEntity httpEntity = entityBuilder.build();
+            post.setEntity( httpEntity );
+            CloseableHttpResponse response = client.execute( post );
+
+            try
+            {
+                if ( response.getStatusLine().getStatusCode() != 200 )
+                {
+                    HttpEntity entity = response.getEntity();
+                    String errMsg = IOUtils.toString( entity.getContent() );
+                    EntityUtils.consume( entity );
+
+                    return Response.serverError().entity(
+                            "Http code: " + response.getStatusLine().getStatusCode() + " Msg: " + errMsg ).build();
+                }
+                else
+                {
+                    return Response.ok().build();
+                }
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage() );
+
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+    }
+
+
+    @Override
+    public Response obtainKurjunToken( final String signedAuthId )
+    {
+
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+
+            HttpPost post = new HttpPost( String.format( "%s/auth/token", Common.GLOBAL_KURJUN_BASE_URL ) );
+
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+            entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
+            entityBuilder.addTextBody( "user", getFingerprint() );
+            entityBuilder.addTextBody( "message", signedAuthId );
+            HttpEntity httpEntity = entityBuilder.build();
+            post.setEntity( httpEntity );
+            CloseableHttpResponse response = client.execute( post );
+
+            try
+            {
+                HttpEntity entity = response.getEntity();
+                String content = IOUtils.toString( entity.getContent() );
+                EntityUtils.consume( entity );
+
+                if ( response.getStatusLine().getStatusCode() == 200 )
+                {
+                    identityManager.getActiveSession().setKurjunToken( content );
+
+                    return Response.ok( content ).build();
+                }
+                else
+                {
+                    return Response.serverError().entity(
+                            "Http code: " + response.getStatusLine().getStatusCode() + " Msg: " + content ).build();
+                }
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage() );
+
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+    }
+
+
+    @Override
+    public Response getObtainedKurjunToken()
+    {
+        String token = null;
+
+        if ( identityManager.getActiveSession() != null )
+        {
+            token = identityManager.getActiveSession().getKurjunToken();
+        }
+
+        return Response.status( Response.Status.OK ).entity( token ).build();
+    }
+
+
+    @Override
+    public Response isRegisteredWithKurjun()
+    {
+        try
+        {
+            return Response.ok( isRegisteredWithGorjun() ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+    }
+
+
+    private boolean isRegisteredWithGorjun() throws IOException
+    {
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+            HttpGet httpGet = new HttpGet(
+                    String.format( "%s/auth/key?user=%s", Common.GLOBAL_KURJUN_BASE_URL, getFingerprint() ) );
+            CloseableHttpResponse response = client.execute( httpGet );
+            try
+            {
+                return response.getStatusLine().getStatusCode() == 200;
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+    }
+
+
+    private CloseableHttpClient getHttpsClient()
+    {
+        try
+        {
+            RequestConfig config = RequestConfig.custom().setSocketTimeout( 5000 ).setConnectTimeout( 5000 ).build();
+
+            SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+            sslContextBuilder.loadTrustMaterial( null, ( TrustStrategy ) ( x509Certificates, s ) -> true );
+            SSLConnectionSocketFactory sslSocketFactory =
+                    new SSLConnectionSocketFactory( sslContextBuilder.build(), NoopHostnameVerifier.INSTANCE );
+
+            return HttpClients.custom().setDefaultRequestConfig( config ).setSSLSocketFactory( sslSocketFactory )
+                              .build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage() );
+        }
+
+        return HttpClients.createDefault();
     }
 }

@@ -22,6 +22,8 @@ function environmentService($http, $q) {
 
 	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
 
+	var PRIVATE_TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/private';
+
 	var VERIFIED_TEMPLATE_URL = ENVIRONMENTS_URL + 'templates/verified/';
 
 	var PEERS_URL = ENVIRONMENTS_URL + 'peers/';
@@ -35,12 +37,14 @@ function environmentService($http, $q) {
 		'apps' : [ 'zabbix', 'webdemo', 'kurjun', 'mysite', 'apache', 'ceph', 'management' ],
 		'bigdata' : [ 'mongo', 'storm', 'zookeeper', 'kurjun', 'elasticsearch', 'ceph', 'cassandra', 'solr', 'hadoop' ],
 		'packages' : [ 'master', 'openjre7', 'debian' ],
+		'own' : [],
 		'other' : [ 'master' ]
 	};
 
 
 	var environmentService = {
 		getTemplates: getTemplates,
+		getPrivateTemplates: getPrivateTemplates,
 		getVerifiedTemplate: getVerifiedTemplate,
 
 		getStrategies : getStrategies,
@@ -70,6 +74,7 @@ function environmentService($http, $q) {
 		getContainerDomainNPort : getContainerDomainNPort,
 		setContainerDomainNPort : setContainerDomainNPort,
 		setContainerName : setContainerName,
+		createTemplate : createTemplate,
 
 
 		getContainersType : getContainersType,
@@ -126,7 +131,7 @@ function environmentService($http, $q) {
 
 				for( var i = 0; i < data.length; i++ )
 				{
-					res[ getCategory( data[i].name )].push( data[i] );
+					res[ getCategory( data[i] )].push( data[i] );
 				}
 
 				callF.resolve(res);
@@ -134,6 +139,19 @@ function environmentService($http, $q) {
 
 		return callF.promise;
 	}
+
+    function getPrivateTemplates() {
+		var callF = $q.defer();
+
+		$http.get(PRIVATE_TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
+			.success(function(data) {
+				callF.resolve(data);
+			});
+
+		return callF.promise;
+	}
+
+
 	// @todo workaround for kurjun to return categorized templates
 	function getCategory(data)
 	{
@@ -141,7 +159,7 @@ function environmentService($http, $q) {
 		for (var key in categories) {
 			for( var i = 0; i < categories[key].length; i++ )
 			{
-				if( categories[key][i] == data )
+				if( categories[key][i] == data.name )
 				{
 					cat = key;
 					break;
@@ -151,7 +169,13 @@ function environmentService($http, $q) {
 			if( cat !== null ) break;
 		}
 
-		if( cat === null ) return 'other';
+		if( cat === null ) {
+		    if(data.owner.indexOf(getCookie('su_fingerprint').toLowerCase()) > -1){
+		        return 'own';
+		    }else{
+		        return 'other';
+		    }
+		}
 
 		return cat;
 	}
@@ -258,7 +282,12 @@ function environmentService($http, $q) {
 
 	function setContainerName( container, name ) {
 		return $http.put( ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/name' +
-			'?name=' + name )
+			'?name=' + name );
+	}
+
+	function createTemplate( container, name, isPrivate ) {
+	    var URL = ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/template/' + name + "/private/" + ( isPrivate == true ? "true" : "false" ) ;
+		return $http.post( URL );
 	}
 
 

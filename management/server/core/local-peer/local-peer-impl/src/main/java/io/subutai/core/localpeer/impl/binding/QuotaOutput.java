@@ -1,7 +1,9 @@
-package io.subutai.core.lxc.quota.impl;
+package io.subutai.core.localpeer.impl.binding;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class QuotaOutput
@@ -10,6 +12,24 @@ public class QuotaOutput
     private String quota;
     @JsonProperty( "threshold" )
     private Integer threshold;
+
+
+    @JsonCreator
+    public static QuotaOutput create( String jsonString )
+    {
+        QuotaOutput output = null;
+
+        try
+        {
+            output = new ObjectMapper().readValue( jsonString, QuotaOutput.class );
+        }
+        catch ( Exception e )
+        {
+            // handle
+        }
+
+        return output;
+    }
 
 
     public QuotaOutput( @JsonProperty( "quota" ) final String quota,
@@ -31,3 +51,5 @@ public class QuotaOutput
         return threshold;
     }
 }
+
+

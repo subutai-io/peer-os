@@ -63,7 +63,6 @@ import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
-import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
 import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
@@ -278,8 +277,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ProductProcessor productProcessor = new ProductProcessor( configManager, this.hubEventListeners );
 
-        StateLinkProcessor vehsProccessor = new VehsProcessor( configManager, peerManager );
-
         AppScaleProcessor appScaleProcessor =
                 new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
@@ -298,7 +295,6 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                                      environmentTelemetryProcessor )
                                                                              .addProcessor( systemConfProcessor )
                                                                              .addProcessor( productProcessor )
-                                                                             .addProcessor( vehsProccessor )
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )

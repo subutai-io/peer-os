@@ -14,9 +14,11 @@ angular.module('subutai.containers.controller', ['ngTagsInput'])
 		}
 	});
 
-ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout', 'cfpLoadingBar'];
+ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout', 'cfpLoadingBar', 'identitySrv'];
 
-function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar) {
+function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar, identitySrv) {
+
+    checkKurjunAuthToken(identitySrv);
 
 	var vm = this;
 
@@ -58,11 +60,18 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
 	vm.getContainerNameFromHostName=getContainerNameFromHostName;
+	vm.createTemplatePopup=createTemplatePopup;
+	vm.createTemplate=createTemplate;
+	vm.hasKurjunToken=hasKurjunToken;
+    vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;
 	});
 
+    function isAdmin(){
+        return localStorage.getItem('isAdmin') == 'true';
+    }
 
 	function alertForHubContainer( container )
 	{
@@ -364,4 +373,69 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 		return name.replace( regex, "" );
 	}
+
+	function createTemplatePopup(container){
+
+		vm.editingContainer = container;
+
+		ngDialog.open({
+			template: 'subutai-app/containers/partials/createTemplate.html',
+			scope: $scope,
+			className: 'b-build-environment-info'
+		});
+	}
+
+    vm.disabled = false;
+
+    function createTemplate( container, name, isPublic ) {
+
+        vm.disabled = true;
+
+        LOADING_SCREEN();
+
+        environmentService.createTemplate( container, name, !isPublic )
+        .success( function (hash) {
+
+            var signedHashTextArea = document.createElement("textarea");
+            signedHashTextArea.setAttribute('class', 'bp-sign-target');
+            signedHashTextArea.style.width = '1px';
+            signedHashTextArea.style.position = 'absolute';
+            signedHashTextArea.style.left = '-100px';
+            signedHashTextArea.value = hash;
+            document.body.appendChild(signedHashTextArea);
+
+            $(signedHashTextArea).on('change', function() {
+
+               var signedHash = $(this).val();
+               console.log(signedHash);
+
+               // submit signed hash
+               identitySrv.submitSignedHash(signedHash).success(function(){
+                   vm.disabled = false;
+                   LOADING_SCREEN('none');
+                   ngDialog.closeAll();
+                   SweetAlert.swal ("Success!", "Template has been created", "success");
+               }).error(function(error){
+                   vm.disabled = false;
+                   LOADING_SCREEN('none');
+                   ngDialog.closeAll();
+                   SweetAlert.swal ("ERROR!", error, "error");
+               });
+
+              $(this).remove();
+           });
+
+        } )
+        .error( function (error) {
+            vm.disabled = false;
+            LOADING_SCREEN('none');
+            ngDialog.closeAll();
+            SweetAlert.swal ("ERROR!", error, "error");
+        } );
+    }
+
+    function hasKurjunToken(){
+        return !(localStorage.getItem('kurjunToken') == undefined || localStorage.getItem('kurjunToken') == null);
+    }
+
 }

@@ -6,7 +6,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -40,6 +40,9 @@ public class ContainerDto
     private boolean local;
     @JsonProperty( "state" )
     private ContainerHostState state;
+    @JsonProperty( "rhId" )
+    private String rhId;
+
 
     // Where environment of container created: subutai, hub
     @JsonProperty( "dataSource" )
@@ -59,7 +62,7 @@ public class ContainerDto
                          @JsonProperty( "dataSource" ) String dataSource,
                          @JsonProperty( "state" ) ContainerHostState state,
                          @JsonProperty( "templateId" ) String templateId,
-                         @JsonProperty( "containerName" ) String containerName )
+                         @JsonProperty( "containerName" ) String containerName, @JsonProperty( "rhId" ) String rhId )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -76,6 +79,7 @@ public class ContainerDto
         this.dataSource = dataSource;
         this.state = state;
         this.containerName = containerName;
+        this.rhId = rhId;
     }
 
 
@@ -256,5 +260,17 @@ public class ContainerDto
     public void setContainerName( final String containerName )
     {
         this.containerName = containerName;
+    }
+
+
+    public String getRhId()
+    {
+        return rhId;
+    }
+
+
+    public void setRhId( final String rhId )
+    {
+        this.rhId = rhId;
     }
 }

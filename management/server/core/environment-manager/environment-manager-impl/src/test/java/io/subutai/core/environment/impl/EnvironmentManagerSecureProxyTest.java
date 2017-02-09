@@ -19,7 +19,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLink;
@@ -32,8 +31,11 @@ import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -42,6 +44,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -70,6 +73,8 @@ public class EnvironmentManagerSecureProxyTest
     @Mock
     Tracker tracker;
     @Mock
+    TemplateManager templateManager;
+    @Mock
     RelationManager relationManager;
     LocalEnvironment environment = TestHelper.ENVIRONMENT();
     @Mock
@@ -84,12 +89,13 @@ public class EnvironmentManagerSecureProxyTest
                                                  final RelationManager relationManager, final HubAdapter hubAdapter,
                                                  final EnvironmentService environmentService )
         {
-            super( peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
+            super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
                     environmentService );
         }
 
 
-        protected EnvironmentManagerImpl getEnvironmentManager( PeerManager peerManager,
+        protected EnvironmentManagerImpl getEnvironmentManager( TemplateManager templateManager,
+                                                                PeerManager peerManager,
                                                                 SecurityManager securityManager, HubAdapter hubAdapter,
                                                                 EnvironmentService environmentService )
         {
@@ -230,8 +236,8 @@ public class EnvironmentManagerSecureProxyTest
     @Test
     public void testModifyEnvironment() throws Exception
     {
-        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
+        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
 
         proxy.modifyEnvironment( TestHelper.ENV_ID, topology, Lists.newArrayList( TestHelper.CONTAINER_ID ),
                 changedContainers, true );
@@ -337,6 +343,6 @@ public class EnvironmentManagerSecureProxyTest
     {
         proxy.loadEnvironment( TestHelper.ENV_ID );
 
-        verify( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+        verify( environmentManager, atLeastOnce() ).loadEnvironment( TestHelper.ENV_ID );
     }
 }

@@ -14,7 +14,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
@@ -23,10 +22,14 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -40,15 +43,16 @@ public class EnvironmentModifyWorkflowTest
 
     class EnvironmentModifyWorkflowSUT extends EnvironmentModifyWorkflow
     {
-        public EnvironmentModifyWorkflowSUT( final String defaultDomain, final PeerManager peerManager,
-                                             final SecurityManager securityManager, final LocalEnvironment environment,
-                                             final Topology topology, final List<String> removedContainers,
-                                             final Map<String, ContainerSize> changedContainers,
+        public EnvironmentModifyWorkflowSUT( final String defaultDomain, final IdentityManager identityManager,
+                                             final PeerManager peerManager, final SecurityManager securityManager,
+                                             final LocalEnvironment environment, final Topology topology,
+                                             final List<String> removedContainers,
+                                             final Map<String, ContainerQuota> changedContainers,
                                              final TrackerOperation operationTracker,
                                              final EnvironmentManagerImpl environmentManager )
         {
-            super( defaultDomain, peerManager, securityManager, environment, topology, removedContainers,
-                    changedContainers, operationTracker, environmentManager );
+            super( defaultDomain, identityManager, peerManager, securityManager, environment, topology,
+                    removedContainers, changedContainers, operationTracker, environmentManager );
         }
 
 
@@ -63,6 +67,8 @@ public class EnvironmentModifyWorkflowTest
     EnvironmentManagerImpl environmentManager;
     @Mock
     PeerManager peerManager;
+    @Mock
+    IdentityManager identityManager;
     @Mock
     SecurityManager securityManager;
     LocalEnvironment environment = TestHelper.ENVIRONMENT();
@@ -84,13 +90,12 @@ public class EnvironmentModifyWorkflowTest
     @Before
     public void setUp() throws Exception
     {
-        Map<String, ContainerSize> changedContainers = Maps.newHashMap();
-        changedContainers.put( TestHelper.CONTAINER_ID, ContainerSize.LARGE );
+        Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
+        changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
 
-        workflow =
-                new EnvironmentModifyWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
-                        topology, Lists.newArrayList( TestHelper.CONTAINER_ID ), changedContainers, trackerOperation,
-                        environmentManager );
+        workflow = new EnvironmentModifyWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, identityManager, peerManager,
+                securityManager, environment, topology, Lists.newArrayList( TestHelper.CONTAINER_ID ),
+                changedContainers, trackerOperation, environmentManager );
 
         doReturn( environment ).when( environmentManager ).update( environment );
         doReturn( environmentContainer ).when( environment ).getContainerHostById( TestHelper.CONTAINER_ID );
@@ -120,7 +125,7 @@ public class EnvironmentModifyWorkflowTest
     {
         workflow.DESTROY_CONTAINERS();
 
-        verify( environmentManager ).update( environment );
+        verify( trackerOperation, atLeastOnce() ).addLog( anyString() );
     }
 
 

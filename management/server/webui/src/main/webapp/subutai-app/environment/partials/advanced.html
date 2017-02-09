@@ -1,4 +1,4 @@
-<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="return dragOver(event)">
+<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="return dragOver(event)" ng-init="advEnvCtrl.loadPrivateTemplates()">
   <div class="b-cloud__tools">
     <div class="b-cloud-tools">
       <div class="b-tabs-menu b-tabs-menu_cloud-env">
@@ -57,13 +57,10 @@
           <li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
               ng-click="advEnvCtrl.showResources(peerId, peersResources.resourceHosts, $index)">
 					<span class="b-tools-menu__item" class="b-cloud-item-text g-margin-bottom-half">
-						Peer {{$index + 1}}
+						Peer {{peerId.substr(peerId.length - 3)}}
 					</span>
 
             <div class="b-progress__cloud">
-              <!--<div class="b-progress-cloud g-margin-bottom-half">
-              <div class="b-progress-cloud-fill" style="width: 0%"></div>
-              </div>-->
               <div class="b-progress-text">
                 <span class="g-text-blue">{{ peersResources.name }}</span>
               </div>
@@ -89,7 +86,7 @@
                 ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
               <div class="g-margin-bottom">
 							<span class="b-cloud-item-resource-name">
-								RH{{$index + 1}} <span ng-show="resourceHost.isManagement"> [MH]</span>
+								RH {{resourceHost.id.substr(resourceHost.length - 3)}} <span ng-show="resourceHost.isManagement"> [MH]</span>
 							</span>
                 <span class="b-progress-text ">({{resourceHost.hostname}})</span>
               </div>
@@ -207,7 +204,7 @@
               <form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings)">
                 <div class="body">
                   <div class="b-form-group">
-                    <div class="b-form-group__label">Container name</div>
+                    <div class="b-form-group__label">Container hostname</div>
                     <input type="text"
                            id="js-container-name"
                            class="b-form-input b-form-input_full"
@@ -287,7 +284,7 @@
             <td class="b-word-break-all">
               <a tooltips
                  ui-sref="containers({ environmentId: environment.id })"
-                 tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}. Source: {{ environment.dataSource == "hub" ? "Hub" : "Local" }}</span>'
+                 tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}. Source: {{ environment.dataSource }}</span>'
                  tooltip-side="right"
                  env-data-source="{{ environment.dataSource }}">
                 {{ environment.name }}

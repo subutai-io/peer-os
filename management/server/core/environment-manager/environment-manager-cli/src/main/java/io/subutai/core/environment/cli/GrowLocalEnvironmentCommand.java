@@ -13,11 +13,12 @@ import com.google.common.base.Strings;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -61,15 +62,18 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
+    private final QuotaManager quotaManager;
 
 
-    public GrowLocalEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
+    public GrowLocalEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager,
+                                        final QuotaManager quotaManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
 
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
+        this.quotaManager = quotaManager;
     }
 
 
@@ -90,8 +94,8 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         Environment environment = environmentManager.loadEnvironment( environmentId );
         String containerName = String.format( "Container%d", new Random().nextInt( 999 ) );
 
-        Node node = new Node( containerName, containerName, ContainerSize.TINY, peerId, hostId,
-                peerManager.getLocalPeer().getTemplateByName( templateName ).getId() );
+        Node node = new Node( containerName, containerName, quotaManager.getDefaultContainerQuota( ContainerSize.TINY ),
+                peerId, hostId, peerManager.getLocalPeer().getTemplateByName( templateName ).getId() );
 
         Topology topology = new Topology( environment.getName() );
         topology.addNodePlacement( peerId, node );
