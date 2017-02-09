@@ -18,4 +18,6 @@ public interface ContainerHostInfo extends HostInfo
     ContainerHostState getState();
 
     String getContainerName();
+
+    Quota getRawQuota();
 }

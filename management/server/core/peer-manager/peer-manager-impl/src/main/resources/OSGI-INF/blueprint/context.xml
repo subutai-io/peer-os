@@ -26,9 +26,6 @@
 
   <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
 
-  <reference id="quotaManager" availability="mandatory"
-             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
-
   <reference id="monitor" availability="optional"
              interface="io.subutai.core.metric.api.Monitor" />
 

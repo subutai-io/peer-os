@@ -63,7 +63,6 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
@@ -73,7 +72,6 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.ByteValueResource;
 
 import static junit.framework.TestCase.assertEquals;
@@ -133,8 +131,6 @@ public class LocalPeerImplTest
     CommandExecutor commandExecutor;
     @Mock
     StrategyManager strategyManager;
-    @Mock
-    QuotaManager quotaManager;
     @Mock
     Monitor monitor;
     @Mock
@@ -231,9 +227,8 @@ public class LocalPeerImplTest
     class LocalPeerImplForTest extends LocalPeerImpl
     {
         public LocalPeerImplForTest( final DaoManager daoManager, final TemplateManager templateManager,
-                                     final QuotaManager quotaManager, final CommandExecutor commandExecutor,
-                                     final HostRegistry hostRegistry, final Monitor monitor,
-                                     final SecurityManager securityManager )
+                                     final CommandExecutor commandExecutor, final HostRegistry hostRegistry,
+                                     final Monitor monitor, final SecurityManager securityManager )
         {
             super( daoManager, templateManager, commandExecutor, hostRegistry, monitor, securityManager );
         }
@@ -259,8 +254,8 @@ public class LocalPeerImplTest
 
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
-        localPeer = spy( new LocalPeerImplForTest( daoManager, templateRegistry, quotaManager, commandExecutor,
-                hostRegistry, monitor, securityManager ) );
+        localPeer = spy( new LocalPeerImplForTest( daoManager, templateRegistry, commandExecutor, hostRegistry, monitor,
+                securityManager ) );
         localPeer.setIdentityManager( identityManager );
         localPeer.setRelationManager( relationManager );
 
@@ -678,18 +673,5 @@ public class LocalPeerImplTest
         doThrow( new MonitorException( "" ) ).when( monitor ).getProcessResourceUsage( containerId, PID );
 
         localPeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetRamQuota() throws Exception
-    {
-        localPeer.getQuota( containerId );
-
-        verify( quotaManager ).getQuota( containerId );
-
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId );
-
-        localPeer.getQuota( containerId );
     }
 }

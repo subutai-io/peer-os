@@ -10,6 +10,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.Quota;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
@@ -27,12 +28,7 @@ public class ContainerInfoJson implements ContainerInfo
     private String gateway;
     private ResourceHostRegistrationStatus status = ResourceHostRegistrationStatus.REQUESTED;
     private ContainerHostState state;
-
-
-    public ContainerInfoJson()
-    {
-        arch = HostArchitecture.AMD64;
-    }
+    private Quota quota;
 
 
     public ContainerInfoJson( ContainerInfo hostInfo )
@@ -47,6 +43,7 @@ public class ContainerInfoJson implements ContainerInfo
         this.status = hostInfo.getStatus();
         this.gateway = hostInfo.getGateway();
         this.state = hostInfo.getState();
+        this.quota = hostInfo.getRawQuota();
         if ( arch == null )
         {
             arch = HostArchitecture.AMD64;
@@ -55,6 +52,13 @@ public class ContainerInfoJson implements ContainerInfo
         {
             this.interfaces.add( new HostInterfaceJson( anHostInterface ) );
         }
+    }
+
+
+    @Override
+    public Quota getRawQuota()
+    {
+        return quota;
     }
 
 

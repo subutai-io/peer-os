@@ -20,7 +20,6 @@ import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.localpeer.impl.LocalPeerImpl;
 import io.subutai.core.localpeer.impl.request.MessageRequestListener;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
@@ -43,8 +42,6 @@ public class PeerManagerImplTest
 {
     private static final String PEER_ID = UUID.randomUUID().toString();
 
-    @Mock
-    QuotaManager quotaManager;
     @Mock
     Monitor monitor;
 

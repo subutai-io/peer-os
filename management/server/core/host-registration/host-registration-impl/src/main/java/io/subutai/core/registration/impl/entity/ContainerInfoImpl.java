@@ -1,7 +1,6 @@
 package io.subutai.core.registration.impl.entity;
 
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +27,11 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.Quota;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
@@ -69,10 +73,8 @@ public class ContainerInfoImpl implements ContainerInfo
 
 
     @JoinColumn( name = "net_interfaces" )
-    @OneToMany( orphanRemoval = true,
-            targetEntity = HostInterfaceImpl.class,
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER )
+    @OneToMany( orphanRemoval = true, targetEntity = HostInterfaceImpl.class, cascade = CascadeType.ALL, fetch =
+            FetchType.EAGER )
     @Expose
     private Set<HostInterface> netHostInterfaces = new HashSet<>();
 
@@ -125,6 +127,26 @@ public class ContainerInfoImpl implements ContainerInfo
 
 
     @Override
+    public Quota getRawQuota()
+    {
+        try
+        {
+            return getLocalPeer().getRawQuota( new ContainerId( id ) );
+        }
+        catch ( PeerException e )
+        {
+            return null;
+        }
+    }
+
+
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.lookup( LocalPeer.class );
+    }
+
+
+    @Override
     public ContainerHostState getState()
     {
         return state;
@@ -142,8 +164,6 @@ public class ContainerInfoImpl implements ContainerInfo
     {
         this.status = status;
     }
-
-
 
 
     public void setRequestedHost( final RequestedHostImpl requestedHost )
@@ -200,15 +220,11 @@ public class ContainerInfoImpl implements ContainerInfo
     }
 
 
-
-
     @Override
     public String getPublicKey()
     {
         return publicKey;
     }
-
-
 
 
     @Override
@@ -225,14 +241,11 @@ public class ContainerInfoImpl implements ContainerInfo
     }
 
 
-
-
     @Override
     public int compareTo( final HostInfo o )
     {
         return hostname.compareTo( o.getHostname() );
     }
-
 
 
     @Override
@@ -264,14 +277,8 @@ public class ContainerInfoImpl implements ContainerInfo
     @Override
     public String toString()
     {
-        return "ContainerInfoImpl{" +
-                "id='" + id + '\'' +
-                ", publicKey='" + publicKey + '\'' +
-                ", hostname='" + hostname + '\'' +
-                ", vlan=" + vlan +
-                ", templateName='" + templateName + '\'' +
-                ", hostInterfaces=" + netHostInterfaces +
-                ", arch=" + arch +
-                '}';
+        return "ContainerInfoImpl{" + "id='" + id + '\'' + ", publicKey='" + publicKey + '\'' + ", hostname='"
+                + hostname + '\'' + ", vlan=" + vlan + ", templateName='" + templateName + '\'' + ", hostInterfaces="
+                + netHostInterfaces + ", arch=" + arch + '}';
     }
 }

@@ -13,8 +13,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.Quota;
 
 
 /**
@@ -24,8 +22,7 @@ import io.subutai.hub.share.quota.Quota;
 public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
-    @Argument( name = "envId", description = "Environment id",
-            index = 0, multiValued = false, required = true )
+    @Argument( name = "envId", description = "Environment id", index = 0, multiValued = false, required = true )
     /**
      * {@value environmentId} environment id to view info about
      * <p>{@code required = true}</p>
@@ -74,22 +71,7 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
             {
                 System.out.println( "Container state: " + containerHost.getState() );
 
-                try
-                {
-                    final ContainerQuota quota = containerHost.getQuota();
-
-                    System.out.println( "Granted resources: " );
-                    System.out.println( "Type\tValue\tThreshold" );
-                    for ( Quota q : quota.getAll() )
-                    {
-                        System.out.println( String.format( "%s\t%s\t%s", q.getResource().getContainerResourceType(),
-                                q.getResource().getPrintValue(), q.getThreshold() ) );
-                    }
-                }
-                catch ( Exception e )
-                {
-                    System.out.println( "ERROR: " + e.getMessage() );
-                }
+                System.out.println( "Quota: " + containerHost.getRawQuota() );
             }
         }
 

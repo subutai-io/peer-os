@@ -15,6 +15,7 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
+import io.subutai.common.host.Quota;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -27,7 +28,6 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.settings.Common;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -901,5 +901,34 @@ public class EnvironmentWebClient
         }
 
         return WebClientBuilder.checkResponse( response, String.class );
+    }
+
+
+    public Quota getRawQuota( final ContainerId containerId ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/quota/raw", containerId.getEnvironmentId().getId(),
+                    containerId.getId() );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 3000, 15000, 1 );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            response = client.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage() );
+            throw new PeerException( "Error on reading container quota: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        return WebClientBuilder.checkResponse( response, Quota.class );
     }
 }
