@@ -137,7 +137,6 @@ import io.subutai.core.localpeer.impl.tasks.DeleteTunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
 import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
@@ -899,7 +898,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             final ContainerSize size = request.getContainerQuota().getContainerSize();
 
-            final ContainerQuota defaultQuota = getQuotaManager().getDefaultContainerQuota( size );
+            final ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( size );
             if ( defaultQuota != null && size != ContainerSize.CUSTOM )
             {
                 request.getContainerQuota().copyValues( defaultQuota );
@@ -2804,11 +2803,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( containerQuota );
 
-        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerQuota.getContainerSize() );
+        ContainerQuota quota = ContainerSize.getDefaultContainerQuota( containerQuota.getContainerSize() );
         // CUSTOM value of container size returns null quota
         if ( quota == null )
         {
-            quota = getQuotaManager().getDefaultContainerQuota( ContainerSize.SMALL );
+            quota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
             quota.copyValues( containerQuota );
         }
         try
@@ -3461,12 +3460,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onContainerDestroyed( final ContainerHostInfo containerInfo )
     {
 
-    }
-
-
-    protected QuotaManager getQuotaManager()
-    {
-        return ServiceLocator.lookup( QuotaManager.class );
     }
 }
 

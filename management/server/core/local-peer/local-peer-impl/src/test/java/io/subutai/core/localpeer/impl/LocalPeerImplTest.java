@@ -63,7 +63,6 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
@@ -132,8 +131,6 @@ public class LocalPeerImplTest
     CommandExecutor commandExecutor;
     @Mock
     StrategyManager strategyManager;
-    @Mock
-    QuotaManager quotaManager;
     @Mock
     Monitor monitor;
     @Mock
@@ -230,9 +227,8 @@ public class LocalPeerImplTest
     class LocalPeerImplForTest extends LocalPeerImpl
     {
         public LocalPeerImplForTest( final DaoManager daoManager, final TemplateManager templateManager,
-                                     final QuotaManager quotaManager, final CommandExecutor commandExecutor,
-                                     final HostRegistry hostRegistry, final Monitor monitor,
-                                     final SecurityManager securityManager )
+                                     final CommandExecutor commandExecutor, final HostRegistry hostRegistry,
+                                     final Monitor monitor, final SecurityManager securityManager )
         {
             super( daoManager, templateManager, commandExecutor, hostRegistry, monitor, securityManager );
         }
@@ -258,8 +254,8 @@ public class LocalPeerImplTest
 
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
-        localPeer = spy( new LocalPeerImplForTest( daoManager, templateRegistry, quotaManager, commandExecutor,
-                hostRegistry, monitor, securityManager ) );
+        localPeer = spy( new LocalPeerImplForTest( daoManager, templateRegistry, commandExecutor, hostRegistry, monitor,
+                securityManager ) );
         localPeer.setIdentityManager( identityManager );
         localPeer.setRelationManager( relationManager );
 
