@@ -61,4 +61,16 @@ public class NetDto
     {
         this.out = out;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "NetDto{" );
+        sb.append( "iface='" ).append( iface ).append( '\'' );
+        sb.append( ", in=" ).append( in );
+        sb.append( ", out=" ).append( out );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

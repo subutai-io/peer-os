@@ -44,4 +44,16 @@ public class DiskDto
     {
         this.used = used;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "DiskDto{" );
+        sb.append( "total=" ).append( total );
+        sb.append( ", available=" ).append( available );
+        sb.append( ", used=" ).append( used );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

@@ -95,4 +95,19 @@ public class MemoryDto
     {
         this.buffers = buffers;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "MemoryDto{" );
+        sb.append( "total=" ).append( total );
+        sb.append( ", available=" ).append( available );
+        sb.append( ", active=" ).append( active );
+        sb.append( ", cached=" ).append( cached );
+        sb.append( ", memFree=" ).append( memFree );
+        sb.append( ", buffers=" ).append( buffers );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }
