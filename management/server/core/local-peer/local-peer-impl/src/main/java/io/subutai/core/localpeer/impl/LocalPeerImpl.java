@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -825,6 +826,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( requestGroup );
 
+        checkQuotaSettings( requestGroup );
+
         NetworkResource reservedNetworkResource =
                 getReservedNetworkResources().findByEnvironmentId( requestGroup.getEnvironmentId() );
 
@@ -886,6 +889,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return new CreateEnvironmentContainersResponse( cloneResults );
+    }
+
+
+    private void checkQuotaSettings( final CreateEnvironmentContainersRequest requestGroup ) throws PeerException
+    {
+
+        for ( CloneRequest request : requestGroup.getRequests() )
+        {
+            final ContainerSize size = request.getContainerQuota().getContainerSize();
+
+            final ContainerQuota defaultQuota = getQuotaManager().getDefaultContainerQuota( size );
+            if ( defaultQuota != null && size != ContainerSize.CUSTOM )
+            {
+                request.getContainerQuota().copyValues( defaultQuota );
+            }
+
+            Collection<Quota> resources = request.getContainerQuota().getAll();
+            if ( resources == null || resources.size() == 0 )
+            {
+                throw new PeerException( "Quota setting not found." );
+            }
+        }
     }
 
 
