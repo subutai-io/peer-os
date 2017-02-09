@@ -38,16 +38,8 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <reference id="peerManager" availability="optional"
-             interface="io.subutai.core.peer.api.PeerManager" />
-
-  <reference id="localPeer" availability="optional"
-             interface="io.subutai.common.peer.LocalPeer" />
-
   <bean id="lxcQuotaManager" scope="singleton" class="io.subutai.core.lxc.quota.impl.QuotaManagerImpl"
         init-method="init">
-    <argument ref="peerManager" />
-    <argument ref="localPeer" />
     <property name="defaultQuota"
               value="$(TINY.ram)|$(TINY.cpu)|$(TINY.space.opt)|$(TINY.space.home)|$(TINY.space.var)|$(TINY.space.root):$(SMALL.ram)|$(SMALL.cpu)|$(SMALL.space.opt)|$(SMALL.space.home)|$(SMALL.space.var)|$(SMALL.space.root):$(MEDIUM.ram)|$(MEDIUM.cpu)|$(MEDIUM.space.opt)|$(MEDIUM.space.home)|$(MEDIUM.space.var)|$(MEDIUM.space.root):$(LARGE.ram)|$(LARGE.cpu)|$(LARGE.space.opt)|$(LARGE.space.home)|$(LARGE.space.var)|$(LARGE.space.root):$(HUGE.ram)|$(HUGE.cpu)|$(HUGE.space.opt)|$(HUGE.space.home)|$(HUGE.space.var)|$(HUGE.space.root)" />
 

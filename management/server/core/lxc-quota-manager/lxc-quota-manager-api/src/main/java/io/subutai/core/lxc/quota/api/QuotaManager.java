@@ -5,10 +5,6 @@ import java.util.Map;
 
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
-import io.subutai.hub.share.quota.QuotaException;
-import io.subutai.hub.share.resource.ContainerResourceType;
-import io.subutai.hub.share.resource.PeerResources;
-import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 /**
@@ -17,13 +13,6 @@ import io.subutai.hub.share.resource.ResourceValueParser;
  */
 public interface QuotaManager
 {
-
-    @Deprecated
-    PeerResources getResourceLimits( String peerId ) throws QuotaException;
-
-
-    ResourceValueParser getResourceValueParser( ContainerResourceType containerResourceType ) throws QuotaException;
-
     /**
      * Returns predefined quotas of container type
      *
