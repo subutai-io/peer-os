@@ -3632,9 +3632,11 @@ td.b-main-table__status-col {
 	font-size: 12px;
 	color: #04346E;
 	line-height: 17px;
-	padding: 0 0 0 10px;
+	padding: 0 20px 0 10px;
 }
-
+.b-template-settings__text_input {
+    margin: 0 0 10px;
+}
 .b-template-settings .body,
 .b-template-settings .footer {
     font-size: 13px;
@@ -3648,7 +3650,10 @@ td.b-main-table__status-col {
 	vertical-align: top;
 	font-size: 14px;
 }
-
+.b-template-settings__coll_quota {
+    min-width: 150px;
+    width: inherit;
+}
 .b-template-settings .footer a {
     font-size: 13px;
 }
@@ -3681,7 +3686,10 @@ td.b-main-table__status-col {
 .b-form-input_textarea {
     height: 100px;
 }
-
+.b-form-input_custom-quota {
+    width: 60px;
+    float: right;
+}
 .e2e-sign-message {
     /*width: 370px;*/
     height: 160px;
