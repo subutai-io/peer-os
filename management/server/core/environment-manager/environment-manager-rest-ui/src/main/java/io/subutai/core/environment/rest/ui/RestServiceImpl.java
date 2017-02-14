@@ -190,6 +190,11 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
+            if ( true )
+            {
+                return Response.ok().build();
+            }
+
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = ContainerSize.getDefaultQuotas();
 

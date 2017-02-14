@@ -4,7 +4,6 @@ package io.subutai.common.environment;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -24,6 +23,19 @@ public class NodeSchema
     @JsonProperty( "templateId" )
     private String templateId;
 
+    @JsonProperty( "cpuQuota" )
+    private double cpu;
+    @JsonProperty( "ramQuota" )
+    private double ram;
+    @JsonProperty( "homeQuota" )
+    private double home;
+    @JsonProperty( "rootQuota" )
+    private double root;
+    @JsonProperty( "varQuota" )
+    private double var;
+    @JsonProperty( "optQuota" )
+    private double opt;
+
 
     public NodeSchema( @JsonProperty( "name" ) final String name, @JsonProperty( "quota" ) final ContainerQuota quota,
                        @JsonProperty( "templateName" ) final String templateName,
@@ -33,6 +45,42 @@ public class NodeSchema
         this.quota = quota;
         this.templateName = templateName;
         this.templateId = templateId;
+    }
+
+
+    public double getCpu()
+    {
+        return cpu;
+    }
+
+
+    public double getRam()
+    {
+        return ram;
+    }
+
+
+    public double getHome()
+    {
+        return home;
+    }
+
+
+    public double getRoot()
+    {
+        return root;
+    }
+
+
+    public double getVar()
+    {
+        return var;
+    }
+
+
+    public double getOpt()
+    {
+        return opt;
     }
 
 

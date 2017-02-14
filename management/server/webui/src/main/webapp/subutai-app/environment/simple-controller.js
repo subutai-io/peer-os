@@ -47,7 +47,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
-	vm.templateSettings = {};
 	vm.getFilteredTemplates = getFilteredTemplates;
 
 	vm.addContainer = addContainer;
@@ -628,6 +627,16 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						$('#js-container-name').prop('disabled', false);
 					}
 					$('#js-container-size').val(currentTemplate.get('quotaSize')).trigger('change');
+
+					if(currentTemplate.get('quotaSize') == 'CUSTOM'){
+					    $('#js-quotasize-custom-cpu').val(currentTemplate.get('cpuQuota')).trigger('change');
+					    $('#js-quotasize-custom-ram').val(currentTemplate.get('ramQuota')).trigger('change');
+					    $('#js-quotasize-custom-home').val(currentTemplate.get('homeQuota')).trigger('change');
+					    $('#js-quotasize-custom-root').val(currentTemplate.get('rootQuota')).trigger('change');
+					    $('#js-quotasize-custom-var').val(currentTemplate.get('varQuota')).trigger('change');
+					    $('#js-quotasize-custom-opt').val(currentTemplate.get('optQuota')).trigger('change');
+					}
+
 					containerSettingMenu.find('.header').html('Settings for <b>' + this.model.get('templateName') + '</b> container');
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({
@@ -925,9 +934,12 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		for (var i = 0; i < allElements.length; i++) {
 			var currentElement = allElements[i];
 			var container2Build = {
-				"quota": {
-					"containerSize":currentElement.get('quotaSize')
-				},
+				"cpuQuota": currentElement.get("cpuQuota"),
+				"ramQuota": currentElement.get("ramQuota"),
+				"homeQuota": currentElement.get("homeQuota"),
+				"rootQuota": currentElement.get("rootQuota"),
+				"varQuota": currentElement.get("varQuota"),
+				"optQuota": currentElement.get("optQuota"),
 				"templateName": currentElement.get('templateName'),
 				"name": currentElement.get('containerName'),
 				"templateId" : currentElement.get('templateId'),
@@ -1033,26 +1045,35 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
     // TODO when container with custom quota is edited we need to obtain previously set quotas and set
-    // vm.templateSettings.quota object to reflect them for user to see current quotas!!!
+    // templateSettings.quota object to reflect them for user to see current quotas!!!
 
-	function addSettingsToTemplate(sizeDetails) {
+	function addSettingsToTemplate(templateSettings, sizeDetails) {
+        var isCustom = templateSettings.quotaSize == 'CUSTOM';
 
-        if(sizeDetails == undefined){
+        if(isCustom){
             //custom quota
             console.log('CUSTOM');
-            console.log(vm.templateSettings);
+            console.log(templateSettings);
         }else{
             //predefined size
-            console.log('PREDEFINED: ' + vm.templateSettings.quotaSize);
+            console.log('PREDEFINED: ' + templateSettings.quotaSize);
             console.log(sizeDetails);
         }
 
-		currentTemplate.set('quotaSize', vm.templateSettings.quotaSize);
-		currentTemplate.attr('rect.b-magnet/fill', vm.colors[vm.templateSettings.quotaSize]);
-		currentTemplate.set('containerName', vm.templateSettings.containerName);
+        currentTemplate.set('quotaSize', templateSettings.quotaSize);
+		currentTemplate.set('cpuQuota', isCustom ? templateSettings.cpuQuota : sizeDetails.cpu);
+		currentTemplate.set('ramQuota', isCustom ? templateSettings.ramQuota : sizeDetails.ram);
+		currentTemplate.set('optQuota', isCustom ? templateSettings.optQuota : sizeDetails['space.opt']);
+		currentTemplate.set('homeQuota', isCustom ? templateSettings.homeQuota : sizeDetails['space.home']);
+		currentTemplate.set('rootQuota', isCustom ? templateSettings.rootQuota : sizeDetails['space.root']);
+		currentTemplate.set('varQuota', isCustom ? templateSettings.varQuota : sizeDetails['space.var']);
+
+		currentTemplate.attr('rect.b-magnet/fill', vm.colors[templateSettings.quotaSize]);
+		currentTemplate.set('containerName', templateSettings.containerName);
 
 		containerSettingMenu.hide();
 
+        //for env modification
 		if( vm.isEditing )
 		{
 			var id = currentTemplate.attributes.containerId;
@@ -1065,14 +1086,16 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			{
 				res = res[0];
 
-				if( res.type == vm.templateSettings.quotaSize && vm.currentEnvironment.changingContainers[id] )
+                //checks if container size was changed back and removes from the set of containers to be updated
+				if( res.type == templateSettings.quotaSize && vm.currentEnvironment.changingContainers[id] )
 				{
 					delete vm.currentEnvironment.changingContainers[id];
 				}
 
-				if( res.type != vm.templateSettings.quotaSize )
+                //if container size is changed then adds to the set of containers to be updated
+				if( res.type != templateSettings.quotaSize )
 				{
-					vm.currentEnvironment.changingContainers[id] = vm.templateSettings.quotaSize;
+					vm.currentEnvironment.changingContainers[id] = templateSettings.quotaSize;
 				}
 			}
 		}
