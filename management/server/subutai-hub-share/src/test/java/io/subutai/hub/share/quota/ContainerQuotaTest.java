@@ -1,9 +1,11 @@
 package io.subutai.hub.share.quota;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -19,6 +21,14 @@ import static junit.framework.TestCase.assertEquals;
 @RunWith( MockitoJUnitRunner.class )
 public class ContainerQuotaTest
 {
+
+//    @Before
+//    public void setUp() throws Exception
+//    {
+//        System.setProperty( "karaf.etc", "/home/dilshat/Dev/base/management/server/server-karaf/src/main/assembly/etc" );
+//    }
+
+
     @Test
     public void testContainerRamResource() throws IOException
     {
@@ -85,6 +95,7 @@ public class ContainerQuotaTest
                 quota.get( ContainerResourceType.HOME ).getAsDiskResource().getResource().getValue( ByteUnit.GB )
                      .doubleValue() );
         assertEquals( "0-7", quota.get( ContainerResourceType.CPUSET ).getAsCpuSetResource().getResource().getValue() );
-        assertEquals( 100.0D, quota.get( ContainerResourceType.NET ).getAsNetResource().getResource().getValue().doubleValue() );
+        assertEquals( 100.0D,
+                quota.get( ContainerResourceType.NET ).getAsNetResource().getResource().getValue().doubleValue() );
     }
 }

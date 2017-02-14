@@ -142,13 +142,13 @@ public class AppScaleManager
     }
 
 
-    private ContainerHost getContainerHost( String hostname )
+    private ContainerHost getContainerHost( String containerName )
     {
         ContainerHost ch = null;
 
         try
         {
-            ch = localPeer.getContainerHostByHostName( hostname );
+            ch = localPeer.getContainerHostByContainerName( containerName );
         }
         catch ( HostNotFoundException e )
         {
@@ -242,7 +242,11 @@ public class AppScaleManager
 
     private String getVlan( final AppScaleConfigDto config, ResourceHost resourceHost )
     {
-        CommandResult res = TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" );
+
+        ContainerHost ch = getContainerHost( config.getClusterName() );
+
+        CommandResult res =
+                TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + ch.getContainerName() + "/config" );
 
         Preconditions.checkNotNull( res );
 
@@ -260,7 +264,8 @@ public class AppScaleManager
             Set<ContainerHost> chs = localPeer.findContainersByEnvironmentId( config.getEnvironmentId() );
             for ( ContainerHost containerHost1 : chs )
             {
-                if ( containerHost1.getContainerName().equals( config.getClusterName() ) )
+                if ( containerHost1.getContainerName()
+                                   .equals( getContainerHost( config.getClusterName() ).getContainerName() ) )
                 {
                     containerHost = containerHost1;
                     break;

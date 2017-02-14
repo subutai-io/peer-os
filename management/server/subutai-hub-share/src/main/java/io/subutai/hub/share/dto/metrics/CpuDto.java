@@ -120,4 +120,21 @@ public class CpuDto
     {
         this.nice = nice;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "CpuDto{" );
+        sb.append( "model='" ).append( model ).append( '\'' );
+        sb.append( ", coreCount=" ).append( coreCount );
+        sb.append( ", frequency=" ).append( frequency );
+        sb.append( ", system=" ).append( system );
+        sb.append( ", idle=" ).append( idle );
+        sb.append( ", iowait=" ).append( iowait );
+        sb.append( ", user=" ).append( user );
+        sb.append( ", nice=" ).append( nice );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

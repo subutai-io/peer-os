@@ -18,6 +18,16 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     @SerializedName( "name" )
     @JsonProperty( "name" )
     protected String name;
+    @SerializedName( "quota" )
+    @JsonProperty( "quota" )
+    protected Quota quota;
+
+
+    @Override
+    public Quota getRawQuota()
+    {
+        return quota;
+    }
 
 
     public ContainerHostInfoModel( @JsonProperty( "id" ) final String id,
@@ -38,6 +48,7 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
         super( info );
         this.state = info.getState();
         this.name = info.getContainerName();
+        this.quota = info.getRawQuota();
     }
 
 

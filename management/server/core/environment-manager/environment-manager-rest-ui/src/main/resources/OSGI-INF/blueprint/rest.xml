@@ -21,15 +21,13 @@
              interface="io.subutai.core.template.api.TemplateManager" />
   <reference id="strategyManager" availability="mandatory"
              interface="io.subutai.core.strategy.api.StrategyManager" />
-  <reference id="quotaManager" availability="mandatory"
-             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
+
 
   <bean id="environmentRestUIServiceImpl" class="io.subutai.core.environment.rest.ui.RestServiceImpl">
     <argument ref="environmentManager" />
     <argument ref="peerManager" />
     <argument ref="templateRegistry" />
     <argument ref="strategyManager" />
-    <argument ref="quotaManager" />
     <argument ref="secureEnvironmentManager" />
   </bean>
 

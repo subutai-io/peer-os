@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -136,10 +137,6 @@ import io.subutai.core.localpeer.impl.tasks.DeleteTunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
 import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
-
-import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
-import io.subutai.core.lxc.quota.api.QuotaManager;
-
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
@@ -388,6 +385,25 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             LOG.error( e.getMessage() );
             throw new PeerException( String.format( "Error getting container state: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public io.subutai.common.host.Quota getRawQuota( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId );
+
+        try
+        {
+            ContainerHostInfo containerHostInfo =
+                    ( ContainerHostInfo ) hostRegistry.getHostInfoById( containerId.getId() );
+            return containerHostInfo.getRawQuota();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+            throw new PeerException( String.format( "Error getting container quota: %s", e.getMessage() ), e );
         }
     }
 
@@ -809,6 +825,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( requestGroup );
 
+        checkQuotaSettings( requestGroup );
+
         NetworkResource reservedNetworkResource =
                 getReservedNetworkResources().findByEnvironmentId( requestGroup.getEnvironmentId() );
 
@@ -870,6 +888,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return new CreateEnvironmentContainersResponse( cloneResults );
+    }
+
+
+    private void checkQuotaSettings( final CreateEnvironmentContainersRequest requestGroup ) throws PeerException
+    {
+
+        for ( CloneRequest request : requestGroup.getRequests() )
+        {
+            final ContainerSize size = request.getContainerQuota().getContainerSize();
+
+            final ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( size );
+            if ( defaultQuota != null && size != ContainerSize.CUSTOM )
+            {
+                request.getContainerQuota().copyValues( defaultQuota );
+            }
+
+            Collection<Quota> resources = request.getContainerQuota().getAll();
+            if ( resources == null || resources.size() == 0 )
+            {
+                throw new PeerException( "Quota setting not found." );
+            }
+        }
     }
 
 
@@ -2763,11 +2803,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( containerQuota );
 
-        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerQuota.getContainerSize() );
+        ContainerQuota quota = ContainerSize.getDefaultContainerQuota( containerQuota.getContainerSize() );
         // CUSTOM value of container size returns null quota
         if ( quota == null )
         {
-            quota = getQuotaManager().getDefaultContainerQuota( ContainerSize.SMALL );
+            quota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
             quota.copyValues( containerQuota );
         }
         try
@@ -3420,12 +3460,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onContainerDestroyed( final ContainerHostInfo containerInfo )
     {
 
-    }
-
-
-    protected QuotaManager getQuotaManager()
-    {
-        return ServiceLocator.lookup( QuotaManager.class );
     }
 }
 

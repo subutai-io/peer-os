@@ -20,6 +20,7 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.Quota;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -36,7 +37,6 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -173,6 +173,8 @@ public interface Peer extends RelationLink
      */
     ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
 
+    Quota getRawQuota( ContainerId containerId ) throws PeerException;
+
     /**
      * Returns set of container information of the environment
      */
@@ -180,7 +182,8 @@ public interface Peer extends RelationLink
 
     //******** Quota functions ***********
 
-//    void setContainerQuota( final ContainerId containerHostId, final ContainerQuota containerQuota ) throws PeerException;
+    //    void setContainerQuota( final ContainerId containerHostId, final ContainerQuota containerQuota ) throws
+    // PeerException;
 
     /**
      * Returns resource usage of process on container by its PID

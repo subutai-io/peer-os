@@ -66,7 +66,6 @@ import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
 import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
@@ -85,14 +84,13 @@ public class RestServiceImpl implements RestService
     private final PeerManager peerManager;
     private final TemplateManager templateManager;
     private final StrategyManager strategyManager;
-    private final QuotaManager quotaManager;
     private final SecureEnvironmentManager secureEnvironmentManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
                             final TemplateManager templateManager, final StrategyManager strategyManager,
-                            final QuotaManager quotaManager, final SecureEnvironmentManager secureEnvironmentManager )
+                            final SecureEnvironmentManager secureEnvironmentManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
@@ -103,7 +101,6 @@ public class RestServiceImpl implements RestService
         this.peerManager = peerManager;
         this.templateManager = templateManager;
         this.strategyManager = strategyManager;
-        this.quotaManager = quotaManager;
         this.secureEnvironmentManager = secureEnvironmentManager;
     }
 
@@ -120,6 +117,13 @@ public class RestServiceImpl implements RestService
                         + "storm14|" + "storm16|" + "zookeeper14|" + "zookeeper16" ) ).collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
+    }
+
+
+    @Override
+    public Response listPrivateTemplates()
+    {
+        return Response.ok().entity( gson.toJson( templateManager.getUserPrivateTemplates() ) ).build();
     }
 
 
@@ -183,10 +187,11 @@ public class RestServiceImpl implements RestService
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
-            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+            final Map<ContainerSize, ContainerQuota> quotas = ContainerSize.getDefaultQuotas();
 
             Topology topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
 
@@ -222,18 +227,19 @@ public class RestServiceImpl implements RestService
             checkName( name );
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             Topology topology = new Topology( name );
 
             schema.forEach( s ->
             {
-                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( s.getQuota().getContainerSize() );
+                ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( s.getQuota().getContainerSize() );
                 if ( defaultQuota == null )
                 {
                     // selected CUSTOM container size
                     // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
-                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                    defaultQuota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
                 }
                 s.getQuota().copyValues( defaultQuota );
                 topology.addNodePlacement( s.getPeerId(), s );
@@ -275,27 +281,30 @@ public class RestServiceImpl implements RestService
 
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {}.getType() );
+            {
+            }.getType() );
 
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
 
             Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {}.getType() );
+                    {
+                    }.getType() );
 
             for ( Map<String, String> cont : changingContainers )
             {
                 ContainerSize containerSize = ContainerSize.valueOf( cont.get( "value" ) );
-                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( containerSize );
+                ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( containerSize );
                 if ( defaultQuota == null )
                 {
                     // selected CUSTOM container size
                     // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
-                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                    defaultQuota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
                 }
 
                 changedContainersFiltered.put( cont.get( "key" ), defaultQuota );
@@ -306,7 +315,7 @@ public class RestServiceImpl implements RestService
             if ( !schema.isEmpty() )
             {
                 final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
-                final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+                final Map<ContainerSize, ContainerQuota> quotas = ContainerSize.getDefaultQuotas();
 
                 topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
             }
@@ -337,25 +346,28 @@ public class RestServiceImpl implements RestService
             String name = environmentManager.loadEnvironment( environmentId ).getName();
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {}.getType() );
+                    {
+                    }.getType() );
 
             for ( Map<String, String> cont : changingContainers )
             {
                 ContainerSize containerSize = ContainerSize.valueOf( cont.get( "value" ) );
-                ContainerQuota defaultQuota = quotaManager.getDefaultContainerQuota( containerSize );
+                ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( containerSize );
                 if ( defaultQuota == null )
                 {
                     // selected CUSTOM container size
                     // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
-                    defaultQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+                    defaultQuota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
                 }
 
                 changedContainersFiltered.put( cont.get( "key" ), defaultQuota );
@@ -783,7 +795,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok().entity( gson.toJson( ContainerSize.getContainerSizeDescription() ) ).build();
+            return Response.ok().entity( gson.toJson( ContainerSize.getContainerSizesDescription() ) ).build();
         }
         catch ( Exception e )
         {
@@ -906,7 +918,8 @@ public class RestServiceImpl implements RestService
             EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             for ( String tag : tags )
             {

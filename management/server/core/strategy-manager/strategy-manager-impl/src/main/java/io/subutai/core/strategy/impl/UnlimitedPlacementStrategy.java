@@ -47,11 +47,11 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
         for ( NodeSchema nodeSchema : nodeSchemaList )
         {
             ContainerQuota quota = quotas.get( nodeSchema.getQuota().getContainerSize() );
-            if ( quota != null )
+            if ( quota == null )
             {
                 quota = quotas.get( ContainerSize.SMALL );
-                nodeSchema.getQuota().copyValues( quota );
             }
+            nodeSchema.getQuota().copyValues( quota );
         }
     }
 

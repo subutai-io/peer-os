@@ -35,6 +35,7 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.Quota;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -341,6 +342,13 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         return environmentWebClient.getState( containerId );
+    }
+
+
+    @Override
+    public Quota getRawQuota( final ContainerId containerId ) throws PeerException
+    {
+        return environmentWebClient.getRawQuota( containerId );
     }
 
 

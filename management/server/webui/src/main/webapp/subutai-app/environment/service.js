@@ -22,6 +22,8 @@ function environmentService($http, $q) {
 
 	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
 
+	var PRIVATE_TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/private';
+
 	var VERIFIED_TEMPLATE_URL = ENVIRONMENTS_URL + 'templates/verified/';
 
 	var PEERS_URL = ENVIRONMENTS_URL + 'peers/';
@@ -42,6 +44,7 @@ function environmentService($http, $q) {
 
 	var environmentService = {
 		getTemplates: getTemplates,
+		getPrivateTemplates: getPrivateTemplates,
 		getVerifiedTemplate: getVerifiedTemplate,
 
 		getStrategies : getStrategies,
@@ -136,6 +139,19 @@ function environmentService($http, $q) {
 
 		return callF.promise;
 	}
+
+    function getPrivateTemplates() {
+		var callF = $q.defer();
+
+		$http.get(PRIVATE_TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
+			.success(function(data) {
+				callF.resolve(data);
+			});
+
+		return callF.promise;
+	}
+
+
 	// @todo workaround for kurjun to return categorized templates
 	function getCategory(data)
 	{

@@ -246,6 +246,17 @@ public interface IdentityManager
     @PermitAll
     boolean changeUserPassword( User user, String oldPassword, String newPassword ) throws SystemSecurityException;
 
+    void resetPassword( String username, String newPassword, String sign ) throws SystemSecurityException;
+
+    /**
+     * Issues a token to be signed and passed to
+     * {@link IdentityManager#resetPassword(java.lang.String username,
+     * java.lang.String newPassword, java.lang.String sign)}. TTL of token is 30 seconds
+     *
+     * @return token to be signed by user PGP key
+     */
+    String getSignToken();
+
     /* *************************************************
          */
     void updateUser( User user );

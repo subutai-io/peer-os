@@ -4057,3 +4057,9 @@ a[disabled] {
     transform: rotate(180deg);
 }
 
+
+.reset-pwd {
+    font-size: 14px !important;
+    padding-top: 15px;
+    cursor: pointer;
+}

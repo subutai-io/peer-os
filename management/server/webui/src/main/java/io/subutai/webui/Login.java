@@ -40,6 +40,7 @@ public class Login extends HttpServlet
             String password = request.getParameter( "password" );
             String sptoken = request.getParameter( "sptoken" );
             String newPassword = request.getParameter( "newpassword" );
+            String sign = request.getParameter( "sign" );
             User user;
 
             IdentityManager identityManager = ServiceLocator.getServiceOrNull( IdentityManager.class );
@@ -50,6 +51,10 @@ public class Login extends HttpServlet
             {
                 identityManager.changeUserPassword( username, password, newPassword );
                 password = newPassword;
+            }
+            else if ( !Strings.isNullOrEmpty( sign ) )
+            {
+                identityManager.resetPassword( username, password, sign );
             }
 
             if ( !Strings.isNullOrEmpty( username ) )
