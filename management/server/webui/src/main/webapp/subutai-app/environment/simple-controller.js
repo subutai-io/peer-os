@@ -1032,6 +1032,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		//vm.selectedPlugin = false;
 	}
 
+    // TODO when container with custom quota is edited we need to obtain previously set quotas and set
+    // vm.templateSettings.quota object to reflect them for user to see current quotas!!!
+
 	function addSettingsToTemplate(sizeDetails) {
 
         if(sizeDetails == undefined){
