@@ -105,20 +105,20 @@
           <div class="b-template-settings js-dropen-menu js-no-close">
             <div class="header"></div>
             <div class="b-template-settings__coll">
-              <form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings)">
+              <form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(environmentViewCtrl.containersTypeInfo[environmentSimpleViewCtrl.templateSettings.quotaSize])">
                 <div class="body">
                   <div class="b-form-group">
                     <div class="b-form-group__label">Container hostname</div>
                     <input type="text"
                            id="js-container-name"
                            class="b-form-input b-form-input_full"
-                           ng-model="templateSettings.containerName" required>
+                           ng-model="environmentSimpleViewCtrl.templateSettings.containerName" required>
                   </div>
                   <div class="b-form-group">
                     <div class="b-form-group__label">Select quota size</div>
                     <select class="b-form-input b-form-input_full"
                             id="js-container-size"
-                            ng-model="templateSettings.quotaSize"
+                            ng-model="environmentSimpleViewCtrl.templateSettings.quotaSize"
                     >
                       <option
                           ng-repeat="type in environmentViewCtrl.containersType"
@@ -133,65 +133,67 @@
                 </div>
               </form>
             </div>
-            <div class="b-template-settings__coll" ng-if="templateSettings.quotaSize !== 'CUSTOM'">
+            <div class="b-template-settings__coll" ng-if="environmentSimpleViewCtrl.templateSettings.quotaSize !== 'CUSTOM'">
               <p class="b-template-settings__text">
-                {{ templateSettings.quotaSize }}: <br>
-                <span ng-repeat="(key, value) in environmentViewCtrl.containersTypeInfo[templateSettings.quotaSize]">
+                {{ environmentSimpleViewCtrl.templateSettings.quotaSize }}: <br>
+                <span ng-repeat="(key, value) in environmentViewCtrl.containersTypeInfo[environmentSimpleViewCtrl.templateSettings.quotaSize]">
 									{{ key }}: {{ value }}<br>
 								</span>
               </p>
             </div>
-            <div class="b-template-settings__coll b-template-settings__coll_quota" ng-if="templateSettings.quotaSize == 'CUSTOM'">
+            <!--CUSTOM-->
+            <div class="b-template-settings__coll b-template-settings__coll_quota" ng-if="environmentSimpleViewCtrl.templateSettings.quotaSize == 'CUSTOM'">
               <p class="b-template-settings__text">CUSTOM:</p>
               <div class="b-template-settings__text b-template-settings__text_input">
                 <label for="js-quotasize-custom-cpu" class="b-form-label b-form-label_margin_r">cpu:</label>
-                <input type="number"
+                <input
                         id="js-quotasize-custom-cpu"
                         class="b-form-input b-form-input_custom-quota"
-                        ng-model="templateSettings.quotaSize.custom.cpu" required>
+                        ng-model="environmentSimpleViewCtrl.templateSettings.quota['cpu']" ng-required="true">
               <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
                 <label for="js-quotasize-custom-ram" class="b-form-label b-form-label_margin_r">ram:</label>
-                <input type="number"
+                <input
                        id="js-quotasize-custom-ram"
                        class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.quotaSize.custom.ram" required>
+                       ng-model="environmentSimpleViewCtrl.templateSettings.quota['ram']" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
                 <label for="js-quotasize-custom-home" class="b-form-label b-form-label_margin_r">space.home:</label>
-                <input type="number"
+                <input
                        id="js-quotasize-custom-home"
                        class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.quotaSize.custom.home" required>
+                       ng-model="environmentSimpleViewCtrl.templateSettings.quota['space.home']" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
                 <label for="js-quotasize-custom-opt" class="b-form-label b-form-label_margin_r">space.opt:</label>
-                <input type="number"
+                <input
                        id="js-quotasize-custom-opt"
                        class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.quotaSize.custom.opt" required>
+                       ng-model="environmentSimpleViewCtrl.templateSettings.quota['space.opt']" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
                 <label for="js-quotasize-custom-root" class="b-form-label b-form-label_margin_r">space.root:</label>
-                <input type="number"
+                <input
                        id="js-quotasize-custom-root"
                        class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.quotaSize.custom.root" required>
+                       ng-model="environmentSimpleViewCtrl.templateSettings.quota['space.root']" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
                 <label for="js-quotasize-custom-var" class="b-form-label b-form-label_margin_r">space.var:</label>
-                <input type="number"
+                <input
                        id="js-quotasize-custom-var"
                        class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.quotaSize.custom.var" required>
+                       ng-model="environmentSimpleViewCtrl.templateSettings.quota['space.var']" required>
                 <div class="clear"></div>
               </div>
             </div>
+            <!--CUSTOM-->
           </div>
 
         </div>

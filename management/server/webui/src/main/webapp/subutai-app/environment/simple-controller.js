@@ -47,6 +47,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
+	vm.templateSettings = {};
 	vm.getFilteredTemplates = getFilteredTemplates;
 
 	vm.addContainer = addContainer;
@@ -1031,11 +1032,22 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		//vm.selectedPlugin = false;
 	}
 
-	function addSettingsToTemplate(settings) {
-		currentTemplate.set('quotaSize', settings.quotaSize);
-		currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
-		currentTemplate.set('containerName', settings.containerName);
-		//ngDialog.closeAll();
+	function addSettingsToTemplate(sizeDetails) {
+
+        if(sizeDetails == undefined){
+            //custom quota
+            console.log('CUSTOM');
+            console.log(vm.templateSettings);
+        }else{
+            //predefined size
+            console.log('PREDEFINED: ' + vm.templateSettings.quotaSize);
+            console.log(sizeDetails);
+        }
+
+		currentTemplate.set('quotaSize', vm.templateSettings.quotaSize);
+		currentTemplate.attr('rect.b-magnet/fill', vm.colors[vm.templateSettings.quotaSize]);
+		currentTemplate.set('containerName', vm.templateSettings.containerName);
+
 		containerSettingMenu.hide();
 
 		if( vm.isEditing )
@@ -1050,14 +1062,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			{
 				res = res[0];
 
-				if( res.type == settings.quotaSize && vm.currentEnvironment.changingContainers[id] )
+				if( res.type == vm.templateSettings.quotaSize && vm.currentEnvironment.changingContainers[id] )
 				{
 					delete vm.currentEnvironment.changingContainers[id];
 				}
 
-				if( res.type != settings.quotaSize )
+				if( res.type != vm.templateSettings.quotaSize )
 				{
-					vm.currentEnvironment.changingContainers[id] = settings.quotaSize;
+					vm.currentEnvironment.changingContainers[id] = vm.templateSettings.quotaSize;
 				}
 			}
 		}
