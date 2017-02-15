@@ -61,8 +61,6 @@ import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -125,7 +123,7 @@ import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 /**
@@ -420,8 +418,8 @@ public class EnvironmentManagerImpl
         {
             if ( !peer.isOnline() )
             {
-                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getId() ) );
-                throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getId() ) );
+                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getName() ) );
+                throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
         }
 
@@ -558,7 +556,7 @@ public class EnvironmentManagerImpl
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Modifying environment %s", environment.getId() ) );
+                String.format( "Modifying environment %s", environment.getName() ) );
 
         operationTracker.addLog( "Logger initialized" );
 
@@ -584,9 +582,9 @@ public class EnvironmentManagerImpl
         {
             if ( !peer.isOnline() )
             {
-                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getId() ) );
+                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getName() ) );
 
-                throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getId() ) );
+                throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
         }
 
@@ -663,7 +661,7 @@ public class EnvironmentManagerImpl
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Adding ssh key %s to environment %s ", sshKey, environmentId ) );
+                String.format( "Adding ssh key %s to environment %s ", sshKey, environment.getName() ) );
 
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
@@ -715,7 +713,7 @@ public class EnvironmentManagerImpl
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Removing ssh key %s from environment %s ", sshKey, environmentId ) );
+                String.format( "Removing ssh key %s from environment %s ", sshKey, environment.getName() ) );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                 || environment.getStatus() == EnvironmentStatus.CANCELLED )
@@ -812,7 +810,7 @@ public class EnvironmentManagerImpl
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Resetting p2p secret key for environment %s ", environmentId ) );
+                String.format( "Resetting p2p secret key for environment %s ", environment.getName() ) );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                 || environment.getStatus() == EnvironmentStatus.CANCELLED )
@@ -917,7 +915,7 @@ public class EnvironmentManagerImpl
         }
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Destroying environment %s", environmentId ) );
+                String.format( "Destroying environment %s", environment.getName() ) );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -981,14 +979,8 @@ public class EnvironmentManagerImpl
             return;
         }
 
-
-        TrackerOperation operationTracker =
-                tracker.createTrackerOperation( MODULE_NAME, String.format( "Destroying container %s", containerId ) );
-
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
-            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
-
             throw new EnvironmentModificationException(
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
@@ -1000,11 +992,11 @@ public class EnvironmentManagerImpl
         }
         catch ( ContainerHostNotFoundException e )
         {
-            operationTracker.addLogFailed( String.format( "Container not registered: %s", e.getMessage() ) );
-
             throw new EnvironmentModificationException( e );
         }
 
+        TrackerOperation operationTracker =
+                tracker.createTrackerOperation( MODULE_NAME, String.format( "Destroying container %s", environmentContainer.getHostname() ) );
 
         final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( environment, environmentContainer, operationTracker );
@@ -1123,7 +1115,7 @@ public class EnvironmentManagerImpl
         if ( checkWorkflow != null )
         {
             throw new IllegalStateException( String.format( "There is already an active workflow %s for environment %s",
-                    checkWorkflow.getClass().getSimpleName(), environment.getId() ) );
+                    checkWorkflow.getClass().getSimpleName(), environment.getName()) );
         }
 
         activeWorkflows.put( environment.getId(), newWorkflow );
@@ -1269,7 +1261,7 @@ public class EnvironmentManagerImpl
         boolean assign = !Strings.isNullOrEmpty( domain );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Modifying environment %s domain", environmentId ) );
+                String.format( "Modifying domain for environment %s", environment.getName() ) );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                 || environment.getStatus() == EnvironmentStatus.CANCELLED )
@@ -1376,7 +1368,7 @@ public class EnvironmentManagerImpl
         EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHostId ) );
+                String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHost.getHostname() ) );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                 || environment.getStatus() == EnvironmentStatus.CANCELLED )
@@ -1432,7 +1424,7 @@ public class EnvironmentManagerImpl
         EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Setting up ssh tunnel for container %s ", containerHostId ) );
+                String.format( "Setting up ssh tunnel for container %s ", environmentContainer.getHostname() ) );
 
         try
         {
@@ -1441,14 +1433,14 @@ public class EnvironmentManagerImpl
                     Common.CONTAINER_SSH_TIMEOUT_SEC );
 
             operationTracker.addLogDone(
-                    String.format( "Ssh for container %s is ready on tunnel %s", containerHostId, sshTunnel ) );
+                    String.format( "Ssh for container %s is ready on tunnel %s", environmentContainer.getHostname(), sshTunnel ) );
 
             return sshTunnel;
         }
         catch ( Exception e )
         {
             operationTracker.addLogFailed(
-                    String.format( "Error setting up ssh for container %s: %s", containerHostId, e.getMessage() ) );
+                    String.format( "Error setting up ssh for container %s: %s", environmentContainer.getHostname(), e.getMessage() ) );
             throw new EnvironmentModificationException( e );
         }
     }
