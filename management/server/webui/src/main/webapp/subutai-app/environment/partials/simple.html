@@ -118,6 +118,7 @@
                     <div class="b-form-group__label">Select quota size</div>
                     <select class="b-form-input b-form-input_full"
                             id="js-container-size"
+                            ng-init="templateSettings.quotaSize = 'SMALL'"
                             ng-model="templateSettings.quotaSize"
                     >
                       <option
@@ -145,48 +146,48 @@
             <div class="b-template-settings__coll b-template-settings__coll_quota" ng-if="templateSettings.quotaSize == 'CUSTOM'">
               <p class="b-template-settings__text">CUSTOM:</p>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-cpu" class="b-form-label b-form-label_margin_r">cpu:</label>
-                <input
+                <label for="js-quotasize-custom-cpu" class="b-form-label b-form-label_margin_r">cpu (%):</label>
+                <input type="number"
                         id="js-quotasize-custom-cpu"
                         class="b-form-input b-form-input_custom-quota"
                         ng-model="templateSettings.cpuQuota" required>
               <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-ram" class="b-form-label b-form-label_margin_r">ram:</label>
-                <input
+                <label for="js-quotasize-custom-ram" class="b-form-label b-form-label_margin_r">ram (MB):</label>
+                <input type="number"
                        id="js-quotasize-custom-ram"
                        class="b-form-input b-form-input_custom-quota"
                        ng-model="templateSettings.ramQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-home" class="b-form-label b-form-label_margin_r">home:</label>
-                <input
+                <label for="js-quotasize-custom-home" class="b-form-label b-form-label_margin_r">home (GB):</label>
+                <input type="number"
                        id="js-quotasize-custom-home"
                        class="b-form-input b-form-input_custom-quota"
                        ng-model="templateSettings.homeQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-opt" class="b-form-label b-form-label_margin_r">opt:</label>
-                <input
+                <label for="js-quotasize-custom-opt" class="b-form-label b-form-label_margin_r">opt (GB):</label>
+                <input type="number"
                        id="js-quotasize-custom-opt"
                        class="b-form-input b-form-input_custom-quota"
                        ng-model="templateSettings.optQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-root" class="b-form-label b-form-label_margin_r">root:</label>
-                <input
+                <label for="js-quotasize-custom-root" class="b-form-label b-form-label_margin_r">root (GB):</label>
+                <input type="number"
                        id="js-quotasize-custom-root"
                        class="b-form-input b-form-input_custom-quota"
                        ng-model="templateSettings.rootQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-var" class="b-form-label b-form-label_margin_r">var:</label>
-                <input
+                <label for="js-quotasize-custom-var" class="b-form-label b-form-label_margin_r">var (GB):</label>
+                <input type="number"
                        id="js-quotasize-custom-var"
                        class="b-form-input b-form-input_custom-quota"
                        ng-model="templateSettings.varQuota" required>

@@ -402,14 +402,22 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		}
 		var includedContainers = [];
 		for (var i = 0; i < vm.currentEnvironment.includedContainers.length; i++) {
+		    var currentElement = vm.currentEnvironment.includedContainers[i];
+			var isCustom = currentElement.get('quotaSize') == 'CUSTOM';
 			includedContainers.push({
-                "quota": {
-                    "containerSize": vm.currentEnvironment.includedContainers[i].get('quotaSize')
-                },
-				"templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
-				"name": vm.currentEnvironment.includedContainers[i].get('containerName'),
-				"position": vm.currentEnvironment.includedContainers[i].get('position'),
-				"templateId" : vm.currentEnvironment.includedContainers[i].get('templateId')
+				"quota": isCustom ?  {
+					"containerSize":currentElement.get('quotaSize'),
+                    "cpuQuota": currentElement.get("cpuQuota"),
+                    "ramQuota": currentElement.get("ramQuota") + 'MB',
+                    "homeQuota": currentElement.get("homeQuota") + 'GB',
+                    "rootQuota": currentElement.get("rootQuota") + 'GB',
+                    "varQuota": currentElement.get("varQuota") + 'GB',
+                    "optQuota": currentElement.get("optQuota") + 'GB'
+				} : { "containerSize":currentElement.get('quotaSize') },
+				"templateName": currentElement.get('templateName'),
+				"name": currentElement.get('containerName'),
+				"position": currentElement.get('position'),
+				"templateId" : currentElement.get('templateId')
 			});
 		}
 
@@ -933,13 +941,19 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 		for (var i = 0; i < allElements.length; i++) {
 			var currentElement = allElements[i];
+			var isCustom = currentElement.get('quotaSize') == 'CUSTOM';
 			var container2Build = {
-				"cpuQuota": currentElement.get("cpuQuota"),
-				"ramQuota": currentElement.get("ramQuota"),
-				"homeQuota": currentElement.get("homeQuota"),
-				"rootQuota": currentElement.get("rootQuota"),
-				"varQuota": currentElement.get("varQuota"),
-				"optQuota": currentElement.get("optQuota"),
+
+				"quota": isCustom ?  {
+					"containerSize":currentElement.get('quotaSize'),
+                    "cpuQuota": currentElement.get("cpuQuota"),
+                    "ramQuota": currentElement.get("ramQuota") + 'MB',
+                    "homeQuota": currentElement.get("homeQuota") + 'GB',
+                    "rootQuota": currentElement.get("rootQuota") + 'GB',
+                    "varQuota": currentElement.get("varQuota") + 'GB',
+                    "optQuota": currentElement.get("optQuota") + 'GB'
+				} : { "containerSize":currentElement.get('quotaSize') },
+
 				"templateName": currentElement.get('templateName'),
 				"name": currentElement.get('containerName'),
 				"templateId" : currentElement.get('templateId'),
@@ -1061,12 +1075,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         }
 
         currentTemplate.set('quotaSize', templateSettings.quotaSize);
-		currentTemplate.set('cpuQuota', isCustom ? templateSettings.cpuQuota : sizeDetails.cpu);
-		currentTemplate.set('ramQuota', isCustom ? templateSettings.ramQuota : sizeDetails.ram);
-		currentTemplate.set('optQuota', isCustom ? templateSettings.optQuota : sizeDetails['space.opt']);
-		currentTemplate.set('homeQuota', isCustom ? templateSettings.homeQuota : sizeDetails['space.home']);
-		currentTemplate.set('rootQuota', isCustom ? templateSettings.rootQuota : sizeDetails['space.root']);
-		currentTemplate.set('varQuota', isCustom ? templateSettings.varQuota : sizeDetails['space.var']);
+
+        if(isCustom){
+            currentTemplate.set('cpuQuota', templateSettings.cpuQuota );
+            currentTemplate.set('ramQuota', templateSettings.ramQuota );
+            currentTemplate.set('optQuota', templateSettings.optQuota );
+            currentTemplate.set('homeQuota', templateSettings.homeQuota );
+            currentTemplate.set('rootQuota', templateSettings.rootQuota );
+            currentTemplate.set('varQuota', templateSettings.varQuota );
+        }
 
 		currentTemplate.attr('rect.b-magnet/fill', vm.colors[templateSettings.quotaSize]);
 		currentTemplate.set('containerName', templateSettings.containerName);
@@ -1087,15 +1104,24 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				res = res[0];
 
                 //checks if container size was changed back and removes from the set of containers to be updated
-				if( res.type == templateSettings.quotaSize && vm.currentEnvironment.changingContainers[id] )
+				if( res.type == templateSettings.quotaSize && vm.currentEnvironment.changingContainers[id] && !isCustom )
 				{
 					delete vm.currentEnvironment.changingContainers[id];
 				}
 
                 //if container size is changed then adds to the set of containers to be updated
-				if( res.type != templateSettings.quotaSize )
+				if( res.type != templateSettings.quotaSize || isCustom )
 				{
-					vm.currentEnvironment.changingContainers[id] = templateSettings.quotaSize;
+					vm.currentEnvironment.changingContainers[id] = { "containerSize" : templateSettings.quotaSize };
+
+					if( isCustom ){
+                        vm.currentEnvironment.changingContainers[id].cpuQuota = templateSettings.cpuQuota;
+                        vm.currentEnvironment.changingContainers[id].ramQuota = templateSettings.ramQuota;
+                        vm.currentEnvironment.changingContainers[id].optQuota = templateSettings.optQuota;
+                        vm.currentEnvironment.changingContainers[id].homeQuota = templateSettings.homeQuota;
+                        vm.currentEnvironment.changingContainers[id].rootQuota = templateSettings.rootQuota;
+                        vm.currentEnvironment.changingContainers[id].varQuota = templateSettings.varQuota;
+					}
 				}
 			}
 		}

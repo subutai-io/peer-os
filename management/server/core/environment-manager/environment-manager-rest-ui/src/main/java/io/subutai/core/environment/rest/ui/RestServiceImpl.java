@@ -190,6 +190,7 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
+            //TODO remove
             if ( true )
             {
                 return Response.ok().build();
@@ -323,6 +324,12 @@ public class RestServiceImpl implements RestService
                 final Map<ContainerSize, ContainerQuota> quotas = ContainerSize.getDefaultQuotas();
 
                 topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
+            }
+
+            //TODO remove
+            if ( true )
+            {
+                return Response.ok().build();
             }
 
             EnvironmentCreationRef ref = environmentManager
