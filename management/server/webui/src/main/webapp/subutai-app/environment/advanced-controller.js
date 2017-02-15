@@ -64,6 +64,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.editEnvironment = editEnvironment;
     vm.clearWorkspace = clearWorkspace;
     vm.addSettingsToTemplate = addSettingsToTemplate;
+    vm.templateSettings = {};
     vm.getFilteredTemplates = getFilteredTemplates;
 
     vm.showResources = showResources;
@@ -1158,11 +1159,26 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         filterPluginsList();
     }
 
-    function addSettingsToTemplate(settings) {
-        currentTemplate.set('quotaSize', settings.quotaSize);
-        currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
-        currentTemplate.set('containerName', settings.containerName);
-        //ngDialog.closeAll();
+
+    // TODO when container with custom quota is edited we need to obtain previously set quotas and set
+    // vm.templateSettings.quota object to reflect them for user to see current quotas!!!
+
+    function addSettingsToTemplate(sizeDetails) {
+
+        if(sizeDetails == undefined){
+            //custom quota
+            console.log('CUSTOM');
+            console.log(vm.templateSettings);
+        }else{
+            //predefined size
+            console.log('PREDEFINED: ' + vm.templateSettings.quotaSize);
+            console.log(sizeDetails);
+        }
+
+        currentTemplate.set('quotaSize', vm.templateSettings.quotaSize);
+        currentTemplate.attr('rect.b-magnet/fill', vm.colors[vm.templateSettings.quotaSize]);
+        currentTemplate.set('containerName', vm.templateSettings.containerName);
+
         containerSettingMenu.hide();
 
         if (vm.isEditing) {
@@ -1175,12 +1191,12 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             if (res[0]) {
                 res = res[0];
 
-                if (res.type == settings.quotaSize && vm.editingEnv.changingContainers[id]) {
+                if (res.type == vm.templateSettings.quotaSize && vm.editingEnv.changingContainers[id]) {
                     delete vm.editingEnv.changingContainers[id];
                 }
 
-                if (res.type != settings.quotaSize) {
-                    vm.editingEnv.changingContainers[id] = settings.quotaSize;
+                if (res.type != vm.templateSettings.quotaSize) {
+                    vm.editingEnv.changingContainers[id] = vm.templateSettings.quotaSize;
                 }
             }
         }
