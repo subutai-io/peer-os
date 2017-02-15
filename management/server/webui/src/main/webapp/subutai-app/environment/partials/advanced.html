@@ -201,21 +201,21 @@
             <div class="header"></div>
 
             <div class="b-template-settings__coll">
-              <form ng-submit="advEnvCtrl.addSettingsToTemplate(environmentViewCtrl.containersTypeInfo[advEnvCtrl.templateSettings.quotaSize])">
+              <form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings, environmentViewCtrl.containersTypeInfo[templateSettings.quotaSize])">
                 <div class="body">
                   <div class="b-form-group">
                     <div class="b-form-group__label">Container hostname</div>
                     <input type="text"
                            id="js-container-name"
                            class="b-form-input b-form-input_full"
-                           ng-model="advEnvCtrl.templateSettings.containerName" required>
+                           ng-model="templateSettings.containerName" required>
                   </div>
                   <div class="b-form-group">
                     <div class="b-form-group__label">Select quota size</div>
                     <select class="b-form-input b-form-input_full"
                             id="js-container-size"
-                            ng-init="advEnvCtrl.templateSettings.quotaSize = 'SMALL'"
-                            ng-model="advEnvCtrl.templateSettings.quotaSize">
+                            ng-init="templateSettings.quotaSize = 'SMALL'"
+                            ng-model="templateSettings.quotaSize">
                       <option
                           ng-repeat="type in environmentViewCtrl.containersType"
                           value="{{ type }}">
@@ -230,64 +230,64 @@
               </form>
             </div>
 
-            <div class="b-template-settings__coll" ng-if="advEnvCtrl.templateSettings.quotaSize !== 'CUSTOM'">
+            <div class="b-template-settings__coll" ng-if="templateSettings.quotaSize !== 'CUSTOM'">
               <p class="b-template-settings__text">
-                {{ advEnvCtrl.templateSettings.quotaSize }}: <br>
-                <span ng-repeat="(key, value) in environmentViewCtrl.containersTypeInfo[advEnvCtrl.templateSettings.quotaSize]">
+                {{ templateSettings.quotaSize }}: <br>
+                <span ng-repeat="(key, value) in environmentViewCtrl.containersTypeInfo[templateSettings.quotaSize]">
 							{{ key }}: {{ value }}<br>
 						</span>
               </p>
             </div>
 
             <!--CUSTOM-->
-            <div class="b-template-settings__coll b-template-settings__coll_quota" ng-if="advEnvCtrl.templateSettings.quotaSize == 'CUSTOM'">
+            <div class="b-template-settings__coll b-template-settings__coll_quota" ng-if="templateSettings.quotaSize == 'CUSTOM'">
               <p class="b-template-settings__text">CUSTOM:</p>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-cpu" class="b-form-label b-form-label_margin_r">cpu:</label>
-                <input
-                    id="js-quotasize-custom-cpu"
-                    class="b-form-input b-form-input_custom-quota"
-                    ng-model="advEnvCtrl.templateSettings.quota['cpu']" ng-required="true">
+                <label for="js-quotasize-custom-cpu" class="b-form-label b-form-label_margin_r">cpu (%):</label>
+                <input type="number"
+                       id="js-quotasize-custom-cpu"
+                       class="b-form-input b-form-input_custom-quota"
+                       ng-model="templateSettings.cpuQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-ram" class="b-form-label b-form-label_margin_r">ram:</label>
-                <input
-                    id="js-quotasize-custom-ram"
-                    class="b-form-input b-form-input_custom-quota"
-                    ng-model="advEnvCtrl.templateSettings.quota['ram']" required>
+                <label for="js-quotasize-custom-ram" class="b-form-label b-form-label_margin_r">ram (MB):</label>
+                <input type="number"
+                       id="js-quotasize-custom-ram"
+                       class="b-form-input b-form-input_custom-quota"
+                       ng-model="templateSettings.ramQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-home" class="b-form-label b-form-label_margin_r">space.home:</label>
-                <input
-                    id="js-quotasize-custom-home"
-                    class="b-form-input b-form-input_custom-quota"
-                    ng-model="advEnvCtrl.templateSettings.quota['space.home']" required>
+                <label for="js-quotasize-custom-home" class="b-form-label b-form-label_margin_r">home (GB):</label>
+                <input type="number"
+                       id="js-quotasize-custom-home"
+                       class="b-form-input b-form-input_custom-quota"
+                       ng-model="templateSettings.homeQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-opt" class="b-form-label b-form-label_margin_r">space.opt:</label>
-                <input
-                    id="js-quotasize-custom-opt"
-                    class="b-form-input b-form-input_custom-quota"
-                    ng-model="advEnvCtrl.templateSettings.quota['space.opt']" required>
+                <label for="js-quotasize-custom-opt" class="b-form-label b-form-label_margin_r">opt (GB):</label>
+                <input type="number"
+                       id="js-quotasize-custom-opt"
+                       class="b-form-input b-form-input_custom-quota"
+                       ng-model="templateSettings.optQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-root" class="b-form-label b-form-label_margin_r">space.root:</label>
-                <input
-                    id="js-quotasize-custom-root"
-                    class="b-form-input b-form-input_custom-quota"
-                    ng-model="advEnvCtrl.templateSettings.quota['space.root']" required>
+                <label for="js-quotasize-custom-root" class="b-form-label b-form-label_margin_r">root (GB):</label>
+                <input type="number"
+                       id="js-quotasize-custom-root"
+                       class="b-form-input b-form-input_custom-quota"
+                       ng-model="templateSettings.rootQuota" required>
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-var" class="b-form-label b-form-label_margin_r">space.var:</label>
-                <input
-                    id="js-quotasize-custom-var"
-                    class="b-form-input b-form-input_custom-quota"
-                    ng-model="advEnvCtrl.templateSettings.quota['space.var']" required>
+                <label for="js-quotasize-custom-var" class="b-form-label b-form-label_margin_r">var (GB):</label>
+                <input type="number"
+                       id="js-quotasize-custom-var"
+                       class="b-form-input b-form-input_custom-quota"
+                       ng-model="templateSettings.varQuota" required>
                 <div class="clear"></div>
               </div>
             </div>
