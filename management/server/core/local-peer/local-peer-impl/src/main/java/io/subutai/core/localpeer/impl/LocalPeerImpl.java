@@ -212,54 +212,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
         this.systemSettings = getSystemSettings();
-
-        cleaner.scheduleWithFixedDelay( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                removeStaleContainers();
-            }
-        }, TimeUnit.MINUTES.toSeconds( 3 ), HostRegistry.HOST_EXPIRATION_SEC * 2, TimeUnit.SECONDS );
-    }
-
-
-    private void removeStaleContainers()
-    {
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            if ( !resourceHost.isConnected() )
-            {
-                continue;
-            }
-
-            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-            {
-                boolean isContainerEligibleForRemoval = containerHost.getState() == ContainerHostState.UNKNOWN
-                        && ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost ).getLastHeartbeat() )
-                        > TimeUnit.SECONDS.toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2 )
-                        && !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHost.getHostname() );
-
-                if ( !isContainerEligibleForRemoval )
-                {
-                    continue;
-                }
-
-                try
-                {
-                    if ( !resourceHost.listExistingContainerNames().contains( containerHost.getContainerName() ) )
-                    {
-                        LOG.warn( "Removing stale container {}", containerHost.getContainerName() );
-
-                        resourceHost.removeContainerHost( containerHost );
-                    }
-                }
-                catch ( ResourceHostException e )
-                {
-                    LOG.error( e.getMessage() );
-                }
-            }
-        }
     }
 
 
@@ -311,6 +263,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             setResourceHostTransientFields( getResourceHosts() );
 
             this.networkResourceDao = new NetworkResourceDaoImpl( daoManager.getEntityManagerFactory() );
+
+            cleaner.scheduleWithFixedDelay( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    removeStaleContainers();
+                }
+            }, TimeUnit.MINUTES.toSeconds( 3 ), HostRegistry.HOST_EXPIRATION_SEC * 2, TimeUnit.SECONDS );
         }
         catch ( Exception e )
         {
@@ -3507,6 +3468,45 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onContainerDestroyed( final ContainerHostInfo containerInfo )
     {
 
+    }
+
+
+    private void removeStaleContainers()
+    {
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            if ( !resourceHost.isConnected() )
+            {
+                continue;
+            }
+
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                boolean isContainerEligibleForRemoval = containerHost.getState() == ContainerHostState.UNKNOWN
+                        && ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost ).getLastHeartbeat() )
+                        > TimeUnit.SECONDS.toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2 )
+                        && !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHost.getHostname() );
+
+                if ( !isContainerEligibleForRemoval )
+                {
+                    continue;
+                }
+
+                try
+                {
+                    if ( !resourceHost.listExistingContainerNames().contains( containerHost.getContainerName() ) )
+                    {
+                        LOG.warn( "Removing stale container {}", containerHost.getContainerName() );
+
+                        resourceHost.removeContainerHost( containerHost );
+                    }
+                }
+                catch ( ResourceHostException e )
+                {
+                    LOG.error( e.getMessage() );
+                }
+            }
+        }
     }
 }
 
