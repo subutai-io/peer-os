@@ -50,7 +50,7 @@ public class HostRegistryImpl implements HostRegistry
 
     private static final String HOST_NOT_CONNECTED_MSG = "Host %s is not connected";
     //timeout after which host expires in seconds
-    private static final int HOST_EXPIRATION_SEC = 30;
+
     private static final long HOST_UPDATER_INTERVAL_SEC = 10;
 
     Set<HostListener> hostListeners = Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );

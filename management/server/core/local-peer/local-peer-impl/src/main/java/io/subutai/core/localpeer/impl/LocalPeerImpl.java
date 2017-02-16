@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -172,7 +175,7 @@ import io.subutai.hub.share.resource.ResourceValue;
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
-    public static final BigDecimal ONE_HUNDRED = new BigDecimal( "100.00" );
+    private static final BigDecimal ONE_HUNDRED = new BigDecimal( "100.00" );
 
 
     private transient DaoManager daoManager;
@@ -192,12 +195,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private transient NetworkResourceDaoImpl networkResourceDao;
     private transient final LocalPeerCommands localPeerCommands = new LocalPeerCommands();
     private transient final HostUtil hostUtil = new HostUtil();
-    protected transient SystemSettings systemSettings;
+    private transient SystemSettings systemSettings;
     private ObjectMapper mapper = new ObjectMapper();
-
-
     volatile boolean initialized = false;
     PeerInfo peerInfo;
+    private ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, CommandExecutor commandExecutor,
@@ -210,6 +212,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
         this.systemSettings = getSystemSettings();
+
+        //todo refactor
+        cleaner.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                for ( ResourceHost resourceHost : getResourceHosts() )
+                {
+                    if ( resourceHost.isConnected() )
+                    {
+                        for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+                        {
+                            if ( containerHost.getState() == ContainerHostState.UNKNOWN &&
+                                    ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost )
+                                            .getLastHeartbeat() ) > TimeUnit.SECONDS
+                                            .toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2 ) )
+                            {
+                                LOG.warn( "Removing stale container {}", containerHost.getContainerName() );
+                                resourceHost.removeContainerHost( containerHost );
+                            }
+                        }
+                    }
+                }
+            }
+        }, TimeUnit.MINUTES.toSeconds( 3 ), HostRegistry.HOST_EXPIRATION_SEC * 2, TimeUnit.SECONDS );
     }
 
 
@@ -1875,9 +1903,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private void buildEnvContainerRelation( final ContainerHostEntity containerHost )
     {
-
-
-        containerHost.getOwnerId();
 
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
         Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
