@@ -213,31 +213,37 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.securityManager = securityManager;
         this.systemSettings = getSystemSettings();
 
-        //todo refactor
         cleaner.scheduleWithFixedDelay( new Runnable()
         {
             @Override
             public void run()
             {
-                for ( ResourceHost resourceHost : getResourceHosts() )
+                removeStaleContainers();
+            }
+        }, TimeUnit.MINUTES.toSeconds( 3 ), HostRegistry.HOST_EXPIRATION_SEC * 2, TimeUnit.SECONDS );
+    }
+
+
+    private void removeStaleContainers()
+    {
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            if ( resourceHost.isConnected() )
+            {
+                for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                 {
-                    if ( resourceHost.isConnected() )
+                    if ( containerHost.getState() == ContainerHostState.UNKNOWN &&
+                            ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost )
+                                    .getLastHeartbeat() ) > TimeUnit.SECONDS
+                                    .toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2 ) )
                     {
-                        for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-                        {
-                            if ( containerHost.getState() == ContainerHostState.UNKNOWN &&
-                                    ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost )
-                                            .getLastHeartbeat() ) > TimeUnit.SECONDS
-                                            .toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2 ) )
-                            {
-                                LOG.warn( "Removing stale container {}", containerHost.getContainerName() );
-                                resourceHost.removeContainerHost( containerHost );
-                            }
-                        }
+                        LOG.warn( "Removing stale container {}", containerHost.getContainerName() );
+
+                        resourceHost.removeContainerHost( containerHost );
                     }
                 }
             }
-        }, TimeUnit.MINUTES.toSeconds( 3 ), HostRegistry.HOST_EXPIRATION_SEC * 2, TimeUnit.SECONDS );
+        }
     }
 
 
