@@ -788,8 +788,6 @@ public class EnvironmentManagerImplTest
         {
         }
 
-        verify( trackerOperation ).addLogFailed( anyString() );
-
         //-----
 
         doReturn( EnvironmentStatus.UNDER_MODIFICATION ).when( environment ).getStatus();
@@ -804,8 +802,6 @@ public class EnvironmentManagerImplTest
         catch ( EnvironmentModificationException e )
         {
         }
-
-        verify( trackerOperation, times( 2 ) ).addLogFailed( anyString() );
 
         //-----
 
