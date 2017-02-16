@@ -44,4 +44,31 @@ public class ContainerResourceFactory
                 return null;
         }
     }
+
+
+    public static ContainerResource createContainerResource( ContainerResourceType containerResourceType,
+                                                             String resourceValue )
+    {
+        switch ( containerResourceType )
+        {
+            case NET:
+                return new ContainerNetResource( resourceValue );
+            case CPU:
+                return new ContainerCpuResource( resourceValue );
+            case CPUSET:
+                return new ContainerCpuSetResource( resourceValue );
+            case RAM:
+                return new ContainerRamResource( resourceValue );
+            case HOME:
+                return new ContainerHomeResource( resourceValue );
+            case OPT:
+                return new ContainerOptResource( resourceValue );
+            case VAR:
+                return new ContainerVarResource( resourceValue );
+            case ROOTFS:
+                return new ContainerRootfsResource( resourceValue );
+            default:
+                return null;
+        }
+    }
 }

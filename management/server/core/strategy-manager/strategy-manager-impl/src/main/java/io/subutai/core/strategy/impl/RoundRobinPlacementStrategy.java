@@ -66,12 +66,11 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
     {
         for ( NodeSchema nodeSchema : nodeSchemaList )
         {
-            ContainerQuota quota = quotas.get( nodeSchema.getQuota().getContainerSize() );
-            if ( quota == null )
+            if ( nodeSchema.getQuota().getContainerSize() != ContainerSize.CUSTOM )
             {
-                quota = quotas.get( ContainerSize.SMALL );
+                ContainerQuota quota = quotas.get( nodeSchema.getQuota().getContainerSize() );
+                nodeSchema.getQuota().copyValues( quota );
             }
-            nodeSchema.getQuota().copyValues( quota );
         }
     }
 

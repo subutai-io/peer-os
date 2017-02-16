@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -48,6 +49,20 @@ public class JsonUtil
         {
             throw new IllegalArgumentException(
                     String.format( "Could not convert string %s to %s object: %s", value, clazz, e.getMessage() ) );
+        }
+    }
+
+
+    public static <T> T fromJsonString( String value, JavaType type )
+    {
+        try
+        {
+            return mapper.readValue( value, type );
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalArgumentException(
+                    String.format( "Could not convert string %s to %s object: %s", value, type, e.getMessage() ) );
         }
     }
 

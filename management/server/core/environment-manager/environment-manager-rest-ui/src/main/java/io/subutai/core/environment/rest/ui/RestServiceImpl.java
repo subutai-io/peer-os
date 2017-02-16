@@ -3,6 +3,7 @@ package io.subutai.core.environment.rest.ui;
 
 import java.io.File;
 import java.security.AccessControlException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,6 +27,10 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
+import com.fasterxml.jackson.databind.type.ArrayType;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -64,6 +69,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
+import io.subutai.core.environment.rest.ui.entity.NodeSchemaDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
 import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
 import io.subutai.core.peer.api.PeerManager;
@@ -74,6 +80,8 @@ import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerGroupResources;
+
+import static io.subutai.common.util.JsonUtil.mapper;
 
 
 public class RestServiceImpl implements RestService
@@ -186,15 +194,19 @@ public class RestServiceImpl implements RestService
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
-            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {
-            }.getType() );
 
-            //TODO remove
-            if ( true )
+            TypeFactory typeFactory = mapper.getTypeFactory();
+            CollectionType arrayType = typeFactory.constructCollectionType( ArrayList.class, NodeSchemaDto.class );
+            List<NodeSchemaDto> schemaDto = mapper.readValue( topologyJson, arrayType );
+
+            List<NodeSchema> schema = new ArrayList<>();
+            for ( NodeSchemaDto dto : schemaDto )
             {
-                return Response.ok().build();
+                NodeSchema nodeSchema = new NodeSchema( dto.getName(), dto.getContainerQuota(), dto.getTemplateName(),
+                        dto.getTemplateId() );
+                schema.add( nodeSchema );
             }
+
 
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = ContainerSize.getDefaultQuotas();
@@ -233,8 +245,7 @@ public class RestServiceImpl implements RestService
             checkName( name );
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             Topology topology = new Topology( name );
 
@@ -287,20 +298,17 @@ public class RestServiceImpl implements RestService
 
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {
-            }.getType() );
+            {}.getType() );
 
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {
-            }.getType() );
+            {}.getType() );
 
 
             Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {
-                    }.getType() );
+                    {}.getType() );
 
             for ( Map<String, String> cont : changingContainers )
             {
@@ -358,18 +366,15 @@ public class RestServiceImpl implements RestService
             String name = environmentManager.loadEnvironment( environmentId ).getName();
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {
-                    }.getType() );
+                    {}.getType() );
 
             for ( Map<String, String> cont : changingContainers )
             {
@@ -930,8 +935,7 @@ public class RestServiceImpl implements RestService
             EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             for ( String tag : tags )
             {
@@ -1126,12 +1130,13 @@ public class RestServiceImpl implements RestService
 
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+            ContainerDto containerDto = new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                     containerHost.getHostname(), containerHost.getIp(), containerHost.getTemplateName(),
                     containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                     containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
                     datasource, containerHost.getState(), containerHost.getTemplateId(),
-                    containerHost.getContainerName(), containerHost.getResourceHostId().getId() ) );
+                    containerHost.getContainerName(), containerHost.getResourceHostId().getId() );
+            containerDtos.add( containerDto );
         }
 
         return containerDtos;
