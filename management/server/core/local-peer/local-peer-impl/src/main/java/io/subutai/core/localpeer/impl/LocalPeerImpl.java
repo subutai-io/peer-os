@@ -3464,13 +3464,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
-    {
-
-    }
-
-
+    //TODO implement subscription service for containerDestroyed event and call here
     private void removeStaleContainers()
     {
         for ( ResourceHost resourceHost : getResourceHosts() )

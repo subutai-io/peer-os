@@ -995,8 +995,8 @@ public class EnvironmentManagerImpl
             throw new EnvironmentModificationException( e );
         }
 
-        TrackerOperation operationTracker =
-                tracker.createTrackerOperation( MODULE_NAME, String.format( "Destroying container %s", environmentContainer.getHostname() ) );
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Destroying container %s", environmentContainer.getHostname() ) );
 
         final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( environment, environmentContainer, operationTracker );
@@ -1115,7 +1115,7 @@ public class EnvironmentManagerImpl
         if ( checkWorkflow != null )
         {
             throw new IllegalStateException( String.format( "There is already an active workflow %s for environment %s",
-                    checkWorkflow.getClass().getSimpleName(), environment.getName()) );
+                    checkWorkflow.getClass().getSimpleName(), environment.getName() ) );
         }
 
         activeWorkflows.put( environment.getId(), newWorkflow );
@@ -1368,7 +1368,8 @@ public class EnvironmentManagerImpl
         EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHost.getHostname() ) );
+                String.format( "%s container %s environment domain", add ? "Adding" : "Removing",
+                        containerHost.getHostname() ) );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                 || environment.getStatus() == EnvironmentStatus.CANCELLED )
@@ -1433,14 +1434,16 @@ public class EnvironmentManagerImpl
                     Common.CONTAINER_SSH_TIMEOUT_SEC );
 
             operationTracker.addLogDone(
-                    String.format( "Ssh for container %s is ready on tunnel %s", environmentContainer.getHostname(), sshTunnel ) );
+                    String.format( "Ssh for container %s is ready on tunnel %s", environmentContainer.getHostname(),
+                            sshTunnel ) );
 
             return sshTunnel;
         }
         catch ( Exception e )
         {
             operationTracker.addLogFailed(
-                    String.format( "Error setting up ssh for container %s: %s", environmentContainer.getHostname(), e.getMessage() ) );
+                    String.format( "Error setting up ssh for container %s: %s", environmentContainer.getHostname(),
+                            e.getMessage() ) );
             throw new EnvironmentModificationException( e );
         }
     }
@@ -2613,17 +2616,10 @@ public class EnvironmentManagerImpl
     }
 
 
-    @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    //TODO call this from LocalPeer.removeStaleContainers
+    public void onContainerDestroyed( final ContainerHost containerHost )
     {
         boolean environmentFound = false;
-
-        ContainerHost containerHost = getContainerHostById( containerInfo.getId() );
-
-        if ( containerHost == null )
-        {
-            return;
-        }
 
         Set<Environment> environments = getLocalEnvironments();
 
@@ -2633,7 +2629,7 @@ public class EnvironmentManagerImpl
             {
                 //remote container metadata
                 EnvironmentContainerImpl environmentContainerHost =
-                        ( EnvironmentContainerImpl ) environment.getContainerHostById( containerInfo.getId() );
+                        ( EnvironmentContainerImpl ) environment.getContainerHostById( containerHost.getId() );
 
                 environmentFound = true;
 
@@ -2652,7 +2648,7 @@ public class EnvironmentManagerImpl
                 }
                 else
                 {
-                    notifyOnContainerDestroyed( env, containerInfo.getId() );
+                    notifyOnContainerDestroyed( env, containerHost.getId() );
                 }
 
                 //remove security relation
@@ -2672,6 +2668,7 @@ public class EnvironmentManagerImpl
             }
         }
 
+        //TODO this might not be needed
         //remove container from local peer cache
         try
         {

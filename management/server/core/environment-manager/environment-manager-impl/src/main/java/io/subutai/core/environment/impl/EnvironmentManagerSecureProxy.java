@@ -897,13 +897,6 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
-    {
-        environmentManager.onContainerDestroyed( containerInfo );
-    }
-
-
-    @Override
     public Set<String> getDeletedEnvironmentsFromHub()
     {
         return environmentManager.getDeletedEnvironmentsFromHub();
