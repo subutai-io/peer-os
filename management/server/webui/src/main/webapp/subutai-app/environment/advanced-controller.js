@@ -1119,11 +1119,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                         "quota": isCustom ?  {
                             "containerSize":currentElement.get('quotaSize'),
                             "cpuQuota": currentElement.get("cpuQuota"),
-                            "ramQuota": currentElement.get("ramQuota") + 'MB',
-                            "homeQuota": currentElement.get("homeQuota") + 'GB',
-                            "rootQuota": currentElement.get("rootQuota") + 'GB',
-                            "varQuota": currentElement.get("varQuota") + 'GB',
-                            "optQuota": currentElement.get("optQuota") + 'GB'
+                            "ramQuota": currentElement.get("ramQuota") + 'MiB',
+                            "homeQuota": currentElement.get("homeQuota") + 'GiB',
+                            "rootQuota": currentElement.get("rootQuota") + 'GiB',
+                            "varQuota": currentElement.get("varQuota") + 'GiB',
+                            "optQuota": currentElement.get("optQuota") + 'GiB'
                         } : { "containerSize":currentElement.get('quotaSize') },
 
                         "templateName": currentElement.get('templateName'),

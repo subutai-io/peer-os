@@ -27,9 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
-import com.fasterxml.jackson.databind.type.ArrayType;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -69,6 +67,8 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
+import io.subutai.core.environment.rest.ui.entity.ChangedContainerDto;
+import io.subutai.core.environment.rest.ui.entity.ContainerQuotaDto;
 import io.subutai.core.environment.rest.ui.entity.NodeSchemaDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
 import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
@@ -194,19 +194,16 @@ public class RestServiceImpl implements RestService
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
-
-            TypeFactory typeFactory = mapper.getTypeFactory();
-            CollectionType arrayType = typeFactory.constructCollectionType( ArrayList.class, NodeSchemaDto.class );
-            List<NodeSchemaDto> schemaDto = mapper.readValue( topologyJson, arrayType );
+            List<NodeSchemaDto> schemaDto = parseNodes( topologyJson );
 
             List<NodeSchema> schema = new ArrayList<>();
             for ( NodeSchemaDto dto : schemaDto )
             {
-                NodeSchema nodeSchema = new NodeSchema( dto.getName(), dto.getContainerQuota(), dto.getTemplateName(),
-                        dto.getTemplateId() );
+                NodeSchema nodeSchema =
+                        new NodeSchema( dto.getName(), dto.getQuota().getContainerQuota(), dto.getTemplateName(),
+                                dto.getTemplateId() );
                 schema.add( nodeSchema );
             }
-
 
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = ContainerSize.getDefaultQuotas();
@@ -235,6 +232,14 @@ public class RestServiceImpl implements RestService
     }
 
 
+    private List<NodeSchemaDto> parseNodes( final String nodes ) throws java.io.IOException
+    {
+        TypeFactory typeFactory = mapper.getTypeFactory();
+        CollectionType arrayType = typeFactory.constructCollectionType( ArrayList.class, NodeSchemaDto.class );
+        return mapper.readValue( nodes, arrayType );
+    }
+
+
     @Override
     public Response buildAdvanced( final String name, final String topologyJson )
     {
@@ -244,24 +249,13 @@ public class RestServiceImpl implements RestService
         {
             checkName( name );
 
-            List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {}.getType() );
+            List<NodeSchemaDto> schemaDto = parseNodes( topologyJson );
+
+            final List<Node> nodes = getNodes( schemaDto );
 
             Topology topology = new Topology( name );
 
-            schema.forEach( s ->
-            {
-                ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( s.getQuota().getContainerSize() );
-                if ( defaultQuota == null )
-                {
-                    // selected CUSTOM container size
-                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
-                    defaultQuota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
-                }
-                s.getQuota().copyValues( defaultQuota );
-                topology.addNodePlacement( s.getPeerId(), s );
-            } );
-
+            topology.addAllNodePlacement( nodes );
 
             EnvironmentCreationRef ref = environmentManager.createEnvironment( topology, true );
 
@@ -297,32 +291,23 @@ public class RestServiceImpl implements RestService
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
 
-            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
-            {}.getType() );
+            List<NodeSchemaDto> schemaDto = parseNodes( topologyJson );
 
-
-            List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {}.getType() );
-
-
-            Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
-            List<Map<String, String>> changingContainers =
-                    JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {}.getType() );
-
-            for ( Map<String, String> cont : changingContainers )
+            List<NodeSchema> schema = new ArrayList<>();
+            for ( NodeSchemaDto dto : schemaDto )
             {
-                ContainerSize containerSize = ContainerSize.valueOf( cont.get( "value" ) );
-                ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( containerSize );
-                if ( defaultQuota == null )
-                {
-                    // selected CUSTOM container size
-                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
-                    defaultQuota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
-                }
-
-                changedContainersFiltered.put( cont.get( "key" ), defaultQuota );
+                NodeSchema nodeSchema =
+                        new NodeSchema( dto.getName(), dto.getQuota().getContainerQuota(), dto.getTemplateName(),
+                                dto.getTemplateId() );
+                schema.add( nodeSchema );
             }
+
+
+            List<String> removedContainersList = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
+            {}.getType() );
+
+
+            Map<String, ContainerQuota> changedContainersFiltered = getChangedContainers( quotaContainers );
 
 
             Topology topology = null;
@@ -334,14 +319,9 @@ public class RestServiceImpl implements RestService
                 topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
             }
 
-            //TODO remove
-            if ( true )
-            {
-                return Response.ok().build();
-            }
-
             EnvironmentCreationRef ref = environmentManager
-                    .modifyEnvironment( environmentId, topology, containers, changedContainersFiltered, true );
+                    .modifyEnvironment( environmentId, topology, removedContainersList, changedContainersFiltered,
+                            true );
 
             trackerId = ref.getTrackerId();
         }
@@ -365,37 +345,21 @@ public class RestServiceImpl implements RestService
         {
             String name = environmentManager.loadEnvironment( environmentId ).getName();
 
-            List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
-            {}.getType() );
-
-            List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {}.getType() );
-
-            Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
-            List<Map<String, String>> changingContainers =
-                    JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
-                    {}.getType() );
-
-            for ( Map<String, String> cont : changingContainers )
-            {
-                ContainerSize containerSize = ContainerSize.valueOf( cont.get( "value" ) );
-                ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( containerSize );
-                if ( defaultQuota == null )
-                {
-                    // selected CUSTOM container size
-                    // TODO: 1/30/17 set value from UI . as a workaround we set it to SMALL
-                    defaultQuota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
-                }
-
-                changedContainersFiltered.put( cont.get( "key" ), defaultQuota );
-            }
+            List<NodeSchemaDto> schemaDto = parseNodes( topologyJson );
 
             Topology topology = new Topology( name );
 
-            schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
+            final List<Node> nodes = getNodes( schemaDto );
+
+            topology.addAllNodePlacement( nodes );
+
+            List<String> containersToRemove = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
+            {}.getType() );
+
+            Map<String, ContainerQuota> changedContainersFiltered = getChangedContainers( quotaContainers );
 
             EnvironmentCreationRef ref = environmentManager
-                    .modifyEnvironment( environmentId, topology, containers, changedContainersFiltered, true );
+                    .modifyEnvironment( environmentId, topology, containersToRemove, changedContainersFiltered, true );
 
             trackerId = ref.getTrackerId();
         }
@@ -406,6 +370,47 @@ public class RestServiceImpl implements RestService
         }
 
         return Response.ok( JsonUtil.toJson( trackerId ) ).build();
+    }
+
+
+    private List<Node> getNodes( final List<NodeSchemaDto> schemaDto )
+    {
+        List<Node> result = new ArrayList<>();
+        for ( NodeSchemaDto dto : schemaDto )
+        {
+            ContainerQuota quota = dto.getQuota().getContainerQuota();
+            if ( quota.getContainerSize() != ContainerSize.CUSTOM )
+            {
+                quota = ContainerSize.getDefaultContainerQuota( quota.getContainerSize() );
+            }
+            Node node = new Node( dto.getName(), dto.getName(), quota, dto.getPeerId(), dto.getHostId(),
+                    dto.getTemplateId() );
+            result.add( node );
+        }
+
+        return result;
+    }
+
+
+    private Map<String, ContainerQuota> getChangedContainers( final String quotaContainers ) throws java.io.IOException
+    {
+        Map<String, ContainerQuota> changedContainersFiltered = new HashMap<>();
+        TypeFactory typeFactory = mapper.getTypeFactory();
+        CollectionType arrayType = typeFactory.constructCollectionType( ArrayList.class, ChangedContainerDto.class );
+        List<ChangedContainerDto> changedContainers = mapper.readValue( quotaContainers, arrayType );
+        for ( ChangedContainerDto cont : changedContainers )
+        {
+            ContainerQuotaDto containerQuotaDto = cont.getQuota();
+            ContainerSize containerSize = containerQuotaDto.getContainerSize();
+            ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( containerSize );
+            if ( containerSize == ContainerSize.CUSTOM )
+            {
+                defaultQuota = containerQuotaDto.getContainerQuota();
+            }
+
+            changedContainersFiltered.put( cont.getHostId(), defaultQuota );
+        }
+        return changedContainersFiltered;
     }
 
 
@@ -1130,12 +1135,14 @@ public class RestServiceImpl implements RestService
 
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            ContainerDto containerDto = new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                    containerHost.getHostname(), containerHost.getIp(), containerHost.getTemplateName(),
-                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                    containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
-                    datasource, containerHost.getState(), containerHost.getTemplateId(),
-                    containerHost.getContainerName(), containerHost.getResourceHostId().getId() );
+            ContainerDto containerDto =
+                    new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                            containerHost.getHostname(), containerHost.getIp(), containerHost.getTemplateName(),
+                            containerHost.getContainerSize(), containerHost.getArch().toString(),
+                            containerHost.getTags(), containerHost.getPeerId(),
+                            containerHost.getResourceHostId().getId(), containerHost.isLocal(), datasource,
+                            containerHost.getState(), containerHost.getTemplateId(), containerHost.getContainerName(),
+                            containerHost.getResourceHostId().getId() );
             containerDtos.add( containerDto );
         }
 
