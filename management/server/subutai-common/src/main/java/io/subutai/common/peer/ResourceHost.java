@@ -17,7 +17,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -136,4 +135,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void promoteTemplate( String containerName, String templateName ) throws ResourceHostException;
 
     String exportTemplate( String templateName, boolean isPrivateTemplate, String token ) throws ResourceHostException;
+
+    Set<String> listExistingContainerNames() throws ResourceHostException;
 }

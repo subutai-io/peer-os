@@ -15,6 +15,12 @@ public class ResourceHostCommands
     }
 
 
+    public RequestBuilder getListContainersCommand()
+    {
+        return new RequestBuilder( "subutai list -c" );
+    }
+
+
     public RequestBuilder getStartContainerCommand( String containerName )
     {
         return new RequestBuilder( String.format( "subutai start %s", containerName ) ).withTimeout( 1 ).daemon();

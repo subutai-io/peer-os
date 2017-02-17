@@ -12,10 +12,4 @@ public class ExceptionUtil
 
         return cause == null ? throwable : cause;
     }
-
-
-    public String getRootCauseMessage( Throwable throwable )
-    {
-        return ExceptionUtils.getRootCauseMessage( throwable );
-    }
 }

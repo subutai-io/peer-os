@@ -1204,4 +1204,38 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         return getId();
     }
+
+
+    @Override
+    public Set<String> listExistingContainerNames() throws ResourceHostException
+    {
+
+        Set<String> containerNames = Sets.newHashSet();
+        try
+        {
+            CommandResult result = commandUtil.execute( resourceHostCommands.getListContainersCommand(), this );
+
+            StringTokenizer tokenizer = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
+
+            int i = 0;
+            while ( tokenizer.hasMoreTokens() )
+            {
+                String token = tokenizer.nextToken();
+                //skip header
+                if ( i > 1 )
+                {
+                    containerNames.add( token );
+                }
+                i++;
+            }
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining list of containers %s", e.getMessage() ),
+                    e );
+        }
+
+
+        return containerNames;
+    }
 }
