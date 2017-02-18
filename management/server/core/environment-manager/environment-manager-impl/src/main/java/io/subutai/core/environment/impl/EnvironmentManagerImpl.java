@@ -2625,7 +2625,7 @@ public class EnvironmentManagerImpl
 
         Set<Environment> environments = getLocalEnvironments();
 
-        for ( Environment environment : environments )
+        for ( final Environment environment : environments )
         {
             try
             {
@@ -2646,7 +2646,16 @@ public class EnvironmentManagerImpl
 
                     relationManager.removeRelation( env );
 
-                    cleanupEnvironment( env.getEnvironmentId() );
+                    Subject.doAs( systemUser, new PrivilegedAction<Void>()
+                    {
+                        @Override
+                        public Void run()
+                        {
+                            cleanupEnvironment( environment.getEnvironmentId() );
+
+                            return null;
+                        }
+                    } );
                 }
                 else
                 {
@@ -2668,18 +2677,6 @@ public class EnvironmentManagerImpl
 
                 break;
             }
-        }
-
-        //TODO this might not be needed
-        //remove container from local peer cache
-        try
-        {
-            peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId() )
-                       .removeContainerHost( containerHost );
-        }
-        catch ( HostNotFoundException e )
-        {
-            LOG.warn( e.getMessage() );
         }
 
         //process an x-peer environment
@@ -2705,7 +2702,6 @@ public class EnvironmentManagerImpl
             //if this is the only container in a remote environment
             //we need to remove the environment
             //environment.getContainerDtos() is used b/c getContainers exposes containers to owner only
-
             if ( xPeerEnvironment.getContainerDtos().isEmpty() || ( xPeerEnvironment.getContainerDtos().size() == 1
                     && containerHost.getId().equals( xPeerEnvironment.getContainerDtos().iterator().next().getId() ) ) )
             {
