@@ -69,4 +69,12 @@
 
   <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />
 
+
+  <reference-list id="peerLstnr"
+                  interface="io.subutai.common.peer.LocalPeerEventListener"
+                  availability="optional">
+    <reference-listener ref="localPeer"
+                        bind-method="addListener" unbind-method="removeListener" />
+  </reference-list>
+
 </blueprint>

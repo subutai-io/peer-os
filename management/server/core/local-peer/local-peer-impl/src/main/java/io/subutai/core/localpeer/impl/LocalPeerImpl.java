@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -73,6 +74,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.LocalPeerEventListener;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
@@ -200,6 +202,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     volatile boolean initialized = false;
     PeerInfo peerInfo;
     private ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
+    ExecutorService threadPool = Executors.newCachedThreadPool();
+    private Set<LocalPeerEventListener> peerEventListeners = Sets.newHashSet();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, CommandExecutor commandExecutor,
@@ -3464,7 +3468,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO implement subscription service for containerDestroyed event and call here
+    public void addListener( LocalPeerEventListener listener )
+    {
+        if ( listener != null )
+        {
+            peerEventListeners.add( listener );
+        }
+    }
+
+
+    public void removeListener( LocalPeerEventListener listener )
+    {
+        if ( listener != null )
+        {
+            peerEventListeners.remove( listener );
+        }
+    }
+
+
     private void removeStaleContainers()
     {
         for ( ResourceHost resourceHost : getResourceHosts() )
@@ -3493,6 +3514,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         LOG.warn( "Removing stale container {}", containerHost.getContainerName() );
 
                         resourceHost.removeContainerHost( containerHost );
+
+                        notifyPeerEventListeners( containerHost );
                     }
                 }
                 catch ( ResourceHostException e )
@@ -3500,6 +3523,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     LOG.error( e.getMessage() );
                 }
             }
+        }
+    }
+
+
+    private void notifyPeerEventListeners( final ContainerHost containerHost )
+    {
+        for ( final LocalPeerEventListener eventListener : peerEventListeners )
+        {
+            threadPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        eventListener.onContainerDestroyed( containerHost );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.warn( "Error notifying LocalPeerEventListener: {}", e.getMessage() );
+                    }
+                }
+            } );
         }
     }
 }

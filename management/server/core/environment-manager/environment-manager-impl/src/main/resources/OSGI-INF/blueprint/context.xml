@@ -21,7 +21,7 @@
              interface="io.subutai.core.peer.api.PeerManager" />
 
   <reference id="templateManager"
-             interface="io.subutai.core.template.api.TemplateManager"/>
+             interface="io.subutai.core.template.api.TemplateManager" />
 
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
@@ -95,6 +95,7 @@
   <service ref="environmentManager" interface="io.subutai.core.peer.api.PeerActionListener" />
   <service ref="environmentManager" interface="io.subutai.hub.share.common.HubEventListener" />
   <service ref="environmentManager" interface="io.subutai.core.hostregistry.api.HostListener" />
+  <service ref="environmentManager" interface="io.subutai.common.peer.LocalPeerEventListener" />
 
   <reference-list id="alertHandler"
                   interface="io.subutai.common.peer.AlertHandler"

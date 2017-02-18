@@ -66,6 +66,7 @@ import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeerEventListener;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
@@ -136,7 +137,8 @@ import io.subutai.hub.share.quota.ContainerQuota;
  * task to consider this TTL (make background task run frequently with short intervals)
  **/
 public class EnvironmentManagerImpl
-        implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, HostListener
+        implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, HostListener,
+        LocalPeerEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
@@ -2616,7 +2618,7 @@ public class EnvironmentManagerImpl
     }
 
 
-    //TODO call this from LocalPeer.removeStaleContainers
+    @Override
     public void onContainerDestroyed( final ContainerHost containerHost )
     {
         boolean environmentFound = false;

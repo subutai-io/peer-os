@@ -41,6 +41,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeerEventListener;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
@@ -85,7 +86,7 @@ import io.subutai.hub.share.quota.ContainerQuota;
 @PermitAll
 public class EnvironmentManagerSecureProxy
         implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, HubEventListener,
-        HostListener
+        HostListener, LocalPeerEventListener
 {
     private final EnvironmentManagerImpl environmentManager;
     private final IdentityManager identityManager;
@@ -925,5 +926,12 @@ public class EnvironmentManagerSecureProxy
         checkContainerPermission( environmentId, containerId, traitsBuilder( "ownership=All;read=true" ) );
 
         return environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate );
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final ContainerHost containerHost )
+    {
+        environmentManager.onContainerDestroyed( containerHost );
     }
 }
