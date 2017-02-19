@@ -54,14 +54,14 @@ public class ResourceHostEntityTest
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1/24";
-    private static final String CONTAINER_STATUS_STARTED =
-            "NAME                               STATE    HWADDR             IP" + "            Interface\n" +
-                    "---------------------------------\n"
-                    + "qwer                               RUNNING  00:16:3e:83:2c:2e  192.168.22.5  eth0";
+    private static final String CONTAINER_STATUS_STARTED =String.format(
+            "NAME                               STATE    HWADDR             IP" + "            Interface%1$s" +
+                    "---------------------------------%1$s"
+                    + "qwer                               RUNNING  00:16:3e:83:2c:2e  192.168.22.5  eth0", System.lineSeparator());
     private static final String CONTAINER_STATUS_STOPPED =
-            "NAME                               STATE    HWADDR             IP" + "            Interface\n" +
-                    "---------------------------------\n"
-                    + "qwer                               STOPPED  00:16:3e:83:2c:2e  192.168.22.5  eth0";
+            String.format("NAME                               STATE    HWADDR             IP" + "            Interface%1$s" +
+                    "---------------------------------%1$s"
+                    + "qwer                               STOPPED  00:16:3e:83:2c:2e  192.168.22.5  eth0", System.lineSeparator());
     @Mock
     ContainerHostEntity containerHost;
     @Mock

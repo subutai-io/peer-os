@@ -432,11 +432,4 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     {
 
     }
-
-
-    @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
-    {
-
-    }
 }

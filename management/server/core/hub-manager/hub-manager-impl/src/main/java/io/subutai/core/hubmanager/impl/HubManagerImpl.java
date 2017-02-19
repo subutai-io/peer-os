@@ -834,11 +834,4 @@ public class HubManagerImpl implements HubManager, HostListener
     {
 
     }
-
-
-    @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
-    {
-
-    }
 }

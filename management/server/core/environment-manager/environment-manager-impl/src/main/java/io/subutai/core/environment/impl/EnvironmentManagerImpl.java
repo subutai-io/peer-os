@@ -66,6 +66,7 @@ import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeerEventListener;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
@@ -136,7 +137,8 @@ import io.subutai.hub.share.quota.ContainerQuota;
  * task to consider this TTL (make background task run frequently with short intervals)
  **/
 public class EnvironmentManagerImpl
-        implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, HostListener
+        implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, HostListener,
+        LocalPeerEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
@@ -995,8 +997,8 @@ public class EnvironmentManagerImpl
             throw new EnvironmentModificationException( e );
         }
 
-        TrackerOperation operationTracker =
-                tracker.createTrackerOperation( MODULE_NAME, String.format( "Destroying container %s", environmentContainer.getHostname() ) );
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Destroying container %s", environmentContainer.getHostname() ) );
 
         final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( environment, environmentContainer, operationTracker );
@@ -1115,7 +1117,7 @@ public class EnvironmentManagerImpl
         if ( checkWorkflow != null )
         {
             throw new IllegalStateException( String.format( "There is already an active workflow %s for environment %s",
-                    checkWorkflow.getClass().getSimpleName(), environment.getName()) );
+                    checkWorkflow.getClass().getSimpleName(), environment.getName() ) );
         }
 
         activeWorkflows.put( environment.getId(), newWorkflow );
@@ -1368,7 +1370,8 @@ public class EnvironmentManagerImpl
         EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHost.getHostname() ) );
+                String.format( "%s container %s environment domain", add ? "Adding" : "Removing",
+                        containerHost.getHostname() ) );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                 || environment.getStatus() == EnvironmentStatus.CANCELLED )
@@ -1433,14 +1436,16 @@ public class EnvironmentManagerImpl
                     Common.CONTAINER_SSH_TIMEOUT_SEC );
 
             operationTracker.addLogDone(
-                    String.format( "Ssh for container %s is ready on tunnel %s", environmentContainer.getHostname(), sshTunnel ) );
+                    String.format( "Ssh for container %s is ready on tunnel %s", environmentContainer.getHostname(),
+                            sshTunnel ) );
 
             return sshTunnel;
         }
         catch ( Exception e )
         {
             operationTracker.addLogFailed(
-                    String.format( "Error setting up ssh for container %s: %s", environmentContainer.getHostname(), e.getMessage() ) );
+                    String.format( "Error setting up ssh for container %s: %s", environmentContainer.getHostname(),
+                            e.getMessage() ) );
             throw new EnvironmentModificationException( e );
         }
     }
@@ -2614,26 +2619,19 @@ public class EnvironmentManagerImpl
 
 
     @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    public void onContainerDestroyed( final ContainerHost containerHost )
     {
         boolean environmentFound = false;
 
-        ContainerHost containerHost = getContainerHostById( containerInfo.getId() );
-
-        if ( containerHost == null )
-        {
-            return;
-        }
-
         Set<Environment> environments = getLocalEnvironments();
 
-        for ( Environment environment : environments )
+        for ( final Environment environment : environments )
         {
             try
             {
                 //remote container metadata
                 EnvironmentContainerImpl environmentContainerHost =
-                        ( EnvironmentContainerImpl ) environment.getContainerHostById( containerInfo.getId() );
+                        ( EnvironmentContainerImpl ) environment.getContainerHostById( containerHost.getId() );
 
                 environmentFound = true;
 
@@ -2648,11 +2646,20 @@ public class EnvironmentManagerImpl
 
                     relationManager.removeRelation( env );
 
-                    cleanupEnvironment( env.getEnvironmentId() );
+                    Subject.doAs( systemUser, new PrivilegedAction<Void>()
+                    {
+                        @Override
+                        public Void run()
+                        {
+                            cleanupEnvironment( environment.getEnvironmentId() );
+
+                            return null;
+                        }
+                    } );
                 }
                 else
                 {
-                    notifyOnContainerDestroyed( env, containerInfo.getId() );
+                    notifyOnContainerDestroyed( env, containerHost.getId() );
                 }
 
                 //remove security relation
@@ -2670,17 +2677,6 @@ public class EnvironmentManagerImpl
 
                 break;
             }
-        }
-
-        //remove container from local peer cache
-        try
-        {
-            peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId() )
-                       .removeContainerHost( containerHost );
-        }
-        catch ( HostNotFoundException e )
-        {
-            LOG.warn( e.getMessage() );
         }
 
         //process an x-peer environment
@@ -2706,7 +2702,6 @@ public class EnvironmentManagerImpl
             //if this is the only container in a remote environment
             //we need to remove the environment
             //environment.getContainerDtos() is used b/c getContainers exposes containers to owner only
-
             if ( xPeerEnvironment.getContainerDtos().isEmpty() || ( xPeerEnvironment.getContainerDtos().size() == 1
                     && containerHost.getId().equals( xPeerEnvironment.getContainerDtos().iterator().next().getId() ) ) )
             {

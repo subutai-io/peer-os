@@ -20,7 +20,7 @@ public interface CommandExecutor
      *
      * @return - result of command execution
      */
-    public CommandResult execute( String hostId, RequestBuilder requestBuilder ) throws CommandException;
+    CommandResult execute( String hostId, RequestBuilder requestBuilder ) throws CommandException;
 
     /**
      * Executes command on host synchronously
@@ -31,7 +31,7 @@ public interface CommandExecutor
      *
      * @return - result of command execution
      */
-    public CommandResult execute( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
+    CommandResult execute( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
             throws CommandException;
 
     /**
@@ -40,7 +40,7 @@ public interface CommandExecutor
      * @param hostId - target host id
      * @param requestBuilder - command to execute
      */
-    public void executeAsync( String hostId, RequestBuilder requestBuilder ) throws CommandException;
+    void executeAsync( String hostId, RequestBuilder requestBuilder ) throws CommandException;
 
     /**
      * Executes command on host asynchronously
@@ -49,6 +49,5 @@ public interface CommandExecutor
      * @param requestBuilder - command to execute
      * @param callback - callback to trigger on each response from host
      */
-    public void executeAsync( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
-            throws CommandException;
+    void executeAsync( String hostId, RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 }

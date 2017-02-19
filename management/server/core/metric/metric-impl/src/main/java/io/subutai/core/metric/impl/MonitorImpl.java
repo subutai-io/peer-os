@@ -730,11 +730,4 @@ public class MonitorImpl implements Monitor, HostListener
     {
 
     }
-
-
-    @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
-    {
-
-    }
 }

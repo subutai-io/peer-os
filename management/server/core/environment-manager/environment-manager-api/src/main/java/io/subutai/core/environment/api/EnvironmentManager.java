@@ -52,14 +52,30 @@ public interface EnvironmentManager
 
     Set<Environment> getEnvironmentsByOwnerId( long userId );
 
-
+    /**
+     * Create environment based on the passed topology
+     *
+     * @param topology topology of future environment
+     * @param async true - env will be created in background, false - caller will block
+     */
     EnvironmentCreationRef createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
     //used in plugins, kept for backward compatibility
+    @Deprecated
     Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                    final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
+    /**
+     * Modifies environment based on the passed topology, additionally performing optional operations on container
+     *
+     * @param environmentId env id
+     * @param topology topology to apply to environment, contains parameters of new containers to be added to env
+     * @param removedContainers - ids of containers to be removed from environment
+     * @param changedContainers - new LXC resource quotas to be applied to containers, key - container id and value -
+     * new quota
+     * @param async true - env will be created in background, false - caller will block
+     */
     EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology, List<String> removedContainers,
                                               Map<String, ContainerQuota> changedContainers, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
@@ -270,6 +286,15 @@ public interface EnvironmentManager
     void placeEnvironmentInfoByContainerId( String environmentId, String containerIp )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
 
+    /**
+     * Creates template on Hub ( Global Kurjun ) out of a specified environment container
+     *
+     * @param environmentId env id
+     * @param containerId container id
+     * @param templateName name of template
+     * @param privateTemplate true indicates that template is accessible to owner only, otherwise it will be public
+     * template
+     */
     String createTemplate( String environmentId, String containerId, String templateName, boolean privateTemplate )
             throws PeerException, EnvironmentNotFoundException;
 }

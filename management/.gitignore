@@ -5,7 +5,6 @@
 *.iml
 *.ipr
 *.MF
-.idea
 .project
 .classpath
 .settings

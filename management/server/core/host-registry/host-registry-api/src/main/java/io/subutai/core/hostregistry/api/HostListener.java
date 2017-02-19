@@ -35,6 +35,4 @@ public interface HostListener
     void onContainerNetInterfaceAdded( ContainerHostInfo containerInfo, HostInterfaceModel netInterface );
 
     void onContainerNetInterfaceRemoved( ContainerHostInfo containerInfo, HostInterfaceModel netInterface );
-
-    void onContainerDestroyed( ContainerHostInfo containerInfo );
 }
