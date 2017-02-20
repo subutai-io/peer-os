@@ -636,6 +636,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					}
 					$('#js-container-size').val(currentTemplate.get('quotaSize')).trigger('change');
 
+					console.log(currentTemplate.get('cpuQuota'));
+					console.log(currentTemplate.get('cpu'));
+					console.log(currentTemplate);
 					if(currentTemplate.get('quotaSize') == 'CUSTOM'){
 					    $('#js-quotasize-custom-cpu').val(currentTemplate.get('cpuQuota')).trigger('change');
 					    $('#js-quotasize-custom-ram').val(currentTemplate.get('ramQuota')).trigger('change');
@@ -1030,6 +1033,12 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				edited: true,
 				templateName: environment.containers[container].templateName,
 				quotaSize: environment.containers[container].type,
+				cpuQuota: environment.containers[container].quota.cpu,
+				ramQuota: environment.containers[container].quota.ram,
+				rootQuota: environment.containers[container].quota.root,
+				homeQuota: environment.containers[container].quota.home,
+				varQuota: environment.containers[container].quota.var,
+				optQuota: environment.containers[container].quota.opt,
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
 				containerName: editedContainerName,
