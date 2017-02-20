@@ -118,12 +118,15 @@ public class ContainerQuotaDto
     public ContainerQuota getContainerQuota()
     {
         ContainerQuota quota = new ContainerQuota( this.containerSize );
-        quota.add( new Quota( new ContainerCpuResource( this.getCpu() ), 0 ) );
-        quota.add( new Quota( new ContainerRamResource( this.getRam() ), 0 ) );
-        quota.add( new Quota( new ContainerRootfsResource( this.getRoot() ), 0 ) );
-        quota.add( new Quota( new ContainerHomeResource( this.getHome() ), 0 ) );
-        quota.add( new Quota( new ContainerOptResource( this.getOpt() ), 0 ) );
-        quota.add( new Quota( new ContainerVarResource( this.getVar() ), 0 ) );
+        if ( this.containerSize == ContainerSize.CUSTOM )
+        {
+            quota.add( new Quota( new ContainerCpuResource( this.getCpu() ), 0 ) );
+            quota.add( new Quota( new ContainerRamResource( this.getRam() ), 0 ) );
+            quota.add( new Quota( new ContainerRootfsResource( this.getRoot() ), 0 ) );
+            quota.add( new Quota( new ContainerHomeResource( this.getHome() ), 0 ) );
+            quota.add( new Quota( new ContainerOptResource( this.getOpt() ), 0 ) );
+            quota.add( new Quota( new ContainerVarResource( this.getVar() ), 0 ) );
+        }
         return quota;
     }
 }
