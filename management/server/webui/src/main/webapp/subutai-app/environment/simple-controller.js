@@ -636,9 +636,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					}
 					$('#js-container-size').val(currentTemplate.get('quotaSize')).trigger('change');
 
-					console.log(currentTemplate.get('cpuQuota'));
-					console.log(currentTemplate.get('cpu'));
-					console.log(currentTemplate);
 					if(currentTemplate.get('quotaSize') == 'CUSTOM'){
 					    $('#js-quotasize-custom-cpu').val(currentTemplate.get('cpuQuota')).trigger('change');
 					    $('#js-quotasize-custom-ram').val(currentTemplate.get('ramQuota')).trigger('change');

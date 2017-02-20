@@ -975,7 +975,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             if (!imageExists(img)) {
                 img = 'assets/templates/no-image.jpg';
             }
-            addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname, container.templateId);
+            addContainerToHost(resourceHost, container.templateName, img, container.type, container.quota, container.id, container.hostname, container.templateId);
         }
         filterPluginsList();
     }
@@ -1411,7 +1411,7 @@ function drop(event) {
     }
 }
 
-function addContainerToHost(model, template, img, size, containerId, name, templateId) {
+function addContainerToHost(model, template, img, size, quota, containerId, name, templateId) {
     if (size === undefined || size === null) {
         size = 'SMALL';
         if (template == 'appscale') {
@@ -1451,12 +1451,12 @@ function addContainerToHost(model, template, img, size, containerId, name, templ
         parentPeerId: model.get('peerId'),
         parentHostId: model.get('hostId'),
         quotaSize: size,
-        cpuQuota: environment.containers[container].quota.cpu,
-        ramQuota: environment.containers[container].quota.ram,
-    	rootQuota: environment.containers[container].quota.root,
-    	homeQuota: environment.containers[container].quota.home,
-    	varQuota: environment.containers[container].quota.var,
-    	optQuota: environment.containers[container].quota.opt,
+        cpuQuota: quota.cpu,
+        ramQuota: quota.ram,
+    	rootQuota: quota.root,
+    	homeQuota: quota.home,
+    	varQuota: quota.var,
+    	optQuota: quota.opt,
 
         containerId: containerId,
         containerName: containerName,
