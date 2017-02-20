@@ -2785,39 +2785,45 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         ContainerQuota containerQuota = new ContainerQuota( containerHost.getContainerSize() );
         try
         {
-            // TODO: 2/17/17 need to add thresholds
-            final ContainerHostInfo hostInfo = hostRegistry.getContainerHostInfoById( containerId.getId() );
 
-            List<Quota> quota = buildQuota( hostInfo.getRawQuota() );
-            containerQuota.addAll( quota );
+            try
+            {
+                final ContainerHostInfo hostInfo = hostRegistry.getContainerHostInfoById( containerId.getId() );
+                List<Quota> quota = buildQuota( hostInfo.getRawQuota() );
+                containerQuota.addAll( quota );
+            }
+            catch ( Exception e )
+            {
+                ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
+                CommandResult result =
+                        resourceHost.execute( Commands.getReadQuotaCommand( containerHost.getContainerName() ) );
 
-//            ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
-//            CommandResult result =
-//                    resourceHost.execute( Commands.getReadQuotaCommand( containerHost.getContainerName() ) );
-//
-//            JavaType type = mapper.getTypeFactory().constructCollectionType( List.class, BatchOutput.class );
-//            List<BatchOutput> outputs = mapper.readValue( result.getStdOut(), type );
-//
-//            for ( int i = 0; i < outputs.size(); i++ )
-//            {
-//                QuotaOutput quotaOutput = outputs.get( i ).getOutput();
-//
-//                ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
-//
-//                ResourceValue resourceValue =
-//                        CommonResourceValueParser.parse( quotaOutput.getQuota(), containerResourceType );
-//
-//                ContainerResource containerResource =
-//                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-//
-//                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
-//            }
+                JavaType type = mapper.getTypeFactory().constructCollectionType( List.class, BatchOutput.class );
+                List<BatchOutput> outputs = mapper.readValue( result.getStdOut(), type );
+
+                for ( int i = 0; i < outputs.size(); i++ )
+                {
+                    QuotaOutput quotaOutput = outputs.get( i ).getOutput();
+
+                    ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
+
+                    ResourceValue resourceValue =
+                            CommonResourceValueParser.parse( quotaOutput.getQuota(), containerResourceType );
+
+
+                    ContainerResource containerResource =
+                            ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
+
+                    containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
+                }
+            }
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Could not obtain quota values of %s.", containerId.getId() ) );
-        } return containerQuota;
+        }
+        return containerQuota;
     }
 
 
