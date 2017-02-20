@@ -1,4 +1,4 @@
-package io.subutai.core.environment.rest.ui.entity;
+package io.subutai.common.environment;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,6 +14,7 @@ import io.subutai.hub.share.quota.ContainerRootfsResource;
 import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.quota.ContainerVarResource;
 import io.subutai.hub.share.quota.Quota;
+import io.subutai.hub.share.resource.ContainerResourceType;
 
 
 @JsonIgnoreProperties( ignoreUnknown = true )
@@ -56,6 +57,18 @@ public class ContainerQuotaDto
         this.root = root;
         this.var = var;
         this.opt = opt;
+    }
+
+
+    public ContainerQuotaDto( final ContainerQuota quota )
+    {
+        this.containerSize = quota.getContainerSize();
+        this.cpu = quota.get( ContainerResourceType.CPU ).getAsCpuResource().getWriteValue();
+        this.ram = quota.get( ContainerResourceType.RAM ).getAsRamResource().getWriteValue();
+        this.home = quota.get( ContainerResourceType.HOME ).getAsDiskResource().getWriteValue();
+        this.root = quota.get( ContainerResourceType.ROOTFS ).getAsDiskResource().getWriteValue();
+        this.var = quota.get( ContainerResourceType.VAR ).getAsDiskResource().getWriteValue();
+        this.opt = quota.get( ContainerResourceType.OPT ).getAsDiskResource().getWriteValue();
     }
 
 

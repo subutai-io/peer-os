@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
 
@@ -36,5 +37,11 @@ public class ContainerHomeResource extends ContainerDiskResource
     public ContainerHomeResource()
     {
         this( new ByteValueResource( BigDecimal.ZERO ) );
+    }
+
+
+    public ContainerHomeResource( final double value, final ByteUnit unit )
+    {
+        super( ContainerResourceType.HOME, value, unit );
     }
 }

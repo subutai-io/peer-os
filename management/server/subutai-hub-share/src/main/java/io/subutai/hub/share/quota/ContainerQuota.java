@@ -3,6 +3,7 @@ package io.subutai.hub.share.quota;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,18 +24,18 @@ public class ContainerQuota
     @JsonProperty( value = "resources" )
     private Map<ContainerResourceType, Quota> resources;
 
-//    @JsonProperty( "cpuQuota" )
-//    private String cpu;
-//    @JsonProperty( "ramQuota" )
-//    private String ram;
-//    @JsonProperty( "homeQuota" )
-//    private String home;
-//    @JsonProperty( "rootQuota" )
-//    private String root;
-//    @JsonProperty( "varQuota" )
-//    private String var;
-//    @JsonProperty( "optQuota" )
-//    private String opt;
+    //    @JsonProperty( "cpuQuota" )
+    //    private String cpu;
+    //    @JsonProperty( "ramQuota" )
+    //    private String ram;
+    //    @JsonProperty( "homeQuota" )
+    //    private String home;
+    //    @JsonProperty( "rootQuota" )
+    //    private String root;
+    //    @JsonProperty( "varQuota" )
+    //    private String var;
+    //    @JsonProperty( "optQuota" )
+    //    private String opt;
 
 
     public ContainerQuota( @JsonProperty( value = "containerSize" ) final ContainerSize containerSize,
@@ -85,6 +86,15 @@ public class ContainerQuota
         Preconditions.checkNotNull( quota.getResource().getContainerResourceType() );
 
         getResources().put( quota.getResource().getContainerResourceType(), quota );
+    }
+
+
+    public void addAll( final List<Quota> quota )
+    {
+        for ( Quota q : quota )
+        {
+            add( q );
+        }
     }
 
 

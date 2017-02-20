@@ -151,12 +151,19 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
+import io.subutai.hub.share.quota.ContainerCpuResource;
+import io.subutai.hub.share.quota.ContainerHomeResource;
+import io.subutai.hub.share.quota.ContainerOptResource;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerRamResource;
 import io.subutai.hub.share.quota.ContainerResource;
 import io.subutai.hub.share.quota.ContainerResourceFactory;
+import io.subutai.hub.share.quota.ContainerRootfsResource;
 import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.hub.share.quota.ContainerVarResource;
 import io.subutai.hub.share.quota.Quota;
 import io.subutai.hub.share.quota.QuotaException;
+import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.CpuResource;
 import io.subutai.hub.share.resource.DiskResource;
@@ -2774,34 +2781,60 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         ContainerQuota containerQuota = new ContainerQuota( containerHost.getContainerSize() );
         try
         {
-            ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
-            CommandResult result =
-                    resourceHost.execute( Commands.getReadQuotaCommand( containerHost.getContainerName() ) );
+            // TODO: 2/17/17 need to add thresholds
+            final ContainerHostInfo hostInfo = hostRegistry.getContainerHostInfoById( containerId.getId() );
 
-            JavaType type = mapper.getTypeFactory().constructCollectionType( List.class, BatchOutput.class );
-            List<BatchOutput> outputs = mapper.readValue( result.getStdOut(), type );
+            List<Quota> quota = buildQuota( hostInfo.getRawQuota() );
+            containerQuota.addAll( quota );
 
-            for ( int i = 0; i < outputs.size(); i++ )
-            {
-                QuotaOutput quotaOutput = outputs.get( i ).getOutput();
-
-                ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
-
-                ResourceValue resourceValue =
-                        CommonResourceValueParser.parse( quotaOutput.getQuota(), containerResourceType );
-
-                ContainerResource containerResource =
-                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-
-                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
-            }
+//            ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
+//            CommandResult result =
+//                    resourceHost.execute( Commands.getReadQuotaCommand( containerHost.getContainerName() ) );
+//
+//            JavaType type = mapper.getTypeFactory().constructCollectionType( List.class, BatchOutput.class );
+//            List<BatchOutput> outputs = mapper.readValue( result.getStdOut(), type );
+//
+//            for ( int i = 0; i < outputs.size(); i++ )
+//            {
+//                QuotaOutput quotaOutput = outputs.get( i ).getOutput();
+//
+//                ContainerResourceType containerResourceType = ContainerResourceType.values()[i];
+//
+//                ResourceValue resourceValue =
+//                        CommonResourceValueParser.parse( quotaOutput.getQuota(), containerResourceType );
+//
+//                ContainerResource containerResource =
+//                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
+//
+//                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
+//            }
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Could not obtain quota values of %s.", containerId.getId() ) );
-        }
-        return containerQuota;
+        } return containerQuota;
+    }
+
+
+    private List<Quota> buildQuota( final io.subutai.common.host.Quota rawQuota )
+    {
+        // TODO: 2/17/17 add quota thresholds after implementing in system level
+        List<Quota> result = new ArrayList<>();
+        Quota cpuQuota = new Quota( new ContainerCpuResource( rawQuota.getCpu() ), 0 );
+        Quota ramQuota = new Quota( new ContainerRamResource( rawQuota.getRam(), ByteUnit.MB ), 0 );
+        Quota rootfsQuota = new Quota( new ContainerRootfsResource( rawQuota.getRoot(), ByteUnit.GB ), 0 );
+        Quota homeQuota = new Quota( new ContainerHomeResource( rawQuota.getHome(), ByteUnit.GB ), 0 );
+        Quota optQuota = new Quota( new ContainerOptResource( rawQuota.getOpt(), ByteUnit.GB ), 0 );
+        Quota varQuota = new Quota( new ContainerVarResource( rawQuota.getVar(), ByteUnit.GB ), 0 );
+
+        result.add( cpuQuota );
+        result.add( ramQuota );
+        result.add( rootfsQuota );
+        result.add( homeQuota );
+        result.add( optQuota );
+        result.add( varQuota );
+        return result;
     }
 
 

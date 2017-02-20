@@ -39,6 +39,7 @@ import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.ContainerQuotaDto;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentDto;
@@ -68,7 +69,6 @@ import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.rest.ui.entity.ChangedContainerDto;
-import io.subutai.core.environment.rest.ui.entity.ContainerQuotaDto;
 import io.subutai.core.environment.rest.ui.entity.NodeSchemaDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
 import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
@@ -1143,6 +1143,14 @@ public class RestServiceImpl implements RestService
                             containerHost.getResourceHostId().getId(), containerHost.isLocal(), datasource,
                             containerHost.getState(), containerHost.getTemplateId(), containerHost.getContainerName(),
                             containerHost.getResourceHostId().getId() );
+            try
+            {
+                containerDto.setQuota( new ContainerQuotaDto( containerHost.getQuota() ) );
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( e.getMessage(), e );
+            }
             containerDtos.add( containerDto );
         }
 

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
 
@@ -36,5 +37,11 @@ public class ContainerRootfsResource extends ContainerDiskResource
     public ContainerRootfsResource( @JsonProperty( "value" ) final String value )
     {
         super( ContainerResourceType.ROOTFS, value );
+    }
+
+
+    public ContainerRootfsResource( final double value, final ByteUnit unit )
+    {
+        super( ContainerResourceType.ROOTFS, value, unit );
     }
 }
