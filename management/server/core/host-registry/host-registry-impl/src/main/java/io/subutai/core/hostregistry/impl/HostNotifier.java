@@ -187,32 +187,33 @@ public class HostNotifier implements Runnable
             }
         }
 
-        // 6. check if container has been destroyed
-        for ( final ContainerHostInfo oldContainerInfo : oldRhInfo.getContainers() )
-        {
-            boolean containerStillExists = false;
-
-            for ( final ContainerHostInfo newContainerInfo : newRhInfo.getContainers() )
-            {
-                if ( oldContainerInfo.getId().equalsIgnoreCase( newContainerInfo.getId() ) )
-                {
-                    containerStillExists = true;
-
-                    break;
-                }
-            }
-
-            if ( !containerStillExists )
-            {
-                try
-                {
-                    listener.onContainerDestroyed( oldContainerInfo );
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( ERR_MSG_TEMPLATE, e.getMessage() );
-                }
-            }
-        }
+        //disabled due to https://github.com/subutai-io/base/issues/1735
+        //        // 6. check if container has been destroyed
+        //        for ( final ContainerHostInfo oldContainerInfo : oldRhInfo.getContainers() )
+        //        {
+        //            boolean containerStillExists = false;
+        //
+        //            for ( final ContainerHostInfo newContainerInfo : newRhInfo.getContainers() )
+        //            {
+        //                if ( oldContainerInfo.getId().equalsIgnoreCase( newContainerInfo.getId() ) )
+        //                {
+        //                    containerStillExists = true;
+        //
+        //                    break;
+        //                }
+        //            }
+        //
+        //            if ( !containerStillExists )
+        //            {
+        //                try
+        //                {
+        //                    listener.onContainerDestroyed( oldContainerInfo );
+        //                }
+        //                catch ( Exception e )
+        //                {
+        //                    LOG.warn( ERR_MSG_TEMPLATE, e.getMessage() );
+        //                }
+        //            }
+        //        }
     }
 }

@@ -447,22 +447,6 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
 
     @Override
-    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
-    {
-        try
-        {
-            ContainerHost containerHost = localPeer.getContainerHostById( containerInfo.getId() );
-
-            destroyContainer( containerHost.getEnvironmentId().getId(), containerInfo.getId() );
-        }
-        catch ( HostNotFoundException e )
-        {
-            //ignore
-        }
-    }
-
-
-    @Override
     public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
                                             final String currentHostname )
     {
@@ -501,7 +485,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
                                                 final HostInterfaceModel netInterface )
     {
-        // todo
+        //not used
     }
 
 
