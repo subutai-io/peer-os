@@ -37,6 +37,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.ContainerQuotaDto;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
@@ -543,7 +544,7 @@ public class LocalEnvironment implements Environment, Serializable
             LocalPeer localPeer = peerManager.getLocalPeer();
 
             boolean isLocalContainer = localPeer.getId().equals( host.getPeerId() );
-
+            ContainerQuotaDto quota = null;
             try
             {
                 // can not use host.getState() b/c proxyContainer throws error due to unset Env
@@ -559,17 +560,22 @@ public class LocalEnvironment implements Environment, Serializable
                     // in case of proxy container, exception will be thrown and state will be UNKNOWN
                     containerHostState = peerManager.getPeer( host.getPeerId() ).getContainerState( containerId );
                 }
+
+                quota = new ContainerQuotaDto( host.getQuota() );
             }
             catch ( Exception e )
             {
                 LOG.warn( "Error getting container state: {}", e.getMessage() );
             }
 
-            containerDtos.add( new ContainerDto( host.getId(), getId(), host.getHostname(), host.getIp(),
-                    host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
-                    host.getPeerId(), host.getResourceHostId().getId(), isLocalContainer,
-                    this instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID, containerHostState,
-                    host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() ) );
+            ContainerDto containerDto =
+                    new ContainerDto( host.getId(), getId(), host.getHostname(), host.getIp(), host.getTemplateName(),
+                            host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
+                            host.getResourceHostId().getId(), isLocalContainer,
+                            this instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID, containerHostState,
+                            host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() );
+            containerDto.setQuota( quota );
+            containerDtos.add( containerDto );
         }
 
         return containerDtos;

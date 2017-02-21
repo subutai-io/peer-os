@@ -167,7 +167,8 @@ public class PeerMetricsProcessor extends HubRequester
                 }
                 else
                 {
-                    log.warn( "Could not send peer monitoring data: " + r.readEntity( String.class ) );
+                    log.warn( "Could not send peer monitoring data: " + r.readEntity( String.class ) + " " + dto
+                            .toString() );
                 }
             }
             catch ( Exception e )

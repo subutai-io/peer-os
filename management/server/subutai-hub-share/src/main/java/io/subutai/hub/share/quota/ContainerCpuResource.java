@@ -25,6 +25,12 @@ public class ContainerCpuResource extends ContainerResource<NumericValueResource
     }
 
 
+    public ContainerCpuResource( final Double resourceValue )
+    {
+        super( ContainerResourceType.CPU, new NumericValueResource( resourceValue ) );
+    }
+
+
     public ContainerCpuResource( final int cpuValue )
     {
         super( ContainerResourceType.CPU, new NumericValueResource( cpuValue ) );

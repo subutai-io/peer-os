@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.ContainerDto;
+import io.subutai.common.environment.ContainerQuotaDto;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -104,10 +105,14 @@ public class RestServiceImpl implements RestService
 
             for ( EnvironmentContainerHost host : environment.getContainerHosts() )
             {
-                containers.add( new ContainerDto( host.getId(), environmentId, host.getHostname(), host.getIp(),
-                        host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
-                        host.getPeerId(), host.getResourceHostId().getId(), host.isLocal(), dataSource, host.getState(),
-                        host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() ) );
+                ContainerDto containerDto =
+                        new ContainerDto( host.getId(), environmentId, host.getHostname(), host.getIp(),
+                                host.getTemplateName(), host.getContainerSize(), host.getArch().name(), host.getTags(),
+                                host.getPeerId(), host.getResourceHostId().getId(), host.isLocal(), dataSource,
+                                host.getState(), host.getTemplateId(), host.getContainerName(),
+                                host.getResourceHostId().getId() );
+                containerDto.setQuota( new ContainerQuotaDto( host.getQuota() ) );
+                containers.add( containerDto );
             }
 
             EnvironmentDto environmentDto =

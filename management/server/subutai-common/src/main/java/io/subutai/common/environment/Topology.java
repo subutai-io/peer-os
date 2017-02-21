@@ -1,6 +1,7 @@
 package io.subutai.common.environment;
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -82,7 +83,8 @@ public class Topology
         return environmentName;
     }
 
-    public void setEnvironmentName(String environmentName)
+
+    public void setEnvironmentName( String environmentName )
     {
         this.environmentName = environmentName;
     }
@@ -145,6 +147,15 @@ public class Topology
     }
 
 
+    public void addAllNodePlacement( final Collection<Node> nodes )
+    {
+        for ( Node node : nodes )
+        {
+            addNodePlacement( node.getPeerId(), node );
+        }
+    }
+
+
     public String getSshKey()
     {
         return sshKey;
@@ -202,11 +213,7 @@ public class Topology
     @Override
     public String toString()
     {
-        return "Topology{" +
-                "id=" + id +
-                ", environmentName='" + environmentName + '\'' +
-                ", nodeGroupPlacement=" + nodeGroupPlacement +
-                ", sshKey='" + sshKey + '\'' +
-                '}';
+        return "Topology{" + "id=" + id + ", environmentName='" + environmentName + '\'' + ", nodeGroupPlacement="
+                + nodeGroupPlacement + ", sshKey='" + sshKey + '\'' + '}';
     }
 }

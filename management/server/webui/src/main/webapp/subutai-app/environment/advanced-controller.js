@@ -21,7 +21,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     var vm = this;
 
-	checkKurjunAuthToken(identitySrv, $rootScope);
+    checkKurjunAuthToken(identitySrv, $rootScope);
 
     vm.buildEnvironment = buildEnvironment;
     vm.buildEditedEnvironment = buildEditedEnvironment;
@@ -75,7 +75,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.setTemplatesByPlugin = setTemplatesByPlugin;
     vm.loadPrivateTemplates = loadPrivateTemplates;
 
-    function loadPrivateTemplates(){
+    function loadPrivateTemplates() {
         environmentService.getPrivateTemplates()
             .then(function (data) {
                 vm.templates['own'] = data;
@@ -83,7 +83,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             });
     }
 
-    function loadTemplates(callback){
+    function loadTemplates(callback) {
         // @todo workaround
         environmentService.getTemplates()
             .then(function (data) {
@@ -94,7 +94,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     loadTemplates();
 
-    $rootScope.$on('kurjunTokenSet', function(event, data){
+    $rootScope.$on('kurjunTokenSet', function (event, data) {
         loadPrivateTemplates();
     });
 
@@ -109,7 +109,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
         vm.templatesList = templatesLst;
 
-        if(callback) callback();
+        if (callback) callback();
     }
 
     function getPeers() {
@@ -667,7 +667,17 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     } else {
                         $('#js-container-name').prop('disabled', false);
                     }
-                    $('#js-container-size').val(currentTemplate.get('quotaSize'));
+                    $('#js-container-size').val(currentTemplate.get('quotaSize')).trigger('change');
+
+                    if (currentTemplate.get('quotaSize') == 'CUSTOM') {
+                        $('#js-quotasize-custom-cpu').val(currentTemplate.get('cpuQuota')).trigger('change');
+                        $('#js-quotasize-custom-ram').val(currentTemplate.get('ramQuota')).trigger('change');
+                        $('#js-quotasize-custom-home').val(currentTemplate.get('homeQuota')).trigger('change');
+                        $('#js-quotasize-custom-root').val(currentTemplate.get('rootQuota')).trigger('change');
+                        $('#js-quotasize-custom-var').val(currentTemplate.get('varQuota')).trigger('change');
+                        $('#js-quotasize-custom-opt').val(currentTemplate.get('optQuota')).trigger('change');
+                    }
+
                     containerSettingMenu.find('.header').html('Settings for <b>' + this.model.get('templateName') + '</b> container');
                     var elementPos = this.model.get('position');
                     containerSettingMenu.css({
@@ -965,7 +975,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             if (!imageExists(img)) {
                 img = 'assets/templates/no-image.jpg';
             }
-            addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname, container.templateId);
+            addContainerToHost(resourceHost, container.templateName, img, container.type, container.quota, container.id, container.hostname, container.templateId);
         }
         filterPluginsList();
     }
@@ -1065,7 +1075,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                                 img = 'assets/templates/no-image.jpg';
                             }
                             environmentService.getVerifiedTemplate(template.toLowerCase()).success(function (verifiedTemplate) {
-                                addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
+                                addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, null, verifiedTemplate.id);
                             });
                         }
 
@@ -1075,7 +1085,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                             img = 'assets/templates/no-image.jpg';
                         }
                         environmentService.getVerifiedTemplate(template.toLowerCase()).success(function (verifiedTemplate) {
-                            addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, verifiedTemplate.id);
+                            addContainerToHost(resourceHost, template, img, vm.selectedPlugin.size, null, null, null, verifiedTemplate.id);
                         });
                     }
 
@@ -1102,10 +1112,20 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 if (getRemoved) {
                     result.containersList.push(currentElement.get('containerId'));
                 } else {
+                    var isCustom = currentElement.get('quotaSize') == 'CUSTOM';
+
                     var container2Build = {
-                        "quota": {
-                            "containerSize": currentElement.get('quotaSize')
-                        },
+
+                        "quota": isCustom ? {
+                                "containerSize": currentElement.get('quotaSize'),
+                                "cpuQuota": currentElement.get("cpuQuota"),
+                                "ramQuota": currentElement.get("ramQuota") + 'MiB',
+                                "homeQuota": currentElement.get("homeQuota") + 'GiB',
+                                "rootQuota": currentElement.get("rootQuota") + 'GiB',
+                                "varQuota": currentElement.get("varQuota") + 'GiB',
+                                "optQuota": currentElement.get("optQuota") + 'GiB'
+                            } : {"containerSize": currentElement.get('quotaSize')},
+
                         "templateName": currentElement.get('templateName'),
                         "templateId": currentElement.get('templateId'),
                         "name": currentElement.get('containerName'),
@@ -1158,11 +1178,37 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         filterPluginsList();
     }
 
-    function addSettingsToTemplate(settings) {
-        currentTemplate.set('quotaSize', settings.quotaSize);
-        currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
-        currentTemplate.set('containerName', settings.containerName);
-        //ngDialog.closeAll();
+
+    // TODO when container with custom quota is edited we need to obtain previously set quotas and set
+    // vm.templateSettings.quota object to reflect them for user to see current quotas!!!
+
+    function addSettingsToTemplate(templateSettings, sizeDetails) {
+        var isCustom = templateSettings.quotaSize == 'CUSTOM';
+
+        if (isCustom) {
+            //custom quota
+            console.log('CUSTOM');
+            console.log(templateSettings);
+        } else {
+            //predefined size
+            console.log('PREDEFINED: ' + templateSettings.quotaSize);
+            console.log(sizeDetails);
+        }
+
+        currentTemplate.set('quotaSize', templateSettings.quotaSize);
+
+        if (isCustom) {
+            currentTemplate.set('cpuQuota', templateSettings.cpuQuota);
+            currentTemplate.set('ramQuota', templateSettings.ramQuota);
+            currentTemplate.set('optQuota', templateSettings.optQuota);
+            currentTemplate.set('homeQuota', templateSettings.homeQuota);
+            currentTemplate.set('rootQuota', templateSettings.rootQuota);
+            currentTemplate.set('varQuota', templateSettings.varQuota);
+        }
+
+        currentTemplate.attr('rect.b-magnet/fill', vm.colors[templateSettings.quotaSize]);
+        currentTemplate.set('containerName', templateSettings.containerName);
+
         containerSettingMenu.hide();
 
         if (vm.isEditing) {
@@ -1175,12 +1221,22 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             if (res[0]) {
                 res = res[0];
 
-                if (res.type == settings.quotaSize && vm.editingEnv.changingContainers[id]) {
+                if (res.type == templateSettings.quotaSize && vm.editingEnv.changingContainers[id] && !isCustom) {
                     delete vm.editingEnv.changingContainers[id];
                 }
 
-                if (res.type != settings.quotaSize) {
-                    vm.editingEnv.changingContainers[id] = settings.quotaSize;
+                if (res.type != templateSettings.quotaSize || isCustom) {
+
+                    vm.editingEnv.changingContainers[id] = {"containerSize": templateSettings.quotaSize};
+
+                    if (isCustom) {
+                        vm.editingEnv.changingContainers[id].cpuQuota = templateSettings.cpuQuota;
+                        vm.editingEnv.changingContainers[id].ramQuota = templateSettings.ramQuota;
+                        vm.editingEnv.changingContainers[id].optQuota = templateSettings.optQuota;
+                        vm.editingEnv.changingContainers[id].homeQuota = templateSettings.homeQuota;
+                        vm.editingEnv.changingContainers[id].rootQuota = templateSettings.rootQuota;
+                        vm.editingEnv.changingContainers[id].varQuota = templateSettings.varQuota;
+                    }
                 }
             }
         }
@@ -1350,12 +1406,12 @@ function drop(event) {
 
     for (var i = 0; i < models.length; i++) {
         if (models[i].attributes.hostId !== undefined) {
-            addContainerToHost(models[i], template.toLowerCase(), img, null, null, null, templateId);
+            addContainerToHost(models[i], template.toLowerCase(), img, null, null, null, null, templateId);
         }
     }
 }
 
-function addContainerToHost(model, template, img, size, containerId, name, templateId) {
+function addContainerToHost(model, template, img, size, quota, containerId, name, templateId) {
     if (size === undefined || size === null) {
         size = 'SMALL';
         if (template == 'appscale') {
@@ -1395,6 +1451,13 @@ function addContainerToHost(model, template, img, size, containerId, name, templ
         parentPeerId: model.get('peerId'),
         parentHostId: model.get('hostId'),
         quotaSize: size,
+        cpuQuota: quota === null ? 33 : quota.cpu,
+        ramQuota: quota === null ? 2048 : quota.ram,
+        rootQuota: quota === null ? 1 : quota.root,
+        homeQuota: quota === null ? 2 : quota.home,
+        varQuota: quota === null ? 3 : quota.var,
+        optQuota: quota === null ? 4 : quota.opt,
+
         containerId: containerId,
         containerName: containerName,
         attrs: {

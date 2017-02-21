@@ -31,6 +31,12 @@ public class ContainerDiskResource extends ContainerResource<ByteValueResource>
     }
 
 
+    public ContainerDiskResource( final ContainerResourceType type, final double value, final ByteUnit unit )
+    {
+        this( type, new ByteValueResource( ByteValueResource.toBytes( BigDecimal.valueOf( value ), unit ) ) );
+    }
+
+
     /**
      * Usually used to write value to CLI
      */

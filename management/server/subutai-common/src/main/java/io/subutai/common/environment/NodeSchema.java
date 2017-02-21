@@ -4,7 +4,6 @@ package io.subutai.common.environment;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
