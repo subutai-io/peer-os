@@ -111,7 +111,15 @@ public class RestServiceImpl implements RestService
                                 host.getPeerId(), host.getResourceHostId().getId(), host.isLocal(), dataSource,
                                 host.getState(), host.getTemplateId(), host.getContainerName(),
                                 host.getResourceHostId().getId() );
-                containerDto.setQuota( new ContainerQuotaDto( host.getQuota() ) );
+                try
+                {
+                    containerDto.setQuota(new ContainerQuotaDto(host.getQuota()));
+                }
+                catch (Exception e)
+                {
+                    LOG.error( "Error getting container quota: {}", e .getMessage());
+                }
+
                 containers.add( containerDto );
             }
 
