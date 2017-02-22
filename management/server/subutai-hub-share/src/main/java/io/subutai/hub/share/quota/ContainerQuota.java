@@ -24,19 +24,6 @@ public class ContainerQuota
     @JsonProperty( value = "resources" )
     private Map<ContainerResourceType, Quota> resources;
 
-    //    @JsonProperty( "cpuQuota" )
-    //    private String cpu;
-    //    @JsonProperty( "ramQuota" )
-    //    private String ram;
-    //    @JsonProperty( "homeQuota" )
-    //    private String home;
-    //    @JsonProperty( "rootQuota" )
-    //    private String root;
-    //    @JsonProperty( "varQuota" )
-    //    private String var;
-    //    @JsonProperty( "optQuota" )
-    //    private String opt;
-
 
     public ContainerQuota( @JsonProperty( value = "containerSize" ) final ContainerSize containerSize,
                            @JsonProperty( value = "resources" ) final Map<ContainerResourceType, Quota> resources )
