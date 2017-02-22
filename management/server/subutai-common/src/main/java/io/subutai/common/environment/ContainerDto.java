@@ -60,10 +60,10 @@ public class ContainerDto
                          @JsonProperty( "environmentId" ) final String environmentId,
                          @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "ip" ) final String ip,
                          @JsonProperty( "templateName" ) final String templateName,
-                         @JsonProperty( "type" ) final ContainerSize type,
-                         @JsonProperty( "arch" ) final String arch, @JsonProperty( "tags" ) final Set<String> tags,
-                         @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId,
-                         @JsonProperty( "local" ) boolean local, @JsonProperty( "dataSource" ) String dataSource,
+                         @JsonProperty( "type" ) final ContainerSize type, @JsonProperty( "arch" ) final String arch,
+                         @JsonProperty( "tags" ) final Set<String> tags, @JsonProperty( "peerId" ) final String peerId,
+                         @JsonProperty( "hostId" ) final String hostId, @JsonProperty( "local" ) boolean local,
+                         @JsonProperty( "dataSource" ) String dataSource,
                          @JsonProperty( "state" ) ContainerHostState state,
                          @JsonProperty( "templateId" ) String templateId,
                          @JsonProperty( "containerName" ) String containerName, @JsonProperty( "rhId" ) String rhId )
@@ -92,23 +92,11 @@ public class ContainerDto
         return id;
     }
 
-    //
-    //    public void setId( final String id )
-    //    {
-    //        this.id = id;
-    //    }
-
 
     public String getEnvironmentId()
     {
         return environmentId;
     }
-
-
-    //    public void setEnvironmentId( final String environmentId )
-    //    {
-    //        this.environmentId = environmentId;
-    //    }
 
 
     public String getHostname()
@@ -117,10 +105,10 @@ public class ContainerDto
     }
 
 
-        public void setHostname( final String hostname )
-        {
-            this.hostname = hostname;
-        }
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
+    }
 
 
     public String getIp()
@@ -129,22 +117,16 @@ public class ContainerDto
     }
 
 
-    //    public void setIp( final String ip )
-    //    {
-    //        this.ip = ip;
-    //    }
-
-
     public String getTemplateName()
     {
         return templateName;
     }
 
 
-        public void setTemplateName( final String templateName )
-        {
-            this.templateName = templateName;
-        }
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
+    }
 
 
     public String getTemplateId()
@@ -153,34 +135,16 @@ public class ContainerDto
     }
 
 
-    //    public void setTemplateId( final String templateId )
-    //    {
-    //        this.templateId = templateId;
-    //    }
-
-
     public ContainerSize getType()
     {
         return type;
     }
 
 
-    //    public void setType( final ContainerSize type )
-    //    {
-    //        this.type = type;
-    //    }
-
-
     public String getArch()
     {
         return arch;
     }
-
-    //
-    //    public void setArch( final String arch )
-    //    {
-    //        this.arch = arch;
-    //    }
 
 
     public Set<String> getTags()
@@ -189,22 +153,10 @@ public class ContainerDto
     }
 
 
-    //    public void setTags( final Set<String> tags )
-    //    {
-    //        this.tags = tags;
-    //    }
-
-
     public String getPeerId()
     {
         return peerId;
     }
-
-
-    //    public void setPeerId( final String peerId )
-    //    {
-    //        this.peerId = peerId;
-    //    }
 
 
     public String getHostId()
@@ -213,22 +165,10 @@ public class ContainerDto
     }
 
 
-    //    public void setHostId( final String hostId )
-    //    {
-    //        this.hostId = hostId;
-    //    }
-
-
     public boolean isLocal()
     {
         return local;
     }
-    //
-    //
-    //    public void setLocal( final boolean local )
-    //    {
-    //        this.local = local;
-    //    }
 
 
     public ContainerHostState getState()
@@ -236,23 +176,11 @@ public class ContainerDto
         return state;
     }
 
-    //
-    //    public void setState( final ContainerHostState state )
-    //    {
-    //        this.state = state;
-    //    }
-
 
     public String getDataSource()
     {
         return dataSource;
     }
-
-
-    //    public void setDataSource( final String dataSource )
-    //    {
-    //        this.dataSource = dataSource;
-    //    }
 
 
     public String getContainerName()
@@ -271,12 +199,6 @@ public class ContainerDto
     {
         return rhId;
     }
-
-    //
-    //    public void setRhId( final String rhId )
-    //    {
-    //        this.rhId = rhId;
-    //    }
 
 
     public ContainerQuotaDto getQuota()
