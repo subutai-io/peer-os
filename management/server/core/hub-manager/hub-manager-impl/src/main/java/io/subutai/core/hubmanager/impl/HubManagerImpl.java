@@ -365,6 +365,8 @@ public class HubManagerImpl implements HubManager, HostListener
         sendResourceHostInfo();
 
         registrationRequestProcessor.run();
+
+        peerMetricsProcessor.request();
     }
 
 
