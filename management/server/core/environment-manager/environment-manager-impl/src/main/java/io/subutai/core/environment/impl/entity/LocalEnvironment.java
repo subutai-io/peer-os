@@ -565,7 +565,7 @@ public class LocalEnvironment implements Environment, Serializable
             }
             catch ( Exception e )
             {
-                LOG.warn( "Error getting container state: {}", e.getMessage() );
+                LOG.warn( "Error getting container state/quota: {}", e.getMessage() );
             }
 
             ContainerDto containerDto =

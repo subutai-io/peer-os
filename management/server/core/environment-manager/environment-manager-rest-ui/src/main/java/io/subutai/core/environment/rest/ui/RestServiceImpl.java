@@ -1147,10 +1147,11 @@ public class RestServiceImpl implements RestService
             {
                 containerDto.setQuota( new ContainerQuotaDto( containerHost.getQuota() ) );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
-                LOG.error( e.getMessage(), e );
+                LOG.error( "Error getting container quota: {}", e .getMessage());
             }
+
             containerDtos.add( containerDto );
         }
 

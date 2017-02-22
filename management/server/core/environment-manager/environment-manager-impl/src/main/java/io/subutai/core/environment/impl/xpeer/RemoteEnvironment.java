@@ -61,12 +61,12 @@ public class RemoteEnvironment extends LocalEnvironment
                             host.getResourceHostId().getId() );
             try
             {
-                final ContainerQuotaDto quota = new ContainerQuotaDto( host.getQuota() );
+                ContainerQuotaDto quota = new ContainerQuotaDto( host.getQuota() );
                 containerDto.setQuota( quota );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
-                LOG.error( e.getMessage(), e );
+                LOG.error( "Error getting container quota: {}", e .getMessage());
             }
 
             containerDtos.add( containerDto );
