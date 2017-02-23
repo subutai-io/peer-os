@@ -12,7 +12,7 @@
             <th>
               <div style="display: inline-block; float: left; margin-top: 8px">Public URL</div>
             </th>
-            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" tabindex=1 
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" tabindex=1
                                                    ng-model="settingsNetworkCtrl.config.publicUrl" required>
             </td>
           </tr>
@@ -22,6 +22,14 @@
             </th>
             <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" tabindex=1
                                                    ng-model="settingsNetworkCtrl.config.publicSecurePort" required>
+            </td>
+          </tr>
+          <tr>
+            <th>
+              <div style="display: inline-block; float: left; margin-top: 8px">Hub IP</div>
+            </th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" tabindex=1
+                                                   ng-model="settingsNetworkCtrl.config.hubIp" required>
             </td>
           </tr>
           <tr>
@@ -44,8 +52,8 @@
       </div>
       <button
           class="b-btn b-btn_green g-left g-margin-bottom"
-          ng-click="settingsNetworkCtrl.updateConfig()" 
-		  tabindex=6 
+          ng-click="settingsNetworkCtrl.updateConfig()"
+          tabindex=6
           style="margin-top: 15px">
         <i class="fa fa-floppy-o"></i>&#160;&#160;Save
       </button>

@@ -19,4 +19,8 @@ public interface NetworkSettings
     int getEndRange();
 
     void setEndRange( final int endRange );
+
+    String getHubIp();
+
+    void setHubIp( final String hubIp );
 }

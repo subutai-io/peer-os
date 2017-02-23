@@ -123,11 +123,11 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
-                                        final String endRange )
+                                        final String endRange, final String hubIp )
     {
         try
         {
-            systemManager.setNetworkSettings( publicUrl, publicSecurePort, startRange, endRange );
+            systemManager.setNetworkSettings( publicUrl, publicSecurePort, startRange, endRange, hubIp );
         }
         catch ( ConfigurationException e )
         {

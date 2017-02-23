@@ -319,8 +319,8 @@
                   <packageDependencies>
                     <packageDependencies>openjdk-8-jre-headless</packageDependencies>
                     <packageDependencies>curl</packageDependencies>
-                    <packageDependencies>gorjun-local</packageDependencies>
-                    <packageDependencies>influxdb</packageDependencies>
+                    <packageDependencies>gorjun</packageDependencies>
+                    <packageDependencies>subutai-influxdb</packageDependencies>
                   </packageDependencies>
                   <excludeAllArtifacts>true</excludeAllArtifacts>
                 </configuration>

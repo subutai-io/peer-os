@@ -55,8 +55,8 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     Response setNetworkSettings( @FormParam( "publicUrl" ) String publicUrl,
                                  @FormParam( "publicSecurePort" ) String publicSecurePort,
-                                 @FormParam( "startRange" ) String startRange,
-                                 @FormParam( "endRange" ) String endRange ) throws ConfigurationException;
+                                 @FormParam( "startRange" ) String startRange, @FormParam( "endRange" ) String endRange,
+                                 @FormParam( "hubIp" ) String hubIp ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )

@@ -10,6 +10,21 @@ public class NetworkSettingsPojo implements NetworkSettings
     private int publicSecurePort;
     private int startRange;
     private int endRange;
+    private String hubIp;
+
+
+    @Override
+    public String getHubIp()
+    {
+        return hubIp;
+    }
+
+
+    @Override
+    public void setHubIp( final String hubIp )
+    {
+        this.hubIp = hubIp;
+    }
 
 
     @Override
