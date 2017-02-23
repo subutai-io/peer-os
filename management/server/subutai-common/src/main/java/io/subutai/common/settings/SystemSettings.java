@@ -11,6 +11,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.LocalPeer;
@@ -31,11 +33,14 @@ public class SystemSettings
 
     private PropertiesConfiguration PROPERTIES = null;
     private volatile long lastSettingsReloadTs = 0L;
+    private static Cache<SystemSettings, Boolean> INSTANCES = CacheBuilder.newBuilder().weakKeys().build();
 
 
     public SystemSettings()
     {
         loadSettings();
+
+        INSTANCES.put( this, true );
     }
 
 
@@ -135,7 +140,7 @@ public class SystemSettings
                 NumUtil.isIntBetween( p2pPortStartRange, DEFAULT_P2P_PORT_START_RANGE, DEFAULT_P2P_PORT_END_RANGE ) );
         Preconditions.checkArgument( p2pPortEndRange > p2pPortStartRange );
 
-        invalidateCache();
+        invalidateCacheOfAll();
 
         saveProperty( P2P_PORT_START_RANGE_KEY, p2pPortStartRange );
         saveProperty( P2P_PORT_END_RANGE_KEY, p2pPortEndRange );
@@ -154,9 +159,18 @@ public class SystemSettings
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hubIp ) );
 
-        invalidateCache();
+        invalidateCacheOfAll();
 
         saveProperty( HUB_IP_KEY, hubIp );
+    }
+
+
+    private void invalidateCacheOfAll()
+    {
+        for ( SystemSettings systemSettings : INSTANCES.asMap().keySet() )
+        {
+            systemSettings.invalidateCache();
+        }
     }
 
 
