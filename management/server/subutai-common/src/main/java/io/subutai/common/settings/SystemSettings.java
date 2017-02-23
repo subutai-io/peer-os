@@ -30,7 +30,7 @@ public class SystemSettings
     private static final String P2P_PORT_END_RANGE_KEY = "p2pPortEndRange";
 
     private PropertiesConfiguration PROPERTIES = null;
-    private long lastSettingsReloadTs = 0L;
+    private volatile long lastSettingsReloadTs = 0L;
 
 
     public SystemSettings()
@@ -97,7 +97,7 @@ public class SystemSettings
     }
 
 
-    protected void saveProperty( final String name, final Object value )
+    private void saveProperty( final String name, final Object value )
     {
         try
         {
@@ -135,6 +135,8 @@ public class SystemSettings
                 NumUtil.isIntBetween( p2pPortStartRange, DEFAULT_P2P_PORT_START_RANGE, DEFAULT_P2P_PORT_END_RANGE ) );
         Preconditions.checkArgument( p2pPortEndRange > p2pPortStartRange );
 
+        invalidateCache();
+
         saveProperty( P2P_PORT_START_RANGE_KEY, p2pPortStartRange );
         saveProperty( P2P_PORT_END_RANGE_KEY, p2pPortEndRange );
     }
@@ -152,7 +154,15 @@ public class SystemSettings
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hubIp ) );
 
+        invalidateCache();
+
         saveProperty( HUB_IP_KEY, hubIp );
+    }
+
+
+    private void invalidateCache()
+    {
+        lastSettingsReloadTs = 0L;
     }
 }
 
