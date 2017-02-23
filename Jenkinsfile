@@ -95,7 +95,7 @@ node() {
 	}
 
 	/* stash p2p binary to use it in next node() */
-	stash includes: "management-jenkinsfile.deb", name: 'deb'
+	stash includes: "management-*.deb", name: 'deb'
 	stash includes: "management-subutai-template*", name: 'template'
 
 	stage("Update management on test node")
