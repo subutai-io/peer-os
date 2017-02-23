@@ -318,10 +318,9 @@
                   <maintainerName>Subutai Social</maintainerName>
                   <packageDependencies>
                     <packageDependencies>openjdk-8-jre-headless</packageDependencies>
-                    <packageDependencies>subutai-dnsmasq</packageDependencies>
-                    <packageDependencies>subutai-influxdb</packageDependencies>
                     <packageDependencies>curl</packageDependencies>
-                    <packageDependencies>gorjun</packageDependencies>
+                    <packageDependencies>gorjun-local</packageDependencies>
+                    <packageDependencies>influxdb</packageDependencies>
                   </packageDependencies>
                   <excludeAllArtifacts>true</excludeAllArtifacts>
                 </configuration>
