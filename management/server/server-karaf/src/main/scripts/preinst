@@ -1,8 +1,0 @@
-#!/bin/bash
-
-service management stop
-if [ "$?" == "1" ]; then
-	touch /tmp/.mng-firstrun
-else
-	rm -rf /opt/subutai-mng/data/*
-fi

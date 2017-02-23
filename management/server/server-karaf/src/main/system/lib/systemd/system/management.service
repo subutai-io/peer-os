@@ -1,0 +1,11 @@
+[Unit]
+Description=SS Management server.
+Documentation=https://github.com/subutai-io/base/wiki
+After=network-online.target
+
+[Service]
+ExecStart=/opt/subutai-mng/bin/start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
