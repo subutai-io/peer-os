@@ -37,7 +37,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response sendHeartbeat( String hubIp )
+    public Response sendHeartbeat()
     {
         try
         {
@@ -64,11 +64,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response register( final String hubIp, final String email, final String password, final String peerName )
+    public Response register( final String email, final String password, final String peerName )
     {
         try
         {
-            hubManager.registerPeer( hubIp, email, password, StringUtil.removeHtml( peerName ) );
+            hubManager.registerPeer( email, password, StringUtil.removeHtml( peerName ) );
 
             return Response.ok().build();
         }
@@ -89,7 +89,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response sendRHConfigurations( final String hubIp )
+    public Response sendRHConfigurations()
     {
         try
         {

@@ -348,13 +348,12 @@ public class HubManagerImpl implements HubManager, HostListener
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String hupIp, String email, String password, String peerName ) throws HubManagerException
+    public void registerPeer( String email, String password, String peerName ) throws HubManagerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hupIp ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );
 
-        RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
+        RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.registerPeer( email, password, peerName );
 
@@ -404,7 +403,7 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void unregisterPeer() throws HubManagerException
     {
-        RegistrationManager registrationManager = new RegistrationManager( this, configManager, null );
+        RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.unregister();
     }
