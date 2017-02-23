@@ -50,7 +50,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.peerNameValue = false;
 
     function updateHubIp() {
-        $http.get(SERVER_URL + '/rest/v1/system/hub_ip', {
+        $http.get(SERVER_URL + 'rest/v1/system/hub_ip', {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
         }).success(function () {
