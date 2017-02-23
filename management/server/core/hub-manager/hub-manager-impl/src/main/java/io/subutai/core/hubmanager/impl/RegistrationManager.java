@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import javax.ws.rs.core.Form;
 
+import io.subutai.common.settings.SystemSettings;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
@@ -36,18 +38,17 @@ public class RegistrationManager
 
     private final ConfigManager configManager;
 
-    private final String hubIp;
-
     private final String peerId;
 
     private final HubRestClient restClient;
 
+    private SystemSettings systemSettings = new SystemSettings();
 
-    public RegistrationManager( HubManagerImpl hubManager, ConfigManager configManager, String hupIp )
+
+    public RegistrationManager( HubManagerImpl hubManager, ConfigManager configManager )
     {
         this.hubManager = hubManager;
         this.configManager = configManager;
-        this.hubIp = hupIp;
         this.peerId = configManager.getPeerId();
 
         restClient = new HubRestClient( configManager );
@@ -135,8 +136,8 @@ public class RegistrationManager
         Config config;
         try
         {
-            config = new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ),
-                    email, peerName );
+            config = new ConfigEntity( regDto.getPeerInfo().getId(), systemSettings.getHubIp(),
+                    hubManager.getPeerInfo().get( "OwnerId" ), email, peerName );
         }
         catch ( Exception e )
         {

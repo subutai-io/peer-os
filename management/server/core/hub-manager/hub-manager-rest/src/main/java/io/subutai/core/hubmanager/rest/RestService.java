@@ -18,7 +18,7 @@ public interface RestService
     @POST
     @Path( "/send-heartbeat" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response sendHeartbeat( @QueryParam( "hubIp" ) String hubIp );
+    public Response sendHeartbeat();
 
     //Resend heartbeat
     @POST
@@ -30,14 +30,14 @@ public interface RestService
     @POST
     @Path( "/register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response register( @FormParam( "hubIp" ) String hubIp, @FormParam( "email" ) String email,
-                              @FormParam( "password" ) String password, @FormParam( "peerName" ) String peerName );
+    public Response register( @FormParam( "email" ) String email, @FormParam( "password" ) String password,
+                              @FormParam( "peerName" ) String peerName );
 
     //Send resource host configurations
     @POST
     @Path( "/send-rh-configurations" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response sendRHConfigurations( @QueryParam( "hubIp" ) String hubIp );
+    public Response sendRHConfigurations();
 
     //Register to HUB
     @GET
