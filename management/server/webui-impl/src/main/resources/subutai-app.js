@@ -53,7 +53,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         $http.get(SERVER_URL + 'rest/v1/system/hub_ip', {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
-        }).success(function () {
+        }).success(function (data) {
             vm.hubIp = data;
         }).error(function (error) {
             vm.hubIp = 'hub.subut.ai';
