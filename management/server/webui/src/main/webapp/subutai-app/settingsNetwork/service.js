@@ -19,7 +19,8 @@ function SettingsNetworkSrv($http) {
     }
 
     function updateConfig(config) {
-        var postData = "&publicUrl=" + config.publicUrl + "&publicSecurePort=" + config.publicSecurePort + "&startRange=" + config.startRange + "&endRange=" + config.endRange;
+        var postData = "&publicUrl=" + config.publicUrl + "&publicSecurePort=" + config.publicSecurePort +
+        "&startRange=" + config.startRange + "&endRange=" + config.endRange + "&hubIp=" + config.hubIp;
         return $http.post(
             SERVER_URL + "rest/v1/system/update_network_settings",
             postData,

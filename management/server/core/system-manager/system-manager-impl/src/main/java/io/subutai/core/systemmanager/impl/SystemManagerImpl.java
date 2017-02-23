@@ -137,6 +137,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setPublicSecurePort( systemSettings.getPublicSecurePort() );
         pojo.setStartRange( systemSettings.getP2pPortStartRange() );
         pojo.setEndRange( systemSettings.getP2pPortEndRange() );
+        pojo.setHubIp( systemSettings.getHubIp() );
 
         return pojo;
     }
@@ -145,7 +146,7 @@ public class SystemManagerImpl implements SystemManager
     @Override
     @RolesAllowed( "System-Management|Update" )
     public void setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
-                                    final String endRange ) throws ConfigurationException
+                                    final String endRange, final String hubIp ) throws ConfigurationException
     {
         try
         {
@@ -153,6 +154,8 @@ public class SystemManagerImpl implements SystemManager
                     Integer.parseInt( publicSecurePort ) );
 
             systemSettings.setP2pPortRange( Integer.parseInt( startRange ), Integer.parseInt( endRange ) );
+
+            systemSettings.setHubIp( hubIp );
         }
         catch ( Exception e )
         {
