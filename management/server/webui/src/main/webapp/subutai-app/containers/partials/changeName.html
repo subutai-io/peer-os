@@ -6,11 +6,11 @@
 		</a>
 	</div>
 
-	<form ng-submit="containerViewCtrl.setContainerName(containerViewCtrl.editingContainer, containerName)">
+	<form ng-submit="containerViewCtrl.setContainerName(containerViewCtrl.editingContainer, containerHostname)">
 		<div class="b-popup__body">
 
 			<div class="popup-body-box">
-				<input ng-model="containerName" ng-init="containerName=containerViewCtrl.editingContainer.containerName" />
+				<input ng-model="containerHostname" ng-init="containerHostname=containerViewCtrl.editingContainer.hostname" />
 			</div>
 
 		</div>

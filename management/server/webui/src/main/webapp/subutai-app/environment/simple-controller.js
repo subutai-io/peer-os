@@ -655,14 +655,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					return;
 					break;
 				case 'rotatable':
-					if (this.model.attributes.containerId) {
-						return;
-					}
-					/*vm.currentTemplate = this.model;
-					  ngDialog.open({
-					  template: 'subutai-app/environment/partials/popups/templateSettings.html',
-					  scope: $scope
-					  });*/
 					return;
 					break;
 				default:
@@ -1023,8 +1015,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				}
 			}
 
-			var containerNameArray = environment.containers[container].hostname.split('-');
-			var editedContainerName = containerNameArray[0];
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 				edited: true,
@@ -1038,7 +1028,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				optQuota: environment.containers[container].quota.opt,
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
-				containerName: editedContainerName,
+				containerName: environment.containers[container].hostname,
 				templateId : environment.containers[container].templateId,
 				attrs: {
 					image: { 'xlink:href': img },
@@ -1063,9 +1053,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		filterPluginsList();
 		//vm.selectedPlugin = false;
 	}
-
-    // TODO when container with custom quota is edited we need to obtain previously set quotas and set
-    // templateSettings.quota object to reflect them for user to see current quotas!!!
 
 	function addSettingsToTemplate(templateSettings, sizeDetails) {
         var isCustom = templateSettings.quotaSize == 'CUSTOM';
