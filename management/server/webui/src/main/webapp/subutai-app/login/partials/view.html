@@ -72,15 +72,17 @@
                       class="b-btn b-btn_green b-btn_full-width" id="subt-button__login" tabindex=3>
                 Login
               </button>
-              <button ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" type="submit" class="b-btn b-btn_green b-btn_full-width"
+              <button ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" type="submit"
+                      class="b-btn b-btn_green b-btn_full-width"
                       tabindex=3>
                 Save and login
               </button>
             </div>
 
-            <div class="reset-pwd" ng-if="loginCtrl.errorMessage && !loginCtrl.resetPwd">
+            <div class="reset-pwd" ng-if="loginCtrl.errorMessage && !loginCtrl.resetPwd && !loginCtrl.passExpired">
               <a ng-click="loginCtrl.requestPwdReset()">Reset password</a>
             </div>
+
           </form>
         </div>
       </div>
