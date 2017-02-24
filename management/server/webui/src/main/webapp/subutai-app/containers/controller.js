@@ -59,7 +59,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.getContainerStatus = getContainerStatus;
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
-	vm.getContainerNameFromHostName=getContainerNameFromHostName;
 	vm.createTemplatePopup=createTemplatePopup;
 	vm.createTemplate=createTemplate;
 	vm.hasKurjunToken=hasKurjunToken;
@@ -358,20 +357,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 		vm.editingContainer = container;
 
-		vm.editingContainer.containerName = getContainerNameFromHostName( container.hostname );
-
 		ngDialog.open({
 			template: 'subutai-app/containers/partials/changeName.html',
 			scope: $scope,
 			className: 'b-build-environment-info'
 		});
-	}
-
-	function getContainerNameFromHostName( name )
-	{
-		var regex = /-(\d)*-(\d)*$/;
-
-		return name.replace( regex, "" );
 	}
 
 	function createTemplatePopup(container){

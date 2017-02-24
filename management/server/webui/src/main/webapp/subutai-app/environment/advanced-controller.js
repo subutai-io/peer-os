@@ -688,11 +688,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     return;
                     break;
                 case 'rotatable':
-                    /*vm.currentTemplate = this.model;
-                     ngDialog.open({
-                     template: 'subutai-app/environment/partials/popups/templateSettingsAdvanced.html',
-                     scope: $scope
-                     });*/
                     return;
                     break;
                 default:
@@ -1178,10 +1173,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         filterPluginsList();
     }
 
-
-    // TODO when container with custom quota is edited we need to obtain previously set quotas and set
-    // vm.templateSettings.quota object to reflect them for user to see current quotas!!!
-
     function addSettingsToTemplate(templateSettings, sizeDetails) {
         var isCustom = templateSettings.quotaSize == 'CUSTOM';
 
@@ -1439,8 +1430,7 @@ function addContainerToHost(model, template, img, size, quota, containerId, name
     if (name == undefined || name == null) {
         containerName = 'Container ' + (containerCounter++).toString();
     } else {
-        var containerNameArray = name.split('-');
-        containerName = containerNameArray[0];
+        containerName = name;
     }
 
     var devElement = new joint.shapes.tm.devElement({
