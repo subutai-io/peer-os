@@ -241,6 +241,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         removeCookie('sptoken');
         localStorage.removeItem('kurjunToken');
         localStorage.removeItem('currentUserToken');
+        sessionStorage.removeItem('notifications');
         $location.path('login');
     }
 
