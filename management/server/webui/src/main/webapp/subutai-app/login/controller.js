@@ -83,6 +83,7 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
                         loginSrv.resetPass(postData).success(function(data){
                              $rootScope.currentUser = vm.name;
                              $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+                             sessionStorage.removeItem('notifications');
 
                              checkUserPermissions();
                          }).error(function(error){
@@ -96,6 +97,7 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
                     loginSrv.login( postData ).success(function(data){
                         $rootScope.currentUser = vm.name;
                         $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+                        sessionStorage.removeItem('notifications');
 
                         checkUserPermissions();
                     }).error(function(error){
