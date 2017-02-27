@@ -63,6 +63,8 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 
         vm.errorMessage="";
 
+	    sessionStorage.removeItem('notifications');
+
 		if( vm.newPass.length > 0 || vm.resetPwd) {
 
 			if( vm.newPass !== vm.passConf ) {
@@ -83,7 +85,6 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
                         loginSrv.resetPass(postData).success(function(data){
                              $rootScope.currentUser = vm.name;
                              $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
-                             sessionStorage.removeItem('notifications');
 
                              checkUserPermissions();
                          }).error(function(error){
@@ -97,7 +98,6 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
                     loginSrv.login( postData ).success(function(data){
                         $rootScope.currentUser = vm.name;
                         $http.defaults.headers.common['sptoken'] = getCookie('sptoken');
-                        sessionStorage.removeItem('notifications');
 
                         checkUserPermissions();
                     }).error(function(error){
@@ -112,7 +112,6 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 			loginSrv.login( postData ).success(function(data){
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
-				sessionStorage.removeItem('notifications');
 
 				checkUserPermissions();
 			}).error(function(error, status){
