@@ -242,6 +242,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         localStorage.removeItem('kurjunToken');
         localStorage.removeItem('currentUserToken');
         $location.path('login');
+        sessionStorage.removeItem('notifications');
     }
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
