@@ -20,6 +20,7 @@ import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesRequest;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
@@ -156,10 +157,34 @@ public class BuildContainerStateHandler extends StateHandler
 
         // Clone requests may be empty if all containers already exists. For example, in case of duplicated requests.
         CreateEnvironmentContainersResponse cloneResponses;
+
+        Set<CloneRequest> cloneRequestsSet = cloneRequests.getRequests();
+
+        //check if container with such hostname already exists within not registered ones
+        //destroy if so and then continue
+        Set<ContainerHostInfo> containerHostInfos = ctx.localPeer.getNotRegisteredContainers();
+        for ( CloneRequest cloneRequest : cloneRequestsSet )
+        {
+            for ( ContainerHostInfo containerHostInfo : containerHostInfos )
+            {
+                if ( cloneRequest.getHostname().equalsIgnoreCase( containerHostInfo.getHostname() ) )
+                {
+                    try
+                    {
+                        ctx.localPeer.destroyNotRegisteredContainer( containerHostInfo.getId() );
+                    }
+                    catch ( PeerException e )
+                    {
+                        log.warn( "Error destroying not registered duplicate container: {}", e.getMessage() );
+                    }
+                }
+            }
+        }
+
         try
         {
-            cloneResponses = cloneRequests.getRequests().isEmpty() ? null :
-                             ctx.localPeer.createEnvironmentContainers( cloneRequests );
+            cloneResponses =
+                    cloneRequestsSet.isEmpty() ? null : ctx.localPeer.createEnvironmentContainers( cloneRequests );
         }
         catch ( PeerException e )
         {
