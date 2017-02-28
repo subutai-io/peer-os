@@ -63,8 +63,7 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "Peer id: %s", containerHost.getPeerId() ) );
             System.out.println( String.format( "Peer status: %s", peerStatus ) );
             System.out.println( String.format( "Template name: %s", containerHost.getTemplateName() ) );
-            System.out.println( String.format( "IP: %s",
-                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
+            System.out.println( String.format( "IP: %s", containerHost.getIp() ) );
 
 
             if ( peerStatus == RegistrationStatus.APPROVED )

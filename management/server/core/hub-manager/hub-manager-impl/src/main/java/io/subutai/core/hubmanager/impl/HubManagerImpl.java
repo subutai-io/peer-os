@@ -801,7 +801,7 @@ public class HubManagerImpl implements HubManager, HostListener
     public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
                                             final String currentHostname )
     {
-        //TODO here we can handle hostname change propagation to /etc/hosts file for Hub environments
+
     }
 
 
