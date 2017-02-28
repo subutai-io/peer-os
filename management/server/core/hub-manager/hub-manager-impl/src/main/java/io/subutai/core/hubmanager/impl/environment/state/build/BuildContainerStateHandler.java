@@ -246,7 +246,7 @@ public class BuildContainerStateHandler extends StateHandler
         Set<ContainerHost> envContainers = ctx.localPeer.findContainersByEnvironmentId( envId );
 
         CreateEnvironmentContainersRequest createRequests =
-                new CreateEnvironmentContainersRequest( envId, peerDto.getPeerId(), peerDto.getOwnerId() );
+                new CreateEnvironmentContainersRequest( envId, Common.HUB_ID, peerDto.getOwnerId() );
 
         log.info( "Clone requests:" );
 
