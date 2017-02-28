@@ -80,7 +80,7 @@ public class ContainerCloneStep
         //remove already used container IPs
         for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
-            addresses.remove( containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() );
+            addresses.remove( containerHost.getIp() );
         }
 
         //obtain available ip address count

@@ -11,10 +11,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.exception.ActionFailedException;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -403,5 +407,53 @@ public class EnvironmentAdapter
 
             rhs.add( rhJson );
         }
+    }
+
+
+    public void handleHostnameChange( final ContainerHostInfo containerInfo, final String previousHostname,
+                                      final String currentHostname )
+    {
+        HubEnvironment environment = null;
+
+        for ( HubEnvironment hubEnvironment : getEnvironments( true ) )
+        {
+            try
+            {
+                hubEnvironment.getContainerHostById( containerInfo.getId() );
+                environment = hubEnvironment;
+
+                break;
+            }
+            catch ( ContainerHostNotFoundException e )
+            {
+                //ignore
+            }
+        }
+
+        if ( environment == null )
+        {
+            return;
+        }
+
+        for ( EnvironmentContainerHost containerHost : environment.getContainerHosts() )
+        {
+            try
+            {
+                containerHost.execute( getChangeHostnameInEtcHostsCommand( previousHostname, currentHostname ) );
+            }
+            catch ( CommandException e )
+            {
+                log.warn( "Error updating /etc/hosts file on container {} with container hostname change: [{}] -> [{}]",
+                        containerHost.getHostname(), previousHostname, currentHostname );
+            }
+        }
+    }
+
+
+    private RequestBuilder getChangeHostnameInEtcHostsCommand( String oldHostname, String newHostname )
+    {
+        return new RequestBuilder(
+                String.format( "sed -i 's/\\b%1$s\\b/%2$s/g' %4$s && sed -i 's/\\b%1$s.%3$s\\b/%2$s.%3$s/g' %4$s",
+                        oldHostname, newHostname, Common.DEFAULT_DOMAIN_NAME, Common.ETC_HOSTS_FILE ) );
     }
 }

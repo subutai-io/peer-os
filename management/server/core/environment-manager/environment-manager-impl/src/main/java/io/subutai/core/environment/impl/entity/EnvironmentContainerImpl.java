@@ -751,6 +751,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public String getIp()
     {
-        return getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
+        return getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
     }
 }

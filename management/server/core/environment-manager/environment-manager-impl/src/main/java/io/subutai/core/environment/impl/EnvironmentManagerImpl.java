@@ -1327,9 +1327,9 @@ public class EnvironmentManagerImpl
         {
             EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
-            return peerManager.getLocalPeer().isIpInVniDomain(
-                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":" + containerHost
-                            .getDomainPort(), environment.getVni() );
+            return peerManager.getLocalPeer()
+                              .isIpInVniDomain( containerHost.getIp() + ":" + containerHost.getDomainPort(),
+                                      environment.getVni() );
         }
         catch ( PeerException e )
         {
@@ -1385,17 +1385,15 @@ public class EnvironmentManagerImpl
         {
             if ( add )
             {
-                peerManager.getLocalPeer().addIpToVniDomain(
-                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":" + port,
-                        environment.getVni() );
+                peerManager.getLocalPeer().addIpToVniDomain( containerHost.getIp() + ":" + port, environment.getVni() );
 
                 ( ( EnvironmentContainerImpl ) containerHost ).setDomainPort( port );
             }
             else
             {
-                peerManager.getLocalPeer().removeIpFromVniDomain(
-                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() + ":"
-                                + containerHost.getDomainPort(), environment.getVni() );
+                peerManager.getLocalPeer()
+                           .removeIpFromVniDomain( containerHost.getIp() + ":" + containerHost.getDomainPort(),
+                                   environment.getVni() );
 
                 ( ( EnvironmentContainerImpl ) containerHost ).setDomainPort( null );
             }
@@ -1431,8 +1429,7 @@ public class EnvironmentManagerImpl
 
         try
         {
-            SshTunnel sshTunnel = peerManager.getLocalPeer().setupSshTunnelForContainer(
-                    environmentContainer.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+            SshTunnel sshTunnel = peerManager.getLocalPeer().setupSshTunnelForContainer( environmentContainer.getIp(),
                     Common.CONTAINER_SSH_TIMEOUT_SEC );
 
             operationTracker.addLogDone(
@@ -2614,6 +2611,11 @@ public class EnvironmentManagerImpl
             {
                 LOG.error( "Error updating container hostname on remote peer: {}", e.getMessage() );
             }
+        }
+        else if ( !environmentFound )
+        {
+            // Hub environment
+            environmentAdapter.handleHostnameChange( containerInfo, previousHostname, currentHostname );
         }
     }
 

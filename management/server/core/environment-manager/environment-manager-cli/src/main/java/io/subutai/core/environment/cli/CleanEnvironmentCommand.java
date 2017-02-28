@@ -23,8 +23,7 @@ import io.subutai.core.peer.api.PeerManager;
 public class CleanEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
-    @Argument( name = "envId", description = "Environment id",
-            index = 0, multiValued = false, required = true )
+    @Argument( name = "envId", description = "Environment id", index = 0, multiValued = false, required = true )
     String environmentId;
 
     private final EnvironmentManager environmentManager;
@@ -61,8 +60,7 @@ public class CleanEnvironmentCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "Peer id: %s", containerHost.getPeerId() ) );
             System.out.println( String.format( "Peer status: %s", peerStatus ) );
             System.out.println( String.format( "Template name: %s", containerHost.getTemplateName() ) );
-            System.out.println( String.format( "IP: %s",
-                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
+            System.out.println( String.format( "IP: %s", containerHost.getIp() ) );
 
 
             if ( peerStatus == RegistrationStatus.NOT_REGISTERED )

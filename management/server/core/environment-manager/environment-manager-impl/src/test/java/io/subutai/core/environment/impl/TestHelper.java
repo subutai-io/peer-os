@@ -162,6 +162,7 @@ public class TestHelper
         doReturn( new HostInterfaces( CONTAINER_ID, Sets.newHashSet( hostInterface ) ) ).when( environmentContainer )
                                                                                         .getHostInterfaces();
         doCallRealMethod().when( environmentContainer ).getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+        doCallRealMethod().when( environmentContainer ).getIp();
 
         return environmentContainer;
     }
