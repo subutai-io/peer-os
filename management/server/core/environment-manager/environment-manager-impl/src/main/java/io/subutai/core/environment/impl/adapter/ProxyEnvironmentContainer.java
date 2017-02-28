@@ -159,7 +159,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         Request req = requestBuilder.build( "id" );
 
-        String command = String.format( "ssh root@%s %s", targetHostIp, req.getCommand() );
+        String command = String.format( "ssh root@%s %s", targetHostIp, req.getCommand().replace( "\\", "\\\\" ) );
 
         LOG.debug( "Command wrapped '{}' to send via {}", command, proxyIp );
 
