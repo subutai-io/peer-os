@@ -46,13 +46,10 @@ node() {
 		case ~/master/: hubIp = "stage.subut.ai"; break;
 		default: hubIp = "dev.subut.ai"
 	}
-	// set hub address
-	sh """
-		sed 's/hubIp=.*/hubIp=${hubIp}/g' -i ${workspace}/management/server/server-karaf/src/main/assembly/etc/subutaisystem.cfg
-	"""
 
 	// build deb
 	sh """
+		sed 's/hubIp=.*/hubIp=${hubIp}/g' -i ${workspace}/management/server/server-karaf/src/main/assembly/etc/subutaisystem.cfg
 		cd management
 		export GIT_BRANCH=${env.BRANCH_NAME}
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
