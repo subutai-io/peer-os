@@ -11,6 +11,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnels;
 
 
@@ -123,5 +124,7 @@ public interface NetworkManager
     void addCustomProxy( CustomProxyConfig proxyConfig, ContainerHost containerHost ) throws NetworkManagerException;
 
     void removeCustomProxy( String vlan ) throws NetworkManagerException;
+
+    ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException;
 }
 

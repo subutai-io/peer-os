@@ -23,6 +23,9 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.Protocol;
+import io.subutai.common.protocol.ReservedPort;
+import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
@@ -419,5 +422,34 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( vlan ) );
 
         execute( getManagementHost(), commands.getRemoveVlanDomainCommand( vlan ) );
+    }
+
+
+    @Override
+    public ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+
+        ReservedPorts reservedPorts = new ReservedPorts();
+
+        CommandResult result = execute( host, commands.getGetReservedPortsCommand() );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "\\s*(\\w+)\\s*:\\s*(\\d+)\\s*" );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 2 )
+            {
+                reservedPorts.addReservedPort( new ReservedPort( Protocol.valueOf( m.group( 1 ).toUpperCase() ),
+                        Integer.parseInt( m.group( 2 ) ) ) );
+            }
+        }
+
+
+        return reservedPorts;
     }
 }

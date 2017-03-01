@@ -13,6 +13,7 @@ import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
@@ -137,4 +138,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     String exportTemplate( String templateName, boolean isPrivateTemplate, String token ) throws ResourceHostException;
 
     Set<String> listExistingContainerNames() throws ResourceHostException;
+
+    ReservedPorts getReservedPorts() throws ResourceHostException;
 }

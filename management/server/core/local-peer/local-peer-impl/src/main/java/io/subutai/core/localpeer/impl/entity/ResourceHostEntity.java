@@ -64,6 +64,7 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
@@ -1237,5 +1238,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
         return containerNames;
+    }
+
+
+    @Override
+    public ReservedPorts getReservedPorts() throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getReservedPorts( this );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to get reserved ports: %s", e.getMessage() ), e );
+        }
     }
 }
