@@ -42,7 +42,7 @@ node() {
 	// declare hub address
 	switch (env.BRANCH_NAME) {
 		case ~/master/: String hubIp = "stage.subut.ai"; break;
-		default: String hubIp = "dev.subut.ai"; break;
+		default: String hubIp = "dev.subut.ai"
 	}
 	// set hub address
 	sh """
@@ -194,7 +194,7 @@ node() {
 		// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 		switch (env.BRANCH_NAME) {
 			case ~/master/: String url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
-			default: String url = "https://devcdn.subut.ai:8338/kurjun/rest"; break;
+			default: String url = "https://devcdn.subut.ai:8338/kurjun/rest"
 		}
 
 		String user = "jenkins"
