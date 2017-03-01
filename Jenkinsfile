@@ -13,10 +13,7 @@
 // Scripts not permitted to use new <method>
 // Goto http://jenkins.domain/scriptApproval/
 // and approve methods denied methods
-//
-// TODO:
-// - refactor getVersion function on native groovy
-// - Stash and unstash for built artifacts (?)
+
 
 import groovy.json.JsonSlurperClassic
 
@@ -29,7 +26,6 @@ node() {
 
 	def mvnHome = tool 'M3'
 	def workspace = pwd()
-	// String artifactDir = "/tmp/jenkins/${env.JOB_NAME}"
 	
 	stage("Build management deb/template")
 	// Use maven to to build deb and template files of management
@@ -43,10 +39,15 @@ node() {
 	commitId = sh (script: "git rev-parse HEAD", returnStdout: true)
 	String serenityReportDir = "/var/lib/jenkins/www/serenity/${commitId}"
 
-	// create dir for artifacts
-	// sh """
-	// 	if test ! -d ${artifactDir}; then mkdir -p ${artifactDir}; fi
-	// """
+	// declare hub address
+	switch (env.BRANCH_NAME) {
+		case ~/master/: String hubIp = "stage.subut.ai"; break;
+		default: String hubIp = "dev.subut.ai"; break;
+	}
+	// set hub address
+	sh """
+		sed 's/hubIp=.*/hubIp=${hubIp=}/g' -i ${workspace}/management/server/server-karaf/src/main/assembly/etc/subutaisystem.cfg
+	"""
 
 	// build deb
 	sh """
@@ -190,7 +191,12 @@ node() {
 		notifyBuildDetails = "\nFailed on Stage - Deploy artifacts on kurjun"
 
 		// cdn auth creadentials 
-		String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
+		// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
+		switch (env.BRANCH_NAME) {
+			case ~/master/: String url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
+			default: String url = "https://devcdn.subut.ai:8338/kurjun/rest"; break;
+		}
+
 		String user = "jenkins"
 		def authID = sh (script: """
 			set +x
