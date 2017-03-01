@@ -436,7 +436,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile( "\\s*(\\d+)\\s*:\\s*(\\d+)\\s*" );
+        Pattern p = Pattern.compile( "\\s*(\\w+)\\s*:\\s*(\\d+)\\s*" );
 
         while ( st.hasMoreTokens() )
         {
