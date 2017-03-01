@@ -18,6 +18,8 @@
 import groovy.json.JsonSlurperClassic
 
 notifyBuildDetails = ""
+hubIp = ""
+url = ""
 
 node() {
 	// Send job started notifications
@@ -41,8 +43,8 @@ node() {
 
 	// declare hub address
 	switch (env.BRANCH_NAME) {
-		case ~/master/: String hubIp = "stage.subut.ai"; break;
-		default: String hubIp = "dev.subut.ai"
+		case ~/master/: hubIp = "stage.subut.ai"; break;
+		default: hubIp = "dev.subut.ai"
 	}
 	// set hub address
 	sh """
@@ -193,8 +195,8 @@ node() {
 		// cdn auth creadentials 
 		// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 		switch (env.BRANCH_NAME) {
-			case ~/master/: String url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
-			default: String url = "https://devcdn.subut.ai:8338/kurjun/rest"
+			case ~/master/: url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
+			default: url = "https://devcdn.subut.ai:8338/kurjun/rest"
 		}
 
 		String user = "jenkins"
@@ -211,7 +213,7 @@ node() {
 		// upload deb
 		String responseDeb = sh (script: """
 			set +x
-			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/apt/info?name=${debFileName}
+			curl -s -k ${url}/apt/info?name=${debFileName}
 			""", returnStdout: true)
 		sh """
 			set +x
@@ -232,7 +234,7 @@ node() {
 		// upload template
 		String responseTemplate = sh (script: """
 			set +x
-			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
+			curl -s -k ${url}/template/info?name=management'&'version=${env.BRANCH_NAME}
 			""", returnStdout: true)
 		def signatureTemplate = sh (script: """
 			set +x
@@ -303,7 +305,7 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
   // Get token
   def slackToken = getSlackToken('ss-bots-slack-token')
   // Send notifications
-  slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
+  // slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
 }
 
 // get slack token from global jenkins credentials store
