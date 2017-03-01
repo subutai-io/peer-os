@@ -22,7 +22,14 @@ public class Commands
     private static final String VXLAN_BINDING = "subutai vxlan";
     private static final String P2P_BINDING = "subutai p2p";
     private static final String PROXY_BINDING = "subutai proxy";
+    private static final String INFO_BINDING = "subutai info";
     private final SimpleDateFormat p2pDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+
+
+    public RequestBuilder getGetReservedPortsCommand()
+    {
+        return new RequestBuilder( INFO_BINDING ).withCmdArgs( Lists.<String>newArrayList( "ports" ) );
+    }
 
 
     public RequestBuilder getGetP2pVersionCommand()
