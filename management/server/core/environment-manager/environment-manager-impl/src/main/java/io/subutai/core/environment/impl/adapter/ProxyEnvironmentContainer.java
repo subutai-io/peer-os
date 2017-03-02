@@ -20,7 +20,10 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.Quota;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -164,5 +167,65 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         LOG.debug( "Command wrapped '{}' to send via {}", command, proxyIp );
 
         return new RequestBuilder( command ).withTimeout( requestBuilder.getTimeout() );
+    }
+
+
+    @Override
+    public ContainerHostState getState()
+    {
+        if ( isLocal() )
+        {
+            return super.getState();
+        }
+        else
+        {
+            //TODO for remote containers obtain from Hub metadata
+            return ContainerHostState.UNKNOWN;
+        }
+    }
+
+
+    @Override
+    public Quota getRawQuota()
+    {
+        if ( isLocal() )
+        {
+            return super.getRawQuota();
+        }
+        else
+        {
+            //TODO for remote containers obtain from Hub metadata
+            return null;
+        }
+    }
+
+
+    @Override
+    public SshKeys getAuthorizedKeys() throws PeerException
+    {
+        if ( isLocal() )
+        {
+            return super.getAuthorizedKeys();
+        }
+        else
+        {
+            //TODO for remote containers obtain from Hub metadata
+            return new SshKeys();
+        }
+    }
+
+
+    @Override
+    public ContainerQuota getQuota() throws PeerException
+    {
+        if ( isLocal() )
+        {
+            return super.getQuota();
+        }
+        else
+        {
+            //TODO for remote containers obtain from Hub metadata
+            return null;
+        }
     }
 }

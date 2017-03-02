@@ -1147,22 +1147,17 @@ public class RestServiceImpl implements RestService
                             containerHost.getState(), containerHost.getTemplateId(), containerHost.getContainerName(),
                             containerHost.getResourceHostId().getId() );
 
-            if ( containerHost.getPeer().isLocal() || containerHost.getPeer().isOnline() )
+            try
             {
-                try
+                ContainerQuota containerQuota = containerHost.getQuota();
+                if ( containerQuota != null )
                 {
-
-                    ContainerQuota containerQuota = containerHost.getQuota();
                     containerDto.setQuota( new ContainerQuotaDto( containerQuota ) );
                 }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error getting container quota: {}", e.getMessage() );
-                }
             }
-            else if ( !containerHost.getPeer().isLocal() )
+            catch ( Exception e )
             {
-                LOG.error( "Error getting container quota: peer {} is offline", containerHost.getPeer().getName() );
+                LOG.error( "Error getting container quota: {}", e.getMessage() );
             }
 
             containerDtos.add( containerDto );
