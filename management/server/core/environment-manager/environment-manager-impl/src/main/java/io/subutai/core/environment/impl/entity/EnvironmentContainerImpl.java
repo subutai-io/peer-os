@@ -194,13 +194,20 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public Quota getRawQuota()
     {
-        try
+        if ( getPeer().isLocal() || getPeer().isOnline() )
         {
-            return getPeer().getRawQuota( getContainerId() );
+            try
+            {
+                return getPeer().getRawQuota( getContainerId() );
+            }
+            catch ( PeerException e )
+            {
+                logger.error( "Failed to get quota: {}", e.getMessage() );
+            }
         }
-        catch ( PeerException e )
+        else if ( !getPeer().isLocal() )
         {
-            logger.error( "Failed to get quota: {}", e.getMessage() );
+            logger.error( "Failed to get quota: peer {} is offline", getPeer().getName() );
         }
 
         return null;
@@ -267,16 +274,23 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public ContainerHostState getState()
     {
-        try
+        if ( getPeer().isLocal() || getPeer().isOnline() )
         {
-            return getPeer().getContainerState( getContainerId() );
+            try
+            {
+                return getPeer().getContainerState( getContainerId() );
+            }
+            catch ( Exception e )
+            {
+                logger.warn( "Error getting container state: {}", e.getMessage() );
+            }
         }
-        catch ( Exception e )
+        else if ( !getPeer().isLocal() )
         {
-            logger.warn( "Error getting container state: {}", e.getMessage() );
+            logger.warn( "Error getting container state: peer {} is offline", getPeer().getName() );
+        }
 
-            return ContainerHostState.UNKNOWN;
-        }
+        return ContainerHostState.UNKNOWN;
     }
 
 
