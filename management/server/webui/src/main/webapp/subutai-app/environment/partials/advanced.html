@@ -205,7 +205,7 @@
                 <div class="body">
                   <div class="b-form-group">
                     <div class="b-form-group__label">Container hostname</div>
-                    <input type="text"
+                    <input type="text" ng-focus="onTextFocus($event)"
                            id="js-container-name"
                            class="b-form-input b-form-input_full"
                            ng-model="templateSettings.containerName" required>
