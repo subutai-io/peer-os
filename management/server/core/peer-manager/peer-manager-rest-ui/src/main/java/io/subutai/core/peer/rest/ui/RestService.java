@@ -43,6 +43,11 @@ public interface RestService
     Response renamePeer( @FormParam( "peerId" ) String peerId, @FormParam( "name" ) String name );
 
     @PUT
+    @Path( "url" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response updatePeerUrl( @FormParam( "peerId" ) String peerId, @FormParam( "ip" ) String ip );
+
+    @PUT
     @Path( "unregister" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response unregisterForRegistrationRequest( @FormParam( "peerId" ) String peerId,

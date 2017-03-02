@@ -180,7 +180,7 @@ public class EnvironmentWebClient
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/state", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 3000, 15000, 1 );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -239,7 +239,7 @@ public class EnvironmentWebClient
             String path = String.format( "/%s/container/%s/quota", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
 
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -524,7 +524,7 @@ public class EnvironmentWebClient
             String path = String.format( "/%s/container/%s/sshkeys", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
 
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -913,7 +913,7 @@ public class EnvironmentWebClient
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/quota/raw", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 3000, 15000, 1 );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );

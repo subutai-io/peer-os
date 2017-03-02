@@ -74,8 +74,7 @@ public class HubEnvironment extends LocalEnvironment implements io.subutai.commo
             for ( JsonNode node : arr )
             {
                 ProxyEnvironmentContainer ch =
-                        new ProxyEnvironmentContainer( node, node.get( "templateId" ).asText(), environmentManager,
-                                localContainerIds );
+                        new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
 
                 ch.setEnvironment( this );
 

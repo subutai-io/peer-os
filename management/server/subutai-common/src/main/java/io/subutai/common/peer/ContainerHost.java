@@ -45,6 +45,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - resource usage
      */
+    @Deprecated
     ProcessResourceUsage getProcessResourceUsage( int processPid ) throws PeerException;
 
 

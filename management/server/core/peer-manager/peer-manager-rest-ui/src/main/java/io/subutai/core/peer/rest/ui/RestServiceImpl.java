@@ -250,6 +250,31 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
+
+    @RolesAllowed( { "Peer-Management|Update" } )
+    @Override
+    public Response updatePeerUrl( final String peerId, final String ip )
+    {
+        try
+        {
+            peerManager.updatePeerUrl( peerId, ip );
+        }
+        catch ( Exception e )
+        {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public Response unregisterForRegistrationRequest( final String peerId, Boolean force )
@@ -278,6 +303,7 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
+
     @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response getResourceHosts()
@@ -290,6 +316,7 @@ public class RestServiceImpl implements RestService
     {
         return new ExecutorCompletionService<>( executor );
     }
+
 
     @RolesAllowed( { "Peer-Management|Read" } )
     @Override

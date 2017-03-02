@@ -22,6 +22,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 /**
@@ -113,11 +114,15 @@ public class RestServiceImpl implements RestService
                                 host.getResourceHostId().getId() );
                 try
                 {
-                    containerDto.setQuota(new ContainerQuotaDto(host.getQuota()));
+                    ContainerQuota containerQuota = host.getQuota();
+                    if ( containerQuota != null )
+                    {
+                        containerDto.setQuota( new ContainerQuotaDto( containerQuota ) );
+                    }
                 }
-                catch (Exception e)
+                catch ( Exception e )
                 {
-                    LOG.error( "Error getting container quota: {}", e .getMessage());
+                    LOG.error( "Error getting container quota: {}", e.getMessage() );
                 }
 
                 containers.add( containerDto );

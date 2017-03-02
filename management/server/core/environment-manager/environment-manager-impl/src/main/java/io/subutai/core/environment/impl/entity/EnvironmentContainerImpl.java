@@ -274,9 +274,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         catch ( Exception e )
         {
             logger.warn( "Error getting container state: {}", e.getMessage() );
-
-            return ContainerHostState.UNKNOWN;
         }
+
+        return ContainerHostState.UNKNOWN;
     }
 
 

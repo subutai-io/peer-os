@@ -304,7 +304,8 @@ public class RestServiceImpl implements RestService
 
 
             List<String> removedContainersList = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
 
             Map<String, ContainerQuota> changedContainersFiltered = getChangedContainers( quotaContainers );
@@ -354,7 +355,8 @@ public class RestServiceImpl implements RestService
             topology.addAllNodePlacement( nodes );
 
             List<String> containersToRemove = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             Map<String, ContainerQuota> changedContainersFiltered = getChangedContainers( quotaContainers );
 
@@ -940,7 +942,8 @@ public class RestServiceImpl implements RestService
             EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             for ( String tag : tags )
             {
@@ -1143,13 +1146,18 @@ public class RestServiceImpl implements RestService
                             containerHost.getResourceHostId().getId(), containerHost.isLocal(), datasource,
                             containerHost.getState(), containerHost.getTemplateId(), containerHost.getContainerName(),
                             containerHost.getResourceHostId().getId() );
+
             try
             {
-                containerDto.setQuota( new ContainerQuotaDto( containerHost.getQuota() ) );
+                ContainerQuota containerQuota = containerHost.getQuota();
+                if ( containerQuota != null )
+                {
+                    containerDto.setQuota( new ContainerQuotaDto( containerQuota ) );
+                }
             }
             catch ( Exception e )
             {
-                LOG.error( "Error getting container quota: {}", e .getMessage());
+                LOG.error( "Error getting container quota: {}", e.getMessage() );
             }
 
             containerDtos.add( containerDto );

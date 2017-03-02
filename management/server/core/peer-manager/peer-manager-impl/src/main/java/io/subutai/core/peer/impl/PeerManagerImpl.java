@@ -470,6 +470,61 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
+    @Override
+    public void updatePeerUrl( final String peerId, final String ip ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid peer ip" );
+
+        PeerData peerData = loadPeerData( peerId );
+
+        if ( peerData == null )
+        {
+            throw new PeerNotRegisteredException();
+        }
+
+        if ( localPeerId.equals( peerId ) )
+        {
+            throw new PeerException( "Can not update Local Peer url. Use System -> Network page for this" );
+        }
+
+        URL destinationUrl = checkDestinationHostConstraints( ip );
+
+        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
+
+        try
+        {
+            SocketUtil.check( peerInfo.getIp(), 3, peerInfo.getPublicSecurePort() );
+        }
+        catch ( NetworkException e )
+        {
+            throw new PeerException( e.getMessage() );
+        }
+
+        Peer peer = constructPeerPojo( peerData );
+
+        peer.getPeerInfo().setPublicUrl( peerInfo.getPublicUrl() );
+
+        peer.getPeerInfo().setPublicSecurePort( peerInfo.getPublicSecurePort() );
+
+        try
+        {
+            peerData.setInfo( toJson( peer.getPeerInfo() ) );
+        }
+        catch ( IOException e )
+        {
+            throw new PeerException( e );
+        }
+
+        //update db
+        updatePeerData( peerData );
+
+        //update cache
+        updatePeerInCache( peer );
+    }
+
+
     @Override
     public List<Peer> getPeers()
     {

@@ -89,4 +89,6 @@ public interface PeerManager
     void checkHostAvailability( final String destinationHost ) throws PeerException;
 
     void setName( String peerId, String newName ) throws PeerException;
+
+    void updatePeerUrl( String peerId, String ip ) throws PeerException;
 }
