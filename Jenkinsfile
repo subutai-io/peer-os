@@ -92,6 +92,8 @@ node() {
 			/apps/bin/lxc-attach -n management -- openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -subj '/C=KG/ST=Subutai/L=Bishkek/O=Kyrgyzstan/CN=gw.intra.lan' -keyout /etc/influxdb/influxkey.pem -out etc/influxdb/influxcert.pem
 			/apps/bin/lxc-attach -n management -- sh -c 'cat /etc/influxdb/influxkey.pem /etc/influxdb/influxcert.pem > /etc/influxdb/influxdb.pem'
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
+			/apps/bin/lxc-attach -n management -- mkdir -p /opt/gorjun/etc/
+			/apps/bin/lxc-attach -n management -- echo -e "[CDN]\nnode = https://devcdn.subut.ai:8338" > /opt/gorjun/etc/gorjun.gcfg
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
 			/apps/bin/subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
