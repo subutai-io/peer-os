@@ -91,6 +91,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	//plugins
 	vm.gotToPlugin = gotToPlugin;
 
+    $scope.onTextFocus = function ($event) {
+      $event.target.select();
+    };
+
 	function changeMode(modeStatus) {
 		if(modeStatus) {
 			vm.activeMode = 'advanced';
