@@ -13,14 +13,13 @@
 // Scripts not permitted to use new <method>
 // Goto http://jenkins.domain/scriptApproval/
 // and approve methods denied methods
-//
-// TODO:
-// - refactor getVersion function on native groovy
-// - Stash and unstash for built artifacts (?)
+
 
 import groovy.json.JsonSlurperClassic
 
 notifyBuildDetails = ""
+hubIp = ""
+url = ""
 
 node() {
 	// Send job started notifications
@@ -29,7 +28,6 @@ node() {
 
 	def mvnHome = tool 'M3'
 	def workspace = pwd()
-	// String artifactDir = "/tmp/jenkins/${env.JOB_NAME}"
 	
 	stage("Build management deb/template")
 	// Use maven to to build deb and template files of management
@@ -43,13 +41,21 @@ node() {
 	commitId = sh (script: "git rev-parse HEAD", returnStdout: true)
 	String serenityReportDir = "/var/lib/jenkins/www/serenity/${commitId}"
 
-	// create dir for artifacts
-	// sh """
-	// 	if test ! -d ${artifactDir}; then mkdir -p ${artifactDir}; fi
-	// """
+	// declare hub address
+	switch (env.BRANCH_NAME) {
+		case ~/master/: hubIp = "stage.subut.ai"; break;
+		default: hubIp = "dev.subut.ai"
+	}
+
+	// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
+	switch (env.BRANCH_NAME) {
+		case ~/master/: url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
+		default: url = "https://devcdn.subut.ai:8338/kurjun/rest"
+	}
 
 	// build deb
 	sh """
+		sed 's/hubIp=.*/hubIp=${hubIp}/g' -i ${workspace}/management/server/server-karaf/src/main/assembly/etc/subutaisystem.cfg
 		cd management
 		export GIT_BRANCH=${env.BRANCH_NAME}
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
@@ -86,6 +92,8 @@ node() {
 			/apps/bin/lxc-attach -n management -- openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -subj '/C=KG/ST=Subutai/L=Bishkek/O=Kyrgyzstan/CN=gw.intra.lan' -keyout /etc/influxdb/influxkey.pem -out etc/influxdb/influxcert.pem
 			/apps/bin/lxc-attach -n management -- sh -c 'cat /etc/influxdb/influxkey.pem /etc/influxdb/influxcert.pem > /etc/influxdb/influxdb.pem'
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
+			/apps/bin/lxc-attach -n management -- mkdir -p /opt/gorjun/etc/
+			/apps/bin/lxc-attach -n management -- echo -e "[CDN]\nnode = https://devcdn.subut.ai:8338" > /opt/gorjun/etc/gorjun.gcfg
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
 			/apps/bin/subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
@@ -113,7 +121,7 @@ node() {
 				subutai destroy everything
 				if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
 				if test -f /mnt/lib/lxc/tmpdir/management-subutai-template_*; then rm /mnt/lib/lxc/tmpdir/management-subutai-template_*; fi
-				/apps/subutai/current/bin/curl https://cdn.subut.ai:8338/kurjun/rest/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
+				/apps/subutai/current/bin/curl ${url}/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
 				if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
 				snappy install --allow-unauthenticated /tmp/subutai-latest.snap
 			EOF"""
@@ -190,7 +198,6 @@ node() {
 		notifyBuildDetails = "\nFailed on Stage - Deploy artifacts on kurjun"
 
 		// cdn auth creadentials 
-		String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 		String user = "jenkins"
 		def authID = sh (script: """
 			set +x
@@ -205,7 +212,7 @@ node() {
 		// upload deb
 		String responseDeb = sh (script: """
 			set +x
-			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/apt/info?name=${debFileName}
+			curl -s -k ${url}/apt/info?name=${debFileName}
 			""", returnStdout: true)
 		sh """
 			set +x
@@ -226,7 +233,7 @@ node() {
 		// upload template
 		String responseTemplate = sh (script: """
 			set +x
-			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
+			curl -s -k ${url}/template/info?name=management'&'version=${env.BRANCH_NAME}
 			""", returnStdout: true)
 		def signatureTemplate = sh (script: """
 			set +x
@@ -297,7 +304,7 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
   // Get token
   def slackToken = getSlackToken('ss-bots-slack-token')
   // Send notifications
-  slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
+  // slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
 }
 
 // get slack token from global jenkins credentials store
