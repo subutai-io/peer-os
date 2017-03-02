@@ -93,8 +93,7 @@ node() {
 			/apps/bin/lxc-attach -n management -- sh -c 'cat /etc/influxdb/influxkey.pem /etc/influxdb/influxcert.pem > /etc/influxdb/influxdb.pem'
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
 			/apps/bin/lxc-attach -n management -- mkdir -p /opt/gorjun/etc/
-			/apps/bin/lxc-attach -n management -- sync
-			/apps/bin/lxc-attach -n management -- sh -c 'echo -e "[CDN]\nnode = https://devcdn.subut.ai:8338" > /opt/gorjun/etc/gorjun.gcfg'
+			/apps/bin/lxc-attach -n management -- sh -c 'echo "[CDN]\nnode = https://devcdn.subut.ai:8338" > /opt/gorjun/etc/gorjun.gcfg'
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
 			/apps/bin/subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
@@ -227,7 +226,7 @@ node() {
 			def jsonDeb = jsonParse(responseDeb)	
 			sh """
 				set +x
-				curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb["id"]}'&'token=${token}
+				curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${token}
 			"""
 		}
 
@@ -250,7 +249,7 @@ node() {
 			def jsonTemplate = jsonParse(responseTemplate)
 			sh """
 				set +x
-				curl -s -k -X DELETE ${url}/template/delete?id=${jsonTemplate["id"]}'&'token=${token}
+				curl -s -k -X DELETE ${url}/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
 			"""
 		}
 	}
@@ -305,7 +304,7 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
   // Get token
   def slackToken = getSlackToken('ss-bots-slack-token')
   // Send notifications
-  // slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
+  slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
 }
 
 // get slack token from global jenkins credentials store
