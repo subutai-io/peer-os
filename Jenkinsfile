@@ -47,6 +47,12 @@ node() {
 		default: hubIp = "dev.subut.ai"
 	}
 
+	// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
+	switch (env.BRANCH_NAME) {
+		case ~/master/: url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
+		default: url = "https://devcdn.subut.ai:8338/kurjun/rest"
+	}
+
 	// build deb
 	sh """
 		sed 's/hubIp=.*/hubIp=${hubIp}/g' -i ${workspace}/management/server/server-karaf/src/main/assembly/etc/subutaisystem.cfg
@@ -113,7 +119,7 @@ node() {
 				subutai destroy everything
 				if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
 				if test -f /mnt/lib/lxc/tmpdir/management-subutai-template_*; then rm /mnt/lib/lxc/tmpdir/management-subutai-template_*; fi
-				/apps/subutai/current/bin/curl https://cdn.subut.ai:8338/kurjun/rest/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
+				/apps/subutai/current/bin/curl ${url}/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
 				if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
 				snappy install --allow-unauthenticated /tmp/subutai-latest.snap
 			EOF"""
@@ -190,12 +196,6 @@ node() {
 		notifyBuildDetails = "\nFailed on Stage - Deploy artifacts on kurjun"
 
 		// cdn auth creadentials 
-		// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
-		switch (env.BRANCH_NAME) {
-			case ~/master/: url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
-			default: url = "https://devcdn.subut.ai:8338/kurjun/rest"
-		}
-
 		String user = "jenkins"
 		def authID = sh (script: """
 			set +x
