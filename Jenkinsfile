@@ -94,7 +94,7 @@ node() {
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
 			/apps/bin/lxc-attach -n management -- mkdir -p /opt/gorjun/etc/
 			/apps/bin/lxc-attach -n management -- sync
-			/apps/bin/lxc-attach -n management -- echo -e "[CDN]\nnode = https://devcdn.subut.ai:8338" > /opt/gorjun/etc/gorjun.gcfg
+			/apps/bin/lxc-attach -n management -- sh -c 'echo -e "[CDN]\nnode = https://devcdn.subut.ai:8338" > /opt/gorjun/etc/gorjun.gcfg'
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
 			/apps/bin/subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
