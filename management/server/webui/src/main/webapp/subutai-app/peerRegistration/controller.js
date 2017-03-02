@@ -14,6 +14,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	vm.peerStatusIco = "";
 	vm.editingPeerId = "";
 	vm.editingPeerName = "";
+	vm.editingPeerIp = "";
 
 
 	cfpLoadingBar.start();
@@ -33,6 +34,8 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	vm.checkResourceHost = checkResourceHost;
 	vm.changeNamePopup = changeNamePopup;
 	vm.renamePeer = renamePeer;
+	vm.updatePeerUrl = updatePeerUrl;
+	vm.updateUrlPopup = updateUrlPopup;
 
 	vm.dtInstance = {};
 	vm.users = {};
@@ -84,6 +87,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 		if(data.registrationData.status == 'APPROVED') {
 			result += '<a href class="b-btn b-btn_red subt_button__peer-unregister" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Unregister\')">Unregister</a>';
 			result += '<a href class="b-btn b-btn_blue subt_button__peer-rename" ng-click="peerRegistrationCtrl.changeNamePopup(\'' + data.registrationData.peerInfo.id + '\', \'' + data.registrationData.peerInfo.name + '\')">Rename</a>';
+			result += '<a href class="b-btn b-btn_white subt_button__peer-update-url" ng-click="peerRegistrationCtrl.updateUrlPopup(\'' + data.registrationData.peerInfo.id + '\', \'' + data.registrationData.peerInfo.publicUrl + '\')">Change url</a>';
 		} else if(data.registrationData.status == 'WAIT') {
 			//result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.cancelPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Cancel</a>';
 			result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Cancel\')">Cancel</a>';
@@ -225,6 +229,15 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
         } );
     }
 
+    function updatePeerUrl(peerId, ip){
+        LOADING_SCREEN();
+        peerRegistrationService.updatePeerUrl( peerId, ip ).success( function (data) {
+          location.reload();
+        } ).error( function (data) {
+          SweetAlert.swal ("ERROR!", data);
+        } );
+    }
+
 	function changeNamePopup( peerId, oldName ) {
 
 		vm.editingPeerId = peerId;
@@ -232,6 +245,18 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 		ngDialog.open({
 			template: 'subutai-app/peerRegistration/partials/changeName.html',
+			scope: $scope,
+			className: 'b-build-environment-info'
+		});
+	}
+
+	function updateUrlPopup( peerId, oldIp ) {
+
+		vm.editingPeerId = peerId;
+        vm.editingPeerIp = oldIp;
+
+		ngDialog.open({
+			template: 'subutai-app/peerRegistration/partials/updateUrl.html',
 			scope: $scope,
 			className: 'b-build-environment-info'
 		});
