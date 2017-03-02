@@ -42,7 +42,6 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     private final boolean local;
 
 
-    //temporary workaround until we get template id from Hub
     ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager, Set<String> localContainerIds )
     {
 
