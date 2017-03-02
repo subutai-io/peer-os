@@ -504,6 +504,10 @@ public class PeerManagerImpl implements PeerManager
 
         Peer peer = constructPeerPojo( peerData );
 
+        peer.getPeerInfo().setPublicUrl( peerInfo.getPublicUrl() );
+
+        peer.getPeerInfo().setPublicSecurePort( peerInfo.getPublicSecurePort() );
+
         try
         {
             peerData.setInfo( toJson( peer.getPeerInfo() ) );
@@ -512,10 +516,6 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new PeerException( e );
         }
-
-        peer.getPeerInfo().setPublicUrl( peerInfo.getPublicUrl() );
-
-        peer.getPeerInfo().setPublicSecurePort( peerInfo.getPublicSecurePort() );
 
         //update db
         updatePeerData( peerData );
