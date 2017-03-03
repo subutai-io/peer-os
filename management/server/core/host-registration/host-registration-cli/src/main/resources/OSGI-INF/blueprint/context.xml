@@ -1,7 +1,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/approve">
+    <command name="host/approve">
       <action class="io.subutai.core.registration.cli.ApproveRequest">
         <argument ref="nodeRegistration" />
       </action>
@@ -10,7 +10,7 @@
 
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/reject">
+    <command name="host/reject">
       <action class="io.subutai.core.registration.cli.RejectRequest">
         <argument ref="nodeRegistration" />
       </action>
@@ -18,7 +18,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/list">
+    <command name="host/requests">
       <action class="io.subutai.core.registration.cli.ListRequests">
         <argument ref="nodeRegistration" />
       </action>
@@ -26,7 +26,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/generate-token">
+    <command name="host/generate-token">
       <action class="io.subutai.core.registration.cli.GenerateContainerToken">
         <argument ref="nodeRegistration" />
       </action>
@@ -34,7 +34,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/verify">
+    <command name="host/verify">
       <action class="io.subutai.core.registration.cli.VerifyContainerToken">
         <argument ref="nodeRegistration" />
       </action>
@@ -42,7 +42,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/clear-requests">
+    <command name="host/clear-requests">
       <action class="io.subutai.core.registration.cli.ClearRequests">
         <argument ref="nodeRegistration" />
       </action>

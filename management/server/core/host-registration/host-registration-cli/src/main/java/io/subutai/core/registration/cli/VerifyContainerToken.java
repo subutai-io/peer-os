@@ -10,7 +10,7 @@ import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.ContainerToken;
 
 
-@Command( scope = "node", name = "verify", description = "Verifies container token" )
+@Command( scope = "host", name = "verify", description = "Verifies container token" )
 public class VerifyContainerToken extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "token", multiValued = false, required = true, description = "Token" )

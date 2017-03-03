@@ -10,7 +10,7 @@ import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
-@Command( scope = "node", name = "clear-requests", description = "clear all request" )
+@Command( scope = "host", name = "clear-requests", description = "clear all request" )
 public class ClearRequests extends SubutaiShellCommandSupport
 {
     private HostRegistrationManager registrationManager;

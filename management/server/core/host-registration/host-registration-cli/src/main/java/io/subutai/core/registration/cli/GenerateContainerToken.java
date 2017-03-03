@@ -8,7 +8,7 @@ import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.ContainerToken;
 
 
-@Command( scope = "node", name = "generate-token", description = "Generates container token" )
+@Command( scope = "host", name = "generate-token", description = "Generates container token" )
 public class GenerateContainerToken extends SubutaiShellCommandSupport
 {
     private HostRegistrationManager registrationManager;

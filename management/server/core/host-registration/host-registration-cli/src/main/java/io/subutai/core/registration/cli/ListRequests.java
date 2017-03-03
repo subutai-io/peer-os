@@ -11,7 +11,7 @@ import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
-@Command( scope = "node", name = "list", description = "approve new registration request" )
+@Command( scope = "host", name = "requests", description = "approve new registration request" )
 public class ListRequests extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "fullInfo", multiValued = false, required = false, description = "Request full "

@@ -9,9 +9,6 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-/**
- * List all existing environments
- */
 @Command( scope = "environment", name = "list-deleted-on-hub", description = "Command to view deleted Hub "
         + "environments" )
 public class ListDeletedHubEnvironmentsCommand extends SubutaiShellCommandSupport

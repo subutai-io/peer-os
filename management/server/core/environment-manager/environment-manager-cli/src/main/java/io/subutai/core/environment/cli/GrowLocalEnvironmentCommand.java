@@ -21,7 +21,7 @@ import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
- * Adds environment container hosts to target environment
+ * Adds environment container host to target environment
  */
 @Command( scope = "environment", name = "grow-local", description = "Command to grow local environment" )
 public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
@@ -41,15 +41,6 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
      * <p>{@code required = true}</p>
      */
             String templateName;
-
-
-    @Argument( name = "numberOfContainers", description = "Number of containers", index = 2, multiValued = false,
-            required = true )
-    /**
-     * {@value numberOfContainers} number of containers to add to environment
-     * <p>{@code required = true}</p>
-     */
-            int numberOfContainers;
 
 
     @Argument( name = "async", description = "asynchronous build", index = 3, multiValued = false, required = false )
