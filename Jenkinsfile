@@ -19,7 +19,7 @@ import groovy.json.JsonSlurperClassic
 
 notifyBuildDetails = ""
 hubIp = ""
-url = ""
+cdnHost = ""
 
 node() {
 	// Send job started notifications
@@ -49,8 +49,8 @@ node() {
 
 	// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 	switch (env.BRANCH_NAME) {
-		case ~/master/: url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
-		default: url = "https://devcdn.subut.ai:8338/kurjun/rest"
+		case ~/master/: cdnHost = "stagecdn.subut.ai"; break;
+		default: cdnHost = "devcdn.subut.ai"
 	}
 
 	// build deb
@@ -93,7 +93,7 @@ node() {
 			/apps/bin/lxc-attach -n management -- sh -c 'cat /etc/influxdb/influxkey.pem /etc/influxdb/influxcert.pem > /etc/influxdb/influxdb.pem'
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
 			/apps/bin/lxc-attach -n management -- mkdir -p /opt/gorjun/etc/
-			/apps/bin/lxc-attach -n management -- sh -c 'echo "[CDN]\nnode = https://devcdn.subut.ai:8338" > /opt/gorjun/etc/gorjun.gcfg'
+			/apps/bin/lxc-attach -n management -- sh -c 'echo "[CDN]\nnode = ${cdnHost}:8338" > /opt/gorjun/etc/gorjun.gcfg'
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
 			/apps/bin/subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
@@ -121,7 +121,7 @@ node() {
 				subutai destroy everything
 				if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
 				if test -f /mnt/lib/lxc/tmpdir/management-subutai-template_*; then rm /mnt/lib/lxc/tmpdir/management-subutai-template_*; fi
-				/apps/subutai/current/bin/curl ${url}/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
+				/apps/subutai/current/bin/curl -k -s https://${cdnHost}:8338/kurjun/rest/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
 				if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
 				snappy install --allow-unauthenticated /tmp/subutai-latest.snap
 			EOF"""
@@ -201,47 +201,47 @@ node() {
 		String user = "jenkins"
 		def authID = sh (script: """
 			set +x
-			curl -s -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
 			""", returnStdout: true)
 		def token = sh (script: """
 			set +x
-			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} ${url}/auth/token
+			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
 
 		// upload artifacts on cdn
 		// upload deb
 		String responseDeb = sh (script: """
 			set +x
-			curl -s -k ${url}/apt/info?name=${debFileName}
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/apt/info?name=${debFileName}
 			""", returnStdout: true)
 		sh """
 			set +x
-			curl -s -k -Ffile=@${debFileName} -Ftoken=${token} ${url}/apt/upload
+			curl -s -k -Ffile=@${debFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/apt/upload
 		"""
-		// def signatureDeb = sh (script: "curl -s -k -Ffile=@${workspace}/${debFileName} -Ftoken=${token} ${url}/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
-		// sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" ${url}/auth/sign"
+		// def signatureDeb = sh (script: "curl -s -k -Ffile=@${workspace}/${debFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
+		// sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" https://${cdnHost}:8338/kurjun/rest/auth/sign"
 
 		// delete old deb
 		if (responseDeb != "Not found") {
 			def jsonDeb = jsonParse(responseDeb)	
 			sh """
 				set +x
-				curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${token}
+				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${token}
 			"""
 		}
 
 		// upload template
 		String responseTemplate = sh (script: """
 			set +x
-			curl -s -k ${url}/template/info?name=management'&'version=${env.BRANCH_NAME}
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
 			""", returnStdout: true)
 		def signatureTemplate = sh (script: """
 			set +x
-			curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} ${url}/template/upload | gpg --clearsign --no-tty
+			curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
 			""", returnStdout: true)
 		sh """
 			set +x
-			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" ${url}/auth/sign
+			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" https://${cdnHost}:8338/kurjun/rest/auth/sign
 		"""
 
 		// delete old template
@@ -249,7 +249,7 @@ node() {
 			def jsonTemplate = jsonParse(responseTemplate)
 			sh """
 				set +x
-				curl -s -k -X DELETE ${url}/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
+				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
 			"""
 		}
 	}
