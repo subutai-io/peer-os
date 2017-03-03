@@ -3,16 +3,23 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="host/approve">
       <action class="io.subutai.core.registration.cli.ApproveRequest">
-        <argument ref="nodeRegistration" />
+        <argument ref="hostRegistration" />
       </action>
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="host/remove">
+      <action class="io.subutai.core.registration.cli.RemoveRequest">
+        <argument ref="hostRegistration" />
+      </action>
+    </command>
+  </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="host/reject">
       <action class="io.subutai.core.registration.cli.RejectRequest">
-        <argument ref="nodeRegistration" />
+        <argument ref="hostRegistration" />
       </action>
     </command>
   </command-bundle>
@@ -20,7 +27,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="host/requests">
       <action class="io.subutai.core.registration.cli.ListRequests">
-        <argument ref="nodeRegistration" />
+        <argument ref="hostRegistration" />
       </action>
     </command>
   </command-bundle>
@@ -28,7 +35,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="host/generate-token">
       <action class="io.subutai.core.registration.cli.GenerateContainerToken">
-        <argument ref="nodeRegistration" />
+        <argument ref="hostRegistration" />
       </action>
     </command>
   </command-bundle>
@@ -36,7 +43,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="host/verify">
       <action class="io.subutai.core.registration.cli.VerifyContainerToken">
-        <argument ref="nodeRegistration" />
+        <argument ref="hostRegistration" />
       </action>
     </command>
   </command-bundle>
@@ -44,12 +51,12 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="host/clear-requests">
       <action class="io.subutai.core.registration.cli.ClearRequests">
-        <argument ref="nodeRegistration" />
+        <argument ref="hostRegistration" />
       </action>
     </command>
   </command-bundle>
 
-  <reference id="nodeRegistration" availability="mandatory"
+  <reference id="hostRegistration" availability="mandatory"
              interface="io.subutai.core.registration.api.HostRegistrationManager" />
 
 </blueprint>
