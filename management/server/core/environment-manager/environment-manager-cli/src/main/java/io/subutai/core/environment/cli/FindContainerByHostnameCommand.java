@@ -13,9 +13,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-/**
- * List all existing environments
- */
+
 @Command( scope = "environment", name = "find-container", description = "Find container by hostname" )
 public class FindContainerByHostnameCommand extends SubutaiShellCommandSupport
 {

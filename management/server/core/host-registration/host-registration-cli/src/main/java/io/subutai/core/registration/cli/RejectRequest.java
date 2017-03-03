@@ -8,7 +8,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.registration.api.HostRegistrationManager;
 
 
-@Command( scope = "node", name = "reject", description = "approve new registration request" )
+@Command( scope = "host", name = "reject", description = "approve new registration request" )
 public class RejectRequest extends SubutaiShellCommandSupport
 {
 

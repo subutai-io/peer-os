@@ -12,9 +12,6 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-/**
- * List all existing environments
- */
 @Command( scope = "environment", name = "list-workflows", description = "Lists all active environment workflows" )
 public class ListWorkflowsCommand extends SubutaiShellCommandSupport
 {

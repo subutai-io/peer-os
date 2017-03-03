@@ -64,6 +64,22 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/requests">
+      <action class="io.subutai.core.peer.cli.ListRequestsCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/approve">
+      <action class="io.subutai.core.peer.cli.ApprovePeerCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
   <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
 
 </blueprint>

@@ -8,8 +8,8 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.registration.api.HostRegistrationManager;
 
 
-@Command( scope = "host", name = "approve", description = "approve new registration request" )
-public class ApproveRequest extends SubutaiShellCommandSupport
+@Command( scope = "host", name = "remove", description = "removes registration request" )
+public class RemoveRequest extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "requestId", multiValued = false, required = true, description = "Request Id" )
     private String requestId;
@@ -17,7 +17,7 @@ public class ApproveRequest extends SubutaiShellCommandSupport
     private HostRegistrationManager registrationManager;
 
 
-    public ApproveRequest( final HostRegistrationManager registrationManager )
+    public RemoveRequest( final HostRegistrationManager registrationManager )
     {
         this.registrationManager = registrationManager;
     }
@@ -27,9 +27,9 @@ public class ApproveRequest extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        registrationManager.approveRequest( requestId );
+        registrationManager.removeRequest( requestId );
 
-        System.out.println( registrationManager.getRequest( requestId ).toString() );
+        System.out.println( "Request removed");
 
         return null;
     }
