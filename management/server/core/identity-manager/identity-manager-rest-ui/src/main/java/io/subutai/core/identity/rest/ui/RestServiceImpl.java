@@ -636,7 +636,7 @@ public class RestServiceImpl implements RestService
             if ( isRegisteredWithGorjun() )
             {
                 HttpGet httpGet = new HttpGet(
-                        String.format( "%s/auth/token?user=%s", Common.GLOBAL_KURJUN_BASE_URL, getFingerprint() ) );
+                        String.format( "%s/auth/token?user=%s", Common.LOCAL_KURJUN_BASE_URL, getFingerprint() ) );
                 CloseableHttpResponse response = client.execute( httpGet );
                 HttpEntity entity = response.getEntity();
                 try
@@ -652,7 +652,7 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                return Response.status( Response.Status.NOT_FOUND).build();
+                return Response.status( Response.Status.NOT_FOUND ).build();
             }
         }
         catch ( Exception e )
@@ -673,7 +673,7 @@ public class RestServiceImpl implements RestService
         try
         {
 
-            HttpPost post = new HttpPost( String.format( "%s/auth/sign", Common.GLOBAL_KURJUN_BASE_URL ) );
+            HttpPost post = new HttpPost( String.format( "%s/auth/sign", Common.LOCAL_KURJUN_BASE_URL ) );
 
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
             entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
@@ -725,7 +725,7 @@ public class RestServiceImpl implements RestService
         try
         {
 
-            HttpPost post = new HttpPost( String.format( "%s/auth/token", Common.GLOBAL_KURJUN_BASE_URL ) );
+            HttpPost post = new HttpPost( String.format( "%s/auth/token", Common.LOCAL_KURJUN_BASE_URL ) );
 
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
             entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
@@ -805,7 +805,7 @@ public class RestServiceImpl implements RestService
         try
         {
             HttpGet httpGet = new HttpGet(
-                    String.format( "%s/auth/key?user=%s", Common.GLOBAL_KURJUN_BASE_URL, getFingerprint() ) );
+                    String.format( "%s/auth/key?user=%s", Common.LOCAL_KURJUN_BASE_URL, getFingerprint() ) );
             CloseableHttpResponse response = client.execute( httpGet );
             try
             {
