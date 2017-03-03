@@ -31,8 +31,8 @@ public class ListRequestsCommand extends SubutaiShellCommandSupport
 
         for ( RegistrationData peer : list )
         {
-            System.out.printf( "%s\t%s\t%s\t%s%n", peer.getPeerInfo().getId(), peer.getPeerInfo().getName(),
-                    peer.getPeerInfo().getIp(), peer.getStatus() );
+            System.out.printf( "%s\t%s\t%s\t%s\t%s%n", peer.getPeerInfo().getId(), peer.getPeerInfo().getName(),
+                    peer.getPeerInfo().getIp(), peer.getKeyPhrase(), peer.getStatus() );
         }
         return null;
     }
