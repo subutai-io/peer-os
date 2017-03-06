@@ -18,16 +18,11 @@ import io.subutai.hub.share.resource.PeerGroupResources;
 public interface PeerManager
 {
 
-
     void registerPeerActionListener( PeerActionListener peerActionListener );
 
     void unregisterPeerActionListener( PeerActionListener peerActionListener );
 
-
-    void doUnregisterRequest( RegistrationData request, boolean forceAction ) throws PeerException;
-
     List<RegistrationData> getRegistrationRequests();
-
 
     /**
      * Returns peer instance by peer id
@@ -52,11 +47,13 @@ public interface PeerManager
 
     void doRegistrationRequest( String destinationHost, String keyPhrase ) throws PeerException;
 
-    void doApproveRequest( String keyPhrase, RegistrationData request ) throws PeerException;
+    void doUnregisterRequest( String peerId, boolean forceAction ) throws PeerException;
 
-    void doRejectRequest( RegistrationData request, boolean forceAction ) throws PeerException;
+    void doApproveRequest( String keyPhrase, String peerId ) throws PeerException;
 
-    void doCancelRequest( RegistrationData request, boolean forceAction ) throws PeerException;
+    void doRejectRequest( String peerId, boolean forceAction ) throws PeerException;
+
+    void doCancelRequest( String peerId, boolean forceAction ) throws PeerException;
 
     void processCancelRequest( RegistrationData registrationData ) throws PeerException;
 

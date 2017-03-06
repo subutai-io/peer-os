@@ -72,6 +72,7 @@ public class KarafManagerImpl implements KarafManager
                 catch ( Exception e )
                 {
                     LOG.error( e.getMessage() );
+                    printStream.println( e.toString() );
                 }
 
                 printStream.flush();
@@ -97,7 +98,7 @@ public class KarafManagerImpl implements KarafManager
             response += byteArrayOutputStream.toString();
         }
 
-        return response;
+        return response.replaceAll( "\u001B\\[[;\\d]*m", "" );
     }
 
 
