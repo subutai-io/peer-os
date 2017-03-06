@@ -94,7 +94,7 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
     private SecurityManager securityManager;
     private Object provider;
-//    private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
+    //    private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
     private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
     private IdentityManager identityManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
@@ -604,7 +604,8 @@ public class PeerManagerImpl implements PeerManager
     private RegistrationData getRequest( final String id )
     {
         //        return this.registrationRequests.get( id );
-        return peerRegistrationDataService.find( id ).getRegistrationData();
+        PeerRegistrationData peerRegistrationData = peerRegistrationDataService.find( id );
+        return peerRegistrationData == null ? null : peerRegistrationData.getRegistrationData();
     }
 
 
