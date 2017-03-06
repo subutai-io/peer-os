@@ -16,6 +16,8 @@ public class CancelPeerCommand extends SubutaiShellCommandSupport
 
     @Argument( name = "peer id", required = true, description = "peer identifier" )
     private String peerId;
+    @Argument( index = 1, name = "with force", description = "perform with force" )
+    private boolean force;
 
 
     public void setPeerManager( final PeerManager peerManager )
@@ -27,7 +29,7 @@ public class CancelPeerCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        peerManager.doCancelRequest( peerId, true );
+        peerManager.doCancelRequest( peerId, force );
 
         return null;
     }

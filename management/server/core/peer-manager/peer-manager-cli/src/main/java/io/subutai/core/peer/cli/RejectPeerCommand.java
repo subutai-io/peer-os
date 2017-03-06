@@ -16,6 +16,8 @@ public class RejectPeerCommand extends SubutaiShellCommandSupport
 
     @Argument( index = 0, name = "peer id", required = true, multiValued = false, description = "peer identifier" )
     private String peerId;
+    @Argument( index = 1, name = "with force", description = "perform with force" )
+    private boolean force;
 
 
     public void setPeerManager( final PeerManager peerManager )
@@ -33,7 +35,7 @@ public class RejectPeerCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        peerManager.doRejectRequest( peerId, true );
+        peerManager.doRejectRequest( peerId, force );
 
         return null;
     }

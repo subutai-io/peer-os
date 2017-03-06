@@ -14,8 +14,10 @@ public class UnregisterPeerCommand extends SubutaiShellCommandSupport
 
     private PeerManager peerManager;
 
-    @Argument( index = 0, name = "peer id", required = true, multiValued = false, description = "peer identifier" )
+    @Argument( name = "peer id", required = true, description = "peer identifier" )
     private String peerId;
+    @Argument( index = 1, name = "with force", description = "perform with force" )
+    private boolean force;
 
 
     public void setPeerManager( final PeerManager peerManager )
@@ -33,7 +35,7 @@ public class UnregisterPeerCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        peerManager.doUnregisterRequest( peerId, true );
+        peerManager.doUnregisterRequest( peerId, force );
 
         return null;
     }
