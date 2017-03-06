@@ -94,7 +94,6 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
     private SecurityManager securityManager;
     private Object provider;
-    //    private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
     private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
     private IdentityManager identityManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
@@ -603,7 +602,6 @@ public class PeerManagerImpl implements PeerManager
 
     private RegistrationData getRequest( final String id )
     {
-        //        return this.registrationRequests.get( id );
         PeerRegistrationData peerRegistrationData = peerRegistrationDataService.find( id );
         return peerRegistrationData == null ? null : peerRegistrationData.getRegistrationData();
     }
@@ -611,7 +609,6 @@ public class PeerManagerImpl implements PeerManager
 
     private void addRequest( final RegistrationData registrationData )
     {
-        //        this.registrationRequests.put( registrationData.getPeerInfo().getId(), registrationData );
         peerRegistrationDataService
                 .persist( new PeerRegistrationData( registrationData.getPeerInfo().getId(), registrationData ) );
     }
@@ -619,7 +616,6 @@ public class PeerManagerImpl implements PeerManager
 
     private void removeRequest( final String id )
     {
-        //        this.registrationRequests.remove( id );
         peerRegistrationDataService.remove( id );
     }
 
@@ -1192,7 +1188,6 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public List<RegistrationData> getRegistrationRequests()
     {
-        //        List<RegistrationData> r = new ArrayList<>( registrationRequests.values() );
         List<RegistrationData> r = peerRegistrationDataService.getAllData();
         for ( Peer peer : getPeers() )
         {
