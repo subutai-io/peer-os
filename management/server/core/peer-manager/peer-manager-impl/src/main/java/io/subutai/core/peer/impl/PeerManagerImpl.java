@@ -67,6 +67,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RegistrationClient;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.dao.PeerDataService;
+import io.subutai.core.peer.impl.dao.PeerRegistrationDataService;
 import io.subutai.core.peer.impl.entity.PeerData;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
@@ -84,6 +85,7 @@ public class PeerManagerImpl implements PeerManager
     private static final int MAX_CONTAINER_LIMIT = 20;
     private static final int MAX_ENVIRONMENT_LIMIT = 20;
     private PeerDataService peerDataService;
+    private PeerRegistrationDataService peerRegistrationDataService;
     private final LocalPeer localPeer;
     protected Messenger messenger;
     CommandResponseListener commandResponseListener;
@@ -131,6 +133,8 @@ public class PeerManagerImpl implements PeerManager
         try
         {
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
+
+            this.peerRegistrationDataService = new PeerRegistrationDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
 
