@@ -6,6 +6,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import io.subutai.common.peer.RegistrationData;
@@ -13,7 +14,7 @@ import io.subutai.common.util.JsonUtil;
 
 
 @Entity
-@Table( name = "peer-requests" )
+@Table( name = "peer_requests" )
 @Access( AccessType.FIELD )
 public class PeerRegistrationData
 {
@@ -22,6 +23,7 @@ public class PeerRegistrationData
     private String id;
 
     @Column
+    @Lob
     private String registrationData;
 
 
