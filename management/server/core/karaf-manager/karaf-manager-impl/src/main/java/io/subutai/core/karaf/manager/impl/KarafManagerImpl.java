@@ -56,7 +56,7 @@ public class KarafManagerImpl implements KarafManager
         String response = "";
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final PrintStream printStream = new PrintStream( byteArrayOutputStream );
-        final CommandSession commandSession = commandProcessor.createSession( System.in, printStream, System.err );
+        final CommandSession commandSession = commandProcessor.createSession( System.in, printStream, printStream);
 
 
         //************************************************
