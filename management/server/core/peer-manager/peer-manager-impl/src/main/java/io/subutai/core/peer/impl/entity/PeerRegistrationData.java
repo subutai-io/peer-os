@@ -1,6 +1,8 @@
 package io.subutai.core.peer.impl.entity;
 
 
+import java.io.Serializable;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -16,7 +18,7 @@ import io.subutai.common.util.JsonUtil;
 @Entity
 @Table( name = "peer_requests" )
 @Access( AccessType.FIELD )
-public class PeerRegistrationData
+public class PeerRegistrationData implements Serializable
 {
     @Id
     @Column
