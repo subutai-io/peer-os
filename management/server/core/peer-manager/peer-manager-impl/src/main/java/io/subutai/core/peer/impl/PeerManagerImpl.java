@@ -69,6 +69,7 @@ import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.dao.PeerDataService;
 import io.subutai.core.peer.impl.dao.PeerRegistrationDataService;
 import io.subutai.core.peer.impl.entity.PeerData;
+import io.subutai.core.peer.impl.entity.PeerRegistrationData;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.resource.PeerGroupResources;
@@ -93,7 +94,7 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
     private SecurityManager securityManager;
     private Object provider;
-    private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
+//    private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
     private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
     private IdentityManager identityManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
@@ -602,19 +603,23 @@ public class PeerManagerImpl implements PeerManager
 
     private RegistrationData getRequest( final String id )
     {
-        return this.registrationRequests.get( id );
+        //        return this.registrationRequests.get( id );
+        return peerRegistrationDataService.find( id ).getRegistrationData();
     }
 
 
     private void addRequest( final RegistrationData registrationData )
     {
-        this.registrationRequests.put( registrationData.getPeerInfo().getId(), registrationData );
+        //        this.registrationRequests.put( registrationData.getPeerInfo().getId(), registrationData );
+        peerRegistrationDataService
+                .persist( new PeerRegistrationData( registrationData.getPeerInfo().getId(), registrationData ) );
     }
 
 
     private void removeRequest( final String id )
     {
-        this.registrationRequests.remove( id );
+        //        this.registrationRequests.remove( id );
+        peerRegistrationDataService.remove( id );
     }
 
 
@@ -1186,7 +1191,8 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public List<RegistrationData> getRegistrationRequests()
     {
-        List<RegistrationData> r = new ArrayList<>( registrationRequests.values() );
+        //        List<RegistrationData> r = new ArrayList<>( registrationRequests.values() );
+        List<RegistrationData> r = peerRegistrationDataService.getAllData();
         for ( Peer peer : getPeers() )
         {
             if ( !peer.getId().equals( localPeer.getId() ) )

@@ -2,6 +2,7 @@ package io.subutai.core.peer.impl.dao;
 
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.peer.impl.entity.PeerRegistrationData;
 
@@ -51,6 +53,21 @@ public class PeerRegistrationDataService implements DataService<String, PeerRegi
             em.close();
         }
         return result;
+    }
+
+
+    public List<RegistrationData> getAllData()
+    {
+        List<RegistrationData> datas = Lists.newArrayList();
+
+        Collection<PeerRegistrationData> peerRegistrationDatas = getAll();
+
+        for ( PeerRegistrationData peerRegistrationData : peerRegistrationDatas )
+        {
+            datas.add( peerRegistrationData.getRegistrationData() );
+        }
+
+        return datas;
     }
 
 
