@@ -98,7 +98,7 @@ public class KarafManagerImpl implements KarafManager
             response += byteArrayOutputStream.toString();
         }
 
-        return response;
+        return response.replaceAll( "\u001B\\[[;\\d]*m", "" );
     }
 
 
