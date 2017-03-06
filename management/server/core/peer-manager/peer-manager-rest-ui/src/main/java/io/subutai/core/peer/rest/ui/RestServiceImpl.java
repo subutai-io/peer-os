@@ -4,9 +4,6 @@ package io.subutai.core.peer.rest.ui;
 import java.security.AccessControlException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -48,23 +45,23 @@ public class RestServiceImpl implements RestService
 
     private class RegistrationDataDto
     {
-        private boolean isOnline = false;
+        private boolean isOnline;
         private RegistrationData registrationData;
 
 
-        public RegistrationDataDto( RegistrationData registrationData )
+        RegistrationDataDto( RegistrationData registrationData )
         {
             this.registrationData = registrationData;
         }
 
 
-        public void setOnline( boolean isOnline )
+        void setOnline( boolean isOnline )
         {
             this.isOnline = isOnline;
         }
 
 
-        public RegistrationData getRegistrationData()
+        RegistrationData getRegistrationData()
         {
             return registrationData;
         }
@@ -144,14 +141,9 @@ public class RestServiceImpl implements RestService
     @Override
     public Response rejectForRegistrationRequest( final String peerId, Boolean force )
     {
-        List<RegistrationData> dataList = peerManager.getRegistrationRequests();
-
-        RegistrationData data =
-                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
-
         try
         {
-            peerManager.doRejectRequest( data, force );
+            peerManager.doRejectRequest( peerId, force );
         }
         catch ( Exception e )
         {
@@ -173,14 +165,9 @@ public class RestServiceImpl implements RestService
     @Override
     public Response approveForRegistrationRequest( final String peerId, final String keyPhrase )
     {
-        List<RegistrationData> dataList = peerManager.getRegistrationRequests();
-
-        RegistrationData data =
-                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
-
         try
         {
-            peerManager.doApproveRequest( keyPhrase, data );
+            peerManager.doApproveRequest( keyPhrase, peerId );
         }
         catch ( Exception e )
         {
@@ -202,14 +189,9 @@ public class RestServiceImpl implements RestService
     @Override
     public Response cancelForRegistrationRequest( final String peerId, Boolean force )
     {
-        List<RegistrationData> dataList = peerManager.getRegistrationRequests();
-
-        RegistrationData data =
-                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
-
         try
         {
-            peerManager.doCancelRequest( data, force );
+            peerManager.doCancelRequest( peerId, force );
         }
         catch ( Exception e )
         {
@@ -279,14 +261,9 @@ public class RestServiceImpl implements RestService
     @Override
     public Response unregisterForRegistrationRequest( final String peerId, Boolean force )
     {
-        List<RegistrationData> dataList = peerManager.getRegistrationRequests();
-
-        RegistrationData data =
-                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
-
         try
         {
-            peerManager.doUnregisterRequest( data, force );
+            peerManager.doUnregisterRequest( peerId, force );
         }
         catch ( Exception e )
         {
@@ -309,12 +286,6 @@ public class RestServiceImpl implements RestService
     public Response getResourceHosts()
     {
         return Response.ok().entity( JsonUtil.toJson( hostRegistry.getResourceHostsInfo() ) ).build();
-    }
-
-
-    protected CompletionService<Boolean> getCompletionService( Executor executor )
-    {
-        return new ExecutorCompletionService<>( executor );
     }
 
 
