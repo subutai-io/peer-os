@@ -1043,7 +1043,7 @@ public class PeerManagerImpl implements PeerManager
         if ( request.getStatus() != RegistrationStatus.REQUESTED )
         {
             throw new PeerException( String.format( "Can not reject request with state other than %s. State is %s",
-                    RegistrationStatus.REJECTED, request.getStatus() ) );
+                    RegistrationStatus.REQUESTED, request.getStatus() ) );
         }
 
         //********forceAction ********************
@@ -1086,22 +1086,6 @@ public class PeerManagerImpl implements PeerManager
         }
 
         removeRequest( request.getPeerInfo().getId() );
-    }
-
-
-    private RegistrationData findRequest( String peerId )
-    {
-        final List<RegistrationData> requests = getRegistrationRequests();
-        RegistrationData request = null;
-        for ( int i = 0; i < requests.size() && request == null; i++ )
-        {
-            if ( requests.get( i ).getPeerInfo().getId().equalsIgnoreCase( peerId ) )
-            {
-                request = requests.get( i );
-            }
-        }
-
-        return request;
     }
 
 
@@ -1176,6 +1160,22 @@ public class PeerManagerImpl implements PeerManager
         unregister( request );
 
         removeRequest( request.getPeerInfo().getId() );
+    }
+
+
+    private RegistrationData findRequest( String peerId )
+    {
+        final List<RegistrationData> requests = getRegistrationRequests();
+        RegistrationData request = null;
+        for ( int i = 0; i < requests.size() && request == null; i++ )
+        {
+            if ( requests.get( i ).getPeerInfo().getId().equalsIgnoreCase( peerId ) )
+            {
+                request = requests.get( i );
+            }
+        }
+
+        return request;
     }
 
 
