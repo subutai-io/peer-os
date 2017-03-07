@@ -18,8 +18,10 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -32,16 +34,18 @@ public class ReservationStep
     private final Topology topology;
     private final LocalEnvironment environment;
     private final PeerManager peerManager;
+    private final IdentityManager identityManager;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public ReservationStep( final Topology topology, final LocalEnvironment environment, final PeerManager peerManager,
-                            final TrackerOperation trackerOperation )
+                            final IdentityManager identityManager, final TrackerOperation trackerOperation )
     {
         this.topology = topology;
         this.environment = environment;
         this.peerManager = peerManager;
+        this.identityManager = identityManager;
         this.trackerOperation = trackerOperation;
     }
 
@@ -135,9 +139,18 @@ public class ReservationStep
                 @Override
                 public Integer call() throws Exception
                 {
-                    return peer.reserveNetworkResource(
+                    NetworkResourceImpl networkResource =
                             new NetworkResourceImpl( environment.getId(), freeVni, freeP2pSubnet, freeContainerSubnet,
-                                    peerManager.getLocalPeer().getId() ) );
+                                    peerManager.getLocalPeer().getId() );
+
+                    User activeUser = identityManager.getActiveUser();
+
+                    if ( activeUser != null )
+                    {
+                        networkResource.setUsername( activeUser.getUserName() );
+                    }
+
+                    return peer.reserveNetworkResource( networkResource );
                 }
             } ) );
         }
@@ -173,7 +186,7 @@ public class ReservationStep
     }
 
 
-    protected long generateRandomVni( Set<Long> excludedVnis )
+    private long generateRandomVni( Set<Long> excludedVnis )
     {
         int maxIterations = 10000;
         int currentIteration = 0;

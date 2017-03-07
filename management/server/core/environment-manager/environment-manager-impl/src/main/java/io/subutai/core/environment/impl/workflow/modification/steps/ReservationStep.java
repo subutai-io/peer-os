@@ -17,8 +17,10 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
-import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
+import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -28,16 +30,18 @@ public class ReservationStep
     private final Topology topology;
     private final LocalEnvironment environment;
     private final PeerManager peerManager;
+    private final IdentityManager identityManager;
     private final TrackerOperation trackerOperation;
     protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public ReservationStep( final Topology topology, final LocalEnvironment environment, final PeerManager peerManager,
-                            final TrackerOperation trackerOperation )
+                            final IdentityManager identityManager, final TrackerOperation trackerOperation )
     {
         this.topology = topology;
         this.environment = environment;
         this.peerManager = peerManager;
+        this.identityManager = identityManager;
         this.trackerOperation = trackerOperation;
     }
 
@@ -70,8 +74,8 @@ public class ReservationStep
     }
 
 
-    protected void checkResourceAvailablility( Map<Peer, UsedNetworkResources> reservedNetResources,
-                                               String containerSubnet ) throws EnvironmentModificationException
+    void checkResourceAvailablility( Map<Peer, UsedNetworkResources> reservedNetResources, String containerSubnet )
+            throws EnvironmentModificationException
     {
         for ( Map.Entry<Peer, UsedNetworkResources> peerReservedNetResourcesEntry : reservedNetResources.entrySet() )
         {
@@ -99,7 +103,7 @@ public class ReservationStep
     }
 
 
-    protected void reserveNetworkResources( Set<Peer> newPeers, final String containerSubnet )
+    private void reserveNetworkResources( Set<Peer> newPeers, final String containerSubnet )
             throws EnvironmentModificationException
     {
 
@@ -110,9 +114,18 @@ public class ReservationStep
                 @Override
                 public Integer call() throws Exception
                 {
-                    return peer.reserveNetworkResource(
+                    NetworkResourceImpl networkResource =
                             new NetworkResourceImpl( environment.getId(), environment.getVni(),
-                                    environment.getP2pSubnet(), containerSubnet, peerManager.getLocalPeer().getId() ) );
+                                    environment.getP2pSubnet(), containerSubnet, peerManager.getLocalPeer().getId() );
+
+                    User activeUser = identityManager.getActiveUser();
+
+                    if ( activeUser != null )
+                    {
+                        networkResource.setUsername( activeUser.getUserName() );
+                    }
+
+                    return peer.reserveNetworkResource( networkResource );
                 }
             } ) );
         }
@@ -143,7 +156,7 @@ public class ReservationStep
     }
 
 
-    protected Map<Peer, UsedNetworkResources> obtainReservedNetResources( Set<Peer> newPeers )
+    private Map<Peer, UsedNetworkResources> obtainReservedNetResources( Set<Peer> newPeers )
             throws EnvironmentModificationException
     {
         final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();

@@ -17,6 +17,7 @@ public class NetworkResourceImpl implements NetworkResource
     private String containerSubnet;
     @JsonProperty( "initiatorPeerId" )
     private String initiatorPeerId;
+    private String username;
 
 
     public NetworkResourceImpl( @JsonProperty( "environmentId" ) final String environmentId,
@@ -73,5 +74,17 @@ public class NetworkResourceImpl implements NetworkResource
     public String getInitiatorPeerId()
     {
         return initiatorPeerId;
+    }
+
+
+    public String getUsername()
+    {
+        return username;
+    }
+
+
+    public void setUsername( final String username )
+    {
+        this.username = username;
     }
 }

@@ -103,7 +103,7 @@ public class EnvironmentCreationWorkflow
 
         try
         {
-            new ReservationStep( topology, environment, peerManager, operationTracker ).execute();
+            new ReservationStep( topology, environment, peerManager, identityManager, operationTracker ).execute();
 
             saveEnvironment();
 
