@@ -14,4 +14,6 @@ public interface NetworkResource
     int getVlan();
 
     String getInitiatorPeerId();
+
+    String getUsername();
 }

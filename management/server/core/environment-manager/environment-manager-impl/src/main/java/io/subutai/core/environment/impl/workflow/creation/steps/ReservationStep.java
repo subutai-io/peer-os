@@ -21,7 +21,6 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -141,14 +140,7 @@ public class ReservationStep
                 {
                     NetworkResourceImpl networkResource =
                             new NetworkResourceImpl( environment.getId(), freeVni, freeP2pSubnet, freeContainerSubnet,
-                                    peerManager.getLocalPeer().getId() );
-
-                    User activeUser = identityManager.getActiveUser();
-
-                    if ( activeUser != null )
-                    {
-                        networkResource.setUsername( activeUser.getUserName() );
-                    }
+                                    peerManager.getLocalPeer().getId(), identityManager.getActiveUser().getUserName() );
 
                     return peer.reserveNetworkResource( networkResource );
                 }

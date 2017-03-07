@@ -146,6 +146,7 @@ public class EnvironmentManagerImpl
     private static final long RESET_ENVS_P2P_KEYS_INTERVAL_MIN = 60;
     private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 30;
     private static final String REMOTE_OWNER_NAME = "remote";
+    private static final String UKNOWN_OWNER_NAME = "unknown";
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
@@ -2095,14 +2096,12 @@ public class EnvironmentManagerImpl
     {
         if ( environment instanceof RemoteEnvironment )
         {
-            if ( Objects.equals( ( ( RemoteEnvironment ) environment ).getInitiatorPeerId(), Common.HUB_ID ) )
-            {
-                return Common.HUB_ID;
-            }
-            else
-            {
-                return REMOTE_OWNER_NAME;
-            }
+            RemoteEnvironment remoteEnvironment = ( RemoteEnvironment ) environment;
+
+            boolean hubEnv = Objects.equals( remoteEnvironment.getInitiatorPeerId(), Common.HUB_ID );
+
+            return remoteEnvironment.getUsername() == null ? ( hubEnv ? Common.HUB_ID : REMOTE_OWNER_NAME ) :
+                   remoteEnvironment.getUsername();
         }
         else if ( environment instanceof HubEnvironment )
         {
@@ -2113,7 +2112,7 @@ public class EnvironmentManagerImpl
 
         if ( user == null )
         {
-            return "unknown";
+            return UKNOWN_OWNER_NAME;
         }
         else
         {
