@@ -146,6 +146,7 @@ public class EnvironmentManagerImpl
     private static final long RESET_ENVS_P2P_KEYS_INTERVAL_MIN = 60;
     private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 30;
     private static final String REMOTE_OWNER_NAME = "remote";
+    private static final String UKNOWN_OWNER_NAME = "unknown";
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
@@ -2095,25 +2096,31 @@ public class EnvironmentManagerImpl
     {
         if ( environment instanceof RemoteEnvironment )
         {
-            if ( Objects.equals( ( ( RemoteEnvironment ) environment ).getInitiatorPeerId(), Common.HUB_ID ) )
+            RemoteEnvironment remoteEnvironment = ( RemoteEnvironment ) environment;
+
+            boolean hubEnv = Objects.equals( remoteEnvironment.getInitiatorPeerId(), Common.HUB_ID );
+
+            if ( hubEnv )
             {
-                return Common.HUB_ID;
+                return remoteEnvironment.getUsername() == null ? Common.HUB_ID :
+                       String.format( "%s@%s", remoteEnvironment.getUsername(), remoteEnvironment.getRemoteUserId() );
             }
             else
             {
-                return REMOTE_OWNER_NAME;
+                return remoteEnvironment.getUsername() == null ? REMOTE_OWNER_NAME : remoteEnvironment.getUsername();
             }
         }
         else if ( environment instanceof HubEnvironment )
         {
-            return ( ( HubEnvironment ) environment ).getOwner();
+            HubEnvironment hubEnvironment = ( ( HubEnvironment ) environment );
+            return String.format( "%s@%s", hubEnvironment.getOwner(), hubEnvironment.getOwnerHubId() );
         }
 
         User user = ServiceLocator.lookup( IdentityManager.class ).getUser( environment.getUserId() );
 
         if ( user == null )
         {
-            return "unknown";
+            return UKNOWN_OWNER_NAME;
         }
         else
         {

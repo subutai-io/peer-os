@@ -7,6 +7,8 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
@@ -41,8 +43,11 @@ public class ReserveNetworkResourceCommand extends SubutaiShellCommandSupport
     {
         try
         {
+            IdentityManager identityManager = ServiceLocator.lookup( IdentityManager.class );
             localPeer.reserveNetworkResource(
-                    new NetworkResourceImpl( envId, vni, p2pSubnet, containerSubnet, localPeer.getId() ) );
+                    new NetworkResourceImpl( envId, vni, p2pSubnet, containerSubnet, localPeer.getId(),
+                            identityManager.getActiveUser().getUserName(),
+                            identityManager.getActiveUser().getSecurityKeyId() ) );
 
             System.out.println( "Network resource reserved" );
         }

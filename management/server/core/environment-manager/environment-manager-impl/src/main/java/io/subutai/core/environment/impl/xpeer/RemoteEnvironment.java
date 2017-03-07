@@ -13,7 +13,6 @@ import io.subutai.common.environment.ContainerQuotaDto;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
@@ -24,6 +23,8 @@ public class RemoteEnvironment extends LocalEnvironment
 
     private String initiatorPeerId;
     private Set<ContainerHost> containers;
+    private String username;
+    private String userId;
 
 
     public RemoteEnvironment( final NetworkResource networkResource, final String name,
@@ -32,10 +33,24 @@ public class RemoteEnvironment extends LocalEnvironment
         this.environmentId = networkResource.getEnvironmentId();
         this.containers = containers;
         this.initiatorPeerId = networkResource.getInitiatorPeerId();
+        this.username = networkResource.getUsername();
+        this.userId = networkResource.getUserId();
         setP2PSubnet( networkResource.getP2pSubnet() );
         setVni( networkResource.getVni() );
         setStatus( EnvironmentStatus.UNKNOWN );
         setName( name );
+    }
+
+
+    public String getUsername()
+    {
+        return username;
+    }
+
+
+    public String getRemoteUserId()
+    {
+        return userId;
     }
 
 
@@ -66,7 +81,7 @@ public class RemoteEnvironment extends LocalEnvironment
             }
             catch ( Exception e )
             {
-                LOG.error( "Error getting container quota: {}", e .getMessage());
+                LOG.error( "Error getting container quota: {}", e.getMessage() );
             }
 
             containerDtos.add( containerDto );

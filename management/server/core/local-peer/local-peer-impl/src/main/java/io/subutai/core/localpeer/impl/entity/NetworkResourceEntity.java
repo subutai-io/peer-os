@@ -49,6 +49,14 @@ public class NetworkResourceEntity implements NetworkResource
     @JsonProperty( "initiatorPeerId" )
     private String initiatorPeerId;
 
+    @Column( name = "username" )
+    @JsonProperty( "username" )
+    private String username;
+
+    @Column( name = "userId" )
+    @JsonProperty( "userId" )
+    private String userId;
+
 
     protected NetworkResourceEntity()
     {
@@ -66,6 +74,8 @@ public class NetworkResourceEntity implements NetworkResource
         this.containerSubnet = IPUtil.getNetworkAddress( networkResource.getContainerSubnet() );
         this.vlan = vlan;
         this.initiatorPeerId = networkResource.getInitiatorPeerId();
+        this.username = networkResource.getUsername();
+        this.userId = networkResource.getUserId();
     }
 
 
@@ -74,7 +84,9 @@ public class NetworkResourceEntity implements NetworkResource
                                   @JsonProperty( "p2pSubnet" ) final String p2pSubnet,
                                   @JsonProperty( "containerSubnet" ) final String containerSubnet,
                                   @JsonProperty( "vlan" ) final int vlan,
-                                  @JsonProperty( "initiatorPeerId" ) final String initiatorPeerId )
+                                  @JsonProperty( "initiatorPeerId" ) final String initiatorPeerId,
+                                  @JsonProperty( "username" ) final String username,
+                                  @JsonProperty( "userId" ) final String userId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSubnet ) );
@@ -88,6 +100,8 @@ public class NetworkResourceEntity implements NetworkResource
         this.containerSubnet = containerSubnet;
         this.vlan = vlan;
         this.initiatorPeerId = initiatorPeerId;
+        this.username = username;
+        this.userId = userId;
     }
 
 
@@ -130,6 +144,20 @@ public class NetworkResourceEntity implements NetworkResource
     public String getInitiatorPeerId()
     {
         return initiatorPeerId;
+    }
+
+
+    @Override
+    public String getUsername()
+    {
+        return username;
+    }
+
+
+    @Override
+    public String getUserId()
+    {
+        return userId;
     }
 
 

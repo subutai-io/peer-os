@@ -15,6 +15,7 @@ import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Matchers.anySet;
@@ -40,12 +41,15 @@ public class ReservationStepTest
     Peer peer = TestHelper.PEER();
     @Mock
     PeerManager peerManager;
+    @Mock
+    IdentityManager identityManager;
 
 
     @Before
     public void setUp() throws Exception
     {
-        step = new ReservationStep( topology, environment, peerManager, TestHelper.TRACKER_OPERATION() );
+        step = new ReservationStep( topology, environment, peerManager, identityManager,
+                TestHelper.TRACKER_OPERATION() );
         TestHelper.bind( environment, peer, peerUtil, peerTaskResults, peerTaskResult );
         step.peerUtil = peerUtil;
         doReturn( Sets.newHashSet( peer ) ).when( peerManager ).resolve( anySet() );
