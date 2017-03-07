@@ -60,12 +60,9 @@ public class ReserveNetworkStateHandler extends StateHandler
 
             String subnetWithoutMask = envInfo.getSubnetCidr().replace( "/24", "" );
 
-            //TODO set username 'networkResource.setUsername(..)' of Hub user in form 'username@userid'
-            //SEE https://github.com/subutai-io/base/issues/1769, https://github.com/optdyn/hub/issues/2913
-
             NetworkResourceImpl networkResource =
                     new NetworkResourceImpl( envInfo.getId(), envInfo.getVni(), envInfo.getP2pSubnet(),
-                            subnetWithoutMask, Common.HUB_ID, peerDto.getOwnerId() );
+                            subnetWithoutMask, Common.HUB_ID, Common.HUB_ID, peerDto.getOwnerId() );
 
             peerDto.setVlan( ctx.localPeer.reserveNetworkResource( networkResource ) );
         }

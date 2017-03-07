@@ -2100,12 +2100,20 @@ public class EnvironmentManagerImpl
 
             boolean hubEnv = Objects.equals( remoteEnvironment.getInitiatorPeerId(), Common.HUB_ID );
 
-            return remoteEnvironment.getUsername() == null ? ( hubEnv ? Common.HUB_ID : REMOTE_OWNER_NAME ) :
-                   remoteEnvironment.getUsername();
+            if ( hubEnv )
+            {
+                return remoteEnvironment.getUsername() == null ? Common.HUB_ID :
+                       String.format( "%s@%s", remoteEnvironment.getUsername(), remoteEnvironment.getRemoteUserId() );
+            }
+            else
+            {
+                return remoteEnvironment.getUsername() == null ? REMOTE_OWNER_NAME : remoteEnvironment.getUsername();
+            }
         }
         else if ( environment instanceof HubEnvironment )
         {
-            return ( ( HubEnvironment ) environment ).getOwner();
+            HubEnvironment hubEnvironment = ( ( HubEnvironment ) environment );
+            return String.format( "%s@%s", hubEnvironment.getOwner(), hubEnvironment.getOwnerHubId() );
         }
 
         User user = ServiceLocator.lookup( IdentityManager.class ).getUser( environment.getUserId() );

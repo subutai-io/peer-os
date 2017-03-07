@@ -16,4 +16,6 @@ public interface NetworkResource
     String getInitiatorPeerId();
 
     String getUsername();
+
+    String getUserId();
 }

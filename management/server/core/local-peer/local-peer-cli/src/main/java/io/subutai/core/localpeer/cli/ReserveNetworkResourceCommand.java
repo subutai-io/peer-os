@@ -46,7 +46,8 @@ public class ReserveNetworkResourceCommand extends SubutaiShellCommandSupport
             IdentityManager identityManager = ServiceLocator.lookup( IdentityManager.class );
             localPeer.reserveNetworkResource(
                     new NetworkResourceImpl( envId, vni, p2pSubnet, containerSubnet, localPeer.getId(),
-                            identityManager.getActiveUser().getUserName() ) );
+                            identityManager.getActiveUser().getUserName(),
+                            identityManager.getActiveUser().getSecurityKeyId() ) );
 
             System.out.println( "Network resource reserved" );
         }

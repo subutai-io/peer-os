@@ -24,6 +24,7 @@ public class RemoteEnvironment extends LocalEnvironment
     private String initiatorPeerId;
     private Set<ContainerHost> containers;
     private String username;
+    private String userId;
 
 
     public RemoteEnvironment( final NetworkResource networkResource, final String name,
@@ -33,6 +34,7 @@ public class RemoteEnvironment extends LocalEnvironment
         this.containers = containers;
         this.initiatorPeerId = networkResource.getInitiatorPeerId();
         this.username = networkResource.getUsername();
+        this.userId = networkResource.getUserId();
         setP2PSubnet( networkResource.getP2pSubnet() );
         setVni( networkResource.getVni() );
         setStatus( EnvironmentStatus.UNKNOWN );
@@ -43,6 +45,12 @@ public class RemoteEnvironment extends LocalEnvironment
     public String getUsername()
     {
         return username;
+    }
+
+
+    public String getRemoteUserId()
+    {
+        return userId;
     }
 
 

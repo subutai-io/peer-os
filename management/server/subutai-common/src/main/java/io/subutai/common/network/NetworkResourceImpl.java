@@ -19,6 +19,8 @@ public class NetworkResourceImpl implements NetworkResource
     private String initiatorPeerId;
     @JsonProperty( "username" )
     private String username;
+    @JsonProperty( "userId" )
+    private String userId;
 
 
     public NetworkResourceImpl( @JsonProperty( "environmentId" ) final String environmentId,
@@ -26,7 +28,8 @@ public class NetworkResourceImpl implements NetworkResource
                                 @JsonProperty( "p2pSubnet" ) final String p2pSubnet,
                                 @JsonProperty( "containerSubnet" ) final String containerSubnet,
                                 @JsonProperty( "initiatorPeerId" ) final String initiatorPeerId,
-                                @JsonProperty( "username" ) final String username )
+                                @JsonProperty( "username" ) final String username,
+                                @JsonProperty( "userId" ) final String userId )
     {
         this.environmentId = environmentId;
         this.vni = vni;
@@ -34,6 +37,7 @@ public class NetworkResourceImpl implements NetworkResource
         this.containerSubnet = containerSubnet;
         this.initiatorPeerId = initiatorPeerId;
         this.username = username;
+        this.userId = userId;
     }
 
 
@@ -83,5 +87,11 @@ public class NetworkResourceImpl implements NetworkResource
     public String getUsername()
     {
         return username;
+    }
+
+
+    public String getUserId()
+    {
+        return userId;
     }
 }

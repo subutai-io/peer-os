@@ -140,7 +140,8 @@ public class ReservationStep
                 {
                     NetworkResourceImpl networkResource =
                             new NetworkResourceImpl( environment.getId(), freeVni, freeP2pSubnet, freeContainerSubnet,
-                                    peerManager.getLocalPeer().getId(), identityManager.getActiveUser().getUserName() );
+                                    peerManager.getLocalPeer().getId(), identityManager.getActiveUser().getUserName(),
+                                    identityManager.getActiveUser().getSecurityKeyId());
 
                     return peer.reserveNetworkResource( networkResource );
                 }
