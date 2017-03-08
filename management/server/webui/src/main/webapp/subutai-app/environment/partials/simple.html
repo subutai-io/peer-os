@@ -30,7 +30,7 @@
           <li ng-repeat="template in environmentSimpleViewCtrl.templatesList | filter:{'name' : searchTemplate} | orderBy: 'name'">
 						<span class="b-tools-menu__item"
                   ng-click="environmentSimpleViewCtrl.addContainer(template.name, $event, null, null, template.id)"
-                  title="Version: {{ template.version }} Size: {{ template.size }} Parent: {{ template.parent }} Owners: {{template.owner}}">
+                  title="Version: {{ template.version }} Size: {{ environmentViewCtrl.humanFileSize(template.size, true) }} Parent: {{ template.parent }} Owners: {{template.owner}}">
 							<span class="b-cloud-item">
 								<img
                     ng-src="assets/templates/{{ template.name }}.jpg"
