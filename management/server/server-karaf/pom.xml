@@ -16,6 +16,7 @@
 
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
+    <hubEnv>hub</hubEnv>
   </properties>
 
   <dependencies>
