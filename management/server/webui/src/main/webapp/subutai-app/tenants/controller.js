@@ -37,7 +37,7 @@ function TenantsViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTO
         var user = data.split("@");
 
         if(user.length == 2){
-            return "<a href='https://"+ localStorage.getItem("hubIp") +"?openPrivateChatWith="+ user[1] +"' >" + user[0] + "<a/>";
+            return "<a href='https://"+ localStorage.getItem("hubIp") +"?openPrivateChatWith="+ user[1] +"' target='_blank'>" + user[0] + "<a/>";
         }else{
             return data;
         }
