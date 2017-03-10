@@ -55,8 +55,12 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             headers: {'Content-Type': 'application/json'}
         }).success(function (data) {
             vm.hubIp = data;
+            localStorage.setItem("hubIp", data);
         }).error(function (error) {
-            vm.hubIp = 'hub.subut.ai';
+            if(!$.trim(vm.hubIp)){
+                vm.hubIp = 'hub.subut.ai';
+                localStorage.setItem("hubIp", vm.hubIp);
+            }
         });
     }
 
