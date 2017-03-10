@@ -79,21 +79,17 @@ node() {
 			/apps/bin/subutai clone openjre16 management
 			/bin/sleep 20
 			/bin/cp /mnt/lib/lxc/jenkins/${workspace}/${debFileName} /mnt/lib/lxc/management/rootfs/tmp/
+			/apps/bin/lxc-attach -n management -- sh -c 'echo "deb http://${cdnHost}:8080/kurjun/rest/apt /" > /etc/apt/sources.list.d/subutai-repo.list'
 			/apps/bin/lxc-attach -n management -- apt-get update
 			/apps/bin/lxc-attach -n management -- sync
-			/apps/bin/lxc-attach -n management -- apt-get -y install --only-upgrade procps
-			/apps/bin/lxc-attach -n management -- apt-get -y install --only-upgrade udev
-			/apps/bin/lxc-attach -n management -- apt-get -y install --only-upgrade libdbus-1-3
-			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install curl gorjun-local apt-transport-https
-			/apps/bin/lxc-attach -n management -- sh -c 'curl -sL https://repos.influxdata.com/influxdb.key | apt-key add -'
-			/apps/bin/lxc-attach -n management -- sh -c 'echo deb https://repos.influxdata.com/ubuntu xenial stable > /etc/apt/sources.list.d/influxdata.list'
-			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install influxdb
+			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install curl gorjun-local influxdb
 			/apps/bin/lxc-attach -n management -- wget -q 'https://cdn.subut.ai:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf
 			/apps/bin/lxc-attach -n management -- openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -subj '/C=KG/ST=Subutai/L=Bishkek/O=Kyrgyzstan/CN=gw.intra.lan' -keyout /etc/influxdb/influxkey.pem -out etc/influxdb/influxcert.pem
 			/apps/bin/lxc-attach -n management -- sh -c 'cat /etc/influxdb/influxkey.pem /etc/influxdb/influxcert.pem > /etc/influxdb/influxdb.pem'
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
 			/apps/bin/lxc-attach -n management -- mkdir -p /opt/gorjun/etc/
 			/apps/bin/lxc-attach -n management -- sh -c 'echo "[CDN]\nnode = ${cdnHost}:8338" > /opt/gorjun/etc/gorjun.gcfg'
+			
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
 			/apps/bin/subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
