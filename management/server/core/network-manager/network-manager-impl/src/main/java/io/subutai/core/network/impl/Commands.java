@@ -62,9 +62,9 @@ public class Commands
 
     public RequestBuilder getGetP2pLogsCommand( Date from, Date till )
     {
-        return new RequestBuilder(
-                String.format( "journalctl -u *p2p* --since \"%s\" --until \"%s\"", p2pDateFormat.format( from ),
-                        p2pDateFormat.format( till ) ) );
+        return new RequestBuilder( String.format(
+                "journalctl -u `ls /etc/systemd/system/ | grep subutai | grep p2p` --since \"%s\" --until \"%s\"",
+                p2pDateFormat.format( from ), p2pDateFormat.format( till ) ) );
     }
 
 
