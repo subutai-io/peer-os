@@ -23,4 +23,8 @@ else
         # cleaned up on purge. Also remove old symlinks.
         deb-systemd-helper update-state management.service >/dev/null || true
 fi
-# End code copied from dh_systemd_enable ------------------
+
+if [ -d /run/systemd/system ]; then
+    systemctl --system daemon-reload >/dev/null || true
+    deb-systemd-invoke start management.service >/dev/null || true
+fi
