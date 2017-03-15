@@ -13,6 +13,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.security.SshKey;
@@ -51,6 +52,8 @@ public class ConfigureContainerStateHandler extends StateHandler
 
             configureHosts( envDto );
 
+            changeHostNames( envDto );
+
             logEnd();
 
             return peerDto;
@@ -69,8 +72,7 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
-    private EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto,
-                                             EnvironmentDto envDto )
+    private EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
             throws HubManagerException
     {
         try
@@ -119,7 +121,8 @@ public class ConfigureContainerStateHandler extends StateHandler
 
             newKeys.addAll( hubSshKeys );
 
-            // Fix for https://github.com/optdyn/hub/issues/2671: "newly added containers do not have the previously installed env SSH keys installed".
+            // Fix for https://github.com/optdyn/hub/issues/2671: "newly added containers do not have the previously
+            // installed env SSH keys installed".
             // newKeys.removeAll( peerSshKeys );
 
             if ( newKeys.isEmpty() )
@@ -281,6 +284,32 @@ public class ConfigureContainerStateHandler extends StateHandler
         catch ( Exception e )
         {
             log.error( "Error configuring hosts: {}", e.getMessage() );
+        }
+    }
+
+
+    private void changeHostNames( EnvironmentDto envDto )
+    {
+        ContainerHost ch = null;
+
+        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+        {
+            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+            {
+                try
+                {
+                    ch = ctx.localPeer.getContainerHostById( nodeDto.getContainerId() );
+
+                    if ( !ch.getHostname().equals( nodeDto.getHostName() ) )
+                    {
+                        ctx.localPeer.setContainerHostname( ch.getContainerId(), nodeDto.getHostName() );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    log.error( "Error configuring hostnames: {}", e.getMessage() );
+                }
+            }
         }
     }
 }
