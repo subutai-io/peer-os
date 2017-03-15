@@ -121,9 +121,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException;
 
-    void setContainerHostname( ContainerHost containerHost, String hostname ) throws ResourceHostException;
+    void setContainerHostname( ContainerHost containerHost, String newHostname ) throws ResourceHostException;
 
-    void setHostname( String hostname ) throws ResourceHostException;
+    void setHostname( String newHostname ) throws ResourceHostException;
 
     int getVlan() throws ResourceHostException;
 
