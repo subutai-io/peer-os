@@ -73,6 +73,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -1061,19 +1062,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setContainerHostname( final ContainerHost containerHost, final String hostname )
+    public void setContainerHostname( final ContainerHost containerHost, final String newHostname )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, "Invalid container" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
 
         //check if new hostname differs from current one
-        if ( !StringUtils.equalsIgnoreCase( containerHost.getHostname(), hostname ) )
+        if ( !StringUtils.equalsIgnoreCase( containerHost.getHostname(), newHostname ) )
         {
             try
             {
                 commandUtil.execute( resourceHostCommands
-                        .getSetContainerHostnameCommand( containerHost.getContainerName(), hostname ), this );
+                        .getSetContainerHostnameCommand( containerHost.getContainerName(), newHostname ), this );
             }
             catch ( CommandException e )
             {
@@ -1085,17 +1086,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setHostname( final String hostname ) throws ResourceHostException
+    public void setHostname( final String newHostname ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
 
-        if ( !StringUtils.equalsIgnoreCase( this.hostname, hostname ) )
+        if ( !StringUtils.equalsIgnoreCase( this.hostname, newHostname ) )
         {
             try
             {
-                commandUtil.execute( resourceHostCommands.getGetSetRhHostnameCommand( hostname ), this );
+                commandUtil.execute( resourceHostCommands.getGetSetRhHostnameCommand( newHostname ), this );
 
-                this.hostname = hostname; //not updating db record b/c heartbeat will handle that
+                this.hostname = newHostname; //not updating db record b/c heartbeat will handle that
             }
             catch ( CommandException e )
             {
