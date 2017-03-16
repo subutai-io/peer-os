@@ -124,9 +124,10 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
         LOADING_SCREEN();
         nodeRegSrv.changeHostName( rh.id, name ).success( function (data) {
             location.reload();
-        } ).error( function (error) {
+        } ).error( function (data, status, headers, config, statusText) {
+            ngDialog.closeAll();
             LOADING_SCREEN('none');
-            SweetAlert.swal ("ERROR!", error, "error");
+            SweetAlert.swal ("ERROR!", data, "error");
         } );
     }
 
