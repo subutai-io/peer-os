@@ -4,7 +4,6 @@ package io.subutai.hub.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.subutai.hub.share.dto.PublicKeyContainer;
@@ -32,7 +31,7 @@ public class EnvironmentPeerDto
 
     private EnvironmentInfoDto environmentInfo;
 
-    private String ownerId;
+    private Long ownerId;
 
     private PeerState requestState;
 
@@ -117,13 +116,13 @@ public class EnvironmentPeerDto
     }
 
 
-    public String getOwnerId()
+    public Long getOwnerId()
     {
         return ownerId;
     }
 
 
-    public void setOwnerId( final String ownerId )
+    public void setOwnerId( final Long ownerId )
     {
         this.ownerId = ownerId;
     }

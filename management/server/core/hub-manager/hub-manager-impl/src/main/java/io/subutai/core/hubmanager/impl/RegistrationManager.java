@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import javax.ws.rs.core.Form;
 
-import io.subutai.common.settings.SystemSettings;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
@@ -16,11 +14,13 @@ import org.apache.http.HttpStatus;
 
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.common.settings.SystemSettings;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
@@ -102,16 +102,16 @@ public class RegistrationManager
         peerInfoDto.setName( peerName );
 
         RegistrationDto dto = new RegistrationDto( PGPKeyHelper.getFingerprint( configManager.getOwnerPublicKey() ) );
+        User activeUser = configManager.getActiveUser();
+        UserToken token = configManager.getPermanentToken();
 
         dto.setOwnerEmail( email );
         dto.setOwnerPassword( password );
         dto.setPeerInfo( peerInfoDto );
-        dto.setTemp1( configManager.getActiveUser().getFingerprint() );
-
-        UserToken token = configManager.getPermanentToken();
-
+        dto.setTemp1( activeUser.getFingerprint() );
+        dto.setOwnerId( activeUser.getId() );
         dto.setToken( token.getFullToken() );
-        dto.setTokenId( configManager.getActiveUser().getAuthId() );
+        dto.setTokenId( activeUser.getAuthId() );
 
         return dto;
     }
