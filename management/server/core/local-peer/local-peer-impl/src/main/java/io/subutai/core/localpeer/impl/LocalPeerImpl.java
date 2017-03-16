@@ -116,6 +116,7 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -2973,16 +2974,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void setContainerHostname( final ContainerId containerId, final String hostname ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
         ContainerHost containerHost = getContainerHostById( containerId.getId() );
+
+        String newHostname = StringUtil.removeHtmlAndSpecialChars( hostname, true );
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
 
         //check if container with new hostname already exists on peer
         try
         {
-            getContainerHostByHostName( hostname );
+            getContainerHostByHostName( newHostname );
 
-            throw new PeerException( String.format( "Container with hostname %s already exists", hostname ) );
+            throw new PeerException( String.format( "Container with hostname %s already exists", newHostname ) );
         }
         catch ( HostNotFoundException ignore )
         {
@@ -2993,7 +2997,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
 
-            resourceHost.setContainerHostname( containerHost, hostname );
+            resourceHost.setContainerHostname( containerHost, newHostname );
         }
         catch ( Exception e )
         {
@@ -3008,16 +3012,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void setRhHostname( final String rhId, final String hostname ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ), "Invalid RH id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
         ResourceHost resourceHost = getResourceHostById( rhId );
+
+        String newHostname = StringUtil.removeHtmlAndSpecialChars( hostname, true );
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
+
 
         //check if RH with new hostname already exists on peer
         try
         {
-            getResourceHostByHostName( hostname );
+            getResourceHostByHostName( newHostname );
 
-            throw new PeerException( String.format( "RH with hostname %s already exists", hostname ) );
+            throw new PeerException( String.format( "RH with hostname %s already exists", newHostname ) );
         }
         catch ( HostNotFoundException ignore )
         {
@@ -3026,7 +3034,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            resourceHost.setHostname( hostname );
+            resourceHost.setHostname( newHostname );
         }
         catch ( Exception e )
         {
