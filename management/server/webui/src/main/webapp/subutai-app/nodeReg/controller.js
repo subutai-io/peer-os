@@ -124,10 +124,10 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
         LOADING_SCREEN();
         nodeRegSrv.changeHostName( rh.id, name ).success( function (data) {
             location.reload();
-        } ).error( function (data, status, headers, config, statusText) {
+        } ).error( function (error) {
             ngDialog.closeAll();
             LOADING_SCREEN('none');
-            SweetAlert.swal ("ERROR!", data, "error");
+            SweetAlert.swal ("ERROR!", $.trim(error) ? error: 'Invalid hostname', "error");
         } );
     }
 

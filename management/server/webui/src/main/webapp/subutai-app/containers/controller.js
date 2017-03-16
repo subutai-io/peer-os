@@ -340,10 +340,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		LOADING_SCREEN();
 		environmentService.setContainerName( container, name ).success( function (data) {
 			location.reload();
-		} ).error( function (data, status, headers, config, statusText) {
+		} ).error( function (error) {
 		    ngDialog.closeAll();
 		    LOADING_SCREEN('none');
-			SweetAlert.swal ("ERROR!", data, "error");
+			SweetAlert.swal ("ERROR!", $.trim(error) ? error: 'Invalid hostname', "error");
 		} );
 	}
 
