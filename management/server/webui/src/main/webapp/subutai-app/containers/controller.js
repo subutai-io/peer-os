@@ -343,8 +343,9 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		LOADING_SCREEN();
 		environmentService.setContainerName( container, name ).success( function (data) {
 			location.reload();
-		} ).error( function (data) {
-			SweetAlert.swal ("ERROR!", data);
+		} ).error( function (error) {
+		    LOADING_SCREEN('none');
+			SweetAlert.swal ("ERROR!", error, "error");
 		} );
 	}
 
