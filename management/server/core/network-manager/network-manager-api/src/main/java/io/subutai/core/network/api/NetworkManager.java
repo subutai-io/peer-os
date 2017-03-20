@@ -11,6 +11,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnels;
 
@@ -126,5 +127,67 @@ public interface NetworkManager
     void removeCustomProxy( String vlan ) throws NetworkManagerException;
 
     ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException;
+
+    /**
+     * Maps specified container port to random RH port
+     *
+     * @param host RH host
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     *
+     * @return mapped random RH port
+     */
+    int mapContainerPort( Host host, Protocol protocol, String containerIp, int containerPort )
+            throws NetworkManagerException;
+
+    /**
+     * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
+     *
+     * @param host RH host
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     */
+    void mapContainerPort( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort )
+            throws NetworkManagerException;
+
+    /**
+     * Removes specified container port mapping
+     *
+     * @param host RH host
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     */
+    void removeContainerPortMapping( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort )
+            throws NetworkManagerException;
+
+    /**
+     * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
+     *
+     * @param host RH host
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     * @param domain domain
+     * @param sslCertPath optional path to SSL cert, pass null if not needed
+     */
+    void mapContainerPortToDomain( Host host, String containerIp, int containerPort, int rhPort, String domain,
+                                   String sslCertPath ) throws NetworkManagerException;
+
+    /**
+     * Removes specified container port domain mapping
+     *
+     * @param host RH host
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     * @param domain domain
+     */
+    void removeContainerPortDomainMapping( Host host, String containerIp, int containerPort, int rhPort, String domain )
+            throws NetworkManagerException;
 }
 

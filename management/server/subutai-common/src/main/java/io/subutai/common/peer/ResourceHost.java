@@ -13,6 +13,7 @@ import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
@@ -140,4 +141,58 @@ public interface ResourceHost extends Host, ResourceHostInfo
     Set<String> listExistingContainerNames() throws ResourceHostException;
 
     ReservedPorts getReservedPorts() throws ResourceHostException;
+
+    /**
+     * Maps specified container port to random RH port
+     *
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     */
+    int mapContainerPort( Protocol protocol, String containerIp, int containerPort ) throws ResourceHostException;
+
+    /**
+     * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
+     *
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     */
+    void mapContainerPort( Protocol protocol, String containerIp, int containerPort, int rhPort )
+            throws ResourceHostException;
+
+    /**
+     * Removes specified container port mapping
+     *
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     */
+    void removeContainerPortMapping( Protocol protocol, String containerIp, int containerPort, int rhPort )
+            throws ResourceHostException;
+
+    /**
+     * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
+     *
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     * @param domain domain
+     * @param sslCertPath optional path to SSL cert, pass null if not needed
+     */
+    void mapContainerPortToDomain( String containerIp, int containerPort, int rhPort, String domain,
+                                   String sslCertPath ) throws ResourceHostException;
+
+    /**
+     * Removes specified container port domain mapping
+     *
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     * @param domain domain
+     */
+    void removeContainerPortDomainMapping( String containerIp, int containerPort, int rhPort, String domain )
+            throws ResourceHostException;
 }

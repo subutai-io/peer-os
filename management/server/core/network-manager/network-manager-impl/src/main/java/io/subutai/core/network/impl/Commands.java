@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.protocol.Protocol;
 
 
 /**
@@ -23,29 +24,30 @@ public class Commands
     private static final String P2P_BINDING = "subutai p2p";
     private static final String PROXY_BINDING = "subutai proxy";
     private static final String INFO_BINDING = "subutai info";
+    private static final String MAP_BINDING = "subutai map";
     private final SimpleDateFormat p2pDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 
-    public RequestBuilder getGetReservedPortsCommand()
+    RequestBuilder getGetReservedPortsCommand()
     {
         return new RequestBuilder( INFO_BINDING ).withCmdArgs( Lists.<String>newArrayList( "ports" ) );
     }
 
 
-    public RequestBuilder getGetP2pVersionCommand()
+    RequestBuilder getGetP2pVersionCommand()
     {
         return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.<String>newArrayList( "-v" ) );
     }
 
 
-    public RequestBuilder getP2PConnectionsCommand()
+    RequestBuilder getP2PConnectionsCommand()
     {
         return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.newArrayList( "-p" ) );
     }
 
 
-    public RequestBuilder getJoinP2PSwarmCommand( String interfaceName, String localIp, String p2pHash,
-                                                  String secretKey, long secretKeyTtlSec, String portRange )
+    RequestBuilder getJoinP2PSwarmCommand( String interfaceName, String localIp, String p2pHash, String secretKey,
+                                           long secretKeyTtlSec, String portRange )
     {
         return new RequestBuilder( P2P_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ), localIp,
@@ -53,14 +55,14 @@ public class Commands
     }
 
 
-    public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
+    RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( P2P_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-u", p2pHash, newSecretKey, String.valueOf( ttlSeconds ) ) );
     }
 
 
-    public RequestBuilder getGetP2pLogsCommand( Date from, Date till )
+    RequestBuilder getGetP2pLogsCommand( Date from, Date till )
     {
         return new RequestBuilder( String.format(
                 "journalctl -u `ls /etc/systemd/system/ | grep subutai | grep p2p` --since \"%s\" --until \"%s\"",
@@ -68,7 +70,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getCreateTunnelCommand( String tunnelName, String tunnelIp, int vlan, long vni )
+    RequestBuilder getCreateTunnelCommand( String tunnelName, String tunnelIp, int vlan, long vni )
     {
         return new RequestBuilder( VXLAN_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-create", tunnelName, "-remoteip", tunnelIp, "-vlan", String.valueOf( vlan ),
@@ -76,34 +78,34 @@ public class Commands
     }
 
 
-    public RequestBuilder getDeleteTunnelCommand( final String tunnelName )
+    RequestBuilder getDeleteTunnelCommand( final String tunnelName )
     {
         return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( Lists.newArrayList( "-delete", tunnelName ) );
     }
 
 
-    public RequestBuilder getGetTunnelsCommand()
+    RequestBuilder getGetTunnelsCommand()
     {
         return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( Lists.newArrayList( "-list" ) );
     }
 
 
-    public RequestBuilder getGetVlanDomainCommand( int vLanId )
+    RequestBuilder getGetVlanDomainCommand( int vLanId )
     {
         return new RequestBuilder( PROXY_BINDING )
                 .withCmdArgs( Lists.newArrayList( "check", String.valueOf( vLanId ), "-d" ) );
     }
 
 
-    public RequestBuilder getRemoveVlanDomainCommand( final String vLanId )
+    RequestBuilder getRemoveVlanDomainCommand( final String vLanId )
     {
         return new RequestBuilder( PROXY_BINDING ).withCmdArgs( Lists.newArrayList( "del", vLanId, "-d" ) );
     }
 
 
-    public RequestBuilder getSetVlanDomainCommand( final String vLanId, final String domain,
-                                                   final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                                                   final String sslCertPath )
+    RequestBuilder getSetVlanDomainCommand( final String vLanId, final String domain,
+                                            final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
+                                            final String sslCertPath )
     {
         List<String> args = Lists.newArrayList( "add", vLanId, "-d", domain );
 
@@ -123,29 +125,79 @@ public class Commands
     }
 
 
-    public RequestBuilder getCheckIpInVlanDomainCommand( final String hostIp, final int vLanId )
+    RequestBuilder getCheckIpInVlanDomainCommand( final String hostIp, final int vLanId )
     {
         return new RequestBuilder( PROXY_BINDING )
                 .withCmdArgs( Lists.newArrayList( "check", String.valueOf( vLanId ), "-h", hostIp ) );
     }
 
 
-    public RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final String vLanId )
+    RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final String vLanId )
     {
         return new RequestBuilder( PROXY_BINDING ).withCmdArgs( Lists.newArrayList( "add", vLanId, "-h", hostIp ) );
     }
 
 
-    public RequestBuilder getRemoveIpFromVlanDomainCommand( final String hostIp, final int vLanId )
+    RequestBuilder getRemoveIpFromVlanDomainCommand( final String hostIp, final int vLanId )
     {
         return new RequestBuilder( PROXY_BINDING )
                 .withCmdArgs( Lists.newArrayList( "del", String.valueOf( vLanId ), "-h", hostIp ) );
     }
 
 
-    public RequestBuilder getSetupContainerSshTunnelCommand( final String containerIp, final int sshIdleTimeout )
+    RequestBuilder getSetupContainerSshTunnelCommand( final String containerIp, final int sshIdleTimeout )
     {
         return new RequestBuilder( TUNNEL_BINDING )
                 .withCmdArgs( Lists.newArrayList( "add", containerIp, String.valueOf( sshIdleTimeout ) ) );
+    }
+
+
+    RequestBuilder getMapContainerPortToRandomPortCommand( final Protocol protocol, final String containerIp,
+                                                           final int containerPort )
+    {
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( protocol.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ) ) );
+    }
+
+
+    RequestBuilder getMapContainerPortToSpecificPortCommand( final Protocol protocol, final String containerIp,
+                                                             final int containerPort, final int rhPort )
+    {
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( protocol.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ) ) );
+    }
+
+
+    RequestBuilder getRemoveContainerPortMappingCommand( final Protocol protocol, final String containerIp,
+                                                         final int containerPort, final int rhPort )
+    {
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( protocol.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-r" ) );
+    }
+
+
+    RequestBuilder getMapContainerPortToDomainCommand( final String containerIp, final int containerPort,
+                                                       final int rhPort, final String domain, final String sslCertPath )
+    {
+        List<String> args = Lists.newArrayList( Protocol.HTTP.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain );
+
+        if ( !Strings.isNullOrEmpty( sslCertPath ) )
+        {
+            args.add( "-c" );
+            args.add( sslCertPath );
+        }
+
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args );
+    }
+
+
+    RequestBuilder getRemoveContainerPortDomainMappingCommand( final String containerIp, final int containerPort,
+                                                               final int rhPort, final String domain )
+    {
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs(
+                Lists.newArrayList( Protocol.HTTP.name().toLowerCase(), "-i",
+                        String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d",
+                        domain, "-r" ) );
     }
 }
