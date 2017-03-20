@@ -69,8 +69,8 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 			LOADING_SCREEN('none');
 			getNodes();
 		}).error(function(error){
-			SweetAlert.swal("ERROR!", error, "error");
 			LOADING_SCREEN('none');
+			SweetAlert.swal("ERROR!", error, "error");
 		});
 	}
 
@@ -87,8 +87,8 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 			LOADING_SCREEN('none');
 			getNodes();
 		}).error(function(error){
-			SweetAlert.swal("ERROR!", error, "error");
 			LOADING_SCREEN('none');
+			SweetAlert.swal("ERROR!", error, "error");
 		});
 	}
 
@@ -105,8 +105,8 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 			LOADING_SCREEN('none');
 			getNodes();
 		}).error(function(error){
-			SweetAlert.swal("ERROR!", error, "error");
 			LOADING_SCREEN('none');
+			SweetAlert.swal("ERROR!", error, "error");
 		});
 	}
 
@@ -124,8 +124,10 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
         LOADING_SCREEN();
         nodeRegSrv.changeHostName( rh.id, name ).success( function (data) {
             location.reload();
-        } ).error( function (data) {
-            SweetAlert.swal ("ERROR!", data);
+        } ).error( function (error) {
+            ngDialog.closeAll();
+            LOADING_SCREEN('none');
+            SweetAlert.swal ("ERROR!", $.trim(error) ? error: 'Invalid hostname', "error");
         } );
     }
 

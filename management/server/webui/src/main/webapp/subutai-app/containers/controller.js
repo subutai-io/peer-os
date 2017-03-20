@@ -321,9 +321,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		}
 
 		environmentService.switchContainer(vm.containers[key].id, action).success(function (data) {
-			/*environmentService.getContainerStatus(vm.containers[key].id).success(function (data) {
-				vm.containers[key].state = data.STATE;
-			});*/
 			if(vm.containers[key].state == 'STOPPING') {
 				vm.containers[key].state = 'STOPPED';
 			} else {
@@ -343,8 +340,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		LOADING_SCREEN();
 		environmentService.setContainerName( container, name ).success( function (data) {
 			location.reload();
-		} ).error( function (data) {
-			SweetAlert.swal ("ERROR!", data);
+		} ).error( function (error) {
+		    ngDialog.closeAll();
+		    LOADING_SCREEN('none');
+			SweetAlert.swal ("ERROR!", $.trim(error) ? error: 'Invalid hostname', "error");
 		} );
 	}
 
