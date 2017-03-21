@@ -176,23 +176,25 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
      *
+     * @param protocol protocol, can only be http or https
      * @param containerIp ip of container
      * @param containerPort container port
      * @param rhPort RH port
      * @param domain domain
      * @param sslCertPath optional path to SSL cert, pass null if not needed
      */
-    void mapContainerPortToDomain( String containerIp, int containerPort, int rhPort, String domain,
+    void mapContainerPortToDomain( Protocol protocol, String containerIp, int containerPort, int rhPort, String domain,
                                    String sslCertPath ) throws ResourceHostException;
 
     /**
      * Removes specified container port domain mapping
      *
+     * @param protocol protocol, can only be http or https
      * @param containerIp ip of container
      * @param containerPort container port
      * @param rhPort RH port
      * @param domain domain
      */
-    void removeContainerPortDomainMapping( String containerIp, int containerPort, int rhPort, String domain )
-            throws ResourceHostException;
+    void removeContainerPortDomainMapping( Protocol protocol, String containerIp, int containerPort, int rhPort,
+                                           String domain ) throws ResourceHostException;
 }

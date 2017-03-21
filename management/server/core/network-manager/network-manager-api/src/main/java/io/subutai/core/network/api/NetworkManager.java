@@ -169,25 +169,27 @@ public interface NetworkManager
      * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
      *
      * @param host RH host
+     * @param protocol protocol, can only be http or https
      * @param containerIp ip of container
      * @param containerPort container port
      * @param rhPort RH port
      * @param domain domain
      * @param sslCertPath optional path to SSL cert, pass null if not needed
      */
-    void mapContainerPortToDomain( Host host, String containerIp, int containerPort, int rhPort, String domain,
-                                   String sslCertPath ) throws NetworkManagerException;
+    void mapContainerPortToDomain( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort,
+                                   String domain, String sslCertPath ) throws NetworkManagerException;
 
     /**
      * Removes specified container port domain mapping
      *
      * @param host RH host
+     * @param protocol protocol, can only be http or https
      * @param containerIp ip of container
      * @param containerPort container port
      * @param rhPort RH port
      * @param domain domain
      */
-    void removeContainerPortDomainMapping( Host host, String containerIp, int containerPort, int rhPort, String domain )
-            throws NetworkManagerException;
+    void removeContainerPortDomainMapping( Host host, Protocol protocol, String containerIp, int containerPort,
+                                           int rhPort, String domain ) throws NetworkManagerException;
 }
 

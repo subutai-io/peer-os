@@ -176,10 +176,11 @@ public class Commands
     }
 
 
-    RequestBuilder getMapContainerPortToDomainCommand( final String containerIp, final int containerPort,
-                                                       final int rhPort, final String domain, final String sslCertPath )
+    RequestBuilder getMapContainerPortToDomainCommand( final Protocol protocol, final String containerIp,
+                                                       final int containerPort, final int rhPort, final String domain,
+                                                       final String sslCertPath )
     {
-        List<String> args = Lists.newArrayList( Protocol.HTTP.name().toLowerCase(), "-i",
+        List<String> args = Lists.newArrayList( protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain );
 
         if ( !Strings.isNullOrEmpty( sslCertPath ) )
@@ -192,12 +193,12 @@ public class Commands
     }
 
 
-    RequestBuilder getRemoveContainerPortDomainMappingCommand( final String containerIp, final int containerPort,
-                                                               final int rhPort, final String domain )
+    RequestBuilder getRemoveContainerPortDomainMappingCommand( final Protocol protocol, final String containerIp,
+                                                               final int containerPort, final int rhPort,
+                                                               final String domain )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs(
-                Lists.newArrayList( Protocol.HTTP.name().toLowerCase(), "-i",
-                        String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d",
-                        domain, "-r" ) );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( protocol.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain,
+                "-r" ) );
     }
 }

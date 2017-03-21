@@ -1303,13 +1303,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void mapContainerPortToDomain( final String containerIp, final int containerPort, final int rhPort,
-                                          final String domain, final String sslCertPath ) throws ResourceHostException
+    public void mapContainerPortToDomain( final Protocol protocol, final String containerIp, final int containerPort,
+                                          final int rhPort, final String domain, final String sslCertPath )
+            throws ResourceHostException
     {
         try
         {
-            getNetworkManager()
-                    .mapContainerPortToDomain( this, containerIp, containerPort, rhPort, domain, sslCertPath );
+            getNetworkManager().mapContainerPortToDomain( this, protocol, containerIp, containerPort, rhPort, domain,
+                    sslCertPath );
         }
         catch ( NetworkManagerException e )
         {
@@ -1320,12 +1321,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void removeContainerPortDomainMapping( final String containerIp, final int containerPort, final int rhPort,
-                                                  final String domain ) throws ResourceHostException
+    public void removeContainerPortDomainMapping( final Protocol protocol, final String containerIp,
+                                                  final int containerPort, final int rhPort, final String domain )
+            throws ResourceHostException
     {
         try
         {
-            getNetworkManager().removeContainerPortDomainMapping( this, containerIp, containerPort, rhPort, domain );
+            getNetworkManager()
+                    .removeContainerPortDomainMapping( this, protocol, containerIp, containerPort, rhPort, domain );
         }
         catch ( NetworkManagerException e )
         {

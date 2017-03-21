@@ -503,27 +503,13 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void mapContainerPortToDomain( final Host host, final String containerIp, final int containerPort,
-                                          final int rhPort, final String domain, final String sslCertPath )
-            throws NetworkManagerException
+    public void mapContainerPortToDomain( final Host host, final Protocol protocol, final String containerIp,
+                                          final int containerPort, final int rhPort, final String domain,
+                                          final String sslCertPath ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
-        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
-        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
-
-        execute( host, commands.getMapContainerPortToDomainCommand( containerIp, containerPort, rhPort, domain, sslCertPath ) );
-    }
-
-
-    @Override
-    public void removeContainerPortDomainMapping( final Host host, final String containerIp, final int containerPort,
-                                                  final int rhPort, final String domain ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( protocol );
+        Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
@@ -532,6 +518,28 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
 
         execute( host,
-                commands.getRemoveContainerPortDomainMappingCommand( containerIp, containerPort, rhPort, domain ) );
+                commands.getMapContainerPortToDomainCommand( protocol, containerIp, containerPort, rhPort, domain,
+                        sslCertPath ) );
+    }
+
+
+    @Override
+    public void removeContainerPortDomainMapping( final Host host, final Protocol protocol, final String containerIp,
+                                                  final int containerPort, final int rhPort, final String domain )
+            throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( protocol );
+        Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
+        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
+
+        execute( host,
+                commands.getRemoveContainerPortDomainMappingCommand( protocol, containerIp, containerPort, rhPort,
+                        domain ) );
     }
 }
