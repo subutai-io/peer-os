@@ -21,6 +21,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.CustomProxyConfig;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Protocol;
@@ -451,5 +452,96 @@ public class NetworkManagerImpl implements NetworkManager
 
 
         return reservedPorts;
+    }
+
+
+    @Override
+    public int mapContainerPort( final Host host, final Protocol protocol, final String containerIp,
+                                 final int containerPort ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( protocol );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
+
+        CommandResult result = execute( host,
+                commands.getMapContainerPortToRandomPortCommand( protocol, containerIp, containerPort ) );
+
+        return Integer.parseInt( result.getStdOut().trim() );
+    }
+
+
+    @Override
+    public void mapContainerPort( final Host host, final Protocol protocol, final String containerIp,
+                                  final int containerPort, final int rhPort ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( protocol );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
+
+        execute( host,
+                commands.getMapContainerPortToSpecificPortCommand( protocol, containerIp, containerPort, rhPort ) );
+    }
+
+
+    @Override
+    public void removeContainerPortMapping( final Host host, final Protocol protocol, final String containerIp,
+                                            final int containerPort, final int rhPort ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( protocol );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
+
+        execute( host, commands.getRemoveContainerPortMappingCommand( protocol, containerIp, containerPort, rhPort ) );
+    }
+
+
+    @Override
+    public void mapContainerPortToDomain( final Host host, final Protocol protocol, final String containerIp,
+                                          final int containerPort, final int rhPort, final String domain,
+                                          final String sslCertPath, final LoadBalancing loadBalancing )
+            throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( protocol );
+        Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
+        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
+
+        execute( host,
+                commands.getMapContainerPortToDomainCommand( protocol, containerIp, containerPort, rhPort, domain,
+                        sslCertPath, loadBalancing ) );
+    }
+
+
+    @Override
+    public void removeContainerPortDomainMapping( final Host host, final Protocol protocol, final String containerIp,
+                                                  final int containerPort, final int rhPort, final String domain )
+            throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( protocol );
+        Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
+        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
+
+        execute( host,
+                commands.getRemoveContainerPortDomainMappingCommand( protocol, containerIp, containerPort, rhPort,
+                        domain ) );
     }
 }

@@ -62,8 +62,10 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
@@ -73,7 +75,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -1252,6 +1253,89 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( String.format( "Failed to get reserved ports: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public int mapContainerPort( final Protocol protocol, final String containerIp, final int containerPort )
+            throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().mapContainerPort( this, protocol, containerIp, containerPort );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to map container port %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void mapContainerPort( final Protocol protocol, final String containerIp, final int containerPort,
+                                  final int rhPort ) throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager().mapContainerPort( this, protocol, containerIp, containerPort, rhPort );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to map container port %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void removeContainerPortMapping( final Protocol protocol, final String containerIp, final int containerPort,
+                                            final int rhPort ) throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager().removeContainerPortMapping( this, protocol, containerIp, containerPort, rhPort );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Failed to remove container port mapping %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void mapContainerPortToDomain( final Protocol protocol, final String containerIp, final int containerPort,
+                                          final int rhPort, final String domain, final String sslCertPath,
+                                          final LoadBalancing loadBalancing ) throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager()
+                    .mapContainerPortToDomain( this, protocol, containerIp, containerPort, rhPort, domain, sslCertPath,
+                            loadBalancing );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Failed to map container port to domain %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void removeContainerPortDomainMapping( final Protocol protocol, final String containerIp,
+                                                  final int containerPort, final int rhPort, final String domain )
+            throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager()
+                    .removeContainerPortDomainMapping( this, protocol, containerIp, containerPort, rhPort, domain );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Failed to remove container port domain mapping %s", e.getMessage() ), e );
         }
     }
 }
