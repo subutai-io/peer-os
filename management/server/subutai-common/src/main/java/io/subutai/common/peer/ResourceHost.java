@@ -11,6 +11,7 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Protocol;
@@ -182,9 +183,10 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param rhPort RH port
      * @param domain domain
      * @param sslCertPath optional path to SSL cert, pass null if not needed
+     * @param loadBalancing optional load balancing method, pass null if not needed
      */
     void mapContainerPortToDomain( Protocol protocol, String containerIp, int containerPort, int rhPort, String domain,
-                                   String sslCertPath ) throws ResourceHostException;
+                                   String sslCertPath, LoadBalancing loadBalancing ) throws ResourceHostException;
 
     /**
      * Removes specified container port domain mapping

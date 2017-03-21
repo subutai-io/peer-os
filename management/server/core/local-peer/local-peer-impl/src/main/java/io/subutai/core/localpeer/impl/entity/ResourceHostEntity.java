@@ -62,6 +62,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Protocol;
@@ -1304,13 +1305,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public void mapContainerPortToDomain( final Protocol protocol, final String containerIp, final int containerPort,
-                                          final int rhPort, final String domain, final String sslCertPath )
-            throws ResourceHostException
+                                          final int rhPort, final String domain, final String sslCertPath,
+                                          final LoadBalancing loadBalancing ) throws ResourceHostException
     {
         try
         {
-            getNetworkManager().mapContainerPortToDomain( this, protocol, containerIp, containerPort, rhPort, domain,
-                    sslCertPath );
+            getNetworkManager()
+                    .mapContainerPortToDomain( this, protocol, containerIp, containerPort, rhPort, domain, sslCertPath,
+                            loadBalancing );
         }
         catch ( NetworkManagerException e )
         {

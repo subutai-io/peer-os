@@ -21,6 +21,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.CustomProxyConfig;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Protocol;
@@ -505,7 +506,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void mapContainerPortToDomain( final Host host, final Protocol protocol, final String containerIp,
                                           final int containerPort, final int rhPort, final String domain,
-                                          final String sslCertPath ) throws NetworkManagerException
+                                          final String sslCertPath, final LoadBalancing loadBalancing )
+            throws NetworkManagerException
     {
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
@@ -519,7 +521,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( host,
                 commands.getMapContainerPortToDomainCommand( protocol, containerIp, containerPort, rhPort, domain,
-                        sslCertPath ) );
+                        sslCertPath, loadBalancing ) );
     }
 
 

@@ -10,6 +10,7 @@ import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.CustomProxyConfig;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
@@ -175,9 +176,11 @@ public interface NetworkManager
      * @param rhPort RH port
      * @param domain domain
      * @param sslCertPath optional path to SSL cert, pass null if not needed
+     * @param loadBalancing optional load balancing method, pass null if not needed
      */
     void mapContainerPortToDomain( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort,
-                                   String domain, String sslCertPath ) throws NetworkManagerException;
+                                   String domain, String sslCertPath, LoadBalancing loadBalancing )
+            throws NetworkManagerException;
 
     /**
      * Removes specified container port domain mapping
