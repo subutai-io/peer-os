@@ -194,5 +194,5 @@ public interface NetworkManager
      */
     void removeContainerPortDomainMapping( Host host, Protocol protocol, String containerIp, int containerPort,
                                            int rhPort, String domain ) throws NetworkManagerException;
-}
+5}
 
