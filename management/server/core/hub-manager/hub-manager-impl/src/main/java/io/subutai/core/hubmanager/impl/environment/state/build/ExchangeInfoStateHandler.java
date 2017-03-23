@@ -39,7 +39,6 @@ public class ExchangeInfoStateHandler extends StateHandler
             }
             resultDto.setEnvOwnerToken( token.getFullToken() );
             resultDto.setEnvOwnerTokenId( user.getAuthId() );
-            resultDto.setOwnerId( user.getId() );
 
             logEnd();
 

@@ -31,7 +31,7 @@ public class EnvironmentPeerDto
 
     private EnvironmentInfoDto environmentInfo;
 
-    private Long ownerId;
+    private String ownerId;
 
     private PeerState requestState;
 
@@ -116,13 +116,13 @@ public class EnvironmentPeerDto
     }
 
 
-    public Long getOwnerId()
+    public String getOwnerId()
     {
         return ownerId;
     }
 
 
-    public void setOwnerId( final Long ownerId )
+    public void setOwnerId( final String ownerId )
     {
         this.ownerId = ownerId;
     }
