@@ -108,7 +108,7 @@ node() {
 	notifyBuildDetails = "\nFailed on Stage - Update management on test node"
 
 	// Start Test-Peer Lock
-	if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/) {
+	if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/ || env.BRANCH_NAME == 'jenkinsfile') {
 		lock('test-node-core16') {
 			// destroy existing management template on test node and install latest available snap
 			sh """
