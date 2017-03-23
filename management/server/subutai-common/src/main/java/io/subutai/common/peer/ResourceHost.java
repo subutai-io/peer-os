@@ -8,7 +8,7 @@ import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.protocol.LoadBalancing;
@@ -121,7 +121,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     String getP2pVersion() throws ResourceHostException;
 
-    P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException;
+    P2pLogs getP2pLogs( LogLevel logLevel, Date from, Date till ) throws ResourceHostException;
 
     void setContainerHostname( ContainerHost containerHost, String newHostname ) throws ResourceHostException;
 
