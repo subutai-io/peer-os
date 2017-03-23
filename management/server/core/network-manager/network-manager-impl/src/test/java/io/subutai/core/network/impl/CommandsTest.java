@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.junit.Test;
 
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.settings.Common;
 
@@ -64,7 +65,7 @@ public class CommandsTest
     @Test
     public void testGetGetP2pLogsCommand() throws Exception
     {
-        assertNotNull( commands.getGetP2pLogsCommand( new Date(), new Date() ) );
+        assertNotNull( commands.getGetP2pLogsCommand( new Date(), new Date(), LogLevel.ERROR ) );
     }
 
 

@@ -8,11 +8,13 @@ import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
@@ -119,7 +121,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     String getP2pVersion() throws ResourceHostException;
 
-    P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException;
+    P2pLogs getP2pLogs( LogLevel logLevel, Date from, Date till ) throws ResourceHostException;
 
     void setContainerHostname( ContainerHost containerHost, String newHostname ) throws ResourceHostException;
 
@@ -140,4 +142,61 @@ public interface ResourceHost extends Host, ResourceHostInfo
     Set<String> listExistingContainerNames() throws ResourceHostException;
 
     ReservedPorts getReservedPorts() throws ResourceHostException;
+
+    /**
+     * Maps specified container port to random RH port
+     *
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     */
+    int mapContainerPort( Protocol protocol, String containerIp, int containerPort ) throws ResourceHostException;
+
+    /**
+     * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
+     *
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     */
+    void mapContainerPort( Protocol protocol, String containerIp, int containerPort, int rhPort )
+            throws ResourceHostException;
+
+    /**
+     * Removes specified container port mapping
+     *
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     */
+    void removeContainerPortMapping( Protocol protocol, String containerIp, int containerPort, int rhPort )
+            throws ResourceHostException;
+
+    /**
+     * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
+     *
+     * @param protocol protocol, can only be http or https
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     * @param domain domain
+     * @param sslCertPath optional path to SSL cert, pass null if not needed
+     * @param loadBalancing optional load balancing method, pass null if not needed
+     */
+    void mapContainerPortToDomain( Protocol protocol, String containerIp, int containerPort, int rhPort, String domain,
+                                   String sslCertPath, LoadBalancing loadBalancing ) throws ResourceHostException;
+
+    /**
+     * Removes specified container port domain mapping
+     *
+     * @param protocol protocol, can only be http or https
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     * @param domain domain
+     */
+    void removeContainerPortDomainMapping( Protocol protocol, String containerIp, int containerPort, int rhPort,
+                                           String domain ) throws ResourceHostException;
 }

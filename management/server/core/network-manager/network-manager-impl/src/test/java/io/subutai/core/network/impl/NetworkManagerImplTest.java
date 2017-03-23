@@ -12,7 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
@@ -207,17 +207,17 @@ public class NetworkManagerImplTest
     {
         doReturn( P2P_LOG_OUTPUT ).when( commandResult ).getStdOut();
 
-        P2pLogs p2pLogs = networkManager.getP2pLogs( resourceHost, JournalCtlLevel.ALL, new Date(), new Date() );
+        P2pLogs p2pLogs = networkManager.getP2pLogs( resourceHost, LogLevel.ALL, new Date(), new Date() );
 
         assertFalse( p2pLogs.isEmpty() );
 
-        p2pLogs = networkManager.getP2pLogs( resourceHost, JournalCtlLevel.ERROR, new Date(), new Date() );
+        p2pLogs = networkManager.getP2pLogs( resourceHost, LogLevel.ERROR, new Date(), new Date() );
 
         assertFalse( p2pLogs.isEmpty() );
 
         doThrow( new CommandException( "" ) ).when( resourceHost ).execute( any( RequestBuilder.class ) );
 
-        networkManager.getP2pLogs( resourceHost, JournalCtlLevel.ERROR, new Date(), new Date() );
+        networkManager.getP2pLogs( resourceHost, LogLevel.ERROR, new Date(), new Date() );
     }
 
 

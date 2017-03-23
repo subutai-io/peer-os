@@ -19,7 +19,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
@@ -191,7 +191,7 @@ public class ResourceHostDataProcessor extends HubRequester
         {
             log.info( "Getting p2p logs: {} - {}", startDate, endDate );
 
-            P2pLogs p2pLogs = rh.getP2pLogs( JournalCtlLevel.ERROR, startDate, endDate );
+            P2pLogs p2pLogs = rh.getP2pLogs( LogLevel.ERROR, startDate, endDate );
 
             String p2pStatus = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
 
