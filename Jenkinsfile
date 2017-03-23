@@ -134,7 +134,7 @@ node() {
 				set -e
 				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
 				sed 's/devcdn.subut.ai/cdn.local/g' -i /var/snap/subutai-dev/current/agent.gcfg
-				echo y | subutai import management
+				echo y | subutai-dev import management
 				sed 's/cdn.local/cdn.subut.ai/g' -i /var/snap/subutai-dev/common/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
 				sed 's/cdn.local/cdn.subut.ai/g' -i /var/snap/subutai-dev/current/agent.gcfg
 			EOF"""
