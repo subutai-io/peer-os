@@ -115,7 +115,7 @@ node() {
 				set +x
 				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
-				subutai destroy everything
+				subutai-dev destroy everything
 				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
 				if test -f /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_*; then rm /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_*; fi
 				snap refresh subutai-dev --devmode --beta
