@@ -118,7 +118,10 @@ node() {
 				subutai-dev destroy everything
 				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
 				if test -f /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_*; then rm /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_*; fi
-				snap refresh subutai-dev --devmode --beta
+				cd /tmp
+				find /tmp -maxdepth 1 -type f -name subutai-dev_* -delete
+				snap download subutai-dev --beta
+				snap install --dangerous --devmode /tmp/subutai-dev_*.snap
 			EOF"""
 
 			// copy generated management template on test node
