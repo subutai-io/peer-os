@@ -51,7 +51,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
@@ -1030,7 +1030,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException
+    public P2pLogs getP2pLogs( LogLevel logLevel, Date from, Date till ) throws ResourceHostException
     {
         Preconditions.checkNotNull( logLevel, "Invalid log level" );
         Preconditions.checkNotNull( from, "Invalid from date" );

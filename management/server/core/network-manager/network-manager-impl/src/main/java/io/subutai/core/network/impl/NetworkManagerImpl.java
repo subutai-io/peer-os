@@ -13,7 +13,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
@@ -137,7 +137,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public P2pLogs getP2pLogs( final Host host, final JournalCtlLevel logLevel, final Date from, final Date till )
+    public P2pLogs getP2pLogs( final Host host, final LogLevel logLevel, final Date from, final Date till )
             throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
@@ -149,7 +149,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         try
         {
-            CommandResult result = host.execute( commands.getGetP2pLogsCommand( from, till ) );
+            CommandResult result = host.execute( commands.getGetP2pLogsCommand( from, till, logLevel ) );
 
             StringTokenizer st = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
 
@@ -157,8 +157,7 @@ public class NetworkManagerImpl implements NetworkManager
             {
                 String logLine = st.nextToken();
 
-                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) || logLine
-                        .contains( String.format( "[%s]", logLevel.name() ) ) )
+                if ( !Strings.isNullOrEmpty( logLine ) )
                 {
                     p2pLogs.addLog( logLine );
                 }

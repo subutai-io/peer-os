@@ -9,6 +9,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.Protocol;
@@ -26,6 +27,7 @@ public class Commands
     private static final String PROXY_BINDING = "subutai proxy";
     private static final String INFO_BINDING = "subutai info";
     private static final String MAP_BINDING = "subutai map";
+    private static final String LOG_BINDING = "subutai log";
     private final SimpleDateFormat p2pDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 
@@ -63,11 +65,18 @@ public class Commands
     }
 
 
-    RequestBuilder getGetP2pLogsCommand( Date from, Date till )
+    RequestBuilder getGetP2pLogsCommand( Date from, Date till, LogLevel logLevel )
     {
-        return new RequestBuilder( String.format(
-                "journalctl -u `ls /etc/systemd/system/ | grep subutai | grep p2p` --since \"%s\" --until \"%s\"",
-                p2pDateFormat.format( from ), p2pDateFormat.format( till ) ) );
+        List<String> args =
+                Lists.newArrayList( "p2p", "-s", p2pDateFormat.format( from ), "-e", p2pDateFormat.format( till ) );
+
+        if ( logLevel != LogLevel.ALL )
+        {
+            args.add( "-l" );
+            args.add( logLevel.getCliParam() );
+        }
+
+        return new RequestBuilder( LOG_BINDING ).withCmdArgs( args );
     }
 
 
