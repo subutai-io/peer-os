@@ -6,14 +6,16 @@
 // MAVEN_HOME - path to Maven3 home dir
 //
 // Manage Jenkins -> Configure System -> Environment variables
-// SS_TEST_NODE - ip of SS node for smoke tests 
+// SS_TEST_NODE_CORE16 - ip of SS node for smoke tests 
 //
 // Approve methods:
 // in build job log you will see 
 // Scripts not permitted to use new <method>
 // Goto http://jenkins.domain/scriptApproval/
 // and approve methods denied methods
-
+//
+// TODO:
+// https://jenkins.io/doc/pipeline/steps/ssh-agent/#sshagent-ssh-agent
 
 import groovy.json.JsonSlurperClassic
 
@@ -107,46 +109,34 @@ node() {
 
 	// Start Test-Peer Lock
 	if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/) {
-		lock('test-node') {
+		lock('test-node-core16') {
 			// destroy existing management template on test node and install latest available snap
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE} <<- EOF
+				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
 				subutai destroy everything
-				if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
-				if test -f /mnt/lib/lxc/tmpdir/management-subutai-template_*; then rm /mnt/lib/lxc/tmpdir/management-subutai-template_*; fi
-				/apps/subutai/current/bin/curl -k -s https://${cdnHost}:8338/kurjun/rest/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
-				if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
-				snappy install --allow-unauthenticated /tmp/subutai-latest.snap
+				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
+				if test -f /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_*; then rm /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_*; fi
+				snap refresh subutai-dev --devmode --beta
 			EOF"""
-
-			// update rh on test node
-			// def rhUpdateStatus = sh (script: "ssh root@${env.SS_TEST_NODE} /apps/subutai/current/bin/subutai update rh -c | cut -d '=' -f4 | tr -d '\"' | tr -d '\n'", returnStdout: true)
-			// if (rhUpdateStatus == '[Update is available] ') {
-			// 	sh """
-			// 		ssh root@${env.SS_TEST_NODE} <<- EOF
-			// 		set -e
-			// 		subutai update rh
-			// 	"""
-			// }
 
 			// copy generated management template on test node
 			sh """
 				set +x
-				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE}:/mnt/lib/lxc/tmpdir
+				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE_CORE16}:/var/snap/subutai-dev/common/lxc/tmpdir
 			"""
 
 			// install generated management template
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE} <<- EOF
+				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
-				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/apps/subutai/current/agent.gcfg
-				sed 's/cdn.subut.ai/cdn.local/g' -i /var/lib/apps/subutai/current/agent.gcfg
+				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
+				sed 's/devcdn.subut.ai/cdn.local/g' -i /var/snap/subutai-dev/current/agent.gcfg
 				echo y | subutai import management
-				sed 's/cdn.local/cdn.subut.ai/g' -i /mnt/lib/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
-				sed 's/cdn.local/cdn.subut.ai/g' -i /var/lib/apps/subutai/current/agent.gcfg
+				sed 's/cdn.local/cdn.subut.ai/g' -i /var/snap/subutai-dev/common/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
+				sed 's/cdn.local/cdn.subut.ai/g' -i /var/snap/subutai-dev/current/agent.gcfg
 			EOF"""
 
 			/* wait until SS starts */
@@ -154,7 +144,7 @@ node() {
 				sh """
 					set +x
 					echo "Waiting SS"
-					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE}:8443/rest/v1/peer/ready') != "200" ]; do
+					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE_CORE16}:8443/rest/v1/peer/ready') != "200" ]; do
 						sleep 5
 					done
 				"""
@@ -169,7 +159,7 @@ node() {
 			git url: "https://github.com/subutai-io/playbooks.git"
 			sh """
 				set +e
-				./run_tests_qa.sh -m ${env.SS_TEST_NODE}
+				./run_tests_qa.sh -m ${env.SS_TEST_NODE_CORE16}
 				./run_tests_qa.sh -s all
 				${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
 				OUT=\$?
