@@ -13,16 +13,12 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import com.google.common.collect.Lists;
 
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.common.network.LogLevel;
-import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -171,45 +167,47 @@ public class ResourceHostDataProcessor extends HubRequester
 
         p2pLogsEndDate = currentDate;
 
-        for ( ResourceHost rh : localPeer.getResourceHosts() )
+        try
         {
-            try
-            {
-                processP2PLogs( rh, startDate, currentDate );
-            }
-            catch ( Exception e )
-            {
-                log.error( "Error to process p2p logs: {} ", e.getMessage() );
-            }
+            processP2PLogs( startDate, currentDate );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to process p2p logs: {} ", e.getMessage() );
         }
     }
 
 
-    private void processP2PLogs( ResourceHost rh, Date startDate, Date endDate ) throws HubManagerException
+    private void processP2PLogs( Date startDate, Date endDate ) throws HubManagerException
     {
         try
         {
             log.info( "Getting p2p logs: {} - {}", startDate, endDate );
 
-            P2pLogs p2pLogs = rh.getP2pLogs( LogLevel.ERROR, startDate, endDate );
+            List<P2Pinfo> p2Pinfos = monitor.getP2PStatus( startDate, endDate );
 
-            String p2pStatus = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+            List<P2PDto> p2pList = Lists.newArrayList();
 
-            log.info( "logs.size: {}", p2pLogs.getLogs().size() );
-
-            if ( p2pLogs.isEmpty() && p2pStatus == null )
+            for ( final P2Pinfo info : p2Pinfos )
             {
-                return;
+                P2PDto dto = new P2PDto();
+                dto.setRhId( info.getRhId() );
+                dto.setRhVersion( info.getRhVersion() );
+                dto.setP2pVersion( info.getP2pVersion() );
+                dto.setP2pStatus( info.getP2pStatus() );
+                dto.setState( info.getState() );
+                dto.setP2pErrorLogs( info.getP2pErrorLogs() );
+                dto.setP2pSystemLogs( info.getP2pSystemLogs() );
+
+                p2pList.add( dto );
             }
 
             SystemLogsDto logsDto = new SystemLogsDto();
-
-            logsDto.setLogs( p2pLogs.getLogs() );
-            logsDto.setStatus( p2pStatus );
+            logsDto.setP2PInfo( p2pList );
 
             log.info( "Sending p2p logs and status to Hub..." );
 
-            String path = format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", localPeer.getId(), rh.getId() );
+            String path = format( "/rest/v1/peers/%s/resource-hosts/system-logs", localPeer.getId() );
 
             RestResult<Object> restResult = restClient.post( path, logsDto );
 

@@ -17,15 +17,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.Response;
-
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -49,6 +44,7 @@ import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
@@ -60,7 +56,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.RestUtil;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
@@ -502,7 +497,7 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public List<P2Pinfo> getP2PStatus()
+    public List<P2Pinfo> getP2PStatus( Date logsStartDate, Date logsEndData )
     {
         List<P2Pinfo> pojos = Lists.newArrayList();
 
@@ -575,6 +570,9 @@ public class MonitorImpl implements Monitor, HostListener
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
                 info.setState( stateList );
                 info.setP2pErrorLogs( errorList );
+
+                info.setP2pSystemLogs( Lists.newArrayList(
+                        resourceHost.getP2pLogs( LogLevel.ERROR, logsStartDate, logsEndData ).getLogs() ) );
 
                 pojos.add( info );
             }

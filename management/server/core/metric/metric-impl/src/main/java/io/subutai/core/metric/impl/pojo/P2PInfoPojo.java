@@ -21,6 +21,20 @@ public class P2PInfoPojo implements P2Pinfo
     private int rhVersionCheck;
     private List<String> state;
     private List<String> p2pErrorLogs;
+    private List<String> p2pSystemLogs;
+
+
+    @Override
+    public List<String> getP2pSystemLogs()
+    {
+        return p2pSystemLogs;
+    }
+
+
+    public void setP2pSystemLogs( final List<String> p2pSystemLogs )
+    {
+        this.p2pSystemLogs = p2pSystemLogs;
+    }
 
 
     @Override

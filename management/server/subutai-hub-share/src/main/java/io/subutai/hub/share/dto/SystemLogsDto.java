@@ -8,9 +8,7 @@ import java.util.Set;
 public class SystemLogsDto
 {
     private Set<SubutaiSystemLog> subutaiSystemLogs;
-    private Set<String> logs;
     private List<P2PDto> P2PInfo;
-    private String status;
 
 
     public SystemLogsDto()
@@ -30,30 +28,6 @@ public class SystemLogsDto
     }
 
 
-    public Set<String> getLogs()
-    {
-        return logs;
-    }
-
-
-    public void setLogs( final Set<String> logs )
-    {
-        this.logs = logs;
-    }
-
-
-    public String getStatus()
-    {
-        return status;
-    }
-
-
-    public void setStatus( final String status )
-    {
-        this.status = status;
-    }
-
-
     public List<P2PDto> getP2PInfo()
     {
         return P2PInfo;
@@ -64,7 +38,4 @@ public class SystemLogsDto
     {
         this.P2PInfo = p2PInfo;
     }
-
-
-
 }
