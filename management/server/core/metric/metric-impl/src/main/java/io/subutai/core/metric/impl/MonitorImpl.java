@@ -576,41 +576,6 @@ public class MonitorImpl implements Monitor, HostListener
                 info.setState( stateList );
                 info.setP2pErrorLogs( errorList );
 
-
-                WebClient client = RestUtil.createTrustedWebClient(
-                        String.format( "https://%s:443/rest/v1/system/versions/range", systemSettings.getHubIp() ) );
-                Response response = client.get();
-
-                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-                {
-                    try
-                    {
-                        String output = response.readEntity( String.class );
-
-                        JSONArray entities = new JSONArray( output );
-
-
-                        for ( int i = 0; i < entities.length(); i++ )
-                        {
-                            if ( "P2P".equals( entities.getJSONObject( i ).get( "key" ) ) )
-                            {
-                                info.setP2pVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
-                                        entities.getJSONObject( i ).getString( "rangeTo" ) );
-                            }
-
-                            if ( "RESOURCE_HOST".equals( entities.getJSONObject( i ).get( "key" ) ) )
-                            {
-                                info.setRhVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
-                                        entities.getJSONObject( i ).getString( "rangeTo" ) );
-                            }
-                        }
-                    }
-                    catch ( JSONException e )
-                    {
-                        LOG.warn( e.getMessage() );
-                    }
-                }
-
                 pojos.add( info );
             }
             catch ( Exception e )

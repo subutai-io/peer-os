@@ -195,21 +195,6 @@ public class ResourceHostDataProcessor extends HubRequester
 
             String p2pStatus = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
 
-            List<P2PDto> p2pList = Lists.newArrayList();
-
-            for ( final P2Pinfo info : monitor.getP2PStatus() )
-            {
-                P2PDto dto = new P2PDto();
-                dto.setRhId( info.getRhId() );
-                dto.setRhVersion( info.getRhVersion() );
-                dto.setP2pVersion( info.getP2pVersion() );
-                dto.setP2pStatus( info.getP2pStatus() );
-                dto.setState( info.getState() );
-                dto.setP2pErrorLogs( info.getP2pErrorLogs() );
-
-                p2pList.add( dto );
-            }
-
             log.info( "logs.size: {}", p2pLogs.getLogs().size() );
 
             if ( p2pLogs.isEmpty() && p2pStatus == null )
@@ -221,7 +206,6 @@ public class ResourceHostDataProcessor extends HubRequester
 
             logsDto.setLogs( p2pLogs.getLogs() );
             logsDto.setStatus( p2pStatus );
-            logsDto.setP2PInfo( p2pList );
 
             log.info( "Sending p2p logs and status to Hub..." );
 
