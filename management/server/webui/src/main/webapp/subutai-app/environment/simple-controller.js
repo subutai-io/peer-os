@@ -1015,6 +1015,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				}
 			}
 
+			if( environment.containers[container].hostname.match(/(\d+)(?!.*\d)/g) != null )
+			{
+				if( containerCounter < parseInt( environment.containers[container].hostname.match(/(\d+)(?!.*\d)/g) ) + 1 )
+				{
+					containerCounter = parseInt( environment.containers[container].hostname.match(/(\d+)(?!.*\d)/g) ) + 1;
+				}
+			}
+
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 				edited: true,

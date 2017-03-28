@@ -961,6 +961,13 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     containerCounter = parseInt(container.containerName.match(/(\d+)(?!.*\d)/g)) + 1;
                 }
             }
+
+            if (container.hostname.match(/(\d+)(?!.*\d)/g) != null) {
+                if (containerCounter < parseInt(container.hostname.match(/(\d+)(?!.*\d)/g)) + 1) {
+                    containerCounter = parseInt(container.hostname.match(/(\d+)(?!.*\d)/g)) + 1;
+                }
+            }
+
             console.log(container);
             vm.rhId = container.rhId;
             var resourceHostItemId = addResource2Build(container.rhId, container.peerId, i);
