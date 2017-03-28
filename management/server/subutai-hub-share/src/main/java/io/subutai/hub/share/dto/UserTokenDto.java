@@ -8,8 +8,7 @@ public class UserTokenDto
 {
     public enum State
     {
-        UPDATE,
-        DELETE
+        EXPIRED, READY, DELETE, EMPTY
     }
 
 
@@ -21,8 +20,6 @@ public class UserTokenDto
 
     private String tokenId;
 
-    private Long lifetime;
-
     private Date validDate;
 
     private State state;
@@ -30,6 +27,18 @@ public class UserTokenDto
 
     public UserTokenDto()
     {
+    }
+
+
+    public UserTokenDto( final Long userId, final String authId, final String token, final String tokenId,
+                         final Date validDate )
+    {
+        this.userId = userId;
+        this.authId = authId;
+        this.token = token;
+        this.tokenId = tokenId;
+        this.validDate = validDate;
+        this.state = State.READY;
     }
 
 
@@ -90,18 +99,6 @@ public class UserTokenDto
     public void setState( final State state )
     {
         this.state = state;
-    }
-
-
-    public Long getLifetime()
-    {
-        return lifetime;
-    }
-
-
-    public void setLifetime( final Long lifetime )
-    {
-        this.lifetime = lifetime;
     }
 
 

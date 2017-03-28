@@ -7,23 +7,15 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.subutai.hub.share.dto.PublicKeyContainer;
+import io.subutai.hub.share.dto.UserTokenDto;
 
 
 public class EnvironmentPeerDto
 {
     public enum PeerState
     {
-        EXCHANGE_INFO,
-        RESERVE_NETWORK,
-        SETUP_TUNNEL,
-        BUILD_CONTAINER,
-        CONFIGURE_CONTAINER,
-        CONFIGURE_DOMAIN,
-        CHANGE_CONTAINER_STATE,
-        DELETE_PEER,
-        WAIT,
-        READY,
-        ERROR
+        EXCHANGE_INFO, RESERVE_NETWORK, SETUP_TUNNEL, BUILD_CONTAINER, CONFIGURE_CONTAINER, CONFIGURE_DOMAIN,
+        CHANGE_CONTAINER_STATE, DELETE_PEER, WAIT, READY, ERROR
     }
 
 
@@ -55,17 +47,11 @@ public class EnvironmentPeerDto
 
     private Set<EnvironmentPeerRHDto> rhs = new HashSet<>();
 
-    private String peerToken;
-
-    private String peerTokenId;
-
-    private String envOwnerToken;
-
-    private String envOwnerTokenId;
+    private UserTokenDto userToken;
 
     private String message;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonInclude( JsonInclude.Include.NON_EMPTY )
     private Integer vlan;
 
 
@@ -278,51 +264,15 @@ public class EnvironmentPeerDto
     }
 
 
-    public String getPeerToken()
+    public UserTokenDto getUserToken()
     {
-        return peerToken;
+        return userToken;
     }
 
 
-    public void setPeerToken( final String peerToken )
+    public void setUserToken( final UserTokenDto userToken )
     {
-        this.peerToken = peerToken;
-    }
-
-
-    public String getEnvOwnerToken()
-    {
-        return envOwnerToken;
-    }
-
-
-    public void setEnvOwnerToken( final String envOwnerToken )
-    {
-        this.envOwnerToken = envOwnerToken;
-    }
-
-
-    public String getPeerTokenId()
-    {
-        return peerTokenId;
-    }
-
-
-    public void setPeerTokenId( final String peerTokenId )
-    {
-        this.peerTokenId = peerTokenId;
-    }
-
-
-    public String getEnvOwnerTokenId()
-    {
-        return envOwnerTokenId;
-    }
-
-
-    public void setEnvOwnerTokenId( final String envOwnerTokenId )
-    {
-        this.envOwnerTokenId = envOwnerTokenId;
+        this.userToken = userToken;
     }
 
 

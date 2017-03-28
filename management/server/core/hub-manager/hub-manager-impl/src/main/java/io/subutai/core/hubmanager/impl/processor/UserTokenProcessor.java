@@ -71,7 +71,7 @@ public class UserTokenProcessor implements StateLinkProcessor
         try
         {
             UserTokenDto userTokenDto = ctx.restClient.getStrict( link, UserTokenDto.class );
-            if (userTokenDto.getState().equals( UserTokenDto.State.UPDATE ))
+            if (userTokenDto.getState().equals( UserTokenDto.State.EXPIRED ))
             {
                 //TODO update token
             }

@@ -1,5 +1,6 @@
 package io.subutai.hub.share.dto;
 
+
 public class RegistrationDto
 {
     private Long ownerId;
@@ -12,11 +13,10 @@ public class RegistrationDto
 
     private PeerInfoDto peerInfo;
 
-    private String token;
-
-    private String tokenId;
+    private UserTokenDto userToken;
 
     private String temp1;
+
 
     public RegistrationDto()
     {
@@ -46,7 +46,8 @@ public class RegistrationDto
         this.peerInfo = peerInfo;
     }
 
-    public void setPeerVersion( final String version)
+
+    public void setPeerVersion( final String version )
     {
         this.peerInfo.setVersion( version );
     }
@@ -82,27 +83,15 @@ public class RegistrationDto
     }
 
 
-    public String getToken()
+    public UserTokenDto getUserToken()
     {
-        return token;
+        return userToken;
     }
 
 
-    public void setToken( final String token )
+    public void setUserToken( final UserTokenDto userToken )
     {
-        this.token = token;
-    }
-
-
-    public String getTokenId()
-    {
-        return tokenId;
-    }
-
-
-    public void setTokenId( final String tokenId )
-    {
-        this.tokenId = tokenId;
+        this.userToken = userToken;
     }
 
 

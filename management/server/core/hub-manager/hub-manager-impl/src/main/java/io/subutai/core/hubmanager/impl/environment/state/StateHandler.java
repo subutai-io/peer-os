@@ -67,7 +67,7 @@ public abstract class StateHandler
      */
     protected String getToken( EnvironmentPeerDto peerDto )
     {
-        return StringUtils.defaultIfEmpty( peerDto.getEnvOwnerToken(), peerDto.getPeerToken() );
+        return peerDto.getUserToken().getToken();
     }
 
 

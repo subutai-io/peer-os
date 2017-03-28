@@ -8,6 +8,7 @@ import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
+import io.subutai.hub.share.dto.UserTokenDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 
@@ -37,8 +38,10 @@ public class ExchangeInfoStateHandler extends StateHandler
                 token = ctx.identityManager
                         .createUserToken( user, null, null, null, TokenType.PERMANENT.getId(), null );
             }
-            resultDto.setEnvOwnerToken( token.getFullToken() );
-            resultDto.setEnvOwnerTokenId( user.getAuthId() );
+            UserTokenDto userTokenDto =
+                    new UserTokenDto( user.getId(), user.getAuthId(), token.getFullToken(), token.getTokenId(),
+                            token.getValidDate() );
+            resultDto.setUserToken( userTokenDto );
 
             logEnd();
 

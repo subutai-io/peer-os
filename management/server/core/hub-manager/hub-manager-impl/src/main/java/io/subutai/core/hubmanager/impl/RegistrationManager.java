@@ -24,6 +24,7 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
+import io.subutai.hub.share.dto.UserTokenDto;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
 import static java.lang.String.format;
@@ -110,8 +111,11 @@ public class RegistrationManager
         dto.setPeerInfo( peerInfoDto );
         dto.setTemp1( activeUser.getFingerprint() );
         dto.setOwnerId( activeUser.getId() );
-        dto.setToken( token.getFullToken() );
-        dto.setTokenId( activeUser.getAuthId() );
+
+        UserTokenDto userTokenDto =
+                new UserTokenDto( activeUser.getId(), activeUser.getAuthId(), token.getFullToken(), token.getTokenId(),
+                        token.getValidDate() );
+        dto.setUserToken( userTokenDto );
 
         return dto;
     }

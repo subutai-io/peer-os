@@ -10,14 +10,12 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelHelper;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
-
-import static java.lang.String.format;
 
 
 public class DeletePeerStateHandler extends StateHandler
@@ -128,7 +126,7 @@ public class DeletePeerStateHandler extends StateHandler
     @Override
     protected String getToken( EnvironmentPeerDto peerDto )
     {
-        return peerDto.getPeerToken();
+        return peerDto.getUserToken().getToken();
     }
 
 
