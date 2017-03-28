@@ -20,7 +20,6 @@ public class P2PInfoPojo implements P2Pinfo
     private int p2pVersionCheck;
     private int rhVersionCheck;
     private List<String> state;
-    private List<String> p2pErrorLogs;
     private List<String> p2pSystemLogs;
 
 
@@ -112,19 +111,6 @@ public class P2PInfoPojo implements P2Pinfo
     public void setState( final List<String> state )
     {
         this.state = state;
-    }
-
-
-    @Override
-    public List<String> getP2pErrorLogs()
-    {
-        return p2pErrorLogs;
-    }
-
-
-    public void setP2pErrorLogs( final List<String> p2pErrorLogs )
-    {
-        this.p2pErrorLogs = p2pErrorLogs;
     }
 
 

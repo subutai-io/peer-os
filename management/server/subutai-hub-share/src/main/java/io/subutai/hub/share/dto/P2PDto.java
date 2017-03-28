@@ -11,7 +11,6 @@ public class P2PDto
     private String p2pVersion;
     private int p2pStatus;
     private List<String> state;
-    private List<String> p2pErrorLogs;
     private List<String> p2pSystemLogs;
 
 
@@ -72,18 +71,6 @@ public class P2PDto
     public void setState( final List<String> state )
     {
         this.state = state;
-    }
-
-
-    public List<String> getP2pErrorLogs()
-    {
-        return p2pErrorLogs;
-    }
-
-
-    public void setP2pErrorLogs( final List<String> p2pErrorLogs )
-    {
-        this.p2pErrorLogs = p2pErrorLogs;
     }
 
 

@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -513,64 +514,19 @@ public class MonitorImpl implements Monitor, HostListener
 
                 String lines[] = status.split( "\\r?\\n" );
 
-                for ( final String line : lines )
+                for ( String line : lines )
                 {
-                    String[] part = line.split( Pattern.quote( "|" ) );
-
-                    if ( part.length > 2 )
+                    if ( StringUtils.isNotBlank( line.trim() ) )
                     {
                         statusLines.add( line );
                     }
-                }
-
-                int errors = 0;
-
-                List<String> stateList = Lists.newArrayList();
-                List<String> errorList = Lists.newArrayList();
-
-                for ( final String statusLine : statusLines )
-                {
-                    if ( statusLine.contains( "LastError" ) )
-                    {
-                        String[] part = statusLine.split( Pattern.quote( "|" ) );
-
-                        for ( final String s : part )
-                        {
-                            if ( s.contains( "State:" ) )
-                            {
-                                String state = s.replace( "State:", "" ).trim();
-                                stateList.add( state );
-                            }
-                            if ( s.contains( "LastError:" ) )
-                            {
-                                String error = s.replace( "LastError:", "" ).trim();
-                                errorList.add( String.format( "%s (%s) - %s", error, part[0], part[1] ) );
-                            }
-                        }
-                        errors++;
-                    }
-                }
-
-                if ( errors > 0 && errors == statusLines.size() )
-                {
-                    info.setP2pStatus( 2 );
-                }
-                else if ( errors == 0 )
-                {
-                    info.setP2pStatus( 0 );
-                }
-                else if ( errors > 0 && errors < statusLines.size() )
-                {
-                    info.setP2pStatus( 1 );
                 }
 
                 info.setRhId( resourceHost.getId() );
                 info.setRhName( resourceHost.getHostname() );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
-                info.setState( stateList );
-                info.setP2pErrorLogs( errorList );
-
+                info.setState( statusLines );
                 info.setP2pSystemLogs( Lists.newArrayList(
                         resourceHost.getP2pLogs( LogLevel.ERROR, logsStartDate, logsEndData ).getLogs() ) );
 
