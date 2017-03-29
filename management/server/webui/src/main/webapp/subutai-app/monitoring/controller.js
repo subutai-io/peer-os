@@ -66,7 +66,7 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 
 		monitoringSrv.isAdminCheck().success(function (data) {
 			if(data == true || data == 'true') {
-				getP2Pstatus();
+//				getP2Pstatus();
 				monitoringSrv.getResourceHosts().success(function (data) {
 					vm.hosts = data;
 					vm.isAdmin = true;
@@ -88,47 +88,47 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 		});
 	}
 	
-	function getP2Pstatus() {
-		monitoringSrv.getP2Pstatus().success (function (data) {
-			vm.info = data.p2pList;
-			for(var i = 0; i < vm.info.length; i++) {
-
-				switch(vm.info[i].p2pStatus) {
-					case 0:
-						vm.statusTable.p2pStatuses.healthy++;
-						break;
-					case 1:
-						vm.statusTable.p2pStatuses.problems++;
-						vm.p2pColor = '#efc94c';
-						break;
-					case 2:
-						vm.statusTable.p2pStatuses.notWork++;
-						if(!vm.p2pColor || vm.p2pColor == '#efc94c') {
-							vm.p2pColor = '#c1272d';
-						}
-						break;
-					default:
-						break;
-				}
-
-				switch(vm.info[i].p2pVersionCheck) {
-					case 0:
-						vm.statusTable.p2pUpdates.updated++;
-						break;
-					case 1:
-						vm.statusTable.p2pUpdates.normal++;
-						break;
-					case 2:
-						vm.statusTable.p2pUpdates.needUpdate++;
-						break;
-					default:
-						break;
-				}
-
-			}
-		});
-		
-	}
+//	function getP2Pstatus() {
+//		monitoringSrv.getP2Pstatus().success (function (data) {
+//			vm.info = data.p2pList;
+//			for(var i = 0; i < vm.info.length; i++) {
+//
+//				switch(vm.info[i].p2pStatus) {
+//					case 0:
+//						vm.statusTable.p2pStatuses.healthy++;
+//						break;
+//					case 1:
+//						vm.statusTable.p2pStatuses.problems++;
+//						vm.p2pColor = '#efc94c';
+//						break;
+//					case 2:
+//						vm.statusTable.p2pStatuses.notWork++;
+//						if(!vm.p2pColor || vm.p2pColor == '#efc94c') {
+//							vm.p2pColor = '#c1272d';
+//						}
+//						break;
+//					default:
+//						break;
+//				}
+//
+//				switch(vm.info[i].p2pVersionCheck) {
+//					case 0:
+//						vm.statusTable.p2pUpdates.updated++;
+//						break;
+//					case 1:
+//						vm.statusTable.p2pUpdates.normal++;
+//						break;
+//					case 2:
+//						vm.statusTable.p2pUpdates.needUpdate++;
+//						break;
+//					default:
+//						break;
+//				}
+//
+//			}
+//		});
+//
+//	}
 
 	function setFirstEnvByDefault() {
 		if(vm.environments.length > 0) {

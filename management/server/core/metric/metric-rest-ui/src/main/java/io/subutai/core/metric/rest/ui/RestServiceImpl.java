@@ -118,14 +118,14 @@ public class RestServiceImpl implements RestService
         return getMetrics( null, null, interval );
     }
 
-
-    @RolesAllowed( "System-Management|Read" )
-    @Override
-    public Response getP2PStatus()
-    {
-        P2PInfoPojo pojo = new P2PInfoPojo();
-        pojo.setP2pList( monitor.getP2PStatus() );
-        String info = JsonUtil.GSON.toJson( pojo );
-        return Response.status( Response.Status.OK ).entity( info ).build();
-    }
+//
+//    @RolesAllowed( "System-Management|Read" )
+//    @Override
+//    public Response getP2PStatus()
+//    {
+//        P2PInfoPojo pojo = new P2PInfoPojo();
+//        pojo.setP2pList( monitor.getP2PStatus() );
+//        String info = JsonUtil.GSON.toJson( pojo );
+//        return Response.status( Response.Status.OK ).entity( info ).build();
+//    }
 }

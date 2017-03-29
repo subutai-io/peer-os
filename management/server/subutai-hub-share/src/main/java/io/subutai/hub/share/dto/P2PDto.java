@@ -11,7 +11,7 @@ public class P2PDto
     private String p2pVersion;
     private int p2pStatus;
     private List<String> state;
-    private List<String> p2pErrorLogs;
+    private List<String> p2pSystemLogs;
 
 
     public String getRhId()
@@ -74,14 +74,14 @@ public class P2PDto
     }
 
 
-    public List<String> getP2pErrorLogs()
+    public void setP2pSystemLogs( final List<String> p2pSystemLogs )
     {
-        return p2pErrorLogs;
+        this.p2pSystemLogs = p2pSystemLogs;
     }
 
 
-    public void setP2pErrorLogs( final List<String> p2pErrorLogs )
+    public List<String> getP2pSystemLogs()
     {
-        this.p2pErrorLogs = p2pErrorLogs;
+        return p2pSystemLogs;
     }
 }

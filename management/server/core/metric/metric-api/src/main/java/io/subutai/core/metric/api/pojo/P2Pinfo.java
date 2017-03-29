@@ -18,7 +18,7 @@ public interface P2Pinfo
     List<String> getState();
 
 
-    List<String> getP2pErrorLogs();
+    List<String> getP2pSystemLogs();
 
 
     String getP2pVersion();
