@@ -93,6 +93,14 @@ public class PeerMetricsProcessor extends HubRequester
             log.info( "{}", resourceHostMetric );
 
             final HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startTime, endTime );
+
+            if ( historicalMetrics.getMetrics() == null )
+            {
+                log.error( "Failed to obtain metric for host %s", host.getHostname() );
+
+                continue;
+            }
+
             final HostMetricsDto hostMetrics = historicalMetrics.getHostMetrics();
 
             hostMetrics.setHostName( resourceHostMetric.getHostInfo().getHostname() );
