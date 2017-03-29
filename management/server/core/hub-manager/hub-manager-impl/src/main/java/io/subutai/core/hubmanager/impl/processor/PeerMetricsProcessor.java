@@ -18,6 +18,7 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.util.RestUtil;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -77,10 +78,20 @@ public class PeerMetricsProcessor extends HubRequester
         Date startTime = cal.getTime();
         PeerMetricsDto peerMetricsDto =
                 new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
+
         for ( ResourceHost host : peerManager.getLocalPeer().getResourceHosts() )
         {
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
+
+            if ( resourceHostMetric == null )
+            {
+                log.error( "Failed to obtain metric for host %s", host.getHostname() );
+
+                continue;
+            }
+
             log.info( "{}", resourceHostMetric );
+
             final HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( host, startTime, endTime );
             final HostMetricsDto hostMetrics = historicalMetrics.getHostMetrics();
 
@@ -109,10 +120,19 @@ public class PeerMetricsProcessor extends HubRequester
                 log.info( e.getMessage(), "No info about available RAM" );
             }
 
-            DiskDto diskDto = new DiskDto();
-            diskDto.setTotal( resourceHostMetric.getTotalSpace() );
-            diskDto.setUsed( resourceHostMetric.getUsedSpace() );
-            hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, diskDto );
+            try
+            {
+                DiskDto diskDto = new DiskDto();
+                diskDto.setTotal( resourceHostMetric.getTotalSpace() );
+                diskDto.setUsed( resourceHostMetric.getUsedSpace() );
+                hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, diskDto );
+            }
+            catch ( Exception e )
+            {
+                hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, new DiskDto() );
+                log.info( e.getMessage(), "No info about used DISK" );
+            }
+
             try
             {
                 hostMetrics.getCpu().setIdle( resourceHostMetric.getCpuIdle() );
@@ -125,6 +145,7 @@ public class PeerMetricsProcessor extends HubRequester
                 hostMetrics.getCpu().setIdle( 0.0 );
                 log.info( e.getMessage(), "No info about used CPU" );
             }
+
             peerMetricsDto.addHostMetrics( hostMetrics );
         }
 
@@ -142,43 +163,63 @@ public class PeerMetricsProcessor extends HubRequester
 
     private void send()
     {
-        log.debug( "Peer monitor queue size = {}", queue.size() );
-        final Iterator<PeerMetricsDto> iterator = queue.iterator();
+        String path = String.format( "/rest/v1/peers/%s/monitor", configManager.getPeerId() );
 
-        while ( iterator.hasNext() )
+        WebClient client = null;
+
+        try
         {
-            PeerMetricsDto dto = iterator.next();
+            client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
-            String path = String.format( "/rest/v1/peers/%s/monitor", configManager.getPeerId() );
-            try
+            log.debug( "Peer monitor queue size = {}", queue.size() );
+
+            final Iterator<PeerMetricsDto> iterator = queue.iterator();
+
+            while ( iterator.hasNext() )
             {
-                WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+                PeerMetricsDto dto = iterator.next();
 
-                byte[] cborData = JsonUtil.toCbor( dto );
+                Response r = null;
 
-                byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
-                Response r = client.post( encryptedData );
-
-                if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+                try
                 {
-                    iterator.remove();
-                    log.debug( "Peer monitoring data sent successfully. {}", dto );
+                    byte[] cborData = JsonUtil.toCbor( dto );
+
+                    byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+                    r = client.post( encryptedData );
+
+                    if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+                    {
+                        iterator.remove();
+                        log.debug( "Peer monitoring data sent successfully. {}", dto );
+                    }
+                    else
+                    {
+                        log.warn( "Could not send peer monitoring data: " + r.readEntity( String.class ) + " " + dto
+                                .toString() );
+                    }
                 }
-                else
+                catch ( Exception e )
                 {
-                    log.warn( "Could not send peer monitoring data: " + r.readEntity( String.class ) + " " + dto
-                            .toString() );
+                    log.warn( "Could not send peer monitoring data to {}", dto.getPeerId(), e );
+                }
+                finally
+                {
+                    RestUtil.close( r );
                 }
             }
-            catch ( Exception e )
-            {
-                log.warn( "Could not send peer monitoring data to {}", dto.getPeerId(), e );
-            }
+        }
+        catch ( HubManagerException e )
+        {
+            log.error( "Error sending peer metrics", e );
+        }
+        finally
+        {
+            RestUtil.close( client );
         }
 
         // clean up queue to avoid memory exhaustion
-
         Iterator<PeerMetricsDto> i = queue.iterator();
         while ( i.hasNext() )
         {
