@@ -128,10 +128,14 @@ public class HistoricalMetrics
         List<Series> result = new ArrayList<>();
         final HostMetricsDto.HostType hostType = getHostType();
 
-        for ( SeriesBatch batch : metrics )
+        if ( metrics != null )
         {
-            result.addAll( batch.getSeriesByName( type.getName( hostType ) ) );
+            for ( SeriesBatch batch : metrics )
+            {
+                result.addAll( batch.getSeriesByName( type.getName( hostType ) ) );
+            }
         }
+
         return result;
     }
 
