@@ -12,7 +12,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.hub.share.quota.ContainerCpuResource;
 import io.subutai.hub.share.quota.ContainerDiskResource;
-import io.subutai.hub.share.quota.ContainerHomeResource;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerRamResource;
 import io.subutai.hub.share.quota.ContainerSize;
@@ -31,16 +30,12 @@ public class NodeSchemeJsonTest
     private static final String TEMPLATE_NAME = "master";
     private static final String TEMPLATE_ID = "templateId";
 
-    private String JSON = "{\"quota\":{\"containerSize\":\"CUSTOM\",\"cpuQuota\":25,\"ramQuota\":\"1024MB\","
-            + "\"homeQuota\":\"1GB\",\"rootQuota\":\"2GB\",\"varQuota\":\"2GB\",\"optQuota\":\"1GB\"},"
-            + "\"templateName\":\"master\",\"name\":\"Container 1\","
-            + "\"templateId\":\"a697e70f3fc538b4f4763588a7868388\",\"position\":{\"x\":20,\"y\":20}}";
 
     private NodeSchema nodeSchema;
     ContainerQuota containerQuota;
     Quota cpuQuota;
     private Quota ramQuota;
-    private Quota homeQuota;
+    private Quota diskQuota;
 
 
     @Before
@@ -51,8 +46,8 @@ public class NodeSchemeJsonTest
         containerQuota.add( cpuQuota );
         ramQuota = new Quota( new ContainerRamResource( "1GiB" ), 51 );
         containerQuota.add( ramQuota );
-        homeQuota = new Quota( new ContainerHomeResource( "10GiB" ), 52 );
-        containerQuota.add( homeQuota );
+        diskQuota = new Quota( new ContainerDiskResource( "10GiB" ), 52 );
+        containerQuota.add( diskQuota );
         nodeSchema = new NodeSchema( CONTAINER_NAME, containerQuota, TEMPLATE_NAME, TEMPLATE_ID );
     }
 
@@ -69,7 +64,7 @@ public class NodeSchemeJsonTest
         assertEquals( 50, object.getQuota().get( ContainerResourceType.CPU ).getThreshold().intValue() );
         assertEquals( "1024", object.getQuota().get( ContainerResourceType.RAM ).getAsRamResource().getWriteValue() );
         assertEquals( 51, object.getQuota().get( ContainerResourceType.RAM ).getThreshold().intValue() );
-        assertEquals( "10", object.getQuota().get( ContainerResourceType.HOME ).getAsDiskResource().getWriteValue() );
-        assertEquals( 52, object.getQuota().get( ContainerResourceType.HOME ).getThreshold().intValue() );
+        assertEquals( "10", object.getQuota().get( ContainerResourceType.DISK ).getAsDiskResource().getWriteValue() );
+        assertEquals( 52, object.getQuota().get( ContainerResourceType.DISK ).getThreshold().intValue() );
     }
 }

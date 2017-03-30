@@ -4,6 +4,8 @@ package io.subutai.common.host;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
+//TODO 30/03/17 we need to obtain consolidated disk quota in heartbeat instead of separated var opt root and home
+
 
 public class Quota
 {

@@ -77,24 +77,10 @@ public enum ContainerSize
                                 .getProperty( containerSize.name() + "." + ContainerResourceType.CPU.getKey() ) ) ),
                         0 ) );
 
-                quotaParser = getResourceValueParser( ContainerResourceType.OPT );
-                quota.add( new Quota( ContainerResourceFactory.createContainerResource( ContainerResourceType.OPT,
+                quotaParser = getResourceValueParser( ContainerResourceType.DISK );
+                quota.add( new Quota( ContainerResourceFactory.createContainerResource( ContainerResourceType.DISK,
                         quotaParser.parse( quotaSettings.getProperty(
-                                containerSize.name() + ".space." + ContainerResourceType.OPT.getKey() ) ) ), 0 ) );
-
-                quotaParser = getResourceValueParser( ContainerResourceType.HOME );
-                quota.add( new Quota( ContainerResourceFactory.createContainerResource( ContainerResourceType.HOME,
-                        quotaParser.parse( quotaSettings.getProperty(
-                                containerSize.name() + ".space." + ContainerResourceType.HOME.getKey() ) ) ), 0 ) );
-
-                quotaParser = getResourceValueParser( ContainerResourceType.VAR );
-                quota.add( new Quota( ContainerResourceFactory.createContainerResource( ContainerResourceType.VAR,
-                        quotaParser.parse( quotaSettings.getProperty(
-                                containerSize.name() + ".space." + ContainerResourceType.VAR.getKey() ) ) ), 0 ) );
-
-                quotaParser = getResourceValueParser( ContainerResourceType.ROOTFS );
-                quota.add( new Quota( ContainerResourceFactory.createContainerResource( ContainerResourceType.ROOTFS,
-                        quotaParser.parse( quotaSettings.getProperty( containerSize.name() + ".space.root" ) ) ), 0 ) );
+                                containerSize.name() + "." + ContainerResourceType.DISK.getKey() ) ) ), 0 ) );
 
                 containerQuotas.put( containerSize, quota );
 
