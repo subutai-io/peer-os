@@ -2831,8 +2831,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         List<Quota> result = new ArrayList<>();
         Quota cpuQuota = new Quota( new ContainerCpuResource( rawQuota.getCpu() ), 0 );
         Quota ramQuota = new Quota( new ContainerRamResource( rawQuota.getRam(), ByteUnit.MB ), 0 );
-        //TODO 30/03/17 we need to obtain consolidated disk quota in heartbeat instead of separated var opt root and
-        Quota diskQuota = new Quota( new ContainerDiskResource( rawQuota.getOpt(), ByteUnit.GB ), 0 );
+        Quota diskQuota = new Quota( new ContainerDiskResource( rawQuota.getDisk(), ByteUnit.GB ), 0 );
 
         result.add( cpuQuota );
         result.add( ramQuota );

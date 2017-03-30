@@ -4,8 +4,6 @@ package io.subutai.common.host;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
-//TODO 30/03/17 we need to obtain consolidated disk quota in heartbeat instead of separated var opt root and home
-
 
 public class Quota
 {
@@ -15,18 +13,9 @@ public class Quota
     @SerializedName( "ram" )
     @JsonProperty( "ram" )
     private Double ram;
-    @SerializedName( "root" )
-    @JsonProperty( "root" )
-    private Double root;
-    @SerializedName( "home" )
-    @JsonProperty( "home" )
-    private Double home;
-    @SerializedName( "opt" )
-    @JsonProperty( "opt" )
-    private Double opt;
-    @SerializedName( "var" )
-    @JsonProperty( "var" )
-    private Double var;
+    @SerializedName( "disk" )
+    @JsonProperty( "disk" )
+    private Double disk;
 
 
     public Double getCpu()
@@ -41,27 +30,9 @@ public class Quota
     }
 
 
-    public Double getRoot()
+    public Double getDisk()
     {
-        return root;
-    }
-
-
-    public Double getHome()
-    {
-        return home;
-    }
-
-
-    public Double getOpt()
-    {
-        return opt;
-    }
-
-
-    public Double getVar()
-    {
-        return var;
+        return disk;
     }
 
 
@@ -71,10 +42,7 @@ public class Quota
         final StringBuffer sb = new StringBuffer( "Quota{" );
         sb.append( "cpu=" ).append( cpu );
         sb.append( ", ram=" ).append( ram );
-        sb.append( ", root=" ).append( root );
-        sb.append( ", home=" ).append( home );
-        sb.append( ", opt=" ).append( opt );
-        sb.append( ", var=" ).append( var );
+        sb.append( ", disk=" ).append( disk );
         sb.append( '}' );
         return sb.toString();
     }
