@@ -12,6 +12,12 @@ public class UserTokenDto
     }
 
 
+    public enum Type
+    {
+        USER, ENV_USER, GITHUB, OTHER
+    }
+
+
     private Long userId;
 
     private String authId;
@@ -23,6 +29,8 @@ public class UserTokenDto
     private Date validDate;
 
     private State state;
+
+    private Type type;
 
 
     public UserTokenDto()
@@ -111,5 +119,17 @@ public class UserTokenDto
     public void setValidDate( final Date validDate )
     {
         this.validDate = validDate;
+    }
+
+
+    public Type getType()
+    {
+        return type;
+    }
+
+
+    public void setType( final Type type )
+    {
+        this.type = type;
     }
 }
