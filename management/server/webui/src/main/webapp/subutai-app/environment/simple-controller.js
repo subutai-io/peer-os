@@ -259,8 +259,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						checkLastLog(false);
 						$('.js-download-progress').html('');
 					} else {
-						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
-
 						if (prevLogs) {
 							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
 							if (logs.length > prevLogs.length) {
@@ -319,7 +317,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				};
 				vm.logMessages.push(currentLog);
 
-				//var logId = getLogsFromTracker(vm.environment2BuildName);
 				getLogById(data.trackerId, true, undefined, data.environmentId);
 				initScrollbar();
 
@@ -409,10 +406,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					"containerSize":currentElement.get('quotaSize'),
                     "cpuQuota": currentElement.get("cpuQuota"),
                     "ramQuota": currentElement.get("ramQuota") + 'MiB',
-                    "homeQuota": currentElement.get("homeQuota") + 'GiB',
-                    "rootQuota": currentElement.get("rootQuota") + 'GiB',
-                    "varQuota": currentElement.get("varQuota") + 'GiB',
-                    "optQuota": currentElement.get("optQuota") + 'GiB'
+                    "diskQuota": currentElement.get("diskQuota") + 'GiB',
 				} : { "containerSize":currentElement.get('quotaSize') },
 				"templateName": currentElement.get('templateName'),
 				"name": currentElement.get('containerName'),
@@ -483,7 +477,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	//custom shapes
 	joint.shapes.tm = {};
 
-	//simple creatiom templates
+	//simple creation templates
 	joint.shapes.tm.toolElement = joint.shapes.basic.Generic.extend({
 
 		toolMarkup: [
@@ -639,10 +633,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					if(currentTemplate.get('quotaSize') == 'CUSTOM'){
 					    $('#js-quotasize-custom-cpu').val(currentTemplate.get('cpuQuota')).trigger('change');
 					    $('#js-quotasize-custom-ram').val(currentTemplate.get('ramQuota')).trigger('change');
-					    $('#js-quotasize-custom-home').val(currentTemplate.get('homeQuota')).trigger('change');
-					    $('#js-quotasize-custom-root').val(currentTemplate.get('rootQuota')).trigger('change');
-					    $('#js-quotasize-custom-var').val(currentTemplate.get('varQuota')).trigger('change');
-					    $('#js-quotasize-custom-opt').val(currentTemplate.get('optQuota')).trigger('change');
+					    $('#js-quotasize-custom-disk').val(currentTemplate.get('diskQuota')).trigger('change');
 					}
 
 					containerSettingMenu.find('.header').html('Settings for <b>' + this.model.get('templateName') + '</b> container');
@@ -755,7 +746,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		}
 		$('.b-template-settings').stop().slideUp(100);
 
-		//getPlugins();
 	}
 
 	var containerCounter = 1;
@@ -889,34 +879,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 		initScrollbar();
 
-		//zoom on scroll
-		/*paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
-
-		  function onMouseWheel(e) {
-
-		  e.preventDefault();
-		  e = e.originalEvent;
-
-		  var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) / 50;
-		  var offsetX = (e.offsetX || e.clientX - $(this).offset().left); // offsetX is not defined in FF
-		  var offsetY = (e.offsetY || e.clientY - $(this).offset().top); // offsetY is not defined in FF
-		  var p = offsetToLocalPoint(offsetX, offsetY);
-		  var newScale = V(paper.viewport).scale().sx + delta; // the current paper scale changed by delta
-
-		  if (newScale > 0.4 && newScale < 2) {
-		  paper.setOrigin(0, 0); // reset the previous viewport translation
-		  paper.scale(newScale, newScale, p.x, p.y);
-		  }
-		  }
-
-		  function offsetToLocalPoint(x, y) {
-		  var svgPoint = paper.svg.createSVGPoint();
-		  svgPoint.x = x;
-		  svgPoint.y = y;
-		// Transform point into the viewport coordinate system.
-		var pointTransformed = svgPoint.matrixTransform(paper.viewport.getCTM().inverse());
-		return pointTransformed;
-		}*/
 	}
 
 	vm.buildStep = 'confirm';
@@ -940,10 +902,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					"containerSize":currentElement.get('quotaSize'),
                     "cpuQuota": currentElement.get("cpuQuota"),
                     "ramQuota": currentElement.get("ramQuota") + 'MiB',
-                    "homeQuota": currentElement.get("homeQuota") + 'GiB',
-                    "rootQuota": currentElement.get("rootQuota") + 'GiB',
-                    "varQuota": currentElement.get("varQuota") + 'GiB',
-                    "optQuota": currentElement.get("optQuota") + 'GiB'
+                    "diskQuota": currentElement.get("diskQuota") + 'GiB',
 				} : { "containerSize":currentElement.get('quotaSize') },
 
 				"templateName": currentElement.get('templateName'),
@@ -1030,10 +989,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				quotaSize: environment.containers[container].type,
 				cpuQuota: environment.containers[container].quota.cpu,
 				ramQuota: environment.containers[container].quota.ram,
-				rootQuota: environment.containers[container].quota.root,
-				homeQuota: environment.containers[container].quota.home,
-				varQuota: environment.containers[container].quota.var,
-				optQuota: environment.containers[container].quota.opt,
+				diskQuota: environment.containers[container].quota.disk,
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
 				containerName: environment.containers[container].hostname,
@@ -1059,7 +1015,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		graph.resetCells();
 		vm.environment2BuildName = '';
 		filterPluginsList();
-		//vm.selectedPlugin = false;
 	}
 
 	function addSettingsToTemplate(templateSettings, sizeDetails) {
@@ -1080,10 +1035,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         if(isCustom){
             currentTemplate.set('cpuQuota', templateSettings.cpuQuota );
             currentTemplate.set('ramQuota', templateSettings.ramQuota );
-            currentTemplate.set('optQuota', templateSettings.optQuota );
-            currentTemplate.set('homeQuota', templateSettings.homeQuota );
-            currentTemplate.set('rootQuota', templateSettings.rootQuota );
-            currentTemplate.set('varQuota', templateSettings.varQuota );
+            currentTemplate.set('diskQuota', templateSettings.diskQuota );
         }
 
 		currentTemplate.attr('rect.b-magnet/fill', vm.colors[templateSettings.quotaSize]);
@@ -1118,10 +1070,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					if( isCustom ){
                         vm.currentEnvironment.changingContainers[id].cpuQuota = templateSettings.cpuQuota;
                         vm.currentEnvironment.changingContainers[id].ramQuota = templateSettings.ramQuota;
-                        vm.currentEnvironment.changingContainers[id].optQuota = templateSettings.optQuota;
-                        vm.currentEnvironment.changingContainers[id].homeQuota = templateSettings.homeQuota;
-                        vm.currentEnvironment.changingContainers[id].rootQuota = templateSettings.rootQuota;
-                        vm.currentEnvironment.changingContainers[id].varQuota = templateSettings.varQuota;
+                        vm.currentEnvironment.changingContainers[id].diskQuota = templateSettings.diskQuota;
 					}
 				}
 			}
