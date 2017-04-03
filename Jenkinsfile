@@ -90,6 +90,8 @@ node() {
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
 			/apps/bin/lxc-attach -n management -- mkdir -p /opt/gorjun/etc/
 			/apps/bin/lxc-attach -n management -- sh -c 'echo "[CDN]\nnode = ${cdnHost}:8338" > /opt/gorjun/etc/gorjun.gcfg'
+			/apps/bin/lxc-attach -n management -- systemctl stop management
+			/apps/bin/lxc-attach -n management -- rm -rf /opt/subutai-mng/keystores/
 			
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
