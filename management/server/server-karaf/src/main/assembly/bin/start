@@ -32,7 +32,6 @@ fi
 
 #Generate certificates before any configuration is applied
 /opt/subutai-mng/bin/influxdbinit.sh &
-/opt/subutai-mng/bin/certgen
 
 #Function to generate self signed certificate for peer
 generate_keystore_certificate() {
