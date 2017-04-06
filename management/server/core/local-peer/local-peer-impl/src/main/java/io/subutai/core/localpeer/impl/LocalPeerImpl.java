@@ -2829,13 +2829,25 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         // TODO: 2/17/17 add quota thresholds after implementing in system level
         List<Quota> result = new ArrayList<>();
-        Quota cpuQuota = new Quota( new ContainerCpuResource( rawQuota.getCpu() ), 0 );
-        Quota ramQuota = new Quota( new ContainerRamResource( rawQuota.getRam(), ByteUnit.MB ), 0 );
-        Quota diskQuota = new Quota( new ContainerDiskResource( rawQuota.getDisk(), ByteUnit.GB ), 0 );
 
-        result.add( cpuQuota );
-        result.add( ramQuota );
-        result.add( diskQuota );
+        if ( rawQuota.getCpu() != null )
+        {
+            Quota cpuQuota = new Quota( new ContainerCpuResource( rawQuota.getCpu() ), 0 );
+            result.add( cpuQuota );
+        }
+
+        if ( rawQuota.getRam() != null )
+        {
+            Quota ramQuota = new Quota( new ContainerRamResource( rawQuota.getRam(), ByteUnit.MB ), 0 );
+            result.add( ramQuota );
+        }
+
+        if ( rawQuota.getDisk() != null )
+        {
+            Quota diskQuota = new Quota( new ContainerDiskResource( rawQuota.getDisk(), ByteUnit.GB ), 0 );
+            result.add( diskQuota );
+        }
+
         return result;
     }
 
