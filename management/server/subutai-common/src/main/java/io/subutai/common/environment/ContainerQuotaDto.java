@@ -45,9 +45,21 @@ public class ContainerQuotaDto
     public ContainerQuotaDto( final ContainerQuota quota )
     {
         this.containerSize = quota.getContainerSize();
-        this.cpu = quota.get( ContainerResourceType.CPU ).getAsCpuResource().getWriteValue();
-        this.ram = quota.get( ContainerResourceType.RAM ).getAsRamResource().getWriteValue();
-        this.disk = quota.get( ContainerResourceType.DISK ).getAsDiskResource().getWriteValue();
+
+        if ( quota.get( ContainerResourceType.CPU ) != null )
+        {
+            this.cpu = quota.get( ContainerResourceType.CPU ).getAsCpuResource().getWriteValue();
+        }
+
+        if ( quota.get( ContainerResourceType.RAM ) != null )
+        {
+            this.ram = quota.get( ContainerResourceType.RAM ).getAsRamResource().getWriteValue();
+        }
+
+        if ( quota.get( ContainerResourceType.DISK ) != null )
+        {
+            this.disk = quota.get( ContainerResourceType.DISK ).getAsDiskResource().getWriteValue();
+        }
     }
 
 
