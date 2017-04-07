@@ -109,7 +109,6 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -205,7 +204,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private transient NetworkResourceDaoImpl networkResourceDao;
     private transient final LocalPeerCommands localPeerCommands = new LocalPeerCommands();
     private transient final HostUtil hostUtil = new HostUtil();
-    private transient SystemSettings systemSettings;
     private ObjectMapper mapper = new ObjectMapper();
     volatile boolean initialized = false;
     PeerInfo peerInfo;
@@ -223,13 +221,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
-        this.systemSettings = getSystemSettings();
-    }
-
-
-    protected SystemSettings getSystemSettings()
-    {
-        return new SystemSettings();
     }
 
 
@@ -323,8 +314,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         peerInfo = new PeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
-        peerInfo.setPublicUrl( systemSettings.getPublicUrl() );
-        peerInfo.setPublicSecurePort( systemSettings.getPublicSecurePort() );
+        peerInfo.setPublicUrl( Common.DEFAULT_PUBLIC_URL );
+        peerInfo.setPublicSecurePort( Common.DEFAULT_PUBLIC_SECURE_PORT );
         peerInfo.setName( "Local Peer" );
     }
 

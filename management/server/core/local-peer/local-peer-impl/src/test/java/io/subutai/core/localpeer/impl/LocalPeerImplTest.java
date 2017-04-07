@@ -52,7 +52,6 @@ import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -220,9 +219,6 @@ public class LocalPeerImplTest
     @Mock
     Future future;
 
-    @Mock
-    SystemSettings systemSettings2;
-
 
     class LocalPeerImplForTest extends LocalPeerImpl
     {
@@ -231,12 +227,6 @@ public class LocalPeerImplTest
                                      final Monitor monitor, final SecurityManager securityManager )
         {
             super( daoManager, templateManager, commandExecutor, hostRegistry, monitor, securityManager );
-        }
-
-
-        protected SystemSettings getSystemSettings()
-        {
-            return systemSettings2;
         }
     }
 

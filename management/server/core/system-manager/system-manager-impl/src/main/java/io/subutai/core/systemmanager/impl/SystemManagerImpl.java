@@ -25,7 +25,6 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SubutaiInfo;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
@@ -53,21 +52,8 @@ public class SystemManagerImpl implements SystemManager
     private DaoManager daoManager;
     private UpdateDao updateDao;
 
-    private SystemSettings systemSettings;
 
     private volatile boolean isUpdateInProgress = false;
-
-
-    public SystemManagerImpl()
-    {
-        this.systemSettings = getSystemSettings();
-    }
-
-
-    private SystemSettings getSystemSettings()
-    {
-        return new SystemSettings();
-    }
 
 
     @Override
@@ -134,10 +120,10 @@ public class SystemManagerImpl implements SystemManager
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
 
-        pojo.setPublicUrl( systemSettings.getPublicUrl() );
-        pojo.setPublicSecurePort( systemSettings.getPublicSecurePort() );
-        pojo.setStartRange( systemSettings.getP2pPortStartRange() );
-        pojo.setEndRange( systemSettings.getP2pPortEndRange() );
+        pojo.setPublicUrl( peerManager.getLocalPeer().getPeerInfo().getPublicUrl() );
+        pojo.setPublicSecurePort( peerManager.getLocalPeer().getPeerInfo().getPublicSecurePort() );
+        pojo.setStartRange( Integer.parseInt( Common.P2P_PORT_RANGE_START ) );
+        pojo.setEndRange( Integer.parseInt( Common.P2P_PORT_RANGE_END ) );
         pojo.setHubIp( Common.HUB_IP );
 
         return pojo;
@@ -153,8 +139,6 @@ public class SystemManagerImpl implements SystemManager
         {
             peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
                     Integer.parseInt( publicSecurePort ) );
-
-            systemSettings.setP2pPortRange( Integer.parseInt( startRange ), Integer.parseInt( endRange ) );
         }
         catch ( Exception e )
         {
