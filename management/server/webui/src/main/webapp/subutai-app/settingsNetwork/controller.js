@@ -48,9 +48,9 @@ function SettingsNetworkCtrl($rootScope, $scope, SettingsNetworkSrv, SweetAlert)
         else if(!$.trim(vm.config.publicUrl)){
             SweetAlert.swal("ERROR!", 'Invalid Public URL', "error");
         }
-        else if(!$.trim(vm.config.hubIp)){
-            SweetAlert.swal("ERROR!", 'Invalid Hub IP', "error");
-        }
+//        else if(!$.trim(vm.config.hubIp)){
+//            SweetAlert.swal("ERROR!", 'Invalid Hub IP', "error");
+//        }
         else {
             SettingsNetworkSrv.updateConfig(vm.config).success(function (data) {
                 $rootScope.$broadcast('hubIpSet', {});

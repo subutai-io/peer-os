@@ -10,7 +10,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -26,8 +25,6 @@ public class SystemSettings
 
     private static final int DEFAULT_P2P_PORT_START_RANGE = Common.MIN_PORT;
     private static final int DEFAULT_P2P_PORT_END_RANGE = Common.MAX_PORT;
-    private static final String DEFAULT_HUB_IP = "hub.subut.ai";
-    private static final String HUB_IP_KEY = "hubIp";
     private static final String P2P_PORT_START_RANGE_KEY = "p2pPortStartRange";
     private static final String P2P_PORT_END_RANGE_KEY = "p2pPortEndRange";
 
@@ -144,24 +141,6 @@ public class SystemSettings
 
         saveProperty( P2P_PORT_START_RANGE_KEY, p2pPortStartRange );
         saveProperty( P2P_PORT_END_RANGE_KEY, p2pPortEndRange );
-    }
-
-
-    public String getHubIp()
-    {
-        checkSettingsFreshness();
-
-        return PROPERTIES.getString( HUB_IP_KEY, DEFAULT_HUB_IP );
-    }
-
-
-    public void setHubIp( String hubIp )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hubIp ) );
-
-        invalidateCacheOfAll();
-
-        saveProperty( HUB_IP_KEY, hubIp );
     }
 
 

@@ -49,9 +49,9 @@ export KARAF_DATA="${SUBUTAI_APP_DATA_PATH}/data" # Karaf data folder
 export KARAF_DEBUG=true # Enable debug mode
 # export KARAF_REDIRECT # Enable/set the std/err redirection when using bin/start
 export SUBUTAI_APP_DATA_PATH="/opt/subutai-mng/"
-#export SUBUTAI_APP_DATA_PATH="/var/lib/subutai"
 export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"
 export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"
+export HUB_IP=dev.subut.ai
 
 #memory optimization
 export MALLOC_ARENA_MAX=4
