@@ -132,8 +132,8 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     @RolesAllowed( "System-Management|Update" )
-    public void setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
-                                    final String endRange, final String hubIp ) throws ConfigurationException
+    public void setNetworkSettings( final String publicUrl, final String publicSecurePort )
+            throws ConfigurationException
     {
         try
         {

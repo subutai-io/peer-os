@@ -68,10 +68,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     setInterval(updateHubIp, 30000);
 
-    $rootScope.$on('hubIpSet', function(event, data){
-        updateHubIp();
-    });
-
     vm.getRegistrationFormVisibilityStatus = function () {
         return vm.isRegistrationFormVisible;
     };
