@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -903,8 +905,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( !quotaTasks.isEmpty() )
         {
-            //set quotas to succeeded containers asynchronously
-            hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+            Map<HostUtil.Task, Future<Boolean>> futures =
+                    hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+
+            for ( Future future : futures.values() )
+            {
+                try
+                {
+                    future.get( 5, TimeUnit.SECONDS );
+                }
+                catch ( Exception e )
+                {
+                    if ( e instanceof ExecutionException )
+                    {
+                        LOG.error( "Error setting container quota: {}", e.getMessage() );
+                    }
+                }
+            }
         }
 
         return new CreateEnvironmentContainersResponse( cloneResults );
