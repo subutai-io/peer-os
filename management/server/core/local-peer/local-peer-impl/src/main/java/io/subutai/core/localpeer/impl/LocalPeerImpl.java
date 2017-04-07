@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -912,14 +911,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 try
                 {
-                    future.get( 5, TimeUnit.SECONDS );
+                    future.get();
                 }
                 catch ( Exception e )
                 {
-                    if ( e instanceof ExecutionException )
-                    {
-                        LOG.error( "Error setting container quota: {}", e.getMessage() );
-                    }
+                    LOG.error( "Error setting container quota: {}", e.getMessage() );
                 }
             }
         }
