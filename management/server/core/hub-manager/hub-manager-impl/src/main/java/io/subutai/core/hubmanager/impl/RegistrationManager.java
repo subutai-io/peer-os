@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import javax.ws.rs.core.Form;
 
-import io.subutai.common.settings.SystemSettings;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
@@ -15,11 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.PeerInfoDto;
@@ -41,8 +40,6 @@ public class RegistrationManager
     private final String peerId;
 
     private final HubRestClient restClient;
-
-    private SystemSettings systemSettings = new SystemSettings();
 
 
     public RegistrationManager( HubManagerImpl hubManager, ConfigManager configManager )
@@ -136,7 +133,7 @@ public class RegistrationManager
         Config config;
         try
         {
-            config = new ConfigEntity( regDto.getPeerInfo().getId(), systemSettings.getHubIp(),
+            config = new ConfigEntity( regDto.getPeerInfo().getId(), Common.HUB_IP,
                     hubManager.getPeerInfo().get( "OwnerId" ), email, peerName );
         }
         catch ( Exception e )

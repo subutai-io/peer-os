@@ -23,6 +23,9 @@ public class Common
     public static final String SUBUTAI_HTTP_HEADER = "sbt-hdr";
     public static final String KARAF_ETC = System.getProperty( "karaf.etc" );
     public static final String SUBUTAI_APP_DATA_PATH = System.getProperty( "subutaiAppDataPath" );
+    public static final String HUB_IP = System.getProperty( "hubIp" );
+    public static final String P2P_PORT_RANGE_START = System.getProperty( "p2pPortRangeStart" );
+    public static final String P2P_PORT_RANGE_END = System.getProperty( "p2pPortRangeEnd" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
     public static final String MNG_NET_INTERFACE = "mng-net";
     public static final String WAN_INTERFACE = "wan";
