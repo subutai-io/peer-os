@@ -21,6 +21,7 @@ public class EnvironmentPeerDto
         CONFIGURE_CONTAINER,
         CONFIGURE_DOMAIN,
         CHANGE_CONTAINER_STATE,
+        CONFIGURE_ENVIRONMENT,
         DELETE_PEER,
         WAIT,
         READY,
