@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,6 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -92,8 +90,6 @@ public class MonitorImpl implements Monitor, HostListener
     private PeerManager peerManager;
     protected ObjectMapper mapper = new ObjectMapper();
 
-    private SystemSettings systemSettings;
-
 
     public MonitorImpl( PeerManager peerManager, DaoManager daoManager, HostRegistry hostRegistry )
             throws MonitorException
@@ -104,7 +100,6 @@ public class MonitorImpl implements Monitor, HostListener
 
         try
         {
-            this.systemSettings = new SystemSettings();
             this.daoManager = daoManager;
             this.monitorDataService = new MonitorDataService( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;

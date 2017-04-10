@@ -32,7 +32,6 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.json.JsonUtil;
@@ -50,8 +49,6 @@ class HttpClient
 
     private final String PEER_KEY_FINGERPRINT;
 
-    private SystemSettings systemSettings;
-
 
     private synchronized KeyStore getPeerKeyStore() throws HubManagerException
     {
@@ -68,7 +65,6 @@ class HttpClient
     {
         try
         {
-            this.systemSettings = new SystemSettings();
 
             PGPPrivateKey senderKey = securityManager.getKeyManager().getPrivateKey( null );
 
@@ -198,7 +194,7 @@ class HttpClient
 
     private WebClient getWebClient( String path ) throws HubManagerException
     {
-        WebClient client = WebClient.create( String.format( "https://%s:444%s", systemSettings.getHubIp(), path ) );
+        WebClient client = WebClient.create( String.format( "https://%s:444%s", Common.HUB_IP, path ) );
 
         fixAsyncHttp( client );
 

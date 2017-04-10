@@ -30,7 +30,6 @@ import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -45,7 +44,6 @@ public class NetworkManagerImpl implements NetworkManager
     private static final String LINE_DELIMITER = System.lineSeparator();
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
-    protected SystemSettings systemSettings;
 
 
     public NetworkManagerImpl( final PeerManager peerManager )
@@ -53,14 +51,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( peerManager );
 
         this.peerManager = peerManager;
-        this.systemSettings = getSystemSettings();
     }
 
-
-    protected SystemSettings getSystemSettings()
-    {
-        return new SystemSettings();
-    }
 
     //---------------- P2P SECTION BEGIN ------------------------
 
@@ -80,8 +72,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( host, commands.getJoinP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ),
-                String.format( "%d-%d", systemSettings.getP2pPortStartRange(),
-                        systemSettings.getP2pPortEndRange() ) ) );
+                String.format( "%s-%s", Common.P2P_PORT_RANGE_START, Common.P2P_PORT_RANGE_END ) ) );
     }
 
 
