@@ -24,7 +24,6 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -79,8 +78,6 @@ public class NetworkManagerImplTest
     Commands commands;
     @Mock
     RequestBuilder requestBuilder;
-    @Mock
-    SystemSettings systemSettings2;
 
 
     private NetworkManagerImpl networkManager;
@@ -92,12 +89,6 @@ public class NetworkManagerImplTest
         NetworkManagerImplForTest( final PeerManager peerManager )
         {
             super( peerManager );
-        }
-
-
-        protected SystemSettings getSystemSettings()
-        {
-            return systemSettings2;
         }
     }
 
@@ -284,13 +275,11 @@ public class NetworkManagerImplTest
 
         doReturn( false ).when( commandResult ).hasSucceeded();
 
-        assertFalse(  networkManager.isIpInVlanDomain( LOCAL_IP, VLAN_ID ) );
+        assertFalse( networkManager.isIpInVlanDomain( LOCAL_IP, VLAN_ID ) );
 
         doThrow( new CommandException( "" ) ).when( managementHost ).execute( any( RequestBuilder.class ) );
 
         networkManager.isIpInVlanDomain( LOCAL_IP, VLAN_ID );
-
-
     }
 
 
