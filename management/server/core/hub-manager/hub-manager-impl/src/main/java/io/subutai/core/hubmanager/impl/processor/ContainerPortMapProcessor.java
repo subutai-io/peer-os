@@ -112,7 +112,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            log.error( e.getMessage() );
+            log.error( "*********", e );
         }
         finally
         {
@@ -168,7 +168,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
         {
             portMapDto.setState( PortMapDto.State.ERROR );
             portMapDto.setErrorLog( e.getMessage() );
-            log.error( e.getMessage() );
+            log.error( "*********", e );
         }
     }
 
@@ -177,18 +177,16 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     {
         try
         {
-            ContainerHost containerHost =
-                    ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
+            ContainerHost containerHost = ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
 
-            ResourceHost resourceHost =
+            ResourceHost resourceHost = //ctx.localPeer.getManagementHost();
                     ctx.localPeer.getResourceHostById( containerHost.getResourceHostId().toString() );
 
-
-            if ( portMapDto.getDomain() == null || portMapDto.getDomain().isEmpty() )
+            if ( portMapDto.getProtocol() == PortMapDto.Protocol.TCP
+                    || portMapDto.getProtocol() == PortMapDto.Protocol.UDP )
             {
-                resourceHost
-                        .mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ), containerHost.getIp(),
-                                portMapDto.getInternalPort(), portMapDto.getExternalPort() );
+                resourceHost.mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ),
+                        containerHost.getIp(), portMapDto.getInternalPort(), portMapDto.getExternalPort() );
             }
             else
             {
@@ -197,14 +195,13 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                         portMapDto.getDomain(), null, LoadBalancing.ROUND_ROBIN );
             }
 
-
             portMapDto.setState( PortMapDto.State.USED );
         }
         catch ( Exception e )
         {
             portMapDto.setState( PortMapDto.State.ERROR );
             portMapDto.setErrorLog( e.getMessage() );
-            log.error( e.getMessage() );
+            log.error( "*********", e );
         }
     }
 }
