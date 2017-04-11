@@ -20,7 +20,7 @@ public class ListContainerPortMappingsCommand extends SubutaiShellCommandSupport
 {
     private final LocalPeer localPeer;
 
-    @Argument( name = "host id", description = "host id" )
+    @Argument( name = "host id", description = "host id, default mh" )
     String hostId;
     @Argument( index = 1, name = "protocol", description = "protocol: tcp | udp | https | https, default all" )
     String protocolName;
@@ -40,9 +40,10 @@ public class ListContainerPortMappingsCommand extends SubutaiShellCommandSupport
         try
         {
             Protocol protocol =
-                    Strings.isNullOrEmpty( protocolName ) ? null : Protocol.valueOf( protocolName.toUpperCase() );
-            ResourceHost host = Strings.isNullOrEmpty( hostId ) ? localPeer.getManagementHost() :
-                                localPeer.getResourceHostById( hostId );
+                    ( Strings.isNullOrEmpty( protocolName ) || "all".equalsIgnoreCase( protocolName ) ) ? null :
+                    Protocol.valueOf( protocolName.toUpperCase() );
+            ResourceHost host = ( Strings.isNullOrEmpty( hostId ) || "mh".equalsIgnoreCase( hostId ) ) ?
+                                localPeer.getManagementHost() : localPeer.getResourceHostById( hostId );
 
             final ReservedPorts reservedPorts = host.getContainerPortMappings( protocol );
 
