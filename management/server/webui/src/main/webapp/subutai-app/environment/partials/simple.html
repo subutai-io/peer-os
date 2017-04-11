@@ -194,7 +194,7 @@
         </div>
       </div>
       <div class="b-cloud-space__table">
-        <table datatable="ng"
+        <table id="envTable" datatable="ng"
                ng-init="environmentViewCtrl.initDataTable()"
                dt-options="environmentViewCtrl.dtOptionsInstallTable"
                dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable"
@@ -220,7 +220,7 @@
                    tooltip-side="right">
               </div>
             </td>
-            <td class="b-word-break-all">
+            <td class="b-word-break-all" data-order="{{ environment.name }}">
               <a tooltips
                  ui-sref="containers({ environmentId: environment.id })"
                  tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}. Source: {{ environment.dataSource }}</span>'
