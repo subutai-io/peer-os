@@ -933,7 +933,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                         {
                             name: 'subutai.tracker',
                             files: [
-                                'subutai-app/tracker/tracker.js',
+                                'subutai-app/tracker/trckr.js',
                                 'subutai-app/tracker/controller.js',
                                 'subutai-app/tracker/service.js'
                             ]
