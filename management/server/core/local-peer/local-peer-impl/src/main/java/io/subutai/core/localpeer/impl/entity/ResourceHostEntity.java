@@ -1133,7 +1133,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     .execute( resourceHostCommands.getExportTemplateCommand( templateName, isPrivateTemplate, token ),
                             this );
 
-            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*" );
+            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*\"" );
 
             Matcher m = p.matcher( result.getStdOut() );
 
