@@ -35,4 +35,12 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="net/container-ports">
+      <action class="io.subutai.core.network.cli.ListContainerPortMappingsCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>

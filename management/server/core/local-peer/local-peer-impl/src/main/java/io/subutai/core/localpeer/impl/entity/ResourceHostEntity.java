@@ -1258,6 +1258,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public ReservedPorts getContainerPortMappings(final Protocol protocol) throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getContainerPortMappings( this , protocol);
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to get reserved ports: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public int mapContainerPort( final Protocol protocol, final String containerIp, final int containerPort )
             throws ResourceHostException
     {

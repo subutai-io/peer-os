@@ -106,7 +106,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="environment/add-domain">
+    <command name="environment/add-containerIpPort">
       <action class="io.subutai.core.environment.cli.AddDomainToEnvironmentCommand">
         <argument ref="environmentManager" />
       </action>
