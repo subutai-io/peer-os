@@ -45,8 +45,8 @@ node() {
 
 	// declare hub address
 	switch (env.BRANCH_NAME) {
-		case ~/master/: hubIp = "stage"; break;
-		default: hubIp = "dev"
+		case ~/master/: hubIp = "stage.subut.ai"; break;
+		default: hubIp = "dev.subut.ai"
 	}
 
 	// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
@@ -60,11 +60,11 @@ node() {
 		cd management
 		export GIT_BRANCH=${env.BRANCH_NAME}
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
-			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} -DhubEnv=${hubIp} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
+			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
 		elif [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
-			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} -DhubEnv=${hubIp}
+			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
 		else 
-			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME} -DhubEnv=${hubIp}
+			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${debFileName}
 	"""
@@ -90,6 +90,7 @@ node() {
 			/apps/bin/lxc-attach -n management -- sh -c 'echo "[CDN]\nnode = ${cdnHost}:8338" > /opt/gorjun/etc/gorjun.gcfg'
 			/apps/bin/lxc-attach -n management -- systemctl stop management
 			/apps/bin/lxc-attach -n management -- rm -rf /opt/subutai-mng/keystores/
+			/apps/bin/lxc-attach -n management -- sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i /opt/subutai-mng/bin/setenv
 			
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}

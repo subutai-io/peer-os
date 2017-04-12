@@ -34,10 +34,7 @@ public final class CommonResourceValueParser
             case NET:
                 result = NetResourceValueParser.getInstance();
                 break;
-            case OPT:
-            case HOME:
-            case VAR:
-            case ROOTFS:
+            case DISK:
                 result = DiskResourceValueParser.getInstance();
                 break;
         }

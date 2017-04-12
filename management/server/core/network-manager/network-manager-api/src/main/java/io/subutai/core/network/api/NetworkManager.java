@@ -129,6 +129,8 @@ public interface NetworkManager
 
     ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException;
 
+    ReservedPorts getContainerPortMappings( final Host host, final Protocol protocol ) throws NetworkManagerException;
+
     /**
      * Maps specified container port to random RH port
      *

@@ -68,10 +68,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     setInterval(updateHubIp, 30000);
 
-    $rootScope.$on('hubIpSet', function(event, data){
-        updateHubIp();
-    });
-
     vm.getRegistrationFormVisibilityStatus = function () {
         return vm.isRegistrationFormVisible;
     };
@@ -937,7 +933,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                         {
                             name: 'subutai.tracker',
                             files: [
-                                'subutai-app/tracker/tracker.js',
+                                'subutai-app/tracker/trckr.js',
                                 'subutai-app/tracker/controller.js',
                                 'subutai-app/tracker/service.js'
                             ]
