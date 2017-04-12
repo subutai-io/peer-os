@@ -554,14 +554,15 @@ public class LocalEnvironment implements Environment, Serializable
                 if ( isLocalContainer )
                 {
                     containerHostState = localPeer.getContainerState( containerId );
+                    quota = new ContainerQuotaDto( localPeer.getQuota( containerId ) );
                 }
                 else
                 {
-                    // in case of proxy container, exception will be thrown and state will be UNKNOWN
+                    // in case of proxy container, exception will be thrown and state will be UNKNOWN and quota will
+                    // be null
                     containerHostState = peerManager.getPeer( host.getPeerId() ).getContainerState( containerId );
+                    quota = new ContainerQuotaDto( peerManager.getPeer( host.getPeerId() ).getQuota( containerId ) );
                 }
-
-                quota = new ContainerQuotaDto( host.getQuota() );
             }
             catch ( Exception e )
             {
