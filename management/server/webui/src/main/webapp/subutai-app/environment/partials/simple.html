@@ -27,7 +27,7 @@
           </select>
         </div>
         <ul>
-          <li ng-repeat="template in environmentSimpleViewCtrl.templatesList track by $index | filter:{'name' : searchTemplate} | orderBy: 'name'">
+          <li ng-repeat="template in environmentSimpleViewCtrl.templatesList | filter:{'name' : searchTemplate} | orderBy: 'name' track by $index">
 						<span class="b-tools-menu__item"
                   ng-click="environmentSimpleViewCtrl.addContainer(template.name, $event, null, null, template.id)"
                   title="Version: {{ template.version }} Size: {{ environmentViewCtrl.humanFileSize(template.size, true) }} Parent: {{ template.parent }} Owners: {{template.owner}}">
