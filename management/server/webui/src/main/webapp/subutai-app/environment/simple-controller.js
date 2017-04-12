@@ -79,13 +79,20 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         loadPrivateTemplates();
     });
 
-    function containsTemplate(templates, template){
-        for(var i in templates){
-            if(template[0].id == templates[i].id){
-                return true;
+    function addUniqueTemplates(filteredTemplates, groupedTemplates){
+        for( var i in groupedTemplates){
+            var found = false;
+            for( var j in filteredTemplates){
+                if( groupedTemplates[i].id == filteredTemplates[j].id){
+                    found = true;
+                    break;
+                }
+            }
+            if(!found){
+                filteredTemplates.push(groupedTemplates[i]);
             }
         }
-        return false;
+        return filteredTemplates;
     }
 
     function getFilteredTemplates(callback) {
@@ -93,9 +100,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
         for (var i in vm.templates) {
             if (vm.templatesType == 'all' || i == vm.templatesType) {
-                if(!containsTemplate(templatesLst, vm.templates[i])){
-                    templatesLst = templatesLst.concat(vm.templates[i]);
-                }
+                templatesLst = addUniqueTemplates(templatesLst, vm.templates[i]);
             }
         }
 
