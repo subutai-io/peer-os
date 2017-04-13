@@ -113,8 +113,9 @@ public class RegistrationManager
         dto.setOwnerId( activeUser.getId() );
 
         UserTokenDto userTokenDto =
-                new UserTokenDto( activeUser.getId(), activeUser.getAuthId(), token.getFullToken(), token.getTokenId(),
-                        token.getValidDate() );
+                new UserTokenDto( null, activeUser.getId(), activeUser.getAuthId(), token.getFullToken(),
+                        token.getTokenId(), token.getValidDate() );
+        userTokenDto.setType( UserTokenDto.Type.USER );
         dto.setUserToken( userTokenDto );
 
         return dto;

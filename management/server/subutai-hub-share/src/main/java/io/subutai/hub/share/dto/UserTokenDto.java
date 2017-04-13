@@ -18,7 +18,9 @@ public class UserTokenDto
     }
 
 
-    private Long userId;
+    private Long ownerId;
+
+    private Long ssUserId;
 
     private String authId;
 
@@ -38,10 +40,11 @@ public class UserTokenDto
     }
 
 
-    public UserTokenDto( final Long userId, final String authId, final String token, final String tokenId,
-                         final Date validDate )
+    public UserTokenDto( final Long ownerId, final Long ssUserId, final String authId, final String token,
+                         final String tokenId, final Date validDate )
     {
-        this.userId = userId;
+        this.ownerId = ownerId;
+        this.ssUserId = ssUserId;
         this.authId = authId;
         this.token = token;
         this.tokenId = tokenId;
@@ -50,15 +53,15 @@ public class UserTokenDto
     }
 
 
-    public Long getUserId()
+    public Long getOwnerId()
     {
-        return userId;
+        return ownerId;
     }
 
 
-    public void setUserId( final Long userId )
+    public void setOwnerId( final Long ownerId )
     {
-        this.userId = userId;
+        this.ownerId = ownerId;
     }
 
 
@@ -131,5 +134,17 @@ public class UserTokenDto
     public void setType( final Type type )
     {
         this.type = type;
+    }
+
+
+    public Long getSsUserId()
+    {
+        return ssUserId;
+    }
+
+
+    public void setSsUserId( final Long ssUserId )
+    {
+        this.ssUserId = ssUserId;
     }
 }
