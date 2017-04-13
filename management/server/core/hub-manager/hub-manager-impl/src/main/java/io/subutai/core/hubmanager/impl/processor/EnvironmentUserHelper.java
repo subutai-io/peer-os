@@ -1,26 +1,36 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.io.IOException;
+
+import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.http.HttpStatus;
 
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.UserDto;
+import io.subutai.hub.share.dto.UserTokenDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 
 public class EnvironmentUserHelper
 {
+    private final String baseHubTokenUrl = "/rest/v1/users/%s/token";
+
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final IdentityManager identityManager;
@@ -195,5 +205,56 @@ public class EnvironmentUserHelper
         }
 
         return restResult.getEntity();
+    }
+
+
+    public UserToken getUserTokenFromHub( String ownerId ) throws HubManagerException, PGPException, IOException
+    {
+        String url = String.format( baseHubTokenUrl, ownerId );
+        RestResult<UserTokenDto> res = restClient.get( url, UserTokenDto.class );
+
+        if ( res.getStatus() != HttpStatus.SC_OK && res.getStatus() != 204 )
+        {
+            throw new HubManagerException( "Error to get user token form Hub: HTTP " + res.getStatus() );
+        }
+
+        UserTokenDto userTokenDto = res.getEntity();
+
+        if ( userTokenDto == null )
+        {
+            return null;
+        }
+
+        try
+        {
+            log.debug( "User TOKEN: " + userTokenDto.getToken() );
+            User user = identityManager.authenticateByToken( userTokenDto.getToken() );
+            log.debug( "User: " + user.getFullName() );
+
+            UserToken userToken = identityManager.getUserToken( user.getId() );
+            log.debug( "Local User TOKEN : " + userToken );
+            return userToken;
+        }
+        catch ( Exception exception )
+        {
+            return updateUserTokenInHub( userTokenDto );
+        }
+    }
+
+
+    public UserToken updateUserTokenInHub( UserTokenDto userTokenDto )
+    {
+        String url = String.format( baseHubTokenUrl, userTokenDto.getOwnerId() );
+
+        User user = identityManager.getUser( userTokenDto.getSsUserId() );
+        UserToken userToken = identityManager.getUserToken( user.getId() );
+        identityManager.updateUserToken( userToken );
+
+        //set new token and valid date
+        userTokenDto.setToken( userToken.getFullToken() );
+        userTokenDto.setValidDate( userToken.getValidDate() );
+
+        restClient.post( url, userToken );
+        return userToken;
     }
 }
