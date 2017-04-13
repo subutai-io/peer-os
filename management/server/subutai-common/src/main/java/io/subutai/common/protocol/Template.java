@@ -15,6 +15,7 @@ public class Template
     private long size;
     @SerializedName( "owner" )
     private Set<String> owners;
+    private Set<String> tags;
     private String parent;
     private String version;
     private String filename;
@@ -42,6 +43,12 @@ public class Template
     public Set<String> getOwners()
     {
         return owners;
+    }
+
+
+    public Set<String> getTags()
+    {
+        return tags;
     }
 
 
@@ -77,6 +84,7 @@ public class Template
         sb.append( ", name='" ).append( name ).append( '\'' );
         sb.append( ", size=" ).append( size );
         sb.append( ", owners=" ).append( owners );
+        sb.append( ", tags=" ).append( tags );
         sb.append( ", parent='" ).append( parent ).append( '\'' );
         sb.append( ", version='" ).append( version ).append( '\'' );
         sb.append( ", filename='" ).append( filename ).append( '\'' );

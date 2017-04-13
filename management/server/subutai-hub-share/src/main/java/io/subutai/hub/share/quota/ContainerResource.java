@@ -13,10 +13,6 @@ import io.subutai.hub.share.resource.ResourceValue;
         @JsonSubTypes.Type( value = ContainerCpuResource.class, name = "cpu" ),
         @JsonSubTypes.Type( value = ContainerRamResource.class, name = "ram" ),
         @JsonSubTypes.Type( value = ContainerDiskResource.class, name = "disk" ),
-        @JsonSubTypes.Type( value = ContainerHomeResource.class, name = "home" ),
-        @JsonSubTypes.Type( value = ContainerOptResource.class, name = "opt" ),
-        @JsonSubTypes.Type( value = ContainerVarResource.class, name = "var" ),
-        @JsonSubTypes.Type( value = ContainerRootfsResource.class, name = "rootfs" ),
         @JsonSubTypes.Type( value = ContainerNetResource.class, name = "net" ),
         @JsonSubTypes.Type( value = ContainerCpuSetResource.class, name = "cpuset" ),
 } )
@@ -42,7 +38,10 @@ public abstract class ContainerResource<T extends ResourceValue>
     }
 
 
-    public T getResource() {return resource;}
+    public T getResource()
+    {
+        return resource;
+    }
 
 
     abstract public String getWriteValue();
@@ -52,7 +51,10 @@ public abstract class ContainerResource<T extends ResourceValue>
     abstract protected T parse( String value );
 
 
-    public ContainerResourceType getContainerResourceType() {return containerResourceType;}
+    public ContainerResourceType getContainerResourceType()
+    {
+        return containerResourceType;
+    }
 
 
     @Override

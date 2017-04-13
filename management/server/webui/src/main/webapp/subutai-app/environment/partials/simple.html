@@ -162,35 +162,11 @@
                 <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-home" class="b-form-label b-form-label_margin_r">home (GB):</label>
+                <label for="js-quotasize-custom-disk" class="b-form-label b-form-label_margin_r">disk (GB):</label>
                 <input type="number"
-                       id="js-quotasize-custom-home"
+                       id="js-quotasize-custom-disk"
                        class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.homeQuota" required>
-                <div class="clear"></div>
-              </div>
-              <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-opt" class="b-form-label b-form-label_margin_r">opt (GB):</label>
-                <input type="number"
-                       id="js-quotasize-custom-opt"
-                       class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.optQuota" required>
-                <div class="clear"></div>
-              </div>
-              <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-root" class="b-form-label b-form-label_margin_r">root (GB):</label>
-                <input type="number"
-                       id="js-quotasize-custom-root"
-                       class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.rootQuota" required>
-                <div class="clear"></div>
-              </div>
-              <div class="b-template-settings__text b-template-settings__text_input">
-                <label for="js-quotasize-custom-var" class="b-form-label b-form-label_margin_r">var (GB):</label>
-                <input type="number"
-                       id="js-quotasize-custom-var"
-                       class="b-form-input b-form-input_custom-quota"
-                       ng-model="templateSettings.varQuota" required>
+                       ng-model="templateSettings.diskQuota" required>
                 <div class="clear"></div>
               </div>
             </div>
@@ -218,7 +194,7 @@
         </div>
       </div>
       <div class="b-cloud-space__table">
-        <table datatable="ng"
+        <table id="envTable" datatable="ng"
                ng-init="environmentViewCtrl.initDataTable()"
                dt-options="environmentViewCtrl.dtOptionsInstallTable"
                dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable"
@@ -244,7 +220,7 @@
                    tooltip-side="right">
               </div>
             </td>
-            <td class="b-word-break-all">
+            <td class="b-word-break-all" data-order="{{ environment.name }}">
               <a tooltips
                  ui-sref="containers({ environmentId: environment.id })"
                  tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}. Source: {{ environment.dataSource }}</span>'

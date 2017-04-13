@@ -22,7 +22,6 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -49,7 +48,6 @@ public class ConfigManager
     private String peerId;
     private PGPMessenger messenger;
     private KeyStoreTool keyStoreTool;
-    private SystemSettings systemSettings;
 
 
     public PeerManager getPeerManager()
@@ -63,7 +61,6 @@ public class ConfigManager
     {
         try
         {
-            this.systemSettings = new SystemSettings();
 
             this.identityManager = identityManager;
 
@@ -130,7 +127,7 @@ public class ConfigManager
 
     public String getHubIp()
     {
-        return systemSettings.getHubIp();
+        return Common.HUB_IP;
     }
 
 
