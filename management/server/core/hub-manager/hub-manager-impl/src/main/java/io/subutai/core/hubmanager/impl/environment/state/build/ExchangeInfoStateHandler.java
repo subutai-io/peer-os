@@ -12,7 +12,7 @@ import io.subutai.hub.share.dto.UserTokenDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 
-public class ExchangeInfoStateHandler extends StateHandler
+public class            ExchangeInfoStateHandler extends StateHandler
 {
     public ExchangeInfoStateHandler( Context ctx )
     {
@@ -34,12 +34,11 @@ public class ExchangeInfoStateHandler extends StateHandler
             UserToken token = ctx.identityManager.getUserToken( user.getId() );
             if ( token == null )
             {
-                //TODO review to make this temporary renewable token
                 token = ctx.identityManager
-                        .createUserToken( user, null, null, null, TokenType.PERMANENT.getId(), null );
+                        .createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
             }
             UserTokenDto userTokenDto =
-                    new UserTokenDto( user.getId(), user.getAuthId(), token.getFullToken(), token.getTokenId(),
+                    new UserTokenDto( null, user.getId(), user.getAuthId(), token.getFullToken(), token.getTokenId(),
                             token.getValidDate() );
             resultDto.setUserToken( userTokenDto );
 
