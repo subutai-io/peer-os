@@ -22,12 +22,6 @@ import static junit.framework.TestCase.assertEquals;
 public class ContainerQuotaTest
 {
 
-//    @Before
-//    public void setUp() throws Exception
-//    {
-//        System.setProperty( "karaf.etc", "/home/dilshat/Dev/base/management/server/server-karaf/src/main/assembly/etc" );
-//    }
-
 
     @Test
     public void testContainerRamResource() throws IOException
@@ -49,12 +43,9 @@ public class ContainerQuotaTest
     @Test
     public void testQuota() throws IOException
     {
-        String json = "{\"resources\":{\"ROOTFS\":{\"resource\":{\"type\":\"rootfs\",\"value\":\"2.00000GiB\"},"
-                + "\"threshold\":0},\"RAM\":{\"resource\":{\"type\":\"ram\",\"value\":\"512.000MiB\"},"
-                + "\"threshold\":0},\"HOME\":{\"resource\":{\"type\":\"home\",\"value\":\"1024.00000KiB\"},"
-                + "\"threshold\":0},\"CPU\":{\"resource\":{\"type\":\"cpu\",\"value\":\"25%\"},\"threshold\":0},"
-                + "\"OPT\":{\"resource\":{\"type\":\"opt\",\"value\":\"5.00000GiB\"},\"threshold\":0},"
-                + "\"VAR\":{\"resource\":{\"type\":\"var\",\"value\":\"5.00000GiB\"},\"threshold\":0}}}";
+        String json = "{\"resources\":{\"RAM\":{\"resource\":{\"type\":\"ram\",\"value\":\"512.000MiB\"},"
+                + "\"threshold\":0},\"DISK\":{\"resource\":{\"type\":\"disk\",\"value\":\"1024.00000KiB\"},"
+                + "\"threshold\":0},\"CPU\":{\"resource\":{\"type\":\"cpu\",\"value\":\"25%\"},\"threshold\":0}}}";
         ObjectMapper mapper = new ObjectMapper();
 
         ContainerQuota quota = mapper.readValue( json, ContainerQuota.class );
@@ -65,7 +56,7 @@ public class ContainerQuotaTest
         assertEquals( 25.0,
                 quota.get( ContainerResourceType.CPU ).getAsCpuResource().getResource().getValue().doubleValue() );
         assertEquals( 1.0,
-                quota.get( ContainerResourceType.HOME ).getAsDiskResource().getResource().getValue( ByteUnit.MB )
+                quota.get( ContainerResourceType.DISK ).getAsDiskResource().getResource().getValue( ByteUnit.MB )
                      .doubleValue() );
     }
 
@@ -74,13 +65,10 @@ public class ContainerQuotaTest
     public void testQuota1() throws IOException
     {
         String json = "{\"containerSize\":\"SMALL\",\"resources\":{\"RAM\":{\"resource\":{\"type\":\"ram\","
-                + "\"value\":\"512.000MiB\"},\"threshold\":0},\"HOME\":{\"resource\":{\"type\":\"home\","
-                + "\"value\":\"1.00000GiB\"},\"threshold\":0},\"ROOTFS\":{\"resource\":{\"type\":\"rootfs\","
-                + "\"value\":\"2.00000GiB\"},\"threshold\":0},\"OPT\":{\"resource\":{\"type\":\"opt\","
-                + "\"value\":\"5.00000GiB\"},\"threshold\":0},\"CPU\":{\"resource\":{\"type\":\"cpu\","
+                + "\"value\":\"512.000MiB\"},\"threshold\":0},\"DISK\":{\"resource\":{\"type\":\"disk\","
+                + "\"value\":\"1.00000GiB\"},\"threshold\":0},\"CPU\":{\"resource\":{\"type\":\"cpu\","
                 + "\"value\":\"25%\"},\"threshold\":0},\"NET\":{\"resource\":{\"type\":\"net\","
-                + "\"value\":\"100.000000Kbps\"},\"threshold\":0},\"VAR\":{\"resource\":{\"type\":\"var\","
-                + "\"value\":\"5.00000GiB\"},\"threshold\":0},\"CPUSET\":{\"resource\":{\"type\":\"cpuset\","
+                + "\"value\":\"100.000000Kbps\"},\"threshold\":0},\"CPUSET\":{\"resource\":{\"type\":\"cpuset\","
                 + "\"value\":\"0-7\"},\"threshold\":0}}}";
         ObjectMapper mapper = new ObjectMapper();
 
@@ -92,7 +80,7 @@ public class ContainerQuotaTest
         assertEquals( 25.0,
                 quota.get( ContainerResourceType.CPU ).getAsCpuResource().getResource().getValue().doubleValue() );
         assertEquals( 1.0,
-                quota.get( ContainerResourceType.HOME ).getAsDiskResource().getResource().getValue( ByteUnit.GB )
+                quota.get( ContainerResourceType.DISK ).getAsDiskResource().getResource().getValue( ByteUnit.GB )
                      .doubleValue() );
         assertEquals( "0-7", quota.get( ContainerResourceType.CPUSET ).getAsCpuSetResource().getResource().getValue() );
         assertEquals( 100.0D,

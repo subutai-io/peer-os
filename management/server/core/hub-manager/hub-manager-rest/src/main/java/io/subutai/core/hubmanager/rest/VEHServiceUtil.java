@@ -24,7 +24,6 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.identity.api.IdentityManager;
@@ -52,12 +51,10 @@ public class VEHServiceUtil
         String password = null;
         String domain = null;
 
-        SystemSettings systemSettings = new SystemSettings();
 
         String url = "https://%s/vehs/rest/%s";
 
-        String json =
-                executeRequest( String.format( url, systemSettings.getHubIp(), peerManager.getLocalPeer().getId() ) );
+        String json = executeRequest( String.format( url, Common.HUB_IP, peerManager.getLocalPeer().getId() ) );
 
         LOG.error( json );
         try
@@ -77,7 +74,7 @@ public class VEHServiceUtil
         }
         setupSite( peerManager, identityManager, projectName, ownerName, userName, password, domain );
 
-        executeRequestPost( String.format( url, systemSettings.getHubIp(), peerManager.getLocalPeer().getId() ), "" );
+        executeRequestPost( String.format( url, Common.HUB_IP, peerManager.getLocalPeer().getId() ), "" );
         return Response.status( Response.Status.OK ).build();
     }
 

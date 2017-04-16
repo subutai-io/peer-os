@@ -152,7 +152,23 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 
 
+    function dynamicSort(property) {
+        var sortOrder = 1;
+        if(property[0] === "-") {
+            sortOrder = -1;
+            property = property.substr(1);
+        }
+        return function (a,b) {
+            var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+            return result * sortOrder;
+        }
+    }
+
+
+
 	vm.containersTotal = [];
+	var eventSet=false;
+	var sortOrder='asc';
 	function loadEnvironments() {
 
 		if( !vm.restInProgress )
@@ -165,6 +181,20 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					data[i].containersByQuota = getContainersSortedByQuota(data[i].containers);
 					environmentsList.push(data[i]);
 				}
+
+				environmentsList.sort(dynamicSort((sortOrder == 'desc' ? '-' : '') + 'name'));
+
+				if(!eventSet){
+                    var table = $('#envTable').dataTable();
+
+                    table.on('click', 'th', function() {
+                        var info = table.fnSettings().aaSorting;
+                        sortOrder = info[0][1];
+                    });
+
+                    eventSet = true;
+                }
+
 				vm.environments = environmentsList;
 				vm.restInProgress = false;
 			}).error(function (error){
@@ -192,7 +222,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		vm.dtInstance = {};
 		vm.dtOptionsInstallTable = DTOptionsBuilder
 			.newOptions()
-			.withOption('order', [[ 1, "asc" ]])
 			.withOption('stateSave', true)
 			//.withOption('paging', false)
 			.withOption('searching', false)
@@ -206,6 +235,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			DTColumnDefBuilder.newColumnDef(4).notSortable(),
 			DTColumnDefBuilder.newColumnDef(5).notSortable()
 		];
+
+
+
 	}
 
 	var refreshTable;
