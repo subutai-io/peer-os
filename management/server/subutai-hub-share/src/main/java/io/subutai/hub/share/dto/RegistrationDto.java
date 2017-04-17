@@ -3,8 +3,6 @@ package io.subutai.hub.share.dto;
 
 public class RegistrationDto
 {
-    private Long ownerId;
-
     private String ownerFingerprint;
 
     private String ownerEmail;
@@ -106,15 +104,4 @@ public class RegistrationDto
         this.temp1 = temp1;
     }
 
-
-    public Long getOwnerId()
-    {
-        return ownerId;
-    }
-
-
-    public void setOwnerId( final Long ownerId )
-    {
-        this.ownerId = ownerId;
-    }
 }

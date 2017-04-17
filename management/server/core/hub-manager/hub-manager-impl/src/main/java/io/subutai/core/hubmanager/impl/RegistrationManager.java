@@ -108,7 +108,7 @@ public class RegistrationManager
         dto.setOwnerPassword( password );
         dto.setPeerInfo( peerInfoDto );
         dto.setTemp1( activeUser.getFingerprint() );
-        dto.setOwnerId( activeUser.getId() );
+//        dto.setOwnerId( activeUser.getId() );
 
         UserTokenDto userTokenDto =
                 new UserTokenDto( null, activeUser.getId(), activeUser.getAuthId(), token.getFullToken(),
