@@ -33,13 +33,13 @@ public class Commands
 
     RequestBuilder getGetReservedPortsCommand()
     {
-        return new RequestBuilder( INFO_BINDING ).withCmdArgs( Lists.<String>newArrayList( "ports" ) );
+        return new RequestBuilder( INFO_BINDING ).withCmdArgs( Lists.newArrayList( "ports" ) );
     }
 
 
     RequestBuilder getGetP2pVersionCommand()
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.<String>newArrayList( "-v" ) );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.newArrayList( "-v" ) );
     }
 
 
@@ -222,5 +222,18 @@ public class Commands
     RequestBuilder getListOfReservedPortMappingCommand()
     {
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
+    }
+
+
+    RequestBuilder getListPortMappingsCommand( final Protocol protocol )
+    {
+        List<String> args = Lists.newArrayList( "-l" );
+
+        if ( protocol != null )
+        {
+            args.add( protocol.name().toLowerCase() );
+        }
+
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args );
     }
 }

@@ -8,7 +8,7 @@
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
 	</div>
-	<form ng-submit="environmentViewCtrl.setDomain(domain)">								
+	<form ng-submit="environmentViewCtrl.setDomain(domain)">
 		<div class="b-popup__body">
 
 			<div class="popup-body-box">
@@ -21,9 +21,9 @@
 
 			<div class="popup-body-box">
 				<label class="b-popup-body-label">Domain Strategy</label>
-				<select ng-init="domain.strategy = environmentViewCtrl.domainStrategies[0]" 
+				<select ng-init="domain.strategy = environmentViewCtrl.domainStrategies[0]"
 					class="b-popup-body-input b-popup-body-input_box" 
-					ng-model="domain.strategy" 
+					ng-model="domain.strategy"
 					ng-options="strategy for strategy in environmentViewCtrl.domainStrategies">
 				</select>
 				<div class="clear"></div>
@@ -57,7 +57,7 @@
 			</button>
 			<button class="b-btn b-btn_green g-right b-btn_margin-r" 
 			ng-click="environmentViewCtrl.removeDomain(environmentViewCtrl.environmentForDomain)" 
-			id="subt_button__environment-remove-domain" 
+			id="subt_button__environment-remove-domain"
 			ng-if="environmentViewCtrl.currentDomain != null">
 				Remove Domain
 			</button>

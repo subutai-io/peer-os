@@ -91,10 +91,7 @@ public class Quota
     @JsonIgnore
     public ContainerDiskResource getAsDiskResource()
     {
-        if ( resource.getContainerResourceType() == ContainerResourceType.OPT
-                || resource.getContainerResourceType() == ContainerResourceType.HOME
-                || resource.getContainerResourceType() == ContainerResourceType.ROOTFS
-                || resource.getContainerResourceType() == ContainerResourceType.VAR )
+        if ( resource.getContainerResourceType() == ContainerResourceType.DISK )
         {
             return ( ContainerDiskResource ) resource;
         }

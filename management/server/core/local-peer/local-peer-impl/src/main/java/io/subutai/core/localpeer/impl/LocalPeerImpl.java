@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -154,15 +155,12 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerCpuResource;
-import io.subutai.hub.share.quota.ContainerHomeResource;
-import io.subutai.hub.share.quota.ContainerOptResource;
+import io.subutai.hub.share.quota.ContainerDiskResource;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerRamResource;
 import io.subutai.hub.share.quota.ContainerResource;
 import io.subutai.hub.share.quota.ContainerResourceFactory;
-import io.subutai.hub.share.quota.ContainerRootfsResource;
 import io.subutai.hub.share.quota.ContainerSize;
-import io.subutai.hub.share.quota.ContainerVarResource;
 import io.subutai.hub.share.quota.Quota;
 import io.subutai.hub.share.quota.QuotaException;
 import io.subutai.hub.share.resource.ByteUnit;
@@ -897,8 +895,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( !quotaTasks.isEmpty() )
         {
-            //set quotas to succeeded containers asynchronously
-            hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+            Map<HostUtil.Task, Future<Boolean>> futures =
+                    hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+
+            for ( Future future : futures.values() )
+            {
+                try
+                {
+                    future.get();
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error setting container quota: {}", e.getMessage() );
+                }
+            }
         }
 
         return new CreateEnvironmentContainersResponse( cloneResults );
@@ -2823,19 +2833,25 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         // TODO: 2/17/17 add quota thresholds after implementing in system level
         List<Quota> result = new ArrayList<>();
-        Quota cpuQuota = new Quota( new ContainerCpuResource( rawQuota.getCpu() ), 0 );
-        Quota ramQuota = new Quota( new ContainerRamResource( rawQuota.getRam(), ByteUnit.MB ), 0 );
-        Quota rootfsQuota = new Quota( new ContainerRootfsResource( rawQuota.getRoot(), ByteUnit.GB ), 0 );
-        Quota homeQuota = new Quota( new ContainerHomeResource( rawQuota.getHome(), ByteUnit.GB ), 0 );
-        Quota optQuota = new Quota( new ContainerOptResource( rawQuota.getOpt(), ByteUnit.GB ), 0 );
-        Quota varQuota = new Quota( new ContainerVarResource( rawQuota.getVar(), ByteUnit.GB ), 0 );
 
-        result.add( cpuQuota );
-        result.add( ramQuota );
-        result.add( rootfsQuota );
-        result.add( homeQuota );
-        result.add( optQuota );
-        result.add( varQuota );
+        if ( rawQuota.getCpu() != null )
+        {
+            Quota cpuQuota = new Quota( new ContainerCpuResource( rawQuota.getCpu() ), 0 );
+            result.add( cpuQuota );
+        }
+
+        if ( rawQuota.getRam() != null )
+        {
+            Quota ramQuota = new Quota( new ContainerRamResource( rawQuota.getRam(), ByteUnit.MB ), 0 );
+            result.add( ramQuota );
+        }
+
+        if ( rawQuota.getDisk() != null )
+        {
+            Quota diskQuota = new Quota( new ContainerDiskResource( rawQuota.getDisk(), ByteUnit.GB ), 0 );
+            result.add( diskQuota );
+        }
+
         return result;
     }
 

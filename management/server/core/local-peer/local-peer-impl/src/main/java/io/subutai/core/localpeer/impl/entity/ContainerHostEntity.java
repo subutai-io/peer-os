@@ -271,6 +271,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
+        this.containerSize = containerQuota.getContainerSize();
         getPeer().setQuota( this.getContainerId(), containerQuota );
     }
 
@@ -279,14 +280,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ContainerSize getContainerSize()
     {
         return containerSize;
-    }
-
-
-    @Override
-    public void setContainerQuota( final ContainerQuota containerQuota ) throws PeerException
-    {
-        this.containerSize = containerQuota.getContainerSize();
-        setQuota( containerQuota );
     }
 
 

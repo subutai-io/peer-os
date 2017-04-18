@@ -145,6 +145,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     ReservedPorts getReservedPorts() throws ResourceHostException;
 
+    ReservedPorts getContainerPortMappings( final Protocol protocol ) throws ResourceHostException;
+
     /**
      * Maps specified container port to random RH port
      *

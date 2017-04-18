@@ -61,8 +61,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
      */
     void setQuota( ContainerQuota containerQuota ) throws PeerException;
 
-    void setContainerQuota( ContainerQuota containerQuota ) throws PeerException;
-
     HostId getResourceHostId();
 
     String getIp();

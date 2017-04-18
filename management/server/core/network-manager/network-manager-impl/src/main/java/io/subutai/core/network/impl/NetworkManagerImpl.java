@@ -426,13 +426,13 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Preconditions.checkNotNull( host, "Invalid host" );
 
-        ReservedPorts reservedPorts = new ReservedPorts();
-
         CommandResult result = execute( host, commands.getGetReservedPortsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
         Pattern p = Pattern.compile( "\\s*(\\w+)\\s*:\\s*(\\d+)\\s*" );
+
+        ReservedPorts reservedPorts = new ReservedPorts();
 
         while ( st.hasMoreTokens() )
         {
@@ -442,6 +442,35 @@ public class NetworkManagerImpl implements NetworkManager
             {
                 reservedPorts.addReservedPort( new ReservedPort( Protocol.valueOf( m.group( 1 ).toUpperCase() ),
                         Integer.parseInt( m.group( 2 ) ) ) );
+            }
+        }
+
+
+        return reservedPorts;
+    }
+
+
+    public ReservedPorts getContainerPortMappings( final Host host, final Protocol protocol )
+            throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+
+        CommandResult result = execute( host, commands.getListPortMappingsCommand( protocol ) );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "\\s*(\\w+)\\s+(\\d+)\\s+(\\S+)\\s*" );
+
+        ReservedPorts reservedPorts = new ReservedPorts();
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                reservedPorts.addReservedPort( new ReservedPort( Protocol.valueOf( m.group( 1 ).toUpperCase() ),
+                        Integer.parseInt( m.group( 2 ) ), m.group( 3 ) ) );
             }
         }
 

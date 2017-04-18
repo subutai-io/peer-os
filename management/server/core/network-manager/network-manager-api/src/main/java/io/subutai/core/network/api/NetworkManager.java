@@ -131,6 +131,7 @@ public interface NetworkManager
 
     ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException;
 
+    ReservedPorts getContainerPortMappings( final Host host, final Protocol protocol ) throws NetworkManagerException;
 
     /**
      * Returns list of ports, mapped using 'subutai map' command. See https://github.com/subutai-io/subos/wiki/Map
@@ -150,6 +151,7 @@ public interface NetworkManager
      */
     boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
                                    final String ipAddress, final int internalPort ) throws NetworkManagerException;
+
 
     /**
      * Maps specified container port to random RH port

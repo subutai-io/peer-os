@@ -58,8 +58,10 @@ public abstract class Commands
             quotaCommand.addArgument( r.getResource().getContainerResourceType().getKey() );
             quotaCommand.addArgument( "-s" );
             quotaCommand.addArgument( r.getResource().getWriteValue() );
-            if ( r.getThreshold() != null
-                    && r.getResource().getContainerResourceType() != ContainerResourceType.CPUSET )
+            if ( r.getThreshold() != null && r.getThreshold() != 0 && !(
+                    r.getResource().getContainerResourceType() == ContainerResourceType.CPUSET
+                            //TODO fix atm threshold for disk is not supported and results in error on system level
+                            || r.getResource().getContainerResourceType() == ContainerResourceType.DISK ) )
             {
                 quotaCommand.addArgument( "-t" );
                 quotaCommand.addArgument( r.getThreshold().toString() );

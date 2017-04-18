@@ -21,13 +21,14 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostProxyDto;
+import io.subutai.hub.share.dto.domain.P2PInfoDto;
+import io.subutai.hub.share.dto.domain.ProxyDto;
 
 import static java.lang.String.format;
 
 
-public class ResourceHostProxyProcessor implements StateLinkProcessor
+public class ProxyProcessor implements StateLinkProcessor
 {
-
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
@@ -39,12 +40,12 @@ public class ResourceHostProxyProcessor implements StateLinkProcessor
     private HubRestClient restClient;
 
 
-    public ResourceHostProxyProcessor()
+    public ProxyProcessor()
     {
     }
 
 
-    public ResourceHostProxyProcessor( ConfigManager configManager, PeerManager peerManager, HubRestClient restClient )
+    public ProxyProcessor( ConfigManager configManager, PeerManager peerManager, HubRestClient restClient )
     {
         this.configManager = configManager;
         this.peerManager = peerManager;
@@ -57,13 +58,102 @@ public class ResourceHostProxyProcessor implements StateLinkProcessor
     {
         for ( String stateLink : stateLinks )
         {
-            if ( stateLink.contains( "proxy" ) )
+            if ( stateLink.contains( "subnets" ) )
             {
-                processLink( stateLink );
+                processStateLink( stateLink );
+            }
+
+            if ( stateLink.contains( "setup" ) )
+            {
+                processP2PSetup( stateLink );
             }
         }
 
         return false;
+    }
+
+
+    private void processP2PSetup( final String stateLink )
+    {
+        try
+        {
+            RestResult<ProxyDto> result = restClient.get( stateLink, ProxyDto.class );
+
+            ProxyDto proxyDto = result.getEntity();
+
+            for ( P2PInfoDto p2PInfoDto : proxyDto.getP2PInfoDtos() )
+            {
+                if ( p2PInfoDto.getContainerId() != null )
+                {
+
+                    ResourceHost resourceHost =
+                            peerManager.getLocalPeer().getResourceHostByContainerId( p2PInfoDto.getContainerId() );
+
+                    resourceHost
+                            .joinP2PSwarm( p2PInfoDto.getP2pIp(), p2PInfoDto.getIntefaceName(), proxyDto.getP2pHash(),
+                                    proxyDto.getP2SecretKey(), proxyDto.getP2pSecretTTL().longValue() );
+
+                    RestResult<Object> re = restClient.post( stateLink, proxyDto );
+
+                    if ( re.isSuccess() )
+                    {
+                        log.error( "Success sent data to HUB" );
+                    }
+                    else
+                    {
+                        log.error( "Can not sent data to hub" );
+                    }
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
+        }
+    }
+
+
+    private void processStateLink( String stateLink )
+    {
+        try
+        {
+            if ( LINKS_IN_PROGRESS.contains( stateLink ) )
+            {
+                log.info( "This link is in progress: {}", stateLink );
+
+                return;
+            }
+
+            LINKS_IN_PROGRESS.add( stateLink );
+
+            Set<String> subnets = new HashSet<>();
+
+
+            for ( NetworkResource networkResource : peerManager.getLocalPeer().getReservedNetworkResources()
+                                                               .getNetworkResources() )
+            {
+                subnets.add( networkResource.getP2pSubnet() );
+            }
+
+            RestResult<Object> result = restClient.post( stateLink, subnets );
+
+            if ( !result.isSuccess() )
+            {
+                log.error( "Error to send  data to Hub: " + result.getError() );
+            }
+            else
+            {
+                log.info( "Sent Data to HUB Success" );
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
+        }
+        finally
+        {
+            LINKS_IN_PROGRESS.remove( stateLink );
+        }
     }
 
 
@@ -176,13 +266,9 @@ public class ResourceHostProxyProcessor implements StateLinkProcessor
             String interfaceName = json.getString( "interfaceName" );
             String hash = json.getString( "hash" );
             long secretKeyTtlSec = json.getLong( "secretKeyTtlSec" );
-
             ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
 
             resourceHost.joinP2PSwarm( p2pIp, interfaceName, hash, secretKey, secretKeyTtlSec );
-
-
-
         }
         catch ( Exception e )
         {
