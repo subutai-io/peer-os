@@ -176,6 +176,7 @@ public class ResourceHostProxyProcessor implements StateLinkProcessor
             String interfaceName = json.getString( "interfaceName" );
             String hash = json.getString( "hash" );
             long secretKeyTtlSec = json.getLong( "secretKeyTtlSec" );
+
             ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHosts().iterator().next();
 
             resourceHost.joinP2PSwarm( p2pIp, interfaceName, hash, secretKey, secretKeyTtlSec );

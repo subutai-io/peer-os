@@ -21,6 +21,8 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostProxyDto;
+import io.subutai.hub.share.dto.domain.P2PInfoDto;
+import io.subutai.hub.share.dto.domain.ProxyDto;
 
 import static java.lang.String.format;
 
@@ -60,9 +62,54 @@ public class ProxyProcessor implements StateLinkProcessor
             {
                 processStateLink( stateLink );
             }
+
+            if ( stateLink.contains( "setup" ) )
+            {
+                processP2PSetup( stateLink );
+            }
         }
 
         return false;
+    }
+
+
+    private void processP2PSetup( final String stateLink )
+    {
+        try
+        {
+            RestResult<ProxyDto> result = restClient.get( stateLink, ProxyDto.class );
+
+            ProxyDto proxyDto = result.getEntity();
+
+            for ( P2PInfoDto p2PInfoDto : proxyDto.getP2PInfoDtos() )
+            {
+                if ( p2PInfoDto.getContainerId() != null )
+                {
+
+                    ResourceHost resourceHost =
+                            peerManager.getLocalPeer().getResourceHostByContainerId( p2PInfoDto.getContainerId() );
+
+                    resourceHost
+                            .joinP2PSwarm( p2PInfoDto.getP2pIp(), p2PInfoDto.getIntefaceName(), proxyDto.getP2pHash(),
+                                    proxyDto.getP2SecretKey(), proxyDto.getP2pSecretTTL().longValue() );
+
+                    RestResult<Object> re = restClient.post( stateLink, proxyDto );
+
+                    if ( re.isSuccess() )
+                    {
+                        log.error( "Success sent data to HUB" );
+                    }
+                    else
+                    {
+                        log.error( "Can not sent data to hub" );
+                    }
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
+        }
     }
 
 
