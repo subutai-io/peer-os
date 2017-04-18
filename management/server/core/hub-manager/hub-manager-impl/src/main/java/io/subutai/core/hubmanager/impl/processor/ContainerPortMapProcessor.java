@@ -30,17 +30,17 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
 
-//    private PeerManager peerManager;
-//
-//    private HubRestClient restClient;
+    //    private PeerManager peerManager;
+    //
+    //    private HubRestClient restClient;
 
     private Context ctx;
 
 
     public ContainerPortMapProcessor( PeerManager peerManager, HubRestClient restClient )
     {
-//        this.peerManager = peerManager;
-//        this.restClient = restClient;
+        //        this.peerManager = peerManager;
+        //        this.restClient = restClient;
     }
 
 
@@ -143,8 +143,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     {
         try
         {
-            ContainerHost containerHost =
-                    ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
+            ContainerHost containerHost = ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
 
             ResourceHost resourceHost =
                     ctx.localPeer.getResourceHostById( containerHost.getResourceHostId().toString() );
@@ -185,8 +184,16 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             if ( portMapDto.getProtocol() == PortMapDto.Protocol.TCP
                     || portMapDto.getProtocol() == PortMapDto.Protocol.UDP )
             {
-                resourceHost.mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ),
-                        containerHost.getIp(), portMapDto.getInternalPort(), portMapDto.getExternalPort() );
+                if ( portMapDto.getExternalPort() == -1 )
+                {
+                    resourceHost.mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ),
+                            containerHost.getIp(), portMapDto.getInternalPort() );
+                }
+                else
+                {
+                    resourceHost.mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ),
+                            containerHost.getIp(), portMapDto.getInternalPort(), portMapDto.getExternalPort() );
+                }
             }
             else
             {
