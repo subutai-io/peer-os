@@ -2,6 +2,7 @@ package io.subutai.core.network.api;
 
 
 import java.util.Date;
+import java.util.List;
 
 import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.P2pLogs;
@@ -15,6 +16,7 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnels;
+import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 
 
 public interface NetworkManager
@@ -128,6 +130,26 @@ public interface NetworkManager
     void removeCustomProxy( String vlan ) throws NetworkManagerException;
 
     ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException;
+
+
+    /**
+     * Returns list of ports, mapped using 'subutai map' command. See https://github.com/subutai-io/subos/wiki/Map
+     * @param host RH host
+     * @return
+     */
+    List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException;
+
+    /**
+     * Check if port is already mapped using 'subutai map' command
+     * @param host RH host on which to check mapping existence
+     * @param protocol
+     * @param externalPort
+     * @param ipAddress IP address of container of Resource Host
+     * @param internalPort
+     * @return
+     */
+    boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
+                                   final String ipAddress, final int internalPort ) throws NetworkManagerException;
 
     /**
      * Maps specified container port to random RH port

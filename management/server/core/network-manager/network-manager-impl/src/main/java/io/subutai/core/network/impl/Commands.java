@@ -217,4 +217,10 @@ public class Commands
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain,
                 "-r" ) );
     }
+
+
+    RequestBuilder getListOfReservedPortMappingCommand()
+    {
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
+    }
 }

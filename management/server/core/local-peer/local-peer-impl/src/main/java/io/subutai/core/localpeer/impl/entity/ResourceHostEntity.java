@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl.entity;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -84,6 +85,7 @@ import io.subutai.core.localpeer.impl.command.TemplateDownloadTracker;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.HostRegistrationManager;
+import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
@@ -1336,6 +1338,37 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             throw new ResourceHostException(
                     String.format( "Failed to remove container port domain mapping %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public boolean isPortMappingReserved( final Protocol protocol, final int externalPort, final String ipAddress,
+                                          final int internalPort) throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().isPortMappingReserved( this, protocol, externalPort, ipAddress,
+                    internalPort );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to check port mapping existence: %s",
+                    e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getReservedPortMappings( this );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to get port mapping list: %s", e.getMessage() ), e );
         }
     }
 }
