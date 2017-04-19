@@ -135,6 +135,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 break;
             case ERROR:
                 break;
+            case USED:
+                break;
             default:
                 log.error( "Port map state is unknown ={} ", portMapDto.getState() );
         }
