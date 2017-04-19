@@ -22,12 +22,12 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -65,6 +65,8 @@ public class ContainerCloneStepTest
     CloneResponse cloneResponse;
     @Mock
     IdentityManager identityManager;
+    @Mock
+    EnvironmentManagerImpl environmentManager;
 
 
     @Before
@@ -74,7 +76,7 @@ public class ContainerCloneStepTest
         doReturn( LOCAL_PEER ).when( peerManager ).getLocalPeer();
 
         step = spy( new ContainerCloneStep( Common.DEFAULT_DOMAIN_NAME, topology, ENVIRONMENT, peerManager,
-                identityManager, TestHelper.TRACKER_OPERATION() ) );
+                identityManager, TestHelper.TRACKER_OPERATION(), environmentManager ) );
         step.cloneUtil = PEER_UTIL;
 
         TestHelper.bind( ENVIRONMENT, PEER, PEER_UTIL, peerTaskResults, peerTaskResult );
