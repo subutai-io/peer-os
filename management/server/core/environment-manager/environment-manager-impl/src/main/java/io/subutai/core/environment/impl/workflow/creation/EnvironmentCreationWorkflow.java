@@ -8,7 +8,6 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
@@ -36,7 +35,7 @@ public class EnvironmentCreationWorkflow
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
-    private Map<EnvironmentContainerImpl, ContainerQuota> containerQuotas;
+    private Map<String, ContainerQuota> containerQuotas;
 
 
     //environment creation phases
@@ -175,7 +174,7 @@ public class EnvironmentCreationWorkflow
         {
             containerQuotas =
                     new ContainerCloneStep( defaultDomain, topology, environment, peerManager, identityManager,
-                            operationTracker, environmentManager ).execute();
+                            operationTracker ).execute();
 
             saveEnvironment();
 
@@ -241,7 +240,7 @@ public class EnvironmentCreationWorkflow
         try
         {
 
-            new SetQuotaStep( containerQuotas, operationTracker ).execute();
+            new SetQuotaStep( environment, containerQuotas, operationTracker ).execute();
 
             saveEnvironment();
 

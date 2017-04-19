@@ -29,7 +29,6 @@ import io.subutai.common.task.CloneResponse;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerEnvironmentContainersTask;
@@ -52,14 +51,12 @@ public class ContainerCloneStep
     private final String localPeerId;
     private PeerManager peerManager;
     protected PeerUtil<CreateEnvironmentContainersResponse> cloneUtil = new PeerUtil<>();
-    private Map<EnvironmentContainerImpl, ContainerQuota> containerQuotas = Maps.newHashMap();
-    private final EnvironmentManagerImpl environmentManager;
+    private Map<String, ContainerQuota> containerQuotas = Maps.newHashMap();
 
 
     public ContainerCloneStep( final String defaultDomain, final Topology topology, final LocalEnvironment environment,
                                final PeerManager peerManager, final IdentityManager identityManager,
-                               final TrackerOperation operationTracker,
-                               final EnvironmentManagerImpl environmentManager )
+                               final TrackerOperation operationTracker )
     {
         this.defaultDomain = defaultDomain;
         this.topology = topology;
@@ -68,11 +65,10 @@ public class ContainerCloneStep
         this.identityManager = identityManager;
         this.operationTracker = operationTracker;
         this.localPeerId = peerManager.getLocalPeer().getId();
-        this.environmentManager = environmentManager;
     }
 
 
-    public Map<EnvironmentContainerImpl, ContainerQuota> execute() throws EnvironmentCreationException, PeerException
+    public Map<String, ContainerQuota> execute() throws EnvironmentCreationException, PeerException
     {
 
         Map<String, Set<Node>> placement = topology.getNodeGroupPlacement();
@@ -143,18 +139,7 @@ public class ContainerCloneStep
             throw new EnvironmentCreationException( "There were errors during container creation." );
         }
 
-        setEnvironmentManager( containerQuotas.keySet() );
-
         return containerQuotas;
-    }
-
-
-    private void setEnvironmentManager( final Set<EnvironmentContainerImpl> environmentContainerHosts )
-    {
-        for ( EnvironmentContainerImpl containerHost : environmentContainerHosts )
-        {
-            containerHost.setEnvironmentManager( environmentManager );
-        }
     }
 
 
@@ -168,7 +153,7 @@ public class ContainerCloneStep
 
             containers.add( c );
 
-            containerQuotas.put( c, response.getContainerQuota() );
+            containerQuotas.put( c.getId(), response.getContainerQuota() );
         }
 
         if ( !responses.hasSucceeded() )
