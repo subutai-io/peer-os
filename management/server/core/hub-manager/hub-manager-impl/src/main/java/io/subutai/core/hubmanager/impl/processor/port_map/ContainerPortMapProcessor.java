@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.processor;
+package io.subutai.core.hubmanager.impl.processor.port_map;
 
 
 import java.util.HashSet;
@@ -31,17 +31,17 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
 
-//    private PeerManager peerManager;
-//
-//    private HubRestClient restClient;
+    //    private PeerManager peerManager;
+    //
+    //    private HubRestClient restClient;
 
     private Context ctx;
 
 
     public ContainerPortMapProcessor( PeerManager peerManager, HubRestClient restClient )
     {
-//        this.peerManager = peerManager;
-//        this.restClient = restClient;
+        //        this.peerManager = peerManager;
+        //        this.restClient = restClient;
     }
 
 
@@ -130,80 +130,13 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 createMap( portMapDto );
                 break;
             case DESTROYING:
-                deleteMap( portMapDto );
+                DestroyPortMap destroyPortMap = new DestroyPortMap( ctx );
+                destroyPortMap.deleteMap( portMapDto );
                 break;
             case ERROR:
                 break;
             default:
                 log.error( "Port map state is unknown ={} ", portMapDto.getState() );
-        }
-    }
-
-
-    private void deleteMap( final PortMapDto portMapDto )
-    {
-        try
-        {
-            ContainerHost containerHost = ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
-
-            ResourceHost resourceHost =
-                    ctx.localPeer.getResourceHostById( containerHost.getResourceHostId().toString() );
-
-            Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
-
-
-            if ( protocol == Protocol.HTTP || protocol == Protocol.HTTPS )
-            {
-                resourceHost.removeContainerPortDomainMapping( protocol, containerHost.getIp(),
-                        portMapDto.getInternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain() );
-            }
-            else
-            {
-                resourceHost.removeContainerPortMapping( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                        portMapDto.getExternalPort() );
-            }
-
-            // if it's RH, remove port mapping from MH too
-            if ( !resourceHost.isManagementHost() )
-            {
-                boolean mappingIsInUseOnRH = false;
-
-                // check if port mapping on MH is not used for other container on this RH
-                for ( final ReservedPortMapping mapping : resourceHost.getReservedPortMappings() )
-                {
-                    if ( mapping.getProtocol() == portMapDto.getProtocol()
-                            && mapping.getExternalPort() == portMapDto.getExternalPort() )
-                    {
-                        mappingIsInUseOnRH = true;
-                        break;
-                    }
-                }
-
-
-                if ( !mappingIsInUseOnRH )
-                {
-                    String rhIpAddr = resourceHost.getInterfaceByName( "wan" ).getIp();
-
-                    if ( protocol == Protocol.HTTP || protocol == Protocol.HTTPS )
-                    {
-                        ctx.localPeer.getManagementHost().removeContainerPortDomainMapping( protocol, rhIpAddr,
-                                portMapDto.getExternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain() );
-                    }
-                    else
-                    {
-                        ctx.localPeer.getManagementHost().removeContainerPortMapping( protocol, rhIpAddr,
-                                portMapDto.getExternalPort(), portMapDto.getExternalPort() );
-                    }
-                }
-            }
-
-            portMapDto.setState( PortMapDto.State.DESTROYING );
-        }
-        catch ( Exception e )
-        {
-            portMapDto.setState( PortMapDto.State.ERROR );
-            portMapDto.setErrorLog( e.getMessage() );
-            log.error( "*********", e );
         }
     }
 
@@ -228,9 +161,10 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 }
                 else
                 {
-                    resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(),
-                            portMapDto.getInternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain(), null,
-                            LoadBalancing.ROUND_ROBIN );
+                    resourceHost
+                            .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                                    portMapDto.getExternalPort(), portMapDto.getDomain(), null,
+                                    LoadBalancing.ROUND_ROBIN );
                 }
             }
             else
@@ -260,13 +194,13 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                             portMapDto.getInternalPort() ) )
                     {
                         mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
-                                portMapDto.getExternalPort(), portMapDto.getDomain(), null,
-                                LoadBalancing.ROUND_ROBIN );
+                                portMapDto.getExternalPort(), portMapDto.getDomain(), null, LoadBalancing.ROUND_ROBIN );
                     }
 
-                    resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(),
-                            portMapDto.getInternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain(),
-                            null, LoadBalancing.ROUND_ROBIN );
+                    resourceHost
+                            .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                                    portMapDto.getExternalPort(), portMapDto.getDomain(), null,
+                                    LoadBalancing.ROUND_ROBIN );
                 }
             }
 
