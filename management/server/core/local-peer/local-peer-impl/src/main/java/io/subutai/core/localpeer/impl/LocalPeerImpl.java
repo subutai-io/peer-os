@@ -3,7 +3,6 @@ package io.subutai.core.localpeer.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -14,7 +13,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -131,7 +129,6 @@ import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainersRequestListener;
 import io.subutai.core.localpeer.impl.container.ImportTemplateTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
-import io.subutai.core.localpeer.impl.container.SetQuotaTask;
 import io.subutai.core.localpeer.impl.dao.NetworkResourceDaoImpl;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
@@ -837,7 +834,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( requestGroup );
 
-        checkQuotaSettings( requestGroup );
+        //        checkQuotaSettings( requestGroup );
 
         NetworkResource reservedNetworkResource =
                 getReservedNetworkResources().findByEnvironmentId( requestGroup.getEnvironmentId() );
@@ -865,7 +862,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         HostUtil.Results cloneResults = hostUtil.execute( cloneTasks, reservedNetworkResource.getEnvironmentId() );
 
         //register succeeded containers
-        HostUtil.Tasks quotaTasks = new HostUtil.Tasks();
+        //        HostUtil.Tasks quotaTasks = new HostUtil.Tasks();
 
         for ( HostUtil.Task cloneTask : cloneResults.getTasks().getTasks() )
         {
@@ -888,53 +885,54 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 registerContainer( request.getResourceHostId(), containerHostEntity );
 
-                quotaTasks.addTask( cloneTask.getHost(),
-                        new SetQuotaTask( request, ( ResourceHost ) cloneTask.getHost(), containerHostEntity ) );
+                //                quotaTasks.addTask( cloneTask.getHost(),
+                //                        new SetQuotaTask( request, ( ResourceHost ) cloneTask.getHost(),
+                // containerHostEntity ) );
             }
         }
 
-        if ( !quotaTasks.isEmpty() )
-        {
-            Map<HostUtil.Task, Future<Boolean>> futures =
-                    hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
-
-            for ( Future future : futures.values() )
-            {
-                try
-                {
-                    future.get();
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error setting container quota: {}", e.getMessage() );
-                }
-            }
-        }
+        //        if ( !quotaTasks.isEmpty() )
+        //        {
+        //            Map<HostUtil.Task, Future<Boolean>> futures =
+        //                    hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+        //
+        //            for ( Future future : futures.values() )
+        //            {
+        //                try
+        //                {
+        //                    future.get();
+        //                }
+        //                catch ( Exception e )
+        //                {
+        //                    LOG.error( "Error setting container quota: {}", e.getMessage() );
+        //                }
+        //            }
+        //        }
 
         return new CreateEnvironmentContainersResponse( cloneResults );
     }
 
 
-    private void checkQuotaSettings( final CreateEnvironmentContainersRequest requestGroup ) throws PeerException
-    {
-
-        for ( CloneRequest request : requestGroup.getRequests() )
-        {
-            final ContainerSize size = request.getContainerQuota().getContainerSize();
-
-            final ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( size );
-            if ( defaultQuota != null && size != ContainerSize.CUSTOM )
-            {
-                request.getContainerQuota().copyValues( defaultQuota );
-            }
-
-            Collection<Quota> resources = request.getContainerQuota().getAll();
-            if ( resources == null || resources.size() == 0 )
-            {
-                throw new PeerException( "Quota setting not found." );
-            }
-        }
-    }
+    //    private void checkQuotaSettings( final CreateEnvironmentContainersRequest requestGroup ) throws PeerException
+    //    {
+    //
+    //        for ( CloneRequest request : requestGroup.getRequests() )
+    //        {
+    //            final ContainerSize size = request.getContainerQuota().getContainerSize();
+    //
+    //            final ContainerQuota defaultQuota = ContainerSize.getDefaultContainerQuota( size );
+    //            if ( defaultQuota != null && size != ContainerSize.CUSTOM )
+    //            {
+    //                request.getContainerQuota().copyValues( defaultQuota );
+    //            }
+    //
+    //            Collection<Quota> resources = request.getContainerQuota().getAll();
+    //            if ( resources == null || resources.size() == 0 )
+    //            {
+    //                throw new PeerException( "Quota setting not found." );
+    //            }
+    //        }
+    //    }
 
 
     private void registerContainer( String resourceHostId, ContainerHostEntity containerHost ) throws PeerException
