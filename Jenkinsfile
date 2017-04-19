@@ -59,6 +59,8 @@ node() {
 	sh """
 		cd management
 		export GIT_BRANCH=${env.BRANCH_NAME}
+		sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i server/server-karaf/src/main/assembly/bin/setenv
+
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
 			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
 		elif [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
@@ -90,7 +92,6 @@ node() {
 			/apps/bin/lxc-attach -n management -- sh -c 'echo "[CDN]\nnode = ${cdnHost}:8338" > /opt/gorjun/etc/gorjun.gcfg'
 			/apps/bin/lxc-attach -n management -- systemctl stop management
 			/apps/bin/lxc-attach -n management -- rm -rf /opt/subutai-mng/keystores/
-			/apps/bin/lxc-attach -n management -- sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i /opt/subutai-mng/bin/setenv
 			
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
