@@ -496,15 +496,22 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( parts.countTokens() >= 4 )
             {
-                ReservedPortMapping mapping = new ReservedPortMapping();
+                try
+                {
+                    ReservedPortMapping mapping = new ReservedPortMapping();
 
-                mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
-                mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
-                mapping.setIpAddress( parts.nextToken() );
-                mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
-                mapping.setDomain( parts.hasMoreTokens()? parts.nextToken() : null );
+                    mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
+                    mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
+                    mapping.setIpAddress( parts.nextToken() );
+                    mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
+                    mapping.setDomain( parts.hasMoreTokens() ? parts.nextToken() : null );
 
-                mappedPorts.add( mapping );
+                    mappedPorts.add( mapping );
+                }
+                catch ( NumberFormatException e )
+                {
+                    continue;
+                }
             }
         }
 
