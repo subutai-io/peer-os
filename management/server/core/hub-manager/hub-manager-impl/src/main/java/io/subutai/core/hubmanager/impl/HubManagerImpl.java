@@ -54,13 +54,12 @@ import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.CommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.processor.ContainerPortMapProcessor;
+import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
-import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
 import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
@@ -292,9 +291,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx);
 
-
-        ProxyProcessor proxyProcessor = new ProxyProcessor(configManager, peerManager, restClient);
-
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( tunnelProcessor )
@@ -306,7 +302,6 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
                                                                              .addProcessor( commandProcessor )
-                                                                             .addProcessor( proxyProcessor )
                                                                              .addProcessor( containerPortMapProcessor );
 
         heartbeatExecutorService

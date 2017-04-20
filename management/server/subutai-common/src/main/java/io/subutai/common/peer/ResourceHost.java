@@ -2,6 +2,7 @@ package io.subutai.common.peer;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
@@ -19,6 +20,7 @@ import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
+import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 import io.subutai.hub.share.quota.ContainerQuota;
 
 
@@ -201,4 +203,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
      */
     void removeContainerPortDomainMapping( Protocol protocol, String containerIp, int containerPort, int rhPort,
                                            String domain ) throws ResourceHostException;
+
+    boolean isPortMappingReserved( final Protocol protocol, final int externalPort, final String ipAddress,
+                                   final int internalPort ) throws ResourceHostException;
+
+    List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException;
 }

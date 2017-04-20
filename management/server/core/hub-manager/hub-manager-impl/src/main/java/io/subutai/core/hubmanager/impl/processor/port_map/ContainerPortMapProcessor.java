@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.processor;
+package io.subutai.core.hubmanager.impl.processor.port_map;
 
 
 import java.util.HashSet;
@@ -19,6 +19,7 @@ import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.domain.ContainerPortMapDto;
 import io.subutai.hub.share.dto.domain.PortMapDto;
+import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 
 import static java.lang.String.format;
 
@@ -129,45 +130,15 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 createMap( portMapDto );
                 break;
             case DESTROYING:
-                deleteMap( portMapDto );
+                DestroyPortMap destroyPortMap = new DestroyPortMap( ctx );
+                destroyPortMap.deleteMap( portMapDto );
                 break;
             case ERROR:
                 break;
+            case USED:
+                break;
             default:
                 log.error( "Port map state is unknown ={} ", portMapDto.getState() );
-        }
-    }
-
-
-    private void deleteMap( PortMapDto portMapDto )
-    {
-        try
-        {
-            ContainerHost containerHost = ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
-
-            ResourceHost resourceHost =
-                    ctx.localPeer.getResourceHostById( containerHost.getResourceHostId().toString() );
-
-
-            if ( portMapDto.getProtocol().equals( PortMapDto.Protocol.HTTP ) )
-            {
-                resourceHost.removeContainerPortDomainMapping( Protocol.valueOf( portMapDto.getProtocol().name() ),
-                        containerHost.getIp(), portMapDto.getInternalPort(), portMapDto.getExternalPort(),
-                        portMapDto.getDomain() );
-            }
-            else
-            {
-                resourceHost.removeContainerPortMapping( Protocol.valueOf( portMapDto.getProtocol().name() ),
-                        containerHost.getIp(), portMapDto.getInternalPort(), portMapDto.getExternalPort() );
-            }
-
-            portMapDto.setState( PortMapDto.State.DESTROYING );
-        }
-        catch ( Exception e )
-        {
-            portMapDto.setState( PortMapDto.State.ERROR );
-            portMapDto.setErrorLog( e.getMessage() );
-            log.error( "*********", e );
         }
     }
 
@@ -178,28 +149,61 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
         {
             ContainerHost containerHost = ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
 
-            ResourceHost resourceHost = //ctx.localPeer.getManagementHost();
+            ResourceHost resourceHost =
                     ctx.localPeer.getResourceHostById( containerHost.getResourceHostId().toString() );
 
-            if ( portMapDto.getProtocol() == PortMapDto.Protocol.TCP
-                    || portMapDto.getProtocol() == PortMapDto.Protocol.UDP )
+            Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
+
+            if ( resourceHost.isManagementHost() )
             {
-                if ( portMapDto.getExternalPort() == -1 )
+                if ( protocol != Protocol.HTTP && protocol != Protocol.HTTPS )
                 {
-                    resourceHost.mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ),
-                            containerHost.getIp(), portMapDto.getInternalPort() );
+                    resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                            portMapDto.getExternalPort() );
                 }
                 else
                 {
-                    resourceHost.mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ),
-                            containerHost.getIp(), portMapDto.getInternalPort(), portMapDto.getExternalPort() );
+                    resourceHost
+                            .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                                    portMapDto.getExternalPort(), portMapDto.getDomain(), null,
+                                    LoadBalancing.ROUND_ROBIN );
                 }
             }
             else
             {
-                resourceHost.mapContainerPortToDomain( Protocol.valueOf( portMapDto.getProtocol().name() ),
-                        containerHost.getIp(), portMapDto.getInternalPort(), portMapDto.getExternalPort(),
-                        portMapDto.getDomain(), null, LoadBalancing.ROUND_ROBIN );
+                // Container resides on additional RH, that's why we need to forward traffic from MH to RH.
+                // On MH external port should be forwarded to same external port of RH, then on RH real
+                // 'external port -> internal port' mapping should occur.
+
+                ResourceHost mngHost = ctx.localPeer.getManagementHost();
+                String rhIpAddr = resourceHost.getInterfaceByName( "wan" ).getIp();
+
+                if ( protocol != Protocol.HTTP && protocol != Protocol.HTTPS )
+                {
+                    if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
+                            portMapDto.getInternalPort() ) )
+                    {
+                        mngHost.mapContainerPort( protocol, rhIpAddr, portMapDto.getExternalPort(),
+                                portMapDto.getExternalPort() );
+                    }
+
+                    resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                            portMapDto.getExternalPort() );
+                }
+                else
+                {
+                    if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
+                            portMapDto.getInternalPort() ) )
+                    {
+                        mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
+                                portMapDto.getExternalPort(), portMapDto.getDomain(), null, LoadBalancing.ROUND_ROBIN );
+                    }
+
+                    resourceHost
+                            .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                                    portMapDto.getExternalPort(), portMapDto.getDomain(), null,
+                                    LoadBalancing.ROUND_ROBIN );
+                }
             }
 
             portMapDto.setState( PortMapDto.State.USED );
