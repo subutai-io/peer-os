@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>hub-manager</artifactId>
-  <name>Hub Manager Manager Parent</name>
-  <description>Hub Manager Parent</description>
+  <name>Subutai Hub Manager Parent</name>
+  <description>Subutai Hub Manager Parent</description>
   <packaging>pom</packaging>
   <modules>
     <module>hub-manager-api</module>
