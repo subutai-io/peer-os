@@ -54,6 +54,7 @@ import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.CommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
@@ -291,6 +292,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx);
 
+        ProxyProcessor proxyProcessor = new ProxyProcessor(configManager, peerManager, restClient);
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( tunnelProcessor )
@@ -302,6 +305,7 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
                                                                              .addProcessor( commandProcessor )
+                                                                             .addProcessor( productProcessor )
                                                                              .addProcessor( containerPortMapProcessor );
 
         heartbeatExecutorService
