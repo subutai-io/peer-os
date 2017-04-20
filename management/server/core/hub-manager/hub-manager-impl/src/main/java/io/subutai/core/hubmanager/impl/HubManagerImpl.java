@@ -434,6 +434,7 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
+            //TODO FIX REST VERSIONING
             WebClient client = configManager
                     .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", configManager.getHubIp() );
 
