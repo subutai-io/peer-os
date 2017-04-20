@@ -25,8 +25,7 @@ public class CommandProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
 
-    //TODO FIX REST VERSIONING
-    private static final String STATE_LINK_PATTERN = "/rest/v2/peers/.*/hosts/execute";
+    private static final String STATE_LINK_PATTERN = "/rest/v1/peers/.*/hosts/execute";
     private static final Pattern PATTERN = Pattern.compile( STATE_LINK_PATTERN );
 
     private final Context context;

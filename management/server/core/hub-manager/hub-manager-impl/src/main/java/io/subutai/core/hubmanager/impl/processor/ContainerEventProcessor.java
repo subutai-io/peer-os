@@ -99,8 +99,7 @@ public class ContainerEventProcessor extends HubRequester
     {
         try
         {
-            //TODO FIX REST VERSIONING
-            String path = String.format( "/rest/v2/containers/%s/events", dto.getContainerId() );
+            String path = String.format( "/rest/v1/containers/%s/events", dto.getContainerId() );
 
             WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 

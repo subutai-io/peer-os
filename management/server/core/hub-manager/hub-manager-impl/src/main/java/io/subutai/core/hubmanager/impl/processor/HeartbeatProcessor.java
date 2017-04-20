@@ -59,8 +59,7 @@ public class HeartbeatProcessor implements Runnable
         this.restClient = restClient;
         this.peerId = peerId;
 
-        //TODO FIX REST VERSIONING
-        path = String.format( "/rest/v1.3/peers/%s/heartbeat/", peerId );
+        path = String.format( "/rest/v1/peers/%s/heartbeat/", peerId );
 
         addShutDownHook();
     }
