@@ -57,7 +57,7 @@ public class EnvironmentUserHelper
 
     public void handleEnvironmentOwnerDeletion( EnvironmentPeerDto peerDto )
     {
-        String envOwnerId = peerDto.getOwnerId();
+        String envOwnerId = peerDto.getEnvironmentInfo().getOwnerId();
 
         User user = getUserByHubId( envOwnerId );
 
@@ -110,7 +110,7 @@ public class EnvironmentUserHelper
 
     public User handleEnvironmentOwnerCreation( EnvironmentPeerDto peerDto )
     {
-        String envOwnerId = peerDto.getOwnerId();
+        String envOwnerId = peerDto.getEnvironmentInfo().getOwnerId();
 
         Config config = configDataService.getHubConfig( peerDto.getPeerId() );
 
@@ -227,13 +227,8 @@ public class EnvironmentUserHelper
 
         try
         {
-            log.debug( "User TOKEN: " + userTokenDto.getToken() );
             User user = identityManager.authenticateByToken( userTokenDto.getToken() );
-            log.debug( "User: " + user.getFullName() );
-
-            UserToken userToken = identityManager.getUserToken( user.getId() );
-            log.debug( "Local User TOKEN : " + userToken );
-            return userToken;
+            return identityManager.getUserToken( user.getId() );
         }
         catch ( Exception exception )
         {

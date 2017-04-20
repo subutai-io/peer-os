@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl.environment.state.destroy;
 
 
+import java.io.IOException;
 import java.util.Set;
 
 import io.subutai.common.environment.Environment;
@@ -15,7 +16,9 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelHelper;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import org.bouncycastle.openpgp.PGPException;
 
 
 public class DeletePeerStateHandler extends StateHandler
@@ -126,7 +129,16 @@ public class DeletePeerStateHandler extends StateHandler
     @Override
     protected String getToken( EnvironmentPeerDto peerDto )
     {
-        return peerDto.getUserToken().getToken();
+        try
+        {
+            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getOwnerId() );
+            return userToken.getFullToken();
+        }
+        catch ( HubManagerException | PGPException | IOException e )
+        {
+            log.error( e.getMessage() );
+        }
+        return null;
     }
 
 
