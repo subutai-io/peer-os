@@ -11,7 +11,7 @@ public class RegistrationDto
 
     private PeerInfoDto peerInfo;
 
-    private UserTokenDto userToken;
+    private UserTokenDto userTokenDto;
 
     private String temp1;
 
@@ -80,18 +80,13 @@ public class RegistrationDto
         this.ownerPassword = ownerPassword;
     }
 
-
-    public UserTokenDto getUserToken()
-    {
-        return userToken;
+    public UserTokenDto getUserTokenDto() {
+        return userTokenDto;
     }
 
-
-    public void setUserToken( final UserTokenDto userToken )
-    {
-        this.userToken = userToken;
+    public void setUserTokenDto(UserTokenDto userTokenDto) {
+        this.userTokenDto = userTokenDto;
     }
-
 
     public String getTemp1()
     {
