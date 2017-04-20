@@ -3,12 +3,14 @@ package io.subutai.core.network.impl;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -30,10 +32,13 @@ import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.domain.PortMapDto;
+import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 
 
 /**
@@ -475,6 +480,66 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException
+    {
+        List<ReservedPortMapping> mappedPorts = Lists.newArrayList();
+
+        Preconditions.checkNotNull( host );
+
+        CommandResult result = execute( host, commands.getListOfReservedPortMappingCommand() );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        while ( st.hasMoreTokens() )
+        {
+            StringTokenizer parts = new StringTokenizer( st.nextToken(), "\t:" );
+
+            if ( parts.countTokens() >= 4 )
+            {
+                try
+                {
+                    ReservedPortMapping mapping = new ReservedPortMapping();
+
+                    mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
+                    mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
+                    mapping.setIpAddress( parts.nextToken() );
+                    mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
+                    mapping.setDomain( parts.hasMoreTokens() ? parts.nextToken() : null );
+
+                    mappedPorts.add( mapping );
+                }
+                catch ( NumberFormatException e )
+                {
+                    continue;
+                }
+            }
+        }
+
+        return mappedPorts;
+    }
+
+
+    @Override
+    public boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
+                                          final String ipAddress, final int internalPort )
+            throws NetworkManagerException
+    {
+        for ( final ReservedPortMapping mapping : getReservedPortMappings( host ) )
+        {
+            if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() )
+                    &&  mapping.getExternalPort() == externalPort
+                    && mapping.getInternalPort() == internalPort
+                    && mapping.getIpAddress().equalsIgnoreCase( ipAddress ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    @Override
     public int mapContainerPort( final Host host, final Protocol protocol, final String containerIp,
                                  final int containerPort ) throws NetworkManagerException
     {
@@ -501,6 +566,11 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
+
+        if ( isPortMappingReserved( host, protocol, rhPort, containerIp, containerPort ))
+        {
+            return;
+        }
 
         execute( host,
                 commands.getMapContainerPortToSpecificPortCommand( protocol, containerIp, containerPort, rhPort ) );
