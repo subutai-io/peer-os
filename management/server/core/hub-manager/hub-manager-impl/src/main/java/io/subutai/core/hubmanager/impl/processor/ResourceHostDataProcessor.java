@@ -99,6 +99,7 @@ public class ResourceHostDataProcessor extends HubRequester
 
         log.info( "Sending resource host configs to Hub..." );
 
+        //TODO FIX REST VERSIONING
         String path = format( "/rest/v1.2/peers/%s/resource-hosts/%s", localPeer.getId(), metricDto.getHostId() );
 
         RestResult<Object> restResult = restClient.post( path, metricDto );

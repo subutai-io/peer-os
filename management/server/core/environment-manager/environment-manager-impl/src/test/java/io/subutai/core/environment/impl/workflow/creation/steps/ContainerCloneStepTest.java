@@ -27,7 +27,6 @@ import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;

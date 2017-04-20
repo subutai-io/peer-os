@@ -102,14 +102,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     .post( format( "/rest/v1/environments/%s/ports/map", containerPortMapDto.getEnvironmentSSId() ),
                             containerPortMapDto );
 
-            if ( !restRes.isSuccess() )
-            {
-                log.error( "Could not send port map data to HUB" );
-            }
-            else
-            {
-                log.info( "Sent port map data to HUB" );
-            }
+            log.info( !restRes.isSuccess() ? "Could not send port map data to HUB" : "Sent port map data to HUB" );
         }
         catch ( Exception e )
         {

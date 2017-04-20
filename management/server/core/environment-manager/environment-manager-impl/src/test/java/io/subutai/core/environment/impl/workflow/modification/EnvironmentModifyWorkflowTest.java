@@ -112,9 +112,9 @@ public class EnvironmentModifyWorkflowTest
 
 
     @Test
-    public void testMODIFY_CONTAINERS_QUOTA() throws Exception
+    public void testMODIFY_QUOTA() throws Exception
     {
-        workflow.MODIFY_CONTAINERS_QUOTA();
+        workflow.MODIFY_QUOTA();
 
         verify( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
     }
@@ -187,6 +187,15 @@ public class EnvironmentModifyWorkflowTest
     public void testCONFIGURE_SSH() throws Exception
     {
         workflow.CONFIGURE_SSH();
+
+        verify( environmentManager ).update( environment );
+    }
+
+
+    @Test
+    public void testSET_QUOTA() throws Exception
+    {
+        workflow.SET_QUOTA();
 
         verify( environmentManager ).update( environment );
     }
