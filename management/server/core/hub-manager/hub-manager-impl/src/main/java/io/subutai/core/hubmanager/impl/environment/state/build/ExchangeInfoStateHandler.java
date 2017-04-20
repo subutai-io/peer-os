@@ -10,6 +10,9 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.UserTokenDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import org.bouncycastle.openpgp.PGPException;
+
+import java.io.IOException;
 
 
 public class            ExchangeInfoStateHandler extends StateHandler
@@ -36,11 +39,16 @@ public class            ExchangeInfoStateHandler extends StateHandler
             {
                 token = ctx.identityManager
                         .createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
+
+                UserTokenDto userTokenDto = new UserTokenDto();
+                userTokenDto.setSsUserId(user.getId());
+                userTokenDto.setAuthId(user.getAuthId());
+                userTokenDto.setType( UserTokenDto.Type.ENV_USER );
+                userTokenDto.setToken(token.getFullToken());
+                userTokenDto.setTokenId(token.getTokenId());
+                userTokenDto.setValidDate(token.getValidDate());
+                resultDto.setUserToken( userTokenDto );
             }
-            UserTokenDto userTokenDto =
-                    new UserTokenDto( null, user.getId(), user.getAuthId(), token.getFullToken(), token.getTokenId(),
-                            token.getValidDate() );
-            resultDto.setUserToken( userTokenDto );
 
             logEnd();
 
@@ -71,5 +79,20 @@ public class            ExchangeInfoStateHandler extends StateHandler
         {
             throw new HubManagerException( e );
         }
+    }
+
+    @Override
+    protected String getToken( EnvironmentPeerDto peerDto )
+    {
+        try
+        {
+            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getOwnerId() );
+            return userToken.getFullToken();
+        }
+        catch ( HubManagerException | PGPException | IOException e )
+        {
+            log.error( e.getMessage() );
+        }
+        return null;
     }
 }
