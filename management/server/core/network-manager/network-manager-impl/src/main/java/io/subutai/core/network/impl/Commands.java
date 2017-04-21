@@ -219,6 +219,12 @@ public class Commands
     }
 
 
+    RequestBuilder getListOfReservedPortMappingCommand()
+    {
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
+    }
+
+
     RequestBuilder getListPortMappingsCommand( final Protocol protocol )
     {
         List<String> args = Lists.newArrayList( "-l" );

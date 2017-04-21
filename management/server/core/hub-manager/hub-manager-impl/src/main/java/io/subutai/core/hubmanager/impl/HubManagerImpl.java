@@ -54,6 +54,7 @@ import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.CommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
@@ -288,6 +289,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
         StateLinkProcessor commandProcessor = new CommandProcessor( ctx );
 
+        ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx);
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( tunnelProcessor )
@@ -298,7 +301,8 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
-                                                                             .addProcessor( commandProcessor );
+                                                                             .addProcessor( commandProcessor )
+                                                                             .addProcessor( containerPortMapProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -430,6 +434,7 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
+            //TODO FIX REST VERSIONING
             WebClient client = configManager
                     .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", configManager.getHubIp() );
 
