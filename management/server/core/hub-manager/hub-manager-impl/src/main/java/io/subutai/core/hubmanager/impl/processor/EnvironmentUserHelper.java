@@ -3,6 +3,7 @@ package io.subutai.core.hubmanager.impl.processor;
 
 import java.io.IOException;
 
+import io.subutai.common.security.objects.TokenType;
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -243,13 +244,17 @@ public class EnvironmentUserHelper
 
         User user = identityManager.getUser( userTokenDto.getSsUserId() );
         UserToken userToken = identityManager.getUserToken( user.getId() );
+        if ( userToken == null )
+        {
+            userToken = identityManager.createUserToken(user, null, null, null, TokenType.SESSION.getId(), null);
+        }
         identityManager.updateUserToken( userToken );
 
         //set new token and valid date
         userTokenDto.setToken( userToken.getFullToken() );
         userTokenDto.setValidDate( userToken.getValidDate() );
 
-        restClient.post( url, userToken );
+        restClient.post( url, userTokenDto );
         return userToken;
     }
 }
