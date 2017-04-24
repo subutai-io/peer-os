@@ -53,6 +53,7 @@ import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
@@ -286,6 +287,8 @@ public class HubManagerImpl implements HubManager, HostListener
                 new ResourceHostRegisterProcessor( hostRegistrationManager, peerManager, restClient );
 
 
+        ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx);
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( tunnelProcessor )
@@ -295,7 +298,8 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor( productProcessor )
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor(
-                                                                                     resourceHostRegisterProcessor );
+                                                                                     resourceHostRegisterProcessor )
+                                                                             .addProcessor( commandProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,

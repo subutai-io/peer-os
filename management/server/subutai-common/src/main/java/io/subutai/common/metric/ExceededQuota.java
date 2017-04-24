@@ -11,12 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.HostId;
 import io.subutai.hub.share.quota.ContainerCpuResource;
-import io.subutai.hub.share.quota.ContainerHomeResource;
-import io.subutai.hub.share.quota.ContainerOptResource;
+import io.subutai.hub.share.quota.ContainerDiskResource;
 import io.subutai.hub.share.quota.ContainerRamResource;
 import io.subutai.hub.share.quota.ContainerResource;
-import io.subutai.hub.share.quota.ContainerRootfsResource;
-import io.subutai.hub.share.quota.ContainerVarResource;
 import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.NumericValueResource;
@@ -93,17 +90,8 @@ public class ExceededQuota
                 case RAM:
                     result = new ContainerRamResource( ( ByteValueResource ) quotaValue );
                     break;
-                case ROOTFS:
-                    result = new ContainerRootfsResource( ( ByteValueResource ) quotaValue );
-                    break;
-                case HOME:
-                    result = new ContainerHomeResource( ( ByteValueResource ) quotaValue );
-                    break;
-                case OPT:
-                    result = new ContainerOptResource( ( ByteValueResource ) quotaValue );
-                    break;
-                case VAR:
-                    result = new ContainerVarResource( ( ByteValueResource ) quotaValue );
+                case DISK:
+                    result = new ContainerDiskResource( ( ByteValueResource ) quotaValue );
                     break;
                 default:
                     // no-op

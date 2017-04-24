@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.Node;
@@ -33,6 +34,7 @@ import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerEnvironmentContainersTask;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 /**
@@ -49,6 +51,7 @@ public class ContainerCloneStep
     private final String localPeerId;
     private PeerManager peerManager;
     protected PeerUtil<CreateEnvironmentContainersResponse> cloneUtil = new PeerUtil<>();
+    private Map<String, ContainerQuota> containerQuotas = Maps.newHashMap();
 
 
     public ContainerCloneStep( final String defaultDomain, final Topology topology, final LocalEnvironment environment,
@@ -65,7 +68,7 @@ public class ContainerCloneStep
     }
 
 
-    public void execute() throws EnvironmentCreationException, PeerException
+    public Map<String, ContainerQuota> execute() throws EnvironmentCreationException, PeerException
     {
 
         Map<String, Set<Node>> placement = topology.getNodeGroupPlacement();
@@ -135,6 +138,8 @@ public class ContainerCloneStep
         {
             throw new EnvironmentCreationException( "There were errors during container creation." );
         }
+
+        return containerQuotas;
     }
 
 
@@ -147,6 +152,8 @@ public class ContainerCloneStep
             EnvironmentContainerImpl c = buildContainerEntity( peerId, response );
 
             containers.add( c );
+
+            containerQuotas.put( c.getId(), response.getContainerQuota() );
         }
 
         if ( !responses.hasSucceeded() )

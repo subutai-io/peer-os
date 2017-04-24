@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl.entity;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -51,7 +52,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
@@ -62,8 +63,10 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
@@ -82,6 +85,7 @@ import io.subutai.core.localpeer.impl.command.TemplateDownloadTracker;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.HostRegistrationManager;
+import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
 
@@ -1028,7 +1032,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException
+    public P2pLogs getP2pLogs( LogLevel logLevel, Date from, Date till ) throws ResourceHostException
     {
         Preconditions.checkNotNull( logLevel, "Invalid log level" );
         Preconditions.checkNotNull( from, "Invalid from date" );
@@ -1061,19 +1065,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setContainerHostname( final ContainerHost containerHost, final String hostname )
+    public void setContainerHostname( final ContainerHost containerHost, final String newHostname )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, "Invalid container" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
 
         //check if new hostname differs from current one
-        if ( !StringUtils.equalsIgnoreCase( containerHost.getHostname(), hostname ) )
+        if ( !StringUtils.equalsIgnoreCase( containerHost.getHostname(), newHostname ) )
         {
             try
             {
                 commandUtil.execute( resourceHostCommands
-                        .getSetContainerHostnameCommand( containerHost.getContainerName(), hostname ), this );
+                        .getSetContainerHostnameCommand( containerHost.getContainerName(), newHostname ), this );
             }
             catch ( CommandException e )
             {
@@ -1085,17 +1089,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setHostname( final String hostname ) throws ResourceHostException
+    public void setHostname( final String newHostname ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
 
-        if ( !StringUtils.equalsIgnoreCase( this.hostname, hostname ) )
+        if ( !StringUtils.equalsIgnoreCase( this.hostname, newHostname ) )
         {
             try
             {
-                commandUtil.execute( resourceHostCommands.getGetSetRhHostnameCommand( hostname ), this );
+                commandUtil.execute( resourceHostCommands.getGetSetRhHostnameCommand( newHostname ), this );
 
-                this.hostname = hostname; //not updating db record b/c heartbeat will handle that
+                this.hostname = newHostname; //not updating db record b/c heartbeat will handle that
             }
             catch ( CommandException e )
             {
@@ -1131,7 +1135,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     .execute( resourceHostCommands.getExportTemplateCommand( templateName, isPrivateTemplate, token ),
                             this );
 
-            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*]" );
+            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*\"" );
 
             Matcher m = p.matcher( result.getStdOut() );
 
@@ -1251,6 +1255,134 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( String.format( "Failed to get reserved ports: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public ReservedPorts getContainerPortMappings(final Protocol protocol) throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getContainerPortMappings( this , protocol);
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to get reserved ports: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public int mapContainerPort( final Protocol protocol, final String containerIp, final int containerPort )
+            throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().mapContainerPort( this, protocol, containerIp, containerPort );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to map container port %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void mapContainerPort( final Protocol protocol, final String containerIp, final int containerPort,
+                                  final int rhPort ) throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager().mapContainerPort( this, protocol, containerIp, containerPort, rhPort );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to map container port %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void removeContainerPortMapping( final Protocol protocol, final String containerIp, final int containerPort,
+                                            final int rhPort ) throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager().removeContainerPortMapping( this, protocol, containerIp, containerPort, rhPort );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Failed to remove container port mapping %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void mapContainerPortToDomain( final Protocol protocol, final String containerIp, final int containerPort,
+                                          final int rhPort, final String domain, final String sslCertPath,
+                                          final LoadBalancing loadBalancing ) throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager()
+                    .mapContainerPortToDomain( this, protocol, containerIp, containerPort, rhPort, domain, sslCertPath,
+                            loadBalancing );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Failed to map container port to domain %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void removeContainerPortDomainMapping( final Protocol protocol, final String containerIp,
+                                                  final int containerPort, final int rhPort, final String domain )
+            throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager()
+                    .removeContainerPortDomainMapping( this, protocol, containerIp, containerPort, rhPort, domain );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Failed to remove container port domain mapping %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public boolean isPortMappingReserved( final Protocol protocol, final int externalPort, final String ipAddress,
+                                          final int internalPort) throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().isPortMappingReserved( this, protocol, externalPort, ipAddress,
+                    internalPort );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to check port mapping existence: %s",
+                    e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getReservedPortMappings( this );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to get port mapping list: %s", e.getMessage() ), e );
         }
     }
 }

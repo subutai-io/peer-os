@@ -3,6 +3,8 @@ package io.subutai.hub.share.quota;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -19,21 +21,22 @@ import io.subutai.hub.share.resource.ContainerResourceType;
 @JsonTypeName( "disk" )
 public class ContainerDiskResource extends ContainerResource<ByteValueResource>
 {
-    public ContainerDiskResource( final ContainerResourceType type, final ByteValueResource value )
+    public ContainerDiskResource( final ByteValueResource value )
     {
-        super( type, value );
+        super( ContainerResourceType.DISK, value );
     }
 
 
-    public ContainerDiskResource( final ContainerResourceType containerResourceType, final String value )
+    public ContainerDiskResource( final double value, final ByteUnit unit )
     {
-        super( containerResourceType, value );
+        this( new ByteValueResource( ByteValueResource.toBytes( BigDecimal.valueOf( value ), unit ) ) );
     }
 
 
-    public ContainerDiskResource( final ContainerResourceType type, final double value, final ByteUnit unit )
+    @JsonCreator
+    public ContainerDiskResource( @JsonProperty( "value" ) final String value )
     {
-        this( type, new ByteValueResource( ByteValueResource.toBytes( BigDecimal.valueOf( value ), unit ) ) );
+        super( ContainerResourceType.DISK, value );
     }
 
 

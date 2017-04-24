@@ -11,9 +11,9 @@ public class Test
     @org.junit.Test
     public void name() throws Exception
     {
-        String TEMPLATE_IS_BEING_DOWNLOADED_PATTERN = "\\[Downloading (.+)\\]";
+        String TEMPLATE_IS_BEING_DOWNLOADED_PATTERN = "Downloading (.+)\"";
         Pattern templateIsBeingDownloadedPattern = Pattern.compile( TEMPLATE_IS_BEING_DOWNLOADED_PATTERN );
-        String line = "time=\"2016-08-19 13:34:58\" level=info msg=\"[Downloading cassandra]";
+        String line = "time=\"2016-08-19 13:34:58\" level=info msg=\"Downloading cassandra\"";
 
         Matcher downloadingMatcher = templateIsBeingDownloadedPattern.matcher( line );
 

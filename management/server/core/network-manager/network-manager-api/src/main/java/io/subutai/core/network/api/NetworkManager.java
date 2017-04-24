@@ -2,17 +2,21 @@ package io.subutai.core.network.api;
 
 
 import java.util.Date;
+import java.util.List;
 
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.CustomProxyConfig;
+import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnels;
+import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 
 
 public interface NetworkManager
@@ -47,7 +51,7 @@ public interface NetworkManager
 
     String getP2pVersion( Host host ) throws NetworkManagerException;
 
-    P2pLogs getP2pLogs( Host host, JournalCtlLevel logLevel, Date from, Date till ) throws NetworkManagerException;
+    P2pLogs getP2pLogs( Host host, LogLevel logLevel, Date from, Date till ) throws NetworkManagerException;
 
     void createTunnel( Host host, String tunnelName, String tunnelIp, int vlan, long vni )
             throws NetworkManagerException;
@@ -126,5 +130,92 @@ public interface NetworkManager
     void removeCustomProxy( String vlan ) throws NetworkManagerException;
 
     ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException;
-}
 
+    ReservedPorts getContainerPortMappings( final Host host, final Protocol protocol ) throws NetworkManagerException;
+
+    /**
+     * Returns list of ports, mapped using 'subutai map' command. See https://github.com/subutai-io/subos/wiki/Map
+     * @param host RH host
+     * @return
+     */
+    List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException;
+
+    /**
+     * Check if port is already mapped using 'subutai map' command
+     * @param host RH host on which to check mapping existence
+     * @param protocol
+     * @param externalPort
+     * @param ipAddress IP address of container of Resource Host
+     * @param internalPort
+     * @return
+     */
+    boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
+                                   final String ipAddress, final int internalPort ) throws NetworkManagerException;
+
+
+    /**
+     * Maps specified container port to random RH port
+     *
+     * @param host RH host
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     *
+     * @return mapped random RH port
+     */
+    int mapContainerPort( Host host, Protocol protocol, String containerIp, int containerPort )
+            throws NetworkManagerException;
+
+    /**
+     * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
+     *
+     * @param host RH host
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     */
+    void mapContainerPort( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort )
+            throws NetworkManagerException;
+
+    /**
+     * Removes specified container port mapping
+     *
+     * @param host RH host
+     * @param protocol protocol
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     */
+    void removeContainerPortMapping( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort )
+            throws NetworkManagerException;
+
+    /**
+     * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
+     *
+     * @param host RH host
+     * @param protocol protocol, can only be http or https
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     * @param domain domain
+     * @param sslCertPath optional path to SSL cert, pass null if not needed
+     * @param loadBalancing optional load balancing method, pass null if not needed
+     */
+    void mapContainerPortToDomain( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort,
+                                   String domain, String sslCertPath, LoadBalancing loadBalancing )
+            throws NetworkManagerException;
+
+    /**
+     * Removes specified container port domain mapping
+     *
+     * @param host RH host
+     * @param protocol protocol, can only be http or https
+     * @param containerIp ip of container
+     * @param containerPort container port
+     * @param rhPort RH port
+     * @param domain domain
+     */
+    void removeContainerPortDomainMapping( Host host, Protocol protocol, String containerIp, int containerPort,
+                                           int rhPort, String domain ) throws NetworkManagerException;
+}

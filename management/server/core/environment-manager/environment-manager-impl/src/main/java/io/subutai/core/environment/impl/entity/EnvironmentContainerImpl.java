@@ -593,7 +593,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
+        this.containerSize = containerQuota.getContainerSize();
         getPeer().setQuota( this.getContainerId(), containerQuota );
+        environmentManager.update( this );
     }
 
 
@@ -608,15 +610,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     public void setContainerSize( final ContainerSize size )
     {
         this.containerSize = size;
-    }
-
-
-    @Override
-    public void setContainerQuota( final ContainerQuota containerQuota ) throws PeerException
-    {
-        this.containerSize = containerQuota.getContainerSize();
-        getPeer().setQuota( getContainerId(), containerQuota );
-        environmentManager.update( this );
     }
 
 

@@ -85,8 +85,6 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         {
             LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
 
-            hostname = StringUtil.removeHtmlAndSpecialChars( hostname, true );
-
             localPeer.setRhHostname( rhId, hostname );
         }
         catch ( Exception e )

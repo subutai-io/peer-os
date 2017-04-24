@@ -15,17 +15,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
-import javax.ws.rs.core.Response;
-
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -49,6 +44,7 @@ import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
@@ -58,9 +54,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.RestUtil;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
@@ -96,8 +90,6 @@ public class MonitorImpl implements Monitor, HostListener
     private PeerManager peerManager;
     protected ObjectMapper mapper = new ObjectMapper();
 
-    private SystemSettings systemSettings;
-
 
     public MonitorImpl( PeerManager peerManager, DaoManager daoManager, HostRegistry hostRegistry )
             throws MonitorException
@@ -108,7 +100,6 @@ public class MonitorImpl implements Monitor, HostListener
 
         try
         {
-            this.systemSettings = new SystemSettings();
             this.daoManager = daoManager;
             this.monitorDataService = new MonitorDataService( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
@@ -502,7 +493,7 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public List<P2Pinfo> getP2PStatus()
+    public List<P2Pinfo> getP2PStatus( Date logsStartDate, Date logsEndData )
     {
         List<P2Pinfo> pojos = Lists.newArrayList();
 
@@ -518,98 +509,21 @@ public class MonitorImpl implements Monitor, HostListener
 
                 String lines[] = status.split( "\\r?\\n" );
 
-                for ( final String line : lines )
+                for ( String line : lines )
                 {
-                    String[] part = line.split( Pattern.quote( "|" ) );
-
-                    if ( part.length > 2 )
+                    if ( StringUtils.isNotBlank( line.trim() ) )
                     {
                         statusLines.add( line );
                     }
-                }
-
-                int errors = 0;
-
-                List<String> stateList = Lists.newArrayList();
-                List<String> errorList = Lists.newArrayList();
-
-                for ( final String statusLine : statusLines )
-                {
-                    if ( statusLine.contains( "LastError" ) )
-                    {
-                        String[] part = statusLine.split( Pattern.quote( "|" ) );
-
-                        for ( final String s : part )
-                        {
-                            if ( s.contains( "State:" ) )
-                            {
-                                String state = s.replace( "State:", "" ).trim();
-                                stateList.add( state );
-                            }
-                            if ( s.contains( "LastError:" ) )
-                            {
-                                String error = s.replace( "LastError:", "" ).trim();
-                                errorList.add( String.format( "%s (%s) - %s", error, part[0], part[1] ) );
-                            }
-                        }
-                        errors++;
-                    }
-                }
-
-                if ( errors > 0 && errors == statusLines.size() )
-                {
-                    info.setP2pStatus( 2 );
-                }
-                else if ( errors == 0 )
-                {
-                    info.setP2pStatus( 0 );
-                }
-                else if ( errors > 0 && errors < statusLines.size() )
-                {
-                    info.setP2pStatus( 1 );
                 }
 
                 info.setRhId( resourceHost.getId() );
                 info.setRhName( resourceHost.getHostname() );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
-                info.setState( stateList );
-                info.setP2pErrorLogs( errorList );
-
-
-                WebClient client = RestUtil.createTrustedWebClient(
-                        String.format( "https://%s:443/rest/v1/system/versions/range", systemSettings.getHubIp() ) );
-                Response response = client.get();
-
-                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-                {
-                    try
-                    {
-                        String output = response.readEntity( String.class );
-
-                        JSONArray entities = new JSONArray( output );
-
-
-                        for ( int i = 0; i < entities.length(); i++ )
-                        {
-                            if ( "P2P".equals( entities.getJSONObject( i ).get( "key" ) ) )
-                            {
-                                info.setP2pVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
-                                        entities.getJSONObject( i ).getString( "rangeTo" ) );
-                            }
-
-                            if ( "RESOURCE_HOST".equals( entities.getJSONObject( i ).get( "key" ) ) )
-                            {
-                                info.setRhVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
-                                        entities.getJSONObject( i ).getString( "rangeTo" ) );
-                            }
-                        }
-                    }
-                    catch ( JSONException e )
-                    {
-                        LOG.warn( e.getMessage() );
-                    }
-                }
+                info.setState( statusLines );
+                info.setP2pSystemLogs( Lists.newArrayList(
+                        resourceHost.getP2pLogs( LogLevel.ERROR, logsStartDate, logsEndData ).getLogs() ) );
 
                 pojos.add( info );
             }

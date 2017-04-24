@@ -16,6 +16,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneSt
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetQuotaStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ChangeQuotaStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.DestroyContainersStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
@@ -44,13 +45,14 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     private boolean hasQuotaModification = false;
     private boolean hasContainerDestruction = false;
     private boolean hasContainerCreation = false;
+    private Map<String, ContainerQuota> containerQuotas;
 
 
-    //environment creation phases
+    //environment modification phases
     public enum EnvironmentGrowingPhase
     {
         INIT, GENERATE_KEYS, RESERVE_NET, SETUP_P2P, PREPARE_TEMPLATES, CLONE_CONTAINERS, CONFIGURE_HOSTS,
-        CONFIGURE_SSH, MODIFY_CONTAINERS_QUOTA, DESTROY_CONTAINERS, FINALIZE
+        CONFIGURE_SSH, SET_QUOTA, MODIFY_QUOTA, DESTROY_CONTAINERS, FINALIZE
 
     }
 
@@ -93,7 +95,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
         saveEnvironment();
 
         return hasContainerCreation ? EnvironmentGrowingPhase.GENERATE_KEYS :
-               ( hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA :
+               ( hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_QUOTA :
                  EnvironmentGrowingPhase.DESTROY_CONTAINERS );
     }
 
@@ -188,8 +190,9 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, identityManager,
-                    operationTracker ).execute();
+            containerQuotas =
+                    new ContainerCloneStep( defaultDomain, topology, environment, peerManager, identityManager,
+                            operationTracker ).execute();
 
             saveEnvironment();
 
@@ -235,7 +238,28 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA :
+            return EnvironmentGrowingPhase.SET_QUOTA;
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+
+            return null;
+        }
+    }
+
+
+    public EnvironmentGrowingPhase SET_QUOTA()
+    {
+        operationTracker.addLog( "Setting quotas" );
+
+        try
+        {
+            new SetQuotaStep( environment, containerQuotas, operationTracker ).execute();
+
+            saveEnvironment();
+
+            return hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_QUOTA :
                    ( hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
                      EnvironmentGrowingPhase.FINALIZE );
         }
@@ -248,7 +272,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase MODIFY_CONTAINERS_QUOTA()
+    public EnvironmentGrowingPhase MODIFY_QUOTA()
     {
         operationTracker.addLog( "Changing container quotas" );
 

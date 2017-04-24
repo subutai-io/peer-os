@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.metric.Alert;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -16,7 +17,6 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
-import io.subutai.common.metric.HistoricalMetrics;
 
 
 /**
@@ -65,7 +65,7 @@ public interface Monitor
 
     void putAlert( Alert alert );
 
-    List<P2Pinfo> getP2PStatus();
+    List<P2Pinfo> getP2PStatus( Date logsStartDate, Date logsEndData );
 
     HistoricalMetrics getMetricsSeries( final Host host, Date startTime, Date endTime );
 }

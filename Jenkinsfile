@@ -6,14 +6,16 @@
 // MAVEN_HOME - path to Maven3 home dir
 //
 // Manage Jenkins -> Configure System -> Environment variables
-// SS_TEST_NODE - ip of SS node for smoke tests 
+// SS_TEST_NODE_CORE16 - ip of SS node for smoke tests 
 //
 // Approve methods:
 // in build job log you will see 
 // Scripts not permitted to use new <method>
 // Goto http://jenkins.domain/scriptApproval/
 // and approve methods denied methods
-
+//
+// TODO:
+// https://jenkins.io/doc/pipeline/steps/ssh-agent/#sshagent-ssh-agent
 
 import groovy.json.JsonSlurperClassic
 
@@ -43,8 +45,8 @@ node() {
 
 	// declare hub address
 	switch (env.BRANCH_NAME) {
-		case ~/master/: hubIp = "stage"; break;
-		default: hubIp = "dev"
+		case ~/master/: hubIp = "stage.subut.ai"; break;
+		default: hubIp = "dev.subut.ai"
 	}
 
 	// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
@@ -57,12 +59,14 @@ node() {
 	sh """
 		cd management
 		export GIT_BRANCH=${env.BRANCH_NAME}
+		sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i server/server-karaf/src/main/assembly/bin/setenv
+
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
-			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} -DhubEnv=${hubIp} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
+			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
 		elif [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
-			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} -DhubEnv=${hubIp}
+			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
 		else 
-			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME} -DhubEnv=${hubIp}
+			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${debFileName}
 	"""
@@ -81,13 +85,13 @@ node() {
 			/apps/bin/lxc-attach -n management -- sh -c 'echo "deb http://${cdnHost}:8080/kurjun/rest/apt /" > /etc/apt/sources.list.d/subutai-repo.list'
 			/apps/bin/lxc-attach -n management -- apt-get update
 			/apps/bin/lxc-attach -n management -- sync
-			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install curl gorjun-local influxdb
+			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install curl gorjun-local influxdb influxdb-certs
 			/apps/bin/lxc-attach -n management -- wget -q 'https://cdn.subut.ai:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf
-			/apps/bin/lxc-attach -n management -- openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -subj '/C=KG/ST=Subutai/L=Bishkek/O=Kyrgyzstan/CN=gw.intra.lan' -keyout /etc/influxdb/influxkey.pem -out etc/influxdb/influxcert.pem
-			/apps/bin/lxc-attach -n management -- sh -c 'cat /etc/influxdb/influxkey.pem /etc/influxdb/influxcert.pem > /etc/influxdb/influxdb.pem'
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
 			/apps/bin/lxc-attach -n management -- mkdir -p /opt/gorjun/etc/
 			/apps/bin/lxc-attach -n management -- sh -c 'echo "[CDN]\nnode = ${cdnHost}:8338" > /opt/gorjun/etc/gorjun.gcfg'
+			/apps/bin/lxc-attach -n management -- systemctl stop management
+			/apps/bin/lxc-attach -n management -- rm -rf /opt/subutai-mng/keystores/
 			
 			/apps/bin/lxc-attach -n management -- sync
 			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
@@ -106,47 +110,38 @@ node() {
 	notifyBuildDetails = "\nFailed on Stage - Update management on test node"
 
 	// Start Test-Peer Lock
-	if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/) {
-		lock('test-node') {
+	if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/ || env.BRANCH_NAME == 'jenkinsfile') {
+		lock('test-node-core16') {
 			// destroy existing management template on test node and install latest available snap
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE} <<- EOF
+				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
-				subutai destroy everything
-				if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
-				if test -f /mnt/lib/lxc/tmpdir/management-subutai-template_*; then rm /mnt/lib/lxc/tmpdir/management-subutai-template_*; fi
-				/apps/subutai/current/bin/curl -k -s https://${cdnHost}:8338/kurjun/rest/raw/get?name=subutai_${artifactVersion}_amd64-dev.snap -o /tmp/subutai-latest.snap
-				if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
-				snappy install --allow-unauthenticated /tmp/subutai-latest.snap
+				subutai-dev destroy everything
+				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
+				find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
+				cd /tmp
+				find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
+				snap download subutai-dev --beta
+				snap install --dangerous --devmode /tmp/subutai-dev_*.snap
 			EOF"""
-
-			// update rh on test node
-			// def rhUpdateStatus = sh (script: "ssh root@${env.SS_TEST_NODE} /apps/subutai/current/bin/subutai update rh -c | cut -d '=' -f4 | tr -d '\"' | tr -d '\n'", returnStdout: true)
-			// if (rhUpdateStatus == '[Update is available] ') {
-			// 	sh """
-			// 		ssh root@${env.SS_TEST_NODE} <<- EOF
-			// 		set -e
-			// 		subutai update rh
-			// 	"""
-			// }
 
 			// copy generated management template on test node
 			sh """
 				set +x
-				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE}:/mnt/lib/lxc/tmpdir
+				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE_CORE16}:/var/snap/subutai-dev/common/lxc/tmpdir
 			"""
 
 			// install generated management template
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE} <<- EOF
+				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
-				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/apps/subutai/current/agent.gcfg
-				sed 's/cdn.subut.ai/cdn.local/g' -i /var/lib/apps/subutai/current/agent.gcfg
-				echo y | subutai import management
-				sed 's/cdn.local/cdn.subut.ai/g' -i /mnt/lib/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
-				sed 's/cdn.local/cdn.subut.ai/g' -i /var/lib/apps/subutai/current/agent.gcfg
+				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
+				sed 's/URL =.*/URL = cdn.local/g' -i /var/snap/subutai-dev/current/agent.gcfg
+				echo y | subutai-dev import management
+				sed 's/cdn.local/devcdn.subut.ai/g' -i /var/snap/subutai-dev/common/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
+				sed 's/URL =.*/URL = devcdn.subut.ai/g' -i /var/snap/subutai-dev/current/agent.gcfg
 			EOF"""
 
 			/* wait until SS starts */
@@ -154,7 +149,7 @@ node() {
 				sh """
 					set +x
 					echo "Waiting SS"
-					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE}:8443/rest/v1/peer/ready') != "200" ]; do
+					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE_CORE16}:8443/rest/v1/peer/ready') != "200" ]; do
 						sleep 5
 					done
 				"""
@@ -169,7 +164,7 @@ node() {
 			git url: "https://github.com/subutai-io/playbooks.git"
 			sh """
 				set +e
-				./run_tests_qa.sh -m ${env.SS_TEST_NODE}
+				./run_tests_qa.sh -m ${env.SS_TEST_NODE_CORE16}
 				./run_tests_qa.sh -s all
 				${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
 				OUT=\$?

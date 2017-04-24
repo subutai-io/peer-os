@@ -8,7 +8,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Strings;
 
-import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
@@ -40,7 +40,7 @@ public class P2pLogsCommand extends SubutaiShellCommandSupport
                                     localPeer.getResourceHostById( hostId );
 
         P2pLogs p2pLogs = resourceHost
-                .getP2pLogs( JournalCtlLevel.ALL, new Date( System.currentTimeMillis() - minutes * 60 * 1000 ),
+                .getP2pLogs( LogLevel.ALL, new Date( System.currentTimeMillis() - minutes * 60 * 1000 ),
                         new Date() );
 
         for ( String log : p2pLogs.getLogs() )
