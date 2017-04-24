@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.hubmanager.impl.processor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,19 +53,7 @@ import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.processor.CommandProcessor;
-import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
-import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
-import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.processor.PeerMetricsProcessor;
-import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
-import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
-import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
-import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
-import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
-import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
@@ -291,6 +280,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx);
 
+        UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx);
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( tunnelProcessor )
@@ -302,7 +293,8 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
                                                                              .addProcessor( commandProcessor )
-                                                                             .addProcessor( containerPortMapProcessor );
+                                                                             .addProcessor( containerPortMapProcessor )
+                                                                             .addProcessor( userTokenProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,

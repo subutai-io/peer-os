@@ -1,9 +1,12 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.subutai.core.identity.api.model.UserToken;
+import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +25,6 @@ public class UserTokenProcessor implements StateLinkProcessor
 
     private final StateHandlerFactory handlerFactory;
 
-    private final String linkPattern;
-
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
 
@@ -32,8 +33,6 @@ public class UserTokenProcessor implements StateLinkProcessor
         this.ctx = ctx;
 
         handlerFactory = new StateHandlerFactory( ctx );
-
-        linkPattern = "/rest/v1/environments/.*/peers/" + ctx.localPeer.getId();
     }
 
 
@@ -44,7 +43,7 @@ public class UserTokenProcessor implements StateLinkProcessor
 
         for ( String link : stateLinks )
         {
-            if ( link.matches( linkPattern ) )
+            if ( link.contains( "token" ) )
             {
                 fastMode = true;
 
@@ -71,18 +70,15 @@ public class UserTokenProcessor implements StateLinkProcessor
         try
         {
             UserTokenDto userTokenDto = ctx.restClient.getStrict( link, UserTokenDto.class );
-            if (userTokenDto.getState().equals( UserTokenDto.State.EXPIRED ))
+            if (userTokenDto != null)
             {
-                //TODO update token
-            }
-            else if (userTokenDto.getState().equals( UserTokenDto.State.DELETE ))
-            {
-                //TODO delete token
+                //This process will get token, updates if expired
+                ctx.envUserHelper.getUserTokenFromHub(String.valueOf(userTokenDto.getOwnerId()));
             }
         }
-        catch ( Exception e )
+        catch ( HubManagerException | PGPException | IOException e )
         {
-            throw new HubManagerException( e );
+            log.error( e.getMessage() );
         }
         finally
         {
@@ -90,18 +86,5 @@ public class UserTokenProcessor implements StateLinkProcessor
 
             LINKS_IN_PROGRESS.remove( link );
         }
-
-    }
-
-    public void updateToken()
-    {
-
-
-
-    }
-
-    public void deleteToken()
-    {
-
     }
 }
