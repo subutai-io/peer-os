@@ -3,14 +3,13 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.Map;
 
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 public class ChangeQuotaStep
@@ -45,7 +44,7 @@ public class ChangeQuotaStep
                     @Override
                     public Object call() throws Exception
                     {
-                        containerHost.setContainerQuota( containerQuota );
+                        containerHost.setQuota( containerQuota );
 
                         return null;
                     }

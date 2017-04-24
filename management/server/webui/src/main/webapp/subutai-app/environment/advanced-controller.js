@@ -293,7 +293,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     if (data.state == 'FAILED') {
                         checkLastLog(false);
                     } else {
-                        //SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 
                         if (prevLogs) {
                             var logs = data.log.split(/(?:\r\n|\r|\n)/g);
@@ -353,7 +352,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 };
                 vm.logMessages.push(currentLog);
 
-                //var logId = getLogsFromTracker(vm.environment2BuildName);
                 getLogById(data.trackerId, true, undefined, data.environmentId);
                 initScrollbar();
 
@@ -525,7 +523,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     //custom shapes
     joint.shapes.tm = {};
 
-    //simple creatiom templates
+    //simple creation templates
     joint.shapes.tm.toolElement = joint.shapes.basic.Generic.extend({
 
         toolMarkup: [
@@ -601,8 +599,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     rx: 50,
                     ry: 50
                 },
-                //'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 50, ry: 50, magnet: true, transform:
-                // 'translate(16,28)'},
                 'rect.b-magnet': {
                     fill: '#04346E',
                     width: 10,
@@ -672,10 +668,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     if (currentTemplate.get('quotaSize') == 'CUSTOM') {
                         $('#js-quotasize-custom-cpu').val(currentTemplate.get('cpuQuota')).trigger('change');
                         $('#js-quotasize-custom-ram').val(currentTemplate.get('ramQuota')).trigger('change');
-                        $('#js-quotasize-custom-home').val(currentTemplate.get('homeQuota')).trigger('change');
-                        $('#js-quotasize-custom-root').val(currentTemplate.get('rootQuota')).trigger('change');
-                        $('#js-quotasize-custom-var').val(currentTemplate.get('varQuota')).trigger('change');
-                        $('#js-quotasize-custom-opt').val(currentTemplate.get('optQuota')).trigger('change');
+                        $('#js-quotasize-custom-disk').val(currentTemplate.get('diskQuota')).trigger('change');
                     }
 
                     containerSettingMenu.find('.header').html('Settings for <b>' + this.model.get('templateName') + '</b> container');
@@ -731,7 +724,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         template: [
             '<div class="b-resource-host">',
             '<div class="b-peer-title"></div>',
-            //'<button class="b-peer-delete js-delete-peer"></button>',
             '<div class="b-resource-host__inner">',
             '<div class="b-recouce-host-title"></div>',
             '<div class="b-resource-host__containers">',
@@ -799,7 +791,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             var parentPeerId = this.model.get('peerId');
             var rhKeys = Object.keys(PEER_MAP[parentPeerId].rh);
             var hostIndex = rhKeys.indexOf(this.model.get('hostId'));
-            //var swapFrom = rhKeys.slice(hostIndex, -1);
 
             var emptyPlace = this.model.get('size').height - 8;
             delete PEER_MAP[parentPeerId].rh[this.model.get('hostId')];
@@ -1068,7 +1059,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                             if (currentTemplate == template.toLowerCase()) {
                                 alreadyONWorckspace = true;
                                 templatesCounter++;
-                                //break;
                             }
                         }
                         if (!alreadyONWorckspace || templatesCounter == i) {
@@ -1122,10 +1112,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                                 "containerSize": currentElement.get('quotaSize'),
                                 "cpuQuota": currentElement.get("cpuQuota"),
                                 "ramQuota": currentElement.get("ramQuota") + 'MiB',
-                                "homeQuota": currentElement.get("homeQuota") + 'GiB',
-                                "rootQuota": currentElement.get("rootQuota") + 'GiB',
-                                "varQuota": currentElement.get("varQuota") + 'GiB',
-                                "optQuota": currentElement.get("optQuota") + 'GiB'
+                                "diskQuota": currentElement.get("diskQuota") + 'GiB',
                             } : {"containerSize": currentElement.get('quotaSize')},
 
                         "templateName": currentElement.get('templateName'),
@@ -1198,10 +1185,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         if (isCustom) {
             currentTemplate.set('cpuQuota', templateSettings.cpuQuota);
             currentTemplate.set('ramQuota', templateSettings.ramQuota);
-            currentTemplate.set('optQuota', templateSettings.optQuota);
-            currentTemplate.set('homeQuota', templateSettings.homeQuota);
-            currentTemplate.set('rootQuota', templateSettings.rootQuota);
-            currentTemplate.set('varQuota', templateSettings.varQuota);
+            currentTemplate.set('diskQuota', templateSettings.diskQuota);
         }
 
         currentTemplate.attr('rect.b-magnet/fill', vm.colors[templateSettings.quotaSize]);
@@ -1230,10 +1214,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     if (isCustom) {
                         vm.editingEnv.changingContainers[id].cpuQuota = templateSettings.cpuQuota;
                         vm.editingEnv.changingContainers[id].ramQuota = templateSettings.ramQuota;
-                        vm.editingEnv.changingContainers[id].optQuota = templateSettings.optQuota;
-                        vm.editingEnv.changingContainers[id].homeQuota = templateSettings.homeQuota;
-                        vm.editingEnv.changingContainers[id].rootQuota = templateSettings.rootQuota;
-                        vm.editingEnv.changingContainers[id].varQuota = templateSettings.varQuota;
+                        vm.editingEnv.changingContainers[id].diskQuota = templateSettings.diskQuota;
                     }
                 }
             }
@@ -1391,7 +1372,6 @@ function endtDrag(event) {
 
 var containerCounter = 1;
 function drop(event) {
-    //event.preventDefault();
 
     var template = event.dataTransfer.getData("template");
     var templateId = event.dataTransfer.getData("templateId");
@@ -1450,10 +1430,7 @@ function addContainerToHost(model, template, img, size, quota, containerId, name
         quotaSize: size,
         cpuQuota: quota === null ? 33 : quota.cpu,
         ramQuota: quota === null ? 2048 : quota.ram,
-        rootQuota: quota === null ? 1 : quota.root,
-        homeQuota: quota === null ? 2 : quota.home,
-        varQuota: quota === null ? 3 : quota.var,
-        optQuota: quota === null ? 4 : quota.opt,
+        diskQuota: quota === null ? 10 : quota.disk,
 
         containerId: containerId,
         containerName: containerName,

@@ -8,7 +8,6 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.hub.share.quota.ContainerCpuResource;
 import io.subutai.hub.share.quota.ContainerDiskResource;
 import io.subutai.hub.share.quota.ContainerRamResource;
-import io.subutai.hub.share.resource.ContainerResourceType;
 
 
 /**
@@ -35,8 +34,8 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
         findSourceHost( environment, alert.getValue().getHostId().getId() );
         cpuResource = new ContainerCpuResource( "100%" );
         ramResource = new ContainerRamResource( alert.getValue().getResourceHostMetric().getAvailableRam().toString() );
-        hddResource = new ContainerDiskResource( ContainerResourceType.ROOTFS,
-                alert.getValue().getResourceHostMetric().getAvailableSpace().toString() );
+        hddResource =
+                new ContainerDiskResource( alert.getValue().getResourceHostMetric().getAvailableSpace().toString() );
     }
 
 

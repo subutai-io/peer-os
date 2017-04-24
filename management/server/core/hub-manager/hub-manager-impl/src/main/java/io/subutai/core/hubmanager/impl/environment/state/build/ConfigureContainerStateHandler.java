@@ -13,7 +13,6 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.security.SshKey;
@@ -53,6 +52,8 @@ public class ConfigureContainerStateHandler extends StateHandler
             configureHosts( envDto );
 
             changeHostNames( envDto );
+
+            setQuotas( envDto );
 
             logEnd();
 
@@ -290,15 +291,13 @@ public class ConfigureContainerStateHandler extends StateHandler
 
     private void changeHostNames( EnvironmentDto envDto )
     {
-        ContainerHost ch = null;
-
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
                 try
                 {
-                    ch = ctx.localPeer.getContainerHostById( nodeDto.getContainerId() );
+                    ContainerHost ch = ctx.localPeer.getContainerHostById( nodeDto.getContainerId() );
 
                     if ( !ch.getHostname().equals( nodeDto.getHostName() ) )
                     {
@@ -308,6 +307,27 @@ public class ConfigureContainerStateHandler extends StateHandler
                 catch ( Exception e )
                 {
                     log.error( "Error configuring hostnames: {}", e.getMessage() );
+                }
+            }
+        }
+    }
+
+
+    private void setQuotas( EnvironmentDto envDto )
+    {
+        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+        {
+            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+            {
+                try
+                {
+                    ContainerHost ch = ctx.localPeer.getContainerHostById( nodeDto.getContainerId() );
+
+                    ctx.localPeer.setQuota( ch.getContainerId(), nodeDto.getContainerQuota() );
+                }
+                catch ( Exception e )
+                {
+                    log.error( "Error setting quotas: {}", e.getMessage() );
                 }
             }
         }

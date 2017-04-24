@@ -6,8 +6,7 @@ package io.subutai.hub.share.resource;
  */
 public enum ContainerResourceType
 {
-    RAM( "ram" ), CPU( "cpu" ), OPT( "opt" ), HOME( "home" ), VAR( "var" ), ROOTFS( "rootfs" ), NET( "network" ),
-    CPUSET( "cpuset" );
+    RAM( "ram" ), CPU( "cpu" ), DISK( "disk" ), NET( "network" ), CPUSET( "cpuset" );
 
     private String key;
 
@@ -36,29 +35,16 @@ public enum ContainerResourceType
             return CPU;
         }
 
-        if ( key.equals( OPT.getKey() ) )
+        if ( key.equals( DISK.getKey() ) )
         {
-            return OPT;
+            return DISK;
         }
 
-        if ( key.equals( HOME.getKey() ) )
-        {
-            return HOME;
-        }
-
-        if ( key.equals( VAR.getKey() ) )
-        {
-            return VAR;
-        }
-
-        if ( key.equals( ROOTFS.getKey() ) )
-        {
-            return ROOTFS;
-        }
         if ( key.equals( NET.getKey() ) )
         {
             return NET;
         }
+
         if ( key.equals( CPUSET.getKey() ) )
         {
             return CPUSET;

@@ -3,12 +3,14 @@ package io.subutai.core.network.impl;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -30,11 +32,13 @@ import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.domain.PortMapDto;
+import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 
 
 /**
@@ -45,7 +49,6 @@ public class NetworkManagerImpl implements NetworkManager
     private static final String LINE_DELIMITER = System.lineSeparator();
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
-    protected SystemSettings systemSettings;
 
 
     public NetworkManagerImpl( final PeerManager peerManager )
@@ -53,14 +56,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( peerManager );
 
         this.peerManager = peerManager;
-        this.systemSettings = getSystemSettings();
     }
 
-
-    protected SystemSettings getSystemSettings()
-    {
-        return new SystemSettings();
-    }
 
     //---------------- P2P SECTION BEGIN ------------------------
 
@@ -80,8 +77,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( host, commands.getJoinP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ),
-                String.format( "%d-%d", systemSettings.getP2pPortStartRange(),
-                        systemSettings.getP2pPortEndRange() ) ) );
+                String.format( "%s-%s", Common.P2P_PORT_RANGE_START, Common.P2P_PORT_RANGE_END ) ) );
     }
 
 
@@ -430,13 +426,13 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Preconditions.checkNotNull( host, "Invalid host" );
 
-        ReservedPorts reservedPorts = new ReservedPorts();
-
         CommandResult result = execute( host, commands.getGetReservedPortsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
         Pattern p = Pattern.compile( "\\s*(\\w+)\\s*:\\s*(\\d+)\\s*" );
+
+        ReservedPorts reservedPorts = new ReservedPorts();
 
         while ( st.hasMoreTokens() )
         {
@@ -451,6 +447,95 @@ public class NetworkManagerImpl implements NetworkManager
 
 
         return reservedPorts;
+    }
+
+
+    public ReservedPorts getContainerPortMappings( final Host host, final Protocol protocol )
+            throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+
+        CommandResult result = execute( host, commands.getListPortMappingsCommand( protocol ) );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "\\s*(\\w+)\\s+(\\d+)\\s+(\\S+)\\s*" );
+
+        ReservedPorts reservedPorts = new ReservedPorts();
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                reservedPorts.addReservedPort( new ReservedPort( Protocol.valueOf( m.group( 1 ).toUpperCase() ),
+                        Integer.parseInt( m.group( 2 ) ), m.group( 3 ) ) );
+            }
+        }
+
+
+        return reservedPorts;
+    }
+
+
+    @Override
+    public List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException
+    {
+        List<ReservedPortMapping> mappedPorts = Lists.newArrayList();
+
+        Preconditions.checkNotNull( host );
+
+        CommandResult result = execute( host, commands.getListOfReservedPortMappingCommand() );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        while ( st.hasMoreTokens() )
+        {
+            StringTokenizer parts = new StringTokenizer( st.nextToken(), "\t:" );
+
+            if ( parts.countTokens() >= 4 )
+            {
+                try
+                {
+                    ReservedPortMapping mapping = new ReservedPortMapping();
+
+                    mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
+                    mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
+                    mapping.setIpAddress( parts.nextToken() );
+                    mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
+                    mapping.setDomain( parts.hasMoreTokens() ? parts.nextToken() : null );
+
+                    mappedPorts.add( mapping );
+                }
+                catch ( NumberFormatException e )
+                {
+                    continue;
+                }
+            }
+        }
+
+        return mappedPorts;
+    }
+
+
+    @Override
+    public boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
+                                          final String ipAddress, final int internalPort )
+            throws NetworkManagerException
+    {
+        for ( final ReservedPortMapping mapping : getReservedPortMappings( host ) )
+        {
+            if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() )
+                    &&  mapping.getExternalPort() == externalPort
+                    && mapping.getInternalPort() == internalPort
+                    && mapping.getIpAddress().equalsIgnoreCase( ipAddress ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

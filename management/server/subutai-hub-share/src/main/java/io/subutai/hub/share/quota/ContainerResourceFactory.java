@@ -32,14 +32,8 @@ public class ContainerResourceFactory
                 return new ContainerCpuSetResource( ( StringValueResource ) resourceValue );
             case RAM:
                 return new ContainerRamResource( ( ByteValueResource ) resourceValue );
-            case HOME:
-                return new ContainerHomeResource( ( ByteValueResource ) resourceValue );
-            case OPT:
-                return new ContainerOptResource( ( ByteValueResource ) resourceValue );
-            case VAR:
-                return new ContainerVarResource( ( ByteValueResource ) resourceValue );
-            case ROOTFS:
-                return new ContainerRootfsResource( ( ByteValueResource ) resourceValue );
+            case DISK:
+                return new ContainerDiskResource( ( ByteValueResource ) resourceValue );
             default:
                 return null;
         }
@@ -59,14 +53,8 @@ public class ContainerResourceFactory
                 return new ContainerCpuSetResource( resourceValue );
             case RAM:
                 return new ContainerRamResource( resourceValue );
-            case HOME:
-                return new ContainerHomeResource( resourceValue );
-            case OPT:
-                return new ContainerOptResource( resourceValue );
-            case VAR:
-                return new ContainerVarResource( resourceValue );
-            case ROOTFS:
-                return new ContainerRootfsResource( resourceValue );
+            case DISK:
+                return new ContainerDiskResource( resourceValue );
             default:
                 return null;
         }

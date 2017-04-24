@@ -38,6 +38,7 @@ import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,14 +55,16 @@ public class ResourceHostEntityTest
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1/24";
-    private static final String CONTAINER_STATUS_STARTED =String.format(
-            "NAME                               STATE    HWADDR             IP" + "            Interface%1$s" +
-                    "---------------------------------%1$s"
-                    + "qwer                               RUNNING  00:16:3e:83:2c:2e  192.168.22.5  eth0", System.lineSeparator());
-    private static final String CONTAINER_STATUS_STOPPED =
-            String.format("NAME                               STATE    HWADDR             IP" + "            Interface%1$s" +
-                    "---------------------------------%1$s"
-                    + "qwer                               STOPPED  00:16:3e:83:2c:2e  192.168.22.5  eth0", System.lineSeparator());
+    private static final String CONTAINER_STATUS_STARTED = String.format(
+            "NAME                               STATE    HWADDR             IP" + "            Interface%1$s"
+                    + "---------------------------------%1$s"
+                    + "qwer                               RUNNING  00:16:3e:83:2c:2e  192.168.22.5  eth0",
+            System.lineSeparator() );
+    private static final String CONTAINER_STATUS_STOPPED = String.format(
+            "NAME                               STATE    HWADDR             IP" + "            Interface%1$s"
+                    + "---------------------------------%1$s"
+                    + "qwer                               STOPPED  00:16:3e:83:2c:2e  192.168.22.5  eth0",
+            System.lineSeparator() );
     @Mock
     ContainerHostEntity containerHost;
     @Mock
@@ -325,6 +328,18 @@ public class ResourceHostEntityTest
         ContainerHost containerHost1 = resourceHostEntity.getContainerHostById( CONTAINER_HOST_ID );
 
         assertEquals( containerHost, containerHost1 );
+    }
+
+
+    @Test
+    public void testExportTemplate() throws Exception
+    {
+        doReturn( "time=\"2017-04-11 10:01:36\" level=info msg=\"tag-test-template exported to "
+                + "/var/snap/subutai-dev/common/lxc/tmpdir/tag-test-template-subutai-template_4.0.0_amd64.tar"
+                + ".gz\" \n" + "time=\"2017-04-11 10:01:38\" level=info msg=\"Template uploaded, hash: "
+                + "7d42f1d084c405b482938bb2620cce77\"" ).when( commandResult ).getStdOut();
+
+        assertEquals( "7d42f1d084c405b482938bb2620cce77", resourceHostEntity.exportTemplate( "foo", false, "token" ) );
     }
 }
 
