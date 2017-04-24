@@ -7,17 +7,15 @@ import java.util.Set;
 
 public class ProxyDto
 {
-    public enum State
-    {
-        SUCCESS, FAILED
-    }
-
-    private Long clusterId;
+    private Long proxyId;
     private String p2pHash;
     private String p2SecretKey;
     private Long p2pSecretTTL;
     private String logs;
     private Set<P2PInfoDto> p2PInfoDtos = new HashSet();
+    private Set<String> subnets = new HashSet<>();
+    private P2PInfoDto.State state;
+    private Set<PortMapDto> portMaps = new HashSet<>();
 
 
     public ProxyDto()
@@ -26,15 +24,51 @@ public class ProxyDto
     }
 
 
-    public Long getClusterId()
+    public Long getProxyId()
     {
-        return clusterId;
+        return proxyId;
     }
 
 
-    public void setClusterId( final Long clusterId )
+    public void setProxyId( final Long proxyId )
     {
-        this.clusterId = clusterId;
+        this.proxyId = proxyId;
+    }
+
+
+    public Set<String> getSubnets()
+    {
+        return subnets;
+    }
+
+
+    public void setSubnets( final Set<String> subnets )
+    {
+        this.subnets = subnets;
+    }
+
+
+    public P2PInfoDto.State getState()
+    {
+        return state;
+    }
+
+
+    public void setState( final P2PInfoDto.State state )
+    {
+        this.state = state;
+    }
+
+
+    public Set<PortMapDto> getPortMaps()
+    {
+        return portMaps;
+    }
+
+
+    public void setPortMaps( final Set<PortMapDto> portMaps )
+    {
+        this.portMaps = portMaps;
     }
 
 

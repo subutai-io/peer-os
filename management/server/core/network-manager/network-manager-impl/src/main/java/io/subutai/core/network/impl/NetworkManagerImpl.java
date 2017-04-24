@@ -82,6 +82,15 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void removeP2PSwarm( final Host host, String p2pHash ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+
+        execute( host, commands.getRemoveP2PSwarmCommand( p2pHash ) );
+    }
+
+
+    @Override
     public void resetSwarmSecretKey( final Host host, final String p2pHash, final String newSecretKey,
                                      final long ttlSeconds ) throws NetworkManagerException
     {
@@ -502,7 +511,7 @@ public class NetworkManagerImpl implements NetworkManager
                 mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
                 mapping.setIpAddress( parts.nextToken() );
                 mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
-                mapping.setDomain( parts.hasMoreTokens()? parts.nextToken() : null );
+                mapping.setDomain( parts.hasMoreTokens() ? parts.nextToken() : null );
 
                 mappedPorts.add( mapping );
             }
@@ -520,9 +529,8 @@ public class NetworkManagerImpl implements NetworkManager
         for ( final ReservedPortMapping mapping : getReservedPortMappings( host ) )
         {
             if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() )
-                    &&  mapping.getExternalPort() == externalPort
-                    && mapping.getInternalPort() == internalPort
-                    && mapping.getIpAddress().equalsIgnoreCase( ipAddress ) )
+                    && mapping.getExternalPort() == externalPort && mapping.getInternalPort() == internalPort && mapping
+                    .getIpAddress().equalsIgnoreCase( ipAddress ) )
             {
                 return true;
             }
@@ -560,7 +568,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
 
-        if ( isPortMappingReserved( host, protocol, rhPort, containerIp, containerPort ))
+        if ( isPortMappingReserved( host, protocol, rhPort, containerIp, containerPort ) )
         {
             return;
         }

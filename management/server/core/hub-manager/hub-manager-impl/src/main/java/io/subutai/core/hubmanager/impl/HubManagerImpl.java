@@ -306,6 +306,7 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                                      resourceHostRegisterProcessor )
                                                                              .addProcessor( commandProcessor )
                                                                              .addProcessor( productProcessor )
+                                                                             .addProcessor( proxyProcessor )
                                                                              .addProcessor( containerPortMapProcessor );
 
         heartbeatExecutorService

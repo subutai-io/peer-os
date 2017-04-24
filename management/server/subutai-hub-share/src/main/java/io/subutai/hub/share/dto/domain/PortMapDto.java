@@ -31,6 +31,8 @@ public class PortMapDto
 
     private String errorLog;
 
+    private String proxyIp;
+
 
     public PortMapDto()
     {
@@ -131,5 +133,17 @@ public class PortMapDto
     public void setDomain( final String domain )
     {
         this.domain = domain;
+    }
+
+
+    public String getProxyIp()
+    {
+        return proxyIp;
+    }
+
+
+    public void setProxyIp( final String proxyIp )
+    {
+        this.proxyIp = proxyIp;
     }
 }

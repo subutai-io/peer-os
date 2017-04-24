@@ -3,11 +3,19 @@ package io.subutai.hub.share.dto.domain;
 
 public class P2PInfoDto
 {
+    public enum State
+    {
+        COLLECT_P2P_SUBNETS, SETUP_TUNNEL, SETUP_PORT_MAP, READY, FAIED, DESTROY, WAIT
+    }
+
+
     private String subutaiId;
     private String containerId;
     private String rhId;
     private String intefaceName;
     private String p2pIp;
+    private State state;
+    private String logs;
 
 
     public P2PInfoDto()
@@ -70,8 +78,32 @@ public class P2PInfoDto
     }
 
 
+    public State getState()
+    {
+        return state;
+    }
+
+
+    public void setState( final State state )
+    {
+        this.state = state;
+    }
+
+
     public void setP2pIp( final String p2pIp )
     {
         this.p2pIp = p2pIp;
+    }
+
+
+    public String getLogs()
+    {
+        return logs;
+    }
+
+
+    public void setLogs( final String logs )
+    {
+        this.logs = logs;
     }
 }

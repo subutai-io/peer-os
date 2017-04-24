@@ -58,6 +58,12 @@ public class Commands
     }
 
 
+    RequestBuilder getRemoveP2PSwarmCommand( String p2pHash )
+    {
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.newArrayList( "-d", p2pHash ) ).withTimeout( 90 );
+    }
+
+
     RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( P2P_BINDING )
