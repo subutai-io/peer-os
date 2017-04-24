@@ -52,9 +52,7 @@ import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.processor.CommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
@@ -65,6 +63,7 @@ import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
+import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
@@ -287,9 +286,8 @@ public class HubManagerImpl implements HubManager, HostListener
         StateLinkProcessor resourceHostRegisterProcessor =
                 new ResourceHostRegisterProcessor( hostRegistrationManager, peerManager, restClient );
 
-        StateLinkProcessor commandProcessor = new CommandProcessor( ctx );
 
-        ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx);
+        ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
@@ -301,7 +299,6 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
-                                                                             .addProcessor( commandProcessor )
                                                                              .addProcessor( containerPortMapProcessor );
 
         heartbeatExecutorService
@@ -434,7 +431,6 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
-            //TODO FIX REST VERSIONING
             WebClient client = configManager
                     .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", configManager.getHubIp() );
 
