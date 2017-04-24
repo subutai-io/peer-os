@@ -567,11 +567,6 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
 
-        if ( isPortMappingReserved( host, protocol, rhPort, containerIp, containerPort ))
-        {
-            return;
-        }
-
         execute( host,
                 commands.getMapContainerPortToSpecificPortCommand( protocol, containerIp, containerPort, rhPort ) );
     }
