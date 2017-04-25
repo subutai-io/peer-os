@@ -243,12 +243,9 @@ public class EnvironmentUserHelper
         String url = String.format( baseHubTokenUrl, userTokenDto.getOwnerId() );
 
         User user = identityManager.getUser( userTokenDto.getSsUserId() );
+        //TODO need to update old TOKEN
+        identityManager.updateUserToken( userTokenDto.getTokenId(), user, userTokenDto.getToken(), null, null, TokenType.SESSION.getId(), userTokenDto.getValidDate());
         UserToken userToken = identityManager.getUserToken( user.getId() );
-        if ( userToken == null )
-        {
-            userToken = identityManager.createUserToken(user, null, null, null, TokenType.SESSION.getId(), null);
-        }
-        identityManager.updateUserToken( userToken );
 
         //set new token and valid date
         userTokenDto.setToken( userToken.getFullToken() );

@@ -73,7 +73,7 @@ public abstract class StateHandler
     {
         try
         {
-            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getEnvironmentInfo().getOwnerId() );
+            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub(String.valueOf(peerDto.getEnvironmentInfo().getHubId()));
             return userToken.getFullToken();
         }
         catch ( HubManagerException | PGPException | IOException e )

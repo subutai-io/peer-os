@@ -9,6 +9,8 @@ public class EnvironmentInfoDto
 {
     private String id;
 
+    private Long hubId;
+
     private String ownerId;
 
     private String name;
@@ -56,6 +58,14 @@ public class EnvironmentInfoDto
     public void setId( final String id )
     {
         this.id = id;
+    }
+
+    public Long getHubId() {
+        return hubId;
+    }
+
+    public void setHubId(Long hubId) {
+        this.hubId = hubId;
     }
 
     public String getOwnerId() {
