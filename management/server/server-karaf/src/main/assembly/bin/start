@@ -20,7 +20,6 @@
 
 rm -rf /opt/subutai-mng/data/cache/
 
-if [ "`grep -c '10.10.10.1 management gw.intra.lan' /etc/hosts`" == "0" ]; then echo "10.10.10.1 management gw.intra.lan" >> /etc/hosts; fi
 echo "management" > /etc/hostname
 
 # Line to add commands by autobuild (do not change it)
