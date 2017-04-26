@@ -15,7 +15,7 @@ public class EnvironmentPeerDto
     public enum PeerState
     {
         EXCHANGE_INFO, RESERVE_NETWORK, SETUP_TUNNEL, BUILD_CONTAINER, CONFIGURE_CONTAINER, CONFIGURE_DOMAIN,
-        CHANGE_CONTAINER_STATE, DELETE_PEER, WAIT, READY, ERROR
+        CHANGE_CONTAINER_STATE, CONFIGURE_ENVIRONMENT, DELETE_PEER, WAIT, READY, ERROR
     }
 
 
@@ -55,6 +55,10 @@ public class EnvironmentPeerDto
 
     @JsonInclude( JsonInclude.Include.NON_EMPTY )
     private Integer vlan;
+
+    private String ansible;
+
+    private String playbook;
 
 
     public EnvironmentPeerDto()
@@ -309,9 +313,35 @@ public class EnvironmentPeerDto
     }
 
 
+    public String getAnsible()
+    {
+        return ansible;
+    }
+
+
+    public void setAnsible( final String ansible )
+    {
+        this.ansible = ansible;
+    }
+
+
+    public String getPlaybook()
+    {
+        return playbook;
+    }
+
+
+    public void setPlaybook( final String playbook )
+    {
+        this.playbook = playbook;
+    }
+
+
     public void setError( String message )
     {
         setState( PeerState.ERROR );
         setMessage( message );
     }
+
+
 }
