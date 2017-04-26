@@ -3,6 +3,7 @@ package io.subutai.core.hubmanager.impl.environment.state;
 
 import io.subutai.core.hubmanager.impl.environment.state.build.BuildContainerStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ConfigureContainerStateHandler;
+import io.subutai.core.hubmanager.impl.environment.state.build.ConfigureEnvironmentStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ExchangeInfoStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ReserveNetworkStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.SetupTunnelStateHandler;
@@ -15,6 +16,7 @@ import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CHANGE_CONTAINER_STATE;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_CONTAINER;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_DOMAIN;
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_ENVIRONMENT;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.DELETE_PEER;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.EXCHANGE_INFO;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.RESERVE_NETWORK;
@@ -41,6 +43,8 @@ public class StateHandlerFactory
 
     private final StateHandler notFoundStateHandler;
 
+    private final StateHandler configureEnvironmentStateHandler;
+
 
     public StateHandlerFactory( Context ctx )
     {
@@ -61,6 +65,8 @@ public class StateHandlerFactory
         domainStateHandler = new DomainStateHandler( ctx );
 
         notFoundStateHandler = new NotFoundStateHandler( ctx );
+
+        configureEnvironmentStateHandler = new ConfigureEnvironmentStateHandler( ctx );
     }
 
 
@@ -99,6 +105,10 @@ public class StateHandlerFactory
         else if ( state == DELETE_PEER )
         {
             handler = deletePeerStateHandler;
+        }
+        else if ( state == CONFIGURE_ENVIRONMENT )
+        {
+            handler = configureEnvironmentStateHandler;
         }
 
         return handler;

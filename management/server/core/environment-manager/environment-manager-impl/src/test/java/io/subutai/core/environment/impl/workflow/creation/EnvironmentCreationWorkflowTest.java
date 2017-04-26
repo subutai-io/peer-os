@@ -146,6 +146,15 @@ public class EnvironmentCreationWorkflowTest
 
 
     @Test
+    public void testSET_QUOTA() throws Exception
+    {
+        workflow.SET_QUOTA();
+
+        verify( environmentManager, atLeastOnce() ).update( environment );
+    }
+
+
+    @Test
     public void testFINALIZE() throws Exception
     {
         workflow.FINALIZE();

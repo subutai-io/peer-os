@@ -8,6 +8,9 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.api.RestResult;
+import io.subutai.core.hubmanager.impl.processor.port_map.DestroyPortMap;
+import io.subutai.hub.share.dto.domain.ContainerPortMapDto;
+import io.subutai.hub.share.dto.domain.PortMapDto;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
@@ -66,6 +69,8 @@ public class ContainerStateHandler extends StateHandler
 
                         if ( nodeDto.getState().equals( ContainerStateDto.ABORTING ) )
                         {
+                            cleanPortMap( nodesDto.getEnvironmentId(), nodeDto.getContainerId() );
+
                             ctx.localPeer.destroyContainer( containerId );
 
                             nodeDto.setState( ContainerStateDto.FROZEN );
@@ -85,6 +90,28 @@ public class ContainerStateHandler extends StateHandler
         catch ( Exception e )
         {
             throw new HubManagerException( e );
+        }
+    }
+
+
+    private void cleanPortMap( String envId, String contId )
+    {
+        String url = "/rest/v1/environments/%s/containers/%s/ports/map";
+        try
+        {
+            RestResult<ContainerPortMapDto> result =
+                    ctx.restClient.get( String.format( url, envId, contId ), ContainerPortMapDto.class );
+
+            DestroyPortMap destroyPortMap = new DestroyPortMap( ctx );
+
+            for ( PortMapDto portMapDto : result.getEntity().getContainerPorts() )
+            {
+                destroyPortMap.deleteMap( portMapDto );
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
         }
     }
 
