@@ -18,6 +18,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -242,15 +243,21 @@ public class AppScaleManager
 
     private String getVlan( final AppScaleConfigDto config, ResourceHost resourceHost )
     {
+        try
+        {
+            ContainerHost ch = getContainerHost( config.getClusterName() );
 
-        ContainerHost ch = getContainerHost( config.getClusterName() );
+            NetworkResource resource =
+                    localPeer.getReservedNetworkResources().findByEnvironmentId( ch.getEnvironmentId().getId() );
 
-        CommandResult res =
-                TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + ch.getContainerName() + "/config" );
+            return resource.getVlan() + "";
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
+        }
 
-        Preconditions.checkNotNull( res );
-
-        return res.getStdOut().substring( 11, 14 );
+        return null;
     }
 
 
