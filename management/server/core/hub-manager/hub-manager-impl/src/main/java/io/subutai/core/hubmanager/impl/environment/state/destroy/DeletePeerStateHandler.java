@@ -161,7 +161,7 @@ public class DeletePeerStateHandler extends StateHandler
     {
         try
         {
-            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getOwnerId() );
+            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getSsUserId() );
             return userToken.getFullToken();
         }
         catch ( HubManagerException | PGPException | IOException e )

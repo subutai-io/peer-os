@@ -13,6 +13,8 @@ public class EnvironmentInfoDto
 
     private String ownerId;
 
+    private Long ssOwnerId;
+
     private String name;
 
     private String subnetCidr;
@@ -74,6 +76,14 @@ public class EnvironmentInfoDto
 
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public Long getSsOwnerId() {
+        return ssOwnerId;
+    }
+
+    public void setSsOwnerId(Long ssOwnerId) {
+        this.ssOwnerId = ssOwnerId;
     }
 
     public String getName()

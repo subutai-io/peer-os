@@ -209,9 +209,9 @@ public class EnvironmentUserHelper
     }
 
 
-    public UserToken getUserTokenFromHub( String ownerId ) throws HubManagerException, PGPException, IOException
+    public UserToken getUserTokenFromHub( Long ssUserId ) throws HubManagerException, PGPException, IOException
     {
-        String url = String.format( baseHubTokenUrl, ownerId );
+        String url = String.format( baseHubTokenUrl, ssUserId );
         RestResult<UserTokenDto> res = restClient.get( url, UserTokenDto.class );
 
         if ( res.getStatus() != HttpStatus.SC_OK && res.getStatus() != 204 )
@@ -244,7 +244,7 @@ public class EnvironmentUserHelper
 
         User user = identityManager.getUser( userTokenDto.getSsUserId() );
         UserToken userToken = identityManager.getUserToken( user.getId() );
-        identityManager.extendTokenTime( userToken, 30 );
+        identityManager.extendTokenTime( userToken, 0 ); //if 0 then it will set default general timeout
 
         //set new token and valid date
         userTokenDto.setToken( userToken.getFullToken() );

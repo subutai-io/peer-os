@@ -39,16 +39,17 @@ public class            ExchangeInfoStateHandler extends StateHandler
             {
                 token = ctx.identityManager
                         .createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
-
-                UserTokenDto userTokenDto = new UserTokenDto();
-                userTokenDto.setSsUserId(user.getId());
-                userTokenDto.setAuthId(user.getAuthId());
-                userTokenDto.setType( UserTokenDto.Type.ENV_USER );
-                userTokenDto.setToken(token.getFullToken());
-                userTokenDto.setTokenId(token.getTokenId());
-                userTokenDto.setValidDate(token.getValidDate());
-                resultDto.setUserToken( userTokenDto );
             }
+
+            UserTokenDto userTokenDto = new UserTokenDto();
+            userTokenDto.setSsUserId(user.getId());
+            userTokenDto.setEnvId(resultDto.getEnvironmentInfo().getHubId());
+            userTokenDto.setAuthId(user.getAuthId());
+            userTokenDto.setType( UserTokenDto.Type.ENV_USER );
+            userTokenDto.setToken(token.getFullToken());
+            userTokenDto.setTokenId(token.getTokenId());
+            userTokenDto.setValidDate(token.getValidDate());
+            resultDto.setUserToken( userTokenDto );
 
             logEnd();
 
@@ -86,7 +87,7 @@ public class            ExchangeInfoStateHandler extends StateHandler
     {
         try
         {
-            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getOwnerId() );
+            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getSsUserId() );
             return userToken.getFullToken();
         }
         catch ( HubManagerException | PGPException | IOException e )

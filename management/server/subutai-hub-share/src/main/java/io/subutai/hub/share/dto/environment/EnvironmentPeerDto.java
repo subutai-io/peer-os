@@ -25,6 +25,8 @@ public class EnvironmentPeerDto
 
     private String ownerId;
 
+    private Long ssUserId;
+
     private PeerState requestState;
 
     private Set<String> p2pSubnets = new HashSet<>();
@@ -113,6 +115,13 @@ public class EnvironmentPeerDto
         this.ownerId = ownerId;
     }
 
+    public Long getSsUserId() {
+        return ssUserId;
+    }
+
+    public void setSsUserId(Long ssUserId) {
+        this.ssUserId = ssUserId;
+    }
 
     public Set<String> getP2pSubnets()
     {

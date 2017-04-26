@@ -22,6 +22,8 @@ public class UserTokenDto
 
     private Long ssUserId;
 
+    private Long envId;
+
     private String authId;
 
     private String token;
@@ -40,11 +42,12 @@ public class UserTokenDto
     }
 
 
-    public UserTokenDto( final Long ownerId, final Long ssUserId, final String authId, final String token,
+    public UserTokenDto( final Long ownerId, final Long ssUserId, final Long envId, final String authId, final String token,
                          final String tokenId, final Date validDate )
     {
         this.ownerId = ownerId;
         this.ssUserId = ssUserId;
+        this.envId = envId;
         this.authId = authId;
         this.token = token;
         this.tokenId = tokenId;
@@ -94,8 +97,15 @@ public class UserTokenDto
         return tokenId;
     }
 
+    public Long getEnvId() {
+        return envId;
+    }
 
-    public void setTokenId( final String tokenId )
+    public void setEnvId(Long envId) {
+        this.envId = envId;
+    }
+
+    public void setTokenId(final String tokenId )
     {
         this.tokenId = tokenId;
     }
