@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -104,11 +105,11 @@ public class DomainStateHandler extends StateHandler
                                     else
                                     {
 
-                                        ResourceHost resourceHost = ctx.localPeer.getResourceHostByContainerId( nodeDto.getContainerId() );
+                                        ResourceHost resourceHost =
+                                                ctx.localPeer.getResourceHostByContainerId( nodeDto.getContainerId() );
 
-                                        CommandResult commandResult = TunnelHelper
-                                                .execute( resourceHost,
-                                                        format( TunnelProcessor.CREATE_TUNNEL_COMMAND, ip, port, "" ) );
+                                        CommandResult commandResult = TunnelHelper.execute( resourceHost,
+                                                format( TunnelProcessor.CREATE_TUNNEL_COMMAND, ip, port, "" ) );
                                         TunnelInfoDto tunnelInfoDto = TunnelHelper
                                                 .parseResult( "", commandResult.getStdOut(), null,
                                                         new TunnelInfoDto() );
@@ -164,7 +165,9 @@ public class DomainStateHandler extends StateHandler
 
         try
         {
-            File file = new File( "/opt/subutai-mng/data/tmp/" + env.getId() );
+            String certPath = System.getProperty( "java.io.tmpdir" ) + "/" + env.getId();
+
+            File file = new File( certPath );
             if ( !file.createNewFile() )
             {
                 log.info( "Domain ssl cert exists, overwriting..." );
@@ -172,7 +175,7 @@ public class DomainStateHandler extends StateHandler
 
             FileUtils.writeStringToFile( file, env.getSslCertPath() );
 
-            return "/mnt/lib/lxc/management/opt/subutai-mng/data/tmp/" + env.getId();
+            return Common.MANAGEMENT_HOSTNAME + ":" + certPath;
         }
         catch ( Exception e )
         {
