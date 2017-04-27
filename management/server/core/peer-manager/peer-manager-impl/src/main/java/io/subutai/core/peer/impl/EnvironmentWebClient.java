@@ -180,7 +180,7 @@ public class EnvironmentWebClient
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/state", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000L, 15000L, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -239,7 +239,7 @@ public class EnvironmentWebClient
             String path = String.format( "/%s/container/%s/quota", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
 
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000L, 15000L, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -493,7 +493,7 @@ public class EnvironmentWebClient
             String path = String.format( "/%s/container/%s/sshkeys", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
 
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000L, 15000L, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -790,7 +790,7 @@ public class EnvironmentWebClient
         {
             remotePeer.checkRelation();
             String path = String.format( "/%s/info/%s", environmentId, containerId );
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000, 15000, 1 );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000L, 15000L, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -819,9 +819,9 @@ public class EnvironmentWebClient
             remotePeer.checkRelation();
             String path = String.format( "/%s/containers/%s/template/%s/promote", containerId.getEnvironmentId(),
                     containerId.getId(), templateName );
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000,
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000L,
                     // 1 min for promote
-                    Common.TEMPLATE_PROMOTE_TIMEOUT_SEC * 1000, 1 );
+                    Common.TEMPLATE_PROMOTE_TIMEOUT_SEC * 1000L, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
