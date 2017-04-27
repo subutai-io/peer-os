@@ -1,11 +1,13 @@
 package io.subutai.common.host;
 
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
 
-public class Quota
+public class Quota implements Serializable
 {
     @SerializedName( "cpu" )
     @JsonProperty( "cpu" )
