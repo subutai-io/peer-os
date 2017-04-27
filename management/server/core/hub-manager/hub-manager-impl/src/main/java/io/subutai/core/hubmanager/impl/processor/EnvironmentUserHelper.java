@@ -87,6 +87,7 @@ public class EnvironmentUserHelper
         }
 
         identityManager.removeUser( user.getId() );
+        deleteUserToken( user.getId() );
 
         log.debug( "User deleted" );
     }
@@ -253,5 +254,11 @@ public class EnvironmentUserHelper
 
         restClient.post( url, userTokenDto );
         return userToken;
+    }
+
+    public void deleteUserToken ( Long userId )
+    {
+        String url = String.format( "/rest/v1/users/%s/token/delete", userId );
+        restClient.post( url, userId );
     }
 }
