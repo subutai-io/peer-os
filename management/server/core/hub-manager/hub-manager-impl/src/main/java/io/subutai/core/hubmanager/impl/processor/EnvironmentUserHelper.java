@@ -249,6 +249,7 @@ public class EnvironmentUserHelper
         //set new token and valid date
         userTokenDto.setToken( userToken.getFullToken() );
         userTokenDto.setValidDate( userToken.getValidDate() );
+        userTokenDto.setState( UserTokenDto.State.READY );
 
         restClient.post( url, userTokenDto );
         return userToken;

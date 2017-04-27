@@ -45,10 +45,11 @@ public class            ExchangeInfoStateHandler extends StateHandler
             userTokenDto.setSsUserId(user.getId());
             userTokenDto.setEnvId(resultDto.getEnvironmentInfo().getHubId());
             userTokenDto.setAuthId(user.getAuthId());
-            userTokenDto.setType( UserTokenDto.Type.ENV_USER );
             userTokenDto.setToken(token.getFullToken());
             userTokenDto.setTokenId(token.getTokenId());
             userTokenDto.setValidDate(token.getValidDate());
+            userTokenDto.setType( UserTokenDto.Type.ENV_USER );
+            userTokenDto.setState( UserTokenDto.State.READY );
             resultDto.setUserToken( userTokenDto );
 
             logEnd();
