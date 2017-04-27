@@ -505,15 +505,22 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( parts.countTokens() >= 4 )
             {
-                ReservedPortMapping mapping = new ReservedPortMapping();
+                try
+                {
+                    ReservedPortMapping mapping = new ReservedPortMapping();
 
-                mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
-                mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
-                mapping.setIpAddress( parts.nextToken() );
-                mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
-                mapping.setDomain( parts.hasMoreTokens() ? parts.nextToken() : null );
+                    mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
+                    mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
+                    mapping.setIpAddress( parts.nextToken() );
+                    mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
+                    mapping.setDomain( parts.hasMoreTokens() ? parts.nextToken() : null );
 
-                mappedPorts.add( mapping );
+                    mappedPorts.add( mapping );
+                }
+                catch ( NumberFormatException e )
+                {
+                    continue;
+                }
             }
         }
 
@@ -529,8 +536,9 @@ public class NetworkManagerImpl implements NetworkManager
         for ( final ReservedPortMapping mapping : getReservedPortMappings( host ) )
         {
             if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() )
-                    && mapping.getExternalPort() == externalPort && mapping.getInternalPort() == internalPort && mapping
-                    .getIpAddress().equalsIgnoreCase( ipAddress ) )
+                    &&  mapping.getExternalPort() == externalPort
+                    && mapping.getInternalPort() == internalPort
+                    && mapping.getIpAddress().equalsIgnoreCase( ipAddress ) )
             {
                 return true;
             }
@@ -567,11 +575,6 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
-
-        if ( isPortMappingReserved( host, protocol, rhPort, containerIp, containerPort ) )
-        {
-            return;
-        }
 
         execute( host,
                 commands.getMapContainerPortToSpecificPortCommand( protocol, containerIp, containerPort, rhPort ) );

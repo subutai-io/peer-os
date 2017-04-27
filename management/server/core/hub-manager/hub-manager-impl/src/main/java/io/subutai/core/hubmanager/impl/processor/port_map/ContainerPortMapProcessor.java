@@ -147,14 +147,16 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
             Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
 
-            if ( resourceHost.isManagementHost() )
+
+            if ( !protocol.isHttpOrHttps() )
             {
-                if ( protocol != Protocol.HTTP && protocol != Protocol.HTTPS )
-                {
-                    resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                            portMapDto.getExternalPort() );
-                }
-                else
+                resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                        portMapDto.getExternalPort() );
+            }
+            else
+            {
+                if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
+                        portMapDto.getInternalPort() ) )
                 {
                     resourceHost
                             .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
@@ -162,7 +164,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                                     LoadBalancing.ROUND_ROBIN );
                 }
             }
-            else
+
+            if ( !resourceHost.isManagementHost() )
             {
                 // Container resides on additional RH, that's why we need to forward traffic from MH to RH.
                 // On MH external port should be forwarded to same external port of RH, then on RH real
@@ -171,31 +174,19 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 ResourceHost mngHost = ctx.localPeer.getManagementHost();
                 String rhIpAddr = resourceHost.getInterfaceByName( "wan" ).getIp();
 
-                if ( protocol != Protocol.HTTP && protocol != Protocol.HTTPS )
+                if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
+                        portMapDto.getExternalPort() ) )
                 {
-                    if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
-                            portMapDto.getInternalPort() ) )
+                    if ( !protocol.isHttpOrHttps() )
                     {
                         mngHost.mapContainerPort( protocol, rhIpAddr, portMapDto.getExternalPort(),
                                 portMapDto.getExternalPort() );
                     }
-
-                    resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                            portMapDto.getExternalPort() );
-                }
-                else
-                {
-                    if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
-                            portMapDto.getInternalPort() ) )
+                    else
                     {
                         mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
                                 portMapDto.getExternalPort(), portMapDto.getDomain(), null, LoadBalancing.ROUND_ROBIN );
                     }
-
-                    resourceHost
-                            .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                                    portMapDto.getExternalPort(), portMapDto.getDomain(), null,
-                                    LoadBalancing.ROUND_ROBIN );
                 }
             }
 
