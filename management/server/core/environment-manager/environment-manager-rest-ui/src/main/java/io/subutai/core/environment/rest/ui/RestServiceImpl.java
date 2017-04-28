@@ -563,8 +563,8 @@ public class RestServiceImpl implements RestService
 
                 attr.transferTo( file );
 
-                // prefix path to get full container path from RH
-                path = "/mnt/lib/lxc/management/" + certPath;
+                // prefix path to enable agent auto-prepend full path from RH to cert location
+                path = Common.MANAGEMENT_HOSTNAME + ":" + certPath;
             }
             catch ( Exception e )
             {

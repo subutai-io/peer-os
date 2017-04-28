@@ -202,9 +202,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private ObjectMapper mapper = new ObjectMapper();
     volatile boolean initialized = false;
     PeerInfo peerInfo;
-    private ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
-    ExecutorService threadPool = Executors.newCachedThreadPool();
-    private Set<LocalPeerEventListener> peerEventListeners = Sets.newHashSet();
+    private transient ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
+    private transient ExecutorService threadPool = Executors.newCachedThreadPool();
+    private transient Set<LocalPeerEventListener> peerEventListeners = Sets.newHashSet();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, CommandExecutor commandExecutor,
@@ -269,7 +269,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     removeStaleContainers();
                 }
-            }, TimeUnit.MINUTES.toSeconds( 3 ), HostRegistry.HOST_EXPIRATION_SEC * 2, TimeUnit.SECONDS );
+            }, TimeUnit.MINUTES.toSeconds( 3L ), HostRegistry.HOST_EXPIRATION_SEC * 2L, TimeUnit.SECONDS );
         }
         catch ( Exception e )
         {
@@ -3505,7 +3505,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 boolean isContainerEligibleForRemoval = containerHost.getState() == ContainerHostState.UNKNOWN
                         && ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost ).getLastHeartbeat() )
-                        > TimeUnit.SECONDS.toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2 )
+                        > TimeUnit.SECONDS.toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2L )
                         && !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHost.getHostname() );
 
                 if ( !isContainerEligibleForRemoval )
