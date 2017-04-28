@@ -60,7 +60,7 @@ public class SessionManagerImpl implements SessionManager
             {
                 try
                 {
-                    removeInvalidTokens();
+//                    removeInvalidTokens();
                     invalidateSessions( null );
                 }
                 catch ( Exception e )

@@ -1922,6 +1922,10 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void extendTokenTime( UserToken token, int minutes )
     {
+        if ( minutes == 0 )
+        {
+            minutes = sessionManager.getSessionTimeout();
+        }
         token.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), minutes ) );
         identityDataService.updateUserToken( token );
     }
@@ -1941,10 +1945,10 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
-    public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
+    public void updateUserToken( String tokenId, User user, String token, String secret, String issuer, int tokenType,
                                  Date validDate )
     {
-        identityDataService.removeUserToken( oldName );
+        identityDataService.removeUserToken( tokenId );
         createUserToken( user, token, secret, issuer, tokenType, validDate );
     }
 
