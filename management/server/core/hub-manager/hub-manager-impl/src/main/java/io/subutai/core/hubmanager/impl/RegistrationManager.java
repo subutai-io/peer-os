@@ -102,13 +102,11 @@ public class RegistrationManager
 
         RegistrationDto dto = new RegistrationDto( PGPKeyHelper.getFingerprint( configManager.getOwnerPublicKey() ) );
         User activeUser = configManager.getActiveUser();
-        UserToken token = configManager.getPermanentToken();
+        UserToken token = configManager.getUserToken();
 
         dto.setOwnerEmail( email );
         dto.setOwnerPassword( password );
         dto.setPeerInfo( peerInfoDto );
-        dto.setTemp1( activeUser.getFingerprint() );
-//        dto.setOwnerId( activeUser.getId() );
 
         UserTokenDto userTokenDto =
                 new UserTokenDto( null, activeUser.getId(), null, activeUser.getAuthId(), token.getFullToken(),

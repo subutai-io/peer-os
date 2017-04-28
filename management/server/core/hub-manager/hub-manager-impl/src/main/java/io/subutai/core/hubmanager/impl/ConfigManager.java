@@ -147,7 +147,7 @@ public class ConfigManager
     }
 
 
-    public UserToken getPermanentToken()
+    public UserToken getUserToken()
     {
         User user = identityManager.getActiveUser();
         return identityManager.createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
