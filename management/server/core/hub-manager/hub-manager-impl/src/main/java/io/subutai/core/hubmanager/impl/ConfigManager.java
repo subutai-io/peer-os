@@ -10,6 +10,8 @@ import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -32,6 +34,8 @@ import io.subutai.hub.share.pgp.message.PGPMessenger;
 
 public class ConfigManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( ConfigManager.class.getName() );
+
     private static final int HUB_PORT = 444;
 
     private IdentityManager identityManager;
@@ -143,13 +147,10 @@ public class ConfigManager
     }
 
 
-    public UserToken getPermanentToken()
+    public UserToken getUserToken()
     {
-
         User user = identityManager.getActiveUser();
-
-        //TODO review to make this temporary renewable token
-        return identityManager.createUserToken( user, null, null, null, TokenType.PERMANENT.getId(), null );
+        return identityManager.createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
     }
 
 

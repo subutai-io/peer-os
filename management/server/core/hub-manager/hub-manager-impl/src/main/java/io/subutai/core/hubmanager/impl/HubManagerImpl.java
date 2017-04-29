@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.hubmanager.impl.processor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -293,6 +294,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ProxyProcessor proxyProcessor = new ProxyProcessor(configManager, peerManager, restClient);
 
+        UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx);
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( tunnelProcessor )
@@ -304,7 +307,9 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
                                                                              .addProcessor( proxyProcessor )
-                                                                             .addProcessor( containerPortMapProcessor );
+                                                                             .addProcessor( containerPortMapProcessor )
+                                                                             .addProcessor( containerPortMapProcessor )
+                                                                             .addProcessor( userTokenProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,

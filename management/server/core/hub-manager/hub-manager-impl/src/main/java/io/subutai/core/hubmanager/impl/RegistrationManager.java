@@ -20,9 +20,11 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
+import io.subutai.hub.share.dto.UserTokenDto;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
 import static java.lang.String.format;
@@ -99,16 +101,18 @@ public class RegistrationManager
         peerInfoDto.setName( peerName );
 
         RegistrationDto dto = new RegistrationDto( PGPKeyHelper.getFingerprint( configManager.getOwnerPublicKey() ) );
+        User activeUser = configManager.getActiveUser();
+        UserToken token = configManager.getUserToken();
 
         dto.setOwnerEmail( email );
         dto.setOwnerPassword( password );
         dto.setPeerInfo( peerInfoDto );
-        dto.setTemp1( configManager.getActiveUser().getFingerprint() );
 
-        UserToken token = configManager.getPermanentToken();
-
-        dto.setToken( token.getFullToken() );
-        dto.setTokenId( configManager.getActiveUser().getAuthId() );
+        UserTokenDto userTokenDto =
+                new UserTokenDto( null, activeUser.getId(), null, activeUser.getAuthId(), token.getFullToken(),
+                        token.getTokenId(), token.getValidDate() );
+        userTokenDto.setType( UserTokenDto.Type.USER );
+        dto.setUserToken( userTokenDto );
 
         return dto;
     }
