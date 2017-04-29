@@ -9,7 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Protocol;
+import io.subutai.common.protocol.ReservedPort;
+import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -91,7 +94,15 @@ public class ProxyProcessor implements StateLinkProcessor
                 case SETUP_PORT_MAP:
                     break;
                 case DESTROY:
-                    destroyTunnel( proxyDto, stateLink );
+                    try
+                    {
+                        destroyTunnel( proxyDto, stateLink );
+                    }
+                    catch ( Exception e )
+                    {
+                        log.info( e.getMessage() );
+                    }
+
                     break;
                 case READY:
                     wrongState( proxyDto );
@@ -124,25 +135,62 @@ public class ProxyProcessor implements StateLinkProcessor
     }
 
 
-    private void destroyTunnel( ProxyDto proxyDto, String stateLink )
+    private void destroyTunnel( ProxyDto proxyDto, String stateLink ) throws Exception
     {
         for ( P2PInfoDto p2PInfoDto : proxyDto.getP2PInfoDtos() )
         {
             if ( p2PInfoDto.getRhId() != null && p2PInfoDto.getState().equals( P2PInfoDto.State.DESTROY ) )
             {
-                try
-                {
-                    ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( p2PInfoDto.getRhId() );
-                    resourceHost.removeP2PSwarm( proxyDto.getP2pHash() );
-                }
-                catch ( Exception e )
-                {
-                    log.error( e.getMessage() );
-                }
+
+                ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( p2PInfoDto.getRhId() );
+
+                cleanPortMap( resourceHost, p2PInfoDto );
+
+                resourceHost.removeP2PSwarm( proxyDto.getP2pHash() );
             }
         }
 
         sendDataToHub( proxyDto, stateLink );
+    }
+
+
+    private void cleanPortMap( ResourceHost resourceHost, P2PInfoDto p2PInfoDto )
+    {
+        ReservedPorts reservedPorts = null;
+        try
+        {
+            reservedPorts = resourceHost.getContainerPortMappings( Protocol.TCP );
+
+            for ( ReservedPort reservedPort : reservedPorts.getReservedPorts() )
+            {
+                if ( reservedPort.getContainerIpPort() != null && !reservedPort.getContainerIpPort().isEmpty() )
+                {
+                    if ( reservedPort.getContainerIpPort().contains( p2PInfoDto.getP2pIp() ) )
+                    {
+                        //Protocol protocol, String containerIp, int containerPort, int rhPort
+                        resourceHost
+                                .removeContainerPortMapping( Protocol.TCP, getIp( reservedPort.getContainerIpPort() ),
+                                        getPort( reservedPort.getContainerIpPort() ), reservedPort.getPort() );
+                    }
+                }
+            }
+        }
+        catch ( ResourceHostException e )
+        {
+            log.error( e.getMessage() );
+        }
+    }
+
+
+    private String getIp( final String ipPort )
+    {
+        return ipPort.split( ":" )[0];
+    }
+
+
+    private int getPort( final String ipPort )
+    {
+        return Integer.valueOf( ipPort.split( ":" )[1] );
     }
 
 
@@ -187,7 +235,7 @@ public class ProxyProcessor implements StateLinkProcessor
                 }
             }
 
-//            sendDataToHub( proxyDto, stateLink );
+            //            sendDataToHub( proxyDto, stateLink );
         }
         catch ( Exception e )
         {
