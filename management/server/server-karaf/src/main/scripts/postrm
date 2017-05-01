@@ -16,3 +16,5 @@ if [ "$1" = "purge" ]; then
 	fi
 fi
 # End code copied from dh_systemd_enable ------------------
+
+if test -f /opt/subutai-mng/lock; then rm /opt/subutai-mng/lock; fi
