@@ -811,6 +811,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 Template template = templateManager.getTemplate( templateId );
 
+                if ( template == null )
+                {
+                    throw new PeerException( String.format( "Template `%s` not found.", templateId ) );
+                }
                 HostUtil.Task<Object> importTask =
                         new ImportTemplateTask( template, resourceHost, request.getEnvironmentId(),
                                 request.getKurjunToken() );
@@ -881,7 +885,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                 request.getContainerQuota() );
 
                 registerContainer( request.getResourceHostId(), containerHostEntity );
-
             }
         }
 
