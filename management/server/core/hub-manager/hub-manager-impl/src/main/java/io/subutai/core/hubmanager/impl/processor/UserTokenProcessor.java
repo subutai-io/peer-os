@@ -1,51 +1,49 @@
-package io.subutai.core.hubmanager.impl.environment;
+package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.subutai.core.identity.api.model.UserToken;
+import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
-import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandlerFactory;
-import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.hub.share.dto.UserTokenDto;
 
 
-public class HubEnvironmentProcessor implements StateLinkProcessor
+public class UserTokenProcessor implements StateLinkProcessor
 {
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
-
-    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final Context ctx;
 
     private final StateHandlerFactory handlerFactory;
 
-    private final String linkPattern;
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
 
-    public HubEnvironmentProcessor( Context ctx )
+    public UserTokenProcessor( Context ctx )
     {
         this.ctx = ctx;
 
         handlerFactory = new StateHandlerFactory( ctx );
-
-        linkPattern = "/rest/v1/environments/.*/peers/" + ctx.localPeer.getId();
     }
 
 
     @Override
-    public synchronized boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         boolean fastMode = false;
 
         for ( String link : stateLinks )
         {
-            if ( link.matches( linkPattern ) )
+            if ( link.contains( "token" ) )
             {
                 fastMode = true;
 
@@ -55,7 +53,6 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
         return fastMode;
     }
-
 
     private void processStateLink( String link ) throws HubManagerException
     {
@@ -72,15 +69,16 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
         try
         {
-            EnvironmentPeerDto peerDto = ctx.restClient.getStrict( link, EnvironmentPeerDto.class );
-
-            StateHandler handler = handlerFactory.getHandler( peerDto.getState() );
-
-            handler.handle( peerDto );
+            UserTokenDto userTokenDto = ctx.restClient.getStrict( link, UserTokenDto.class );
+            if (userTokenDto != null)
+            {
+                //This process will get token, updates if expired
+                ctx.envUserHelper.getUserTokenFromHub( userTokenDto.getSsUserId() );
+            }
         }
-        catch ( Exception e )
+        catch ( HubManagerException | PGPException | IOException e )
         {
-                throw new HubManagerException( e );
+            log.error( e.getMessage() );
         }
         finally
         {

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
+import org.omg.CORBA.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,8 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -122,23 +125,32 @@ public class AppScaleManager
 
         try
         {
-            ResourceHost resourceHostByContainerId = localPeer.getResourceHostByContainerId( containerHost.getId() );
+            ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
+            String sslCertPath = getSSLCertPath( config );
 
-            String vlanString = getVlan( config, resourceHostByContainerId );
+            Long vni = getVni( config );
 
-            resourceHostByContainerId.execute( new RequestBuilder( "subutai proxy del " + vlanString + " -d" ) );
-
-            resourceHostByContainerId.execute( new RequestBuilder(
-                    "subutai proxy add " + vlanString + " -d \"*." + config.getUserDomain() + "\" -f /mnt/lib/lxc/"
-                            + config.getClusterName() + "/rootfs/etc/nginx/ssl.pem" ) );
-
-            resourceHostByContainerId
-                    .execute( new RequestBuilder( "subutai proxy add " + vlanString + " -h " + ipAddress ) );
+            if ( vni != 0 )
+            {
+                localPeer.removeVniDomain( vni );
+                localPeer.setVniDomain( vni, "*." + config.getUserDomain().trim(), balanceStrategy, sslCertPath );
+                localPeer.addIpToVniDomain( ipAddress, vni );
+            }
+            else
+            {
+                log.error( "Error getting vni");
+            }
         }
         catch ( Exception e )
         {
             log.error( "Error to set proxy settings: ", e );
         }
+    }
+
+
+    private String getSSLCertPath( final AppScaleConfigDto config )
+    {
+        return config.getClusterName() + ":/etc/nginx/ssl.pem";
     }
 
 
@@ -195,118 +207,24 @@ public class AppScaleManager
     }
 
 
-    void createTunnel( String link, final AppScaleConfigDto config, ConfigManager configManager )
+    private Long getVni( final AppScaleConfigDto config )
     {
-        TunnelInfoDto tunnelInfoDto = config.getTunnelInfoDto();
-
-        String cmd = "subutai tunnel add %s:%s %s -g";
-
-        ResourceHost resourceHost = getResourceHost( config );
-
-
-        CommandResult commandResult = TunnelHelper.execute( resourceHost,
-                String.format( cmd, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(), "" ) );
-
-        Preconditions.checkNotNull( commandResult );
-
-        tunnelInfoDto = TunnelHelper.parseResult( link, commandResult.getStdOut(), configManager, tunnelInfoDto );
-
-        Preconditions.checkNotNull( tunnelInfoDto );
-
-        tunnelInfoDto.setTunnelStatus( TunnelInfoDto.TunnelStatus.READY );
-
-        String tunnelLink = link + "/tunnel";
-
-        String vlanString = null;
         try
         {
-            vlanString = getVlan( config, resourceHost );
+            ContainerHost ch = getContainerHost( config.getClusterName() );
+
+            NetworkResource resource =
+                    localPeer.getReservedNetworkResources().findByEnvironmentId( ch.getEnvironmentId().getId() );
+
+            return resource.getVni();
         }
         catch ( Exception e )
-        {
-            log.error( "Error getting vlan : {}", e.getMessage() );
-        }
-
-        String revpx = "sed -i -e 's/https:\\/\\/$host$request_uri/https:\\/\\/$host:%s$request_uri/g' "
-                + "/var/lib/apps/subutai/current/nginx-includes/%s.conf";
-
-        String port = tunnelInfoDto.getOpenedPort().replaceAll( "\\n", "" );
-        String ccmd = String.format( revpx, port, vlanString ).replaceAll( "\\n", "" );
-        TunnelHelper.execute( resourceHost, ccmd );
-
-        TunnelHelper.execute( resourceHost, "systemctl restart *nginx*" );
-
-        updateTunnelStatus( tunnelLink, tunnelInfoDto, configManager );
-    }
-
-
-    private String getVlan( final AppScaleConfigDto config, ResourceHost resourceHost )
-    {
-
-        ContainerHost ch = getContainerHost( config.getClusterName() );
-
-        CommandResult res =
-                TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + ch.getContainerName() + "/config" );
-
-        Preconditions.checkNotNull( res );
-
-        return res.getStdOut().substring( 11, 14 );
-    }
-
-
-    private ResourceHost getResourceHost( final AppScaleConfigDto config )
-    {
-        ContainerHost containerHost = null;
-        ResourceHost resourceHost = null;
-        try
-        {
-
-            Set<ContainerHost> chs = localPeer.findContainersByEnvironmentId( config.getEnvironmentId() );
-            for ( ContainerHost containerHost1 : chs )
-            {
-                if ( containerHost1.getContainerName()
-                                   .equals( getContainerHost( config.getClusterName() ).getContainerName() ) )
-                {
-                    containerHost = containerHost1;
-                    break;
-                }
-            }
-            if ( containerHost != null )
-            {
-                resourceHost = localPeer.getResourceHostByContainerId( containerHost.getId() );
-            }
-        }
-        catch ( HostNotFoundException e )
         {
             log.error( e.getMessage() );
         }
 
-        return resourceHost;
+        return 0l;
     }
 
 
-    private Response updateTunnelStatus( String link, TunnelInfoDto tunnelInfoDto, ConfigManager configManager )
-    {
-        WebClient client = null;
-        try
-        {
-            client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
-            byte[] cborData = JsonUtil.toCbor( tunnelInfoDto );
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            return client.post( encryptedData );
-        }
-        catch ( Exception e )
-        {
-            String mgs = "Could not sent tunnel peer data to hub.";
-            log.error( mgs, e.getMessage() );
-            return null;
-        }
-        finally
-        {
-            if ( client != null )
-            {
-                client.close();
-            }
-        }
-    }
 }

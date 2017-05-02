@@ -383,7 +383,7 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
+    public void updateUserToken( String tokenId, User user, String token, String secret, String issuer, int tokenType,
                                  Date validDate );
 
 

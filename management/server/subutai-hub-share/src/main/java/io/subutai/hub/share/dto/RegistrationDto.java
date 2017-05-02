@@ -1,5 +1,6 @@
 package io.subutai.hub.share.dto;
 
+
 public class RegistrationDto
 {
     private String ownerFingerprint;
@@ -10,11 +11,7 @@ public class RegistrationDto
 
     private PeerInfoDto peerInfo;
 
-    private String token;
-
-    private String tokenId;
-
-    private String temp1;
+    private UserTokenDto userToken;
 
 
     public RegistrationDto()
@@ -45,7 +42,8 @@ public class RegistrationDto
         this.peerInfo = peerInfo;
     }
 
-    public void setPeerVersion( final String version)
+
+    public void setPeerVersion( final String version )
     {
         this.peerInfo.setVersion( version );
     }
@@ -81,38 +79,15 @@ public class RegistrationDto
     }
 
 
-    public String getToken()
+    public UserTokenDto getUserToken()
     {
-        return token;
+        return userToken;
     }
 
 
-    public void setToken( final String token )
+    public void setUserToken( final UserTokenDto userToken )
     {
-        this.token = token;
+        this.userToken = userToken;
     }
 
-
-    public String getTokenId()
-    {
-        return tokenId;
-    }
-
-
-    public void setTokenId( final String tokenId )
-    {
-        this.tokenId = tokenId;
-    }
-
-
-    public String getTemp1()
-    {
-        return temp1;
-    }
-
-
-    public void setTemp1( final String temp1 )
-    {
-        this.temp1 = temp1;
-    }
 }

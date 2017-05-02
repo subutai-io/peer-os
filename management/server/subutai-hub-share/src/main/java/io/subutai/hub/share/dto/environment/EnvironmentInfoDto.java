@@ -9,6 +9,12 @@ public class EnvironmentInfoDto
 {
     private String id;
 
+    private Long hubId;
+
+    private String ownerId;
+
+    private Long ssOwnerId;
+
     private String name;
 
     private String subnetCidr;
@@ -37,8 +43,6 @@ public class EnvironmentInfoDto
 
     private String VEHS;
 
-    private String ownerToken;
-
     private Set<SSHKeyDto> sshKeys = new HashSet<>();
 
 
@@ -58,6 +62,29 @@ public class EnvironmentInfoDto
         this.id = id;
     }
 
+    public Long getHubId() {
+        return hubId;
+    }
+
+    public void setHubId(Long hubId) {
+        this.hubId = hubId;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public Long getSsOwnerId() {
+        return ssOwnerId;
+    }
+
+    public void setSsOwnerId(Long ssOwnerId) {
+        this.ssOwnerId = ssOwnerId;
+    }
 
     public String getName()
     {
@@ -244,15 +271,4 @@ public class EnvironmentInfoDto
         this.sslCertPath = sslCertPath;
     }
 
-
-    public String getOwnerToken()
-    {
-        return ownerToken;
-    }
-
-
-    public void setOwnerToken( final String ownerToken )
-    {
-        this.ownerToken = ownerToken;
-    }
 }

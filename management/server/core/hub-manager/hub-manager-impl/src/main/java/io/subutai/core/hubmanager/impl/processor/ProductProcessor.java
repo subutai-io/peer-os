@@ -221,8 +221,8 @@ public class ProductProcessor implements StateLinkProcessor
     private ProductDtoV1_2 getProductDataDTO( final String productId ) throws HubManagerException
     {
         ProductDtoV1_2 result = null;
-        //TODO FIX REST VERSIONING
-        String path = String.format( "/rest/v1.2/marketplace/products/%s", productId );
+
+        String path = String.format( "/rest/v1/marketplace/products/%s", productId );
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
