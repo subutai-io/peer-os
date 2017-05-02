@@ -364,9 +364,9 @@ public class HubManagerImpl implements HubManager, HostListener
 
         generateChecksum();
 
-        notifyRegistrationListeners();
-
         sendResourceHostInfo();
+
+        notifyRegistrationListeners();
 
         registrationRequestProcessor.run();
 
