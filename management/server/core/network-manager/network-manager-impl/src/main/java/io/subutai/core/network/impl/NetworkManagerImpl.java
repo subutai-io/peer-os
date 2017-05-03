@@ -32,7 +32,6 @@ import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -405,7 +404,7 @@ public class NetworkManagerImpl implements NetworkManager
         execute( getManagementHost(), commands.getRemoveVlanDomainCommand( proxyConfig.getVlan() ) );
         execute( getManagementHost(), commands.getSetVlanDomainCommand( proxyConfig.getVlan(), proxyConfig.getDomain(),
                 ProxyLoadBalanceStrategy.NONE,
-                String.format( "/mnt/lib/lxc/%s/rootfs/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
+                String.format( " %s:/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
         execute( getManagementHost(), commands.getAddIpToVlanDomainCommand(
                 containerHost.getIp() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
                 proxyConfig.getVlan() ) );
@@ -527,9 +526,8 @@ public class NetworkManagerImpl implements NetworkManager
         for ( final ReservedPortMapping mapping : getReservedPortMappings( host ) )
         {
             if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() )
-                    &&  mapping.getExternalPort() == externalPort
-                    && mapping.getInternalPort() == internalPort
-                    && mapping.getIpAddress().equalsIgnoreCase( ipAddress ) )
+                    && mapping.getExternalPort() == externalPort && mapping.getInternalPort() == internalPort && mapping
+                    .getIpAddress().equalsIgnoreCase( ipAddress ) )
             {
                 return true;
             }
@@ -596,6 +594,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
         Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
+        //for https protocol there always must be an SSL cert specified
+        Preconditions.checkArgument( protocol == Protocol.HTTP || !Strings.isNullOrEmpty( sslCertPath ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );

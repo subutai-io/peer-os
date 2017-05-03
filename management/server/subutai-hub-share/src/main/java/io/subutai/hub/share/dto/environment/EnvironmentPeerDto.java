@@ -4,10 +4,10 @@ package io.subutai.hub.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.subutai.hub.share.dto.PublicKeyContainer;
+import io.subutai.hub.share.dto.UserTokenDto;
 
 
 public class EnvironmentPeerDto
@@ -24,6 +24,8 @@ public class EnvironmentPeerDto
     private EnvironmentInfoDto environmentInfo;
 
     private String ownerId;
+
+    private Long ssUserId;
 
     private PeerState requestState;
 
@@ -47,13 +49,7 @@ public class EnvironmentPeerDto
 
     private Set<EnvironmentPeerRHDto> rhs = new HashSet<>();
 
-    private String peerToken;
-
-    private String peerTokenId;
-
-    private String envOwnerToken;
-
-    private String envOwnerTokenId;
+    private UserTokenDto userToken;
 
     private String message;
 
@@ -61,7 +57,7 @@ public class EnvironmentPeerDto
     private Integer vlan;
 
     private String ansible;
-    
+
     private String playbook;
 
 
@@ -123,6 +119,13 @@ public class EnvironmentPeerDto
         this.ownerId = ownerId;
     }
 
+    public Long getSsUserId() {
+        return ssUserId;
+    }
+
+    public void setSsUserId(Long ssUserId) {
+        this.ssUserId = ssUserId;
+    }
 
     public Set<String> getP2pSubnets()
     {
@@ -274,51 +277,15 @@ public class EnvironmentPeerDto
     }
 
 
-    public String getPeerToken()
+    public UserTokenDto getUserToken()
     {
-        return peerToken;
+        return userToken;
     }
 
 
-    public void setPeerToken( final String peerToken )
+    public void setUserToken( final UserTokenDto userToken )
     {
-        this.peerToken = peerToken;
-    }
-
-
-    public String getEnvOwnerToken()
-    {
-        return envOwnerToken;
-    }
-
-
-    public void setEnvOwnerToken( final String envOwnerToken )
-    {
-        this.envOwnerToken = envOwnerToken;
-    }
-
-
-    public String getPeerTokenId()
-    {
-        return peerTokenId;
-    }
-
-
-    public void setPeerTokenId( final String peerTokenId )
-    {
-        this.peerTokenId = peerTokenId;
-    }
-
-
-    public String getEnvOwnerTokenId()
-    {
-        return envOwnerTokenId;
-    }
-
-
-    public void setEnvOwnerTokenId( final String envOwnerTokenId )
-    {
-        this.envOwnerTokenId = envOwnerTokenId;
+        this.userToken = userToken;
     }
 
 

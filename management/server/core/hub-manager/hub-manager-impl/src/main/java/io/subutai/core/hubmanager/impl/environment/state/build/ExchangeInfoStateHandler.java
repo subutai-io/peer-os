@@ -8,10 +8,14 @@ import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
+import io.subutai.hub.share.dto.UserTokenDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import org.bouncycastle.openpgp.PGPException;
+
+import java.io.IOException;
 
 
-public class ExchangeInfoStateHandler extends StateHandler
+public class            ExchangeInfoStateHandler extends StateHandler
 {
     public ExchangeInfoStateHandler( Context ctx )
     {
@@ -33,12 +37,20 @@ public class ExchangeInfoStateHandler extends StateHandler
             UserToken token = ctx.identityManager.getUserToken( user.getId() );
             if ( token == null )
             {
-                //TODO review to make this temporary renewable token
                 token = ctx.identityManager
-                        .createUserToken( user, null, null, null, TokenType.PERMANENT.getId(), null );
+                        .createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
             }
-            resultDto.setEnvOwnerToken( token.getFullToken() );
-            resultDto.setEnvOwnerTokenId( user.getAuthId() );
+
+            UserTokenDto userTokenDto = new UserTokenDto();
+            userTokenDto.setSsUserId(user.getId());
+            userTokenDto.setEnvId(resultDto.getEnvironmentInfo().getHubId());
+            userTokenDto.setAuthId(user.getAuthId());
+            userTokenDto.setToken(token.getFullToken());
+            userTokenDto.setTokenId(token.getTokenId());
+            userTokenDto.setValidDate(token.getValidDate());
+            userTokenDto.setType( UserTokenDto.Type.ENV_USER );
+            userTokenDto.setState( UserTokenDto.State.READY );
+            resultDto.setUserToken( userTokenDto );
 
             logEnd();
 
@@ -69,5 +81,20 @@ public class ExchangeInfoStateHandler extends StateHandler
         {
             throw new HubManagerException( e );
         }
+    }
+
+    @Override
+    protected String getToken( EnvironmentPeerDto peerDto )
+    {
+        try
+        {
+            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getSsUserId() );
+            return userToken.getFullToken();
+        }
+        catch ( HubManagerException | PGPException | IOException e )
+        {
+            log.error( e.getMessage() );
+        }
+        return null;
     }
 }

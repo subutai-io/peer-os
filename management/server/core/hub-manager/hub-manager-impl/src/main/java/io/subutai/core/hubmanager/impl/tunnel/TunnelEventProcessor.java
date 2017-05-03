@@ -181,11 +181,11 @@ public class TunnelEventProcessor extends HubRequester
     private Map<Long, String> parseResult( String result )
     {
         Map<Long, String> tunnelCache = new TreeMap<>();
-        String[] ipArray = result.split( "\n" );
+        String[] ipArray = result.split( "\\n" );
 
         for ( String ipPort : ipArray )
         {
-            String[] tunnelData = ipPort.split( " " );
+            String[] tunnelData = ipPort.split( "\\t" );
             tunnelCache.put( Long.valueOf( tunnelData[2] ), tunnelData[0] );
         }
 

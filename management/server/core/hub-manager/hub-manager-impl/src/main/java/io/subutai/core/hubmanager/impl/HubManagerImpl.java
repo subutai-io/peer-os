@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.hubmanager.impl.processor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -289,6 +290,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
+        UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx);
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( tunnelProcessor )
@@ -299,7 +302,8 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
-                                                                             .addProcessor( containerPortMapProcessor );
+                                                                             .addProcessor( containerPortMapProcessor )
+                                                                             .addProcessor( userTokenProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -360,9 +364,9 @@ public class HubManagerImpl implements HubManager, HostListener
 
         generateChecksum();
 
-        notifyRegistrationListeners();
-
         sendResourceHostInfo();
+
+        notifyRegistrationListeners();
 
         registrationRequestProcessor.run();
 
@@ -432,7 +436,7 @@ public class HubManagerImpl implements HubManager, HostListener
         try
         {
             WebClient client = configManager
-                    .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", configManager.getHubIp() );
+                    .getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", configManager.getHubIp() );
 
             Response r = client.get();
 
