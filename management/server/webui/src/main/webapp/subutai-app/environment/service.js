@@ -32,15 +32,6 @@ function environmentService($http, $q) {
 
 	var TENANTS_URL = ENVIRONMENTS_URL + 'tenants';
 
-	// @todo workaround for kurjun to return categorized templates
-	var categories = {
-		'apps' : [ 'zabbix', 'webdemo', 'kurjun', 'mysite', 'apache', 'ceph', 'management' ],
-		'bigdata' : [ 'mongo', 'storm', 'zookeeper', 'kurjun', 'elasticsearch', 'ceph', 'cassandra', 'solr', 'hadoop' ],
-		'packages' : [ 'master', 'openjre7', 'debian' ],
-		'own' : [],
-		'other' : [ 'master' ]
-	};
-
 
 	var environmentService = {
 		getTemplates: getTemplates,
@@ -117,22 +108,24 @@ function environmentService($http, $q) {
         return $http.get(VERIFIED_TEMPLATE_URL + name, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
-	// @todo workaround for kurjun to return categorized templates
 	function getTemplates() {
 		var callF = $q.defer();
 
 		$http.get(TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
 			.success(function(data) {
 				var res = {};
+                res['other'] = [];
 
-				for (var key in categories) {
-					res[key] = [];
-				}
-
-				for( var i = 0; i < data.length; i++ )
-				{
-					res[ getCategory( data[i] )].push( data[i] );
-				}
+                for( var i = 0; i < data.length; i++ ){
+                    if(data[i].tags){
+                        for( var j = 0; j < data[i].tags.length; j++ ){
+                            res[data[i].tags[j]] = [];
+                            res[data[i].tags[j]].push(data[i]);
+                        }
+                    }else{
+                       res['other'].push(data[i]);
+                    }
+                }
 
 				callF.resolve(res);
 			});
@@ -150,36 +143,6 @@ function environmentService($http, $q) {
 
 		return callF.promise;
 	}
-
-
-	// @todo workaround for kurjun to return categorized templates
-	function getCategory(data)
-	{
-		var cat = null;
-		for (var key in categories) {
-			for( var i = 0; i < categories[key].length; i++ )
-			{
-				if( categories[key][i] == data.name )
-				{
-					cat = key;
-					break;
-				}
-			}
-
-			if( cat !== null ) break;
-		}
-
-		if( cat === null ) {
-		    if(data.owner.indexOf(getCookie('su_fingerprint').toLowerCase()) > -1){
-		        return 'own';
-		    }else{
-		        return 'other';
-		    }
-		}
-
-		return cat;
-	}
-
 
 
 	function getEnvironments() {

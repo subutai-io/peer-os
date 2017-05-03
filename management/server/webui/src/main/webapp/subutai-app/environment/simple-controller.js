@@ -66,7 +66,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     }
 
     function loadTemplates(callback){
-        // @todo workaround
         environmentService.getTemplates()
             .then(function (data) {
                 vm.templates = data;
@@ -80,12 +79,28 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         loadPrivateTemplates();
     });
 
+    function addUniqueTemplates(filteredTemplates, groupedTemplates){
+        for( var i in groupedTemplates){
+            var found = false;
+            for( var j in filteredTemplates){
+                if( groupedTemplates[i].id == filteredTemplates[j].id){
+                    found = true;
+                    break;
+                }
+            }
+            if(!found){
+                filteredTemplates.push(groupedTemplates[i]);
+            }
+        }
+        return filteredTemplates;
+    }
+
     function getFilteredTemplates(callback) {
         var templatesLst = [];
 
         for (var i in vm.templates) {
             if (vm.templatesType == 'all' || i == vm.templatesType) {
-                templatesLst = templatesLst.concat(vm.templates[i]);
+                templatesLst = addUniqueTemplates(templatesLst, vm.templates[i]);
             }
         }
 
