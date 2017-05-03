@@ -413,7 +413,7 @@ public class NetworkManagerImpl implements NetworkManager
         execute( getManagementHost(), commands.getRemoveVlanDomainCommand( proxyConfig.getVlan() ) );
         execute( getManagementHost(), commands.getSetVlanDomainCommand( proxyConfig.getVlan(), proxyConfig.getDomain(),
                 ProxyLoadBalanceStrategy.NONE,
-                String.format( "/mnt/lib/lxc/%s/rootfs/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
+                String.format( " %s:/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
         execute( getManagementHost(), commands.getAddIpToVlanDomainCommand(
                 containerHost.getIp() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
                 proxyConfig.getVlan() ) );

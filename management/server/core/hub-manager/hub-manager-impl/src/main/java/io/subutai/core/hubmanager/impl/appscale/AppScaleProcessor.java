@@ -73,46 +73,38 @@ public class AppScaleProcessor implements StateLinkProcessor
 
         Preconditions.checkNotNull( config );
 
-        if ( config.getState() != null && "ENABLING_DOMAIN".equals( config.getState() ) )
+
+        log.debug( "config: {}", config );
+
+
+        executor.execute( new Runnable()
         {
-            appScaleManager.createTunnel( stateLink, config, configManager );
-        }
-        else
-        {
-
-            log.debug( "config: {}", config );
-
-
-            executor.execute( new Runnable()
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
+                processLinks.add( stateLink );
+
+                update( stateLink, "INSTALLING" );
+
+                try
                 {
-                    processLinks.add( stateLink );
+                    appScaleManager.installCluster( config );
 
-                    update( stateLink, "INSTALLING" );
-
-                    try
-                    {
-                        appScaleManager.installCluster( config );
-
-                        update( stateLink, "INSTALLED" );
-                    }
-                    catch ( Exception e )
-                    {
-                        log.error( "Error to install AppScale cluster: ", e );
-
-                        update( stateLink, e.getMessage() );
-                    }
-                    finally
-                    {
-                        processLinks.remove( stateLink );
-                    }
+                    update( stateLink, "INSTALLED" );
                 }
-            } );
-        }
-    }
+                catch ( Exception e )
+                {
+                    log.error( "Error to install AppScale cluster: ", e );
 
+                    update( stateLink, e.getMessage() );
+                }
+                finally
+                {
+                    processLinks.remove( stateLink );
+                }
+            }
+        } );
+    }
 
     private void update( String link, String state )
     {
