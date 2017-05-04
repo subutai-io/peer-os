@@ -224,12 +224,6 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
         String sslCertPath = "/tmp/" + fileName + ".pem";
 
-//        if ( rh.isManagementHost() )
-//        {
-//            FileUtils.writeStringToFile( new File( sslCertPath ), portMapDto.getSslCertPem(), Charset.forName( "utf-8" ),
-//                    false );
-//        }
-//        else
         rh.execute( new RequestBuilder( String.format("echo \"%s\" > %s", portMapDto.getSslCertPem(), sslCertPath ) ) );
 
         return sslCertPath;
