@@ -1,12 +1,20 @@
 package io.subutai.core.hubmanager.impl.processor.port_map;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.LoadBalancing;
@@ -19,7 +27,6 @@ import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.domain.ContainerPortMapDto;
 import io.subutai.hub.share.dto.domain.PortMapDto;
-import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 
 import static java.lang.String.format;
 
@@ -155,8 +162,12 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             }
             else
             {
+                String sslCertPath = protocol == Protocol.HTTPS?
+                                     saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
+
                 resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                        portMapDto.getExternalPort(), portMapDto.getDomain(), null, LoadBalancing.ROUND_ROBIN );
+                        portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
+                        portMapDto.isSslBackend() );
             }
 
 
@@ -179,8 +190,12 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     }
                     else
                     {
+                        String sslCertPath = protocol == Protocol.HTTPS?
+                                             saveSslCertificateToFilesystem( portMapDto, mngHost ) : null;
+
                         mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
-                                portMapDto.getExternalPort(), portMapDto.getDomain(), null, LoadBalancing.ROUND_ROBIN );
+                                portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
+                                LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
                     }
                 }
             }
@@ -193,5 +208,30 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             portMapDto.setErrorLog( e.getMessage() );
             log.error( "*********", e );
         }
+    }
+
+
+    private String saveSslCertificateToFilesystem( PortMapDto portMapDto, ResourceHost rh )
+            throws IOException, CommandException
+    {
+        if ( StringUtils.isBlank( portMapDto.getSslCertPem() ) )
+        {
+            return null;
+        }
+
+        String fileName = String.format( "%s-%d-%d", portMapDto.getDomain(), portMapDto.getExternalPort(),
+                portMapDto.getInternalPort() );
+
+        String sslCertPath = "/tmp/" + fileName + ".pem";
+
+//        if ( rh.isManagementHost() )
+//        {
+//            FileUtils.writeStringToFile( new File( sslCertPath ), portMapDto.getSslCertPem(), Charset.forName( "utf-8" ),
+//                    false );
+//        }
+//        else
+        rh.execute( new RequestBuilder( String.format("echo \"%s\" > %s", portMapDto.getSslCertPem(), sslCertPath ) ) );
+
+        return sslCertPath;
     }
 }
