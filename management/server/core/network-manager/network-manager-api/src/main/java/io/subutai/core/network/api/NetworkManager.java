@@ -201,9 +201,10 @@ public interface NetworkManager
      * @param domain domain
      * @param sslCertPath optional path to SSL cert, pass null if not needed
      * @param loadBalancing optional load balancing method, pass null if not needed
+     * @param sslBackend determines if backend is working over SSL or not
      */
     void mapContainerPortToDomain( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort,
-                                   String domain, String sslCertPath, LoadBalancing loadBalancing )
+                                   String domain, String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend )
             throws NetworkManagerException;
 
     /**

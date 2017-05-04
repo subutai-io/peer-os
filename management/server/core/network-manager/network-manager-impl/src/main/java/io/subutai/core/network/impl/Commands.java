@@ -188,7 +188,8 @@ public class Commands
 
     RequestBuilder getMapContainerPortToDomainCommand( final Protocol protocol, final String containerIp,
                                                        final int containerPort, final int rhPort, final String domain,
-                                                       final String sslCertPath, final LoadBalancing loadBalancing )
+                                                       final String sslCertPath, final LoadBalancing loadBalancing,
+                                                       final boolean sslBackend )
     {
         List<String> args = Lists.newArrayList( protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain );
@@ -197,6 +198,11 @@ public class Commands
         {
             args.add( "-c" );
             args.add( sslCertPath );
+        }
+
+        if ( sslBackend )
+        {
+            args.add( "--sslbackend" );
         }
 
         if ( loadBalancing != null )
