@@ -81,6 +81,15 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void removeP2PSwarm( final Host host, String p2pHash ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+
+        execute( host, commands.getRemoveP2PSwarmCommand( p2pHash ) );
+    }
+
+
+    @Override
     public void resetSwarmSecretKey( final Host host, final String p2pHash, final String newSecretKey,
                                      final long ttlSeconds ) throws NetworkManagerException
     {

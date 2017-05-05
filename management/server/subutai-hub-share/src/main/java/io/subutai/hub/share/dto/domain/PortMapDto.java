@@ -41,6 +41,8 @@ public class PortMapDto
 
     private String errorLog;
 
+    private String proxyIp;
+
 
     public PortMapDto()
     {
@@ -165,5 +167,17 @@ public class PortMapDto
     public void setSslBackend( final boolean sslBackend )
     {
         this.sslBackend = sslBackend;
+    }
+
+
+    public String getProxyIp()
+    {
+        return proxyIp;
+    }
+
+
+    public void setProxyIp( final String proxyIp )
+    {
+        this.proxyIp = proxyIp;
     }
 }

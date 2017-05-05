@@ -100,6 +100,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void joinP2PSwarm( String p2pIp, String interfaceName, String p2pHash, String secretKey, long secretKeyTtlSec )
             throws ResourceHostException;
 
+    void removeP2PSwarm( String p2pHash ) throws ResourceHostException;
+
     void resetSwarmSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws ResourceHostException;
 
     Tunnels getTunnels() throws ResourceHostException;

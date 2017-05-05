@@ -1,16 +1,13 @@
 package io.subutai.core.hubmanager.impl.processor.port_map;
 
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import io.subutai.common.command.CommandException;
@@ -162,14 +159,17 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             }
             else
             {
-                String sslCertPath = protocol == Protocol.HTTPS?
-                                     saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
+                if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
+                        portMapDto.getInternalPort() ) )
+                {
+                    String sslCertPath = protocol == Protocol.HTTPS?
+                                         saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
 
-                resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                        portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
-                        portMapDto.isSslBackend() );
+                    resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                            portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
+                            portMapDto.isSslBackend() );
+                }
             }
-
 
             if ( !resourceHost.isManagementHost() )
             {
