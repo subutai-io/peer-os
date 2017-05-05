@@ -30,7 +30,7 @@
           </select>
         </div>
         <ul>
-          <li ng-repeat="template in advEnvCtrl.templatesList  | filter:{'name' : searchTemplate} | orderBy: 'name'"
+          <li ng-repeat="template in advEnvCtrl.templatesList | filter:{'name' : searchTemplate} | orderBy: 'name' track by $index"
               data-template="{{ template.name }}"
               title="Version: {{ template.version }} Size: {{ environmentViewCtrl.humanFileSize(template.size, true) }} Parent: {{ template.parent }} Owners: {{template.owner}}">
 					<span class="b-tools-menu__item">

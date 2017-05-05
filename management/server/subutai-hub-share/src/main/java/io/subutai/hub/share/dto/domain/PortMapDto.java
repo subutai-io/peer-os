@@ -35,6 +35,10 @@ public class PortMapDto
 
     private String domain;
 
+    private String sslCertPem;
+
+    private boolean sslBackend;
+
     private String errorLog;
 
     private String proxyIp;
@@ -151,5 +155,29 @@ public class PortMapDto
     public void setProxyIp( final String proxyIp )
     {
         this.proxyIp = proxyIp;
+    }
+
+
+    public String getSslCertPem()
+    {
+        return sslCertPem;
+    }
+
+
+    public void setSslCertPem( final String sslCertPem )
+    {
+        this.sslCertPem = sslCertPem;
+    }
+
+
+    public boolean isSslBackend()
+    {
+        return sslBackend;
+    }
+
+
+    public void setSslBackend( final boolean sslBackend )
+    {
+        this.sslBackend = sslBackend;
     }
 }
