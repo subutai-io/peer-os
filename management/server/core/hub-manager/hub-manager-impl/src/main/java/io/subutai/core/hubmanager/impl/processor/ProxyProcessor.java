@@ -202,9 +202,25 @@ public class ProxyProcessor implements StateLinkProcessor
 
             for ( PortMapDto portMapDto : proxyDto.getPortMaps() )
             {
-                resourceHost
-                        .mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ), portMapDto.getProxyIp(),
-                                portMapDto.getExternalPort(), portMapDto.getExternalPort() );
+
+                if ( resourceHost.isPortMappingReserved( Protocol.valueOf( portMapDto.getProtocol().name() ),
+                        portMapDto.getExternalPort(), portMapDto.getProxyIp(), portMapDto.getExternalPort() ) )
+                {
+
+                    if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING ) || portMapDto.getState().equals(
+                            PortMapDto.State.DELETED ) )
+                    {
+                        resourceHost.removeContainerPortMapping( Protocol.valueOf( portMapDto.getProtocol().name() ),
+                                portMapDto.getProxyIp(), portMapDto.getExternalPort(), portMapDto.getExternalPort() );
+                    }
+                }
+                else if ( portMapDto.getState().equals( PortMapDto.State.CREATING ) || portMapDto.getState().equals(
+                        PortMapDto.State.USED ) )
+                {
+
+                    resourceHost.mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ),
+                            portMapDto.getProxyIp(), portMapDto.getExternalPort(), portMapDto.getExternalPort() );
+                }
             }
 
             sendDataToHub( proxyDto, stateLink );
