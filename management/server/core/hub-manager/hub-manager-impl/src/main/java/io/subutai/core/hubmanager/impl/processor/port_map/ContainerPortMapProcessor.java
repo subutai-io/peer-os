@@ -163,14 +163,17 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             }
             else
             {
-                String sslCertPath = protocol == Protocol.HTTPS?
-                                     saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
+                if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
+                        portMapDto.getInternalPort() ) )
+                {
+                    String sslCertPath = protocol == Protocol.HTTPS?
+                                         saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
 
-                resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                        portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
-                        portMapDto.isSslBackend() );
+                    resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                            portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
+                            portMapDto.isSslBackend() );
+                }
             }
-
 
             if ( !resourceHost.isManagementHost() )
             {
