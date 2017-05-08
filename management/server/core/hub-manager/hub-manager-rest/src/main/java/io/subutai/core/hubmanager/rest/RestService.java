@@ -7,7 +7,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,60 +17,42 @@ public interface RestService
     @POST
     @Path( "/send-heartbeat" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response sendHeartbeat();
+    Response sendHeartbeat();
 
     //Resend heartbeat
     @POST
     @Path( "/resend-heartbeat" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response triggerHeartbeat();
+    Response triggerHeartbeat();
 
     //Register to HUB
     @POST
     @Path( "/register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response register( @FormParam( "email" ) String email, @FormParam( "password" ) String password,
-                              @FormParam( "peerName" ) String peerName );
+    Response register( @FormParam( "email" ) String email, @FormParam( "password" ) String password,
+                       @FormParam( "peerName" ) String peerName );
 
     //Send resource host configurations
     @POST
     @Path( "/send-rh-configurations" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response sendRHConfigurations();
+    Response sendRHConfigurations();
 
     //Register to HUB
     @GET
     @Path( "/dns" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getHubDns();
+    Response getHubDns();
 
     //Unregister to HUB
     @DELETE
     @Path( "/unregister" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response unregister();
+    Response unregister();
 
     //Check registration state
     @GET
     @Path( "/registration_state" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getRegistrationState();
-
-    //TODO after finish ENVIRONMENT MANAGEMENT should delete this method
-    @POST
-    @Path( "/upSite" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response upSite();
-
-    //TODO after finish ENVIRONMENT MANAGEMENT should delete this method
-    @DELETE
-    @Path( "/downSite" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response downSite();
-
-    //TODO after finish ENVIRONMENT MANAGEMENT should delete this method
-    @GET
-    @Path( "/checksum" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response checksum();
+    Response getRegistrationState();
 }
