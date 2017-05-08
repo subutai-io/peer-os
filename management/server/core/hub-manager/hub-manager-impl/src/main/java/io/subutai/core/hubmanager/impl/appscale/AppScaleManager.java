@@ -3,16 +3,11 @@ package io.subutai.core.hubmanager.impl.appscale;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import javax.ws.rs.core.Response;
-
-import org.omg.CORBA.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 
@@ -24,14 +19,9 @@ import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.TaskUtil;
-import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.tunnel.TunnelHelper;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.AppScaleConfigDto;
-import io.subutai.hub.share.dto.TunnelInfoDto;
-import io.subutai.hub.share.json.JsonUtil;
 
 import static java.lang.String.format;
 
@@ -138,7 +128,7 @@ public class AppScaleManager
             }
             else
             {
-                log.error( "Error getting vni");
+                log.error( "Error getting vni" );
             }
         }
         catch ( Exception e )
@@ -225,6 +215,4 @@ public class AppScaleManager
 
         return 0l;
     }
-
-
 }

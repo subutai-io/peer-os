@@ -35,6 +35,10 @@ public class PortMapDto
 
     private String domain;
 
+    private String sslCertPem;
+
+    private boolean sslBackend;
+
     private String errorLog;
 
 
@@ -137,5 +141,29 @@ public class PortMapDto
     public void setDomain( final String domain )
     {
         this.domain = domain;
+    }
+
+
+    public String getSslCertPem()
+    {
+        return sslCertPem;
+    }
+
+
+    public void setSslCertPem( final String sslCertPem )
+    {
+        this.sslCertPem = sslCertPem;
+    }
+
+
+    public boolean isSslBackend()
+    {
+        return sslBackend;
+    }
+
+
+    public void setSslBackend( final boolean sslBackend )
+    {
+        this.sslBackend = sslBackend;
     }
 }
