@@ -506,6 +506,18 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @Override
+    public UserToken updateTokenAndSession( long userId )
+    {
+        User user = identityDataService.getUser( userId );
+        UserToken userToken = createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
+
+        String sessionId = UUID.randomUUID() + "-" + System.currentTimeMillis();
+        sessionManager.startSession( sessionId, null, user );
+        return userToken;
+    }
+
+
     @PermitAll
     @Override
     public String getSystemUserToken()
@@ -1478,7 +1490,8 @@ public class IdentityManagerImpl implements IdentityManager
         try
         {
             String signToken =
-                    new String( securityManager.getEncryptionTool().extractClearSignContent( sign.getBytes() ) ).trim().toLowerCase();
+                    new String( securityManager.getEncryptionTool().extractClearSignContent( sign.getBytes() ) ).trim()
+                                                                                                                .toLowerCase();
 
             if ( signTokensCache.getIfPresent( signToken ) == null )
             {

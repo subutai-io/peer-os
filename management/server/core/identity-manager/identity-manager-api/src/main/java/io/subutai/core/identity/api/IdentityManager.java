@@ -81,6 +81,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    UserToken updateTokenAndSession( long userId );
+
+
+    /* *************************************************
+     */
     @PermitAll
     String updateUserAuthId( User user, String authId ) throws SystemSecurityException;
 
