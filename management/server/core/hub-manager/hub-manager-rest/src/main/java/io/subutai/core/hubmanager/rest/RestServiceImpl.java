@@ -10,11 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
-import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.peer.api.PeerManager;
 
 
 public class RestServiceImpl implements RestService
@@ -22,18 +19,6 @@ public class RestServiceImpl implements RestService
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
     private HubManager hubManager;
-
-    private CommandExecutor commandExecutor;
-
-    private PeerManager peerManager;
-
-    private IdentityManager identityManager = null;
-
-
-    public void setIntegration( HubManager hubManager )
-    {
-        this.hubManager = hubManager;
-    }
 
 
     @Override
@@ -167,83 +152,8 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response upSite()
+    public void setIntegration( HubManager hubManager )
     {
-
-        Thread thread = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                VEHServiceUtil.upSite( peerManager, identityManager );
-            }
-        };
-
-        thread.start();
-
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response downSite()
-    {
-
-        Thread thread = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                VEHServiceUtil.downSite( peerManager, identityManager );
-            }
-        };
-
-        thread.start();
-
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response checksum()
-    {
-        return VEHServiceUtil.getChecksum( peerManager );
-    }
-
-
-    public CommandExecutor getCommandExecutor()
-    {
-        return commandExecutor;
-    }
-
-
-    public void setCommandExecutor( final CommandExecutor commandExecutor )
-    {
-        this.commandExecutor = commandExecutor;
-    }
-
-
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }
-
-
-    public IdentityManager getIdentityManager()
-    {
-        return identityManager;
-    }
-
-
-    public void setIdentityManager( final IdentityManager identityManager )
-    {
-        this.identityManager = identityManager;
+        this.hubManager = hubManager;
     }
 }
