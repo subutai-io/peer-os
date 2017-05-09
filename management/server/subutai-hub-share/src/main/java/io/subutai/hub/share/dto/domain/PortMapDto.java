@@ -43,6 +43,8 @@ public class PortMapDto
 
     private String proxyIp;
 
+    private boolean isProxied;
+
 
     public PortMapDto()
     {
@@ -179,5 +181,17 @@ public class PortMapDto
     public void setProxyIp( final String proxyIp )
     {
         this.proxyIp = proxyIp;
+    }
+
+
+    public boolean isProxied()
+    {
+        return isProxied;
+    }
+
+
+    public void setProxied( final boolean proxied )
+    {
+        isProxied = proxied;
     }
 }

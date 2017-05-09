@@ -175,7 +175,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 }
             }
 
-            if ( !resourceHost.isManagementHost() )
+            if ( !resourceHost.isManagementHost() && !portMapDto.isProxied())
             {
                 // Container resides on additional RH, that's why we need to forward traffic from MH to RH.
                 // On MH external port should be forwarded to same external port of RH, then on RH real
