@@ -148,6 +148,11 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     {
         try
         {
+            if ( portMapDto.getState().equals( PortMapDto.State.USED ) )
+            {
+                return;
+            }
+
             ContainerHost containerHost = ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
 
             ResourceHost resourceHost =
@@ -166,16 +171,18 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
                         portMapDto.getInternalPort() ) )
                 {
-                    String sslCertPath = protocol == Protocol.HTTPS?
-                                         saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
+                    String sslCertPath =
+                            protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, resourceHost ) :
+                            null;
 
-                    resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                            portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
-                            portMapDto.isSslBackend() );
+                    resourceHost
+                            .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                                    portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
+                                    LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
                 }
             }
 
-            if ( !resourceHost.isManagementHost() && !portMapDto.isProxied())
+            if ( !resourceHost.isManagementHost() && !portMapDto.isProxied() )
             {
                 // Container resides on additional RH, that's why we need to forward traffic from MH to RH.
                 // On MH external port should be forwarded to same external port of RH, then on RH real
@@ -194,8 +201,9 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     }
                     else
                     {
-                        String sslCertPath = protocol == Protocol.HTTPS?
-                                             saveSslCertificateToFilesystem( portMapDto, mngHost ) : null;
+                        String sslCertPath =
+                                protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, mngHost ) :
+                                null;
 
                         mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
                                 portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
@@ -228,7 +236,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
         String sslCertPath = "/tmp/" + fileName + ".pem";
 
-        rh.execute( new RequestBuilder( String.format("echo \"%s\" > %s", portMapDto.getSslCertPem(), sslCertPath ) ) );
+        rh.execute(
+                new RequestBuilder( String.format( "echo \"%s\" > %s", portMapDto.getSslCertPem(), sslCertPath ) ) );
 
         return sslCertPath;
     }
