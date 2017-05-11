@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Protocol;
-import io.subutai.common.protocol.ReservedPort;
-import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -144,7 +141,7 @@ public class ProxyProcessor implements StateLinkProcessor
 
                 ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( p2PInfoDto.getRhId() );
 
-                cleanPortMap( resourceHost, p2PInfoDto );
+                cleanPortMap( resourceHost, proxyDto );
 
                 resourceHost.removeP2PSwarm( proxyDto.getP2pHash() );
             }
@@ -154,43 +151,24 @@ public class ProxyProcessor implements StateLinkProcessor
     }
 
 
-    private void cleanPortMap( ResourceHost resourceHost, P2PInfoDto p2PInfoDto )
+    private void cleanPortMap( ResourceHost resourceHost, ProxyDto proxyDto )
     {
-        ReservedPorts reservedPorts = null;
         try
         {
-            reservedPorts = resourceHost.getContainerPortMappings( Protocol.TCP );
-
-            for ( ReservedPort reservedPort : reservedPorts.getReservedPorts() )
+            for ( PortMapDto portMapDto : proxyDto.getPortMaps() )
             {
-                if ( reservedPort.getContainerIpPort() != null && !reservedPort.getContainerIpPort().isEmpty() )
+                if ( resourceHost.isPortMappingReserved( Protocol.valueOf( portMapDto.getProtocol().name() ),
+                        portMapDto.getExternalPort(), portMapDto.getProxyIp(), portMapDto.getExternalPort() ) )
                 {
-                    if ( reservedPort.getContainerIpPort().contains( p2PInfoDto.getP2pIp() ) )
-                    {
-                        //Protocol protocol, String containerIp, int containerPort, int rhPort
-                        resourceHost
-                                .removeContainerPortMapping( Protocol.TCP, getIp( reservedPort.getContainerIpPort() ),
-                                        getPort( reservedPort.getContainerIpPort() ), reservedPort.getPort() );
-                    }
+                    resourceHost.removeContainerPortMapping( Protocol.valueOf( portMapDto.getProtocol().name() ),
+                            portMapDto.getProxyIp(), portMapDto.getExternalPort(), portMapDto.getExternalPort() );
                 }
             }
         }
-        catch ( ResourceHostException e )
+        catch ( Exception e )
         {
             log.error( e.getMessage() );
         }
-    }
-
-
-    private String getIp( final String ipPort )
-    {
-        return ipPort.split( ":" )[0];
-    }
-
-
-    private int getPort( final String ipPort )
-    {
-        return Integer.valueOf( ipPort.split( ":" )[1] );
     }
 
 
@@ -217,7 +195,6 @@ public class ProxyProcessor implements StateLinkProcessor
                 else if ( portMapDto.getState().equals( PortMapDto.State.CREATING ) || portMapDto.getState().equals(
                         PortMapDto.State.USED ) )
                 {
-
                     resourceHost.mapContainerPort( Protocol.valueOf( portMapDto.getProtocol().name() ),
                             portMapDto.getProxyIp(), portMapDto.getExternalPort(), portMapDto.getExternalPort() );
                 }

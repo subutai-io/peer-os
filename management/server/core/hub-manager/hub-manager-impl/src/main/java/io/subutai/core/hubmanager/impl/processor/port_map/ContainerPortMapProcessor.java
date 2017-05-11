@@ -163,8 +163,14 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
             if ( !protocol.isHttpOrHttps() )
             {
-                resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                        portMapDto.getExternalPort() );
+
+                if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
+                        portMapDto.getInternalPort() ) )
+                {
+
+                    resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                            portMapDto.getExternalPort() );
+                }
             }
             else
             {
@@ -213,6 +219,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             }
 
             portMapDto.setState( PortMapDto.State.USED );
+
+            Thread.sleep( 1000 );
         }
         catch ( Exception e )
         {
