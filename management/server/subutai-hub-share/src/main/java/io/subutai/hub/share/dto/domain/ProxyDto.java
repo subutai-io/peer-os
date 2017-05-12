@@ -12,7 +12,7 @@ public class ProxyDto
     private String p2SecretKey;
     private Long p2pSecretTTL;
     private String logs;
-    private Set<P2PInfoDto> p2PInfoDtos = new HashSet();
+    private Set<P2PInfoDto> p2PInfoDtos = new HashSet<>();
     private Set<String> subnets = new HashSet<>();
     private P2PInfoDto.State state;
     private Set<PortMapDto> portMaps = new HashSet<>();

@@ -104,7 +104,7 @@ public class ProxyProcessor implements StateLinkProcessor
                 case READY:
                     wrongState( proxyDto );
                     break;
-                case FAIED:
+                case FAILED:
                     wrongState( proxyDto );
                     break;
                 case WAIT:
