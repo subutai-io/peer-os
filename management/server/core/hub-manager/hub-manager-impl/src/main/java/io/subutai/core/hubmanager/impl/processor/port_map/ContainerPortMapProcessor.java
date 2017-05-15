@@ -1,16 +1,13 @@
 package io.subutai.core.hubmanager.impl.processor.port_map;
 
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import io.subutai.common.command.CommandException;
@@ -27,7 +24,6 @@ import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.domain.ContainerPortMapDto;
 import io.subutai.hub.share.dto.domain.PortMapDto;
-import io.subutai.hub.share.dto.domain.ReservedPortMapping;
 
 import static java.lang.String.format;
 
@@ -38,6 +34,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
+    private static final HashSet<PortMapDto> PORT_CACHE = new HashSet<>();
+
 
     //    private PeerManager peerManager;
     //
@@ -110,6 +108,9 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     .post( format( "/rest/v1/environments/%s/ports/map", containerPortMapDto.getEnvironmentSSId() ),
                             containerPortMapDto );
 
+            log.info( "" );
+            log.info( "Sent data to HUB" );
+            log.info( "" );
             log.info( !restRes.isSuccess() ? "Could not send port map data to HUB" : "Sent port map data to HUB" );
         }
         catch ( Exception e )
@@ -119,6 +120,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
         finally
         {
             LINKS_IN_PROGRESS.remove( stateLink );
+            PORT_CACHE.clear();
         }
     }
 
@@ -153,6 +155,14 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 return;
             }
 
+            if ( PORT_CACHE.contains( portMapDto ) )
+            {
+                return;
+            }
+
+            PORT_CACHE.add( portMapDto );
+
+
             ContainerHost containerHost = ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
 
             ResourceHost resourceHost =
@@ -163,13 +173,15 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
             if ( !protocol.isHttpOrHttps() )
             {
-
                 if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
                         portMapDto.getInternalPort() ) )
                 {
-
                     resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
                             portMapDto.getExternalPort() );
+                }
+                else
+                {
+                    portMapDto.setState( PortMapDto.State.USED );
                 }
             }
             else
@@ -218,9 +230,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 }
             }
 
-            portMapDto.setState( PortMapDto.State.USED );
 
-            Thread.sleep( 1000 );
+            portMapDto.setState( PortMapDto.State.USED );
         }
         catch ( Exception e )
         {
