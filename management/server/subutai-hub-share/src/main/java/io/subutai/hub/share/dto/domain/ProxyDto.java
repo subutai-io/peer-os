@@ -24,6 +24,18 @@ public class ProxyDto
     }
 
 
+    public ProxyDto(
+            final Long proxyId, final String p2pHash, final String p2SecretKey, final Long p2pSecretTTL,
+                     final P2PInfoDto.State state )
+    {
+        this.proxyId = proxyId;
+        this.p2pHash = p2pHash;
+        this.p2SecretKey = p2SecretKey;
+        this.p2pSecretTTL = p2pSecretTTL;
+        this.state = state;
+    }
+
+
     public Long getProxyId()
     {
         return proxyId;

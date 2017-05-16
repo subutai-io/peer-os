@@ -52,7 +52,7 @@ public class ProxyProcessor implements StateLinkProcessor
     {
         for ( String stateLink : stateLinks )
         {
-            if ( stateLink.contains( "subnets" ) )
+            if ( stateLink.contains( "proxies" ) )
             {
                 processStateLink( stateLink );
             }
@@ -79,40 +79,31 @@ public class ProxyProcessor implements StateLinkProcessor
 
             ProxyDto proxyDto = result.getEntity();
 
-            switch ( proxyDto.getState() )
+            for ( P2PInfoDto p2PInfoDto : proxyDto.getP2PInfoDtos() )
             {
-                case COLLECT_P2P_SUBNETS:
-                    collectP2PSubnets( proxyDto, stateLink );
-                    break;
-                case SETUP_TUNNEL:
-                    setupP2PTunnel( proxyDto, stateLink );
-                    setupPortMap( proxyDto, stateLink );
-                    break;
-                case SETUP_PORT_MAP:
-                    break;
-                case DESTROY:
-                    try
-                    {
-                        destroyTunnel( proxyDto, stateLink );
-                    }
-                    catch ( Exception e )
-                    {
-                        log.info( e.getMessage() );
-                    }
-
-                    break;
-                case READY:
-                    wrongState( proxyDto );
-                    break;
-                case FAILED:
-                    wrongState( proxyDto );
-                    break;
-                case WAIT:
-                    wrongState( proxyDto );
-                    break;
-                default:
-                    wrongState( proxyDto );
-                    break;
+                switch ( p2PInfoDto.getState() )
+                {
+                    case CREATE:
+                        setupP2PTunnel( proxyDto, p2PInfoDto );
+                        setupPortMap( proxyDto, stateLink );
+                        break;
+                    case UPDATE:
+                        setupPortMap( proxyDto, stateLink );
+                        break;
+                    case DESTROY:
+                        try
+                        {
+                            destroyTunnel( proxyDto, stateLink );
+                        }
+                        catch ( Exception e )
+                        {
+                            log.info( e.getMessage() );
+                        }
+                        break;
+                    default:
+                        wrongState( proxyDto );
+                        break;
+                }
             }
         }
         catch ( Exception e )
@@ -209,29 +200,25 @@ public class ProxyProcessor implements StateLinkProcessor
     }
 
 
-    private void setupP2PTunnel( ProxyDto proxyDto, String stateLink )
+    private void setupP2PTunnel( ProxyDto proxyDto, P2PInfoDto p2PInfoDto )
     {
         try
         {
-            for ( P2PInfoDto p2PInfoDto : proxyDto.getP2PInfoDtos() )
+            if ( p2PInfoDto.getRhId() != null && p2PInfoDto.getState().equals( P2PInfoDto.State.CREATE ) )
             {
-                if ( p2PInfoDto.getRhId() != null && p2PInfoDto.getState().equals( P2PInfoDto.State.SETUP_TUNNEL ) )
-                {
 
-                    ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( p2PInfoDto.getRhId() );
+                ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( p2PInfoDto.getRhId() );
 
-                    resourceHost
-                            .joinP2PSwarm( p2PInfoDto.getP2pIp(), p2PInfoDto.getIntefaceName(), proxyDto.getP2pHash(),
-                                    proxyDto.getP2SecretKey(), proxyDto.getP2pSecretTTL().longValue() );
+                resourceHost.joinP2PSwarm( p2PInfoDto.getP2pIp(), p2PInfoDto.getIntefaceName(), proxyDto.getP2pHash(),
+                        proxyDto.getP2SecretKey(), proxyDto.getP2pSecretTTL().longValue() );
 
-                    p2PInfoDto.setState( P2PInfoDto.State.READY );
-                }
+                p2PInfoDto.setState( P2PInfoDto.State.READY );
             }
-
-            //            sendDataToHub( proxyDto, stateLink );
         }
         catch ( Exception e )
         {
+            p2PInfoDto.setState( P2PInfoDto.State.FAILED );
+            p2PInfoDto.setLogs( e.getMessage() );
             log.error( e.getMessage() );
         }
     }

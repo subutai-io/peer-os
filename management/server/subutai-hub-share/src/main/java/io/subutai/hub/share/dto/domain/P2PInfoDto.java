@@ -5,7 +5,7 @@ public class P2PInfoDto
 {
     public enum State
     {
-        COLLECT_P2P_SUBNETS, SETUP_TUNNEL, SETUP_PORT_MAP, READY, FAILED, DESTROY, WAIT
+        COLLECT_P2P_SUBNETS, SETUP_TUNNEL, SETUP_PORT_MAP, READY, FAILED, DESTROY, WAIT, CREATE, UPDATE
     }
 
 
@@ -21,6 +21,17 @@ public class P2PInfoDto
     public P2PInfoDto()
     {
 
+    }
+
+
+    public P2PInfoDto( final String subutaiId, final String rhId, final String intefaceName, final String p2pIp,
+                       final State state )
+    {
+        this.subutaiId = subutaiId;
+        this.rhId = rhId;
+        this.intefaceName = intefaceName;
+        this.p2pIp = p2pIp;
+        this.state = state;
     }
 
 
