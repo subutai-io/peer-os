@@ -244,8 +244,7 @@ public class EnvironmentUserHelper
         String url = String.format( baseHubTokenUrl, userTokenDto.getOwnerId() );
 
         User user = identityManager.getUser( userTokenDto.getSsUserId() );
-        UserToken userToken = identityManager.getUserToken( user.getId() );
-        identityManager.extendTokenTime( userToken, 0 ); //if 0 then it will set default general timeout
+        UserToken userToken = identityManager.updateTokenAndSession( user.getId() );
 
         //set new token and valid date
         userTokenDto.setToken( userToken.getFullToken() );
