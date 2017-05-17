@@ -7,7 +7,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.core.hubmanager.api.RestResult;
@@ -223,28 +222,6 @@ public class ProxyProcessor implements StateLinkProcessor
         }
     }
 
-
-    private void collectP2PSubnets( ProxyDto proxyDto, String stateLink )
-    {
-        try
-        {
-            Set<String> subnets = new HashSet<>();
-
-            for ( NetworkResource networkResource : peerManager.getLocalPeer().getReservedNetworkResources()
-                                                               .getNetworkResources() )
-            {
-                subnets.add( networkResource.getP2pSubnet() );
-            }
-
-            proxyDto.setSubnets( subnets );
-
-            sendDataToHub( proxyDto, stateLink );
-        }
-        catch ( Exception e )
-        {
-            log.error( e.getMessage() );
-        }
-    }
 
 
     private void sendDataToHub( ProxyDto proxyDto, String link )

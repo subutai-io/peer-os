@@ -5,7 +5,7 @@ public class P2PInfoDto
 {
     public enum State
     {
-        COLLECT_P2P_SUBNETS, SETUP_TUNNEL, SETUP_PORT_MAP, READY, FAILED, DESTROY, WAIT, CREATE, UPDATE
+        READY, FAILED, DESTROY, WAIT, CREATE, UPDATE
     }
 
 
