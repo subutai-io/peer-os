@@ -181,14 +181,24 @@ public class ProxyProcessor implements StateLinkProcessor
 
                 if ( protocol.isHttpOrHttps() )
                 {
-                    String sslCertPath =
-                            protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, resourceHost ) :
-                            null;
 
-                    resourceHost
-                            .mapContainerPortToDomain( protocol, portMapDto.getProxyIp(), portMapDto.getExternalPort(),
-                                    portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
-                                    LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
+                    if ( portMapDto.getState().equals( PortMapDto.State.CREATING ) || portMapDto.getState().equals(
+                            PortMapDto.State.USED ) )
+                    {
+                        String sslCertPath = protocol == Protocol.HTTPS ?
+                                             saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
+
+                        resourceHost.mapContainerPortToDomain( protocol, portMapDto.getProxyIp(),
+                                portMapDto.getExternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain(),
+                                sslCertPath, LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
+                    }
+                    else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING ) || portMapDto.getState()
+                                                                                                       .equals(
+                                                                                                               PortMapDto.State.DELETED ) )
+                    {
+                        resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getProxyIp(),
+                                portMapDto.getExternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain() );
+                    }
                 }
                 else
                 {
@@ -266,7 +276,6 @@ public class ProxyProcessor implements StateLinkProcessor
             log.error( e.getMessage() );
         }
     }
-
 
 
     private void sendDataToHub( ProxyDto proxyDto, String link )
