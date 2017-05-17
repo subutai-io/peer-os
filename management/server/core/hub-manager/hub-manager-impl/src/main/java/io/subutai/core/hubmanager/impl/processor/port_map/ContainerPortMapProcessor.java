@@ -36,18 +36,11 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
     private static final HashSet<PortMapDto> PORT_CACHE = new HashSet<>();
 
-
-    //    private PeerManager peerManager;
-    //
-    //    private HubRestClient restClient;
-
     private Context ctx;
 
 
-    public ContainerPortMapProcessor( PeerManager peerManager, HubRestClient restClient )
+    public ContainerPortMapProcessor()
     {
-        //        this.peerManager = peerManager;
-        //        this.restClient = restClient;
     }
 
 
@@ -108,9 +101,6 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     .post( format( "/rest/v1/environments/%s/ports/map", containerPortMapDto.getEnvironmentSSId() ),
                             containerPortMapDto );
 
-            log.info( "" );
-            log.info( "Sent data to HUB" );
-            log.info( "" );
             log.info( !restRes.isSuccess() ? "Could not send port map data to HUB" : "Sent port map data to HUB" );
         }
         catch ( Exception e )
