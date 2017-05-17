@@ -748,6 +748,25 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public void removeP2PSwarm( String p2pHash ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
+
+        try
+        {
+            if ( getP2PConnections().findByHash( p2pHash ) != null )
+            {
+                getNetworkManager().removeP2PSwarm( this, p2pHash );
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to remove P2P swarm: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public void resetSwarmSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
             throws ResourceHostException
     {
@@ -1260,11 +1279,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ReservedPorts getContainerPortMappings(final Protocol protocol) throws ResourceHostException
+    public ReservedPorts getContainerPortMappings( final Protocol protocol ) throws ResourceHostException
     {
         try
         {
-            return getNetworkManager().getContainerPortMappings( this , protocol);
+            return getNetworkManager().getContainerPortMappings( this, protocol );
         }
         catch ( NetworkManagerException e )
         {
@@ -1359,17 +1378,16 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public boolean isPortMappingReserved( final Protocol protocol, final int externalPort, final String ipAddress,
-                                          final int internalPort) throws ResourceHostException
+                                          final int internalPort ) throws ResourceHostException
     {
         try
         {
-            return getNetworkManager().isPortMappingReserved( this, protocol, externalPort, ipAddress,
-                    internalPort );
+            return getNetworkManager().isPortMappingReserved( this, protocol, externalPort, ipAddress, internalPort );
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( String.format( "Failed to check port mapping existence: %s",
-                    e.getMessage() ), e );
+            throw new ResourceHostException(
+                    String.format( "Failed to check port mapping existence: %s", e.getMessage() ), e );
         }
     }
 
@@ -1383,7 +1401,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( String.format( "Failed to get port mapping list: %s", e.getMessage() ), e );
+            throw new ResourceHostException( String.format( "Failed to get port mapping list: %s", e.getMessage() ),
+                    e );
         }
     }
 }
