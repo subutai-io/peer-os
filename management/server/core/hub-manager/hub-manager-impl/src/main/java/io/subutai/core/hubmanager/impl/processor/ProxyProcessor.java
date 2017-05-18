@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.sun.org.apache.regexp.internal.RE;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
@@ -90,15 +92,19 @@ public class ProxyProcessor implements StateLinkProcessor
                 {
                     case CREATE:
                         setupP2PTunnel( proxyDto, p2PInfoDto );
-                        setupPortMap( proxyDto, stateLink );
+                        setupPortMap( proxyDto );
+                        sendDataToHub( proxyDto, stateLink );
                         break;
                     case UPDATE:
-                        setupPortMap( proxyDto, stateLink );
+                        setupPortMap( proxyDto );
+                        p2PInfoDto.setState( P2PInfoDto.State.READY );
+                        sendDataToHub( proxyDto, stateLink );
                         break;
                     case DESTROY:
                         try
                         {
-                            destroyTunnel( proxyDto, stateLink );
+                            destroyTunnel( proxyDto );
+                            sendDataToHub( proxyDto, stateLink );
                         }
                         catch ( Exception e )
                         {
@@ -124,11 +130,11 @@ public class ProxyProcessor implements StateLinkProcessor
 
     private void wrongState( ProxyDto proxyDto )
     {
-        log.error( "Wrong state come from HUB: {}", proxyDto );
+        log.error( "Wrong state come from HUB: {}", proxyDto.toString() );
     }
 
 
-    private void destroyTunnel( ProxyDto proxyDto, String stateLink ) throws Exception
+    private void destroyTunnel( ProxyDto proxyDto ) throws Exception
     {
         for ( P2PInfoDto p2PInfoDto : proxyDto.getP2PInfoDtos() )
         {
@@ -142,8 +148,6 @@ public class ProxyProcessor implements StateLinkProcessor
                 resourceHost.removeP2PSwarm( proxyDto.getP2pHash() );
             }
         }
-
-        sendDataToHub( proxyDto, stateLink );
     }
 
 
@@ -168,7 +172,7 @@ public class ProxyProcessor implements StateLinkProcessor
     }
 
 
-    private void setupPortMap( ProxyDto proxyDto, String stateLink )
+    private void setupPortMap( ProxyDto proxyDto )
     {
         try
         {
@@ -196,12 +200,16 @@ public class ProxyProcessor implements StateLinkProcessor
                                         portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN, portMapDto
                                                 .isSslBackend() );
                             }
+
+                            portMapDto.setState( PortMapDto.State.USED );
                         }
                         else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING )
                                 || portMapDto.getState().equals( PortMapDto.State.DELETED ) )
                         {
                             resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getProxyIp(),
                                     portMapDto.getExternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain() );
+
+                            portMapDto.setState( PortMapDto.State.DELETED );
                         }
                     }
                     else
@@ -215,12 +223,16 @@ public class ProxyProcessor implements StateLinkProcessor
                                 resourceHost.mapContainerPort( protocol, portMapDto.getProxyIp(), portMapDto
                                         .getExternalPort(), portMapDto.getExternalPort() );
                             }
+
+                            portMapDto.setState( PortMapDto.State.USED );
                         }
                         else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING )
                                 || portMapDto.getState().equals( PortMapDto.State.DELETED ) )
                         {
                             resourceHost.removeContainerPortMapping( protocol, portMapDto.getProxyIp(),
                                     portMapDto.getExternalPort(), portMapDto.getExternalPort() );
+
+                            portMapDto.setState( PortMapDto.State.DELETED );
                         }
                     }
                 }
@@ -231,8 +243,6 @@ public class ProxyProcessor implements StateLinkProcessor
                     log.error( "*********", e );
                 }
             }
-
-            sendDataToHub( proxyDto, stateLink );
         }
         catch ( Exception e )
         {
