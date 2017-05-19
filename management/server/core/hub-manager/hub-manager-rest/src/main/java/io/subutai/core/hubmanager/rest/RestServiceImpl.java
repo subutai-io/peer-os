@@ -49,11 +49,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response register( final String email, final String password, final String peerName )
+    public Response register( final String email, final String password, final String peerName, final String peerScope )
     {
         try
         {
-            hubManager.registerPeer( email, password, StringUtil.removeHtml( peerName ) );
+            hubManager.registerPeer( email, password, StringUtil.removeHtml( peerName ), peerScope );
 
             return Response.ok().build();
         }

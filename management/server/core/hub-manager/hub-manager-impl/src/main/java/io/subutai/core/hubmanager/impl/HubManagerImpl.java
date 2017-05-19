@@ -353,14 +353,14 @@ public class HubManagerImpl implements HubManager, HostListener
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String email, String password, String peerName ) throws HubManagerException
+    public void registerPeer( String email, String password, String peerName, String peerScope ) throws HubManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );
 
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
-        registrationManager.registerPeer( email, password, peerName );
+        registrationManager.registerPeer( email, password, peerName, peerScope );
 
         generateChecksum();
 

@@ -30,7 +30,7 @@ public interface RestService
     @Path( "/register" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response register( @FormParam( "email" ) String email, @FormParam( "password" ) String password,
-                       @FormParam( "peerName" ) String peerName );
+                       @FormParam( "peerName" ) String peerName, @FormParam( "peerScope" ) String peerScope );
 
     //Send resource host configurations
     @POST

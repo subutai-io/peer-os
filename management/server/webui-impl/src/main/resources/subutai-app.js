@@ -143,6 +143,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         login: "",
         password: "",
         peerName: "",
+        peerScope: "Public"
     };
 
 
@@ -169,7 +170,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         vm.hubRegisterError = false;
         hubPopupLoadScreen(true);
 
-        var postData = 'email=' + vm.hub.login + '&peerName=' + vm.hub.peerName + '&password=' + encodeURIComponent(vm.hub.password);
+        var postData = 'email=' + vm.hub.login + '&peerName=' + vm.hub.peerName + '&password=' + encodeURIComponent(vm.hub.password) + '&peerScore=' + vm.hub.peerScope;
         $http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
             withCredentials: true,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
