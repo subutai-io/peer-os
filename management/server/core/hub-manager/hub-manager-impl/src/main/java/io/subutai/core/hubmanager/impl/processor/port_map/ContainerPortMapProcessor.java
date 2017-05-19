@@ -1,16 +1,13 @@
 package io.subutai.core.hubmanager.impl.processor.port_map;
 
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import io.subutai.common.command.CommandException;
@@ -37,18 +34,13 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
-
-    //    private PeerManager peerManager;
-    //
-    //    private HubRestClient restClient;
+    private static final HashSet<PortMapDto> PORT_CACHE = new HashSet<>();
 
     private Context ctx;
 
 
-    public ContainerPortMapProcessor( PeerManager peerManager, HubRestClient restClient )
+    public ContainerPortMapProcessor()
     {
-        //        this.peerManager = peerManager;
-        //        this.restClient = restClient;
     }
 
 
@@ -118,6 +110,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
         finally
         {
             LINKS_IN_PROGRESS.remove( stateLink );
+            PORT_CACHE.clear();
         }
     }
 
@@ -147,6 +140,19 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     {
         try
         {
+            if ( portMapDto.getState().equals( PortMapDto.State.USED ) )
+            {
+                return;
+            }
+
+            if ( PORT_CACHE.contains( portMapDto ) )
+            {
+                return;
+            }
+
+            PORT_CACHE.add( portMapDto );
+
+
             ContainerHost containerHost = ctx.localPeer.getContainerHostById( portMapDto.getContainerSSId() );
 
             ResourceHost resourceHost =
@@ -157,21 +163,34 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
             if ( !protocol.isHttpOrHttps() )
             {
-                resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                        portMapDto.getExternalPort() );
+                if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
+                        portMapDto.getInternalPort() ) )
+                {
+                    resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                            portMapDto.getExternalPort() );
+                }
+                else
+                {
+                    portMapDto.setState( PortMapDto.State.USED );
+                }
             }
             else
             {
-                String sslCertPath = protocol == Protocol.HTTPS?
-                                     saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
+                if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
+                        portMapDto.getInternalPort() ) )
+                {
+                    String sslCertPath =
+                            protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, resourceHost ) :
+                            null;
 
-                resourceHost.mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                        portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
-                        portMapDto.isSslBackend() );
+                    resourceHost
+                            .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
+                                    portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
+                                    LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
+                }
             }
 
-
-            if ( !resourceHost.isManagementHost() )
+            if ( !resourceHost.isManagementHost() && !portMapDto.isProxied() )
             {
                 // Container resides on additional RH, that's why we need to forward traffic from MH to RH.
                 // On MH external port should be forwarded to same external port of RH, then on RH real
@@ -190,8 +209,9 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     }
                     else
                     {
-                        String sslCertPath = protocol == Protocol.HTTPS?
-                                             saveSslCertificateToFilesystem( portMapDto, mngHost ) : null;
+                        String sslCertPath =
+                                protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, mngHost ) :
+                                null;
 
                         mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
                                 portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
@@ -199,6 +219,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     }
                 }
             }
+
 
             portMapDto.setState( PortMapDto.State.USED );
         }
@@ -224,7 +245,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
         String sslCertPath = "/tmp/" + fileName + ".pem";
 
-        rh.execute( new RequestBuilder( String.format("echo \"%s\" > %s", portMapDto.getSslCertPem(), sslCertPath ) ) );
+        rh.execute(
+                new RequestBuilder( String.format( "echo \"%s\" > %s", portMapDto.getSslCertPem(), sslCertPath ) ) );
 
         return sslCertPath;
     }

@@ -28,6 +28,7 @@ public interface NetworkManager
     void joinP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
                        long secretKeyTtlSec ) throws NetworkManagerException;
 
+    void removeP2PSwarm(  Host host, String p2pHash) throws NetworkManagerException;
 
     /**
      * Resets a secret key for a given P2P network
