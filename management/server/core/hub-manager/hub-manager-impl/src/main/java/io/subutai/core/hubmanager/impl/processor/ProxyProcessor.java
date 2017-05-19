@@ -86,35 +86,35 @@ public class ProxyProcessor implements StateLinkProcessor
 
             ProxyDto proxyDto = result.getEntity();
 
-            P2PInfoDto p2PInfoDto = proxyDto.getP2PInfoDto();
-
-
-            switch ( p2PInfoDto.getState() )
+            for ( P2PInfoDto p2PInfoDto : proxyDto.getP2PInfoDtos() )
             {
-                case CREATE:
-                    setupP2PTunnel( proxyDto, p2PInfoDto );
-                    setupPortMap( proxyDto );
-                    sendDataToHub( proxyDto, stateLink );
-                    break;
-                case UPDATE:
-                    setupPortMap( proxyDto );
-                    p2PInfoDto.setState( P2PInfoDto.State.READY );
-                    sendDataToHub( proxyDto, stateLink );
-                    break;
-                case DESTROY:
-                    try
-                    {
-                        destroyTunnel( proxyDto );
+                switch ( p2PInfoDto.getState() )
+                {
+                    case CREATE:
+                        setupP2PTunnel( proxyDto, p2PInfoDto );
+                        setupPortMap( proxyDto );
                         sendDataToHub( proxyDto, stateLink );
-                    }
-                    catch ( Exception e )
-                    {
-                        log.info( e.getMessage() );
-                    }
-                    break;
-                default:
-                    wrongState( proxyDto );
-                    break;
+                        break;
+                    case UPDATE:
+                        setupPortMap( proxyDto );
+                        p2PInfoDto.setState( P2PInfoDto.State.READY );
+                        sendDataToHub( proxyDto, stateLink );
+                        break;
+                    case DESTROY:
+                        try
+                        {
+                            destroyTunnel( proxyDto );
+                            sendDataToHub( proxyDto, stateLink );
+                        }
+                        catch ( Exception e )
+                        {
+                            log.info( e.getMessage() );
+                        }
+                        break;
+                    default:
+                        wrongState( proxyDto );
+                        break;
+                }
             }
         }
         catch ( Exception e )
@@ -136,16 +136,17 @@ public class ProxyProcessor implements StateLinkProcessor
 
     private void destroyTunnel( ProxyDto proxyDto ) throws Exception
     {
-        P2PInfoDto p2PInfoDto = proxyDto.getP2PInfoDto();
-
-        if ( p2PInfoDto.getRhId() != null && p2PInfoDto.getState().equals( P2PInfoDto.State.DESTROY ) )
+        for ( P2PInfoDto p2PInfoDto : proxyDto.getP2PInfoDtos() )
         {
+            if ( p2PInfoDto.getRhId() != null && p2PInfoDto.getState().equals( P2PInfoDto.State.DESTROY ) )
+            {
 
-            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( p2PInfoDto.getRhId() );
+                ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( p2PInfoDto.getRhId() );
 
-            cleanPortMap( resourceHost, proxyDto );
+                cleanPortMap( resourceHost, proxyDto );
 
-            resourceHost.removeP2PSwarm( proxyDto.getP2pHash() );
+                resourceHost.removeP2PSwarm( proxyDto.getP2pHash() );
+            }
         }
     }
 

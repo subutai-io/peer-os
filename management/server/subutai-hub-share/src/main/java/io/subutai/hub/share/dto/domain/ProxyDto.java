@@ -12,7 +12,7 @@ public class ProxyDto
     private String p2SecretKey;
     private Long p2pSecretTTL;
     private String logs;
-    private P2PInfoDto p2PInfoDto;
+    private Set<P2PInfoDto> p2PInfoDtos = new HashSet<>();
     private Set<String> subnets = new HashSet<>();
     private P2PInfoDto.State state;
     private Set<PortMapDto> portMaps = new HashSet<>();
@@ -83,15 +83,15 @@ public class ProxyDto
     }
 
 
-    public P2PInfoDto getP2PInfoDto()
+    public Set<P2PInfoDto> getP2PInfoDtos()
     {
-        return p2PInfoDto;
+        return p2PInfoDtos;
     }
 
 
-    public void setP2PInfoDto( final P2PInfoDto p2PInfoDto )
+    public void setP2PInfoDtos( final Set<P2PInfoDto> p2PInfoDtos )
     {
-        this.p2PInfoDto = p2PInfoDto;
+        this.p2PInfoDtos = p2PInfoDtos;
     }
 
 
