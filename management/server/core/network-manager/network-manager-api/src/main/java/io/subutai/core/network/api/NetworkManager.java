@@ -28,7 +28,7 @@ public interface NetworkManager
     void joinP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
                        long secretKeyTtlSec ) throws NetworkManagerException;
 
-    void removeP2PSwarm(  Host host, String p2pHash) throws NetworkManagerException;
+    void removeP2PSwarm( Host host, String p2pHash ) throws NetworkManagerException;
 
     /**
      * Resets a secret key for a given P2P network
@@ -136,19 +136,16 @@ public interface NetworkManager
 
     /**
      * Returns list of ports, mapped using 'subutai map' command. See https://github.com/subutai-io/subos/wiki/Map
+     *
      * @param host RH host
-     * @return
      */
     List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException;
 
     /**
      * Check if port is already mapped using 'subutai map' command
+     *
      * @param host RH host on which to check mapping existence
-     * @param protocol
-     * @param externalPort
      * @param ipAddress IP address of container of Resource Host
-     * @param internalPort
-     * @return
      */
     boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
                                    final String ipAddress, final int internalPort ) throws NetworkManagerException;
@@ -220,4 +217,6 @@ public interface NetworkManager
      */
     void removeContainerPortDomainMapping( Host host, Protocol protocol, String containerIp, int containerPort,
                                            int rhPort, String domain ) throws NetworkManagerException;
+
+    String getResourceHostIp( Host host ) throws NetworkManagerException;
 }
