@@ -1503,7 +1503,8 @@ public class PeerManagerImpl implements PeerManager
                         CommandResult result =
                                 localPeer.getManagementHost().execute( new RequestBuilder( "subutai info ipaddr" ) );
 
-                        String ip = result.getStdOut();
+                        String ip = !Strings.isNullOrEmpty( result.getStdOut() ) ? result.getStdOut().trim() :
+                                    result.getStdOut();
 
                         if ( IPUtil.isValid( ip ) && !ip.equals( localPeer.getPeerInfo().getIp() ) )
                         {
