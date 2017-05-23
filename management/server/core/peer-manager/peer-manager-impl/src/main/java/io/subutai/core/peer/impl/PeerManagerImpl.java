@@ -28,8 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.NetworkException;
 import io.subutai.common.network.SocketUtil;
@@ -1498,13 +1496,7 @@ public class PeerManagerImpl implements PeerManager
                             Common.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
                                     .getPeerInfo().isManualSetting() ) )
                     {
-
-                        //TODO move to network manager and expose in ResourceHost
-                        CommandResult result =
-                                localPeer.getManagementHost().execute( new RequestBuilder( "subutai info ipaddr" ) );
-
-                        String ip = !Strings.isNullOrEmpty( result.getStdOut() ) ? result.getStdOut().trim() :
-                                    result.getStdOut();
+                        String ip = localPeer.getManagementHost().getIp();
 
                         if ( IPUtil.isValid( ip ) && !ip.equals( localPeer.getPeerInfo().getIp() ) )
                         {

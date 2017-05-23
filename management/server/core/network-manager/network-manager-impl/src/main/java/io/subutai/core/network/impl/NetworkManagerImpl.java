@@ -598,8 +598,7 @@ public class NetworkManagerImpl implements NetworkManager
     public void mapContainerPortToDomain( final Host host, final Protocol protocol, final String containerIp,
                                           final int containerPort, final int rhPort, final String domain,
                                           final String sslCertPath, final LoadBalancing loadBalancing,
-                                          final boolean sslBackend )
-            throws NetworkManagerException
+                                          final boolean sslBackend ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
@@ -637,5 +636,16 @@ public class NetworkManagerImpl implements NetworkManager
         execute( host,
                 commands.getRemoveContainerPortDomainMappingCommand( protocol, containerIp, containerPort, rhPort,
                         domain ) );
+    }
+
+
+    @Override
+    public String getResourceHostIp( final Host host ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+
+        CommandResult result = execute( host, commands.getGetIPAddressCommand() );
+
+        return !Strings.isNullOrEmpty( result.getStdOut() ) ? result.getStdOut().trim() : result.getStdOut();
     }
 }
