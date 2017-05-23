@@ -30,7 +30,6 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.NetworkException;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.network.SocketUtil;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.HostNotFoundException;
@@ -1497,19 +1496,11 @@ public class PeerManagerImpl implements PeerManager
                             Common.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
                                     .getPeerInfo().isManualSetting() ) )
                     {
+                        String ip = localPeer.getManagementHost().getIp();
 
-                        HostInterface eth1 = localPeer.getManagementHost().getInterfaceByName( "eth1" );
-
-                        if ( IPUtil.isIpValid( eth1 ) )
+                        if ( IPUtil.isValid( ip ) && !ip.equals( localPeer.getPeerInfo().getIp() ) )
                         {
-                            HostInterface wan = localPeer.getManagementHost().getInterfaceByName( "wan" );
-
-                            if ( IPUtil.isIpValid( wan ) && !wan.getIp().equals( localPeer.getPeerInfo().getIp() ) )
-
-                            {
-                                setPublicUrl( localPeerId, wan.getIp(), localPeer.getPeerInfo().getPublicSecurePort(),
-                                        false );
-                            }
+                            setPublicUrl( localPeerId, ip, localPeer.getPeerInfo().getPublicSecurePort(), false );
                         }
                     }
                 }

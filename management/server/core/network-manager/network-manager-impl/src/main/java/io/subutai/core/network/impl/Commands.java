@@ -248,4 +248,10 @@ public class Commands
 
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( args );
     }
+
+
+    RequestBuilder getGetIPAddressCommand()
+    {
+        return new RequestBuilder( INFO_BINDING ).withCmdArgs( Lists.newArrayList( "ipaddr" ) );
+    }
 }

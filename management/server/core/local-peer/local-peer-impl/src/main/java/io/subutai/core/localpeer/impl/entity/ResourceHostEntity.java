@@ -1405,4 +1405,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     e );
         }
     }
+
+
+    @Override
+    public String getIp() throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getResourceHostIp( this );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to get ip: %s", e.getMessage() ), e );
+        }
+    }
 }
