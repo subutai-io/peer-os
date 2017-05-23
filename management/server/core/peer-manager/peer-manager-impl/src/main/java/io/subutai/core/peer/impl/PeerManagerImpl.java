@@ -28,9 +28,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.NetworkException;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.network.SocketUtil;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.HostNotFoundException;
@@ -1498,18 +1499,15 @@ public class PeerManagerImpl implements PeerManager
                                     .getPeerInfo().isManualSetting() ) )
                     {
 
-                        HostInterface eth1 = localPeer.getManagementHost().getInterfaceByName( "eth1" );
+                        //TODO move to network manager and expose in ResourceHost
+                        CommandResult result =
+                                localPeer.getManagementHost().execute( new RequestBuilder( "subutai info ipaddr" ) );
 
-                        if ( IPUtil.isIpValid( eth1 ) )
+                        String ip = result.getStdOut();
+
+                        if ( IPUtil.isValid( ip ) && !ip.equals( localPeer.getPeerInfo().getIp() ) )
                         {
-                            HostInterface wan = localPeer.getManagementHost().getInterfaceByName( "wan" );
-
-                            if ( IPUtil.isIpValid( wan ) && !wan.getIp().equals( localPeer.getPeerInfo().getIp() ) )
-
-                            {
-                                setPublicUrl( localPeerId, wan.getIp(), localPeer.getPeerInfo().getPublicSecurePort(),
-                                        false );
-                            }
+                            setPublicUrl( localPeerId, ip, localPeer.getPeerInfo().getPublicSecurePort(), false );
                         }
                     }
                 }
