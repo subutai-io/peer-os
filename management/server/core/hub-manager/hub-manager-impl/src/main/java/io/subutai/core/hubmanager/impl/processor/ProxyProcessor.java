@@ -180,8 +180,18 @@ public class ProxyProcessor implements StateLinkProcessor
                 if ( portMapDto.getState().equals( PortMapDto.State.DELETED ) || portMapDto.getState().equals(
                         PortMapDto.State.DESTROYING ) )
                 {
-                    resourceHost.removeContainerPortMapping( Protocol.valueOf( portMapDto.getProtocol().name() ),
-                            portMapDto.getProxyIp(), portMapDto.getExternalPort(), portMapDto.getExternalPort() );
+                    Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
+
+                    if ( portMapDto.getProtocol().isHttpOrHttps() )
+                    {
+                        resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getProxyIp(),
+                                portMapDto.getExternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain() );
+                    }
+                    else
+                    {
+                        resourceHost.removeContainerPortMapping( protocol, portMapDto.getProxyIp(),
+                                portMapDto.getExternalPort(), portMapDto.getExternalPort() );
+                    }
                 }
             }
         }
