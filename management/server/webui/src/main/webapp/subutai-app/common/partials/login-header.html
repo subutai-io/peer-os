@@ -147,10 +147,17 @@
 										 tabindex=3
 										 ng-model="currentUserCtrl.hub.peerName">
 						</div>
+						<div class="b-form-group">
+							<div class="g-text g-margin-bottom-half">Scope</div>
+							<select class="b-form-input b-form-input_full" tabindex="4" ng-model="currentUserCtrl.hub.peerScope">
+								<option value="Public" selected>Public</option>
+								<option value="Private">Private</option>
+							</select>
+						</div>
 					</div>
 					<div class="footer">
 						<a href="https://{{ currentUserCtrl.hubIp }}" target="_blank" tabindex=3 class="b-form-label">Sign Up</a>
-						<button type="submit" class="b-btn b-btn_green g-right" tabindex=4
+						<button type="submit" class="b-btn b-btn_green g-right" tabindex=5
 										ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
 							Register
 						</button>

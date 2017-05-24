@@ -54,11 +54,11 @@ public class RegistrationManager
     }
 
 
-    public void registerPeer( String email, String password, String peerName ) throws HubManagerException
+    public void registerPeer( String email, String password, String peerName, String peerScope ) throws HubManagerException
     {
         registerPeerPubKey();
 
-        register( email, password, peerName );
+        register( email, password, peerName, peerScope );
     }
 
 
@@ -92,13 +92,14 @@ public class RegistrationManager
     }
 
 
-    private RegistrationDto getRegistrationDto( String email, String password, String peerName )
+    private RegistrationDto getRegistrationDto( String email, String password, String peerName, String peerScope )
     {
         PeerInfoDto peerInfoDto = new PeerInfoDto();
 
         peerInfoDto.setId( configManager.getPeerId() );
         peerInfoDto.setVersion( String.valueOf( SubutaiInfo.getVersion() ) );
         peerInfoDto.setName( peerName );
+        peerInfoDto.setScope( peerScope );
 
         RegistrationDto dto = new RegistrationDto( PGPKeyHelper.getFingerprint( configManager.getOwnerPublicKey() ) );
         User activeUser = configManager.getActiveUser();
@@ -118,13 +119,13 @@ public class RegistrationManager
     }
 
 
-    private void register( String email, String password, String peerName ) throws HubManagerException
+    private void register( String email, String password, String peerName, String peerScope ) throws HubManagerException
     {
         log.info( "Registering peer with Hub..." );
 
         String path = format( "/rest/v1/peers/%s", peerId );
 
-        RegistrationDto regDto = getRegistrationDto( email, password, peerName );
+        RegistrationDto regDto = getRegistrationDto( email, password, peerName, peerScope );
 
         RestResult<Object> restResult = restClient.post( path, regDto );
 

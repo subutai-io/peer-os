@@ -9,6 +9,8 @@ public class PeerInfoDto
 
     private String version;
 
+    private String scope;
+
 
     public PeerInfoDto()
     {
@@ -48,5 +50,17 @@ public class PeerInfoDto
     public void setVersion( final String version )
     {
         this.version = version;
+    }
+
+
+    public String getScope()
+    {
+        return scope;
+    }
+
+
+    public void setScope( final String scope )
+    {
+        this.scope = scope;
     }
 }
