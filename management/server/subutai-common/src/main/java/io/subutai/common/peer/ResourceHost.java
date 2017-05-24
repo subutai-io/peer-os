@@ -212,4 +212,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
                                    final int internalPort ) throws ResourceHostException;
 
     List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException;
+
+    String getIp() throws ResourceHostException;
 }
