@@ -376,7 +376,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		} else {
 		    SweetAlert.swal(
 		    "Your key is not registered with Kurjun",
-		    "Please, register your Key on Hub",
+		    "Please, register your key on Hub",
 		    "success");
 		}
 	}
