@@ -13,6 +13,8 @@ public class EnvironmentInfoDto
 
     private String ownerId;
 
+    private String ownerName;
+
     private Long ssOwnerId;
 
     private String name;
@@ -62,29 +64,54 @@ public class EnvironmentInfoDto
         this.id = id;
     }
 
-    public Long getHubId() {
+
+    public Long getHubId()
+    {
         return hubId;
     }
 
-    public void setHubId(Long hubId) {
+
+    public void setHubId( Long hubId )
+    {
         this.hubId = hubId;
     }
 
-    public String getOwnerId() {
+
+    public String getOwnerId()
+    {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+
+    public void setOwnerId( String ownerId )
+    {
         this.ownerId = ownerId;
     }
 
-    public Long getSsOwnerId() {
+
+    public String getOwnerName()
+    {
+        return ownerName;
+    }
+
+
+    public void setOwnerName( final String ownerName )
+    {
+        this.ownerName = ownerName;
+    }
+
+
+    public Long getSsOwnerId()
+    {
         return ssOwnerId;
     }
 
-    public void setSsOwnerId(Long ssOwnerId) {
+
+    public void setSsOwnerId( Long ssOwnerId )
+    {
         this.ssOwnerId = ssOwnerId;
     }
+
 
     public String getName()
     {
@@ -270,5 +297,4 @@ public class EnvironmentInfoDto
     {
         this.sslCertPath = sslCertPath;
     }
-
 }
