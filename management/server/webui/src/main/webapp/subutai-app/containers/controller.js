@@ -365,13 +365,20 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function createTemplatePopup(container){
 
-		vm.editingContainer = container;
+        if( hasKurjunToken() ){
+            vm.editingContainer = container;
 
-		ngDialog.open({
-			template: 'subutai-app/containers/partials/createTemplate.html',
-			scope: $scope,
-			className: 'b-build-environment-info'
-		});
+            ngDialog.open({
+                template: 'subutai-app/containers/partials/createTemplate.html',
+                scope: $scope,
+                className: 'b-build-environment-info'
+            });
+		} else {
+		    SweetAlert.swal(
+		    "Your key is not registered with Kurjun",
+		    "Please, register your Key on Hub",
+		    "success");
+		}
 	}
 
     vm.disabled = false;
