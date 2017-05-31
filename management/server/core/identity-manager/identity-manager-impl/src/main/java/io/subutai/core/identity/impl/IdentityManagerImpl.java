@@ -857,6 +857,12 @@ public class IdentityManagerImpl implements IdentityManager
     public void setUserPublicKey( long userId, String publicKeyASCII )
     {
 
+        Session session = getActiveSession();
+        if ( session != null )
+        {
+            session.setKurjunToken( null );
+        }
+
         User user = identityDataService.getUser( userId );
 
         if ( user != null )
