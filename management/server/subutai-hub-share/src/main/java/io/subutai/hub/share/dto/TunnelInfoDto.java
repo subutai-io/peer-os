@@ -1,34 +1,25 @@
 package io.subutai.hub.share.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 
 
-public class TunnelInfoDto
+public class TunnelInfoDto implements Serializable
 {
 
     public enum TunnelStatus
     {
-        PENDING,
-        READY,
-        ERROR,
-        DELETE
+        PENDING, READY, ERROR, DELETE
     }
 
 
-    @JsonIgnore
     private String containerId;
-
     private String ip;
     private String portToOpen;
     private long ttl;
-
     private TunnelStatus tunnelStatus;
-
     private String openedPort;
     private String openedIp;
-
-    @JsonIgnore
     private String errorLogs;
 
 

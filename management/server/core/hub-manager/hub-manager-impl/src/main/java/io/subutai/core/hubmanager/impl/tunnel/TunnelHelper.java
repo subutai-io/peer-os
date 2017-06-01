@@ -17,6 +17,8 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.hub.share.common.util.DtoConverter;
+import io.subutai.hub.share.dto.CommonDto;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -29,8 +31,8 @@ public class TunnelHelper
 
     private static String COMMAND = "";
 
-    private static final String DELETE_TUNNEL_COMMAND =  "subutai tunnel del %s";
-    private static final String GET_OPENED_TUNNELS_FOR_IP_COMMAND =  "subutai tunnel list | grep %s | awk '{print $2}'";
+    private static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s";
+    private static final String GET_OPENED_TUNNELS_FOR_IP_COMMAND = "subutai tunnel list | grep %s | awk '{print $2}'";
 
 
     private TunnelHelper()
@@ -86,8 +88,12 @@ public class TunnelHelper
         WebClient client = null;
         try
         {
+
+            byte[] body = DtoConverter.serialize( tunnelInfoDto );
+            CommonDto commonDto = new CommonDto( body );
+
             client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
-            byte[] cborData = JsonUtil.toCbor( tunnelInfoDto );
+            byte[] cborData = JsonUtil.toCbor( commonDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             return client.put( encryptedData );
         }
@@ -142,26 +148,14 @@ public class TunnelHelper
     public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager,
                                              TunnelInfoDto tunnelInfoDto )
     {
-        String[] data = result.split( ":" );
+        result = result.replaceAll( "\n", "" );
+        result = result.replaceAll( "\t", "_" );
+        String[] ipport = result.split( "_" );
+        result = ipport[0];
+        ipport = result.split( ":" );
 
-        try
-        {
-            tunnelInfoDto.setOpenedIp( data[0] );
-            if ( data[1].contains( " " ) )
-            {
-                tunnelInfoDto.setOpenedPort( data[1].split( " " )[0] );
-            }
-            else
-            {
-                tunnelInfoDto.setOpenedPort( data[1] );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage() );
-            sendError( link, "Executed: " + COMMAND + "   output: " + result, configManager );
-            return null;
-        }
+        tunnelInfoDto.setOpenedIp( String.valueOf( ipport[0] ) );
+        tunnelInfoDto.setOpenedPort( String.valueOf( ipport[1] ) );
         return tunnelInfoDto;
     }
 
@@ -171,8 +165,7 @@ public class TunnelHelper
 
         ResourceHost resourceHost = resourceHosts.iterator().next();
 
-        CommandResult result =
-                execute( resourceHost, String.format( GET_OPENED_TUNNELS_FOR_IP_COMMAND, ip ) );
+        CommandResult result = execute( resourceHost, String.format( GET_OPENED_TUNNELS_FOR_IP_COMMAND, ip ) );
 
 
         String[] data = result.getStdOut().split( "\n" );
