@@ -100,6 +100,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void joinP2PSwarm( String p2pIp, String interfaceName, String p2pHash, String secretKey, long secretKeyTtlSec )
             throws ResourceHostException;
 
+    void removeP2PSwarm( String p2pHash ) throws ResourceHostException;
+
     void resetSwarmSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws ResourceHostException;
 
     Tunnels getTunnels() throws ResourceHostException;
@@ -188,9 +190,11 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param domain domain
      * @param sslCertPath optional path to SSL cert, pass null if not needed
      * @param loadBalancing optional load balancing method, pass null if not needed
+     * @param sslBackend determines if backend is working over SSL or not
      */
     void mapContainerPortToDomain( Protocol protocol, String containerIp, int containerPort, int rhPort, String domain,
-                                   String sslCertPath, LoadBalancing loadBalancing ) throws ResourceHostException;
+                                   String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend )
+            throws ResourceHostException;
 
     /**
      * Removes specified container port domain mapping
@@ -208,4 +212,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
                                    final int internalPort ) throws ResourceHostException;
 
     List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException;
+
+    String getIp() throws ResourceHostException;
 }

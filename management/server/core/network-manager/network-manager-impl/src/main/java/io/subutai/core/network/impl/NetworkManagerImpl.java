@@ -81,6 +81,15 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void removeP2PSwarm( final Host host, String p2pHash ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+
+        execute( host, commands.getRemoveP2PSwarmCommand( p2pHash ) );
+    }
+
+
+    @Override
     public void resetSwarmSecretKey( final Host host, final String p2pHash, final String newSecretKey,
                                      final long ttlSeconds ) throws NetworkManagerException
     {
@@ -588,8 +597,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void mapContainerPortToDomain( final Host host, final Protocol protocol, final String containerIp,
                                           final int containerPort, final int rhPort, final String domain,
-                                          final String sslCertPath, final LoadBalancing loadBalancing )
-            throws NetworkManagerException
+                                          final String sslCertPath, final LoadBalancing loadBalancing,
+                                          final boolean sslBackend ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
@@ -605,7 +614,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( host,
                 commands.getMapContainerPortToDomainCommand( protocol, containerIp, containerPort, rhPort, domain,
-                        sslCertPath, loadBalancing ) );
+                        sslCertPath, loadBalancing, sslBackend ) );
     }
 
 
@@ -627,5 +636,16 @@ public class NetworkManagerImpl implements NetworkManager
         execute( host,
                 commands.getRemoveContainerPortDomainMappingCommand( protocol, containerIp, containerPort, rhPort,
                         domain ) );
+    }
+
+
+    @Override
+    public String getResourceHostIp( final Host host ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+
+        CommandResult result = execute( host, commands.getGetIPAddressCommand() );
+
+        return !Strings.isNullOrEmpty( result.getStdOut() ) ? result.getStdOut().trim() : result.getStdOut();
     }
 }

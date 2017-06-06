@@ -13,18 +13,8 @@
   <reference id="integration"
              interface="io.subutai.core.hubmanager.api.HubManager" />
 
-  <reference id="commandExecutor" availability="mandatory"
-             interface="io.subutai.core.executor.api.CommandExecutor" />
-  <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
-
-  <reference id="identityManager"
-             interface="io.subutai.core.identity.api.IdentityManager" />
-
   <bean id="hubRestServiceImpl" class="io.subutai.core.hubmanager.rest.RestServiceImpl">
     <property name="integration" ref="integration" />
-    <property name="commandExecutor" ref="commandExecutor" />
-    <property name="peerManager" ref="peerManager" />
-    <property name="identityManager" ref="identityManager" />
   </bean>
 
   <jaxrs:server address="/v1/hub" id="hubRestService">
@@ -32,6 +22,5 @@
       <ref component-id="hubRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
-
 
 </blueprint>

@@ -58,6 +58,12 @@ public class Commands
     }
 
 
+    RequestBuilder getRemoveP2PSwarmCommand( String p2pHash )
+    {
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.newArrayList( "-d", p2pHash ) ).withTimeout( 90 );
+    }
+
+
     RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( P2P_BINDING )
@@ -188,7 +194,8 @@ public class Commands
 
     RequestBuilder getMapContainerPortToDomainCommand( final Protocol protocol, final String containerIp,
                                                        final int containerPort, final int rhPort, final String domain,
-                                                       final String sslCertPath, final LoadBalancing loadBalancing )
+                                                       final String sslCertPath, final LoadBalancing loadBalancing,
+                                                       final boolean sslBackend )
     {
         List<String> args = Lists.newArrayList( protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain );
@@ -197,6 +204,11 @@ public class Commands
         {
             args.add( "-c" );
             args.add( sslCertPath );
+        }
+
+        if ( sslBackend )
+        {
+            args.add( "--sslbackend" );
         }
 
         if ( loadBalancing != null )
@@ -235,5 +247,11 @@ public class Commands
         }
 
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( args );
+    }
+
+
+    RequestBuilder getGetIPAddressCommand()
+    {
+        return new RequestBuilder( INFO_BINDING ).withCmdArgs( Lists.newArrayList( "ipaddr" ) );
     }
 }

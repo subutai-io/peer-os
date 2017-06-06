@@ -54,6 +54,8 @@ import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
+import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
@@ -290,6 +292,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
+        ProxyProcessor proxyProcessor = new ProxyProcessor(configManager, peerManager, restClient);
+
         UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx);
 
         heartbeatProcessor =
@@ -302,6 +306,7 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
+                                                                             .addProcessor( proxyProcessor )
                                                                              .addProcessor( containerPortMapProcessor )
                                                                              .addProcessor( userTokenProcessor );
 
@@ -353,20 +358,20 @@ public class HubManagerImpl implements HubManager, HostListener
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String email, String password, String peerName ) throws HubManagerException
+    public void registerPeer( String email, String password, String peerName, String peerScope ) throws HubManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );
 
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
-        registrationManager.registerPeer( email, password, peerName );
+        registrationManager.registerPeer( email, password, peerName, peerScope );
 
         generateChecksum();
 
-        notifyRegistrationListeners();
-
         sendResourceHostInfo();
+
+        notifyRegistrationListeners();
 
         registrationRequestProcessor.run();
 

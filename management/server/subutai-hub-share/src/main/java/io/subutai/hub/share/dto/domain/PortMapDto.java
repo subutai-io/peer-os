@@ -17,7 +17,7 @@ public class PortMapDto
 
     public enum State
     {
-        CREATING, RESERVED, USED, DESTROYING, ERROR
+        CREATING, RESERVED, USED, DESTROYING, ERROR, DELETED
     }
 
 
@@ -35,7 +35,15 @@ public class PortMapDto
 
     private String domain;
 
+    private String sslCertPem;
+
+    private boolean sslBackend;
+
     private String errorLog;
+
+    private String proxyIp;
+
+    private boolean isProxied;
 
 
     public PortMapDto()
@@ -137,5 +145,53 @@ public class PortMapDto
     public void setDomain( final String domain )
     {
         this.domain = domain;
+    }
+
+
+    public String getSslCertPem()
+    {
+        return sslCertPem;
+    }
+
+
+    public void setSslCertPem( final String sslCertPem )
+    {
+        this.sslCertPem = sslCertPem;
+    }
+
+
+    public boolean isSslBackend()
+    {
+        return sslBackend;
+    }
+
+
+    public void setSslBackend( final boolean sslBackend )
+    {
+        this.sslBackend = sslBackend;
+    }
+
+
+    public String getProxyIp()
+    {
+        return proxyIp;
+    }
+
+
+    public void setProxyIp( final String proxyIp )
+    {
+        this.proxyIp = proxyIp;
+    }
+
+
+    public boolean isProxied()
+    {
+        return isProxied;
+    }
+
+
+    public void setProxied( final boolean proxied )
+    {
+        isProxied = proxied;
     }
 }
