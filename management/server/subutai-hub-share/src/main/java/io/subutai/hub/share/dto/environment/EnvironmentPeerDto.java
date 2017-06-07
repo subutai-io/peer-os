@@ -60,6 +60,8 @@ public class EnvironmentPeerDto
 
     private String playbook;
 
+    private String kurjunToken;
+
 
     public EnvironmentPeerDto()
     {
@@ -334,6 +336,18 @@ public class EnvironmentPeerDto
     public void setPlaybook( final String playbook )
     {
         this.playbook = playbook;
+    }
+
+
+    public String getKurjunToken()
+    {
+        return kurjunToken;
+    }
+
+
+    public void setKurjunToken( final String kurjunToken )
+    {
+        this.kurjunToken = kurjunToken;
     }
 
 
