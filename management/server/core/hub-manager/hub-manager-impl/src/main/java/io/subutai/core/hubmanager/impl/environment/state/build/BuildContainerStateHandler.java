@@ -38,7 +38,6 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 import static io.subutai.hub.share.dto.environment.ContainerStateDto.BUILDING;
 
@@ -246,8 +245,8 @@ public class BuildContainerStateHandler extends StateHandler
         Set<ContainerHost> envContainers = ctx.localPeer.findContainersByEnvironmentId( envId );
 
         CreateEnvironmentContainersRequest createRequests =
-                new CreateEnvironmentContainersRequest( envId, Common.HUB_ID,
-                        peerDto.getEnvironmentInfo().getOwnerId() );
+                new CreateEnvironmentContainersRequest( envId, Common.HUB_ID, peerDto.getEnvironmentInfo().getOwnerId(),
+                        peerDto.getKurjunToken() );
 
         log.info( "Clone requests:" );
 
@@ -260,7 +259,7 @@ public class BuildContainerStateHandler extends StateHandler
             // container to existing peer in env.
             if ( !containerExists( nodeDto.getHostName(), envContainers ) && nodeDto.getState() == BUILDING )
             {
-                createRequests.addRequest( createCloneRequest( nodeDto, peerDto.getKurjunToken() ) );
+                createRequests.addRequest( createCloneRequest( nodeDto ) );
             }
         }
 
@@ -268,11 +267,10 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto, String kurjunToken ) throws HubManagerException
+    private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws HubManagerException
     {
         return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota(),
-                kurjunToken );
+                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota() );
     }
 
 
