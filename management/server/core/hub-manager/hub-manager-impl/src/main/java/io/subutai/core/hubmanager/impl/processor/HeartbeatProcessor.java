@@ -189,6 +189,8 @@ public class HeartbeatProcessor implements Runnable
 
             if ( !restResult.isSuccess() )
             {
+                //TODO here we need to use a dedicated http code for letting know that peer is not registered with Hub
+                //otherwise it gets unregistered fir any auth error
                 if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
                 {
                     hubManager.getConfigDataService().deleteConfig( peerId );
