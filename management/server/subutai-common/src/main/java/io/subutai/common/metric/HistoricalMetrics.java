@@ -198,14 +198,11 @@ public class HistoricalMetrics
     private Map<String, NetDto> getNetDto( final List<Series> series )
     {
         Map<String, NetDto> result = new HashMap<>();
-        long timeInterval = ( endTime.getTime() - startTime.getTime() ) / 1000;
-
         for ( String iface : HostMetricsDto.RESOURCE_HOST_INTERFACES )
         {
             double in = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "in" ) );
             double out = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "out" ) );
-            NetDto dto = new NetDto( iface, in / timeInterval / 1024, out / timeInterval / 1024 );
-
+            NetDto dto = new NetDto( iface, in, out );
             result.put( iface, dto );
         }
         return result;
