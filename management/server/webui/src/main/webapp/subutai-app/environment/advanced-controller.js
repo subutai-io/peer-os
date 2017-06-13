@@ -632,6 +632,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     joint.shapes.tm.ToolElementView = joint.dia.ElementView.extend({
         initialize: function () {
             joint.dia.ElementView.prototype.initialize.apply(this, arguments);
+            this.isMovingContainer = false;
         },
         render: function () {
             joint.dia.ElementView.prototype.render.apply(this, arguments);
@@ -701,6 +702,30 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 default:
             }
             joint.dia.CellView.prototype.pointerclick.apply(this, arguments);
+        },
+        pointermove: function (evt, x, y) {
+            if(this.model.get('edited') == true) {
+                // disable moving for existing environment's containers
+                return false;
+            } else {
+                this.isMovingContainer = true;
+                joint.dia.ElementView.prototype.pointermove.apply(this, arguments);
+            }
+        },
+        pointerup: function (evt, x, y) {
+            joint.dia.ElementView.prototype.pointerup.apply(this, arguments);
+
+            if ( this.isMovingContainer == true ) {
+                var models = graph.findModelsFromPoint({x: evt.offsetX, y: evt.offsetY});
+
+                if ( models != undefined && models.length > 0 ) {
+                    this.model.set('parentHostId', models[0].get('hostId'));
+                    this.model.set('parentPeerId', models[0].get('peerId'));
+                    this.model.get('rh')['model'] = models[0].id;
+                }
+            }
+
+            this.isMovingContainer = false;
         }
     });
     joint.shapes.tm.devElementView = joint.shapes.tm.ToolElementView;
