@@ -98,20 +98,18 @@ public class TemplateManagerImpl implements TemplateManager
 
         lock.lock();
 
-        //check again just in case
-
-        needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
-                .toMillis( TEMPLATE_CACHE_TTL_SEC );
-
-        if ( !needToUpdate )
-        {
-            lock.unlock();
-
-            return templatesCache;
-        }
-
         try
         {
+            //check again just in case
+            needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
+                    .toMillis( TEMPLATE_CACHE_TTL_SEC );
+
+            if ( !needToUpdate )
+            {
+                return templatesCache;
+            }
+
+
             WebClient webClient = null;
             Response response = null;
 
