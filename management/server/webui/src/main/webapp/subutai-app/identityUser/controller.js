@@ -3,9 +3,7 @@
 angular.module('subutai.identity-user.controller', [])
 	.controller('IdentityUserCtrl', IdentityUserCtrl)
 	.directive('pwCheck', pwCheck)
-	.directive('colSelect', colSelect)
-	.directive('onErrorSrc', onErrorSrc);
-
+	.directive('colSelect', colSelect);
 IdentityUserCtrl.$inject = ['$scope', 'identitySrv', 'SweetAlert', 'ngDialog', 'cfpLoadingBar', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
 
 var trustedLevels = {
@@ -288,18 +286,6 @@ function pwCheck() {
 		}
 	}
 };
-
-function onErrorSrc() {
-    return {
-        link: function(scope, element, attrs) {
-            element.bind('error', function() {
-                if (attrs.src != attrs.onErrorSrc) {
-                    attrs.$set('src', attrs.onErrorSrc);
-                }
-            });
-        }
-    }
-}
 
 function colSelect() {
 	return {
