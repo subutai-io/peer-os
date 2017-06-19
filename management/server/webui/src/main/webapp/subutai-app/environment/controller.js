@@ -3,6 +3,7 @@
 angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel)
+    .directive('onErrorSrc', onErrorSrc)
 	.directive('onReadFile', onReadFile)
 	.filter( 'sshEmail', function () {
 		return function( input, modify )
@@ -853,5 +854,17 @@ function onReadFile($parse) {
 			});
 		}
 	};
+}
+
+function onErrorSrc() {
+    return {
+        link: function(scope, element, attrs) {
+            element.bind('error', function() {
+                if (attrs.src != attrs.onErrorSrc) {
+                    attrs.$set('src', attrs.onErrorSrc);
+                }
+            });
+        }
+    }
 }
 

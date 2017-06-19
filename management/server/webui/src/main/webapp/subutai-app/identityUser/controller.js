@@ -4,7 +4,6 @@ angular.module('subutai.identity-user.controller', [])
 	.controller('IdentityUserCtrl', IdentityUserCtrl)
 	.directive('pwCheck', pwCheck)
 	.directive('colSelect', colSelect);
-
 IdentityUserCtrl.$inject = ['$scope', 'identitySrv', 'SweetAlert', 'ngDialog', 'cfpLoadingBar', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
 
 var trustedLevels = {
