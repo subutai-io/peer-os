@@ -119,7 +119,9 @@ function environmentService($http, $q) {
                 for( var i = 0; i < data.length; i++ ){
                     if(data[i].tags){
                         for( var j = 0; j < data[i].tags.length; j++ ){
-                            res[data[i].tags[j]] = [];
+                            if ( res[data[i].tags[j]] == undefined ) {
+                                res[data[i].tags[j]] = [];
+                            }
                             res[data[i].tags[j]].push(data[i]);
                         }
                     }else{
