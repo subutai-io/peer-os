@@ -19,9 +19,23 @@ public interface TemplateManager
     Set<Template> getTemplates();
 
     /**
+     * Returns all templates visible to current user
+     *
+     * @param kurjunToken - kurjun token
+     */
+    Set<Template> getTemplates( String kurjunToken );
+
+    /**
      * Returns template by its id
      */
     Template getTemplate( String id );
+
+    /**
+     * Returns template by its id
+     *
+     * @param kurjunToken - kurjun token
+     */
+    Template getTemplate( String id, String kurjunToken );
 
     /**
      * Returns template by name. First looks in verified templates, if not found looks in the rest templates.

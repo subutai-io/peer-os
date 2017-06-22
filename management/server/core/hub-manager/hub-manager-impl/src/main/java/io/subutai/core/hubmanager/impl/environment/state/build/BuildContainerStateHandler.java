@@ -38,7 +38,6 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 import static io.subutai.hub.share.dto.environment.ContainerStateDto.BUILDING;
 
@@ -140,8 +139,8 @@ public class BuildContainerStateHandler extends StateHandler
         try
         {
             ctx.localPeer.prepareTemplates(
-                    //todo pass user kurjun token
-                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), null, rhTemplates ) );
+                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), peerDto.getKurjunToken(),
+                            rhTemplates ) );
         }
         catch ( PeerException e )
         {
@@ -246,7 +245,8 @@ public class BuildContainerStateHandler extends StateHandler
         Set<ContainerHost> envContainers = ctx.localPeer.findContainersByEnvironmentId( envId );
 
         CreateEnvironmentContainersRequest createRequests =
-                new CreateEnvironmentContainersRequest( envId, Common.HUB_ID, peerDto.getEnvironmentInfo().getOwnerId() );
+                new CreateEnvironmentContainersRequest( envId, Common.HUB_ID, peerDto.getEnvironmentInfo().getOwnerId(),
+                        peerDto.getKurjunToken() );
 
         log.info( "Clone requests:" );
 
@@ -270,8 +270,7 @@ public class BuildContainerStateHandler extends StateHandler
     private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws HubManagerException
     {
         return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                //todo pass user kurjun token
-                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota(), null );
+                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota() );
     }
 
 

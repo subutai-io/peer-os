@@ -66,8 +66,8 @@ public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvir
         String maskLength = environment.getSubnetCidr().split( "/" )[1];
 
         final CreateEnvironmentContainersRequest request =
-                new CreateEnvironmentContainersRequest( environment.getId(), localPeer.getId(),
-                        localPeer.getOwnerId() );
+                new CreateEnvironmentContainersRequest( environment.getId(), localPeer.getId(), localPeer.getOwnerId(),
+                        identityManager.getActiveSession().getKurjunToken() );
 
         Iterator<String> ipAddressIterator = ipAddresses.iterator();
 
@@ -79,8 +79,7 @@ public class CreatePeerEnvironmentContainersTask implements Callable<CreateEnvir
 
             CloneRequest cloneRequest =
                     new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
-                            node.getTemplateId(), HostArchitecture.AMD64, node.getQuota(),
-                            identityManager.getActiveSession().getKurjunToken() );
+                            node.getTemplateId(), HostArchitecture.AMD64, node.getQuota() );
 
             request.addRequest( cloneRequest );
         }

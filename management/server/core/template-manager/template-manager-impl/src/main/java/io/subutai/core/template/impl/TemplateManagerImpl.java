@@ -81,6 +81,13 @@ public class TemplateManagerImpl implements TemplateManager
             kurjunToken = session.getKurjunToken();
         }
 
+        return getTemplates( kurjunToken );
+    }
+
+
+    @Override
+    public Set<Template> getTemplates( String kurjunToken )
+    {
         boolean needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
                 .toMillis( TEMPLATE_CACHE_TTL_SEC );
 
@@ -91,20 +98,18 @@ public class TemplateManagerImpl implements TemplateManager
 
         lock.lock();
 
-        //check again just in case
-
-        needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
-                .toMillis( TEMPLATE_CACHE_TTL_SEC );
-
-        if ( !needToUpdate )
-        {
-            lock.unlock();
-
-            return templatesCache;
-        }
-
         try
         {
+            //check again just in case
+            needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
+                    .toMillis( TEMPLATE_CACHE_TTL_SEC );
+
+            if ( !needToUpdate )
+            {
+                return templatesCache;
+            }
+
+
             WebClient webClient = null;
             Response response = null;
 
@@ -176,6 +181,23 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
+    public Template getTemplate( final String id, final String kurjunToken )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
+
+        for ( Template template : getTemplates( kurjunToken ) )
+        {
+            if ( template.getId().equalsIgnoreCase( id ) )
+            {
+                return template;
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
     public Template getTemplateByName( final String name )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
@@ -218,6 +240,26 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
+    @Override
+    public Template getVerifiedTemplateByName( final String templateName )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+
+        try
+        {
+            return getVerifiedTemplatesCache().get( templateName );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error getting verified template by name {} from local Gorjun: {}", templateName,
+                    e.getMessage() );
+
+            return null;
+        }
+    }
+
+
+    @Override
     public List<Template> getUserPrivateTemplates()
     {
         List<Template> templates = Lists.newArrayList();
@@ -300,24 +342,5 @@ public class TemplateManagerImpl implements TemplateManager
     LoadingCache<String, Template> getVerifiedTemplatesCache()
     {
         return verifiedTemplatesCache;
-    }
-
-
-    @Override
-    public Template getVerifiedTemplateByName( final String templateName )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
-
-        try
-        {
-            return getVerifiedTemplatesCache().get( templateName );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error getting verified template by name {} from local Gorjun: {}", templateName,
-                    e.getMessage() );
-
-            return null;
-        }
     }
 }
