@@ -58,6 +58,16 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionButton),
 	];
 
+	function loadPeerDataAsync(){
+		peerRegistrationService.loadPeerDataAsync().success(function (data) {
+			vm.dtOptions = DTOptionsBuilder.fromJson(data);
+		}).error(function(error){
+			console.error('Error determining peer states: ' + error)
+		});
+	}
+
+	loadPeerDataAsync();
+
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
 	}
