@@ -4,25 +4,16 @@ package io.subutai.core.peer.rest.ui;
 import io.subutai.common.peer.RegistrationData;
 
 
-/**
- * Created by Dilshat on 27-Jun-17.
- */
 public class PeerDto
 {
     enum State
     {
-        ONLINE, OFFFLINE, UNKNOWN
+        ONLINE, OFFLINE, UNKNOWN
     }
 
 
     private State state;
     private RegistrationData registrationData;
-
-
-    public State getState()
-    {
-        return state;
-    }
 
 
     public void setState( final State state )

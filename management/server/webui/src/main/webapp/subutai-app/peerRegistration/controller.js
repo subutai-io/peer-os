@@ -76,7 +76,6 @@ function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuil
                 {className: "b-main-table__buttons-group", "targets": 3},
                 {className: "b-main-table__peer-status-col", "targets": 2}
             ]);
-//            .withOption('stateSave', true);
 		}).error(function(error){
 			console.error('Error determining peer states: ' + error)
 		});
@@ -120,11 +119,9 @@ function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuil
 			result += '<a href class="b-btn b-btn_blue subt_button__peer-rename" ng-click="peerRegistrationCtrl.changeNamePopup(\'' + data.registrationData.peerInfo.id + '\', \'' + data.registrationData.peerInfo.name + '\')">Rename</a>';
 			result += '<a href class="b-btn b-btn_white subt_button__peer-update-url" ng-click="peerRegistrationCtrl.updateUrlPopup(\'' + data.registrationData.peerInfo.id + '\', \'' + data.registrationData.peerInfo.publicUrl + '\')">Change url</a>';
 		} else if(data.registrationData.status == 'WAIT') {
-			//result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.cancelPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Cancel</a>';
 			result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Cancel\')">Cancel</a>';
 		} else if(data.registrationData.status == 'REQUESTED') {
 			result += '<a href class="b-btn b-btn_green subt_button__peer-approve" ng-click="peerRegistrationCtrl.approvePeerRequestForm(\'' + data.registrationData.peerInfo.id + '\')">Approve</a>';
-			//result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ng-click="peerRegistrationCtrl.rejectPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Reject</a>';
 			result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Reject\')">Reject</a>';
 		}
 

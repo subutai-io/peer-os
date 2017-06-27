@@ -60,6 +60,7 @@ public class RestServiceImpl implements RestService
         }
     }
 
+
     @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response getRegisteredPeersStates()
@@ -83,7 +84,7 @@ public class RestServiceImpl implements RestService
                         {
                             d.setState(
                                     peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() ).isOnline() ?
-                                    PeerDto.State.ONLINE : PeerDto.State.OFFFLINE );
+                                    PeerDto.State.ONLINE : PeerDto.State.OFFLINE );
                         }
                         catch ( PeerException e )
                         {
@@ -103,7 +104,6 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
-
 
 
     @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
