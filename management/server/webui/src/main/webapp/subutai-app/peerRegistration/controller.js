@@ -69,7 +69,14 @@ function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuil
 	function loadPeerDataAsync(){
 		peerRegistrationService.loadPeerDataAsync().success(function (data) {
 		peerData = data;
-		vm.dtOptions = DTOptionsBuilder.fromFnPromise(getTableData);
+		vm.dtOptions = DTOptionsBuilder.fromFnPromise(getTableData).
+		    withPaginationType('full_numbers')
+            .withOption('createdRow', createdRow)
+            .withOption('columnDefs', [
+                {className: "b-main-table__buttons-group", "targets": 3},
+                {className: "b-main-table__peer-status-col", "targets": 2}
+            ])
+            .withOption('stateSave', true);
 		}).error(function(error){
 			console.error('Error determining peer states: ' + error)
 		});
