@@ -51,6 +51,24 @@ public class RestServiceImpl implements RestService
             List<PeerDto> registrationDatas =
                     peerManager.getRegistrationRequests().stream().map( PeerDto::new ).collect( Collectors.toList() );
 
+            return Response.ok( JsonUtil.toJson( registrationDatas ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting registered peers #getRegisteredPeers", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @RolesAllowed( { "Peer-Management|Read" } )
+    @Override
+    public Response getRegisteredPeersStates()
+    {
+        try
+        {
+            List<PeerDto> registrationDatas =
+                    peerManager.getRegistrationRequests().stream().map( PeerDto::new ).collect( Collectors.toList() );
+
             if ( !registrationDatas.isEmpty() )
             {
                 ExecutorService taskExecutor =
@@ -81,10 +99,11 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting registered peers #getRegisteredPeers", e );
+            LOGGER.error( "Error getting registered peers #getRegisteredPeersStates", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
+
 
 
     @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )

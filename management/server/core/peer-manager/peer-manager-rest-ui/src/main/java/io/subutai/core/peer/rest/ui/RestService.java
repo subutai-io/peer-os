@@ -21,6 +21,11 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getRegisteredPeers();
 
+    @GET
+    @Path( "states" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getRegisteredPeersStates();
+
     @PUT
     @Path( "reject" )
     @Produces( { MediaType.TEXT_PLAIN } )

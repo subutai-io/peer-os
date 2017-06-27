@@ -73,6 +73,11 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 				status = 'true';
 				statusText = 'ONLINE';
 			}
+			else if(data.state == 'UNKNOWN')
+			{
+			    status = 'UKNOWN';
+			    statusText = "Determining status..."
+			}
 			else
 			{
 				status = 'false';
