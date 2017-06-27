@@ -58,9 +58,18 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionButton),
 	];
 
+	var peerData;
+
+	var getTableData = function() {
+        var deferred = $q.defer();
+        deferred.resolve(peerData);
+        return deferred.promise;
+    };
+
 	function loadPeerDataAsync(){
 		peerRegistrationService.loadPeerDataAsync().success(function (data) {
-			vm.dtOptions = DTOptionsBuilder.fromJson(data);
+		peerData = data;
+		vm.dtOptions = DTOptionsBuilder.fromFnPromise(getTableData);
 		}).error(function(error){
 			console.error('Error determining peer states: ' + error)
 		});
