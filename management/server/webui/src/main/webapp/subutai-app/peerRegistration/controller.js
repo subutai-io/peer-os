@@ -68,15 +68,15 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 		if( data.registrationData.status == "APPROVED" )
 		{
-			if(data.isOnline == false)
-			{
-				status = 'false';
-				statusText = 'OFFLINE';
-			}
-			else
+			if(data.state == 'ONLINE')
 			{
 				status = 'true';
 				statusText = 'ONLINE';
+			}
+			else
+			{
+				status = 'false';
+				statusText = 'OFFLINE';
 			}
 		}
 		return '<div class="b-status-icon b-status-icon_' + status + '" title="' + statusText + '"></div>';

@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
@@ -43,40 +42,14 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private class RegistrationDataDto
-    {
-        private boolean isOnline;
-        private RegistrationData registrationData;
-
-
-        RegistrationDataDto( RegistrationData registrationData )
-        {
-            this.registrationData = registrationData;
-        }
-
-
-        void setOnline( boolean isOnline )
-        {
-            this.isOnline = isOnline;
-        }
-
-
-        RegistrationData getRegistrationData()
-        {
-            return registrationData;
-        }
-    }
-
-
     @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response getRegisteredPeers()
     {
         try
         {
-            List<RegistrationDataDto> registrationDatas =
-                    peerManager.getRegistrationRequests().stream().map( RegistrationDataDto::new )
-                               .collect( Collectors.toList() );
+            List<PeerDto> registrationDatas =
+                    peerManager.getRegistrationRequests().stream().map( PeerDto::new ).collect( Collectors.toList() );
 
             if ( !registrationDatas.isEmpty() )
             {
@@ -90,8 +63,9 @@ public class RestServiceImpl implements RestService
                     {
                         try
                         {
-                            d.setOnline(
-                                    peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() ).isOnline() );
+                            d.setState(
+                                    peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() ).isOnline() ?
+                                    PeerDto.State.ONLINE : PeerDto.State.OFFFLINE );
                         }
                         catch ( PeerException e )
                         {
