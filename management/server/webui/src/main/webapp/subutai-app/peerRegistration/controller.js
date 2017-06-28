@@ -3,9 +3,9 @@
 angular.module('subutai.peer-registration.controller', [])
 	.controller('PeerRegistrationCtrl', PeerRegistrationCtrl);
 
-PeerRegistrationCtrl.$inject = ['$scope', 'peerRegistrationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog', 'cfpLoadingBar'];
+PeerRegistrationCtrl.$inject = ['$scope', '$q', 'peerRegistrationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog', 'cfpLoadingBar'];
 
-function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog, cfpLoadingBar) {
+function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog, cfpLoadingBar) {
 
 	var vm = this;
 	vm.peerId = null;
@@ -58,6 +58,31 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionButton),
 	];
 
+	var peerData;
+
+	var getTableData = function() {
+        var deferred = $q.defer();
+        deferred.resolve(peerData);
+        return deferred.promise;
+    };
+
+	function loadPeerDataAsync(){
+		peerRegistrationService.loadPeerDataAsync().success(function (data) {
+		peerData = data;
+		vm.dtOptions = DTOptionsBuilder.fromFnPromise(getTableData).
+		    withPaginationType('full_numbers')
+            .withOption('createdRow', createdRow)
+            .withOption('columnDefs', [
+                {className: "b-main-table__buttons-group", "targets": 3},
+                {className: "b-main-table__peer-status-col", "targets": 2}
+            ]);
+		}).error(function(error){
+			console.error('Error determining peer states: ' + error)
+		});
+	}
+
+	loadPeerDataAsync();
+
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
 	}
@@ -68,15 +93,20 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 		if( data.registrationData.status == "APPROVED" )
 		{
-			if(data.isOnline == false)
-			{
-				status = 'false';
-				statusText = 'OFFLINE';
-			}
-			else
+			if(data.state == 'ONLINE')
 			{
 				status = 'true';
 				statusText = 'ONLINE';
+			}
+			else if(data.state == 'UNKNOWN')
+			{
+			    status = 'UKNOWN';
+			    statusText = "Determining status..."
+			}
+			else
+			{
+				status = 'false';
+				statusText = 'OFFLINE';
 			}
 		}
 		return '<div class="b-status-icon b-status-icon_' + status + '" title="' + statusText + '"></div>';
@@ -89,11 +119,9 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 			result += '<a href class="b-btn b-btn_blue subt_button__peer-rename" ng-click="peerRegistrationCtrl.changeNamePopup(\'' + data.registrationData.peerInfo.id + '\', \'' + data.registrationData.peerInfo.name + '\')">Rename</a>';
 			result += '<a href class="b-btn b-btn_white subt_button__peer-update-url" ng-click="peerRegistrationCtrl.updateUrlPopup(\'' + data.registrationData.peerInfo.id + '\', \'' + data.registrationData.peerInfo.publicUrl + '\')">Change url</a>';
 		} else if(data.registrationData.status == 'WAIT') {
-			//result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.cancelPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Cancel</a>';
 			result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Cancel\')">Cancel</a>';
 		} else if(data.registrationData.status == 'REQUESTED') {
 			result += '<a href class="b-btn b-btn_green subt_button__peer-approve" ng-click="peerRegistrationCtrl.approvePeerRequestForm(\'' + data.registrationData.peerInfo.id + '\')">Approve</a>';
-			//result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ng-click="peerRegistrationCtrl.rejectPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Reject</a>';
 			result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Reject\')">Reject</a>';
 		}
 

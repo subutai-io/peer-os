@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
@@ -43,40 +42,33 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private class RegistrationDataDto
-    {
-        private boolean isOnline;
-        private RegistrationData registrationData;
-
-
-        RegistrationDataDto( RegistrationData registrationData )
-        {
-            this.registrationData = registrationData;
-        }
-
-
-        void setOnline( boolean isOnline )
-        {
-            this.isOnline = isOnline;
-        }
-
-
-        RegistrationData getRegistrationData()
-        {
-            return registrationData;
-        }
-    }
-
-
     @RolesAllowed( { "Peer-Management|Read" } )
     @Override
     public Response getRegisteredPeers()
     {
         try
         {
-            List<RegistrationDataDto> registrationDatas =
-                    peerManager.getRegistrationRequests().stream().map( RegistrationDataDto::new )
-                               .collect( Collectors.toList() );
+            List<PeerDto> registrationDatas =
+                    peerManager.getRegistrationRequests().stream().map( PeerDto::new ).collect( Collectors.toList() );
+
+            return Response.ok( JsonUtil.toJson( registrationDatas ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting registered peers #getRegisteredPeers", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @RolesAllowed( { "Peer-Management|Read" } )
+    @Override
+    public Response getRegisteredPeersStates()
+    {
+        try
+        {
+            List<PeerDto> registrationDatas =
+                    peerManager.getRegistrationRequests().stream().map( PeerDto::new ).collect( Collectors.toList() );
 
             if ( !registrationDatas.isEmpty() )
             {
@@ -90,8 +82,9 @@ public class RestServiceImpl implements RestService
                     {
                         try
                         {
-                            d.setOnline(
-                                    peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() ).isOnline() );
+                            d.setState(
+                                    peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() ).isOnline() ?
+                                    PeerDto.State.ONLINE : PeerDto.State.OFFLINE );
                         }
                         catch ( PeerException e )
                         {
@@ -107,7 +100,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting registered peers #getRegisteredPeers", e );
+            LOGGER.error( "Error getting registered peers #getRegisteredPeersStates", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }

@@ -20,6 +20,7 @@ function peerRegistrationService($http) {
         renamePeer: renamePeer,
         checkPeer: checkPeer,
         updatePeerUrl: updatePeerUrl,
+        loadPeerDataAsync: loadPeerDataAsync,
 
         getPeersUrl: function () {
             return PEERS_URL;
@@ -30,8 +31,13 @@ function peerRegistrationService($http) {
 
     //// Implementation
 
+
     function getRequestedPeers() {
         return $http.get(PEERS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+    }
+
+    function loadPeerDataAsync() {
+        return $http.get(PEERS_URL +'states', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
     }
 
     function registerRequest(postData) {
