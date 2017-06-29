@@ -857,7 +857,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             CloneContainerTask task =
                     new CloneContainerTask( request, templateManager.getTemplate( request.getTemplateId() ),
-                            resourceHost, reservedNetworkResource, this, requestGroup.getKurjunToken() );
+                            resourceHost, reservedNetworkResource, this );
 
             cloneTasks.addTask( resourceHost, task );
         }

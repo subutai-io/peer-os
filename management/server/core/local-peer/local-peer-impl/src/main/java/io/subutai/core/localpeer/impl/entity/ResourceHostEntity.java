@@ -896,8 +896,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public String cloneContainer( final Template template, final String containerName, final String hostname,
-                                  final String ip, final int vlan, final String environmentId,
-                                  final String kurjunToken ) throws ResourceHostException
+                                  final String ip, final int vlan, final String environmentId )
+            throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
@@ -914,7 +914,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
             CommandResult result = commandUtil.execute( resourceHostCommands
                     .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
-                            containerToken, kurjunToken ), this );
+                            containerToken ), this );
 
             //parse ID from output
 
