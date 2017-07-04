@@ -104,8 +104,6 @@ public class IdentityManagerImpl implements IdentityManager
     private static final String SYSTEM_USER_EMAIL = "system@subutai.io";
     private static final String ADMIN_USER_FULL_NAME = "Admin User";
     private static final String ADMIN_ROLE = "Administrator";
-    private static final String KARAF_MANAGER_ROLE = "Karaf-Manager";
-    private static final String PEER_MANAGER_ROLE = "Peer-Manager";
     private static final String SYSTEM_ROLE = "Internal-System";
     private static final String ENV_OWNER_ROLE = "Environment-Owner";
     private static final long SIGN_TOKEN_TTL_SEC = 30;
@@ -1625,16 +1623,15 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private void isValidPassword( String userName, String password )
     {
-        if ( Strings.isNullOrEmpty( password ) || password.length() < 4 )
-        {
-            throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
-        }
+        Preconditions.checkArgument( !( Strings.isNullOrEmpty( userName ) || userName.trim().isEmpty() ),
+                "Username can not be blank" );
 
-        if ( password.equalsIgnoreCase( userName ) || "password".equalsIgnoreCase( password ) || "system"
-                .equalsIgnoreCase( password ) )
-        {
-            throw new IllegalArgumentException( "Password doesn't match security measures" );
-        }
+        Preconditions.checkArgument( !( Strings.isNullOrEmpty( password ) || password.trim().length() < 4 ),
+                "Password cannot be shorter than 4 characters" );
+
+
+        Preconditions.checkArgument( !password.trim().equalsIgnoreCase( userName.trim() ),
+                "Password can not be the same as username" );
     }
 
 
@@ -1670,12 +1667,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         User user = getActiveUser();
 
-        if ( user == null )
-        {
-            return false;
-        }
-
-        return SYSTEM_USERNAME.equalsIgnoreCase( user.getUserName() );
+        return user != null && SYSTEM_USERNAME.equalsIgnoreCase( user.getUserName() );
     }
 
 
