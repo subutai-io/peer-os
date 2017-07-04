@@ -98,6 +98,12 @@ public class BazaarImpl implements Bazaar, HubEventListener
         // TODO: send installed plugin list to Hub
     }
 
+    @Override
+    public void onUnregister()
+    {
+
+    }
+
 
     @Override
     public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )

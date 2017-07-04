@@ -769,6 +769,13 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
+    public void onUnregister()
+    {
+        environmentManager.onUnregister();
+    }
+
+
+    @Override
     public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
     {
         environmentManager.onPluginEvent( pluginUid, state );

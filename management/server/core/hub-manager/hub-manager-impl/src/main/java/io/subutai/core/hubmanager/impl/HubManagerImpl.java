@@ -17,6 +17,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import io.subutai.core.hubmanager.impl.processor.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -292,9 +293,9 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
-        ProxyProcessor proxyProcessor = new ProxyProcessor(configManager, peerManager, restClient);
+        ProxyProcessor proxyProcessor = new ProxyProcessor( configManager, peerManager, restClient );
 
-        UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx);
+        UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx );
 
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
@@ -358,7 +359,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String email, String password, String peerName, String peerScope ) throws HubManagerException
+    public void registerPeer( String email, String password, String peerName, String peerScope )
+            throws HubManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );
@@ -416,6 +418,32 @@ public class HubManagerImpl implements HubManager, HostListener
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.unregister();
+
+        if ( !CollectionUtil.isCollectionEmpty( hubEventListeners ) )
+        {
+            ExecutorService notifier = Executors.newFixedThreadPool( hubEventListeners.size() );
+
+            for ( final HubEventListener hubEventListener : hubEventListeners )
+            {
+                notifier.execute( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            hubEventListener.onUnregister();
+                        }
+                        catch ( Exception e )
+                        {
+                            log.error( "Error notifying hub event listener", e );
+                        }
+                    }
+                } );
+            }
+
+            notifier.shutdown();
+        }
     }
 
 

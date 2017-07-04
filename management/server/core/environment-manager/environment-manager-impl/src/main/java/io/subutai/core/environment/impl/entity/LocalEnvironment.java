@@ -209,6 +209,12 @@ public class LocalEnvironment implements Environment, Serializable
     }
 
 
+    public void markAsNotUploaded()
+    {
+        this.uploaded = false;
+    }
+
+
     public boolean isDeleted()
     {
         return deleted;
