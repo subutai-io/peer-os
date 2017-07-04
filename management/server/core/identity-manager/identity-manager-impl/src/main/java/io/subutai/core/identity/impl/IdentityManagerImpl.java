@@ -1623,15 +1623,15 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private void isValidPassword( String userName, String password )
     {
-        Preconditions.checkArgument( Strings.isNullOrEmpty( password ) || password.trim().length() < 4,
+        Preconditions.checkArgument( !( Strings.isNullOrEmpty( userName ) || userName.trim().isEmpty() ),
+                "Username can not be blank" );
+
+        Preconditions.checkArgument( !( Strings.isNullOrEmpty( password ) || password.trim().length() < 4 ),
                 "Password cannot be shorter than 4 characters" );
 
-        Preconditions.checkNotNull( userName );
 
-        if ( password.trim().equalsIgnoreCase( userName.trim() ) )
-        {
-            throw new IllegalArgumentException( "Password can not be the same as username" );
-        }
+        Preconditions.checkArgument( !password.trim().equalsIgnoreCase( userName.trim() ),
+                "Password can not be the same as username" );
     }
 
 
