@@ -45,6 +45,7 @@ import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
@@ -53,6 +54,7 @@ import io.subutai.core.identity.rest.ui.entity.KeyDataDto;
 import io.subutai.core.identity.rest.ui.entity.PermissionDto;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.model.SecurityKey;
+import io.subutai.core.template.api.TemplateManager;
 
 
 public class RestServiceImpl implements RestService
@@ -744,6 +746,12 @@ public class RestServiceImpl implements RestService
                 if ( response.getStatusLine().getStatusCode() == 200 )
                 {
                     identityManager.getActiveSession().setKurjunToken( content );
+
+                    TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
+                    if ( templateManager != null )
+                    {
+                        templateManager.resetTemplateCache();
+                    }
 
                     return Response.ok( content ).build();
                 }

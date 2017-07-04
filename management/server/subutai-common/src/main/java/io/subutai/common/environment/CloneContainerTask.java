@@ -30,12 +30,10 @@ public class CloneContainerTask extends HostUtil.Task<String>
     private final ResourceHost resourceHost;
     private final NetworkResource networkResource;
     private final LocalPeer localPeer;
-    private final String kurjunToken;
 
 
     public CloneContainerTask( final CloneRequest request, final Template template, final ResourceHost resourceHost,
-                               final NetworkResource networkResource, final LocalPeer localPeer,
-                               final String kurjunToken )
+                               final NetworkResource networkResource, final LocalPeer localPeer )
     {
         Preconditions.checkNotNull( request );
         Preconditions.checkNotNull( template );
@@ -48,7 +46,6 @@ public class CloneContainerTask extends HostUtil.Task<String>
         this.resourceHost = resourceHost;
         this.networkResource = networkResource;
         this.localPeer = localPeer;
-        this.kurjunToken = kurjunToken;
     }
 
 
@@ -94,7 +91,7 @@ public class CloneContainerTask extends HostUtil.Task<String>
 
         String containerId = resourceHost
                 .cloneContainer( template, request.getContainerName(), request.getHostname(), request.getIp(),
-                        networkResource.getVlan(), networkResource.getEnvironmentId(), kurjunToken );
+                        networkResource.getVlan(), networkResource.getEnvironmentId() );
 
         //wait for container connection
         boolean connected = false;

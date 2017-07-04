@@ -60,13 +60,11 @@ public class ResourceHostCommands
 
 
     public RequestBuilder getCloneContainerCommand( final String templateId, String containerName, String hostname,
-                                                    String ip, int vlan, String environmentId, String containerToken,
-                                                    String kurjunToken )
+                                                    String ip, int vlan, String environmentId, String containerToken )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -t %s %s && subutai hostname %s %s",
-                        templateId, containerName, ip, vlan, environmentId, containerToken,
-                        Strings.isNullOrEmpty( kurjunToken ) ? "" : "-k " + kurjunToken, containerName, hostname ) )
+                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -t %s && subutai hostname %s %s", templateId,
+                        containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 

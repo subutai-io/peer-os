@@ -86,6 +86,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.model.SecurityKey;
+import io.subutai.core.template.api.TemplateManager;
 
 
 /**
@@ -860,6 +861,12 @@ public class IdentityManagerImpl implements IdentityManager
         Session session = getActiveSession();
         if ( session != null )
         {
+            TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
+            if ( templateManager != null )
+            {
+                templateManager.resetTemplateCache();
+            }
+
             session.setKurjunToken( null );
         }
 
