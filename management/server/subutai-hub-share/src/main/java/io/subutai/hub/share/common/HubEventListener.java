@@ -13,5 +13,7 @@ public interface HubEventListener
 
     void onPluginEvent( String pluginUid, PeerProductDataDto.State state );
 
+    void onUnregister();
+
     //add more events if needed
 }
