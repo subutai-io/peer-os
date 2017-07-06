@@ -33,6 +33,8 @@ public class EnvironmentDto
 
     private List<EnvironmentNodesDto> nodes = new ArrayList<>();
 
+    private boolean isCreatedOnSS;
+
 
     public String getId()
     {
@@ -158,5 +160,17 @@ public class EnvironmentDto
     public void setOwnerToken( final String ownerToken )
     {
         this.ownerToken = ownerToken;
+    }
+
+
+    public boolean isCreatedOnSS()
+    {
+        return isCreatedOnSS;
+    }
+
+
+    public void setCreatedOnSS( final boolean createdOnSS )
+    {
+        isCreatedOnSS = createdOnSS;
     }
 }
