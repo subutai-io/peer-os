@@ -71,7 +71,16 @@ public class ContainerStateHandler extends StateHandler
                         {
                             cleanPortMap( nodesDto.getEnvironmentId(), nodeDto.getContainerId() );
 
-                            ctx.localPeer.destroyContainer( containerId );
+                            if ( envDto.isCreatedOnSS() )
+                            {
+                                ctx.envManager
+                                        .destroyContainer( nodeDto.getEnvironmentId(), nodeDto.getContainerId(), true );
+                            }
+                            else
+                            {
+                                ctx.localPeer.destroyContainer( containerId );
+                            }
+
 
                             nodeDto.setState( ContainerStateDto.FROZEN );
                         }
