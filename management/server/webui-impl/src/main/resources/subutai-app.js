@@ -355,26 +355,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         });
     }
 
-
-    function checkSum() {
-        $http.get(SERVER_URL + "rest/v1/bazaar/products/checksum", {
-            withCredentials: true,
-            headers: {'Content-Type': 'application/json'}
-        }).success(function (data) {
-            if (localStorage.getItem("bazaarMD5") === null) {
-                localStorage.setItem("bazaarMD5", data);
-                bazaarUpdate = true;
-            }
-            else {
-                if (localStorage.getItem("bazaarMD5") !== data) {
-                    localStorage.setItem("bazaarMD5", data);
-                    bazaarUpdate = true;
-                }
-            }
-        });
-    }
-
-    checkSum();
 }
 
 
