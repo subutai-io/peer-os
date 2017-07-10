@@ -240,7 +240,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     function logout() {
     	//TODO here we can clear cache
-
+        localStorage.removeItem('bazaarProducts');
         removeCookie('sptoken');
         localStorage.removeItem('kurjunToken');
         localStorage.removeItem('currentUserToken');
@@ -375,11 +375,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     }
 
     checkSum();
-
-    setInterval(function () {
-        checkSum();
-    }, 600000);
-
 }
 
 

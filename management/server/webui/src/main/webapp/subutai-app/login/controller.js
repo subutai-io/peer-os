@@ -66,11 +66,12 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 
 	function login() {
 
-        vm.errorMessage="";
+	    //TODO here we can clear cache
 
+        vm.errorMessage="";
+        localStorage.removeItem('bazaarProducts');
 	    sessionStorage.removeItem('notifications');
 
-	    //TODO here we can clear cache
 
 		if( vm.newPass.length > 0 || vm.resetPwd) {
 
