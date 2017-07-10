@@ -3,7 +3,6 @@ package io.subutai.core.hubmanager.impl;
 
 import java.io.File;
 import java.io.InputStream;
-import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
-
-import io.subutai.core.hubmanager.impl.processor.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,17 +52,17 @@ import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
-import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
+import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
 import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
+import io.subutai.core.hubmanager.impl.processor.UserTokenProcessor;
 import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
@@ -90,7 +87,7 @@ public class HubManagerImpl implements HubManager, HostListener
 {
     private static final long TIME_15_MINUTES = 900;
 
-    public static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
+    private static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -188,7 +185,7 @@ public class HubManagerImpl implements HubManager, HostListener
                 public void run()
                 {
                     log.info( "Starting sumchecker" );
-                    generateChecksum();
+                    obtainChecksum();
                 }
             }, 1, 600000, TimeUnit.MILLISECONDS );
 
@@ -369,7 +366,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
         registrationManager.registerPeer( email, password, peerName, peerScope );
 
-        generateChecksum();
+        obtainChecksum();
 
         sendResourceHostInfo();
 
@@ -491,6 +488,31 @@ public class HubManagerImpl implements HubManager, HostListener
         catch ( Exception e )
         {
             throw new HubManagerException( "Could not retrieve product data", e );
+        }
+    }
+
+
+    private void obtainChecksum()
+    {
+        try
+        {
+            WebClient client = configManager
+                    .getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/checksum", configManager.getHubIp() );
+
+            Response r = client.get();
+
+            if ( r.getStatus() != HttpStatus.SC_OK )
+            {
+                log.error( r.readEntity( String.class ) );
+            }
+            else
+            {
+                this.checksum = r.readEntity( String.class );
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Could not retrieve checksum", e );
         }
     }
 
@@ -640,36 +662,6 @@ public class HubManagerImpl implements HubManager, HostListener
     public Config getHubConfiguration()
     {
         return configDataService.getHubConfig( configManager.getPeerId() );
-    }
-
-
-    private void generateChecksum()
-    {
-        try
-        {
-            log.info( "Generating plugins list md5 checksum" );
-            String productList = getProducts();
-            MessageDigest md = MessageDigest.getInstance( "MD5" );
-            byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
-            StringBuilder hexString = new StringBuilder();
-
-            for ( final byte aByte : bytes )
-            {
-                String hex = Integer.toHexString( 0xFF & aByte );
-                if ( hex.length() == 1 )
-                {
-                    hexString.append( '0' );
-                }
-                hexString.append( hex );
-            }
-
-            checksum = hexString.toString();
-            log.info( "Checksum generated: " + checksum );
-        }
-        catch ( Exception e )
-        {
-            log.error( e.getMessage() );
-        }
     }
 
 

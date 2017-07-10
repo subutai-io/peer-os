@@ -70,6 +70,8 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 
 	    sessionStorage.removeItem('notifications');
 
+	    //TODO here we can clear cache
+
 		if( vm.newPass.length > 0 || vm.resetPwd) {
 
 			if( vm.newPass !== vm.passConf ) {
