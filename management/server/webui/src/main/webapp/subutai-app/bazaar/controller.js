@@ -182,10 +182,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
     }
 
     function checkSum() {
-        $http.get(SERVER_URL + "rest/v1/bazaar/products/checksum", {
-            withCredentials: true,
-            headers: {'Content-Type': 'application/json'}
-        }).success(function (checksum) {
+        BazaarSrv.checkSum().success(function (checksum) {
             var bazaarUpdateNeeded = localStorage.getItem("bazaarMD5") === null
                 || localStorage.getItem("bazaarMD5") !== checksum;
 
