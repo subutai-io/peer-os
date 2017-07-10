@@ -196,7 +196,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
         });
     }
 
-    function updateBazaar(reloadFromHub){
+    function loadBazaar(reloadFromHub){
         vm.plugins = JSON.parse(localStorage.getItem("bazaarProducts"));
 
         if (reloadFromHub === true || vm.plugins === null) {
