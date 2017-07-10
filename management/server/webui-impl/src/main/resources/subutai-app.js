@@ -240,7 +240,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     function logout() {
     	//TODO here we can clear cache
-        localStorage.removeItem('bazaarProducts');
+//        localStorage.removeItem('bazaarProducts');
         removeCookie('sptoken');
         localStorage.removeItem('kurjunToken');
         localStorage.removeItem('currentUserToken');

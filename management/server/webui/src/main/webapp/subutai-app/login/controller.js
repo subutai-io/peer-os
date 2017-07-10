@@ -69,7 +69,7 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 	    //TODO here we can clear cache
 
         vm.errorMessage="";
-        localStorage.removeItem('bazaarProducts');
+//        localStorage.removeItem('bazaarProducts');
 	    sessionStorage.removeItem('notifications');
 
 
