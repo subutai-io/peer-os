@@ -25,8 +25,8 @@ function BazaarSrv($http) {
         registerPeer: registerPeer,
         checkRegistration: checkRegistration,
         getRefOldPlugins: getRefOldPlugins,
-        updatePlugin: updatePlugin
-        //uninstallHubPluginWOButton: uninstallHubPluginWOButton
+        updatePlugin: updatePlugin,
+        checkSum: checkSum
     };
 
     return BazaarSrv;
@@ -72,6 +72,13 @@ function BazaarSrv($http) {
 
     function getPluginInfo(pluginId) {
         return $http.get(PLUGIN_URL + "plugins/registered/" + pluginId);
+    }
+
+    function checkSum() {
+        return $http.get(BAZAAR_URL + "products/checksum", {
+           withCredentials: true,
+           headers: {'Content-Type': 'application/json'}
+        });
     }
 
 

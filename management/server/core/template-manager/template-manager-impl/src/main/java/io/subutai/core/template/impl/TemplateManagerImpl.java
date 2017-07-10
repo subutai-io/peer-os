@@ -329,7 +329,21 @@ public class TemplateManagerImpl implements TemplateManager
 
                                     response = webClient.get();
 
-                                    return JsonUtil.fromJson( response.readEntity( String.class ), Template.class );
+                                    String json = response.readEntity( String.class ).trim();
+
+                                    if ( json.startsWith( "[" ) )
+                                    {
+                                        Set<Template> templates =
+                                                JsonUtil.fromJson( json, new TypeToken<Set<Template>>()
+                                                {
+                                                }.getType() );
+
+                                        return templates.iterator().next();
+                                    }
+                                    else
+                                    {
+                                        return JsonUtil.fromJson( json, Template.class );
+                                    }
                                 }
                                 finally
                                 {

@@ -181,80 +181,99 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
          });*/
     }
 
-//	getHubPlugins();
-    vm.plugins = JSON.parse(localStorage.getItem("bazaarProducts"));
-    if (bazaarUpdate === true || vm.plugins === null) {
-        getHubPlugins();
-    }
-    else {
-        LOADING_SCREEN();
-        BazaarSrv.getInstalledHubPlugins().success(function (data) {
-            vm.installedHubPlugins = data;
-            BazaarSrv.getRefOldPlugins().success(function (data) {
-                vm.refOldPlugins = data;
-                for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
-                    for (var j = 0; j < vm.refOldPlugins.length; ++j) {
-                        if (vm.refOldPlugins[j].name.toLowerCase() === vm.installedHubPlugins[i].name.toLowerCase()) {
-                            vm.installedHubPlugins[i].restore = false;
-                            break;
-                        }
-                    }
-                    if (vm.installedHubPlugins[i].restore === undefined) {
-                        vm.installedHubPlugins[i].restore = true;
-                    }
-                }
-                for (var i = 0; i < vm.plugins.length; ++i) {
-                    vm.plugins[i].installed = false;
-                    vm.plugins[i].restore = false;
-                    for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
-                        if (vm.plugins[i].name === vm.installedHubPlugins[j].name) {
-                            if (vm.installedHubPlugins[j].restore === false) {
-                                vm.plugins[i].installed = true;
-                                vm.plugins[i].launch = true;
-                                vm.plugins[i].hubId = vm.installedHubPlugins[j].id;
-                                vm.plugins[i].url = vm.installedHubPlugins[j].url;
-                            }
-                            else {
-                                vm.plugins[i].restore = true;
-                                vm.plugins[i].hubId = vm.installedHubPlugins[j].id;
-                                vm.plugins[i].url = vm.installedHubPlugins[j].url;
-                            }
-                            break;
-                        }
-                    }
-                }
-                $scope.$applyAsync(function () {
-                    var toScroll = document.getElementById(localStorage.getItem("bazaarScroll"));
-                    if (toScroll !== null) {
-                        toScroll.scrollIntoView();
-                    }
-                    localStorage.removeItem("bazaarScroll");
-                    var index = 0;
-                    var counter = 0;
-                    [].slice.call(document.querySelectorAll(".progress-button")).forEach(function (bttn, pos) {
-                        var prog = new UIProgressButton(bttn, {
-                            callback: function (instance) {
-                            }
-                        });
-                        if (counter === 0) {
-                            vm.plugins[index].installButton = prog;
-                        }
-                        else if (counter === 1) {
-                            vm.plugins[index].restoreButton = prog;
-                        }
-                        else {
-                            vm.plugins[index].uninstallButton = prog;
-                        }
-                        counter = (counter + 1) % 3;
-                        if (counter === 0) {
-                            ++index;
-                        }
-                    });
-                });
-                LOADING_SCREEN("none");
-            });
+    function checkSum() {
+        BazaarSrv.checkSum().success(function (checksum) {
+            var bazaarUpdateNeeded = localStorage.getItem("bazaarMD5") === null
+                || localStorage.getItem("bazaarMD5") !== checksum;
+
+            localStorage.setItem("bazaarMD5", checksum);
+
+            if(bazaarUpdateNeeded){
+                loadBazaar(true);
+            }else{
+                loadBazaar(false);
+            }
         });
     }
+
+    function loadBazaar(reloadFromHub){
+        vm.plugins = JSON.parse(localStorage.getItem("bazaarProducts"));
+
+        if (reloadFromHub === true || vm.plugins === null) {
+            getHubPlugins();
+        }
+        else {
+            LOADING_SCREEN();
+            BazaarSrv.getInstalledHubPlugins().success(function (data) {
+                vm.installedHubPlugins = data;
+                BazaarSrv.getRefOldPlugins().success(function (data) {
+                    vm.refOldPlugins = data;
+                    for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+                        for (var j = 0; j < vm.refOldPlugins.length; ++j) {
+                            if (vm.refOldPlugins[j].name.toLowerCase() === vm.installedHubPlugins[i].name.toLowerCase()) {
+                                vm.installedHubPlugins[i].restore = false;
+                                break;
+                            }
+                        }
+                        if (vm.installedHubPlugins[i].restore === undefined) {
+                            vm.installedHubPlugins[i].restore = true;
+                        }
+                    }
+                    for (var i = 0; i < vm.plugins.length; ++i) {
+                        vm.plugins[i].installed = false;
+                        vm.plugins[i].restore = false;
+                        for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
+                            if (vm.plugins[i].name === vm.installedHubPlugins[j].name) {
+                                if (vm.installedHubPlugins[j].restore === false) {
+                                    vm.plugins[i].installed = true;
+                                    vm.plugins[i].launch = true;
+                                    vm.plugins[i].hubId = vm.installedHubPlugins[j].id;
+                                    vm.plugins[i].url = vm.installedHubPlugins[j].url;
+                                }
+                                else {
+                                    vm.plugins[i].restore = true;
+                                    vm.plugins[i].hubId = vm.installedHubPlugins[j].id;
+                                    vm.plugins[i].url = vm.installedHubPlugins[j].url;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    $scope.$applyAsync(function () {
+                        var toScroll = document.getElementById(localStorage.getItem("bazaarScroll"));
+                        if (toScroll !== null) {
+                            toScroll.scrollIntoView();
+                        }
+                        localStorage.removeItem("bazaarScroll");
+                        var index = 0;
+                        var counter = 0;
+                        [].slice.call(document.querySelectorAll(".progress-button")).forEach(function (bttn, pos) {
+                            var prog = new UIProgressButton(bttn, {
+                                callback: function (instance) {
+                                }
+                            });
+                            if (counter === 0) {
+                                vm.plugins[index].installButton = prog;
+                            }
+                            else if (counter === 1) {
+                                vm.plugins[index].restoreButton = prog;
+                            }
+                            else {
+                                vm.plugins[index].uninstallButton = prog;
+                            }
+                            counter = (counter + 1) % 3;
+                            if (counter === 0) {
+                                ++index;
+                            }
+                        });
+                    });
+                    LOADING_SCREEN("none");
+                });
+            });
+        }
+    }
+
+    checkSum();
 
     /*	vm.buttonCheck = buttonCheck;
      function buttonCheck (s) {
