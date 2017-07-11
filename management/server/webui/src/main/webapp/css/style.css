@@ -4063,3 +4063,7 @@ a[disabled] {
     padding-top: 15px;
     cursor: pointer;
 }
+
+.dataTables_empty {
+  display:none;
+}
