@@ -12,7 +12,7 @@
   <artifactId>webui-impl</artifactId>
 
   <packaging>jar</packaging>
-  <name>Subutai Web UI</name>
+  <name>Subutai Web UI Impl</name>
   <description>Subutai Web UI</description>
 
   <dependencies>

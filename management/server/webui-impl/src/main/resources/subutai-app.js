@@ -288,6 +288,13 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         if (vm.notificationsLogs[logId].log.length > 0) {
             var logsArray = vm.notificationsLogs[logId].log.split(/(?:\r\n|\r|\n)/g);
             vm.currentLogTitle = vm.notificationsLogs[logId].description;
+
+            var trim = vm.currentLogTitle.length > 70;
+            if (trim)
+            {
+                vm.currentLogTitle = vm.currentLogTitle.substring(0, 70) + '...';
+            }
+
             var logs = [];
             for (var i = 0; i < logsArray.length; i++) {
                 var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
