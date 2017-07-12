@@ -290,19 +290,9 @@ public class EncryptionToolImpl implements EncryptionTool
     *
     */
     @Override
-    public KeyPair generateKeyPair( String userId, String secretPwd, boolean armored )
+    public KeyPair generateKeyPair( String userId, String secretPwd, boolean armored ) throws PGPException
     {
-        KeyPair keyPair;
-
-        try
-        {
-            keyPair = PGPEncryptionUtil.generateKeyPair( userId, secretPwd, armored );
-            return keyPair;
-        }
-        catch ( Exception ex )
-        {
-            return null;
-        }
+        return PGPEncryptionUtil.generateKeyPair( userId, secretPwd, armored );
     }
 
 

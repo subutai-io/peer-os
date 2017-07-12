@@ -154,7 +154,7 @@ public interface EncryptionTool
      *
      * @return - KeyPair
      */
-    KeyPair generateKeyPair( String userId, String secretPwd, boolean armored );
+    KeyPair generateKeyPair( String userId, String secretPwd, boolean armored ) throws PGPException;
 
 
     /**

@@ -1013,7 +1013,9 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            return null;
+            LOG.error( " ***** Error generating key pair" + ex.toString(), ex );
+
+            throw new RuntimeException( ex );
         }
     }
 
