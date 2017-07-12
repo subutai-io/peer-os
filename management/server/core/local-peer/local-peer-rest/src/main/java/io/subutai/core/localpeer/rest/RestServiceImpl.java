@@ -11,6 +11,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.karaf.bundle.core.BundleState;
 import org.apache.karaf.bundle.core.BundleStateService;
 
@@ -35,6 +36,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.TaskUtil;
 
 
 public class RestServiceImpl implements RestService
@@ -80,9 +82,14 @@ public class RestServiceImpl implements RestService
 
         Bundle[] bundles = ctx.getBundles();
 
+        if ( bundleStateService == null || ArrayUtils.isEmpty( bundles ) )
+        {
+            return Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
+        }
+
         for ( Bundle bundle : bundles )
         {
-            if ( bundleStateService != null && bundleStateService.getState( bundle ) == BundleState.Failure )
+            if ( bundleStateService.getState( bundle ) == BundleState.Failure )
             {
                 failed = true;
 
@@ -97,6 +104,12 @@ public class RestServiceImpl implements RestService
             }
         }
 
+        TaskUtil.sleep( 100 );
+
+        if ( !ArrayUtils.isSameLength( bundles, ctx.getBundles() ) )
+        {
+            return Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
+        }
 
         return failed ? Response.serverError().build() :
                ready ? Response.ok().build() : Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
