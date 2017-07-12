@@ -36,7 +36,6 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.TaskUtil;
 
 
 public class RestServiceImpl implements RestService
@@ -82,12 +81,11 @@ public class RestServiceImpl implements RestService
 
         Bundle[] bundles = ctx.getBundles();
 
-        if ( ArrayUtils.isEmpty( bundles ) )
+        if ( ArrayUtils.isEmpty( bundles ) || bundles.length < 288 )
         {
             return Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
         }
 
-        StringBuilder bundleList = new StringBuilder( "BUNDLES>>>>\n" );
         for ( Bundle bundle : bundles )
         {
             if ( bundleStateService.getState( bundle ) == BundleState.Failure )
@@ -103,18 +101,6 @@ public class RestServiceImpl implements RestService
 
                 break;
             }
-
-            bundleList.append( bundle.getSymbolicName() ).append( "\n" );
-        }
-        LOGGER.debug( bundleList.toString() );
-
-        TaskUtil.sleep( 100 );
-
-        ctx = FrameworkUtil.getBundle( RestServiceImpl.class ).getBundleContext();
-
-        if ( !ArrayUtils.isSameLength( bundles, ctx.getBundles() ) )
-        {
-            return Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
         }
 
         return failed ? Response.serverError().build() :
