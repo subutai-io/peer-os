@@ -22,7 +22,13 @@ angular.module('subutai.environment.controller', [])
 				return false;
 			}
 		}
-	}]);
+	}]).factory('DTLoadingTemplate', dtLoadingTemplate);
+
+	function dtLoadingTemplate() {
+        return {
+            html: ''
+        };
+    }
 
 EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$state'];
 fileModel.$inject = ['$parse'];
