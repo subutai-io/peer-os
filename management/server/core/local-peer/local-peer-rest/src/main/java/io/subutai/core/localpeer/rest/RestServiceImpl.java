@@ -40,7 +40,7 @@ import io.subutai.common.util.ServiceLocator;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
-    private static final int BUNDLE_COUNT = 288;
+    private static final int BUNDLE_COUNT = 278;
 
     private final LocalPeer localPeer;
 
