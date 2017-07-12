@@ -40,6 +40,8 @@ import io.subutai.common.util.ServiceLocator;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
+    private static final int BUNDLE_COUNT = 278;
+
     private final LocalPeer localPeer;
 
 
@@ -76,13 +78,20 @@ public class RestServiceImpl implements RestService
 
         BundleContext ctx = FrameworkUtil.getBundle( RestServiceImpl.class ).getBundleContext();
 
-        BundleStateService bundleStateService = ServiceLocator.getServiceOrNull( BundleStateService.class );
+        BundleStateService bundleStateService = ServiceLocator.lookup( BundleStateService.class );
 
         Bundle[] bundles = ctx.getBundles();
 
+        if ( bundles.length < BUNDLE_COUNT )
+        {
+            LOGGER.warn( "Bundle count is {}", bundles.length );
+
+            return Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
+        }
+
         for ( Bundle bundle : bundles )
         {
-            if ( bundleStateService != null && bundleStateService.getState( bundle ) == BundleState.Failure )
+            if ( bundleStateService.getState( bundle ) == BundleState.Failure )
             {
                 failed = true;
 
@@ -96,7 +105,6 @@ public class RestServiceImpl implements RestService
                 break;
             }
         }
-
 
         return failed ? Response.serverError().build() :
                ready ? Response.ok().build() : Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
