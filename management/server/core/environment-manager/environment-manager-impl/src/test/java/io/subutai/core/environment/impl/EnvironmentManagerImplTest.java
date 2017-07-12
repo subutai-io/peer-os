@@ -1368,6 +1368,7 @@ public class EnvironmentManagerImplTest
     public void testResetP2pKey() throws Exception
     {
         doNothing().when( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
+        doReturn( EnvironmentStatus.HEALTHY).when( environment ).getStatus();
 
         environmentManager.doResetP2Pkeys();
 
