@@ -78,11 +78,11 @@ public class RestServiceImpl implements RestService
 
         BundleContext ctx = FrameworkUtil.getBundle( RestServiceImpl.class ).getBundleContext();
 
-        BundleStateService bundleStateService = ServiceLocator.getServiceOrNull( BundleStateService.class );
+        BundleStateService bundleStateService = ServiceLocator.lookup( BundleStateService.class );
 
         Bundle[] bundles = ctx.getBundles();
 
-        if ( bundleStateService == null || ArrayUtils.isEmpty( bundles ) )
+        if ( ArrayUtils.isEmpty( bundles ) )
         {
             return Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
         }
@@ -105,6 +105,8 @@ public class RestServiceImpl implements RestService
         }
 
         TaskUtil.sleep( 100 );
+
+        ctx = FrameworkUtil.getBundle( RestServiceImpl.class ).getBundleContext();
 
         if ( !ArrayUtils.isSameLength( bundles, ctx.getBundles() ) )
         {
