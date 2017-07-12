@@ -87,6 +87,7 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
         }
 
+        StringBuilder bundleList = new StringBuilder( "BUNDLES>>>>\n" );
         for ( Bundle bundle : bundles )
         {
             if ( bundleStateService.getState( bundle ) == BundleState.Failure )
@@ -102,7 +103,10 @@ public class RestServiceImpl implements RestService
 
                 break;
             }
+
+            bundleList.append( bundle.getSymbolicName() ).append( "\n" );
         }
+        LOGGER.debug( bundleList.toString() );
 
         TaskUtil.sleep( 100 );
 
