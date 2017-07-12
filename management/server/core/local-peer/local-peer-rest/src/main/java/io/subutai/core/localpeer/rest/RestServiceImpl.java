@@ -11,7 +11,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.karaf.bundle.core.BundleState;
 import org.apache.karaf.bundle.core.BundleStateService;
 
@@ -41,6 +40,8 @@ import io.subutai.common.util.ServiceLocator;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
+    private static final int BUNDLE_COUNT = 288;
+
     private final LocalPeer localPeer;
 
 
@@ -81,8 +82,10 @@ public class RestServiceImpl implements RestService
 
         Bundle[] bundles = ctx.getBundles();
 
-        if ( ArrayUtils.isEmpty( bundles ) || bundles.length < 288 )
+        if ( bundles.length < BUNDLE_COUNT )
         {
+            LOGGER.warn( "Bundle count is {}", bundles.length );
+
             return Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
         }
 
