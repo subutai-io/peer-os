@@ -1323,8 +1323,11 @@ public class IdentityManagerImpl implements IdentityManager
             //***************************************
             if ( createUserDelegate )
             {
+                LOGGER.debug( "generating delegate for user {}: {}", user.getId(), user.getUserName() );
                 createUserDelegate( user, null, true );
             }
+
+            LOGGER.debug( "User {} created", userName );
         }
         catch ( Exception e )
         {
@@ -1742,6 +1745,8 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public Role createRole( String roleName, int roleType )
     {
+        LOGGER.debug( "Creating role {}", roleName );
+
         Preconditions.checkArgument( !Strings.isNullOrEmpty( roleName ), "Invalid role name" );
 
         if ( identityDataService.findRoleByName( roleName ) != null )
@@ -1759,6 +1764,8 @@ public class IdentityManagerImpl implements IdentityManager
         role.setType( roleType );
 
         identityDataService.persistRole( role );
+
+        LOGGER.debug( "Role {} created", roleName );
 
         return role;
     }
