@@ -1313,6 +1313,7 @@ public class IdentityManagerImpl implements IdentityManager
             if ( generateKeyPair )
             {
                 String securityKeyId = user.getId() + "-" + UUID.randomUUID();
+                LOGGER.debug( "generating keypair for user {}: {}", user.getId(), user.getUserName() );
                 generateKeyPair( securityKeyId, SecurityKeyType.USER_KEY.getId() );
                 user.setSecurityKeyId( securityKeyId );
                 identityDataService.updateUser( user );

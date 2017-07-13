@@ -1033,7 +1033,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
     }
 
