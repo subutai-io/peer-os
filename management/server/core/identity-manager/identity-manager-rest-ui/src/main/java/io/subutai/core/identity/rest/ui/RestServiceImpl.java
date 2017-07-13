@@ -389,6 +389,11 @@ public class RestServiceImpl implements RestService
         {
             List<Role> roles = identityManager.getAllRoles();
 
+            for ( Role role : roles )
+            {
+                LOGGER.debug( "ROLE: " + role.getName() );
+            }
+
             return Response.ok( jsonUtil.to( roles.stream().filter( role -> role.getType() != UserType.SYSTEM.getId() )
                                                   .collect( Collectors.toList() ) ) ).build();
         }
