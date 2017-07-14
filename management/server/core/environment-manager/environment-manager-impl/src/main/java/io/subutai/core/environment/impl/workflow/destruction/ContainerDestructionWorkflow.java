@@ -62,8 +62,11 @@ public class ContainerDestructionWorkflow
         {
             if ( environment.getContainerHosts().size() <= 1 )
             {
-                throw new IllegalStateException(
-                        "Environment will have 0 containers after modification. Please, destroy environment instead" );
+                operationTracker.addLogFailed(
+                        "Environment will have 0 containers after modification. Please, destroy environment instead. "
+                                + "Container destruction has been skipped" );
+
+                return ContainerDestructionPhase.FINALIZE;
             }
             else
             {

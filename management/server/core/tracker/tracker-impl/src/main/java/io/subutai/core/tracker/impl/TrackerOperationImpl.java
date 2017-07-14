@@ -47,7 +47,7 @@ public class TrackerOperationImpl implements TrackerOperation
     /**
      * State of operation
      */
-    private volatile OperationState state;
+    private OperationState state;
 
 
     public TrackerOperationImpl( String source, String description, TrackerImpl tracker )
@@ -81,7 +81,7 @@ public class TrackerOperationImpl implements TrackerOperation
 
 
     @Override
-    public String getLog()
+    public synchronized String getLog()
     {
         return log.toString();
     }
@@ -129,7 +129,7 @@ public class TrackerOperationImpl implements TrackerOperation
     }
 
 
-    private void addLog( String logString, OperationState state )
+    private synchronized void addLog( String logString, OperationState state )
     {
         //ignore all messages after operation was marked as complete
         if ( this.state != OperationState.RUNNING )
