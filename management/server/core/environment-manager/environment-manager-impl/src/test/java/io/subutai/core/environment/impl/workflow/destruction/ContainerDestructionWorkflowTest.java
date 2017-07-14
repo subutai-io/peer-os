@@ -18,7 +18,6 @@ import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
@@ -78,7 +77,7 @@ public class ContainerDestructionWorkflowTest
     @Test
     public void testVALIDATE() throws Exception
     {
-        assertNull( workflow.VALIDATE() );
+        assertEquals( ContainerDestructionWorkflow.ContainerDestructionPhase.FINALIZE, workflow.VALIDATE() );
 
         doReturn( Sets.newHashSet( container, TestHelper.ENV_CONTAINER() ) ).when( environment ).getContainerHosts();
 
