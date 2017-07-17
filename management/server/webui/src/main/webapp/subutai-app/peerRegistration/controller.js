@@ -128,22 +128,11 @@ function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuil
 		return result;
 	}
 
-    function reloadPeerTable(){
-        if(Object.keys(vm.dtInstance).length !== 0) {
-//            setTimeout(
-//                function(){
-//                    vm.dtInstance.reloadData(null, false);
-//                    LOADING_SCREEN('none');
-//                }, 2000);
-            location.reload();
-        }
-    }
-
 	function rejectPeerRequest(peerId, force) {
 		ngDialog.closeAll();
 		LOADING_SCREEN();
 		peerRegistrationService.rejectPeerRequest(peerId, force).success(function (data) {
-			reloadPeerTable();
+			location.reload();
 		}).error(function(error){
 			LOADING_SCREEN('none');
 			if(error.ERROR !== undefined) {
@@ -175,7 +164,7 @@ function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuil
 		ngDialog.closeAll();
 		LOADING_SCREEN();
 		peerRegistrationService.registerRequest(postData).success(function (data) {
-			reloadPeerTable();
+			location.reload();
 		}).error(function(error){
 			LOADING_SCREEN('none');
 			SweetAlert.swal("ERROR!", "Peer request error: " + error, "error");
@@ -186,7 +175,7 @@ function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuil
 		ngDialog.closeAll();
 		LOADING_SCREEN();
 		peerRegistrationService.approvePeerRequest(vm.peerId, keyPhrase).success(function (data) {
-            reloadPeerTable();
+            location.reload();
 		}).error(function(error){
 			LOADING_SCREEN('none');
 			SweetAlert.swal("ERROR!", "Peer approve error: " + error, "error");
@@ -206,8 +195,7 @@ function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuil
 		ngDialog.closeAll();
 		LOADING_SCREEN();
 		peerRegistrationService.unregisterPeerRequest(peerId, force).success(function (data) {
-			SweetAlert.swal("Unregistered!", "Your peer request has been unregistered.", "success");
-			reloadPeerTable();
+			location.reload();
 		}).error(function (error) {
 			LOADING_SCREEN('none');
 			SweetAlert.swal("ERROR!", error, "error");
@@ -242,8 +230,7 @@ function PeerRegistrationCtrl($scope, $q, peerRegistrationService, DTOptionsBuil
 		ngDialog.closeAll();
 		LOADING_SCREEN();
 		peerRegistrationService.cancelPeerRequest(peerId, force).success(function (data) {
-			SweetAlert.swal("Canceled!", "Your peer request has been canceled.", "success");
-			reloadPeerTable();
+			location.reload();
 		}).error(function (error) {
 			LOADING_SCREEN('none');
 			SweetAlert.swal("ERROR!", error, "error");
