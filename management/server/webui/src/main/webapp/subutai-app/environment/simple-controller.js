@@ -1053,6 +1053,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             currentTemplate.set('diskQuota', templateSettings.diskQuota );
         }
 
+        currentTemplate.attr('title/text', templateSettings.containerName + ' (' + currentTemplate.get('templateName') +  ') ' + templateSettings.quotaSize);
 		currentTemplate.attr('rect.b-magnet/fill', vm.colors[templateSettings.quotaSize]);
 		currentTemplate.set('containerName', templateSettings.containerName);
 
