@@ -232,6 +232,8 @@ public class RestServiceImpl implements RestService
                     {
                     }.getType() );
 
+                    //add env owner role by default
+                    roleIds.add( identityManager.findRoleByName( IdentityManager.ENV_OWNER_ROLE ).getId() );
 
                     roleIds.forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
                 }
@@ -246,6 +248,9 @@ public class RestServiceImpl implements RestService
                 List<Long> roleIds = jsonUtil.from( rolesJson, new TypeToken<ArrayList<Long>>()
                 {
                 }.getType() );
+
+                //add env owner role by default
+                roleIds.add( identityManager.findRoleByName( IdentityManager.ENV_OWNER_ROLE ).getId() );
 
                 newUser.setRoles(
                         roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() ) );

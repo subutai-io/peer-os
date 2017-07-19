@@ -30,8 +30,9 @@ public interface IdentityManager
     String TOKEN_ID = "token";
     String ADMIN_DEFAULT_PWD = "secret";
 
-    public static final String ENV_MANAGER_ROLE = "Environment-Manager";
-    public static final String TEMPLATE_MANAGER_ROLE = "Template-Manager";
+    String ENV_MANAGER_ROLE = "Environment-Manager";
+    String TEMPLATE_MANAGER_ROLE = "Template-Manager";
+    String ENV_OWNER_ROLE = "Environment-Owner";
 
 
     /* *************************************************
@@ -319,6 +320,9 @@ public interface IdentityManager
     /* *************************************************
      */
     List<Role> getAllRoles();
+
+
+    Role findRoleByName( String roleName );
 
 
     /* *************************************************
