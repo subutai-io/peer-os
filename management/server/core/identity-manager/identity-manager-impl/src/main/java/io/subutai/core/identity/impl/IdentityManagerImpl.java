@@ -105,7 +105,6 @@ public class IdentityManagerImpl implements IdentityManager
     private static final String ADMIN_USER_FULL_NAME = "Admin User";
     private static final String ADMIN_ROLE = "Administrator";
     private static final String SYSTEM_ROLE = "Internal-System";
-    private static final String ENV_OWNER_ROLE = "Environment-Owner";
     private static final long SIGN_TOKEN_TTL_SEC = 30;
 
     private IdentityDataService identityDataService = null;
@@ -224,13 +223,13 @@ public class IdentityManagerImpl implements IdentityManager
 
             // editable roles -----------------------------
 
-            // pre-create env-owner role for regular users
-            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
-
-            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
-                    true, true, true, true );
-
-            assignRolePermission( role, per );
+//            // pre-create env-owner role for regular users
+//            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
+//
+//            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
+//                    true, true, true, true );
+//
+//            assignRolePermission( role, per );
 
 
             //***** setPeer Owner By Default ***************
@@ -1768,6 +1767,16 @@ public class IdentityManagerImpl implements IdentityManager
         LOGGER.debug( "Role {} created", roleName );
 
         return role;
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( { "Identity-Management|Read" } )
+    @Override
+    public Role findRoleByName( String roleName )
+    {
+        return identityDataService.findRoleByName( roleName );
     }
 
 

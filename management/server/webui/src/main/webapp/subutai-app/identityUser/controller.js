@@ -93,9 +93,9 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	vm.dtColumns = [
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionEdit),
 		DTColumnBuilder.newColumn('userName').withTitle('Username'),
-		DTColumnBuilder.newColumn('type').withTitle('User type').renderWith(getUserType),
-		DTColumnBuilder.newColumn('trustLevel').withTitle('Trust Level').renderWith(getUserTrustLevel),
-		DTColumnBuilder.newColumn(null).withTitle('Roles').renderWith(rolesTags),
+//		DTColumnBuilder.newColumn('type').withTitle('User type').renderWith(getUserType),
+//		DTColumnBuilder.newColumn('trustLevel').withTitle('Trust Level').renderWith(getUserTrustLevel),
+//		DTColumnBuilder.newColumn(null).withTitle('Roles').renderWith(rolesTags),
 		DTColumnBuilder.newColumn('fullName').withTitle('Full name'),
 		DTColumnBuilder.newColumn('email').withTitle('E-mail'),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
