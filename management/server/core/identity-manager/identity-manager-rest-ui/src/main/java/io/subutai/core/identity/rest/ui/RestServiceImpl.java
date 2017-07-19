@@ -209,7 +209,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            User newUser;
+            User user;
 
             if ( userId == null || userId <= 0 )
             {
@@ -223,7 +223,7 @@ public class RestServiceImpl implements RestService
                                    .entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();
                 }
 
-                newUser = identityManager.createUser( username, password, fullName, email, UserType.REGULAR.getId(),
+                user = identityManager.createUser( username, password, fullName, email, UserType.REGULAR.getId(),
                         Integer.parseInt( trustLevel ), false, true );
 
                 if ( !Strings.isNullOrEmpty( rolesJson ) )
@@ -232,30 +232,31 @@ public class RestServiceImpl implements RestService
                     {
                     }.getType() );
 
-                    //add env owner role by default
-                    roleIds.add( identityManager.findRoleByName( IdentityManager.ENV_MANAGER_ROLE ).getId() );
-
-                    roleIds.forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
+                    roleIds.forEach( r -> identityManager.assignUserRole( user, identityManager.getRole( r ) ) );
                 }
+
+                //add env mgr role by default
+                identityManager
+                        .assignUserRole( user, identityManager.findRoleByName( IdentityManager.ENV_MANAGER_ROLE ) );
             }
             else
             {
-                newUser = identityManager.getUser( userId );
-                newUser.setEmail( email );
-                newUser.setFullName( fullName );
-                newUser.setTrustLevel( Integer.parseInt( trustLevel ) );
+                user = identityManager.getUser( userId );
+                user.setEmail( email );
+                user.setFullName( fullName );
+                user.setTrustLevel( Integer.parseInt( trustLevel ) );
 
                 List<Long> roleIds = jsonUtil.from( rolesJson, new TypeToken<ArrayList<Long>>()
                 {
                 }.getType() );
 
-                //add env owner role by default
+                //add env mgr role by default
                 roleIds.add( identityManager.findRoleByName( IdentityManager.ENV_MANAGER_ROLE ).getId() );
 
-                newUser.setRoles(
+                user.setRoles(
                         roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() ) );
 
-                identityManager.modifyUser( newUser, password );
+                identityManager.modifyUser( user, password );
             }
         }
         catch ( Exception e )
