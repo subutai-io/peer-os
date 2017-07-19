@@ -32,7 +32,7 @@ public interface IdentityManager
 
     String ENV_MANAGER_ROLE = "Environment-Manager";
     String TEMPLATE_MANAGER_ROLE = "Template-Manager";
-    String ENV_OWNER_ROLE = "Environment-Owner";
+//    String ENV_OWNER_ROLE = "Environment-Owner";
 
 
     /* *************************************************

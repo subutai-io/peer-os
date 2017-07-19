@@ -223,13 +223,13 @@ public class IdentityManagerImpl implements IdentityManager
 
             // editable roles -----------------------------
 
-            // pre-create env-owner role for regular users
-            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
-
-            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
-                    true, true, true, true );
-
-            assignRolePermission( role, per );
+//            // pre-create env-owner role for regular users
+//            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
+//
+//            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
+//                    true, true, true, true );
+//
+//            assignRolePermission( role, per );
 
 
             //***** setPeer Owner By Default ***************
