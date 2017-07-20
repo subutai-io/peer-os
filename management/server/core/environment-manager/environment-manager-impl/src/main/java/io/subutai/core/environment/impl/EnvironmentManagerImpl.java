@@ -2490,7 +2490,7 @@ public class EnvironmentManagerImpl
                 }
             }
         }
-        catch ( ActionFailedException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
         }
