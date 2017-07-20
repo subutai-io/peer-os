@@ -181,4 +181,9 @@ public interface RestService
     @Path( "/is-admin" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response isAdmin();
+
+    @GET
+    @Path( "/has-environments/{userId}" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response hasEnvironments( @PathParam( "userId" ) Long userId );
 }
