@@ -30,6 +30,8 @@
         <div class="b-main-form__element">
           <label class="b-popup-body-label b-popup-body-label_inline">New password</label>
           <input type="password"
+                 pattern="(?=^.{4,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[a-z]).*$"
+                 title="Min length 4. Chars and numbers"
                  ng-model="changePassCtrl.pass.newPassword"
                  id="js-password"
                  class="b-popup-body-input"
