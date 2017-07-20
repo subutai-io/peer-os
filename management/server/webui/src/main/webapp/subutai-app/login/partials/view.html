@@ -40,6 +40,8 @@
             <div ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
               <label class="b-form-label">New Password</label>
               <input
+                  pattern="(?=^.{4,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[a-z]).*$"
+                  title="Min length 4. Chars and numbers"
                   class="b-form-input b-form-input_full"
                   ng-model="loginCtrl.newPass"
                   name="new-password"
