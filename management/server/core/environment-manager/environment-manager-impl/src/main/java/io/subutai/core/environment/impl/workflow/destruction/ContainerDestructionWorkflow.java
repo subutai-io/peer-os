@@ -18,6 +18,7 @@ public class ContainerDestructionWorkflow
     private LocalEnvironment environment;
     private final ContainerHost containerHost;
     private final TrackerOperation operationTracker;
+    private boolean isLastContainer = false;
 
 
     public enum ContainerDestructionPhase
@@ -62,6 +63,8 @@ public class ContainerDestructionWorkflow
         {
             if ( environment.getContainerHosts().size() <= 1 )
             {
+                isLastContainer = true;
+
                 throw new IllegalStateException(
                         "Environment will have 0 containers after modification. Please, destroy environment instead" );
             }
@@ -120,7 +123,7 @@ public class ContainerDestructionWorkflow
     @Override
     public void fail( final String message, final Throwable e )
     {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        environment.setStatus( isLastContainer ? EnvironmentStatus.HEALTHY : EnvironmentStatus.UNHEALTHY );
 
         saveEnvironment();
 

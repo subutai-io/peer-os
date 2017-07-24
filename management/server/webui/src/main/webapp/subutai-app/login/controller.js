@@ -14,7 +14,12 @@ function ChangePassCtrl( $scope, loginSrv, SweetAlert) {
 
 	function changePass(passObj) {
 		if ($scope.changePassForm.$valid) {
-			LOADING_SCREEN();
+		    if(passObj.newPassword != passObj.confirmPass){
+		        SweetAlert.swal ("ERROR!", "Error: new password does not match confirming password", "error");
+		        return;
+		    }
+
+		    LOADING_SCREEN();
 			loginSrv.changePass(passObj).success(function(data){
 				LOADING_SCREEN('none');
 				SweetAlert.swal ("Success!", "You have successfully changed password.", "success");
@@ -61,9 +66,12 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 
 	function login() {
 
-        vm.errorMessage="";
+	    //TODO here we can clear cache
 
+        vm.errorMessage="";
+//        localStorage.removeItem('bazaarProducts');
 	    sessionStorage.removeItem('notifications');
+
 
 		if( vm.newPass.length > 0 || vm.resetPwd) {
 

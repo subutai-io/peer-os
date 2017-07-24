@@ -239,6 +239,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     }
 
     function logout() {
+    	//TODO here we can clear cache
+//        localStorage.removeItem('bazaarProducts');
         removeCookie('sptoken');
         localStorage.removeItem('kurjunToken');
         localStorage.removeItem('currentUserToken');
@@ -286,6 +288,13 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         if (vm.notificationsLogs[logId].log.length > 0) {
             var logsArray = vm.notificationsLogs[logId].log.split(/(?:\r\n|\r|\n)/g);
             vm.currentLogTitle = vm.notificationsLogs[logId].description;
+
+            var trim = vm.currentLogTitle.length > 70;
+            if (trim)
+            {
+                vm.currentLogTitle = vm.currentLogTitle.substring(0, 70) + '...';
+            }
+
             var logs = [];
             for (var i = 0; i < logsArray.length; i++) {
                 var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
@@ -352,27 +361,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             console.log(error);
         });
     }
-
-
-    function checkSum() {
-        $http.get(SERVER_URL + "rest/v1/bazaar/products/checksum", {
-            withCredentials: true,
-            headers: {'Content-Type': 'application/json'}
-        }).success(function (data) {
-            if (localStorage.getItem("bazaarMD5") === null) {
-                localStorage.setItem("bazaarMD5", data);
-                bazaarUpdate = true;
-            }
-            else {
-                if (localStorage.getItem("bazaarMD5") !== data) {
-                    localStorage.setItem("bazaarMD5", data);
-                    bazaarUpdate = true;
-                }
-            }
-        });
-    }
-
-    checkSum();
 
 }
 

@@ -45,6 +45,7 @@ import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
@@ -53,6 +54,7 @@ import io.subutai.core.identity.rest.ui.entity.KeyDataDto;
 import io.subutai.core.identity.rest.ui.entity.PermissionDto;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.model.SecurityKey;
+import io.subutai.core.template.api.TemplateManager;
 
 
 public class RestServiceImpl implements RestService
@@ -207,7 +209,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            User newUser;
+            User user;
 
             if ( userId == null || userId <= 0 )
             {
@@ -221,7 +223,7 @@ public class RestServiceImpl implements RestService
                                    .entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();
                 }
 
-                newUser = identityManager.createUser( username, password, fullName, email, UserType.REGULAR.getId(),
+                user = identityManager.createUser( username, password, fullName, email, UserType.REGULAR.getId(),
                         Integer.parseInt( trustLevel ), false, true );
 
                 if ( !Strings.isNullOrEmpty( rolesJson ) )
@@ -230,25 +232,31 @@ public class RestServiceImpl implements RestService
                     {
                     }.getType() );
 
-
-                    roleIds.forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
+                    roleIds.forEach( r -> identityManager.assignUserRole( user, identityManager.getRole( r ) ) );
                 }
+
+                //add env mgr role by default
+                identityManager
+                        .assignUserRole( user, identityManager.findRoleByName( IdentityManager.ENV_MANAGER_ROLE ) );
             }
             else
             {
-                newUser = identityManager.getUser( userId );
-                newUser.setEmail( email );
-                newUser.setFullName( fullName );
-                newUser.setTrustLevel( Integer.parseInt( trustLevel ) );
+                user = identityManager.getUser( userId );
+                user.setEmail( email );
+                user.setFullName( fullName );
+                user.setTrustLevel( Integer.parseInt( trustLevel ) );
 
                 List<Long> roleIds = jsonUtil.from( rolesJson, new TypeToken<ArrayList<Long>>()
                 {
                 }.getType() );
 
-                newUser.setRoles(
+                //add env mgr role by default
+                roleIds.add( identityManager.findRoleByName( IdentityManager.ENV_MANAGER_ROLE ).getId() );
+
+                user.setRoles(
                         roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() ) );
 
-                identityManager.modifyUser( newUser, password );
+                identityManager.modifyUser( user, password );
             }
         }
         catch ( Exception e )
@@ -386,6 +394,11 @@ public class RestServiceImpl implements RestService
         try
         {
             List<Role> roles = identityManager.getAllRoles();
+
+            for ( Role role : roles )
+            {
+                LOGGER.debug( "ROLE: " + role.getName() );
+            }
 
             return Response.ok( jsonUtil.to( roles.stream().filter( role -> role.getType() != UserType.SYSTEM.getId() )
                                                   .collect( Collectors.toList() ) ) ).build();
@@ -744,6 +757,12 @@ public class RestServiceImpl implements RestService
                 if ( response.getStatusLine().getStatusCode() == 200 )
                 {
                     identityManager.getActiveSession().setKurjunToken( content );
+
+                    TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
+                    if ( templateManager != null )
+                    {
+                        templateManager.resetTemplateCache();
+                    }
 
                     return Response.ok( content ).build();
                 }

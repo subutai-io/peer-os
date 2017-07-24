@@ -28,6 +28,11 @@
       <artifactId>identity-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>template-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>javax.annotation</groupId>
@@ -91,11 +96,14 @@
       <version>1.1</version>
     </dependency>
 
-
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>template-manager-api</artifactId>
     </dependency>
 
   </dependencies>

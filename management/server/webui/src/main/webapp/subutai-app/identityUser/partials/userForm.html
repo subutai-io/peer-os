@@ -1,4 +1,4 @@
-<div class="b-popup b-popup_wide">
+<div class="b-popup b-popup_log">
 	<div class="b-popup__header">
 		<span ng-show="identityUserCtrl.editUser">Edit</span>
 		<span ng-show="!identityUserCtrl.editUser">Create</span> user
@@ -30,17 +30,17 @@
 					tabindex=2 
 					required>
 
-				<label class="b-popup-body-label b-popup-body-label_block">Trusted Level:</label>
-				<select class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
-					tabindex=3 
-					ng-model="identityUserCtrl.user2Add.trustLevel">
-					<option 
-					ng-repeat="(trystedLevelId, trustLevel) in identityUserCtrl.trustedLevels" 
-					value="{{ trystedLevelId }}" 
-					ng-selected="trystedLevelId == identityUserCtrl.user2Add.trustLevel">
-						{{ trustLevel }}
-					</option>
-				</select>
+				<!--<label class="b-popup-body-label b-popup-body-label_block">Trusted Level:</label>-->
+				<!--<select class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" -->
+					<!--tabindex=3 -->
+					<!--ng-model="identityUserCtrl.user2Add.trustLevel">-->
+					<!--<option -->
+					<!--ng-repeat="(trystedLevelId, trustLevel) in identityUserCtrl.trustedLevels" -->
+					<!--value="{{ trystedLevelId }}" -->
+					<!--ng-selected="trystedLevelId == identityUserCtrl.user2Add.trustLevel">-->
+						<!--{{ trustLevel }}-->
+					<!--</option>-->
+				<!--</select>-->
 
 				<label class="b-popup-body-label b-popup-body-label_block">E-mail:</label>
 				<input type="email"
@@ -76,10 +76,10 @@
 				<span class="b-form-hint b-form-hint_red" ng-show="identityUserCtrl.addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
 
 			</div>
-			<div class="b-popup-body b-popup-body_col-2 g-right">
-				<col-select></col-select>
-			</div>
-			<div class="clear"></div>
+			<!--<div class="b-popup-body b-popup-body_col-2 g-right">-->
+				<!--<col-select></col-select>-->
+			<!--</div>-->
+			<!--<div class="clear"></div>-->
 		</div>
 		<div class="b-popup__footer">
 			<button class="b-btn b-btn_green g-right" type="submit" tabindex=7>Save user</button>

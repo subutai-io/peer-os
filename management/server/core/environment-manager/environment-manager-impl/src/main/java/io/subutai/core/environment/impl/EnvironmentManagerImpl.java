@@ -2136,6 +2136,27 @@ public class EnvironmentManagerImpl
     }
 
 
+    @Override
+    public void onUnregister()
+    {
+        Set<LocalEnvironment> envs = new HashSet<>();
+
+        envs.addAll( environmentService.getAll() );
+
+        for ( Iterator<LocalEnvironment> iterator = envs.iterator(); iterator.hasNext(); )
+        {
+            LocalEnvironment environment = iterator.next();
+
+            if ( environment.isUploaded() )
+            {
+                environment.markAsNotUploaded();
+
+                environmentService.merge( environment );
+            }
+        }
+    }
+
+
     // remove environments that exist on Hub but don't exist on peer
     // workaround for https://github.com/subutai-io/base/issues/1464
     private void removeStaleHubEnvironments( Set<HubEnvironment> hubEnvironments )
@@ -2329,12 +2350,10 @@ public class EnvironmentManagerImpl
             //process only SS side environments
             for ( Environment environment : environmentService.getAll() )
             {
-                if ( !( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
-                        || environment.getStatus() == EnvironmentStatus.CANCELLED || (
-                        ( System.currentTimeMillis() - environment.getCreationTimestamp() ) < TimeUnit.HOURS
-                                .toMillis( 1 ) ) ) )
+                if ( !( environment.getStatus() != EnvironmentStatus.HEALTHY || (
+                        ( System.currentTimeMillis() - environment.getCreationTimestamp() ) < TimeUnit.MINUTES
+                                .toMillis( RESET_ENVS_P2P_KEYS_INTERVAL_MIN ) ) ) )
                 {
-
                     final String secretKey = UUID.randomUUID().toString();
                     final long keyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
                     resetP2PSecretKey( environment.getId(), secretKey, keyTtl, true );

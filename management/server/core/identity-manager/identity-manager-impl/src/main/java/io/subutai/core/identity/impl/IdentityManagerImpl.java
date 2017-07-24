@@ -86,6 +86,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.model.SecurityKey;
+import io.subutai.core.template.api.TemplateManager;
 
 
 /**
@@ -103,10 +104,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final String SYSTEM_USER_EMAIL = "system@subutai.io";
     private static final String ADMIN_USER_FULL_NAME = "Admin User";
     private static final String ADMIN_ROLE = "Administrator";
-    private static final String KARAF_MANAGER_ROLE = "Karaf-Manager";
-    private static final String PEER_MANAGER_ROLE = "Peer-Manager";
     private static final String SYSTEM_ROLE = "Internal-System";
-    private static final String ENV_OWNER_ROLE = "Environment-Owner";
     private static final long SIGN_TOKEN_TTL_SEC = 30;
 
     private IdentityDataService identityDataService = null;
@@ -225,13 +223,13 @@ public class IdentityManagerImpl implements IdentityManager
 
             // editable roles -----------------------------
 
-            // pre-create env-owner role for regular users
-            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
-
-            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
-                    true, true, true, true );
-
-            assignRolePermission( role, per );
+//            // pre-create env-owner role for regular users
+//            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
+//
+//            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
+//                    true, true, true, true );
+//
+//            assignRolePermission( role, per );
 
 
             //***** setPeer Owner By Default ***************
@@ -860,6 +858,12 @@ public class IdentityManagerImpl implements IdentityManager
         Session session = getActiveSession();
         if ( session != null )
         {
+            TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
+            if ( templateManager != null )
+            {
+                templateManager.resetTemplateCache();
+            }
+
             session.setKurjunToken( null );
         }
 
@@ -1308,6 +1312,7 @@ public class IdentityManagerImpl implements IdentityManager
             if ( generateKeyPair )
             {
                 String securityKeyId = user.getId() + "-" + UUID.randomUUID();
+                LOGGER.debug( "generating keypair for user {}: {}", user.getId(), user.getUserName() );
                 generateKeyPair( securityKeyId, SecurityKeyType.USER_KEY.getId() );
                 user.setSecurityKeyId( securityKeyId );
                 identityDataService.updateUser( user );
@@ -1317,8 +1322,11 @@ public class IdentityManagerImpl implements IdentityManager
             //***************************************
             if ( createUserDelegate )
             {
+                LOGGER.debug( "generating delegate for user {}: {}", user.getId(), user.getUserName() );
                 createUserDelegate( user, null, true );
             }
+
+            LOGGER.debug( "User {} created", userName );
         }
         catch ( Exception e )
         {
@@ -1618,16 +1626,15 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private void isValidPassword( String userName, String password )
     {
-        if ( Strings.isNullOrEmpty( password ) || password.length() < 4 )
-        {
-            throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
-        }
+        Preconditions.checkArgument( !( Strings.isNullOrEmpty( userName ) || userName.trim().isEmpty() ),
+                "Username can not be blank" );
 
-        if ( password.equalsIgnoreCase( userName ) || "password".equalsIgnoreCase( password ) || "system"
-                .equalsIgnoreCase( password ) )
-        {
-            throw new IllegalArgumentException( "Password doesn't match security measures" );
-        }
+        Preconditions.checkArgument( !( Strings.isNullOrEmpty( password ) || password.trim().length() < 4 ),
+                "Password cannot be shorter than 4 characters" );
+
+
+        Preconditions.checkArgument( !password.trim().equalsIgnoreCase( userName.trim() ),
+                "Password can not be the same as username" );
     }
 
 
@@ -1663,12 +1670,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         User user = getActiveUser();
 
-        if ( user == null )
-        {
-            return false;
-        }
-
-        return SYSTEM_USERNAME.equalsIgnoreCase( user.getUserName() );
+        return user != null && SYSTEM_USERNAME.equalsIgnoreCase( user.getUserName() );
     }
 
 
@@ -1742,6 +1744,8 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public Role createRole( String roleName, int roleType )
     {
+        LOGGER.debug( "Creating role {}", roleName );
+
         Preconditions.checkArgument( !Strings.isNullOrEmpty( roleName ), "Invalid role name" );
 
         if ( identityDataService.findRoleByName( roleName ) != null )
@@ -1760,7 +1764,19 @@ public class IdentityManagerImpl implements IdentityManager
 
         identityDataService.persistRole( role );
 
+        LOGGER.debug( "Role {} created", roleName );
+
         return role;
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( { "Identity-Management|Read" } )
+    @Override
+    public Role findRoleByName( String roleName )
+    {
+        return identityDataService.findRoleByName( roleName );
     }
 
 

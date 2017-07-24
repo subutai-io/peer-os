@@ -3,7 +3,6 @@ package io.subutai.core.hubmanager.impl;
 
 import java.io.File;
 import java.io.InputStream;
-import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
-import io.subutai.core.hubmanager.impl.processor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,17 +52,17 @@ import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
-import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
+import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
 import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
+import io.subutai.core.hubmanager.impl.processor.UserTokenProcessor;
 import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
@@ -89,7 +87,7 @@ public class HubManagerImpl implements HubManager, HostListener
 {
     private static final long TIME_15_MINUTES = 900;
 
-    public static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
+    private static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -112,8 +110,6 @@ public class HubManagerImpl implements HubManager, HostListener
     private final ScheduledExecutorService versionEventExecutor = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
-
-    private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService registrationRequestExecutor = Executors.newSingleThreadScheduledExecutor();
 
@@ -149,8 +145,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
-    private String checksum = "";
-
     private HubRestClient restClient;
 
     private LocalPeer localPeer;
@@ -179,18 +173,6 @@ public class HubManagerImpl implements HubManager, HostListener
             configManager = new ConfigManager( securityManager, peerManager, identityManager );
 
             restClient = new HubRestClient( configManager );
-
-
-            this.sumChecker.scheduleWithFixedDelay( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    log.info( "Starting sumchecker" );
-                    generateChecksum();
-                }
-            }, 1, 600000, TimeUnit.MILLISECONDS );
-
 
             envUserHelper = new EnvironmentUserHelper( identityManager, configDataService, envManager, restClient );
 
@@ -292,9 +274,9 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
-        ProxyProcessor proxyProcessor = new ProxyProcessor(configManager, peerManager, restClient);
+        ProxyProcessor proxyProcessor = new ProxyProcessor( configManager, peerManager, restClient );
 
-        UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx);
+        UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx );
 
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
@@ -358,7 +340,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String email, String password, String peerName, String peerScope ) throws HubManagerException
+    public void registerPeer( String email, String password, String peerName, String peerScope )
+            throws HubManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );
@@ -366,8 +349,6 @@ public class HubManagerImpl implements HubManager, HostListener
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.registerPeer( email, password, peerName, peerScope );
-
-        generateChecksum();
 
         sendResourceHostInfo();
 
@@ -416,6 +397,32 @@ public class HubManagerImpl implements HubManager, HostListener
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.unregister();
+
+        if ( !CollectionUtil.isCollectionEmpty( hubEventListeners ) )
+        {
+            ExecutorService notifier = Executors.newFixedThreadPool( hubEventListeners.size() );
+
+            for ( final HubEventListener hubEventListener : hubEventListeners )
+            {
+                notifier.execute( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            hubEventListener.onUnregister();
+                        }
+                        catch ( Exception e )
+                        {
+                            log.error( "Error notifying hub event listener", e );
+                        }
+                    }
+                } );
+            }
+
+            notifier.shutdown();
+        }
     }
 
 
@@ -438,9 +445,10 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public String getProducts() throws HubManagerException
     {
+        WebClient client = null;
         try
         {
-            WebClient client = configManager
+            client = configManager
                     .getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", configManager.getHubIp() );
 
             Response r = client.get();
@@ -464,17 +472,22 @@ public class HubManagerImpl implements HubManager, HostListener
         {
             throw new HubManagerException( "Could not retrieve product data", e );
         }
+        finally
+        {
+            RestUtil.close( client );
+        }
     }
 
 
     @Override
     public void installPlugin( String url, String name, String uid ) throws HubManagerException
     {
+        WebClient client = null;
         InputStream initialStream = null;
         try
         {
-            WebClient webClient = RestUtil.createTrustedWebClient( url );
-            File product = webClient.get( File.class );
+            client = RestUtil.createTrustedWebClient( url );
+            File product = client.get( File.class );
             initialStream = FileUtils.openInputStream( product );
             File targetFile =
                     new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
@@ -507,6 +520,7 @@ public class HubManagerImpl implements HubManager, HostListener
         }
         finally
         {
+            RestUtil.close( client );
             SafeCloseUtil.close( initialStream );
         }
     }
@@ -582,11 +596,12 @@ public class HubManagerImpl implements HubManager, HostListener
     public Map<String, String> getPeerInfo() throws HubManagerException
     {
         Map<String, String> result = new HashMap<>();
+        WebClient client = null;
         try
         {
             String path = "/rest/v1/peers/" + configManager.getPeerId();
 
-            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+            client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
             Response r = client.get();
 
@@ -604,6 +619,10 @@ public class HubManagerImpl implements HubManager, HostListener
         {
             throw new HubManagerException( "Could not retrieve Peer info", e );
         }
+        finally
+        {
+            RestUtil.close( client );
+        }
         return result;
     }
 
@@ -615,40 +634,36 @@ public class HubManagerImpl implements HubManager, HostListener
     }
 
 
-    private void generateChecksum()
-    {
-        try
-        {
-            log.info( "Generating plugins list md5 checksum" );
-            String productList = getProducts();
-            MessageDigest md = MessageDigest.getInstance( "MD5" );
-            byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
-            StringBuilder hexString = new StringBuilder();
-
-            for ( final byte aByte : bytes )
-            {
-                String hex = Integer.toHexString( 0xFF & aByte );
-                if ( hex.length() == 1 )
-                {
-                    hexString.append( '0' );
-                }
-                hexString.append( hex );
-            }
-
-            checksum = hexString.toString();
-            log.info( "Checksum generated: " + checksum );
-        }
-        catch ( Exception e )
-        {
-            log.error( e.getMessage() );
-        }
-    }
-
-
     @Override
     public String getChecksum()
     {
-        return this.checksum;
+        WebClient client = null;
+        try
+        {
+            client = configManager
+                    .getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/checksum", configManager.getHubIp() );
+
+            Response r = client.get();
+
+            if ( r.getStatus() != HttpStatus.SC_OK )
+            {
+                log.error( r.readEntity( String.class ) );
+            }
+            else
+            {
+                return r.readEntity( String.class );
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Could not retrieve checksum", e );
+        }
+        finally
+        {
+            RestUtil.close( client );
+        }
+
+        return null;
     }
 
 
@@ -657,10 +672,11 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         if ( isRegisteredWithHub() )
         {
+            WebClient client = null;
             try
             {
                 String path = "/rest/v1/system-changes";
-                WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+                client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
                 byte[] cborData = JsonUtil.toCbor( dto );
 
@@ -682,6 +698,10 @@ public class HubManagerImpl implements HubManager, HostListener
             catch ( Exception e )
             {
                 log.error( "Could not send SS configuration to Hub", e );
+            }
+            finally
+            {
+                RestUtil.close( client );
             }
         }
     }
