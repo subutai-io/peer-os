@@ -1,8 +1,0 @@
-Package: subutai-hadoop2
-Priority: optional
-Section: devel
-Installed-Size: 89000
-Maintainer: subutai
-Architecture: all
-Version: 1.0.0
-Description: This is a hadoop version 2 package of subutai distribution.

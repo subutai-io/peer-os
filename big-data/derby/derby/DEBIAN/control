@@ -1,8 +1,0 @@
-Package: subutai-derby
-Priority: optional
-Section: devel
-Installed-Size: 54272
-Maintainer: subutai
-Architecture: all
-Version: 1.0.14
-Description: This is a derby package of subutai distribution.

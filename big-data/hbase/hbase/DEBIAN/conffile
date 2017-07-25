@@ -1,8 +1,0 @@
-/etc/hbase/backup-masters
-/etc/hbase/hbase-env.sh
-/etc/hbase/hosts
-/etc/hbase/hadoop-metrics.properties
-/etc/hbase/hbase-policy.xml
-/etc/hbase/regionservers
-/etc/hbase/hadoop-policy.xml
-/etc/hbase/hbase-site.xml

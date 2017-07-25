@@ -1,9 +1,0 @@
-Package: subutai-sqoop
-Priority: optional
-Section: devel
-Installed-Size: 7533
-Maintainer: subutai
-Architecture: amd64
-Version: 1.0.3
-Depends: subutai-hadoop, openjdk-7-jdk
-Description: This is a sqoop package of subutai distribution. 

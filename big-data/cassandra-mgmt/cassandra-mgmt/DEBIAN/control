@@ -1,8 +1,0 @@
-Package: ksks-cassandra-mgmt
-Priority: optional
-Section: devel
-Installed-Size: 100
-Maintainer: kiskis
-Architecture: amd64 
-Version: 1.0.10
-Description: This is a subutai-management server cassandra package.

@@ -1,9 +1,0 @@
-Package: subutai-hive
-Priority: optional
-Section: devel
-Installed-Size: 69000
-Maintainer: subutai
-Architecture: all
-Version: 1.0.25
-Depends: subutai-hadoop
-Description: This is a hive package of subutai distribution.

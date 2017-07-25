@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# Exit on error
-set -e
-
-service solr start

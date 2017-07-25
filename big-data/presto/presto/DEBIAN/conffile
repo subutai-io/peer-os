@@ -1,7 +1,0 @@
-/etc/presto/config.properties
-/etc/presto/jvm.config
-/etc/presto/log.properties
-/etc/presto/node.properties
-/etc/presto/catalog/cassandra.properties
-/etc/presto/catalog/hive.properties
-/etc/presto/catalog/jmx.properties
