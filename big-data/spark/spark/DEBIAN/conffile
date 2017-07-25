@@ -1,6 +1,0 @@
-/opt/spark-0.9.1/conf/fairscheduler.xml.template
-/opt/spark-0.9.1/conf/log4j.properties.template
-/opt/spark-0.9.1/conf/metrics.properties.template
-/opt/spark-0.9.1/conf/slaves
-/opt/spark-0.9.1/conf/spark-env.sh.template
-/opt/spark-0.9.1/conf/spark-env.sh

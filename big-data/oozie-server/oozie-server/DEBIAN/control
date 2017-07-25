@@ -1,9 +1,0 @@
-Package: subutai-oozie-server
-Priority: optional
-Section: devel
-Installed-Size: 115000
-Maintainer: subutai
-Architecture: all
-Version: 1.0.17
-Depends: subutai-hadoop, zip, unzip
-Description: This is a oozie server package of subutai distribution.

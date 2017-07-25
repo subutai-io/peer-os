@@ -1,8 +1,0 @@
-Package: subutai-shark
-Priority: optional
-Section: devel
-Installed-Size: 119100
-Maintainer: subutai
-Architecture: amd64 
-Version: 1.0.1
-Description: This is a shark package of subutai distribution.

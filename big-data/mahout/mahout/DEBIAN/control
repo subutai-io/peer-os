@@ -1,8 +1,0 @@
-Package: subutai-mahout
-Priority: optional
-Section: devel
-Installed-Size: 242000
-Maintainer: subutai
-Architecture: all
-Version: 1.0.6
-Description: This is a mahout package of subutai distribution.

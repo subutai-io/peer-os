@@ -1,9 +1,0 @@
-*.project
-*.settings
-*.classpath
-*.log
-.idea/
-VAADIN/
-target/
-md5sums
-*.deb

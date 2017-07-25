@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# Exit on error
-set -e
-
-. /etc/profile
-if [ -f /etc/init.d/derby ]; then
-	service derby stop
-fi

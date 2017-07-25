@@ -1,5 +1,0 @@
-#!/bin/bash
-set -e
-
-service solr stop
-service solr kill
