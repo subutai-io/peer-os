@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# Exit on error
-set -e
-
-service hive-thrift stop
-service hive-thrift kill

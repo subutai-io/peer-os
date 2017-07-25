@@ -1,6 +1,0 @@
-#!/bin/bash
-set -e
-sharkVer="shark-0.9.1"
-
-# stop sparkVer if it is running
-# service spark stop
