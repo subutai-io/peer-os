@@ -1,8 +1,0 @@
-Package: subutai-presto
-Priority: optional
-Section: devel
-Installed-Size: 100
-Maintainer: subutai 
-Architecture: amd64 
-Version: 1.0.14
-Description: This is a presto package of subutai distribution.

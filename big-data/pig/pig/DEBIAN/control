@@ -1,9 +1,0 @@
-Package: subutai-pig 
-Priority: optional
-Section: devel
-Installed-Size: 251962
-Maintainer: subutai 
-Architecture: amd64
-Version: 1.1.5
-Depends: subutai-hadoop
-Description: This is a pig package of subutai distribution.

@@ -1,9 +1,0 @@
-Package: subutai-hipi 
-Priority: optional
-Section: devel
-Installed-Size: 136
-Maintainer: subutai 
-Architecture: amd64 
-Version: 1.0.1
-Depends: subutai-hadoop
-Description: This is a hipi package of subutai distribution.

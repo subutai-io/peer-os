@@ -1,8 +1,0 @@
-Package: subutai-mongo
-Priority: optional
-Section: devel
-Maintainer: subutai
-Architecture: all
-Depends: mongodb-10gen
-Version: 1.0.4
-Description: This is a mongo package of subutai distribution.
