@@ -246,16 +246,15 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	function deleteUser(userId) {
 		identitySrv.hasEnvironments(userId).success(function (data) {
-            showConfirmationDialog(data == true || data == 'true');
+            showConfirmationDialog(userId, data == true || data == 'true');
 		});
 	}
 
-	function showConfirmationDialog(hasEnvironments){
+	function showConfirmationDialog(userId, hasEnvironments){
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
-				text: "You will not be able to recover this user!"
-				 + hasEnvironments? ' This user has environments!':'',
+				text: ( hasEnvironments? "This user has environments! " : "" ) + "You will not be able to recover this user!",
 				type: "warning",
 				showCancelButton: true,
 				confirmButtonColor: "#ff3f3c",
