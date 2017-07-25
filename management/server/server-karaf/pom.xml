@@ -316,7 +316,7 @@
                 <configuration>
                   <packageName>management-${git.branch}</packageName>
                   <packageVersion>${project.version}</packageVersion>
-                  <maintainerName>Subutai Social</maintainerName>
+                  <maintainerName>Subutai</maintainerName>
                   <packageDependencies>
                     <packageDependencies>openjdk-8-jre-headless</packageDependencies>
                     <packageDependencies>curl</packageDependencies>

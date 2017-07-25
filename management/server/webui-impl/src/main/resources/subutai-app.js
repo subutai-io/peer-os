@@ -371,7 +371,7 @@ function SubutaiController($rootScope, $http, $state) {
     vm.activeState = '';
     vm.adminMenus = false;
     vm.isTenantManager = false;
-    vm.peerName = "Subutai Social";
+    vm.peerName = "Subutai";
 
 	$http.get(SERVER_URL + 'rest/ui/identity/is-admin', {
 		withCredentials: true,
@@ -412,9 +412,9 @@ function SubutaiController($rootScope, $http, $state) {
                 headers: {'Content-Type': 'application/json'}
             }).success(function (data) {
                 if (data.isRegisteredToHub == true) {
-                    vm.peerName = data.peerName + " | Subutai Social";
+                    vm.peerName = data.peerName + " | Subutai";
                 }else{
-                    vm.peerName = "Subutai Social";
+                    vm.peerName = "Subutai";
                 }
             });*/
             return;
