@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>blueprint-auth</artifactId>
-  <name>Subutai Social Blueprint Authz</name>
+  <name>Subutai Blueprint Authz</name>
   <description>Interceptor for osgi bundle initialization</description>
   <packaging>bundle</packaging>
 

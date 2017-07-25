@@ -72,7 +72,7 @@ function ConsoleViewCtrl($scope, consoleService, $stateParams, ngDialog, cfpLoad
 		$scope.$broadcast('terminal-output', {
 			output: true,
 			text: [
-				'Subutai Social',
+				'Subutai',
 			],
 			breakLine: true
 		});

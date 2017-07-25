@@ -46,6 +46,7 @@ import io.subutai.common.security.objects.UserType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
@@ -630,7 +631,19 @@ public class RestServiceImpl implements RestService
         return Response.status( Response.Status.OK ).entity( identityManager.isAdmin() ).build();
     }
 
+
+    @Override
+    public Response hasEnvironments( Long userId )
+    {
+        EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
+
+        boolean hasLocalEnvironments = !environmentManager.getEnvironmentsByOwnerId( userId ).isEmpty();
+
+        return Response.status( Response.Status.OK ).entity( hasLocalEnvironments ).build();
+    }
+
     //****** Kurjun ***********/
+    //TODO extract Kurjun related functionality into separate KurjunClient
 
 
     private String getFingerprint()
