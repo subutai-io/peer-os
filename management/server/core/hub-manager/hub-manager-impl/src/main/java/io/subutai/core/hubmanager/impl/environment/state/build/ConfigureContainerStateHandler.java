@@ -120,14 +120,13 @@ public class ConfigureContainerStateHandler extends StateHandler
             //add new keys
             Set<String> newKeys = new HashSet<>();
 
-            //remove existing keys
-            hubSshKeys.removeAll( peerSshKeys );
+            if ( isSsEnv )
+            {
+                //for SS env no need to duplicate keys, it will add to Environment entity
+                hubSshKeys.removeAll( peerSshKeys );
+            }
 
             newKeys.addAll( hubSshKeys );
-
-            // Fix for https://github.com/optdyn/hub/issues/2671: "newly added containers do not have the previously
-            // installed env SSH keys installed".
-            // newKeys.removeAll( peerSshKeys );
 
             if ( newKeys.isEmpty() )
             {
