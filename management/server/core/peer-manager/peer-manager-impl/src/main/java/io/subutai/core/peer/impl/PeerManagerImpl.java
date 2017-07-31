@@ -32,6 +32,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.NetworkException;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.SocketUtil;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.LocalPeer;
@@ -54,6 +55,8 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.SecurityUtilities;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
@@ -1531,7 +1534,11 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
         {
             try
             {
-                String ip = localPeer.getManagementHost().getIp();
+                HostRegistry hostRegistry = ServiceLocator.lookup( HostRegistry.class );
+
+                String ip =
+                        ( ( ResourceHostInfo ) hostRegistry.getHostInfoById( localPeer.getManagementHost().getId() ) )
+                                .getAddress();
 
                 if ( setLocalPeerUrl( ip ) )
                 {
