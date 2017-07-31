@@ -63,6 +63,9 @@
 
   <service ref="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
 
+  <!--heartbeat listener-->
+  <service ref="peerManager" interface="io.subutai.common.host.HeartbeatListener" />
+
   <reference-list id="peerActionListener"
                   interface="io.subutai.core.peer.api.PeerActionListener"
                   availability="optional" ext:proxy-method="classes">
