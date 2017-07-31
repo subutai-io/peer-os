@@ -120,6 +120,9 @@ public class ConfigureContainerStateHandler extends StateHandler
             //add new keys
             Set<String> newKeys = new HashSet<>();
 
+            //remove existing keys
+            hubSshKeys.removeAll( peerSshKeys );
+
             newKeys.addAll( hubSshKeys );
 
             // Fix for https://github.com/optdyn/hub/issues/2671: "newly added containers do not have the previously
