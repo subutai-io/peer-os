@@ -30,9 +30,10 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.NetworkException;
+import io.subutai.common.host.HeartBeat;
+import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.network.SocketUtil;
 import io.subutai.common.peer.Encrypted;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -52,7 +53,6 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -79,7 +79,7 @@ import io.subutai.hub.share.resource.PeerResources;
  * PeerManager implementation
  */
 @PermitAll
-public class PeerManagerImpl implements PeerManager
+public class PeerManagerImpl implements PeerManager, HeartbeatListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final int MAX_CONTAINER_LIMIT = 20;
@@ -100,6 +100,7 @@ public class PeerManagerImpl implements PeerManager
     private String localPeerId;
     private RegistrationClient registrationClient;
     private RelationManager relationManager;
+    private ScheduledExecutorService localIpSetter = Executors.newSingleThreadScheduledExecutor();
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -157,8 +158,8 @@ public class PeerManagerImpl implements PeerManager
                 updatePeerInCache( peer );
             }
 
-            final ScheduledExecutorService localIpSetter = Executors.newSingleThreadScheduledExecutor();
-            localIpSetter.scheduleWithFixedDelay( new IpDetectionTask(), 1, 5, TimeUnit.SECONDS );
+
+            localIpSetter.scheduleWithFixedDelay( new IpDetectionJob(), 1, 5, TimeUnit.SECONDS );
         }
         catch ( Exception e )
         {
@@ -1481,37 +1482,65 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private class IpDetectionTask implements Runnable
+    @Override
+    public void onHeartbeat( final HeartBeat heartBeat )
     {
+        String ip = heartBeat.getHostInfo().getAddress();
+
+        setLocalPeerUrl( ip );
+    }
 
 
+    private boolean setLocalPeerUrl( String ip )
+    {
+        synchronized ( localPeer )
+        {
+            if ( !localPeer.isInitialized() )
+            {
+                return false;
+            }
+
+            try
+            {
+                if ( ( Common.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
+                        .getPeerInfo().isManualSetting() ) && !ip.equals( localPeer.getPeerInfo().getIp() ) )
+                {
+                    setPublicUrl( localPeerId, ip, localPeer.getPeerInfo().getPublicSecurePort(), false );
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Error updating local peer public url", e );
+
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+
+    /**
+     * Since heartbeat arrives only once per change on system level, and it can arrive when local peer is not init'ed
+     * yet, we need this additional job to obtain IP of RH-with-MH
+     */
+    private class IpDetectionJob implements Runnable
+    {
         @Override
         public void run()
         {
-            synchronized ( localPeer )
+            try
             {
-                try
-                {
-                    if ( localPeer.isInitialized() && (
-                            Common.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
-                                    .getPeerInfo().isManualSetting() ) )
-                    {
-                        String ip = localPeer.getManagementHost().getIp();
+                String ip = localPeer.getManagementHost().getIp();
 
-                        if ( IPUtil.isValid( ip ) && !ip.equals( localPeer.getPeerInfo().getIp() ) )
-                        {
-                            setPublicUrl( localPeerId, ip, localPeer.getPeerInfo().getPublicSecurePort(), false );
-                        }
-                    }
-                }
-                catch ( HostNotFoundException e )
+                if ( setLocalPeerUrl( ip ) )
                 {
-                    //ignore
+                    localIpSetter.shutdown();
                 }
-                catch ( Exception e )
-                {
-                    LOG.warn( "Error updating local peer public url", e );
-                }
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Error updating local peer public url", e );
             }
         }
     }

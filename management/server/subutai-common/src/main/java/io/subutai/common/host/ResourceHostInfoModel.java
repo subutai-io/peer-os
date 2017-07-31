@@ -21,6 +21,8 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     private InstanceType instance;
     @JsonIgnore
     private Set<Alert> alert = Sets.newHashSet();
+    @JsonIgnore
+    private String address;
 
 
     public ResourceHostInfoModel( final ResourceHostInfo resourceHostInfo )
@@ -32,6 +34,14 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         {
             containers.add( new ContainerHostInfoModel( containerHostInfo ) );
         }
+        this.address = resourceHostInfo.getAddress();
+    }
+
+
+    @Override
+    public String getAddress()
+    {
+        return address;
     }
 
 
