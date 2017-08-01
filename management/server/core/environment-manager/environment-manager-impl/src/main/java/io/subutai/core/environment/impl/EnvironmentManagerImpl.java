@@ -144,7 +144,7 @@ public class EnvironmentManagerImpl
 
     protected static final String MODULE_NAME = "Environment Manager";
     private static final long RESET_ENVS_P2P_KEYS_INTERVAL_MIN = 60;
-    private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 30;
+    private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 10;
     private static final String REMOTE_OWNER_NAME = "remote";
     private static final String UKNOWN_OWNER_NAME = "unknown";
 
