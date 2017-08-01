@@ -120,6 +120,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @JsonIgnore
     private Set<HostInterface> netInterfaces = new HashSet<>();
 
+    @Column( name = "address" )
+    private String address;
+
 
     @Transient
     protected transient CommandUtil commandUtil = new CommandUtil();
@@ -151,6 +154,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         this.instanceType = resourceHostInfo.getInstanceType();
 
+        this.address = resourceHostInfo.getAddress();
+
         setSavedHostInterfaces( resourceHostInfo.getHostInterfaces() );
 
         init();
@@ -175,6 +180,13 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             netInterface.setHost( this );
             this.netInterfaces.add( netInterface );
         }
+    }
+
+
+    @Override
+    public String getAddress()
+    {
+        return address;
     }
 
 
@@ -962,6 +974,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         setSavedHostInterfaces( hostInfo.getHostInterfaces() );
 
         ResourceHostInfo resourceHostInfo = ( ResourceHostInfo ) hostInfo;
+
+        this.address = resourceHostInfo.getAddress();
 
         for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
         {
