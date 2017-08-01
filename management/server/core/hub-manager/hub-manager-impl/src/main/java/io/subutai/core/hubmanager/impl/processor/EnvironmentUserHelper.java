@@ -141,8 +141,9 @@ public class EnvironmentUserHelper
     {
         for ( User user : identityManager.getAllUsers() )
         {
-            // Email contains the user id in Hub
-            if ( user.getEmail().startsWith( userId ) )
+            String email = user.getEmail();
+            String username = email.substring( 0, email.indexOf( "@" ) );
+            if ( username.equals( userId ) )
             {
                 return user;
             }
