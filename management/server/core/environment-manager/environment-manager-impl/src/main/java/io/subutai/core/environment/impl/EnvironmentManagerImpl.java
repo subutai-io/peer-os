@@ -1705,7 +1705,16 @@ public class EnvironmentManagerImpl
 
         setTransientFields( Sets.<Environment>newHashSet( environment ) );
 
-        environmentAdapter.uploadEnvironment( environment );
+        boolean uploaded = environmentAdapter.uploadEnvironment( environment );
+
+        if ( !uploaded )
+        {
+            environment.markAsNotUploaded();
+
+            environment = environmentService.merge( environment );
+
+            setTransientFields( Sets.<Environment>newHashSet( environment ) );
+        }
 
         return environment;
     }
