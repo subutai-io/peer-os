@@ -141,9 +141,8 @@ public class EnvironmentUserHelper
     {
         for ( User user : identityManager.getAllUsers() )
         {
-            String email = user.getEmail();
-            String username = email.substring( 0, email.indexOf( "@" ) );
-            if ( username.equals( userId ) )
+            String email = userId + HubManager.HUB_EMAIL_SUFFIX;
+            if ( user.getEmail().equals( email ) )
             {
                 return user;
             }
