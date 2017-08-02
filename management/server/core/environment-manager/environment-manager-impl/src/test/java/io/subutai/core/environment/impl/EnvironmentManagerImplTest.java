@@ -102,6 +102,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -1194,7 +1195,7 @@ public class EnvironmentManagerImplTest
 
         environmentManager.update( environment );
 
-        verify( environmentService ).merge( environment );
+        verify( environmentService, atLeastOnce() ).merge( environment );
 
         //-----
 
@@ -1368,7 +1369,7 @@ public class EnvironmentManagerImplTest
     public void testResetP2pKey() throws Exception
     {
         doNothing().when( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
-        doReturn( EnvironmentStatus.HEALTHY).when( environment ).getStatus();
+        doReturn( EnvironmentStatus.HEALTHY ).when( environment ).getStatus();
 
         environmentManager.doResetP2Pkeys();
 
