@@ -80,7 +80,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-                throw new HubManagerException( e );
+            throw new HubManagerException( e );
         }
         finally
         {

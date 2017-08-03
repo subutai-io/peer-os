@@ -1,19 +1,17 @@
 package io.subutai.core.hubmanager.impl.environment.state;
 
 
-import java.io.IOException;
 import java.security.PrivilegedAction;
 
 import javax.security.auth.Subject;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.RestResult;
+import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.UserToken;
@@ -76,7 +74,7 @@ public abstract class StateHandler
             UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getEnvironmentInfo().getSsOwnerId() );
             return userToken.getFullToken();
         }
-        catch ( HubManagerException | PGPException | IOException e )
+        catch ( Exception e )
         {
             log.error( e.getMessage() );
         }
