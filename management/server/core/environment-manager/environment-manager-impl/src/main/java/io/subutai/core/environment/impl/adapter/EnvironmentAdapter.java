@@ -231,16 +231,16 @@ public class EnvironmentAdapter
     }
 
 
-    public void uploadEnvironment( LocalEnvironment env )
+    public boolean uploadEnvironment( LocalEnvironment env )
     {
         if ( !canWorkWithHub() )
         {
-            return;
+            return false;
         }
 
         if ( env.getStatus() != EnvironmentStatus.HEALTHY )
         {
-            return;
+            return false;
         }
 
         try
@@ -252,10 +252,14 @@ public class EnvironmentAdapter
             environmentContainersToJson( env, envJson );
 
             hubAdapter.uploadEnvironment( envJson.toString() );
+
+            return true;
         }
         catch ( Exception e )
         {
             log.debug( "Error to post local environment to Hub: ", e );
+
+            return false;
         }
     }
 
