@@ -924,9 +924,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             //generate registration token for container for 30 min
             String containerToken = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
 
-            CommandResult result = commandUtil.execute( resourceHostCommands
+
+            CommandResult result = execute( resourceHostCommands
                     .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
-                            containerToken ), this );
+                            containerToken ) );
+
+            //If container clone failed with message containing "{container} already exist", assume this result as
+            // successful and skip the error. See https://github.com/optdyn/hub/issues/3268
+            if ( !result.hasSucceeded() && !result.getStdOut()
+                                                  .contains( String.format( "%s already exist", containerName ) ) )
+            {
+                throw new RuntimeException(
+                        String.format( "Failed to clone container: %s, exit code %d", result.getStdErr(),
+                                result.getExitCode() ) );
+            }
 
             //parse ID from output
 
