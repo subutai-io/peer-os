@@ -351,4 +351,11 @@ public class UserEntity implements User
     {
         return validDate == null || System.currentTimeMillis() <= validDate.getTime();
     }
+
+
+    @Override
+    public boolean isHubUser()
+    {
+        return type == UserType.HUB.getId();
+    }
 }
