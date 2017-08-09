@@ -63,6 +63,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.SecureEnvironmentManager;
@@ -72,6 +73,8 @@ import io.subutai.core.environment.rest.ui.entity.ChangedContainerDto;
 import io.subutai.core.environment.rest.ui.entity.NodeSchemaDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
 import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
@@ -94,6 +97,7 @@ public class RestServiceImpl implements RestService
     private final StrategyManager strategyManager;
     private final SecureEnvironmentManager secureEnvironmentManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
+    private IdentityManager identityManager = ServiceLocator.lookup(IdentityManager.class );
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -179,14 +183,20 @@ public class RestServiceImpl implements RestService
     /** Environments **************************************************** */
 
 
+
     @Override
     public Response build( final String name, final String topologyJson )
     {
 
+
+        User user = identityManager.getActiveUser();
         Map<String, String> envCreationRef = Maps.newHashMap();
 
         try
         {
+            //disallow hub users to use this operation
+            filterHubUser();
+
             Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid environment name" );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( topologyJson ), "Invalid environment topology" );
 
@@ -247,6 +257,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            //disallow hub users to use this operation
+            filterHubUser();
+
             checkName( name );
 
             List<NodeSchemaDto> schemaDto = parseNodes( topologyJson );
@@ -286,6 +299,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            //disallow hub users to use this operation
+            filterHubUser();
+
             String name = environmentManager.loadEnvironment( environmentId ).getName();
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
@@ -344,6 +360,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            //disallow hub users to use this operation
+            filterHubUser();
+
             String name = environmentManager.loadEnvironment( environmentId ).getName();
 
             List<NodeSchemaDto> schemaDto = parseNodes( topologyJson );
@@ -743,6 +762,17 @@ public class RestServiceImpl implements RestService
     @Override
     public Response startContainer( final String containerId )
     {
+        try
+        {
+            //disallow hub users to use this operation
+            filterHubUser();
+        }
+        catch ( AccessControlException e )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+        }
+
         if ( Strings.isNullOrEmpty( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
@@ -1178,6 +1208,21 @@ public class RestServiceImpl implements RestService
         if ( name.trim().length() > 50 )
         {
             throw new EnvironmentCreationException( "Environment name is too long, it should be 50 chars max" );
+        }
+    }
+
+
+    /**
+     * Filter if active user is Hub user.
+     * TODO refactor, allow if Hub user has enough balance and otherwise disallow
+     * @throws AccessControlException
+     */
+    private void filterHubUser() throws AccessControlException
+    {
+        User user = identityManager.getActiveUser();
+        if ( user.isHubUser() && identityManager.isAdmin() )
+        {
+            throw new AccessControlException( "You don't have permission to perform this operation" );
         }
     }
 }
