@@ -1563,7 +1563,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
             }
             catch ( Exception e )
             {
-                LOG.warn( "Error updating local peer public url", e );
+                LOG.warn( "Error updating local peer public url: {} ", e.getMessage() );
             }
         }
     }
