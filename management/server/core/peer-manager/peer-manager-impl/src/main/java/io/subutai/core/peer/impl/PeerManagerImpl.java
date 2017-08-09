@@ -30,6 +30,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.NetworkException;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.ResourceHostInfo;
@@ -1488,9 +1489,24 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     @Override
     public void onHeartbeat( final HeartBeat heartBeat )
     {
-        String ip = heartBeat.getHostInfo().getAddress();
+        boolean hasManagementContainer = false;
 
-        setLocalPeerUrl( ip );
+        for ( ContainerHostInfo containerHostInfo : heartBeat.getHostInfo().getContainers() )
+        {
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getHostname() ) )
+            {
+                hasManagementContainer = true;
+
+                break;
+            }
+        }
+
+        if ( hasManagementContainer )
+        {
+            String ip = heartBeat.getHostInfo().getAddress();
+
+            setLocalPeerUrl( ip );
+        }
     }
 
 
