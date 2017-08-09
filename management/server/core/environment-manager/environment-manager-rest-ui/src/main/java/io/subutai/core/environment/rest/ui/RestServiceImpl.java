@@ -97,7 +97,7 @@ public class RestServiceImpl implements RestService
     private final StrategyManager strategyManager;
     private final SecureEnvironmentManager secureEnvironmentManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
-    private IdentityManager identityManager = ServiceLocator.lookup(IdentityManager.class );
+    private IdentityManager identityManager = ServiceLocator.lookup( IdentityManager.class );
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -183,7 +183,6 @@ public class RestServiceImpl implements RestService
     /** Environments **************************************************** */
 
 
-
     @Override
     public Response build( final String name, final String topologyJson )
     {
@@ -228,7 +227,7 @@ public class RestServiceImpl implements RestService
             if ( e.getClass() == AccessControlException.class )
             {
                 LOG.error( e.getMessage() );
-                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                return Response.status( Response.Status.FORBIDDEN ).
                         entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
             }
 
@@ -278,7 +277,7 @@ public class RestServiceImpl implements RestService
             if ( e.getClass() == AccessControlException.class )
             {
                 LOG.error( e.getMessage() );
-                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                return Response.status( Response.Status.FORBIDDEN ).
                         entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
             }
 
@@ -342,6 +341,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.FORBIDDEN ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
@@ -384,6 +390,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.FORBIDDEN ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
@@ -1212,13 +1225,11 @@ public class RestServiceImpl implements RestService
 
     /**
      * Filter if active user is Hub user.
-     * TODO refactor, allow if Hub user has enough balance and otherwise disallow
-     * @throws AccessControlException
      */
     private void filterHubUser() throws AccessControlException
     {
         User user = identityManager.getActiveUser();
-        if ( user.isHubUser() && identityManager.isAdmin() )
+        if ( user.isHubUser() )
         {
             throw new AccessControlException( "You don't have permission to perform this operation" );
         }

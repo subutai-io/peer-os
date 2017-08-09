@@ -7,13 +7,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.bazaar.api.Bazaar;
+import io.subutai.core.identity.api.IdentityManager;
 
 
 public class RestServiceImpl implements RestService
 {
     private Bazaar bazaar;
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
+    private IdentityManager identityManager = ServiceLocator.lookup( IdentityManager.class );
 
 
     @Override
@@ -33,6 +36,12 @@ public class RestServiceImpl implements RestService
     @Override
     public Response installPlugin( String name, String version, String kar, String url, String uid )
     {
+        if ( isHubUser() )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+        }
+
         try
         {
             bazaar.installPlugin( name, version, kar, url, uid );
@@ -49,6 +58,12 @@ public class RestServiceImpl implements RestService
     @Override
     public Response uninstallPlugin( Long id, String name )
     {
+        if ( isHubUser() )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+        }
+
         bazaar.uninstallPlugin( id, name );
         return Response.status( Response.Status.OK ).build();
     }
@@ -57,6 +72,12 @@ public class RestServiceImpl implements RestService
     @Override
     public Response restorePlugin( Long id, String name, String version, String kar, String url, String uid )
     {
+        if ( isHubUser() )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+        }
+
         try
         {
             bazaar.restorePlugin( id, name, version, kar, url, uid );
@@ -80,5 +101,11 @@ public class RestServiceImpl implements RestService
     public void setBazaar( final Bazaar bazaar )
     {
         this.bazaar = bazaar;
+    }
+
+
+    private boolean isHubUser()
+    {
+        return identityManager.getActiveUser().isHubUser();
     }
 }
