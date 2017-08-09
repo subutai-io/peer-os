@@ -11,7 +11,13 @@ BazaarCtrl.$inject = ['$scope', '$rootScope', 'BazaarSrv', 'ngDialog', 'SweetAle
 function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadingBar) {
 
     var vm = this;
-    vm.activeTab = "hub";
+
+    function isAdmin(){
+        return localStorage.getItem('isAdmin') == 'true';
+    }
+
+    vm.activeTab = isAdmin() ? "hub" : "plugins";
+
     vm.changeTab = changeTab;
     vm.running = false;
     function changeTab(tab) {
@@ -89,10 +95,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
     vm.notRegistered = true;
     function getHubPlugins() {
         LOADING_SCREEN();
-        // TODO: refactor checking registration and storing plugins
-        /*		BazaarSrv.checkRegistration().success (function (data) {
-         if (data.isRegisteredToHub) {
-         vm.notRegistered = false;*/
         BazaarSrv.getHubPlugins().success(function (data) {
             vm.plugins = data.productsDto;
             console.log(vm.plugins);
@@ -169,16 +171,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
                 });
             });
         });
-        /*			}
-         else {
-         vm.notRegistered = true;
-         vm.plugins = [];
-         BazaarSrv.getRefOldPlugins().success(function(data) {
-         vm.refOldPlugins = data;
-         });
-         LOADING_SCREEN("none");
-         }
-         });*/
     }
 
     function checkSum() {
@@ -274,30 +266,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
     }
 
     checkSum();
-
-    /*	vm.buttonCheck = buttonCheck;
-     function buttonCheck (s) {
-     s.$applyAsync (function() {
-     var index = 0;
-     var counter = 0;
-     [].slice.call (document.querySelectorAll (".progress-button")).forEach (function (bttn, pos) {
-     var prog = new UIProgressButton (bttn, {
-     callback: function (instance) {
-     }
-     });
-     if (counter === 0) {
-     vm.plugins[index].installButton = prog;
-     }
-     else {
-     vm.plugins[index].uninstallButton = prog;
-     }
-     counter = (counter + 1) % 2;
-     if (counter === 0) {
-     ++index;
-     }
-     });
-     });
-     }*/
 
     function getInstalledHubPlugins() {
         BazaarSrv.getInstalledHubPlugins().success(function (data) {
@@ -500,107 +468,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
         });
     }
 
-    // function editPermissionsWindow(plugin, isNew, isEdit) {
-    //     if (isEdit === undefined || isEdit === null) isEdit = false;
-    //     vm.permissions = [
-    //         {
-    //             'object': 2,
-    //             'name': 'Peer-Management',
-    //             'scope': 1,
-    //             'read': true,
-    //             'write': true,
-    //             'update': true,
-    //             'delete': true,
-    //         },
-    //         {
-    //             'object': 3,
-    //             'name': 'Environment-Management',
-    //             'scope': 1,
-    //             'read': true,
-    //             'write': true,
-    //             'update': true,
-    //             'delete': true,
-    //         },
-    //         {
-    //             'object': 4,
-    //             'name': 'Resource-Management',
-    //             'scope': 1,
-    //             'read': true,
-    //             'write': true,
-    //             'update': true,
-    //             'delete': true,
-    //         },
-    //         {
-    //             'object': 5,
-    //             'name': 'Template-Management',
-    //             'scope': 1,
-    //             'read': true,
-    //             'write': true,
-    //             'update': true,
-    //             'delete': true,
-    //         }
-    //     ];
-    //     if (isNew) {
-    //         for (var i = 0; i < vm.installedPlugins.length; ++i) {
-    //             if (vm.installedPlugins[i].name === plugin.name) {
-    //                 SweetAlert.swal("ERROR!", "Plugin with such name already exists", "error");
-    //                 return;
-    //             }
-    //         }
-    //         if (!isEdit) {
-    //             if (angular.equals(karUploader, {})) {
-    //                 SweetAlert.swal("ERROR!", "Please select kar file", "error");
-    //                 return;
-    //             }
-    //         }
-    //         if (vm.newPlugin.name === '' || vm.newPlugin.name === undefined) {
-    //             SweetAlert.swal("ERROR!", "Please enter name", "error");
-    //             return;
-    //         }
-    //         if (vm.newPlugin.version === '' || vm.newPlugin.version === undefined) {
-    //             SweetAlert.swal("ERROR!", "Please enter version", "error");
-    //             return;
-    //         }
-    //         vm.permissions2Add = [];
-    //     }
-    //     else {
-    //         if (!isEdit) {
-    //             if (angular.equals(karUploader, {})) {
-    //                 SweetAlert.swal("ERROR!", "Please select kar file", "error");
-    //                 return;
-    //             }
-    //         }
-    //         if (vm.newPlugin.name === '' || vm.newPlugin.name === undefined) {
-    //             SweetAlert.swal("ERROR!", "Please enter name", "error");
-    //             return;
-    //         }
-    //         if (vm.newPlugin.version === '' || vm.newPlugin.version === undefined) {
-    //             SweetAlert.swal("ERROR!", "Please enter version", "error");
-    //             return;
-    //         }
-    //         vm.currentPlugin = plugin;
-    //         BazaarSrv.getPermissions(vm.currentPlugin.id).success(function (data) {
-    //             vm.permissions2Add = data.permissions;
-    //             for (var i = 0; i < vm.permissions2Add.length; i++) {
-    //                 for (var j = 0; j < vm.permissions.length; j++) {
-    //                     if (vm.permissions[j].object === vm.permissions2Add[i].object) {
-    //                         vm.permissions2Add[i].name = vm.permissions[j].name;
-    //                         vm.permissions.splice(j, 1);
-    //                         --j
-    //                         break;
-    //                     }
-    //                 }
-    //             }
-    //             ngDialog.open({
-    //                 template: "subutai-app/bazaar/partials/uploadPlugin.html",
-    //                 scope: $scope
-    //             });
-    //         });
-    //     }
-    //     vm.isNew = isNew;
-    //     vm.step = "perms";
-    // }
-
     function editPermissionsWindow(plugin, isNew, isEdit) {
         BazaarSrv.getPluginInfo(plugin.id).success(function (data) {
             vm.editPlugin = data;
@@ -720,11 +587,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
                                     interval = setInterval(function () {
                                         progress = Math.min(progress + Math.random() * 0.1, 0.99);
                                         instance.setProgress(progress);
-                                        /*					if( progress === 0.99 ) {
-                                         progress = 1;
-                                         instance.stop(  -1 );
-                                         clearInterval( interval );
-                                         }*/
                                     }, 150);
                                 var installPluginDependencies = function (dependencies, callback) {
                                     var arr = dependencies.slice();
@@ -790,11 +652,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
                         interval = setInterval(function () {
                             progress = Math.min(progress + Math.random() * 0.1, 0.99);
                             instance.setProgress(progress);
-                            /*					if( progress === 0.99 ) {
-                             progress = 1;
-                             instance.stop(  1 );
-                             clearInterval( interval );
-                             }*/
                         }, 150);
                     BazaarSrv.installHubPlugin(plugin).success(function (data) {
                         setTimeout(function () {
@@ -832,11 +689,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
                     interval = setInterval(function () {
                         progress = Math.min(progress + Math.random() * 0.1, 0.99);
                         instance.setProgress(progress);
-                        /*					if( progress === 0.99 ) {
-                         progress = 1;
-                         instance.stop(  1 );
-                         clearInterval( interval );
-                         }*/
                     }, 150);
                 BazaarSrv.uninstallHubPlugin(plugin).success(function (data) {
                     setTimeout(function () {
@@ -945,11 +797,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
                         interval = setInterval(function () {
                             progress = Math.min(progress + Math.random() * 0.1, 0.99);
                             instance.setProgress(progress);
-                            /*					if( progress === 0.99 ) {
-                             progress = 1;
-                             instance.stop(  1 );
-                             clearInterval( interval );
-                             }*/
                         }, 150);
                     BazaarSrv.restoreHubPlugin(plugin).success(function (data) {
                         setTimeout(function () {
