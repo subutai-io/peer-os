@@ -326,7 +326,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			} else {
 				vm.containers[key].state = 'RUNNING';
 			}
-		});		
+		}).error(function (data) {
+            vm.containers[key].state = 'STOPPED';
+            SweetAlert.swal("ERROR!", data, "error");
+        });
 	}
 
 	function getContainerStatus(container) {
