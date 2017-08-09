@@ -188,8 +188,6 @@ public class RestServiceImpl implements RestService
     public Response build( final String name, final String topologyJson )
     {
 
-
-        User user = identityManager.getActiveUser();
         Map<String, String> envCreationRef = Maps.newHashMap();
 
         try
