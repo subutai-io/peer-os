@@ -15,6 +15,7 @@ function nodeRegSrv($http) {
 		approveReq : approveReq,
 		rejectReq : rejectReq,
 		removeReq : removeReq,
+		unblockReq : unblockReq,
 		changeHostName : changeHostName
 	};
 
@@ -30,6 +31,10 @@ function nodeRegSrv($http) {
 
 	function rejectReq(nodeId) {
 		return $http.post(NODES_URL + nodeId + '/reject');
+	}
+
+	function unblockReq(nodeId) {
+		return $http.post(NODES_URL + nodeId + '/unblock');
 	}
 
 	function removeReq(nodeId) {
