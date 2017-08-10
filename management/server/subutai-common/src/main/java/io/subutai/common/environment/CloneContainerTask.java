@@ -89,10 +89,9 @@ public class CloneContainerTask extends HostUtil.Task<String>
         //append 3 random letters
         //append VLAN, it will make it unique on this peer
         //append additional suffix (last IP octet) that will make it unique inside host environment
-        request.setContainerName(
-                String.format( "%s-%s-%d-%s", request.getHostname(), RandomStringUtils.randomAlphanumeric( 3 ),
-                        networkResource.getVlan(),
-                        StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ).toLowerCase() );
+        request.setContainerName( String.format( "%s-%s-%d-%s", request.getHostname(),
+                RandomStringUtils.randomAlphanumeric( 3 ).toLowerCase(), networkResource.getVlan(),
+                StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ) );
 
         String containerId = resourceHost
                 .cloneContainer( template, request.getContainerName(), request.getHostname(), request.getIp(),
