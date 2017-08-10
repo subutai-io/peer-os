@@ -15,6 +15,7 @@ function nodeRegSrv($http) {
 		approveReq : approveReq,
 		rejectReq : rejectReq,
 		removeReq : removeReq,
+		unblockReq : unblockReq,
 		changeHostName : changeHostName
 	};
 
