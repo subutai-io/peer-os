@@ -4,6 +4,7 @@ package io.subutai.common.environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
@@ -83,11 +84,15 @@ public class CloneContainerTask extends HostUtil.Task<String>
     {
         //cleanse hostname
         request.setHostname( StringUtil.removeHtmlAndSpecialChars( request.getHostname(), true ) );
+
         //update hostname to make it unique on this peer
-        //VLAN will make it unique on this peer
-        //additional suffix (last IP octet) will make it unique inside host environment
-        request.setContainerName( String.format( "%s-%d-%s", request.getHostname(), networkResource.getVlan(),
-                StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ) );
+        //append 3 random letters
+        //append VLAN, it will make it unique on this peer
+        //append additional suffix (last IP octet) that will make it unique inside host environment
+        request.setContainerName(
+                String.format( "%s-%s-%d-%s", request.getHostname(), RandomStringUtils.randomAlphanumeric( 3 ),
+                        networkResource.getVlan(),
+                        StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ) );
 
         String containerId = resourceHost
                 .cloneContainer( template, request.getContainerName(), request.getHostname(), request.getIp(),
