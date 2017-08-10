@@ -107,7 +107,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
                 getNodes();
             }).error(function(error){
                 LOADING_SCREEN('none');
-                SweetAlert.swal("ERROR!", error, "error");
+                SweetAlert.swal("ERROR!", "Oops. Please, try again later", "error");
             });
 		}else if(status == 'REJECTED'){
             nodeRegSrv.unblockReq( nodeId ).success(function (data) {
