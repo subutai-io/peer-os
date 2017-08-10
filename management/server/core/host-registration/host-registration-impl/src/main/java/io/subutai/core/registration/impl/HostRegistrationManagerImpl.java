@@ -154,7 +154,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         }
         catch ( Exception e )
         {
-            LOG.error( "Error queueing agent registration request", e );
+            LOG.error( "Error queueing registration request", e );
 
             throw new HostRegistrationException( e );
         }
@@ -172,7 +172,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         }
         catch ( Exception e )
         {
-            LOG.error( "Error rejecting agent registration request", e );
+            LOG.error( "Error rejecting registration request", e );
 
             throw new HostRegistrationException( e );
         }
@@ -207,7 +207,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         }
         catch ( Exception e )
         {
-            LOG.error( "Error approving agent registration request", e );
+            LOG.error( "Error approving registration request", e );
 
             throw new HostRegistrationException( e );
         }
@@ -232,11 +232,32 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         }
         catch ( HostNotFoundException e )
         {
-            LOG.warn( "Error removing agent registration request: {}", e.getMessage() );
+            LOG.warn( "Error removing registration request: {}", e.getMessage() );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error removing agent registration request", e );
+            LOG.error( "Error removing registration request", e );
+
+            throw new HostRegistrationException( e );
+        }
+    }
+
+
+    @Override
+    public void unblockRequest( final String requestId ) throws HostRegistrationException
+    {
+        try
+        {
+            RequestedHost requestedHost = requestDataService.find( requestId );
+
+            if ( requestedHost != null )
+            {
+                requestDataService.remove( requestedHost.getId() );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error unblocking registration request", e );
 
             throw new HostRegistrationException( e );
         }

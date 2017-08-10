@@ -32,6 +32,10 @@ function nodeRegSrv($http) {
 		return $http.post(NODES_URL + nodeId + '/reject');
 	}
 
+	function unblockReq(nodeId) {
+		return $http.post(NODES_URL + nodeId + '/unblock');
+	}
+
 	function removeReq(nodeId) {
 		return $http.post(NODES_URL + nodeId + '/remove');
 	}

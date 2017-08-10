@@ -68,6 +68,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         }
     }
 
+
     @RolesAllowed( { "Resource-Management|Write", "Resource-Management|Update" } )
     @Override
     public Response changeRhHostname( final String rhId, final String hostname )
@@ -126,6 +127,22 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         try
         {
             registrationManager.removeRequest( requestId );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @RolesAllowed( { "Resource-Management|Delete", "Resource-Management|Update" } )
+    @Override
+    public Response unblockRequest( final String requestId )
+    {
+        try
+        {
+            registrationManager.unblockRequest( requestId );
             return Response.ok().build();
         }
         catch ( Exception e )
