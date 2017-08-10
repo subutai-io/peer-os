@@ -53,7 +53,7 @@
             </button>
             <button ng-if="clusterNode.status == 'APPROVED' || clusterNode.status == 'REJECTED'"
                     class="b-btn b-btn_{{ clusterNode.status == 'APPROVED' ? 'dark' : 'grey'}}"
-                    ng-click="nodeRegCtrl.remove( clusterNode.id )">{{ clusterNode.status == 'APPROVED' ? 'Remove' :
+                    ng-click="nodeRegCtrl.remove( clusterNode.id, clusterNode.status )">{{ clusterNode.status == 'APPROVED' ? 'Remove' :
               'Unblock' }}
             </button>
           </td>
