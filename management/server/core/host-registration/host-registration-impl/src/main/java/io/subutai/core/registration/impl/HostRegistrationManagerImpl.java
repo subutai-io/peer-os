@@ -22,7 +22,6 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
@@ -246,7 +245,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         {
             RequestedHost requestedHost = requestDataService.find( requestId );
 
-            if ( requestedHost != null )
+            if ( requestedHost != null && requestedHost.getStatus() == ResourceHostRegistrationStatus.REJECTED )
             {
                 requestDataService.remove( requestedHost.getId() );
             }
