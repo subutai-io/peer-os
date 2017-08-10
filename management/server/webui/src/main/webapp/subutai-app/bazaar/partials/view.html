@@ -4,6 +4,7 @@
     <div class="b-tabs-menu b-tabs-menu_header">
       <ul>
         <li class="b-tabs-menu__item"
+            ng-if="subutaiController.adminMenus"
             ng-click="bazaarCtrl.changeTab ('hub')"
             ng-class="bazaarCtrl.activeTab == 'hub' ? 'b-tabs-menu__item_active' : ''">
           Available
@@ -23,10 +24,7 @@
     </div>
   </div>
   <div class="b-workspace__content" style="min-height: 220px">
-    <!--		<div
-            ng-if="bazaarCtrl.activeTab == 'hub'"
-            ng-include="'subutai-app/bazaar/partials/hub.html'" onload = "bazaarCtrl.buttonCheck (this)">
-        </div>-->
+
     <div
         ng-if="bazaarCtrl.activeTab == 'hub'"
         ng-include="'subutai-app/bazaar/partials/hub.html'">

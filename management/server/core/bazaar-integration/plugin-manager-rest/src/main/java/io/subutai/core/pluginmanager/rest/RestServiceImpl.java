@@ -18,6 +18,8 @@ import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.pluginmanager.api.PluginManager;
 import io.subutai.core.pluginmanager.api.model.PermissionJson;
 import io.subutai.core.pluginmanager.api.model.PluginDetails;
@@ -29,12 +31,23 @@ public class RestServiceImpl implements RestService
 
     private static final String ERROR_KEY = "ERROR";
     private PluginManager pluginManager;
+    private IdentityManager identityManager = ServiceLocator.lookup( IdentityManager.class );
 
+    private boolean isHubUser()
+    {
+        return identityManager.getActiveUser().isHubUser();
+    }
 
     @Override
     public javax.ws.rs.core.Response uploadPlugin( final String name, final String version, final Attachment kar,
                                                    final String permissionJson )
     {
+        if ( isHubUser() )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+        }
+
         ArrayList<PermissionJson> permissions = null;
         if ( !Strings.isNullOrEmpty( permissionJson ) )
         {
@@ -81,6 +94,12 @@ public class RestServiceImpl implements RestService
     @Override
     public Response deleteProfile( final String pluginId )
     {
+        if ( isHubUser() )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+        }
+
         try
         {
             pluginManager.unregister( Long.parseLong( pluginId ) );
@@ -108,6 +127,12 @@ public class RestServiceImpl implements RestService
     @Override
     public Response updatePlugin( final String pluginId, final String name, final String version )
     {
+        if ( isHubUser() )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+        }
+
         pluginManager.update( pluginId, name, version );
         return null;
     }
