@@ -28,7 +28,6 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
@@ -224,11 +223,11 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
 
             if ( requestedHost != null )
             {
-                requestDataService.remove( requestedHost.getId() );
-
                 LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
 
                 localPeer.removeResourceHost( requestedHost.getId() );
+
+                requestDataService.remove( requestedHost.getId() );
             }
         }
         catch ( HostNotFoundException e )
