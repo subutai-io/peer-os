@@ -16,46 +16,50 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-	  <dependency>
-		  <groupId>${project.groupId}</groupId>
-		  <artifactId>bazaar-plugin-api</artifactId>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>bazaar-plugin-api</artifactId>
       <version>${project.version}</version>
-	  </dependency>
-	  <dependency>
-		  <groupId>org.apache.cxf</groupId>
-		  <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-		  <version>3.1.0</version>
-	  </dependency>
-	  <dependency>
-		  <groupId>io.subutai</groupId>
-		  <artifactId>subutai-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-common</artifactId>
       <version>${project.version}</version>
-	  </dependency>
+    </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>identity-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<configuration>
-					<instructions>
-						<Bundle-SymbolicName>${project.groupId}.core.bazaar.rest</Bundle-SymbolicName>
-						<Export-Package>
-							{local-packages};version=${project.version};-noimport:=true
-						</Export-Package>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.core.bazaar.rest</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -224,7 +224,8 @@ public class ResourceHostDataProcessor extends HubRequester
 
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        // TODO: 7/29/16 need optimize
+        // TODO Totally incorrect implementation
+        // TODO Use host registry to obtain interfaces
         if ( hubManager.canWorkWithHub() )
         {
             HostInterfaces as = resourceHostInfo.getHostInterfaces();

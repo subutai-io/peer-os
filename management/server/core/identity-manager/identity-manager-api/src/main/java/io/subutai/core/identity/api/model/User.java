@@ -73,4 +73,6 @@ public interface User extends RelationLink
     void setAuthId( String authId );
 
     boolean isIdentityValid();
+
+    boolean isHubUser();
 }

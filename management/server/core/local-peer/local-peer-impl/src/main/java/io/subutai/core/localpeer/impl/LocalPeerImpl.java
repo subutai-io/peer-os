@@ -848,6 +848,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     requestGroup.getEnvironmentId() ) );
         }
 
+        Set<String> namesToExclude = Sets.newHashSet();
+        for ( ContainerHostInfo containerHostInfo : getNotRegisteredContainers() )
+        {
+            namesToExclude.add( containerHostInfo.getContainerName().toLowerCase() );
+        }
+
+
         //clone containers
         HostUtil.Tasks cloneTasks = new HostUtil.Tasks();
 
@@ -857,7 +864,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             CloneContainerTask task =
                     new CloneContainerTask( request, templateManager.getTemplate( request.getTemplateId() ),
-                            resourceHost, reservedNetworkResource, this );
+                            resourceHost, reservedNetworkResource, this, namesToExclude );
 
             cloneTasks.addTask( resourceHost, task );
         }

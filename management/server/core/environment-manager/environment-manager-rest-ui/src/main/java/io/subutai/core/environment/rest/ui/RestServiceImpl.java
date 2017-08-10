@@ -63,6 +63,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.SecureEnvironmentManager;
@@ -72,6 +73,8 @@ import io.subutai.core.environment.rest.ui.entity.ChangedContainerDto;
 import io.subutai.core.environment.rest.ui.entity.NodeSchemaDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
 import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
@@ -94,6 +97,7 @@ public class RestServiceImpl implements RestService
     private final StrategyManager strategyManager;
     private final SecureEnvironmentManager secureEnvironmentManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
+    private IdentityManager identityManager = ServiceLocator.lookup( IdentityManager.class );
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -187,6 +191,17 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            //disallow hub users to use this operation
+            filterHubUser();
+        }
+        catch ( AccessControlException e )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+        }
+
+        try
+        {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid environment name" );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( topologyJson ), "Invalid environment topology" );
 
@@ -220,7 +235,7 @@ public class RestServiceImpl implements RestService
             if ( e.getClass() == AccessControlException.class )
             {
                 LOG.error( e.getMessage() );
-                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                return Response.status( Response.Status.FORBIDDEN ).
                         entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
             }
 
@@ -244,6 +259,16 @@ public class RestServiceImpl implements RestService
     public Response buildAdvanced( final String name, final String topologyJson )
     {
         Map<String, String> envCreationRef = Maps.newHashMap();
+        try
+        {
+            //disallow hub users to use this operation
+            filterHubUser();
+        }
+        catch ( AccessControlException e )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+        }
 
         try
         {
@@ -267,7 +292,7 @@ public class RestServiceImpl implements RestService
             if ( e.getClass() == AccessControlException.class )
             {
                 LOG.error( e.getMessage() );
-                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                return Response.status( Response.Status.FORBIDDEN ).
                         entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
             }
 
@@ -283,6 +308,16 @@ public class RestServiceImpl implements RestService
                             final String quotaContainers )
     {
         String trackerId;
+        try
+        {
+            //disallow hub users to use this operation
+            filterHubUser();
+        }
+        catch ( AccessControlException e )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+        }
 
         try
         {
@@ -328,6 +363,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.FORBIDDEN ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
@@ -341,6 +383,16 @@ public class RestServiceImpl implements RestService
                                     final String removedContainers, final String quotaContainers )
     {
         String trackerId;
+        try
+        {
+            //disallow hub users to use this operation
+            filterHubUser();
+        }
+        catch ( AccessControlException e )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+        }
 
         try
         {
@@ -367,6 +419,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.FORBIDDEN ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
@@ -743,6 +802,17 @@ public class RestServiceImpl implements RestService
     @Override
     public Response startContainer( final String containerId )
     {
+        try
+        {
+            //disallow hub users to use this operation
+            filterHubUser();
+        }
+        catch ( AccessControlException e )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).
+                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+        }
+
         if ( Strings.isNullOrEmpty( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
@@ -1178,6 +1248,19 @@ public class RestServiceImpl implements RestService
         if ( name.trim().length() > 50 )
         {
             throw new EnvironmentCreationException( "Environment name is too long, it should be 50 chars max" );
+        }
+    }
+
+
+    /**
+     * Filter if active user is Hub user.
+     */
+    private void filterHubUser() throws AccessControlException
+    {
+        User user = identityManager.getActiveUser();
+        if ( user.isHubUser() )
+        {
+            throw new AccessControlException( "You don't have permission to perform this operation" );
         }
     }
 }
