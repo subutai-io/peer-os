@@ -230,10 +230,6 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
                 requestDataService.remove( requestedHost.getId() );
             }
         }
-        catch ( HostNotFoundException e )
-        {
-            LOG.warn( "Error removing registration request: {}", e.getMessage() );
-        }
         catch ( Exception e )
         {
             LOG.error( "Error removing registration request", e );
