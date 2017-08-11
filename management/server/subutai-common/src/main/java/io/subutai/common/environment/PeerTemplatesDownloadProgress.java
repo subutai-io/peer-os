@@ -1,13 +1,13 @@
 package io.subutai.common.environment;
 
 
-import java.util.Set;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
 
 public class PeerTemplatesDownloadProgress
@@ -16,7 +16,7 @@ public class PeerTemplatesDownloadProgress
     String peerId;
 
     @JsonProperty( "templatesDownloadProgress" )
-    Set<RhTemplatesDownloadProgress> templatesDownloadProgress = Sets.newHashSet();
+    List<RhTemplatesDownloadProgress> templatesDownloadProgress = Lists.newArrayList();
 
 
     public PeerTemplatesDownloadProgress( @JsonProperty( "peerId" ) final String peerId )
@@ -37,7 +37,7 @@ public class PeerTemplatesDownloadProgress
 
 
     @JsonIgnore
-    public Set<RhTemplatesDownloadProgress> getTemplatesDownloadProgresses()
+    public List<RhTemplatesDownloadProgress> getTemplatesDownloadProgresses()
     {
         return templatesDownloadProgress;
     }

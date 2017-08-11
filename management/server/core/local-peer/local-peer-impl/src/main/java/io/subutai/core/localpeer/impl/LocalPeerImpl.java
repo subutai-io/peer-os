@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -3324,7 +3326,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         PeerTemplatesDownloadProgress peerProgress = new PeerTemplatesDownloadProgress( getId() );
 
-        for ( ResourceHost resourceHost : getResourceHosts() )
+        List<ResourceHost> resourceHosts = Lists.newArrayList( getResourceHosts() );
+
+        Collections.sort( resourceHosts, new Comparator<ResourceHost>()
+        {
+            @Override
+            public int compare( final ResourceHost o1, final ResourceHost o2 )
+            {
+                return o1.getId().compareTo( o2.getId() );
+            }
+        } );
+
+        for ( ResourceHost resourceHost : resourceHosts )
         {
             RhTemplatesDownloadProgress rhProgress = resourceHost.getTemplateDownloadProgress( environmentId.getId() );
 
