@@ -122,7 +122,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         Preconditions
                 .checkArgument( PGPKeyUtil.isValidPublicKeyring( requestedHost.getPublicKey() ), "Invalid public key" );
 
-        Preconditions.checkArgument( !StringUtils.isBlank( requestedHost.getId() ), "invalid host id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( requestedHost.getId() ), "Invalid host id" );
 
         try
         {
