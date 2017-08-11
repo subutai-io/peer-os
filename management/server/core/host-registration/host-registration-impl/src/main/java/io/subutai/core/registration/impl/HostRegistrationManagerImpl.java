@@ -11,6 +11,8 @@ import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -119,6 +121,8 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         Preconditions.checkNotNull( requestedHost, "'Invalid registration request" );
         Preconditions
                 .checkArgument( PGPKeyUtil.isValidPublicKeyring( requestedHost.getPublicKey() ), "Invalid public key" );
+
+        Preconditions.checkArgument( !StringUtils.isBlank( requestedHost.getId() ), "invalid host id" );
 
         try
         {

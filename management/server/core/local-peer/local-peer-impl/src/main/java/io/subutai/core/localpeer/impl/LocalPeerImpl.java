@@ -24,6 +24,8 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -1455,6 +1457,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
+
+        if ( StringUtils.isBlank( resourceHostInfo.getId() ) )
+        {
+            //handle case when agent sends empty ID after RH update
+            return;
+        }
 
         if ( isInitialized() && !CollectionUtil.isCollectionEmpty( resourceHostInfo.getHostInterfaces().getAll() ) )
         {
