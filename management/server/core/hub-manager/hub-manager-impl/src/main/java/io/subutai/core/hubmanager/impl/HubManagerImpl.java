@@ -52,6 +52,7 @@ import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.processor.ContainerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
@@ -115,6 +116,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
 
+    private final ScheduledExecutorService containersMetricsExecutorService = Executors.newSingleThreadScheduledExecutor();
+
     private SecurityManager securityManager;
 
     private EnvironmentManager envManager;
@@ -154,6 +157,8 @@ public class HubManagerImpl implements HubManager, HostListener
     private LogListenerImpl logListener;
 
     private PeerMetricsProcessor peerMetricsProcessor;
+
+    private ContainerMetricsProcessor containersMetricsProcessor;
 
 
     public HubManagerImpl( DaoManager daoManager )
@@ -247,6 +252,12 @@ public class HubManagerImpl implements HubManager, HostListener
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
 
         environmentTelemetryService.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
+
+        //***********
+        containersMetricsProcessor = new ContainerMetricsProcessor( this, localPeer, monitor, restClient );
+        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 30, 3600, TimeUnit.SECONDS );
+
+
     }
 
 
