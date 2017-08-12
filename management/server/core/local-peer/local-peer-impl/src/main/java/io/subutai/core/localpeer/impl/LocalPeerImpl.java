@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,10 +25,13 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -848,6 +852,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     requestGroup.getEnvironmentId() ) );
         }
 
+        Set<String> namesToExclude = Sets.newHashSet();
+        for ( ContainerHostInfo containerHostInfo : getNotRegisteredContainers() )
+        {
+            namesToExclude.add( containerHostInfo.getContainerName().toLowerCase() );
+        }
+
+
         //clone containers
         HostUtil.Tasks cloneTasks = new HostUtil.Tasks();
 
@@ -857,7 +868,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             CloneContainerTask task =
                     new CloneContainerTask( request, templateManager.getTemplate( request.getTemplateId() ),
-                            resourceHost, reservedNetworkResource, this );
+                            resourceHost, reservedNetworkResource, this, namesToExclude );
 
             cloneTasks.addTask( resourceHost, task );
         }
@@ -1448,6 +1459,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
+
+        if ( StringUtils.isBlank( resourceHostInfo.getId() ) )
+        {
+            //handle case when agent sends empty ID after RH update
+            return;
+        }
 
         if ( isInitialized() && !CollectionUtil.isCollectionEmpty( resourceHostInfo.getHostInterfaces().getAll() ) )
         {
@@ -3309,7 +3326,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         PeerTemplatesDownloadProgress peerProgress = new PeerTemplatesDownloadProgress( getId() );
 
-        for ( ResourceHost resourceHost : getResourceHosts() )
+        List<ResourceHost> resourceHosts = Lists.newArrayList( getResourceHosts() );
+
+        Collections.sort( resourceHosts, new Comparator<ResourceHost>()
+        {
+            @Override
+            public int compare( final ResourceHost o1, final ResourceHost o2 )
+            {
+                return o1.getId().compareTo( o2.getId() );
+            }
+        } );
+
+        for ( ResourceHost resourceHost : resourceHosts )
         {
             RhTemplatesDownloadProgress rhProgress = resourceHost.getTemplateDownloadProgress( environmentId.getId() );
 

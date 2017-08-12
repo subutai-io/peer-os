@@ -11,6 +11,8 @@ import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -22,13 +24,11 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
@@ -122,6 +122,8 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         Preconditions
                 .checkArgument( PGPKeyUtil.isValidPublicKeyring( requestedHost.getPublicKey() ), "Invalid public key" );
 
+        Preconditions.checkArgument( !StringUtils.isBlank( requestedHost.getId() ), "Invalid host id" );
+
         try
         {
             RequestedHostImpl requestedHostImpl = requestDataService.find( requestedHost.getId() );
@@ -155,7 +157,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         }
         catch ( Exception e )
         {
-            LOG.error( "Error queueing agent registration request", e );
+            LOG.error( "Error queueing registration request", e );
 
             throw new HostRegistrationException( e );
         }
@@ -173,7 +175,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         }
         catch ( Exception e )
         {
-            LOG.error( "Error rejecting agent registration request", e );
+            LOG.error( "Error rejecting registration request", e );
 
             throw new HostRegistrationException( e );
         }
@@ -208,7 +210,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         }
         catch ( Exception e )
         {
-            LOG.error( "Error approving agent registration request", e );
+            LOG.error( "Error approving registration request", e );
 
             throw new HostRegistrationException( e );
         }
@@ -224,20 +226,37 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
 
             if ( requestedHost != null )
             {
-                requestDataService.remove( requestedHost.getId() );
-
                 LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
 
                 localPeer.removeResourceHost( requestedHost.getId() );
+
+                requestDataService.remove( requestedHost.getId() );
             }
-        }
-        catch ( HostNotFoundException e )
-        {
-            LOG.warn( "Error removing agent registration request: {}", e.getMessage() );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error removing agent registration request", e );
+            LOG.error( "Error removing registration request", e );
+
+            throw new HostRegistrationException( e );
+        }
+    }
+
+
+    @Override
+    public void unblockRequest( final String requestId ) throws HostRegistrationException
+    {
+        try
+        {
+            RequestedHost requestedHost = requestDataService.find( requestId );
+
+            if ( requestedHost != null && requestedHost.getStatus() == ResourceHostRegistrationStatus.REJECTED )
+            {
+                requestDataService.remove( requestedHost.getId() );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error unblocking registration request", e );
 
             throw new HostRegistrationException( e );
         }

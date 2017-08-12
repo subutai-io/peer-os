@@ -44,7 +44,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
             return interfaces[i].ip;
           }
         }
-        return 'No WAN IP detected';
+        return 'No IP detected';
     }
 
 	function getNodes() {
@@ -63,7 +63,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 		nodeRegSrv.approveReq( nodeId ).success(function (data) {
 			SweetAlert.swal(
 				"Success!",
-				"Node has been added to cluster.",
+				"Host has been approved",
 				"success"
 			);
 			LOADING_SCREEN('none');
@@ -81,7 +81,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 		nodeRegSrv.rejectReq( nodeId ).success(function (data) {
 			SweetAlert.swal(
 				"Success!",
-				"Node has been unregistered.",
+				"Host has been blocked",
 				"success"
 			);
 			LOADING_SCREEN('none');
@@ -92,22 +92,37 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 		});
 	}
 
-	function remove(nodeId) {
+	function remove(nodeId, status) {
 		if(nodeId === undefined) return;
 
 		LOADING_SCREEN();
-		nodeRegSrv.removeReq( nodeId ).success(function (data) {
-			SweetAlert.swal(
-				"Success!",
-				"Node has been unregistered.",
-				"success"
-			);
-			LOADING_SCREEN('none');
-			getNodes();
-		}).error(function(error){
-			LOADING_SCREEN('none');
-			SweetAlert.swal("ERROR!", error, "error");
-		});
+		if(status == 'APPROVED'){
+            nodeRegSrv.removeReq( nodeId ).success(function (data) {
+                SweetAlert.swal(
+                    "Success!",
+                    "Host has been removed",
+                    "success"
+                );
+                LOADING_SCREEN('none');
+                getNodes();
+            }).error(function(error){
+                LOADING_SCREEN('none');
+                SweetAlert.swal("ERROR!", "Oops. Please, try again later", "error");
+            });
+		}else if(status == 'REJECTED'){
+            nodeRegSrv.unblockReq( nodeId ).success(function (data) {
+                SweetAlert.swal(
+                    "Success!",
+                    "Host has been unblocked",
+                    "success"
+                );
+                LOADING_SCREEN('none');
+                getNodes();
+            }).error(function(error){
+                LOADING_SCREEN('none');
+                SweetAlert.swal("ERROR!", error, "error");
+            });
+		}
 	}
 
     function changeNamePopup( rh ) {

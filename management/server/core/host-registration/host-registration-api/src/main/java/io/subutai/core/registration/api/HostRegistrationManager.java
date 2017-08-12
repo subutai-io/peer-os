@@ -22,6 +22,8 @@ public interface HostRegistrationManager
 
     void removeRequest( String requestId ) throws HostRegistrationException;
 
+    void unblockRequest( String requestId ) throws HostRegistrationException;
+
     ContainerToken generateContainerTTLToken( long ttlInMs ) throws HostRegistrationException;
 
     ContainerToken verifyToken( String token, String containerHostId, String publicKey )

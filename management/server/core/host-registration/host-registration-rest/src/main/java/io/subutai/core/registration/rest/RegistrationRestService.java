@@ -36,6 +36,10 @@ public interface RegistrationRestService
     @Path( "requests/{id}/remove" )
     Response removeRequest( @PathParam( "id" ) String requestId );
 
+    @POST
+    @Path( "requests/{id}/unblock" )
+    Response unblockRequest( @PathParam( "id" ) String requestId );
+
 
     @POST
     @Path( "verify/container-token" )

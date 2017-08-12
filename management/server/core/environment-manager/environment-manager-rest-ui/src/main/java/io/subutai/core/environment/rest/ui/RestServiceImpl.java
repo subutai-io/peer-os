@@ -197,7 +197,9 @@ public class RestServiceImpl implements RestService
         catch ( AccessControlException e )
         {
             return Response.status( Response.Status.FORBIDDEN ).
-                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+                    entity( JsonUtil.GSON.toJson(
+                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                                    + " this operation." ) ).build();
         }
 
         try
@@ -267,7 +269,9 @@ public class RestServiceImpl implements RestService
         catch ( AccessControlException e )
         {
             return Response.status( Response.Status.FORBIDDEN ).
-                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+                    entity( JsonUtil.GSON.toJson(
+                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                                    + " this operation." ) ).build();
         }
 
         try
@@ -316,7 +320,9 @@ public class RestServiceImpl implements RestService
         catch ( AccessControlException e )
         {
             return Response.status( Response.Status.FORBIDDEN ).
-                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+                    entity( JsonUtil.GSON.toJson(
+                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                                    + " this operation." ) ).build();
         }
 
         try
@@ -391,7 +397,9 @@ public class RestServiceImpl implements RestService
         catch ( AccessControlException e )
         {
             return Response.status( Response.Status.FORBIDDEN ).
-                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+                    entity( JsonUtil.GSON.toJson(
+                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                                    + " this operation." ) ).build();
         }
 
         try
@@ -810,7 +818,9 @@ public class RestServiceImpl implements RestService
         catch ( AccessControlException e )
         {
             return Response.status( Response.Status.FORBIDDEN ).
-                    entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation, please visit Subutai Hub to perform this operation." ) ).build();
+                    entity( JsonUtil.GSON.toJson(
+                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                                    + " this operation." ) ).build();
         }
 
         if ( Strings.isNullOrEmpty( containerId ) )
@@ -1113,19 +1123,20 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            List<PeerTemplatesDownloadProgress> result =
-                    environmentManager.loadEnvironment( environmentId ).getPeers().stream().map( p ->
-                    {
-                        try
-                        {
-                            return p.getTemplateDownloadProgress( new EnvironmentId( environmentId ) );
-                        }
-                        catch ( Exception e )
-                        {
-                            return new PeerTemplatesDownloadProgress( "NONE" );
-                        }
-                    } ).sorted( Comparator.comparing( PeerTemplatesDownloadProgress::getPeerId ) )
-                                      .collect( Collectors.toList() );
+            List<Peer> peers = Lists.newArrayList( environmentManager.loadEnvironment( environmentId ).getPeers() );
+
+            List<PeerTemplatesDownloadProgress> result = peers.stream().map( p ->
+            {
+                try
+                {
+                    return p.getTemplateDownloadProgress( new EnvironmentId( environmentId ) );
+                }
+                catch ( Exception e )
+                {
+                    return new PeerTemplatesDownloadProgress( "NONE" );
+                }
+            } ).sorted( Comparator.comparing( PeerTemplatesDownloadProgress::getPeerId ) )
+                                                              .collect( Collectors.toList() );
 
             if ( result.stream().filter( s -> !s.getTemplatesDownloadProgresses().isEmpty() ).count() == 0 )
             {
