@@ -84,16 +84,20 @@ public class ContainerMetricsProcessor extends HubRequester
                 }
                 else
                 {
-                    ContainerMetrics containerMetrics = new ContainerMetricsEntity();
-                    containerMetrics.setHostId();
-                    containerMetrics.setHostName();
-                    containerMetrics.setCpu();
-                    containerMetrics.setDisk();
-                    containerMetrics.setMemory();
-                    containerMetrics.setNet();
-                    containerMetrics.setStartTime();
-                    containerMetrics.setEndTime();
-                    containerMetricsService.persistMetrics( containerMetrics );
+                    for ( HostMetricsDto metricsDto : containersMetricsDto.getContainerHostMetricsDto() )
+                    {
+                        ContainerMetrics containerMetrics = new ContainerMetricsEntity();
+                        containerMetrics.setHostId( containersMetricsDto.getHostId() );
+                        containerMetrics.setHostName( metricsDto.getHostName() );
+                        containerMetrics.setEndTime( containersMetricsDto.getEndTime() );
+                        containerMetrics.setStartTime( containersMetricsDto.getStartTime() );
+
+                        containerMetrics.setCpu( metricsDto.getCpu().getIdle() ); //TODO review which data to save
+                        containerMetrics.setDisk( 0.0 );
+                        containerMetrics.setMemory( metricsDto.getMemory().getActive() ); //TODO review which data to save
+                        containerMetrics.setNet( 0.0 );
+                        containerMetricsService.persistMetrics( containerMetrics );
+                    }
                 }
             }
             catch ( Exception e )
