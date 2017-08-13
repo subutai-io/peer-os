@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.impl.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ import io.subutai.core.hubmanager.impl.model.ContainerMetricsEntity;
 
 
 /**
- * Implementation of Container Metrics Dao
+ * Implementation of Container host metrics DAO
  */
 class ContainerMetricsDAO
 {
@@ -73,7 +74,8 @@ class ContainerMetricsDAO
         List<ContainerMetrics> result = Lists.newArrayList();
         try
         {
-            result = em.createQuery( "select cme from ContainerMetricsEntity cme", ContainerMetricsEntity.class ).getResultList();
+            result = em.createQuery( "select cm from ContainerMetrics cm", ContainerMetrics.class )
+                       .getResultList();
         }
         catch ( Exception e )
         {
@@ -164,5 +166,38 @@ class ContainerMetricsDAO
         {
             daoManager.closeEntityManager( em );
         }
+    }
+
+
+    /* *************************************************
+     *
+     */
+    public ContainerMetrics getByContainerId( final String containerHostId )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        ContainerMetrics result = null;
+        try
+        {
+            TypedQuery<ContainerMetrics> query =
+                    em.createQuery( "select cm from ContainerMetricsEntity cm where cm.hostId = :hostId",
+                            ContainerMetrics.class );
+            query.setParameter( "hostId", containerHostId );
+
+            List<ContainerMetrics> resultList = query.getResultList();
+            if ( !resultList.isEmpty() )
+            {
+                result = resultList.iterator().next();
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
+        return result;
     }
 }

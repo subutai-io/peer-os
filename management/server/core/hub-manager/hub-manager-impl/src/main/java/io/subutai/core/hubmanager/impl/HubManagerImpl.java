@@ -43,6 +43,7 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
+import io.subutai.core.hubmanager.api.dao.ContainerMetricsService;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
@@ -158,6 +159,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private PeerMetricsProcessor peerMetricsProcessor;
 
+    private ContainerMetricsService containerMetricsService;
+
     private ContainerMetricsProcessor containersMetricsProcessor;
 
 
@@ -254,7 +257,7 @@ public class HubManagerImpl implements HubManager, HostListener
         environmentTelemetryService.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
 
         //***********
-        containersMetricsProcessor = new ContainerMetricsProcessor( this, localPeer, monitor, restClient );
+        containersMetricsProcessor = new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService );
         containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 30, 3600, TimeUnit.SECONDS );
 
 

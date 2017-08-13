@@ -15,6 +15,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestResult;
+import io.subutai.core.hubmanager.api.dao.ContainerMetricsService;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.ContainerMetrics;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -35,15 +36,19 @@ public class ContainerMetricsProcessor extends HubRequester
 
     private Monitor monitor;
 
+    private ContainerMetricsService containerMetricsService;
+
 
     public ContainerMetricsProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
-                                      HubRestClient restClient )
+                                      HubRestClient restClient, ContainerMetricsService containerMetricsService )
     {
         super( hubManager, restClient );
 
         this.localPeer = localPeer;
 
         this.monitor = monitor;
+
+        this.containerMetricsService = containerMetricsService;
     }
 
 
@@ -80,15 +85,15 @@ public class ContainerMetricsProcessor extends HubRequester
                 else
                 {
                     ContainerMetrics containerMetrics = new ContainerMetricsEntity();
-                    containerMetrics.setHostId(  );
-                    containerMetrics.setHostName(  );
-                    containerMetrics.setCpu(  );
-                    containerMetrics.setDisk(  );
-                    containerMetrics.setMemory(  );
-                    containerMetrics.setNet(  );
-                    containerMetrics.setStartTime(  );
-                    containerMetrics.setEndTime(  );
-                    //TODO save to DB
+                    containerMetrics.setHostId();
+                    containerMetrics.setHostName();
+                    containerMetrics.setCpu();
+                    containerMetrics.setDisk();
+                    containerMetrics.setMemory();
+                    containerMetrics.setNet();
+                    containerMetrics.setStartTime();
+                    containerMetrics.setEndTime();
+                    containerMetricsService.persistMetrics( containerMetrics );
                 }
             }
             catch ( Exception e )
@@ -120,8 +125,9 @@ public class ContainerMetricsProcessor extends HubRequester
         return containersMetricsDto;
     }
 
+
     private void sentSavedMetrics()
     {
-        //TODO sent saved containers metrics from DB.
+        List<ContainerMetrics> containerMetrics = containerMetricsService.getAll();
     }
 }
