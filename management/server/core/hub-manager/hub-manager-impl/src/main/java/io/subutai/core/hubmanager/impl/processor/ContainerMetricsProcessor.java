@@ -71,7 +71,7 @@ public class ContainerMetricsProcessor extends HubRequester
 
         for ( ResourceHost host : localPeer.getResourceHosts() )
         {
-            ContainersMetricsDto containersMetricsDto = getContainersMetrics( host, startTime, endTime )
+            ContainersMetricsDto containersMetricsDto = getContainersMetrics( host, startTime, endTime );
             sent( containersMetricsDto );
         }
     }

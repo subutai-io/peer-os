@@ -40,26 +40,26 @@ public class ContainerMetricsEntity implements ContainerMetrics
     @Column( name = "host_id" )
     private String hostId;
 
-    @Column( "host_name" )
+    @Column( name = "host_name" )
     private String hostName;
 
-    @Column( "hostMemory" )
+    @Column( name = "host_memory" )
     private String memory;
 
-    @Column( "hostCpu" )
+    @Column( name = "host_cpu" )
     private String cpu;
 
-    @Column( "hostNet" )
+    @Column( name = "host_net" )
     private String net;
 
-    @Column( "hostDisk" )
+    @Column( name = "host_disk" )
     private String disk;
 
-    @Column( "start_time" )
-    private Date startTime = new Date();
+    @Column( name = "start_time" )
+    private Date startTime = null;
 
-    @Column( "end_time" )
-    private Date endTime = new Date();
+    @Column( name = "end_time" )
+    private Date endTime = null;
 
 
     @Override
