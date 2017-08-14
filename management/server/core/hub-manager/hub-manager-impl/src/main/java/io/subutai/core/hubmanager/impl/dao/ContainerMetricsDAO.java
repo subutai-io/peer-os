@@ -74,7 +74,7 @@ class ContainerMetricsDAO
         List<ContainerMetrics> result = Lists.newArrayList();
         try
         {
-            result = em.createQuery( "select cm from ContainerMetrics cm", ContainerMetrics.class )
+            result = em.createQuery( "select cm from ContainerMetricsEntity cm", ContainerMetrics.class )
                        .getResultList();
         }
         catch ( Exception e )

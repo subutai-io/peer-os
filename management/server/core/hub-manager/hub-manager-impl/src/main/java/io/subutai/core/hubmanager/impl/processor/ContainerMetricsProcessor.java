@@ -71,8 +71,15 @@ public class ContainerMetricsProcessor extends HubRequester
 
         for ( ResourceHost host : localPeer.getResourceHosts() )
         {
-            ContainersMetricsDto containersMetricsDto = getContainersMetrics( host, startTime, endTime );
-            sent( containersMetricsDto );
+            try
+            {
+                ContainersMetricsDto containersMetricsDto = getContainersMetrics( host, startTime, endTime );
+                sent( containersMetricsDto );
+            }
+            catch ( Exception e )
+            {
+                log.error( e.getMessage() );
+            }
         }
     }
 
@@ -83,13 +90,20 @@ public class ContainerMetricsProcessor extends HubRequester
 
         for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
         {
-            HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
-            HostMetricsDto containerMetricsDto = historicalMetrics.getHostMetrics();
-            containerMetricsDto.setType( HostMetricsDto.HostType.CONTAINER_HOST );
-            containerMetricsDto.setHostId( containerHost.getId() );
-            containerMetricsDto.setHostName( containerHost.getHostname() );
+            try
+            {
+                HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
+                HostMetricsDto containerMetricsDto = historicalMetrics.getHostMetrics();
+                containerMetricsDto.setType( HostMetricsDto.HostType.CONTAINER_HOST );
+                containerMetricsDto.setHostId( containerHost.getId() );
+                containerMetricsDto.setHostName( containerHost.getHostname() );
 
-            containersMetricsDto.getContainerHostMetricsDto().add( containerMetricsDto );
+                containersMetricsDto.getContainerHostMetricsDto().add( containerMetricsDto );
+            }
+            catch ( Exception e )
+            {
+                log.error( "Could not collect container metrics: ", e.getMessage() );
+            }
         }
 
         return containersMetricsDto;
@@ -98,29 +112,36 @@ public class ContainerMetricsProcessor extends HubRequester
 
     private void confgureSavedMetrics()
     {
-        ContainersMetricsDto containersMetricsDto = new ContainersMetricsDto();
-
-        Set<Long> ids = new HashSet<>();
-        List<ContainerMetrics> containerMetricsList = containerMetricsService.getAll();
-        for ( ContainerMetrics containerMetrics : containerMetricsList )
+        try
         {
-            HostMetricsDto hostMetricsDto = new HostMetricsDto();
-            hostMetricsDto.setHostName( containerMetrics.getHostName() );
-            hostMetricsDto.setHostId( containerMetrics.getHostId() );
-            hostMetricsDto.setCpu( containerMetrics.getCpuDto() );
-            hostMetricsDto.setDisk( containerMetrics.getDiskDto() );
-            hostMetricsDto.setMemory( containerMetrics.getMemoryDto() );
-            hostMetricsDto.setNet( containerMetrics.getNetDto() );
-            containersMetricsDto.getContainerHostMetricsDto().add( hostMetricsDto );
-            ids.add( containerMetrics.getId() );
-        }
+            ContainersMetricsDto containersMetricsDto = new ContainersMetricsDto();
 
-        for ( Long id : ids )
+            Set<Long> ids = new HashSet<>();
+            List<ContainerMetrics> containerMetricsList = containerMetricsService.getAll();
+            for ( ContainerMetrics containerMetrics : containerMetricsList )
+            {
+                HostMetricsDto hostMetricsDto = new HostMetricsDto();
+                hostMetricsDto.setHostName( containerMetrics.getHostName() );
+                hostMetricsDto.setHostId( containerMetrics.getHostId() );
+                hostMetricsDto.setCpu( containerMetrics.getCpuDto() );
+                hostMetricsDto.setDisk( containerMetrics.getDiskDto() );
+                hostMetricsDto.setMemory( containerMetrics.getMemoryDto() );
+                hostMetricsDto.setNet( containerMetrics.getNetDto() );
+                containersMetricsDto.getContainerHostMetricsDto().add( hostMetricsDto );
+                ids.add( containerMetrics.getId() );
+            }
+
+            for ( Long id : ids )
+            {
+                containerMetricsService.removeMetrics( id );
+            }
+
+            sent( containersMetricsDto );
+        }
+        catch ( Exception e )
         {
-            containerMetricsService.removeMetrics( id );
+            log.error( e.getMessage() );
         }
-
-        sent( containersMetricsDto );
     }
 
 
