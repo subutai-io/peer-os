@@ -1,7 +1,9 @@
 package io.subutai.core.hubmanager.impl.model;
 
 
+import java.lang.reflect.Type;
 import java.util.Date;
+import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -12,7 +14,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import io.subutai.core.hubmanager.api.model.ContainerMetrics;
+import io.subutai.hub.share.dto.metrics.CpuDto;
+import io.subutai.hub.share.dto.metrics.DiskDto;
+import io.subutai.hub.share.dto.metrics.MemoryDto;
+import io.subutai.hub.share.dto.metrics.NetDto;
 
 
 /**
@@ -35,16 +44,16 @@ public class ContainerMetricsEntity implements ContainerMetrics
     private String hostName;
 
     @Column( "hostMemory" )
-    private double memory;
+    private String memory;
 
     @Column( "hostCpu" )
-    private double cpu;
+    private String cpu;
 
     @Column( "hostNet" )
-    private double net;
+    private String net;
 
     @Column( "hostDisk" )
-    private double disk;
+    private String disk;
 
     @Column( "start_time" )
     private Date startTime = new Date();
@@ -90,51 +99,117 @@ public class ContainerMetricsEntity implements ContainerMetrics
     }
 
 
-    public double getMemory()
+    public String getMemory()
     {
         return memory;
     }
 
 
-    public void setMemory( final double memory )
+    @Override
+    public MemoryDto getMemoryDto()
+    {
+        Gson gson = new Gson();
+        return gson.fromJson( this.memory, MemoryDto.class );
+    }
+
+
+    public void setMemory( final String memory )
     {
         this.memory = memory;
     }
 
 
-    public double getCpu()
+    @Override
+    public void setMemory( final MemoryDto memory )
+    {
+        Gson gson = new Gson();
+        this.memory = gson.toJson( memory );
+    }
+
+
+    public String getCpu()
     {
         return cpu;
     }
 
 
-    public void setCpu( final double cpu )
+    @Override
+    public CpuDto getCpuDto()
+    {
+        Gson gson = new Gson();
+        return gson.fromJson( this.cpu, CpuDto.class );
+    }
+
+
+    public void setCpu( final String cpu )
     {
         this.cpu = cpu;
     }
 
 
-    public double getNet()
+    @Override
+    public void setCpu( final CpuDto cpu )
+    {
+        Gson gson = new Gson();
+        this.cpu = gson.toJson( cpu );
+    }
+
+
+    public String getNet()
     {
         return net;
     }
 
 
-    public void setNet( final double net )
+    @Override
+    public Map<String, NetDto> getNetDto()
+    {
+        Gson gson = new Gson();
+        Type typeOfHashMap = new TypeToken<Map<String, NetDto>>(){}.getType();
+        return gson.fromJson( this.net, typeOfHashMap );
+    }
+
+
+    public void setNet( final String net )
     {
         this.net = net;
     }
 
 
-    public double getDisk()
+    @Override
+    public void setNet( final Map<String, NetDto> net )
+    {
+        Gson gson = new Gson();
+        this.net = gson.toJson( net );
+    }
+
+
+    public String getDisk()
     {
         return disk;
     }
 
 
-    public void setDisk( final double disk )
+    @Override
+    public Map<String, DiskDto> getDiskDto()
+    {
+        Gson gson = new Gson();
+        Type typeOfHashMap = new TypeToken<Map<String, DiskDto>>(){}.getType();
+        return gson.fromJson( this.disk, typeOfHashMap );
+    }
+
+
+    public void setDisk( final String disk )
     {
         this.disk = disk;
+    }
+
+
+    @Override
+    public void setDisk( final Map<String, DiskDto> disk )
+    {
+        Gson gson = new Gson();
+        this.disk = gson.toJson( disk );
     }
 
 

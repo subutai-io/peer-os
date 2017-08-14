@@ -15,14 +15,19 @@ public class CpuDto
     @JsonProperty( "frequency" )
     private double frequency = 0.0;
 
+    @JsonProperty( "system" )
     private double system = 0.0;
 
+    @JsonProperty( "idle" )
     private double idle = 0.0;
 
+    @JsonProperty( "iowait" )
     private double iowait = 0.0;
 
+    @JsonProperty( "user" )
     private double user = 0.0;
 
+    @JsonProperty( "nice" )
     private double nice = 0.0;
 
 

@@ -52,7 +52,7 @@ public class ContainerMetricsServiceImpl implements ContainerMetricsService
 
 
     @Override
-    public void persistMetrics( final ContainerMetrics item )
+    public void save( final ContainerMetrics item )
     {
         containerMetricsDAO.persist( item );
     }

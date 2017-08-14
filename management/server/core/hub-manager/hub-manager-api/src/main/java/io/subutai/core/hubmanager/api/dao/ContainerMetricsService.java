@@ -15,7 +15,7 @@ public interface ContainerMetricsService
 
     List<ContainerMetrics> getAll();
 
-    void persistMetrics( ContainerMetrics item );
+    void save( ContainerMetrics item );
 
     void removeMetrics( long id );
 

@@ -3,6 +3,12 @@ package io.subutai.core.hubmanager.api.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
+
+import io.subutai.hub.share.dto.metrics.CpuDto;
+import io.subutai.hub.share.dto.metrics.DiskDto;
+import io.subutai.hub.share.dto.metrics.MemoryDto;
+import io.subutai.hub.share.dto.metrics.NetDto;
 
 
 public interface ContainerMetrics
@@ -19,21 +25,37 @@ public interface ContainerMetrics
 
     public void setHostName( final String hostName );
 
-    public double getMemory();
+    public String getMemory();
 
-    public void setMemory( final double memory );
+    public MemoryDto getMemoryDto();
 
-    public double getCpu();
+    public void setMemory( final String memory );
 
-    public void setCpu( final double cpu );
+    public void setMemory( final MemoryDto memory );
 
-    public double getNet();
+    public String getCpu();
 
-    public void setNet( final double net );
+    public CpuDto getCpuDto();
 
-    public double getDisk();
+    public void setCpu( final String cpu );
 
-    public void setDisk( final double disk );
+    public void setCpu( final CpuDto cpu );
+
+    public String getNet();
+
+    public Map<String, NetDto> getNetDto();
+
+    public void setNet( final String net );
+
+    public void setNet( final Map<String, NetDto> net );
+
+    public String getDisk();
+
+    public Map<String, DiskDto> getDiskDto();
+
+    public void setDisk( final String disk );
+
+    public void setDisk( final Map<String, DiskDto> disk );
 
     public Date getStartTime();
 
