@@ -125,11 +125,13 @@ public class TrackerImpl implements Tracker
         Preconditions.checkNotNull( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
 
         TrackerOperationImpl po = new TrackerOperationImpl( source.toUpperCase(), description, this );
+
         if ( saveTrackerOperation( source, po ) )
         {
             return po;
         }
-        return null;
+
+        throw new IllegalStateException( "Failed to create tracker object" );
     }
 
 

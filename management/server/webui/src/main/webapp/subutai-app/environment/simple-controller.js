@@ -271,8 +271,44 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					return result;
 				} else {
 					if (data.state == 'FAILED') {
-						checkLastLog(false);
-						$('.js-download-progress').html('');
+
+                        checkLastLog(false);
+
+                        var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+                        var result = [];
+                        var i = 0;
+                        if (prevLogs) {
+                            i = prevLogs.length;
+                            if (logs.length > prevLogs.length) {
+                                checkLastLog(true, logs[i - 1]);
+                            }
+                        }
+
+                        var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+					    for (i; i < logs.length; i++) {
+
+                            var logCheck = logs[i].replace(/ /g, '');
+
+                            var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+                            var logTime = moment(logObj.date).format('HH:mm:ss');
+
+							var logStatus = 'success';
+							var logClasses = ['fa-check', 'g-text-green'];
+
+							if (i + 1 == logs.length) {
+								logStatus = 'failed';
+								logClasses = ['fa-times', 'g-text-red'];
+							}
+
+                            var currentLog = {
+                                "time": logTime,
+                                "status": logStatus,
+                                "classes": logClasses,
+                                "text": logObj.log
+                            };
+                            vm.logMessages.push(currentLog);
+                        }
+
 					} else {
 						if (prevLogs) {
 							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
@@ -286,7 +322,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 							"time": moment().format('HH:mm:ss'),
 							"status": 'success',
 							"classes": ['fa-check', 'g-text-green'],
-							"text": 'Your environment has been built successfully'
+							"text": 'Operation has been performed successfully'
 						};
 						vm.logMessages.push(currentLog);
 						vm.buildCompleted = true;
