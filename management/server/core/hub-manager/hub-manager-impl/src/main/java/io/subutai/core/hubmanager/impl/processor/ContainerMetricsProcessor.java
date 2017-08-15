@@ -1,7 +1,6 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -102,7 +101,7 @@ public class ContainerMetricsProcessor extends HubRequester
             }
             catch ( Exception e )
             {
-                log.error( "Could not collect container metrics: ", e.getMessage() );
+                log.error( "Failed to obtain metric for host %s", containerHost.getHostname() );
             }
         }
 
