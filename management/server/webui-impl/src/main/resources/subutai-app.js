@@ -1019,7 +1019,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/bazaar/controller.js',
                                 'subutai-app/bazaar/service.js',
                                 'subutai-app/identity/service.js',
-                                'subutai-app/bazaar/partials/css/demo.css',
+//                                'subutai-app/bazaar/partials/css/demo.css',
                                 'subutai-app/bazaar/partials/css/component.css'
                             ]
                         }
