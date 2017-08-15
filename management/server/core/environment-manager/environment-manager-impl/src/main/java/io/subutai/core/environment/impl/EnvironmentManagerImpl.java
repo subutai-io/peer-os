@@ -1022,8 +1022,9 @@ public class EnvironmentManagerImpl
 
             if ( containerDestructionWorkflow.isFailed() )
             {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( containerDestructionWorkflow.getFailedException() ) );
+                throw new EnvironmentModificationException( exceptionUtil.getRootCause(
+                        containerDestructionWorkflow.getFailedException() == null ?
+                        containerDestructionWorkflow.getError() : containerDestructionWorkflow.getFailedException() ) );
             }
         }
     }
