@@ -772,7 +772,7 @@ public class RestServiceImpl implements RestService
             }
         }
 
-        return Response.status( Response.Status.NOT_FOUND ).build();
+        return Response.status( Response.Status.NOT_FOUND ).entity( JsonUtil.toJson( ERROR_KEY, "Container not found" ) ).build();
     }
 
 
