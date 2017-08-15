@@ -457,8 +457,9 @@ public class EnvironmentManagerImpl
 
             if ( environmentCreationWorkflow.isFailed() )
             {
-                throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
+                throw new EnvironmentCreationException( exceptionUtil.getRootCause(
+                        environmentCreationWorkflow.getFailedException() == null ?
+                        environmentCreationWorkflow.getError() : environmentCreationWorkflow.getFailedException() ) );
             }
         }
 
@@ -639,8 +640,9 @@ public class EnvironmentManagerImpl
 
             if ( environmentModifyWorkflow.isFailed() )
             {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( environmentModifyWorkflow.getFailedException() ) );
+                throw new EnvironmentModificationException( exceptionUtil.getRootCause(
+                        environmentModifyWorkflow.getFailedException() == null ? environmentModifyWorkflow.getError() :
+                        environmentModifyWorkflow.getFailedException() ) );
             }
             else
             {
@@ -697,8 +699,9 @@ public class EnvironmentManagerImpl
 
             if ( sshKeyAdditionWorkflow.isFailed() )
             {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( sshKeyAdditionWorkflow.getFailedException() ) );
+                throw new EnvironmentModificationException( exceptionUtil.getRootCause(
+                        sshKeyAdditionWorkflow.getFailedException() == null ? sshKeyAdditionWorkflow.getError() :
+                        sshKeyAdditionWorkflow.getFailedException() ) );
             }
         }
 
@@ -748,8 +751,9 @@ public class EnvironmentManagerImpl
 
             if ( sshKeyRemovalWorkflow.isFailed() )
             {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( sshKeyRemovalWorkflow.getFailedException() ) );
+                throw new EnvironmentModificationException( exceptionUtil.getRootCause(
+                        sshKeyRemovalWorkflow.getFailedException() == null ? sshKeyRemovalWorkflow.getError() :
+                        sshKeyRemovalWorkflow.getFailedException() ) );
             }
         }
 
@@ -846,8 +850,10 @@ public class EnvironmentManagerImpl
 
             if ( p2PSecretKeyModificationWorkflow.isFailed() )
             {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( p2PSecretKeyModificationWorkflow.getFailedException() ) );
+                throw new EnvironmentModificationException( exceptionUtil.getRootCause(
+                        p2PSecretKeyModificationWorkflow.getFailedException() == null ?
+                        p2PSecretKeyModificationWorkflow.getError() :
+                        p2PSecretKeyModificationWorkflow.getFailedException() ) );
             }
         }
     }
@@ -958,8 +964,10 @@ public class EnvironmentManagerImpl
 
             if ( environmentDestructionWorkflow.isFailed() )
             {
-                throw new EnvironmentDestructionException(
-                        exceptionUtil.getRootCause( environmentDestructionWorkflow.getFailedException() ) );
+                throw new EnvironmentDestructionException( exceptionUtil.getRootCause(
+                        environmentDestructionWorkflow.getFailedException() == null ?
+                        environmentDestructionWorkflow.getError() :
+                        environmentDestructionWorkflow.getFailedException() ) );
             }
         }
     }
@@ -1067,8 +1075,9 @@ public class EnvironmentManagerImpl
 
             if ( hostnameModificationWorkflow.isFailed() )
             {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( hostnameModificationWorkflow.getFailedException() ) );
+                throw new EnvironmentModificationException( exceptionUtil.getRootCause(
+                        hostnameModificationWorkflow.getFailedException() == null ?
+                        hostnameModificationWorkflow.getError() : hostnameModificationWorkflow.getFailedException() ) );
             }
         }
     }
