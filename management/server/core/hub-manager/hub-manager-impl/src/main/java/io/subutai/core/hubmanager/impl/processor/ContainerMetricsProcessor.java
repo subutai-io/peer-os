@@ -65,7 +65,7 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         Calendar cal = Calendar.getInstance();
         Date endTime = cal.getTime();
-        cal.add( Calendar.HOUR, 1 );
+        cal.add( Calendar.HOUR, -1 );
         Date startTime = cal.getTime();
 
         for ( ResourceHost host : localPeer.getResourceHosts() )

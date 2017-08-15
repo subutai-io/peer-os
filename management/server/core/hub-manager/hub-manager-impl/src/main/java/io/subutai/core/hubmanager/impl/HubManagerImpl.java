@@ -258,7 +258,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
         //***********
         containersMetricsProcessor = new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService );
-        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 30, 3600, TimeUnit.SECONDS );
+//        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 30, 3600, TimeUnit.SECONDS );
+        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 30, 100, TimeUnit.SECONDS );
 
 
     }
