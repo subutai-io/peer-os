@@ -85,7 +85,7 @@ public class ContainerMetricsProcessor extends HubRequester
 
     private ContainersMetricsDto getContainersMetrics( ResourceHost resourceHost, Date startTime, Date endTime )
     {
-        ContainersMetricsDto containersMetricsDto = new ContainersMetricsDto( localPeer.getId(), resourceHost.getId() );
+        ContainersMetricsDto containersMetricsDto = new ContainersMetricsDto( localPeer.getId() );
 
         for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
         {
@@ -96,6 +96,8 @@ public class ContainerMetricsProcessor extends HubRequester
                 containerMetricsDto.setType( HostMetricsDto.HostType.CONTAINER_HOST );
                 containerMetricsDto.setHostId( containerHost.getId() );
                 containerMetricsDto.setHostName( containerHost.getHostname() );
+                containerMetricsDto.setStartTime( startTime );
+                containerMetricsDto.setEndTime( endTime );
 
                 containersMetricsDto.getContainerHostMetricsDto().add( containerMetricsDto );
             }
@@ -126,6 +128,9 @@ public class ContainerMetricsProcessor extends HubRequester
                 hostMetricsDto.setDisk( containerMetrics.getDiskDto() );
                 hostMetricsDto.setMemory( containerMetrics.getMemoryDto() );
                 hostMetricsDto.setNet( containerMetrics.getNetDto() );
+                hostMetricsDto.setStartTime( containerMetrics.getStartTime() );
+                hostMetricsDto.setEndTime( containerMetrics.getEndTime() );
+
                 containersMetricsDto.getContainerHostMetricsDto().add( hostMetricsDto );
                 ids.add( containerMetrics.getId() );
             }
@@ -148,8 +153,7 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         try
         {
-            String path = format( "/rest/v1/peers/%s/resource-hosts/%s/containers-metrics", localPeer.getId(),
-                    containersMetricsDto.getHostId() );
+            String path = format( "/rest/v1/peers/%s/containers-metrics", localPeer.getId() );
 
             RestResult<Object> restResult = restClient.post( path, containersMetricsDto );
 
@@ -162,10 +166,10 @@ public class ContainerMetricsProcessor extends HubRequester
                 for ( HostMetricsDto metricsDto : containersMetricsDto.getContainerHostMetricsDto() )
                 {
                     ContainerMetrics containerMetrics = new ContainerMetricsEntity();
-                    containerMetrics.setHostId( containersMetricsDto.getHostId() );
+                    containerMetrics.setHostId( metricsDto.getHostId() );
                     containerMetrics.setHostName( metricsDto.getHostName() );
-                    containerMetrics.setEndTime( containersMetricsDto.getEndTime() );
-                    containerMetrics.setStartTime( containersMetricsDto.getStartTime() );
+                    containerMetrics.setEndTime( metricsDto.getEndTime() );
+                    containerMetrics.setStartTime( metricsDto.getStartTime() );
                     containerMetrics.setCpu( metricsDto.getCpu() );
                     containerMetrics.setDisk( metricsDto.getDisk() );
                     containerMetrics.setMemory( metricsDto.getMemory() );
