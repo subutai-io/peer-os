@@ -41,8 +41,10 @@ public class TemplateManagerImpl implements TemplateManager
     private static final String GORJUN_GET_VERIFIED_TEMPLATE_URL =
             Common.LOCAL_KURJUN_BASE_URL + "/template/info?name=%s&verified=true";
     private static final int TEMPLATE_CACHE_TTL_SEC = 30;
+    private static final int HIT_CACHE_IF_ERROR_INTERVAL_SEC = 30;
     private Set<Template> templatesCache = Sets.newHashSet();
     private volatile long lastTemplatesFetchTime = 0L;
+    private volatile long lastTemplatesFetchErrorTime = 0L;
     private final ReentrantLock lock = new ReentrantLock( true );
 
     private final IdentityManager identityManager;
@@ -89,7 +91,9 @@ public class TemplateManagerImpl implements TemplateManager
     public Set<Template> getTemplates( String kurjunToken )
     {
         boolean needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
-                .toMillis( TEMPLATE_CACHE_TTL_SEC );
+                .toMillis( TEMPLATE_CACHE_TTL_SEC )
+                && System.currentTimeMillis() - lastTemplatesFetchErrorTime > TimeUnit.SECONDS
+                .toMillis( HIT_CACHE_IF_ERROR_INTERVAL_SEC );
 
         if ( !needToUpdate )
         {
@@ -102,7 +106,9 @@ public class TemplateManagerImpl implements TemplateManager
         {
             //check again just in case
             needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
-                    .toMillis( TEMPLATE_CACHE_TTL_SEC );
+                    .toMillis( TEMPLATE_CACHE_TTL_SEC )
+                    && System.currentTimeMillis() - lastTemplatesFetchErrorTime > TimeUnit.SECONDS
+                    .toMillis( HIT_CACHE_IF_ERROR_INTERVAL_SEC );
 
             if ( !needToUpdate )
             {
@@ -148,6 +154,8 @@ public class TemplateManagerImpl implements TemplateManager
             catch ( Exception e )
             {
                 LOG.error( "Error getting templates from local Gorjun", e );
+
+                lastTemplatesFetchErrorTime = System.currentTimeMillis();
             }
             finally
             {
