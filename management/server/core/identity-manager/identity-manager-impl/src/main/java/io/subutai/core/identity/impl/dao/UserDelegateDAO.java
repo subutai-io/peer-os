@@ -182,7 +182,7 @@ class UserDelegateDAO
             qr.setParameter( "userId", userId );
             result = qr.getResultList();
 
-            if ( result != null )
+            if ( result != null && !result.isEmpty() )
             {
                 tk = result.get( 0 );
             }
