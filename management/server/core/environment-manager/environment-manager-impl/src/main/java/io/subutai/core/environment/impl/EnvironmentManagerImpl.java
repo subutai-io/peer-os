@@ -458,7 +458,7 @@ public class EnvironmentManagerImpl
             if ( environmentCreationWorkflow.isFailed() )
             {
                 throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
             }
         }
 
@@ -640,7 +640,7 @@ public class EnvironmentManagerImpl
             if ( environmentModifyWorkflow.isFailed() )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( environmentModifyWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( environmentModifyWorkflow.getError() ) );
             }
             else
             {
@@ -698,7 +698,7 @@ public class EnvironmentManagerImpl
             if ( sshKeyAdditionWorkflow.isFailed() )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( sshKeyAdditionWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( sshKeyAdditionWorkflow.getError() ) );
             }
         }
 
@@ -749,7 +749,7 @@ public class EnvironmentManagerImpl
             if ( sshKeyRemovalWorkflow.isFailed() )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( sshKeyRemovalWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( sshKeyRemovalWorkflow.getError() ) );
             }
         }
 
@@ -847,7 +847,7 @@ public class EnvironmentManagerImpl
             if ( p2PSecretKeyModificationWorkflow.isFailed() )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( p2PSecretKeyModificationWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( p2PSecretKeyModificationWorkflow.getError() ) );
             }
         }
     }
@@ -959,7 +959,7 @@ public class EnvironmentManagerImpl
             if ( environmentDestructionWorkflow.isFailed() )
             {
                 throw new EnvironmentDestructionException(
-                        exceptionUtil.getRootCause( environmentDestructionWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( environmentDestructionWorkflow.getError() ) );
             }
         }
     }
@@ -1023,7 +1023,7 @@ public class EnvironmentManagerImpl
             if ( containerDestructionWorkflow.isFailed() )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( containerDestructionWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( containerDestructionWorkflow.getError() ) );
             }
         }
     }
@@ -1067,7 +1067,7 @@ public class EnvironmentManagerImpl
             if ( hostnameModificationWorkflow.isFailed() )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( hostnameModificationWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( hostnameModificationWorkflow.getError() ) );
             }
         }
     }

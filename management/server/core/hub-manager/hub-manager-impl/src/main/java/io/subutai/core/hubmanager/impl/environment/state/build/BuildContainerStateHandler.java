@@ -126,10 +126,11 @@ public class BuildContainerStateHandler extends StateHandler
 
         for ( Node node : nodes )
         {
-            Set<String> templates = rhTemplates.getOrDefault( node.getHostId(), new HashSet<String>() );
+            Set<String> templates = rhTemplates.get( node.getHostId() );
 
-            if ( templates.isEmpty() )
+            if ( templates == null )
             {
+                templates = new HashSet<>();
                 rhTemplates.put( node.getHostId(), templates );
             }
 
@@ -231,6 +232,8 @@ public class BuildContainerStateHandler extends StateHandler
         nodeDto.addSshKey( createSshKey( contId ) );
 
         nodeDto.setContainerId( contId );
+
+        nodeDto.setContainerName( ch.getContainerName() );
 
         nodeDto.setState( EnumUtils.getEnum( ContainerStateDto.class, ch.getState().toString() ) );
     }

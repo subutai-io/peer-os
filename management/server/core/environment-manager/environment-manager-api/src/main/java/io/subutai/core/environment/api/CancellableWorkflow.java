@@ -12,6 +12,8 @@ public abstract class CancellableWorkflow<T> extends Workflow<T>
 {
     private final ExecutorService executor;
 
+    private Throwable error;
+
 
     private CancellableWorkflow( final T firstStep, ExecutorService executor )
     {
@@ -65,4 +67,17 @@ public abstract class CancellableWorkflow<T> extends Workflow<T>
 
 
     public abstract void onCancellation();
+
+
+    public Throwable getError()
+    {
+        return error;
+    }
+
+
+    public void fail( String message, Throwable e )
+    {
+        this.error = e;
+        super.fail( message, e );
+    }
 }
