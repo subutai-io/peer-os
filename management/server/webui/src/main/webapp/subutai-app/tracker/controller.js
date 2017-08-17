@@ -215,7 +215,7 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 								"time": moment().format('HH:mm:ss'),
 								"status": 'success',
 								"classes": ['fa-check', 'g-text-green'],
-								"log": 'Your environment has been built successfully'
+								"log": 'Operation has been performed successfully'
 							};
 							vm.currentLog.push(currentLog);						
 						}
