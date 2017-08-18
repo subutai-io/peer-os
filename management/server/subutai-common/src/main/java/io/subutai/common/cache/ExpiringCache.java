@@ -22,9 +22,6 @@ import org.slf4j.LoggerFactory;
 /**
  * This is a cache with entries having time-to-live setting. After the specified interval entry gets evicted (expires).
  * It is possible to add expiry callback to an entry to handle the expiration event
- *
- * TODO review possibility to use simple map and synchronize on it to avoid concurrent issues
- * OR properly synchronize eviction with get(update timestamp)
  */
 public class ExpiringCache<K, V>
 {
@@ -69,12 +66,24 @@ public class ExpiringCache<K, V>
         for ( Iterator<Map.Entry<K, CacheEntry<V>>> it = entries.entrySet().iterator(); it.hasNext(); )
         {
             final Map.Entry<K, CacheEntry<V>> entry = it.next();
-            if ( entry.getValue().isExpired() )
+
+            if ( entry.getValue().lock() )
             {
-                it.remove();
-                if ( entry.getValue() instanceof CacheEntryWithExpiryCallback )
+                try
                 {
-                    evictEntry( ( CacheEntryWithExpiryCallback ) entry.getValue() );
+                    if ( entry.getValue().isExpired() )
+                    {
+                        it.remove();
+
+                        if ( entry.getValue() instanceof CacheEntryWithExpiryCallback )
+                        {
+                            evictEntry( ( CacheEntryWithExpiryCallback ) entry.getValue() );
+                        }
+                    }
+                }
+                finally
+                {
+                    entry.getValue().unlock();
                 }
             }
         }
@@ -106,10 +115,21 @@ public class ExpiringCache<K, V>
         if ( key != null )
         {
             CacheEntry<V> entry = entries.get( key );
-            if ( entry != null && !entry.isExpired() )
+
+            if ( entry != null && entry.lock() )
             {
-                entry.resetCreationTimestamp();
-                return entry.getValue();
+                try
+                {
+                    if ( !entry.isExpired() )
+                    {
+                        entry.resetCreationTimestamp();
+                        return entry.getValue();
+                    }
+                }
+                finally
+                {
+                    entry.unlock();
+                }
             }
         }
         return null;
