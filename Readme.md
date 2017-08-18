@@ -1,6 +1,6 @@
-# Subutai Social repository
+# Subutai Server repository
 
-This repository contains source code of Subutai Social Console Project.
+This repository contains source code of Subutai Server Project.
 This is a multi-module Maven Java project.
 
 ## Building the project
@@ -206,7 +206,7 @@ To build the project, you need to have the following tools:
     ```
 
 After this you will have `management/server/server-karaf/target` directory with **subutai-{version}.tar.gz** archive
-which contains custom Karaf distribution of SS Console application.
+which contains custom Karaf distribution of SS application.
 
 Untar it to some directory and execute `{distr}/bin/karaf`.
 
