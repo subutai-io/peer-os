@@ -14,6 +14,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -306,6 +307,11 @@ public class ConfigureContainerStateHandler extends StateHandler
                         ctx.localPeer.setContainerHostname( ch.getContainerId(), nodeDto.getHostName() );
                     }
                 }
+                catch ( HostNotFoundException ignore )
+                {
+                    //this is a remote container
+                    //no-op
+                }
                 catch ( Exception e )
                 {
                     log.error( "Error configuring hostnames: {}", e.getMessage() );
@@ -326,6 +332,11 @@ public class ConfigureContainerStateHandler extends StateHandler
                     ContainerHost ch = ctx.localPeer.getContainerHostById( nodeDto.getContainerId() );
 
                     ctx.localPeer.setQuota( ch.getContainerId(), nodeDto.getContainerQuota() );
+                }
+                catch ( HostNotFoundException ignore )
+                {
+                    //this is a remote container
+                    //no-op
                 }
                 catch ( Exception e )
                 {
