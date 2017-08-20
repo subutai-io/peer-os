@@ -51,7 +51,7 @@ export KARAF_DEBUG=true # Enable debug mode
 export SUBUTAI_APP_DATA_PATH="/opt/subutai-mng/"
 export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"
 export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"
-export HUB_IP=dev.subut.ai
+export HUB_IP=hub.subut.ai
 export P2P_PORT_RANGE_START=1
 export P2P_PORT_RANGE_END=65535
 
