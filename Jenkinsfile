@@ -46,13 +46,15 @@ node() {
 	// declare hub address
 	switch (env.BRANCH_NAME) {
 		case ~/master/: hubIp = "stage.subut.ai"; break;
-		default: hubIp = "dev.subut.ai"
+		case ~/dev/: hubIp = "dev.subut.ai"; break;
+		default: hubIp = "hub.subut.ai"
 	}
 
 	// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 	switch (env.BRANCH_NAME) {
 		case ~/master/: cdnHost = "stagecdn.subut.ai"; break;
-		default: cdnHost = "devcdn.subut.ai"
+		case ~/dev/: cdnHost = "devcdn.subut.ai"; break;
+		default: cdnHost = "cdn.subut.ai"
 	}
 
 	// build deb
