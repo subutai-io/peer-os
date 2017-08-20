@@ -8,6 +8,7 @@ package io.subutai.common.cache;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.google.common.base.Preconditions;
 
@@ -31,6 +32,20 @@ public class CacheEntry<V>
      */
     private AtomicLong createTimestamp;
 
+    private ReentrantLock lock = new ReentrantLock( true );
+
+
+    boolean lock()
+    {
+        return lock.tryLock();
+    }
+
+
+    void unlock()
+    {
+        lock.unlock();
+    }
+
 
     /**
      * Initializes {@code CacheEntry} with the give type and ttl
@@ -38,7 +53,7 @@ public class CacheEntry<V>
      * @param value - entry value
      * @param ttlMs - entry time to live in milliseconds
      */
-    public CacheEntry( V value, long ttlMs )
+    CacheEntry( V value, long ttlMs )
     {
         Preconditions.checkNotNull( value, "Value is null" );
         Preconditions.checkArgument( ttlMs > 0, "Time-to-live must be greater than 0" );
@@ -63,7 +78,7 @@ public class CacheEntry<V>
     /**
      * Resets creation timestamp to the current timestamp to prolong entry's lifespan
      */
-    public void resetCreationTimestamp()
+    void resetCreationTimestamp()
     {
         createTimestamp.set( System.nanoTime() );
     }

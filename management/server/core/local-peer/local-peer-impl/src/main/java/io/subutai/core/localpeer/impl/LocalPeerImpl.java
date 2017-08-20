@@ -1030,7 +1030,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ContainerHost getContainerHostByIp( final String hostIp ) throws HostNotFoundException
     {
-        Preconditions.checkNotNull( hostIp, "Invalid container host id" );
+        Preconditions.checkNotNull( hostIp, "Invalid container host ip" );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
