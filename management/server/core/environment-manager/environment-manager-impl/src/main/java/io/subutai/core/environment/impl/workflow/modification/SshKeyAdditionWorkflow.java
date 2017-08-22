@@ -60,6 +60,8 @@ public class SshKeyAdditionWorkflow extends CancellableWorkflow<SshKeyAdditionWo
         {
             environment.addSshKey( sshKey );
 
+            saveEnvironment();
+
             new AddSshKeyStep( sshKey, environment, operationTracker ).execute();
 
             saveEnvironment();
