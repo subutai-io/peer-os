@@ -567,8 +567,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 			vm.sshKeysList.splice(index, 1);
 			LOADING_SCREEN('none');
-		}).error( function(error) {
-			SweetAlert.swal("Error", "Error: " + error, "error");
+		}).error( function(data) {
+			SweetAlert.swal("Error", "Error: " + data.ERROR, "error");
 			ngDialog.closeAll();
 			LOADING_SCREEN('none');
 		});

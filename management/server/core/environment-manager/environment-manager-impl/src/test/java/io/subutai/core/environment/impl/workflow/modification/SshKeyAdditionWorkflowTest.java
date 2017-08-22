@@ -13,6 +13,7 @@ import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -51,7 +52,8 @@ public class SshKeyAdditionWorkflowTest
     public void setUp() throws Exception
     {
 
-        workflow = new SshKeyAdditionWorkflowSUT( environment, TestHelper.SSH_KEY, trackerOperation, environmentManager );
+        workflow =
+                new SshKeyAdditionWorkflowSUT( environment, TestHelper.SSH_KEY, trackerOperation, environmentManager );
 
         doReturn( environment ).when( environmentManager ).update( environment );
     }
@@ -71,7 +73,7 @@ public class SshKeyAdditionWorkflowTest
     {
         workflow.ADD_KEY();
 
-        verify( environmentManager ).update( environment );
+        verify( environmentManager, atLeastOnce() ).update( environment );
     }
 
 
@@ -92,6 +94,7 @@ public class SshKeyAdditionWorkflowTest
 
         verify( trackerOperation ).addLogFailed( anyString() );
     }
+
 
     @Test
     public void testOnCancellation() throws Exception

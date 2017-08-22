@@ -74,7 +74,6 @@ public class AddSshKeyStep
                 throw new EnvironmentManagerException( "Failed to add SSH key on all peers" );
             }
 
-            environment.addSshKey( sshKey );
         }
     }
 }

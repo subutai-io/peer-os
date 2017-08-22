@@ -13,6 +13,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -48,7 +49,7 @@ public class AddSshKeyStepTest
     {
         step.execute();
 
-        verify( environment ).addSshKey( TestHelper.SSH_KEY );
+        verify( PEER_UTIL ).addPeerTask( any( PeerUtil.PeerTask.class ) );
 
         doReturn( true ).when( peerTaskResult ).hasSucceeded();
 
