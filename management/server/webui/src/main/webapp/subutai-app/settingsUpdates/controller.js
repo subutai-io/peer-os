@@ -26,22 +26,22 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
                 vm.updateInProgress = true;
                 vm.updateText = 'Update is in progress';
                 removeUpdateMessage();
-                setTimeout(function() {checkActiveUpdate();}, 30000);
+                scheduleUpdateCheck();
              }else{
     		   SettingsUpdatesSrv.isEnvironmentWorkflowInProgress().success(function (data){
     			 if (data == true || data == 'true') {
     				LOADING_SCREEN("none");
     				vm.updateText = 'Environment workflow is in progress';
-    				setTimeout(function() {checkActiveUpdate();}, 30000);
+    				scheduleUpdateCheck();
     			 }else{
     				getConfig();
     			 }
     		   }).error(function (error) {
-                  setTimeout(function() {checkActiveUpdate();}, 30000);
+                  scheduleUpdateCheck();
                });
              }
 		}).error(function (error) {
-            setTimeout(function() {checkActiveUpdate();}, 30000);
+            scheduleUpdateCheck();
         });
 	}
 
@@ -122,10 +122,16 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 			}
 			checkActiveUpdate();
 		}).error(function (error) {
-			setTimeout(function() {checkActiveUpdate();}, 30000);
+			scheduleUpdateCheck();
 		});
 
 		removeUpdateMessage();
+	}
+
+	var lastScheduledCheck;
+	function scheduleUpdateCheck(){
+	    clearTimeout(lastScheduledCheck);
+	    lastScheduledCheck = setTimeout(function() {checkActiveUpdate();}, 30000);
 	}
 
     function reloadHistory(){
