@@ -25,6 +25,8 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
@@ -211,7 +213,7 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Update" )
     public boolean updateManagement()
     {
-        if ( isUpdateInProgress )
+        if ( isUpdateInProgress || isEnvironmentWorkflowInProgress() )
         {
             return false;
         }
@@ -263,6 +265,14 @@ public class SystemManagerImpl implements SystemManager
     public boolean isUpdateInProgress()
     {
         return isUpdateInProgress;
+    }
+
+
+    @Override
+    public boolean isEnvironmentWorkflowInProgress()
+    {
+        EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
+        return !environmentManager.getActiveWorkflows().isEmpty();
     }
 
 

@@ -85,6 +85,11 @@ public interface RestService
     Response isUpdateInProgress();
 
     @GET
+    @Path( "is_env_workflow_in_progress" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response isEnvironmentWorkflowInProgress();
+
+    @GET
     @Path( "hub_ip" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response getHubIp();
