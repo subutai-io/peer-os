@@ -14,6 +14,7 @@ function SettingsUpdatesSrv($http) {
         update: update,
         getHistory: getHistory,
         isUpdateInProgress: isUpdateInProgress,
+        isEnvironmentWorkflowInProgress: isEnvironmentWorkflowInProgress,
         getHistoryUrl: function () {
             return HISTORY_URL
         }
@@ -28,6 +29,13 @@ function SettingsUpdatesSrv($http) {
 
     function isUpdateInProgress() {
         return $http.get(BASE_URL + "is_update_in_progress", {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/json'}
+        });
+    }
+
+    function isEnvironmentWorkflowInProgress() {
+        return $http.get(BASE_URL + "is_env_workflow_in_progress", {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
         });

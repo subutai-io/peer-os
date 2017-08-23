@@ -21,17 +21,25 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 		LOADING_SCREEN();
 
 		SettingsUpdatesSrv.isUpdateInProgress().success(function (data){
-			 if (data == true || data == 'true') {
-				LOADING_SCREEN("none");
-
-				vm.updateInProgress = true;
-				vm.updateText = 'Update is in progress';
-				removeUpdateMessage();
-
-				setTimeout(function() {checkActiveUpdate();}, 30000);
-			 }else{
-				getConfig();
-			 }
+             if (data == true || data == 'true') {
+                LOADING_SCREEN("none");
+                vm.updateInProgress = true;
+                vm.updateText = 'Update is in progress';
+                removeUpdateMessage();
+                setTimeout(function() {checkActiveUpdate();}, 30000);
+             }else{
+    		   SettingsUpdatesSrv.isEnvironmentWorkflowInProgress().success(function (data){
+    			 if (data == true || data == 'true') {
+    				LOADING_SCREEN("none");
+    				vm.updateText = 'Environment workflow is in progress';
+    				setTimeout(function() {checkActiveUpdate();}, 30000);
+    			 }else{
+    				getConfig();
+    			 }
+    		   }).error(function (error) {
+                  setTimeout(function() {checkActiveUpdate();}, 30000);
+               });
+             }
 		}).error(function (error) {
             setTimeout(function() {checkActiveUpdate();}, 30000);
         });
