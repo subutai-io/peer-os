@@ -105,23 +105,23 @@ public class CloneContainerTask extends HostUtil.Task<String>
                         networkResource.getVlan(), networkResource.getEnvironmentId() );
 
         //wait for container connection
-        boolean connected = false;
+        boolean running = false;
 
         long waitStart = System.currentTimeMillis();
 
         HostId containerHostId = new HostId( containerId );
 
-        while ( !connected && System.currentTimeMillis() - waitStart < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 )
+        while ( !running && System.currentTimeMillis() - waitStart < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 )
         {
-            connected = localPeer.isConnected( containerHostId );
+            running = localPeer.isConnected( containerHostId );
 
-            if ( !connected )
+            if ( !running )
             {
                 Thread.sleep( 100 );
             }
         }
 
-        if ( !connected )
+        if ( !running )
         {
             throw new IllegalStateException(
                     String.format( "Container %s has not connected within %d sec", request.getHostname(),

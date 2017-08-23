@@ -1271,12 +1271,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             HostInfo hostInfo = hostRegistry.getHostInfoById( hostId.getId() );
-            return hostInfo.getId().equals( hostId.getId() );
+
+            if ( hostInfo.getId().equals( hostId.getId() ) )
+            {
+                return hostInfo instanceof ResourceHostInfo || ContainerHostState.RUNNING
+                        .equals( ( ( ContainerHostInfo ) hostInfo ).getState() );
+            }
         }
-        catch ( HostDisconnectedException e )
+        catch ( HostDisconnectedException ignore )
         {
-            return false;
         }
+
+        return false;
     }
 
 

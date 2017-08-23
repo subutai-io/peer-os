@@ -92,7 +92,7 @@ public interface Peer extends RelationLink
 
 
     /**
-     * Returns true of the host is connected, false otherwise
+     * Returns true of the host is connected (AND running, in case it is a container host), false otherwise
      */
     boolean isConnected( HostId hostId );
 
