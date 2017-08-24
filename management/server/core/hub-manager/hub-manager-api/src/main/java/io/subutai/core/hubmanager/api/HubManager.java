@@ -47,4 +47,6 @@ public interface HubManager
     boolean isHubReachable();
 
     boolean canWorkWithHub();
+
+    RestClient getRestClient();
 }

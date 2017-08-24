@@ -50,16 +50,23 @@ public abstract class StateHandler
 
         Session session = ctx.identityManager.login( IdentityManager.TOKEN_ID, token );
 
-        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
+        if ( session != null )
         {
-            @Override
-            public Void run()
+            Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
             {
-                runAs( peerDto );
+                @Override
+                public Void run()
+                {
+                    runAs( peerDto );
 
-                return null;
-            }
-        } );
+                    return null;
+                }
+            } );
+        }
+        else
+        {
+            log.warn( "Probably, environment has been deleted, no user to perform environment operation" );
+        }
     }
 
 

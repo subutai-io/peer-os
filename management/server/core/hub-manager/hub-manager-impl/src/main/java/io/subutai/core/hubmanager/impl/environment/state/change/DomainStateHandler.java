@@ -111,8 +111,7 @@ public class DomainStateHandler extends StateHandler
                                         CommandResult commandResult = TunnelHelper.execute( resourceHost,
                                                 format( TunnelProcessor.CREATE_TUNNEL_COMMAND, ip, port, "" ) );
                                         TunnelInfoDto tunnelInfoDto = TunnelHelper
-                                                .parseResult( "", commandResult.getStdOut(), null,
-                                                        new TunnelInfoDto() );
+                                                .parseResult(  commandResult.getStdOut(), new TunnelInfoDto() );
                                         JSONObject ipPort = new JSONObject();
                                         ipPort.put( "ip", tunnelInfoDto.getOpenedIp() );
                                         ipPort.put( "port", tunnelInfoDto.getOpenedPort().replaceAll( "\n", "" ) );

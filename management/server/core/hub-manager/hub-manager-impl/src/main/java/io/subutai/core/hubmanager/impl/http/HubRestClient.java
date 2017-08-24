@@ -127,6 +127,11 @@ public class HubRestClient implements RestClient
         }
         catch ( Exception e )
         {
+            if ( response != null )
+            {
+                restResult.setReasonPhrase( response.getStatusInfo().getReasonPhrase() );
+            }
+
             if ( ExceptionUtils.getStackTrace( e ).contains( CONNECTION_EXCEPTION_MARKER ) )
             {
                 restResult.setError( CONNECTION_EXCEPTION_MARKER );
@@ -151,12 +156,24 @@ public class HubRestClient implements RestClient
     {
         if ( response != null )
         {
-            response.close();
+            try
+            {
+                response.close();
+            }
+            catch ( Exception ignore )
+            {
+            }
         }
 
         if ( webClient != null )
         {
-            webClient.close();
+            try
+            {
+                webClient.close();
+            }
+            catch ( Exception ignore )
+            {
+            }
         }
     }
 
@@ -173,6 +190,8 @@ public class HubRestClient implements RestClient
             throws IOException, PGPException
     {
         RestResult<T> restResult = new RestResult<>( response.getStatus() );
+
+        restResult.setReasonPhrase( response.getStatusInfo().getReasonPhrase() );
 
         if ( !restResult.isSuccess() )
         {
