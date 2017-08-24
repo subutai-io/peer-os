@@ -70,7 +70,6 @@
   <bean id="hubAdapter" class="io.subutai.core.hubmanager.impl.adapter.HubAdapterImpl" activation="eager"
         scope="singleton">
     <argument ref="daoManagerHub" />
-    <argument ref="securityManager" />
     <argument ref="peerManager" />
     <argument ref="identityManager" />
   </bean>

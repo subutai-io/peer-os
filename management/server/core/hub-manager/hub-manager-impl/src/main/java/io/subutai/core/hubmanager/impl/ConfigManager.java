@@ -1,20 +1,12 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyStore;
 
-import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
@@ -34,7 +26,6 @@ import io.subutai.hub.share.pgp.message.PGPMessenger;
 
 public class ConfigManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ConfigManager.class.getName() );
 
     private static final int HUB_PORT = 444;
 
@@ -43,11 +34,9 @@ public class ConfigManager
     private PGPPublicKey hPublicKey;
     private PGPPublicKey ownerPublicKey;
     private PGPPublicKey peerPublicKey;
-    private PGPPrivateKey sender;
     private KeyStore keyStore;
     private String peerId;
     private PGPMessenger messenger;
-    private KeyStoreTool keyStoreTool;
 
 
     public PeerManager getPeerManager()
@@ -66,7 +55,7 @@ public class ConfigManager
 
             this.peerManager = peerManager;
 
-            this.sender = securityManager.getKeyManager().getPrivateKey( null );
+            final PGPPrivateKey sender = securityManager.getKeyManager().getPrivateKey( null );
 
             this.peerId = peerManager.getLocalPeer().getId();
 
@@ -80,7 +69,7 @@ public class ConfigManager
 
             this.messenger = new PGPMessenger( sender, hPublicKey );
 
-            this.keyStoreTool = new KeyStoreTool();
+            final KeyStoreTool keyStoreTool = new KeyStoreTool();
 
             this.keyStore = keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS,
                     PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) );
@@ -98,13 +87,13 @@ public class ConfigManager
     }
 
 
-    public PGPPublicKey getOwnerPublicKey()
+    PGPPublicKey getOwnerPublicKey()
     {
         return ownerPublicKey;
     }
 
 
-    public PGPPublicKey getPeerPublicKey()
+    PGPPublicKey getPeerPublicKey()
     {
         return peerPublicKey;
     }
@@ -131,30 +120,14 @@ public class ConfigManager
     }
 
 
-    public byte[] readContent( Response response ) throws IOException
-    {
-        if ( response.getEntity() == null )
-        {
-            return ArrayUtils.EMPTY_BYTE_ARRAY;
-        }
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        InputStream is = ( InputStream ) response.getEntity();
-
-        IOUtils.copy( is, bos );
-        return bos.toByteArray();
-    }
-
-
-    public UserToken getUserToken()
+    UserToken getUserToken()
     {
         User user = identityManager.getActiveUser();
         return identityManager.createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
     }
 
 
-    public User getActiveUser()
+    User getActiveUser()
     {
         return identityManager.getActiveUser();
     }

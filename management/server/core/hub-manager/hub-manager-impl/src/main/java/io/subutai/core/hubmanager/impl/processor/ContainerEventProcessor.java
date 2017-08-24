@@ -1,43 +1,34 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
-import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.container.ContainerEventDto;
-import io.subutai.hub.share.json.JsonUtil;
 
 
-// TODO: Replace WebClient with HubRestClient.
 public class ContainerEventProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-
-    private ConfigManager configManager;
-
     private PeerManager peerManager;
 
 
-    public ContainerEventProcessor( final HubManagerImpl hubManager, final ConfigManager configManager,
-                                    final PeerManager peerManager, final RestClient restClient )
+    public ContainerEventProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
+                                    final RestClient restClient )
     {
         super( hubManager, restClient );
-        this.configManager = configManager;
         this.peerManager = peerManager;
     }
 
@@ -89,25 +80,19 @@ public class ContainerEventProcessor extends HubRequester
 
         ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
 
-        Response res = doRequest( dto );
+        RestResult res = doRequest( dto );
 
         log.info( "Response status: {}", res.getStatus() );
     }
 
 
-    private Response doRequest( ContainerEventDto dto ) throws HubManagerException
+    private RestResult doRequest( ContainerEventDto dto ) throws HubManagerException
     {
         try
         {
             String path = String.format( "/rest/v1/containers/%s/events", dto.getContainerId() );
 
-            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
-
-            byte[] plainData = JsonUtil.toCbor( dto );
-
-            byte[] encryptedData = configManager.getMessenger().produce( plainData );
-
-            return client.post( encryptedData );
+            return restClient.post( path, dto );
         }
         catch ( Exception e )
         {

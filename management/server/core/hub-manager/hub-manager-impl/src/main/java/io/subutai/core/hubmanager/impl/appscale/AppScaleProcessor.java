@@ -5,24 +5,21 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
-import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.hub.share.dto.AppScaleConfigDto;
-import io.subutai.hub.share.json.JsonUtil;
 
 
-// TODO: Replace WebClient with HubRestClient.
 public class AppScaleProcessor implements StateLinkProcessor
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -31,15 +28,15 @@ public class AppScaleProcessor implements StateLinkProcessor
 
     private final Set<String> processLinks = Sets.newConcurrentHashSet();
 
-    private final ConfigManager configManager;
-
     private final AppScaleManager appScaleManager;
 
+    private final HubRestClient restClient;
 
-    public AppScaleProcessor( ConfigManager configManager, AppScaleManager appScaleManager )
+
+    public AppScaleProcessor( AppScaleManager appScaleManager, HubRestClient restClient )
     {
-        this.configManager = configManager;
         this.appScaleManager = appScaleManager;
+        this.restClient = restClient;
     }
 
 
@@ -106,21 +103,16 @@ public class AppScaleProcessor implements StateLinkProcessor
         } );
     }
 
+
     private void update( String link, String state )
     {
         log.debug( "Sending state: {}", state );
 
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
+            RestResult<Object> restResult = restClient.post( link, state );
 
-            byte[] cborData = JsonUtil.toCbor( state );
-
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
-            Response res = client.post( encryptedData );
-
-            log.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
+            log.debug( "Response: HTTP {} - {}", restResult.getStatus(), restResult.getReasonPhrase() );
         }
         catch ( Exception e )
         {
@@ -135,25 +127,19 @@ public class AppScaleProcessor implements StateLinkProcessor
 
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
+            RestResult<AppScaleConfigDto> restResult = restClient.get( link, AppScaleConfigDto.class );
 
-            Response res = client.get();
+            log.debug( "Response: HTTP {} - {}", restResult.getStatus(), restResult.getReasonPhrase() );
 
-            log.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
-
-            if ( res.getStatus() != HttpStatus.SC_OK )
+            if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( "Error to get AppScale data from Hub: HTTP {} - {}", res.getStatus(),
-                        res.getStatusInfo().getReasonPhrase() );
+                log.error( "Error to get AppScale data from Hub: HTTP {} - {}", restResult.getStatus(),
+                        restResult.getError() );
 
                 return null;
             }
 
-            byte[] encryptedContent = configManager.readContent( res );
-
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-
-            return JsonUtil.fromCbor( plainContent, AppScaleConfigDto.class );
+            return restResult.getEntity();
         }
         catch ( Exception e )
         {
