@@ -14,9 +14,9 @@ import org.apache.http.HttpStatus;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.hub.share.dto.AppScaleConfigDto;
 
 
@@ -30,10 +30,10 @@ public class AppScaleProcessor implements StateLinkProcessor
 
     private final AppScaleManager appScaleManager;
 
-    private final HubRestClient restClient;
+    private final RestClient restClient;
 
 
-    public AppScaleProcessor( AppScaleManager appScaleManager, HubRestClient restClient )
+    public AppScaleProcessor( AppScaleManager appScaleManager, RestClient restClient )
     {
         this.appScaleManager = appScaleManager;
         this.restClient = restClient;

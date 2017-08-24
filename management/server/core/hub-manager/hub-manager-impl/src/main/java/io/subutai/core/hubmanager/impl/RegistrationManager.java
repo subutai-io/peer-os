@@ -15,10 +15,10 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
@@ -41,7 +41,7 @@ public class RegistrationManager
 
     private final String peerId;
 
-    private final HubRestClient restClient;
+    private final RestClient restClient;
 
 
     public RegistrationManager( HubManagerImpl hubManager, ConfigManager configManager )
@@ -50,11 +50,12 @@ public class RegistrationManager
         this.configManager = configManager;
         this.peerId = configManager.getPeerId();
 
-        restClient = new HubRestClient( configManager );
+        restClient = hubManager.getRestClient();
     }
 
 
-    public void registerPeer( String email, String password, String peerName, String peerScope ) throws HubManagerException
+    public void registerPeer( String email, String password, String peerName, String peerScope )
+            throws HubManagerException
     {
         registerPeerPubKey();
 

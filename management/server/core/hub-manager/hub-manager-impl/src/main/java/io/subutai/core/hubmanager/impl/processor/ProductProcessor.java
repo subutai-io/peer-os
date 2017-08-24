@@ -24,15 +24,14 @@ import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.product.ProductDtoV1_2;
-import io.subutai.hub.share.json.JsonUtil;
 
 
 public class ProductProcessor implements StateLinkProcessor
@@ -45,11 +44,11 @@ public class ProductProcessor implements StateLinkProcessor
             + "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
 
     private static final String PATH_TO_DEPLOY = String.format( "%s/deploy", System.getProperty( "karaf.home" ) );
-    private HubRestClient restClient;
+    private RestClient restClient;
 
 
     public ProductProcessor( final ConfigManager hConfigManager, final Set<HubEventListener> hubEventListeners,
-                             final HubRestClient restClient )
+                             final RestClient restClient )
     {
         this.configManager = hConfigManager;
         this.hubEventListeners = hubEventListeners != null ? hubEventListeners : new HashSet<HubEventListener>();
@@ -207,7 +206,8 @@ public class ProductProcessor implements StateLinkProcessor
         // TODO: check that there is no installed plugins, which depends on this plugin
 
         //TODO check what we are deleting here!!!
-        for ( String url : productDTO.getMetadata() )
+        assert productDTO != null;
+        for ( String ignored : productDTO.getMetadata() )
         {
             File file = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
             if ( file.delete() )

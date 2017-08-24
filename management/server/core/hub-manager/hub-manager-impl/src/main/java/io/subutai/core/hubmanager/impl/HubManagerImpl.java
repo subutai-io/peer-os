@@ -13,7 +13,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +145,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
-    private HubRestClient restClient;
+    private RestClient restClient;
 
     private LocalPeer localPeer;
 
@@ -274,7 +273,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
-        ProxyProcessor proxyProcessor = new ProxyProcessor( configManager, peerManager, restClient );
+        ProxyProcessor proxyProcessor = new ProxyProcessor( peerManager, restClient );
 
         UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx );
 

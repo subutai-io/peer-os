@@ -15,10 +15,10 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 
@@ -36,12 +36,12 @@ public class TunnelProcessor implements StateLinkProcessor
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
-    private final HubRestClient restClient;
+    private final RestClient restClient;
 
     private PeerManager peerManager;
 
 
-    public TunnelProcessor( PeerManager peerManager, HubRestClient restClient )
+    public TunnelProcessor( PeerManager peerManager, RestClient restClient )
     {
         this.peerManager = peerManager;
         this.restClient = restClient;

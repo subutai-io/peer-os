@@ -20,10 +20,10 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 import io.subutai.hub.share.dto.HostInterfaceDto;
@@ -48,7 +48,7 @@ public class ResourceHostDataProcessor extends HubRequester
 
 
     public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
-                                      HubRestClient restClient )
+                                      RestClient restClient )
     {
         super( hubManager, restClient );
 
