@@ -27,10 +27,11 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.json.JsonUtil;
 
 
+//TODO put 2 retries on 503
 public class HubRestClient implements RestClient
 {
-    public static final String CONNECTION_EXCEPTION_MARKER = "ConnectException";
     private static final String ERROR = "Error executing request to Hub: ";
+    private static final int MAX_ATTEMPTS = 3;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -120,6 +121,15 @@ public class HubRestClient implements RestClient
             Object requestBody = encrypt ? encryptBody( body ) : body;
 
             response = webClient.invoke( httpMethod, requestBody );
+
+            // retry on 503 http code >>>
+            int attemptNo = 1;
+            while ( response.getStatus() == HttpStatus.SC_SERVICE_UNAVAILABLE && attemptNo < MAX_ATTEMPTS )
+            {
+                attemptNo++;
+                response = webClient.invoke( httpMethod, requestBody );
+            }
+            // <<< retry on 503 http code
 
             log.info( "response.status: {} - {}", response.getStatus(), response.getStatusInfo().getReasonPhrase() );
 

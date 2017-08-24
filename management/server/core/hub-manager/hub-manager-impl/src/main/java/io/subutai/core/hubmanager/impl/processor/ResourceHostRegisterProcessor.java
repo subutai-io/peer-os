@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.HostRegistrationManager;
@@ -26,14 +26,14 @@ public class ResourceHostRegisterProcessor implements StateLinkProcessor
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostRegisterProcessor.class.getName() );
 
     private HostRegistrationManager registrationManager;
-    private HubRestClient restClient;
+    private RestClient restClient;
     private PeerManager peerManager;
 
     private static final Pattern RH_DATA_PATTERN = Pattern.compile( "/rest/v1/peers/.*/requested-hosts/.*" );
 
 
     public ResourceHostRegisterProcessor( final HostRegistrationManager registrationManager,
-                                          final PeerManager peerManager, final HubRestClient restClient )
+                                          final PeerManager peerManager, final RestClient restClient )
     {
         this.registrationManager = registrationManager;
         this.peerManager = peerManager;
@@ -107,7 +107,7 @@ public class ResourceHostRegisterProcessor implements StateLinkProcessor
     }
 
 
-    public void updateResourceHostData( ResourceHostDataDto resourceHostDataDto )
+    private void updateResourceHostData( ResourceHostDataDto resourceHostDataDto )
     {
 
         String path = format( "/rest/v1/peers/%s/requested-hosts/%s", peerManager.getLocalPeer().getId(),
@@ -121,7 +121,7 @@ public class ResourceHostRegisterProcessor implements StateLinkProcessor
     }
 
 
-    public void deleteResourceHostData( ResourceHostDataDto resourceHostDataDto )
+    private void deleteResourceHostData( ResourceHostDataDto resourceHostDataDto )
     {
 
         String path = format( "/rest/v1/peers/%s/requested-hosts/%s", peerManager.getLocalPeer().getId(),

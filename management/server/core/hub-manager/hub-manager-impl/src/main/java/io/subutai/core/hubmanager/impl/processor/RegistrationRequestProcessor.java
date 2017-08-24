@@ -7,10 +7,10 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.HubRequester;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -29,7 +29,7 @@ public class RegistrationRequestProcessor extends HubRequester
 
     public RegistrationRequestProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
                                          final HostRegistrationManager registrationManager,
-                                         final HubRestClient restClient )
+                                         final RestClient restClient )
     {
         super( hubManager, restClient );
 

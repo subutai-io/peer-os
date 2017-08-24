@@ -10,18 +10,16 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.sun.org.apache.regexp.internal.RE;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.Protocol;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
-import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.domain.P2PInfoDto;
 import io.subutai.hub.share.dto.domain.PortMapDto;
@@ -34,21 +32,14 @@ public class ProxyProcessor implements StateLinkProcessor
 
     private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
 
-    private ConfigManager configManager;
 
     private PeerManager peerManager;
 
-    private HubRestClient restClient;
+    private RestClient restClient;
 
 
-    public ProxyProcessor()
+    public ProxyProcessor( PeerManager peerManager, RestClient restClient )
     {
-    }
-
-
-    public ProxyProcessor( ConfigManager configManager, PeerManager peerManager, HubRestClient restClient )
-    {
-        this.configManager = configManager;
         this.peerManager = peerManager;
         this.restClient = restClient;
     }
@@ -101,7 +92,7 @@ public class ProxyProcessor implements StateLinkProcessor
                         p2PInfoDto.setState( P2PInfoDto.State.READY );
                         break;
                     case DESTROY:
-                       isPortCleaned =  destroy( proxyDto, p2PInfoDto, isPortCleaned );
+                        isPortCleaned = destroy( proxyDto, p2PInfoDto, isPortCleaned );
                         break;
                     default:
                         wrongState( proxyDto );
@@ -135,7 +126,7 @@ public class ProxyProcessor implements StateLinkProcessor
             }
 
 
-            destroyTunnel( resourceHost, p2PInfoDto, proxyDto );
+            destroyTunnel( resourceHost, proxyDto );
 
             if ( !isPortCleaned )
             {
@@ -148,7 +139,7 @@ public class ProxyProcessor implements StateLinkProcessor
             log.error( e.getMessage() );
         }
 
-        return  isPortCleaned;
+        return isPortCleaned;
     }
 
 
@@ -158,7 +149,7 @@ public class ProxyProcessor implements StateLinkProcessor
     }
 
 
-    private void destroyTunnel( ResourceHost resourceHost, P2PInfoDto p2PInfoDto, ProxyDto proxyDto )
+    private void destroyTunnel( ResourceHost resourceHost, ProxyDto proxyDto )
     {
         try
         {
@@ -314,7 +305,7 @@ public class ProxyProcessor implements StateLinkProcessor
                 ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( p2PInfoDto.getRhId() );
 
                 resourceHost.joinP2PSwarm( p2PInfoDto.getP2pIp(), p2PInfoDto.getIntefaceName(), proxyDto.getP2pHash(),
-                        proxyDto.getP2SecretKey(), proxyDto.getP2pSecretTTL().longValue() );
+                        proxyDto.getP2SecretKey(), proxyDto.getP2pSecretTTL() );
 
                 p2PInfoDto.setState( P2PInfoDto.State.READY );
             }
