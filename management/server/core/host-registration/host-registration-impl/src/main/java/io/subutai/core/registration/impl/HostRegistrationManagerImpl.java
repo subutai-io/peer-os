@@ -24,6 +24,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
@@ -228,10 +229,14 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
             {
                 LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
 
-                localPeer.removeResourceHost( requestedHost.getId() );
-
                 requestDataService.remove( requestedHost.getId() );
+
+                localPeer.removeResourceHost( requestedHost.getId() );
             }
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.warn( "Resource host {} not found in registered hosts", requestId );
         }
         catch ( Exception e )
         {
