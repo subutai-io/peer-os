@@ -142,7 +142,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
         } ).error( function (error) {
             ngDialog.closeAll();
             LOADING_SCREEN('none');
-            SweetAlert.swal ("ERROR!", error.ERROR: 'Invalid hostname', "error");
+            SweetAlert.swal ("ERROR!", error.ERROR, "error");
         } );
     }
 
