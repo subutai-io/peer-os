@@ -75,23 +75,22 @@ public class RestServiceImpl implements RestService
                 ExecutorService taskExecutor =
                         Executors.newFixedThreadPool( Math.min( Common.MAX_EXECUTOR_SIZE, registrationDatas.size() ) );
 
-                List<CompletableFuture> futures = registrationDatas.stream().map( d -> CompletableFuture.runAsync( () ->
-                {
+                List<CompletableFuture> futures =
+                        registrationDatas.stream().map( d -> CompletableFuture.runAsync( () -> {
 
-                    if ( d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED )
-                    {
-                        try
-                        {
-                            d.setState(
-                                    peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() ).isOnline() ?
-                                    PeerDto.State.ONLINE : PeerDto.State.OFFLINE );
-                        }
-                        catch ( PeerException e )
-                        {
-                            LOGGER.error( "Exceptions getting peer status", e );
-                        }
-                    }
-                }, taskExecutor ) ).collect( Collectors.toList() );
+                            if ( d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED )
+                            {
+                                try
+                                {
+                                    d.setState( peerManager.getPeer( d.getRegistrationData().getPeerInfo().getId() )
+                                                           .isOnline() ? PeerDto.State.ONLINE : PeerDto.State.OFFLINE );
+                                }
+                                catch ( PeerException e )
+                                {
+                                    LOGGER.error( "Exceptions getting peer status", e );
+                                }
+                            }
+                        }, taskExecutor ) ).collect( Collectors.toList() );
 
                 CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
             }
@@ -292,7 +291,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( e.getMessage() ) ).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
 
         return Response.ok().build();
