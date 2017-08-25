@@ -843,7 +843,7 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    @RolesAllowed( "Tenant-Management|Read" )
+    @PermitAll
     public boolean rhHasEnvironments( final String rhId )
     {
         return environmentManager.rhHasEnvironments( rhId );
