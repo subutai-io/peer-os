@@ -30,6 +30,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
@@ -221,6 +222,13 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     @Override
     public void removeRequest( final String requestId ) throws HostRegistrationException
     {
+        EnvironmentManager environmentManager = serviceLocator.getService( EnvironmentManager.class );
+
+        if ( environmentManager.rhHasEnvironments( requestId ) )
+        {
+            throw new HostRegistrationException( "There are environments on this host" );
+        }
+
         try
         {
             RequestedHost requestedHost = requestDataService.find( requestId );
