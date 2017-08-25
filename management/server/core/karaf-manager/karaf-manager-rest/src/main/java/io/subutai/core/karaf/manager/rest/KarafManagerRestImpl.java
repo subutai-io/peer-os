@@ -36,7 +36,7 @@ public class KarafManagerRestImpl implements KarafManagerRest
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage() );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
 
         return Response.ok( output ).build();
