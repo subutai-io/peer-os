@@ -91,6 +91,7 @@ public class HubManagerImpl implements HubManager, HostListener
     private static final long TIME_15_MINUTES = 900;
 
     private static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
+    private static final int CONTAINER_METRIC_SEND_INTERVAL_MIN = 15;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -260,10 +261,11 @@ public class HubManagerImpl implements HubManager, HostListener
 
         //***********
         final ContainerMetricsProcessor containersMetricsProcessor =
-                new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService );
-//        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 1, 5, TimeUnit.MINUTES );
-        //TODO set proper interval after tests
-        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 1, 10, TimeUnit.SECONDS );
+                new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService,
+                        CONTAINER_METRIC_SEND_INTERVAL_MIN );
+        containersMetricsExecutorService
+                .scheduleWithFixedDelay( containersMetricsProcessor, 1, CONTAINER_METRIC_SEND_INTERVAL_MIN,
+                        TimeUnit.MINUTES );
     }
 
 

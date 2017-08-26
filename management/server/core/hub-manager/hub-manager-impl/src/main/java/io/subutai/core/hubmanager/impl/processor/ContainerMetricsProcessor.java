@@ -28,7 +28,6 @@ import io.subutai.hub.share.dto.metrics.ContainersMetricsDto;
 import static java.lang.String.format;
 
 
-//TODO add job to cleanup old (N days) metrics to avoid db overflow
 public class ContainerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -39,9 +38,12 @@ public class ContainerMetricsProcessor extends HubRequester
 
     private ContainerMetricsService containerMetricsService;
 
+    private int scanIntervalMinutes;
+
 
     public ContainerMetricsProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
-                                      RestClient restClient, ContainerMetricsService containerMetricsService )
+                                      RestClient restClient, ContainerMetricsService containerMetricsService,
+                                      int scanIntervalMinutes )
     {
         super( hubManager, restClient );
 
@@ -50,6 +52,8 @@ public class ContainerMetricsProcessor extends HubRequester
         this.monitor = monitor;
 
         this.containerMetricsService = containerMetricsService;
+
+        this.scanIntervalMinutes = scanIntervalMinutes;
     }
 
 
@@ -66,7 +70,8 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         Calendar cal = Calendar.getInstance();
         Date endTime = cal.getTime();
-        cal.add( Calendar.HOUR, -1 );
+        //add 1 minute just in case not to loose some metrics in between, Hub side should handle duplicate metrics
+        cal.add( Calendar.MINUTE, -( scanIntervalMinutes + 1 ) );
         Date startTime = cal.getTime();
 
         ContainersMetricsDto containersMetricsDto = new ContainersMetricsDto( localPeer.getId() );
@@ -171,14 +176,15 @@ public class ContainerMetricsProcessor extends HubRequester
             {
                 if ( restResult.isSuccess() )
                 {
+                    //remove the ones that are already in DB
                     if ( metricsDto.getDbId() != null )
                     {
-                        // TODO uncomment: containerMetricsService.removeMetrics( metricsDto.getDbId() );
-                        log.debug( "REMOVING SENT METRIC {}", metricsDto.getDbId() );
+                        containerMetricsService.removeMetrics( metricsDto.getDbId() );
                     }
                 }
                 else if ( metricsDto.getDbId() == null )
                 {
+                    //save the ones that are new
                     ContainerMetrics containerMetrics = new ContainerMetricsEntity();
 
                     containerMetrics.setHostId( metricsDto.getHostId() );
@@ -190,8 +196,7 @@ public class ContainerMetricsProcessor extends HubRequester
                     containerMetrics.setMemory( metricsDto.getMemory() );
                     containerMetrics.setNet( metricsDto.getNet() );
 
-                    // TODO uncomment:  containerMetricsService.save( containerMetrics );
-                    log.debug( "SAVING UNSENT METRIC {}", metricsDto );
+                    containerMetricsService.save( containerMetrics );
                 }
             }
 
