@@ -155,10 +155,12 @@ public class HistoricalMetrics
         CpuDto cpuDto = new CpuDto();
         cpuDto.setSystem( SeriesHelper.getAvg( series, new Tag( "type", "system" ) ) );
         cpuDto.setUser( SeriesHelper.getAvg( series, new Tag( "type", "user" ) ) );
-        cpuDto.setIdle( SeriesHelper.getAvg( series, new Tag( "type", "idle" ) ) );
-        cpuDto.setIowait( SeriesHelper.getAvg( series, new Tag( "type", "iowait" ) ) );
-        cpuDto.setNice( SeriesHelper.getAvg( series, new Tag( "type", "nice" ) ) );
-
+        if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
+        {
+            cpuDto.setIdle( SeriesHelper.getAvg( series, new Tag( "type", "idle" ) ) );
+            cpuDto.setIowait( SeriesHelper.getAvg( series, new Tag( "type", "iowait" ) ) );
+            cpuDto.setNice( SeriesHelper.getAvg( series, new Tag( "type", "nice" ) ) );
+        }
         return cpuDto;
     }
 
@@ -167,18 +169,18 @@ public class HistoricalMetrics
     private MemoryDto getMemoryDto( final List<Series> series )
     {
         MemoryDto memoryDto = new MemoryDto();
-        memoryDto.setActive( SeriesHelper.getAvg( series, new Tag( "type", "active" ) ) );
-        memoryDto.setBuffers( SeriesHelper.getAvg( series, new Tag( "type", "buffers" ) ) );
         if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
         {
+            memoryDto.setBuffers( SeriesHelper.getAvg( series, new Tag( "type", "buffers" ) ) );
+            memoryDto.setActive( SeriesHelper.getAvg( series, new Tag( "type", "active" ) ) );
             memoryDto.setCached( SeriesHelper.getAvg( series, new Tag( "type", "cached" ) ) );
+            memoryDto.setMemFree( SeriesHelper.getAvg( series, new Tag( "type", "memfree" ) ) );
         }
         else
         {
             memoryDto.setCached( SeriesHelper.getAvg( series, new Tag( "type", "cache" ) ) );
             memoryDto.setRss( SeriesHelper.getAvg( series, new Tag( "type", "rss" ) ) );
         }
-        memoryDto.setMemFree( SeriesHelper.getAvg( series, new Tag( "type", "memfree" ) ) );
         return memoryDto;
     }
 
@@ -203,7 +205,7 @@ public class HistoricalMetrics
         else
         {
             DiskDto dto = new DiskDto();
-            dto.setTotal( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", "total" ) ) );
+            dto.setUsed( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", "total" ) ) );
             result.put( "total", dto );
         }
 
