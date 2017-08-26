@@ -66,6 +66,21 @@ public class HostMetricsDto
     private Date endTime;
 
 
+    private transient Long dbId = null;
+
+
+    public Long getDbId()
+    {
+        return dbId;
+    }
+
+
+    public void setDbId( final long dbId )
+    {
+        this.dbId = dbId;
+    }
+
+
     public String getHostId()
     {
         return hostId;

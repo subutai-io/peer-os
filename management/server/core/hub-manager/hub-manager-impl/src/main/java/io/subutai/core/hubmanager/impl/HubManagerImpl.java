@@ -50,6 +50,7 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
+import io.subutai.core.hubmanager.impl.dao.ContainerMetricsServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
@@ -117,7 +118,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
 
-    private final ScheduledExecutorService containersMetricsExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService containersMetricsExecutorService =
+            Executors.newSingleThreadScheduledExecutor();
 
     private SecurityManager securityManager;
 
@@ -161,8 +163,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private ContainerMetricsService containerMetricsService;
 
-    private ContainerMetricsProcessor containersMetricsProcessor;
-
 
     public HubManagerImpl( DaoManager daoManager )
     {
@@ -175,6 +175,8 @@ public class HubManagerImpl implements HubManager, HostListener
         try
         {
             localPeer = peerManager.getLocalPeer();
+
+            containerMetricsService = new ContainerMetricsServiceImpl( daoManager );
 
             configDataService = new ConfigDataServiceImpl( daoManager );
 
@@ -257,11 +259,11 @@ public class HubManagerImpl implements HubManager, HostListener
         environmentTelemetryService.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
 
         //***********
-        containersMetricsProcessor = new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService );
-//        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 30, 3600, TimeUnit.SECONDS );
-        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 30, 100, TimeUnit.SECONDS );
-
-
+        final ContainerMetricsProcessor containersMetricsProcessor =
+                new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService );
+//        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 1, 5, TimeUnit.MINUTES );
+        //TODO set proper interval after tests
+        containersMetricsExecutorService.scheduleWithFixedDelay( containersMetricsProcessor, 1, 10, TimeUnit.SECONDS );
     }
 
 
