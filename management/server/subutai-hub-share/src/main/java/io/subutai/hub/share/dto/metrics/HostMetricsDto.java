@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -65,7 +66,7 @@ public class HostMetricsDto
     @JsonProperty( "endTime" )
     private Date endTime;
 
-
+    @JsonIgnore
     private transient Long dbId = null;
 
 
