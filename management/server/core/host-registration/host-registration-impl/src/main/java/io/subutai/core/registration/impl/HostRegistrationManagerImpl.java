@@ -24,11 +24,13 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
@@ -220,6 +222,13 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     @Override
     public void removeRequest( final String requestId ) throws HostRegistrationException
     {
+        EnvironmentManager environmentManager = serviceLocator.getService( EnvironmentManager.class );
+
+        if ( environmentManager.rhHasEnvironments( requestId ) )
+        {
+            throw new HostRegistrationException( "There are environments on this host" );
+        }
+
         try
         {
             RequestedHost requestedHost = requestDataService.find( requestId );
@@ -228,10 +237,14 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
             {
                 LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
 
-                localPeer.removeResourceHost( requestedHost.getId() );
-
                 requestDataService.remove( requestedHost.getId() );
+
+                localPeer.removeResourceHost( requestedHost.getId() );
             }
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.warn( "Resource host {} not found in registered hosts", requestId );
         }
         catch ( Exception e )
         {

@@ -1313,8 +1313,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
 
-        ResourceHost resourceHost = getResourceHostById( rhId );
-
         //remove rh ssl cert
         securityManager.getKeyStoreManager().removeCertFromTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT, rhId );
 
@@ -1325,6 +1323,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         keyManager.removeKeyData( rhId );
 
+        //remove rh from db
+        resourceHostDataService.remove( rhId );
+
+        //remove from host registry cache
+        hostRegistry.removeResourceHost( rhId);
+
+        ResourceHost resourceHost = getResourceHostById( rhId );
+
         //remove rh containers' keys
         for ( final ContainerHost containerHost : resourceHost.getContainerHosts() )
         {
@@ -1333,12 +1339,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         //remove rh from local cache
         resourceHosts.remove( resourceHost );
-
-        //remove rh from db
-        resourceHostDataService.remove( resourceHost.getId() );
-
-        //remove from host registry cache
-        hostRegistry.removeResourceHost( resourceHost.getId() );
     }
 
 

@@ -37,8 +37,7 @@ public interface EnvironmentManager
     String getEnvironmentOwnerName( Environment environment );
 
     /**
-     * Returns a set of DTO objects of all local environments
-     * Used by users with Tenant-Management role
+     * Returns a set of DTO objects of all local environments Used by users with Tenant-Management role
      */
     Set<EnvironmentDto> getTenantEnvironments();
 
@@ -297,4 +296,11 @@ public interface EnvironmentManager
      */
     String createTemplate( String environmentId, String containerId, String templateName, boolean privateTemplate )
             throws PeerException, EnvironmentNotFoundException;
+
+    /**
+     * Returns true, if resource host has environment containers, false otherwise
+     *
+     * @param rhId id of RH
+     */
+    boolean rhHasEnvironments( String rhId );
 }

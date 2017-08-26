@@ -131,7 +131,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( "Error on execute command #executeCommand", e );
 
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.serverError().entity( JsonUtil.toJson( "ERROR", e.getMessage() ) ).build();
         }
     }
 }

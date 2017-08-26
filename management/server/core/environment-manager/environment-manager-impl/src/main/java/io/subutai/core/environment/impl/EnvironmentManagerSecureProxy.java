@@ -843,6 +843,14 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
+    @PermitAll
+    public boolean rhHasEnvironments( final String rhId )
+    {
+        return environmentManager.rhHasEnvironments( rhId );
+    }
+
+
+    @Override
     public String getEnvironmentOwnerName( final Environment environment )
     {
         return environmentManager.getEnvironmentOwnerName( environment );
