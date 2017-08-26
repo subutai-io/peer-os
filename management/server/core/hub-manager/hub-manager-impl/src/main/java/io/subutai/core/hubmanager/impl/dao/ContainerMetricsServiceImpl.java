@@ -42,4 +42,11 @@ public class ContainerMetricsServiceImpl implements ContainerMetricsService
     {
         containerMetricsDAO.remove( id );
     }
+
+
+    @Override
+    public void purgeOldMetrics()
+    {
+        containerMetricsDAO.purgeOldMetrics();
+    }
 }

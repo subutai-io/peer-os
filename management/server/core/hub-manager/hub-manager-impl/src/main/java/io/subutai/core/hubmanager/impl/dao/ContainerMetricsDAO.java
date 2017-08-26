@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.impl.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +105,36 @@ class ContainerMetricsDAO
 
             ContainerMetrics item = em.find( ContainerMetrics.class, id );
             em.remove( item );
+
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+
+            LOG.error( e.getMessage() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    public void purgeOldMetrics()
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+
+            long ts = System.currentTimeMillis();
+
+            Query query = em.createQuery(
+                    "delete from ContainerMetricsEntity e where e.createDate + 3600 * 1000 * 24 * :days < :ts1" )
+                            .setParameter( "days", ContainerMetrics.METRIC_TTL_DAYS ).setParameter( "ts1", ts );
+
+            query.executeUpdate();
 
             daoManager.commitTransaction( em );
         }

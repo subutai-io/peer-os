@@ -1,7 +1,6 @@
 package io.subutai.core.hubmanager.api.model;
 
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
@@ -13,55 +12,41 @@ import io.subutai.hub.share.dto.metrics.NetDto;
 
 public interface ContainerMetrics
 {
+    int METRIC_TTL_DAYS = 30;
+
     long getId();
 
     void setId( long id );
 
-    public String getHostId();
+    String getHostId();
 
-    public void setHostId( final String hostId );
+    void setHostId( final String hostId );
 
-    public String getHostName();
+    String getHostName();
 
-    public void setHostName( final String hostName );
+    void setHostName( final String hostName );
 
-    public String getMemory();
+    MemoryDto getMemoryDto();
 
-    public MemoryDto getMemoryDto();
+    void setMemory( final MemoryDto memory );
 
-    public void setMemory( final String memory );
+    CpuDto getCpuDto();
 
-    public void setMemory( final MemoryDto memory );
+    void setCpu( final CpuDto cpu );
 
-    public String getCpu();
+    Map<String, NetDto> getNetDto();
 
-    public CpuDto getCpuDto();
+    void setNet( final Map<String, NetDto> net );
 
-    public void setCpu( final String cpu );
+    Map<String, DiskDto> getDiskDto();
 
-    public void setCpu( final CpuDto cpu );
+    void setDisk( final Map<String, DiskDto> disk );
 
-    public String getNet();
+    Date getStartTime();
 
-    public Map<String, NetDto> getNetDto();
+    void setStartTime( final Date startTime );
 
-    public void setNet( final String net );
+    Date getEndTime();
 
-    public void setNet( final Map<String, NetDto> net );
-
-    public String getDisk();
-
-    public Map<String, DiskDto> getDiskDto();
-
-    public void setDisk( final String disk );
-
-    public void setDisk( final Map<String, DiskDto> disk );
-
-    public Date getStartTime();
-
-    public void setStartTime( final Date startTime );
-
-    public Date getEndTime();
-
-    public void setEndTime( final Date endTime );
+    void setEndTime( final Date endTime );
 }

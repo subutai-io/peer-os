@@ -12,6 +12,7 @@ import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
@@ -27,6 +28,7 @@ import io.subutai.hub.share.dto.metrics.ContainersMetricsDto;
 import static java.lang.String.format;
 
 
+//TODO add job to cleanup old (N days) metrics to avoid db overflow
 public class ContainerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -56,6 +58,7 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         processUnsentMetrics();
         processRealTimeMetrics();
+        purgeOldMetrics();
     }
 
 
@@ -87,26 +90,28 @@ public class ContainerMetricsProcessor extends HubRequester
     private void populateRealTimeContainerMetrics( ContainersMetricsDto containersMetricsDto, ResourceHost resourceHost,
                                                    Date startTime, Date endTime )
     {
-
         for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
         {
-            try
+            if ( Common.HUB_ID.equals( containerHost.getInitiatorPeerId() ) )
             {
-                HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
-                HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
+                try
+                {
+                    HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
+                    HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
 
-                hostMetricsDto.setType( HostMetricsDto.HostType.CONTAINER_HOST );
-                hostMetricsDto.setHostId( containerHost.getId() );
-                //set container name instead of hostname since it is unchangeable unlike hostname
-                hostMetricsDto.setHostName( containerHost.getContainerName() );
-                hostMetricsDto.setStartTime( startTime );
-                hostMetricsDto.setEndTime( endTime );
+                    hostMetricsDto.setType( HostMetricsDto.HostType.CONTAINER_HOST );
+                    hostMetricsDto.setHostId( containerHost.getId() );
+                    //set container name instead of hostname since it is unchangeable unlike hostname
+                    hostMetricsDto.setHostName( containerHost.getContainerName() );
+                    hostMetricsDto.setStartTime( startTime );
+                    hostMetricsDto.setEndTime( endTime );
 
-                containersMetricsDto.getContainerHostMetricsDto().add( hostMetricsDto );
-            }
-            catch ( Exception e )
-            {
-                log.error( "Failed to obtain metrics of container {}: {}", containerHost.getId(), e.getMessage() );
+                    containersMetricsDto.getContainerHostMetricsDto().add( hostMetricsDto );
+                }
+                catch ( Exception e )
+                {
+                    log.error( "Failed to obtain metrics of container {}: {}", containerHost.getId(), e.getMessage() );
+                }
             }
         }
     }
@@ -168,7 +173,7 @@ public class ContainerMetricsProcessor extends HubRequester
                 {
                     if ( metricsDto.getDbId() != null )
                     {
-                        //containerMetricsService.removeMetrics( metricsDto.getDbId() );
+                        // TODO uncomment: containerMetricsService.removeMetrics( metricsDto.getDbId() );
                         log.debug( "REMOVING SENT METRIC {}", metricsDto.getDbId() );
                     }
                 }
@@ -185,7 +190,7 @@ public class ContainerMetricsProcessor extends HubRequester
                     containerMetrics.setMemory( metricsDto.getMemory() );
                     containerMetrics.setNet( metricsDto.getNet() );
 
-//                    containerMetricsService.save( containerMetrics );
+                    // TODO uncomment:  containerMetricsService.save( containerMetrics );
                     log.debug( "SAVING UNSENT METRIC {}", metricsDto );
                 }
             }
@@ -199,6 +204,19 @@ public class ContainerMetricsProcessor extends HubRequester
         catch ( Exception e )
         {
             log.error( "Error sending container metrics: {}", e.getMessage() );
+        }
+    }
+
+
+    private void purgeOldMetrics()
+    {
+        try
+        {
+            containerMetricsService.purgeOldMetrics();
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error purging old metrics: {}", e.getMessage() );
         }
     }
 }

@@ -61,6 +61,15 @@ public class ContainerMetricsEntity implements ContainerMetrics
     @Column( name = "end_time" )
     private Date endTime = null;
 
+    @Column( name = "create_date" )
+    private Long createDate;
+
+
+    public ContainerMetricsEntity()
+    {
+        createDate = System.currentTimeMillis();
+    }
+
 
     @Override
     public long getId()
@@ -99,23 +108,11 @@ public class ContainerMetricsEntity implements ContainerMetrics
     }
 
 
-    public String getMemory()
-    {
-        return memory;
-    }
-
-
     @Override
     public MemoryDto getMemoryDto()
     {
         Gson gson = new Gson();
         return gson.fromJson( this.memory, MemoryDto.class );
-    }
-
-
-    public void setMemory( final String memory )
-    {
-        this.memory = memory;
     }
 
 
@@ -127,23 +124,11 @@ public class ContainerMetricsEntity implements ContainerMetrics
     }
 
 
-    public String getCpu()
-    {
-        return cpu;
-    }
-
-
     @Override
     public CpuDto getCpuDto()
     {
         Gson gson = new Gson();
         return gson.fromJson( this.cpu, CpuDto.class );
-    }
-
-
-    public void setCpu( final String cpu )
-    {
-        this.cpu = cpu;
     }
 
 
@@ -155,24 +140,14 @@ public class ContainerMetricsEntity implements ContainerMetrics
     }
 
 
-    public String getNet()
-    {
-        return net;
-    }
-
-
     @Override
     public Map<String, NetDto> getNetDto()
     {
         Gson gson = new Gson();
-        Type typeOfHashMap = new TypeToken<Map<String, NetDto>>(){}.getType();
+        Type typeOfHashMap = new TypeToken<Map<String, NetDto>>()
+        {
+        }.getType();
         return gson.fromJson( this.net, typeOfHashMap );
-    }
-
-
-    public void setNet( final String net )
-    {
-        this.net = net;
     }
 
 
@@ -184,24 +159,14 @@ public class ContainerMetricsEntity implements ContainerMetrics
     }
 
 
-    public String getDisk()
-    {
-        return disk;
-    }
-
-
     @Override
     public Map<String, DiskDto> getDiskDto()
     {
         Gson gson = new Gson();
-        Type typeOfHashMap = new TypeToken<Map<String, DiskDto>>(){}.getType();
+        Type typeOfHashMap = new TypeToken<Map<String, DiskDto>>()
+        {
+        }.getType();
         return gson.fromJson( this.disk, typeOfHashMap );
-    }
-
-
-    public void setDisk( final String disk )
-    {
-        this.disk = disk;
     }
 
 

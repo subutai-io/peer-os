@@ -14,4 +14,6 @@ public interface ContainerMetricsService
     void save( ContainerMetrics item );
 
     void removeMetrics( long id );
+
+    void purgeOldMetrics();
 }
