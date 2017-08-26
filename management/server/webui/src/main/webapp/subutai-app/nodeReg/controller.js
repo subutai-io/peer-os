@@ -70,7 +70,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 			getNodes();
 		}).error(function(error){
 			LOADING_SCREEN('none');
-			SweetAlert.swal("ERROR!", error, "error");
+			SweetAlert.swal("ERROR!", error.ERROR, "error");
 		});
 	}
 
@@ -88,7 +88,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 			getNodes();
 		}).error(function(error){
 			LOADING_SCREEN('none');
-			SweetAlert.swal("ERROR!", error, "error");
+			SweetAlert.swal("ERROR!", error.ERROR, "error");
 		});
 	}
 
@@ -107,7 +107,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
                 getNodes();
             }).error(function(error){
                 LOADING_SCREEN('none');
-                SweetAlert.swal("ERROR!", "Oops. Please, try again later", "error");
+                SweetAlert.swal("ERROR!", error.ERROR, "error");
             });
 		}else if(status == 'REJECTED'){
             nodeRegSrv.unblockReq( nodeId ).success(function (data) {
@@ -120,7 +120,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
                 getNodes();
             }).error(function(error){
                 LOADING_SCREEN('none');
-                SweetAlert.swal("ERROR!", error, "error");
+                SweetAlert.swal("ERROR!", error.ERROR, "error");
             });
 		}
 	}
@@ -142,7 +142,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
         } ).error( function (error) {
             ngDialog.closeAll();
             LOADING_SCREEN('none');
-            SweetAlert.swal ("ERROR!", $.trim(error) ? error: 'Invalid hostname', "error");
+            SweetAlert.swal ("ERROR!", error.ERROR, "error");
         } );
     }
 

@@ -27,6 +27,8 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -2588,6 +2590,25 @@ public class EnvironmentManagerImpl
         setTransientFields( environments );
 
         return environments;
+    }
+
+
+    public boolean rhHasEnvironments( String rhId )
+    {
+        Preconditions.checkArgument( !StringUtils.isBlank( rhId ) );
+
+        for ( EnvironmentDto environment : getTenantEnvironments() )
+        {
+            for ( ContainerDto container : environment.getContainers() )
+            {
+                if ( rhId.equalsIgnoreCase( container.getRhId() ) )
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 

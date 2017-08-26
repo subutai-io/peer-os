@@ -71,7 +71,7 @@ public interface RestService
 
     @POST
     @Path( "update_management" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response update();
 
     @GET

@@ -20,6 +20,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.exception.HostRegistrationException;
@@ -85,6 +86,8 @@ public class HostRegistrationManagerImplTest
     KeyStoreManager keyStoreManager;
     @Mock
     HttpContextManager httpContextManager;
+    @Mock
+    EnvironmentManager environmentManager;
 
     private static final String REQUEST_ID = UUID.randomUUID().toString();
 
@@ -112,6 +115,7 @@ public class HostRegistrationManagerImplTest
         when( securityManager.getEncryptionTool() ).thenReturn( encryptionTool );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
         doReturn( localPeer ).when( serviceLocator ).getService( LocalPeer.class );
+        doReturn( environmentManager ).when( serviceLocator ).getService( EnvironmentManager.class );
         doReturn( keyStoreManager ).when( securityManager ).getKeyStoreManager();
         doReturn( httpContextManager ).when( securityManager ).getHttpContextManager();
     }

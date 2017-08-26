@@ -66,6 +66,6 @@ public interface RestService
 
     @GET
     @Path( "check" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response checkPeer( @FormParam( "ip" ) String ip );
 }

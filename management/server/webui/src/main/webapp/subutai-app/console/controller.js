@@ -173,7 +173,7 @@ function ConsoleViewCtrl($scope, consoleService, $stateParams, ngDialog, cfpLoad
 					{ output: true, text: output, breakLine: true }
 				);
 			}).error(function (data) {
-				$scope.session.output.push({ output: true, breakLine: true, text: [data] });
+				$scope.session.output.push({ output: true, breakLine: true, text: [data.ERROR] });
 			});
 
 		} catch (err) {

@@ -26,6 +26,7 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 public class RegistrationRestServiceImpl implements RegistrationRestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );
+    private static final String ERROR_KEY = "ERROR";
     private SecurityManager securityManager;
     private HostRegistrationManager registrationManager;
     private LocalPeer localPeer;
@@ -64,7 +65,8 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         {
             LOGGER.error( "Error registering public key: {}", e.getMessage() );
 
-            return Response.serverError().build();
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 
@@ -82,7 +84,9 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         catch ( Exception e )
         {
             LOGGER.error( "Error changing RH hostname", e );
-            return Response.serverError().entity( e.getMessage() ).build();
+
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 
@@ -99,7 +103,9 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         catch ( Exception e )
         {
             LOGGER.error( "Error approving registration request", e );
-            return Response.serverError().entity( e.getMessage() ).build();
+
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 
@@ -115,7 +121,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         }
         catch ( Exception e )
         {
-            return Response.serverError().entity( e.getMessage() ).build();
+            LOGGER.error( "Error rejecting registration request", e );
+
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 
@@ -131,7 +140,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         }
         catch ( Exception e )
         {
-            return Response.serverError().entity( e.getMessage() ).build();
+            LOGGER.error( "Error removing registration request", e );
+
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 
@@ -147,7 +159,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         }
         catch ( Exception e )
         {
-            return Response.serverError().entity( e.getMessage() ).build();
+            LOGGER.error( "Error unblocking registration request", e );
+
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 
@@ -178,7 +193,9 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         catch ( Exception e )
         {
             LOGGER.error( "Error verifying container token", e );
-            return Response.serverError().build();
+
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 
@@ -226,7 +243,8 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         {
             LOGGER.warn( "Error in getRegistrationRequests {}", e.getMessage() );
 
-            return Response.serverError().entity( e.getMessage() ).build();
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 }
