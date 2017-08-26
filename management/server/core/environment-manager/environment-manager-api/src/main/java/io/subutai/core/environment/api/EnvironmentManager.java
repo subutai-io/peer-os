@@ -298,7 +298,7 @@ public interface EnvironmentManager
             throws PeerException, EnvironmentNotFoundException;
 
     /**
-     * Returns true, if resource host has environments containers, false otherwise
+     * Returns true, if resource host has environment containers, false otherwise
      *
      * @param rhId id of RH
      */
