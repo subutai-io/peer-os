@@ -116,6 +116,6 @@ public class MemoryDto
     public String toString()
     {
         return "MemoryDto{" + "total=" + total + ", available=" + available + ", active=" + active + ", cached="
-                + cached + ", memFree=" + memFree + ", buffers=" + buffers + ", buffers=" + rss + '}';
+                + cached + ", memFree=" + memFree + ", buffers=" + buffers + ", rss=" + rss + '}';
     }
 }
