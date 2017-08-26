@@ -4,7 +4,7 @@ package io.subutai.common.metric;
 import java.util.List;
 
 
-public class SeriesHelper
+class SeriesHelper
 {
 
     private SeriesHelper()
@@ -13,7 +13,7 @@ public class SeriesHelper
     }
 
 
-    public static double getAvg( final List<Series> series, final Tag... tags )
+    static double getAvg( final List<Series> series, final Tag... tags )
     {
         double result = 0;
 
@@ -45,7 +45,7 @@ public class SeriesHelper
     }
 
 
-    public static Double getLast( final List<Series> series, final Tag... tags )
+    static Double getLast( final List<Series> series, final Tag... tags )
     {
         Double result = null;
 

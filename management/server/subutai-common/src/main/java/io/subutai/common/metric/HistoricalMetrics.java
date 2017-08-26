@@ -89,7 +89,7 @@ public class HistoricalMetrics
 
 
     @JsonIgnore
-    public HostMetricsDto.HostType getHostType()
+    HostMetricsDto.HostType getHostType()
     {
         HostMetricsDto.HostType result = HostMetricsDto.HostType.UNKNOWN;
         if ( metrics != null && !metrics.isEmpty() && ( metrics.get( 0 ).getSeries() != null ) && !( metrics.get( 0 )
@@ -118,7 +118,7 @@ public class HistoricalMetrics
 
 
     @JsonIgnore
-    public List<Series> getSeriesByType( final SeriesBatch.SeriesType type )
+    List<Series> getSeriesByType( final SeriesBatch.SeriesType type )
     {
         if ( type == null )
         {
@@ -140,7 +140,7 @@ public class HistoricalMetrics
     }
 
 
-    protected void splitSeries()
+    private void splitSeries()
     {
         for ( SeriesBatch.SeriesType type : SeriesBatch.SeriesType.values() )
         {
@@ -169,7 +169,15 @@ public class HistoricalMetrics
         MemoryDto memoryDto = new MemoryDto();
         memoryDto.setActive( SeriesHelper.getAvg( series, new Tag( "type", "active" ) ) );
         memoryDto.setBuffers( SeriesHelper.getAvg( series, new Tag( "type", "buffers" ) ) );
-        memoryDto.setCached( SeriesHelper.getAvg( series, new Tag( "type", "cached" ) ) );
+        if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
+        {
+            memoryDto.setCached( SeriesHelper.getAvg( series, new Tag( "type", "cached" ) ) );
+        }
+        else
+        {
+            memoryDto.setCached( SeriesHelper.getAvg( series, new Tag( "type", "cache" ) ) );
+            memoryDto.setRss( SeriesHelper.getAvg( series, new Tag( "type", "rss" ) ) );
+        }
         memoryDto.setMemFree( SeriesHelper.getAvg( series, new Tag( "type", "memfree" ) ) );
         return memoryDto;
     }
@@ -180,14 +188,23 @@ public class HistoricalMetrics
     {
         Map<String, DiskDto> result = new HashMap<>();
 
-        for ( String mount : HostMetricsDto.RESOURCE_HOST_PARTITIONS )
+        if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
+        {
+            for ( String mount : HostMetricsDto.RESOURCE_HOST_PARTITIONS )
+            {
+                DiskDto dto = new DiskDto();
+                dto.setAvailable(
+                        SeriesHelper.getAvg( series, new Tag( "type", "available" ), new Tag( "mount", mount ) ) );
+                dto.setTotal( SeriesHelper.getAvg( series, new Tag( "type", "total" ), new Tag( "mount", mount ) ) );
+                dto.setUsed( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", mount ) ) );
+                result.put( mount, dto );
+            }
+        }
+        else
         {
             DiskDto dto = new DiskDto();
-            dto.setAvailable(
-                    SeriesHelper.getAvg( series, new Tag( "type", "available" ), new Tag( "mount", mount ) ) );
-            dto.setTotal( SeriesHelper.getAvg( series, new Tag( "type", "total" ), new Tag( "mount", mount ) ) );
-            dto.setUsed( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", mount ) ) );
-            result.put( mount, dto );
+            dto.setTotal( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", "total" ) ) );
+            result.put( "total", dto );
         }
 
         return result;
@@ -198,13 +215,25 @@ public class HistoricalMetrics
     private Map<String, NetDto> getNetDto( final List<Series> series )
     {
         Map<String, NetDto> result = new HashMap<>();
-        for ( String iface : HostMetricsDto.RESOURCE_HOST_INTERFACES )
+
+        if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
         {
-            double in = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "in" ) );
-            double out = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "out" ) );
-            NetDto dto = new NetDto( iface, in, out );
-            result.put( iface, dto );
+            for ( String iface : HostMetricsDto.RESOURCE_HOST_INTERFACES )
+            {
+                double in = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "in" ) );
+                double out = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "out" ) );
+                NetDto dto = new NetDto( iface, in, out );
+                result.put( iface, dto );
+            }
         }
+        else
+        {
+            double in = SeriesHelper.getAvg( series, new Tag( "type", "in" ) );
+            double out = SeriesHelper.getAvg( series, new Tag( "type", "out" ) );
+            NetDto dto = new NetDto( "eth0", in, out );
+            result.put( "eth0", dto );
+        }
+
         return result;
     }
 

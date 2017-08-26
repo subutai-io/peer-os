@@ -91,7 +91,7 @@ public class            ExchangeInfoStateHandler extends StateHandler
             UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getSsUserId() );
             return userToken.getFullToken();
         }
-        catch ( HubManagerException | PGPException | IOException e )
+        catch ( Exception e )
         {
             log.error( e.getMessage() );
         }

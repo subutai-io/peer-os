@@ -71,7 +71,7 @@ public class UserTokenProcessor implements StateLinkProcessor
                 ctx.envUserHelper.getUserTokenFromHub( userTokenDto.getSsUserId() );
             }
         }
-        catch ( HubManagerException | PGPException | IOException e )
+        catch ( Exception e )
         {
             log.error( e.getMessage() );
         }
