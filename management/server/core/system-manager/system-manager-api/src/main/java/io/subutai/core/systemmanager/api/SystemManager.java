@@ -27,7 +27,6 @@ public interface SystemManager
 
     AdvancedSettings getAdvancedSettings();
 
-
     SystemInfo getManagementUpdates();
 
     boolean updateManagement();
@@ -35,6 +34,8 @@ public interface SystemManager
     List<UpdateDto> getUpdates();
 
     boolean isUpdateInProgress();
+
+    boolean isEnvironmentWorkflowInProgress();
 
     String getHubIp();
 }

@@ -13,7 +13,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +40,8 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.RestClient;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.dao.ContainerMetricsService;
@@ -84,7 +85,6 @@ import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-// TODO: Replace WebClient with HubRestClient.
 public class HubManagerImpl implements HubManager, HostListener
 {
     private static final long TIME_15_MINUTES = 900;
@@ -149,7 +149,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
-    private HubRestClient restClient;
+    private RestClient restClient;
 
     private LocalPeer localPeer;
 
@@ -218,7 +218,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
         //***********
 
-        containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager, restClient );
+        containerEventProcessor = new ContainerEventProcessor( this, peerManager, restClient );
 
         containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
@@ -267,18 +267,17 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private void initHeartbeatProcessors()
     {
-        StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
+        StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, restClient );
 
         Context ctx = new Context( identityManager, envManager, envUserHelper, localPeer, restClient );
 
         StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
-        StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
+        StateLinkProcessor systemConfProcessor = new SystemConfProcessor( restClient );
 
-        ProductProcessor productProcessor = new ProductProcessor( configManager, this.hubEventListeners );
+        ProductProcessor productProcessor = new ProductProcessor( configManager, this.hubEventListeners, restClient );
 
-        AppScaleProcessor appScaleProcessor =
-                new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
+        AppScaleProcessor appScaleProcessor = new AppScaleProcessor( new AppScaleManager( peerManager ), restClient );
 
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
@@ -289,7 +288,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
-        ProxyProcessor proxyProcessor = new ProxyProcessor( configManager, peerManager, restClient );
+        ProxyProcessor proxyProcessor = new ProxyProcessor( peerManager, restClient );
 
         UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx );
 
@@ -460,36 +459,28 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public String getProducts() throws HubManagerException
     {
-        WebClient client = null;
         try
         {
-            client = configManager
-                    .getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", configManager.getHubIp() );
+            RestResult<String> restResult = restClient.get( "/rest/v1/marketplace/products/public", String.class );
 
-            Response r = client.get();
-
-            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 return null;
             }
 
-            if ( r.getStatus() != HttpStatus.SC_OK )
+            if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( r.readEntity( String.class ) );
+                log.error( restResult.getError() );
                 return null;
             }
 
-            String result = r.readEntity( String.class );
-            ProductsDto productsDto = new ProductsDto( result );
+            ProductsDto productsDto = new ProductsDto( restResult.getEntity() );
+
             return JsonUtil.toJson( productsDto );
         }
         catch ( Exception e )
         {
             throw new HubManagerException( "Could not retrieve product data", e );
-        }
-        finally
-        {
-            RestUtil.close( client );
         }
     }
 
@@ -497,6 +488,7 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void installPlugin( String url, String name, String uid ) throws HubManagerException
     {
+        //Using WebClient directly here b/c we need to close it only after response is processed
         WebClient client = null;
         InputStream initialStream = null;
         try
@@ -511,7 +503,9 @@ public class HubManagerImpl implements HubManager, HostListener
 
             if ( isRegisteredWithHub() )
             {
-                ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
+                //TODO use already existing this.productProcessor
+                ProductProcessor productProcessor =
+                        new ProductProcessor( this.configManager, this.hubEventListeners, this.restClient );
                 PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
                 peerProductDataDto.setProductId( uid );
                 peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
@@ -553,7 +547,9 @@ public class HubManagerImpl implements HubManager, HostListener
 
         if ( isRegisteredWithHub() )
         {
-            ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
+            //TODO use already existing this.productProcessor
+            ProductProcessor productProcessor =
+                    new ProductProcessor( this.configManager, this.hubEventListeners, this.restClient );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
             peerProductDataDto.setProductId( uid );
             peerProductDataDto.setState( PeerProductDataDto.State.REMOVE );
@@ -611,20 +607,17 @@ public class HubManagerImpl implements HubManager, HostListener
     public Map<String, String> getPeerInfo() throws HubManagerException
     {
         Map<String, String> result = new HashMap<>();
-        WebClient client = null;
+
         try
         {
             String path = "/rest/v1/peers/" + configManager.getPeerId();
 
-            client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+            RestResult<PeerDto> restResult = restClient.get( path, PeerDto.class );
 
-            Response r = client.get();
-
-            if ( r.getStatus() == HttpStatus.SC_OK )
+            if ( restResult.getStatus() == HttpStatus.SC_OK )
             {
-                byte[] encryptedContent = configManager.readContent( r );
-                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-                PeerDto dto = JsonUtil.fromCbor( plainContent, PeerDto.class );
+                PeerDto dto = restResult.getEntity();
+
                 result.put( "OwnerId", dto != null ? dto.getOwnerId() : null );
 
                 log.debug( "PeerDto: " + result.toString() );
@@ -634,10 +627,7 @@ public class HubManagerImpl implements HubManager, HostListener
         {
             throw new HubManagerException( "Could not retrieve Peer info", e );
         }
-        finally
-        {
-            RestUtil.close( client );
-        }
+
         return result;
     }
 
@@ -652,33 +642,31 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public String getChecksum()
     {
-        WebClient client = null;
         try
         {
-            client = configManager
-                    .getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/checksum", configManager.getHubIp() );
+            RestResult<String> restResult = restClient.get( "/rest/v1/marketplace/products/checksum", String.class );
 
-            Response r = client.get();
-
-            if ( r.getStatus() != HttpStatus.SC_OK )
+            if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( r.readEntity( String.class ) );
+                log.error( restResult.getError() );
             }
             else
             {
-                return r.readEntity( String.class );
+                return restResult.getEntity();
             }
         }
         catch ( Exception e )
         {
             log.error( "Could not retrieve checksum", e );
         }
-        finally
-        {
-            RestUtil.close( client );
-        }
 
         return null;
+    }
+
+
+    public RestClient getRestClient()
+    {
+        return restClient;
     }
 
 
@@ -687,36 +675,26 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         if ( isRegisteredWithHub() )
         {
-            WebClient client = null;
             try
             {
                 String path = "/rest/v1/system-changes";
-                client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
-                byte[] cborData = JsonUtil.toCbor( dto );
-
-                byte[] encryptedData = configManager.getMessenger().produce( cborData );
+                RestResult<Object> restResult = restClient.post( path, dto, Object.class );
 
                 log.info( "Sending Configuration of SS to Hub..." );
 
-                Response r = client.post( encryptedData );
-
-                if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+                if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
                 {
                     log.info( "SS configuration sent successfully." );
                 }
                 else
                 {
-                    log.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
+                    log.error( "Could not send SS configuration to Hub: ", restResult.getError() );
                 }
             }
             catch ( Exception e )
             {
                 log.error( "Could not send SS configuration to Hub", e );
-            }
-            finally
-            {
-                RestUtil.close( client );
             }
         }
     }

@@ -11,6 +11,7 @@ public class RestResult<T>
     private String error = "";
 
     private T entity;
+    private String reasonPhrase;
 
 
     public RestResult( int status )
@@ -52,5 +53,17 @@ public class RestResult<T>
     public void setEntity( T entity )
     {
         this.entity = entity;
+    }
+
+
+    public void setReasonPhrase( final String reasonPhrase )
+    {
+        this.reasonPhrase = reasonPhrase;
+    }
+
+
+    public String getReasonPhrase()
+    {
+        return reasonPhrase;
     }
 }

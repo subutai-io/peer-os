@@ -6,13 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import com.google.common.base.Preconditions;
@@ -25,6 +23,7 @@ import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -32,7 +31,6 @@ import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
-import io.subutai.hub.share.json.JsonUtil;
 
 import static java.lang.String.format;
 
@@ -76,20 +74,20 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
     private void startProcess()
     {
-        Set<String> envs = getEnvIds( format( GET_ENV_URL, configManager.getPeerId() ), configManager );
+        Set envs = getEnvIds( format( GET_ENV_URL, configManager.getPeerId() ) );
 
-        for ( String envId : envs )
+        for ( Object envId : envs )
         {
-            checkEnvironmentHealth( envId, "pingssh" );
+            checkEnvironmentHealth( ( String ) envId, "pingssh" );
         }
     }
 
 
-    private JSONObject checkEnvironmentHealth( String envId, String tools )
+    private void checkEnvironmentHealth( String envId, String tools )
     {
         JSONObject result = new JSONObject();
         Set<ContainerHost> containerHosts = peerManager.getLocalPeer().findContainersByEnvironmentId( envId );
-        EnvironmentDto environmentDto = getEnvironmentPeerDto( format( GET_ENV_CONTAINERS_URL, envId ), configManager );
+        EnvironmentDto environmentDto = getEnvironmentPeerDto( format( GET_ENV_CONTAINERS_URL, envId ) );
 
         Preconditions.checkNotNull( environmentDto );
 
@@ -97,7 +95,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
         if ( environmentNodeDtoList == null || environmentNodeDtoList.size() < 2 )
         {
-            return result;
+            return;
         }
 
         for ( EnvironmentNodesDto environmentNodesDto : environmentNodeDtoList )
@@ -133,8 +131,6 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
         JSONObject healthData = new JSONObject();
         healthData.put( configManager.getPeerId(), result.toString() );
         sendToHUB( healthData, envId );
-
-        return result;
     }
 
 
@@ -206,57 +202,40 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
     private void sendToHUB( JSONObject healthData, String envId )
     {
-        WebClient client = null;
         try
         {
-            client = configManager
-                    .getTrustedWebClientWithAuth( format( PUT_ENV_TELEMETRY_URL, envId ), configManager.getHubIp() );
-            byte[] cborData = JsonUtil.toCbor( healthData );
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response response = client.put( encryptedData );
+            RestResult restResult = restClient.put( format( PUT_ENV_TELEMETRY_URL, envId ), healthData, Object.class );
 
-            if ( response.getStatus() != HttpStatus.SC_OK && response.getStatus() != 204 )
+            if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", response.getStatus(),
-                        response.getStatusInfo().getReasonPhrase() );
+                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", restResult.getStatus(),
+                        restResult.getError() );
             }
         }
         catch ( Exception e )
         {
             log.error( "Could not sent  telemetry data to hub.", e.getMessage() );
         }
-        finally
-        {
-            if ( client != null )
-            {
-                client.close();
-            }
-        }
     }
 
 
-    private JSONObject getTelemetry( String link, ConfigManager configManager )
+    private JSONObject getTelemetry( String link )
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
-            Response res = client.get();
+            RestResult<JSONObject> restResult = restClient.get( link, JSONObject.class );
 
-            log.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
+            log.debug( "Response: HTTP {} - {}", restResult.getStatus(), restResult.getReasonPhrase() );
 
-            if ( res.getStatus() != HttpStatus.SC_OK )
+            if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( "Error to get telemetry  data from Hub: HTTP {} - {}", res.getStatus(),
-                        res.getStatusInfo().getReasonPhrase() );
+                log.error( "Error to get telemetry  data from Hub: HTTP {} - {}", restResult.getStatus(),
+                        restResult.getError() );
 
                 return null;
             }
 
-            byte[] encryptedContent = configManager.readContent( res );
-
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-
-            return JsonUtil.fromCbor( plainContent, JSONObject.class );
+            return restResult.getEntity();
         }
         catch ( Exception e )
         {
@@ -267,28 +246,23 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
     }
 
 
-    private Set<String> getEnvIds( String link, ConfigManager configManager )
+    private Set getEnvIds( String link )
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
-            Response res = client.get();
+            RestResult<Set> restResult = restClient.get( link, Set.class );
 
-            log.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
+            log.debug( "Response: HTTP {} - {}", restResult.getStatus(), restResult.getReasonPhrase() );
 
-            if ( res.getStatus() != HttpStatus.SC_OK && res.getStatus() != 204 )
+            if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", res.getStatus(),
-                        res.getStatusInfo().getReasonPhrase() );
+                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", restResult.getStatus(),
+                        restResult.getError() );
 
                 return Collections.emptySet();
             }
 
-            byte[] encryptedContent = configManager.readContent( res );
-
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-
-            return JsonUtil.fromCbor( plainContent, Set.class );
+            return restResult.getEntity();
         }
         catch ( Exception e )
         {
@@ -299,28 +273,23 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
     }
 
 
-    private EnvironmentDto getEnvironmentPeerDto( String link, ConfigManager configManager )
+    private EnvironmentDto getEnvironmentPeerDto( String link )
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
-            Response res = client.get();
+            RestResult<EnvironmentDto> restResult = restClient.get( link, EnvironmentDto.class );
 
-            log.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
+            log.debug( "Response: HTTP {} - {}", restResult.getStatus(), restResult.getReasonPhrase() );
 
-            if ( res.getStatus() != HttpStatus.SC_OK && res.getStatus() != 204 )
+            if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get environmentPeerDto from Hub: HTTP {} - {}", res.getStatus(),
-                        res.getStatusInfo().getReasonPhrase() );
+                log.error( "Error to get environmentPeerDto from Hub: HTTP {} - {}", restResult.getStatus(),
+                        restResult.getError() );
 
                 return null;
             }
 
-            byte[] encryptedContent = configManager.readContent( res );
-
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-
-            return JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
+            return restResult.getEntity();
         }
         catch ( Exception e )
         {
@@ -379,7 +348,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
     private void process( String link )
     {
-        JSONObject result = getTelemetry( link, configManager );
+        JSONObject result = getTelemetry( link );
 
         Preconditions.checkNotNull( result );
 

@@ -10,8 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.Response;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,16 +24,16 @@ import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.hubmanager.api.RestClient;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.product.ProductDtoV1_2;
-import io.subutai.hub.share.json.JsonUtil;
 
 
-// TODO: Replace WebClient with HubRestClient.
 public class ProductProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ProductProcessor.class.getName() );
@@ -46,12 +44,15 @@ public class ProductProcessor implements StateLinkProcessor
             + "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
 
     private static final String PATH_TO_DEPLOY = String.format( "%s/deploy", System.getProperty( "karaf.home" ) );
+    private RestClient restClient;
 
 
-    public ProductProcessor( final ConfigManager hConfigManager, final Set<HubEventListener> hubEventListeners )
+    public ProductProcessor( final ConfigManager hConfigManager, final Set<HubEventListener> hubEventListeners,
+                             final RestClient restClient )
     {
         this.configManager = hConfigManager;
         this.hubEventListeners = hubEventListeners != null ? hubEventListeners : new HashSet<HubEventListener>();
+        this.restClient = restClient;
     }
 
 
@@ -85,33 +86,26 @@ public class ProductProcessor implements StateLinkProcessor
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
+            RestResult<PeerProductDataDto> restResult = restClient.get( link, PeerProductDataDto.class );
 
             LOG.debug( "Sending request for getting PeerProductDTO..." );
-            Response r = client.get();
-            PeerProductDataDto result = null;
 
-            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                return result;
+                return null;
             }
 
-            if ( r.getStatus() != HttpStatus.SC_OK )
+            if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                LOG.error( r.readEntity( String.class ) );
-                return result;
+                LOG.error( restResult.getError() );
+                return null;
             }
 
-            byte[] encryptedContent = configManager.readContent( r );
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+            Preconditions.checkNotNull( restResult.getEntity() );
 
-            result = JsonUtil.fromCbor( plainContent, PeerProductDataDto.class );
+            LOG.debug( "PeerProductDataDTO: " + restResult.getEntity().toString() );
 
-            Preconditions.checkNotNull( result );
-
-            LOG.debug( "PeerProductDataDTO: " + result.toString() );
-
-            return result;
+            return restResult.getEntity();
         }
         catch ( Exception e )
         {
@@ -143,28 +137,43 @@ public class ProductProcessor implements StateLinkProcessor
         LOG.debug( "Installing Product to Local Peer..." );
         ProductDtoV1_2 productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
 
-        // install dependencies first (if plugin has dependencies)
-        for ( String dependencyId : productDTO.getDependencies() )
-        {
-            PeerProductDataDto _peerProductDataDto = getPeerProductDto( getProductProcessUrl( dependencyId ) );
-            if ( _peerProductDataDto.getState() != PeerProductDataDto.State.INSTALLED )
-            {
-                installingProcess( _peerProductDataDto );
-            }
-        }
         InputStream initialStream = null;
         try
         {
+            // install dependencies first (if plugin has dependencies)
+            assert productDTO != null;
+            for ( String dependencyId : productDTO.getDependencies() )
+            {
+                PeerProductDataDto _peerProductDataDto = getPeerProductDto( getProductProcessUrl( dependencyId ) );
+                assert _peerProductDataDto != null;
+                if ( _peerProductDataDto.getState() != PeerProductDataDto.State.INSTALLED )
+                {
+                    installingProcess( _peerProductDataDto );
+                }
+            }
 
             // downloading plugin files
             for ( String url : productDTO.getMetadata() )
             {
-                WebClient webClient = RestUtil.createTrustedWebClient( url );
+                //Using WebClient directly here since we need to close it only after request is processed
+                WebClient webClient = null;
+                try
+                {
+                    webClient = RestUtil.createTrustedWebClient( url );
 
-                File product = webClient.get( File.class );
-                initialStream = FileUtils.openInputStream( product );
-                File targetFile = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
-                FileUtils.copyInputStreamToFile( initialStream, targetFile );
+                    File product = webClient.get( File.class );
+                    initialStream = FileUtils.openInputStream( product );
+                    File targetFile = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
+                    FileUtils.copyInputStreamToFile( initialStream, targetFile );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error downloading plugin", e );
+                }
+                finally
+                {
+                    RestUtil.close( webClient );
+                }
             }
         }
         catch ( Exception e )
@@ -197,7 +206,8 @@ public class ProductProcessor implements StateLinkProcessor
         // TODO: check that there is no installed plugins, which depends on this plugin
 
         //TODO check what we are deleting here!!!
-        for ( String url : productDTO.getMetadata() )
+        assert productDTO != null;
+        for ( String ignored : productDTO.getMetadata() )
         {
             File file = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
             if ( file.delete() )
@@ -220,28 +230,25 @@ public class ProductProcessor implements StateLinkProcessor
 
     private ProductDtoV1_2 getProductDataDTO( final String productId ) throws HubManagerException
     {
-        ProductDtoV1_2 result = null;
+        ProductDtoV1_2 result;
 
         String path = String.format( "/rest/v1/marketplace/products/%s", productId );
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+            RestResult<String> restResult = restClient.get( path, String.class );
 
-            Response r = client.get();
-
-
-            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 return null;
             }
 
-            if ( r.getStatus() != HttpStatus.SC_OK )
+            if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                LOG.error( r.readEntity( String.class ) );
+                LOG.error( restResult.getError() );
                 return null;
             }
 
-            String jsonString = r.readEntity( String.class );
+            String jsonString = restResult.getEntity();
             JSONObject jsonObj = new JSONObject( jsonString );
             result = new ProductDtoV1_2( jsonObj );
 
@@ -255,7 +262,7 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    public String getProductProcessUrl( String productId )
+    private String getProductProcessUrl( String productId )
     {
         return String.format( "/rest/v1/peers/%s/products/%s", configManager.getPeerId(), productId );
     }
@@ -268,14 +275,11 @@ public class ProductProcessor implements StateLinkProcessor
 
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( updatePath, configManager.getHubIp() );
+            RestResult<Object> restResult = restClient.put( updatePath, peerProductDataDTO, Object.class );
 
-            byte[] plainData = JsonUtil.toCbor( peerProductDataDTO );
-            byte[] encryptedData = configManager.getMessenger().produce( plainData );
-            Response r = client.put( encryptedData );
-            if ( r.getStatus() != HttpStatus.SC_NO_CONTENT )
+            if ( restResult.getStatus() != HttpStatus.SC_NO_CONTENT )
             {
-                LOG.warn( "Unexpected response: " + r.readEntity( String.class ) );
+                LOG.warn( "Unexpected response: " + restResult.getError() );
             }
         }
         catch ( Exception e )
@@ -289,18 +293,16 @@ public class ProductProcessor implements StateLinkProcessor
     {
         String removePath = getProductProcessUrl( peerProductDataDto.getProductId() );
 
-        WebClient client = configManager.getTrustedWebClientWithAuth( removePath, configManager.getHubIp() );
+        RestResult<Object> restResult = restClient.delete( removePath );
 
-        Response r = client.delete();
-
-        if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+        if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
         {
-            LOG.debug( "Status: " + "no content" );
+            LOG.debug( "Status: no content" );
         }
     }
 
 
-    public void notifyPluginEventListeners( final String pluginUid, final PeerProductDataDto.State state )
+    private void notifyPluginEventListeners( final String pluginUid, final PeerProductDataDto.State state )
     {
         if ( !CollectionUtil.isCollectionEmpty( hubEventListeners ) )
         {

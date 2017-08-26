@@ -196,6 +196,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response isEnvironmentWorkflowInProgress()
+    {
+        return Response.status( Response.Status.OK ).entity( systemManager.isEnvironmentWorkflowInProgress() ).build();
+    }
+
+
+    @Override
     public Response getHubIp()
     {
         return Response.status( Response.Status.OK ).entity( systemManager.getHubIp() ).build();

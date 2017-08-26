@@ -6,6 +6,8 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 
 public interface RestClient
 {
+    String CONNECTION_EXCEPTION_MARKER = "ConnectException";
+
     <T> RestResult<T> get( String url, Class<T> clazz );
 
     <T> T getStrict( String url, Class<T> clazz ) throws HubManagerException;

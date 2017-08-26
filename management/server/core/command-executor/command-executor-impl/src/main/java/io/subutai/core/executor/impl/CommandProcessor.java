@@ -29,6 +29,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.ResourceHostInfo;
@@ -150,6 +151,15 @@ public class CommandProcessor implements RestProcessor
         try
         {
             resourceHostInfo = getResourceHostInfo( request.getId() );
+
+            if ( !resourceHostInfo.getId().equals( request.getId() ) )
+            {
+                //in case the target host is a container, ensure its state is RUNNING, otherwise throw exception
+                if ( hostRegistry.getContainerHostInfoById( request.getId() ).getState() != ContainerHostState.RUNNING )
+                {
+                    throw new CommandException( "Container is not running" );
+                }
+            }
         }
         catch ( HostDisconnectedException e )
         {

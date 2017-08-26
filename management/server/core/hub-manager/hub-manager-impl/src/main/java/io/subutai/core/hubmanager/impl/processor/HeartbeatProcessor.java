@@ -14,11 +14,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.settings.Common;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
 
 
@@ -36,7 +36,7 @@ public class HeartbeatProcessor implements Runnable
 
     private final HubManagerImpl hubManager;
 
-    private final HubRestClient restClient;
+    private final RestClient restClient;
 
     private final String path;
 
@@ -53,7 +53,7 @@ public class HeartbeatProcessor implements Runnable
     private volatile boolean isHubReachable = true;
 
 
-    public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
+    public HeartbeatProcessor( HubManagerImpl hubManager, RestClient restClient, String peerId )
     {
         this.hubManager = hubManager;
         this.restClient = restClient;
@@ -155,7 +155,7 @@ public class HeartbeatProcessor implements Runnable
             }
             catch ( Exception e )
             {
-                if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( e.getMessage() ) )
+                if ( RestClient.CONNECTION_EXCEPTION_MARKER.equals( e.getMessage() ) )
                 {
                     isHubReachable = false;
                 }
@@ -182,15 +182,15 @@ public class HeartbeatProcessor implements Runnable
 
             RestResult<HeartbeatResponseDto> restResult = restClient.post( url, null, HeartbeatResponseDto.class );
 
-            if ( HubRestClient.CONNECTION_EXCEPTION_MARKER.equals( restResult.getError() ) )
+            if ( RestClient.CONNECTION_EXCEPTION_MARKER.equals( restResult.getError() ) )
             {
-                throw new IllegalStateException( HubRestClient.CONNECTION_EXCEPTION_MARKER );
+                throw new IllegalStateException( RestClient.CONNECTION_EXCEPTION_MARKER );
             }
 
             if ( !restResult.isSuccess() )
             {
                 //TODO here we need to use a dedicated http code for letting know that peer is not registered with Hub
-                //otherwise it gets unregistered fir any auth error
+                //otherwise it gets unregistered for any auth error
                 if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
                 {
                     hubManager.getConfigDataService().deleteConfig( peerId );

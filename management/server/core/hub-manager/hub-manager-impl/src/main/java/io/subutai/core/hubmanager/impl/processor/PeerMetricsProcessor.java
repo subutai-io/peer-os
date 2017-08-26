@@ -12,15 +12,14 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.util.RestUtil;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -29,10 +28,8 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.metrics.DiskDto;
 import io.subutai.hub.share.dto.metrics.HostMetricsDto;
 import io.subutai.hub.share.dto.metrics.PeerMetricsDto;
-import io.subutai.hub.share.json.JsonUtil;
 
 
-// TODO: Replace WebClient with HubRestClient.
 public class PeerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -173,58 +170,34 @@ public class PeerMetricsProcessor extends HubRequester
     {
         String path = String.format( "/rest/v1/peers/%s/monitor", configManager.getPeerId() );
 
-        WebClient client = null;
+        log.debug( "Peer monitor queue size = {}", queue.size() );
 
-        try
+        final Iterator<PeerMetricsDto> iterator = queue.iterator();
+
+        while ( iterator.hasNext() )
         {
-            client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+            PeerMetricsDto dto = iterator.next();
 
-            log.debug( "Peer monitor queue size = {}", queue.size() );
+            Response r = null;
 
-            final Iterator<PeerMetricsDto> iterator = queue.iterator();
-
-            while ( iterator.hasNext() )
+            try
             {
-                PeerMetricsDto dto = iterator.next();
+                RestResult<Object> restResult = restClient.post( path, dto );
 
-                Response r = null;
-
-                try
+                if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
                 {
-                    byte[] cborData = JsonUtil.toCbor( dto );
-
-                    byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
-                    r = client.post( encryptedData );
-
-                    if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
-                    {
-                        iterator.remove();
-                        log.debug( "Peer monitoring data sent successfully. {}", dto );
-                    }
-                    else
-                    {
-                        log.warn( "Could not send peer monitoring data: " + r.readEntity( String.class ) + " " + dto
-                                .toString() );
-                    }
+                    iterator.remove();
+                    log.debug( "Peer monitoring data sent successfully. {}", dto );
                 }
-                catch ( Exception e )
+                else
                 {
-                    log.warn( "Could not send peer monitoring data to {}", dto.getPeerId(), e );
-                }
-                finally
-                {
-                    RestUtil.close( r );
+                    log.warn( "Could not send peer monitoring data: " + restResult.getError() + " " + dto.toString() );
                 }
             }
-        }
-        catch ( HubManagerException e )
-        {
-            log.error( "Error sending peer metrics", e );
-        }
-        finally
-        {
-            RestUtil.close( client );
+            catch ( Exception e )
+            {
+                log.warn( "Could not send peer monitoring data to {}", dto.getPeerId(), e );
+            }
         }
 
         // clean up queue to avoid memory exhaustion

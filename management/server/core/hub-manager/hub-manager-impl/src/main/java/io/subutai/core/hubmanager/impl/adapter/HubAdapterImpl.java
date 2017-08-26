@@ -26,9 +26,11 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -40,7 +42,7 @@ import io.subutai.hub.share.json.JsonUtil;
 import static java.lang.String.format;
 
 
-//TODO use HubRestClient and ConfigDataServiceimpl instead of DaoHelper and HttpClient
+//TODO use ConfigDataServiceimpl instead of DaoHelper
 public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, HostListener
 {
     private static final String USER_ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
@@ -65,7 +67,6 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
     private final DaoHelper daoHelper;
 
-    private final HttpClient httpClient;
 
     private final IdentityManager identityManager;
 
@@ -74,18 +75,22 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     private final LocalPeer localPeer;
 
 
-    public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager,
-                           IdentityManager identityManager ) throws HubManagerException
+    public HubAdapterImpl( DaoManager daoManager, PeerManager peerManager, IdentityManager identityManager )
+            throws HubManagerException
     {
         daoHelper = new DaoHelper( daoManager );
-
-        httpClient = new HttpClient( securityManager );
 
         this.identityManager = identityManager;
 
         localPeer = peerManager.getLocalPeer();
 
         peerId = peerManager.getLocalPeer().getId();
+    }
+
+
+    private RestClient getRestClient()
+    {
+        return ServiceLocator.lookup( HubManager.class ).getRestClient();
     }
 
 
@@ -152,7 +157,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
         {
             log.debug( "json: {}", json );
 
-            httpClient.doPost( format( USER_ENVIRONMENTS_URL, userId ), json );
+            getRestClient().post( format( USER_ENVIRONMENTS_URL, userId ), json );
         }
     }
 
@@ -163,7 +168,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
         //obtain Hub peer owner id
         String userId = getOwnerId();
 
-        httpClient.doPost( format( USER_ENVIRONMENTS_URL, userId ), json );
+        getRestClient().post( format( USER_ENVIRONMENTS_URL, userId ), json );
     }
 
 
@@ -183,7 +188,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
         {
             String path = format( USER_ENVIRONMENTS_URL, getUserId() ) + "/" + envId;
 
-            httpClient.doDelete( path );
+            getRestClient().delete( path );
         }
     }
 
@@ -193,7 +198,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     {
         String path = format( ENVIRONMENT_SSHKEY_URL, envId ) + "/remove";
 
-        httpClient.doPost( path, sshKey );
+        getRestClient().post( path, sshKey );
     }
 
 
@@ -201,7 +206,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     public void addSshKey( final String envId, final String sshKey )
     {
         String path = format( ENVIRONMENT_SSHKEY_URL, envId ) + "/add";
-        httpClient.doPost( path, sshKey );
+        getRestClient().post( path, sshKey );
     }
 
 
@@ -214,7 +219,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
         {
             log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", userId, peerId );
 
-            return httpClient.doGet( format( USER_ENVIRONMENTS_URL, userId ) );
+            return getRestClient().get( format( USER_ENVIRONMENTS_URL, userId ), String.class ).getEntity();
         }
 
         return null;
@@ -224,21 +229,21 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     @Override
     public String getDeletedEnvironmentsForPeer()
     {
-        return httpClient.doGet( DELETED_ENVIRONMENTS_URL );
+        return getRestClient().get( DELETED_ENVIRONMENTS_URL, String.class ).getEntity();
     }
 
 
     @Override
     public String getAllEnvironmentsForPeer()
     {
-        return httpClient.doGet( PEER_ENVIRONMENTS_URL );
+        return getRestClient().get( PEER_ENVIRONMENTS_URL, String.class ).getEntity();
     }
 
 
     @Override
     public void destroyContainer( String envId, String containerId )
     {
-        httpClient.doDelete( format( CONTAINERS_URL, envId, containerId ) );
+        getRestClient().delete( format( CONTAINERS_URL, envId, containerId ) );
     }
 
 
@@ -258,7 +263,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
         String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
 
-        String response = httpClient.doPost( url, json );
+        String response = getRestClient().post( url, json, String.class ).getEntity();
 
         // The data is for environment created on Hub. We save the plugin data there only,
         // i.e. no need to store in the local DB too.
@@ -278,7 +283,8 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
         log.debug( "userId={}, pluginKey={}, class={}", userId, pluginKey, clazz );
 
-        String response = httpClient.doGet( format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) );
+        String response =
+                getRestClient().get( format( PLUGIN_DATA_URL, userId, peerId, pluginKey ), String.class ).getEntity();
 
         log.debug( "response: {}", response );
 
@@ -324,7 +330,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
         String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
 
-        String response = httpClient.doGet( url );
+        String response = getRestClient().get( url, String.class ).getEntity();
 
         log.debug( "response: {}", response );
 
@@ -346,9 +352,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
         String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
 
-        String response = httpClient.doDelete( url );
-
-        log.debug( "response: {}", response );
+        getRestClient().delete( url );
 
         return true;
     }
@@ -363,7 +367,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
         log.info( "onContainerStateChange: envId={}, contId={}, state={}", envId, contId, state );
 
-        httpClient.doPost( format( CONTAINERS_STATE_URL, envId, contId, state ), null );
+        getRestClient().post( format( CONTAINERS_STATE_URL, envId, contId, state ), null );
     }
 
 
@@ -376,7 +380,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
         log.info( "onContainerHostnameChange: envId={}, contId={}, hostname={}", envId, contId, hostname );
 
-        httpClient.doPost( format( CONTAINERS_HOSTNAME_URL, envId, contId, hostname ), null );
+        getRestClient().post( format( CONTAINERS_HOSTNAME_URL, envId, contId, hostname ), null );
     }
 
 

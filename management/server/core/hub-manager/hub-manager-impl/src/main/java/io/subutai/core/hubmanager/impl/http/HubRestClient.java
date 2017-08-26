@@ -27,10 +27,11 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.json.JsonUtil;
 
 
+//TODO put 2 retries on 503
 public class HubRestClient implements RestClient
 {
-    public static final String CONNECTION_EXCEPTION_MARKER = "ConnectException";
     private static final String ERROR = "Error executing request to Hub: ";
+    private static final int MAX_ATTEMPTS = 3;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -121,12 +122,26 @@ public class HubRestClient implements RestClient
 
             response = webClient.invoke( httpMethod, requestBody );
 
+            // retry on 503 http code >>>
+            int attemptNo = 1;
+            while ( response.getStatus() == HttpStatus.SC_SERVICE_UNAVAILABLE && attemptNo < MAX_ATTEMPTS )
+            {
+                attemptNo++;
+                response = webClient.invoke( httpMethod, requestBody );
+            }
+            // <<< retry on 503 http code
+
             log.info( "response.status: {} - {}", response.getStatus(), response.getStatusInfo().getReasonPhrase() );
 
             restResult = handleResponse( response, clazz, encrypt );
         }
         catch ( Exception e )
         {
+            if ( response != null )
+            {
+                restResult.setReasonPhrase( response.getStatusInfo().getReasonPhrase() );
+            }
+
             if ( ExceptionUtils.getStackTrace( e ).contains( CONNECTION_EXCEPTION_MARKER ) )
             {
                 restResult.setError( CONNECTION_EXCEPTION_MARKER );
@@ -151,12 +166,24 @@ public class HubRestClient implements RestClient
     {
         if ( response != null )
         {
-            response.close();
+            try
+            {
+                response.close();
+            }
+            catch ( Exception ignore )
+            {
+            }
         }
 
         if ( webClient != null )
         {
-            webClient.close();
+            try
+            {
+                webClient.close();
+            }
+            catch ( Exception ignore )
+            {
+            }
         }
     }
 
@@ -173,6 +200,8 @@ public class HubRestClient implements RestClient
             throws IOException, PGPException
     {
         RestResult<T> restResult = new RestResult<>( response.getStatus() );
+
+        restResult.setReasonPhrase( response.getStatusInfo().getReasonPhrase() );
 
         if ( !restResult.isSuccess() )
         {

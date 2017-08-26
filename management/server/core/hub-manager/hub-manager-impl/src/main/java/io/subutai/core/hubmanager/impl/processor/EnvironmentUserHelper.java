@@ -3,7 +3,6 @@ package io.subutai.core.hubmanager.impl.processor;
 
 import java.io.IOException;
 
-import io.subutai.common.security.objects.TokenType;
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +13,11 @@ import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
@@ -40,11 +39,11 @@ public class EnvironmentUserHelper
 
     private final EnvironmentManager environmentManager;
 
-    private final HubRestClient restClient;
+    private final RestClient restClient;
 
 
     public EnvironmentUserHelper( IdentityManager identityManager, ConfigDataService configDataService,
-                                  EnvironmentManager environmentManager, HubRestClient restClient )
+                                  EnvironmentManager environmentManager, RestClient restClient )
     {
         this.identityManager = identityManager;
 
@@ -239,7 +238,7 @@ public class EnvironmentUserHelper
     }
 
 
-    public UserToken updateUserTokenInHub( UserTokenDto userTokenDto )
+    private UserToken updateUserTokenInHub( UserTokenDto userTokenDto )
     {
         String url = String.format( baseHubTokenUrl, userTokenDto.getOwnerId() );
 
@@ -255,7 +254,8 @@ public class EnvironmentUserHelper
         return userToken;
     }
 
-    public void deleteUserToken ( Long userId )
+
+    private void deleteUserToken( Long userId )
     {
         String url = String.format( "/rest/v1/users/%s/token/delete", userId );
         restClient.post( url, userId );
