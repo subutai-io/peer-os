@@ -176,6 +176,11 @@ public class ContainerMetricsProcessor extends HubRequester
 
     private void send( ContainersMetricsDto containersMetricsDto )
     {
+        if ( containersMetricsDto.getContainerHostMetricsDto().isEmpty() )
+        {
+            return;
+        }
+
         try
         {
             if ( !hubManager.canWorkWithHub() )
