@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.hubmanager.api.model.ContainerMetrics;
+import io.subutai.core.hubmanager.impl.model.ContainerMetricsEntity;
 
 
 /**
@@ -103,7 +104,7 @@ class ContainerMetricsDAO
         {
             daoManager.startTransaction( em );
 
-            ContainerMetrics item = em.find( ContainerMetrics.class, id );
+            ContainerMetrics item = em.find( ContainerMetricsEntity.class, id );
             em.remove( item );
 
             daoManager.commitTransaction( em );

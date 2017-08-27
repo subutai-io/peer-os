@@ -135,7 +135,7 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         try
         {
-            ContainersMetricsDto containersMetricsDto = new ContainersMetricsDto();
+            ContainersMetricsDto containersMetricsDto = new ContainersMetricsDto( localPeer.getId() );
 
             populateUnsentContainerMetrics( containersMetricsDto );
 
@@ -182,7 +182,7 @@ public class ContainerMetricsProcessor extends HubRequester
             RestResult<Object> restResult = restClient.post( path, containersMetricsDto );
 
             for ( HostMetricsDto metricsDto : containersMetricsDto.getContainerHostMetricsDto() )
-            {
+            {//todo add check canWorkWithHub
                 if ( restResult.isSuccess() )
                 {
                     //remove the ones that are already in DB
