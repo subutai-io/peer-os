@@ -28,12 +28,13 @@ import io.subutai.hub.share.dto.metrics.ContainersMetricsDto;
 import static java.lang.String.format;
 
 
-// TODO skip zero metrics
 public class ContainerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final int DB_FETCH_LIMIT = 100;
+
+    private static final int METRIC_TTL_DAYS = 1;
 
     private LocalPeer localPeer;
 
@@ -100,6 +101,7 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
         {
+            //send only Hub environment containers' metrics
             if ( Common.HUB_ID.equals( containerHost.getInitiatorPeerId() ) )
             {
                 try
@@ -107,14 +109,18 @@ public class ContainerMetricsProcessor extends HubRequester
                     HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
                     HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
 
-                    hostMetricsDto.setType( HostMetricsDto.HostType.CONTAINER_HOST );
-                    hostMetricsDto.setHostId( containerHost.getId() );
-                    //set container name instead of hostname since it is unchangeable unlike hostname
-                    hostMetricsDto.setHostName( containerHost.getContainerName() );
-                    hostMetricsDto.setStartTime( startTime );
-                    hostMetricsDto.setEndTime( endTime );
+                    //skip "zero" metrics
+                    if ( !HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
+                    {
+                        hostMetricsDto.setType( HostMetricsDto.HostType.CONTAINER_HOST );
+                        hostMetricsDto.setHostId( containerHost.getId() );
+                        //set container name instead of hostname since it is unchangeable unlike hostname
+                        hostMetricsDto.setHostName( containerHost.getContainerName() );
+                        hostMetricsDto.setStartTime( startTime );
+                        hostMetricsDto.setEndTime( endTime );
 
-                    containersMetricsDto.getContainerHostMetricsDto().add( hostMetricsDto );
+                        containersMetricsDto.getContainerHostMetricsDto().add( hostMetricsDto );
+                    }
                 }
                 catch ( Exception e )
                 {
@@ -220,7 +226,7 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         try
         {
-            containerMetricsService.purgeOldMetrics();
+            containerMetricsService.purgeOldMetrics( METRIC_TTL_DAYS );
         }
         catch ( Exception e )
         {

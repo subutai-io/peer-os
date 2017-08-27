@@ -12,7 +12,6 @@ import io.subutai.hub.share.dto.metrics.NetDto;
 
 public interface ContainerMetrics
 {
-    int METRIC_TTL_DAYS = 1;
 
     long getId();
 

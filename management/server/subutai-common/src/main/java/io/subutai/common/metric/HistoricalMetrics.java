@@ -256,4 +256,30 @@ public class HistoricalMetrics
 
         return result;
     }
+
+
+    public static boolean isZeroMetric( HostMetricsDto hostMetricsDto )
+    {
+        if ( hostMetricsDto.getType() == HostMetricsDto.HostType.CONTAINER_HOST )
+        {
+            //check memory
+            boolean isZero = hostMetricsDto.getCpu().getSystem() == 0D;
+            isZero &= hostMetricsDto.getCpu().getUser() == 0D;
+            //check cpu
+            isZero &= hostMetricsDto.getMemory().getCached() == 0D;
+            isZero &= hostMetricsDto.getMemory().getRss() == 0D;
+            //check disk
+            isZero &= hostMetricsDto.getDisk().get( "total" ).getUsed() == 0D;
+            //check network
+            isZero &= hostMetricsDto.getNet().get( "eth0" ).getIn() == 0D;
+            isZero &= hostMetricsDto.getNet().get( "eth0" ).getOut() == 0D;
+
+            return isZero;
+        }
+        else
+        {
+            //for near future we don't skip sending RH metrics
+            return false;
+        }
+    }
 }

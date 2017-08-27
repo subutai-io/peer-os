@@ -121,7 +121,7 @@ class ContainerMetricsDAO
     }
 
 
-    public void purgeOldMetrics()
+    public void purgeOldMetrics( int daysOld )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -132,7 +132,7 @@ class ContainerMetricsDAO
 
             Query query = em.createQuery(
                     "delete from ContainerMetricsEntity e where e.createDate + 3600 * 1000 * 24 * :days < :ts1" )
-                            .setParameter( "days", ContainerMetrics.METRIC_TTL_DAYS ).setParameter( "ts1", ts );
+                            .setParameter( "days", daysOld ).setParameter( "ts1", ts );
 
             query.executeUpdate();
 

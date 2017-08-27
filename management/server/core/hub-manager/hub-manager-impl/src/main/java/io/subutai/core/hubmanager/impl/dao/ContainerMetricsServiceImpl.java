@@ -45,8 +45,8 @@ public class ContainerMetricsServiceImpl implements ContainerMetricsService
 
 
     @Override
-    public void purgeOldMetrics()
+    public void purgeOldMetrics( int daysOld )
     {
-        containerMetricsDAO.purgeOldMetrics();
+        containerMetricsDAO.purgeOldMetrics( daysOld );
     }
 }

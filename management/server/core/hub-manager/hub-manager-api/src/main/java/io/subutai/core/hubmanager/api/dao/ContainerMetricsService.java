@@ -15,5 +15,5 @@ public interface ContainerMetricsService
 
     void removeMetrics( long id );
 
-    void purgeOldMetrics();
+    void purgeOldMetrics( int daysOld );
 }
