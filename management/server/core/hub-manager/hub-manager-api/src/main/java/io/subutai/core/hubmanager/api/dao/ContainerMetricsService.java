@@ -9,7 +9,7 @@ import io.subutai.core.hubmanager.api.model.ContainerMetrics;
 public interface ContainerMetricsService
 {
 
-    List<ContainerMetrics> getAll();
+    List<ContainerMetrics> getOldest( int limit );
 
     void save( ContainerMetrics item );
 

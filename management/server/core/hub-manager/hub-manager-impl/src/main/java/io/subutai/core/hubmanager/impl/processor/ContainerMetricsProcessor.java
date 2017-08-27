@@ -28,9 +28,12 @@ import io.subutai.hub.share.dto.metrics.ContainersMetricsDto;
 import static java.lang.String.format;
 
 
+// TODO skip zero metrics
 public class ContainerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
+
+    private static final int DB_FETCH_LIMIT = 100;
 
     private LocalPeer localPeer;
 
@@ -142,7 +145,7 @@ public class ContainerMetricsProcessor extends HubRequester
     private void populateUnsentContainerMetrics( ContainersMetricsDto containersMetricsDto )
     {
 
-        List<ContainerMetrics> containerMetricsList = containerMetricsService.getAll();
+        List<ContainerMetrics> containerMetricsList = containerMetricsService.getOldest( DB_FETCH_LIMIT );
 
         for ( ContainerMetrics containerMetrics : containerMetricsList )
         {

@@ -37,7 +37,7 @@ class ContainerMetricsDAO
     /* *************************************************
      *
      */
-    List<ContainerMetrics> getAll()
+    List<ContainerMetrics> getOldest( int limit )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
@@ -46,8 +46,8 @@ class ContainerMetricsDAO
         {
             daoManager.startTransaction( em );
 
-            result = em.createQuery( "select cm from ContainerMetricsEntity cm", ContainerMetrics.class )
-                       .getResultList();
+            result = em.createQuery( "select cm from ContainerMetricsEntity cm order by cm.createDate asc",
+                    ContainerMetrics.class ).setMaxResults( limit ).getResultList();
 
             daoManager.commitTransaction( em );
         }

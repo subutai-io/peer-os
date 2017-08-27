@@ -24,9 +24,9 @@ public class ContainerMetricsServiceImpl implements ContainerMetricsService
 
 
     @Override
-    public List<ContainerMetrics> getAll()
+    public List<ContainerMetrics> getOldest( int limit )
     {
-        return containerMetricsDAO.getAll();
+        return containerMetricsDAO.getOldest( limit );
     }
 
 
