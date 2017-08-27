@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -28,7 +29,9 @@ import io.subutai.hub.share.dto.metrics.NetDto;
  * User for container metrics, which are not sent to Hub.
  */
 @Entity
-@Table( name = "container_metrics" )
+@Table( name = "container_metrics", uniqueConstraints = {
+        @UniqueConstraint( columnNames = { "host_id", "start_time" } )
+} )
 @Access( AccessType.FIELD )
 public class ContainerMetricsEntity implements ContainerMetrics
 {

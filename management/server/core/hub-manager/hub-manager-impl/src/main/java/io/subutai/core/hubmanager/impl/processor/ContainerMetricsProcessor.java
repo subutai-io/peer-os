@@ -80,18 +80,19 @@ public class ContainerMetricsProcessor extends HubRequester
 
         ContainersMetricsDto containersMetricsDto = new ContainersMetricsDto( localPeer.getId() );
 
-        for ( ResourceHost host : localPeer.getResourceHosts() )
+        try
         {
-            try
-            {
-                populateRealTimeContainerMetrics( containersMetricsDto, host, startTime, endTime );
 
-                send( containersMetricsDto );
-            }
-            catch ( Exception e )
+            for ( ResourceHost resourceHost : localPeer.getResourceHosts() )
             {
-                log.error( "Error sending container metrics of resource host {}: {}", host.getId(), e.getMessage() );
+                populateRealTimeContainerMetrics( containersMetricsDto, resourceHost, startTime, endTime );
             }
+
+            send( containersMetricsDto );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error sending container metrics: {}", e.getMessage() );
         }
     }
 
@@ -101,7 +102,7 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
         {
-            //send only Hub environment containers' metrics
+            //pick only Hub environment containers' metrics
             if ( Common.HUB_ID.equals( containerHost.getInitiatorPeerId() ) )
             {
                 try
@@ -177,40 +178,25 @@ public class ContainerMetricsProcessor extends HubRequester
     {
         try
         {
+            if ( !hubManager.canWorkWithHub() )
+            {
+                saveMetrics( containersMetricsDto );
+
+                return;
+            }
+
             String path = format( "/rest/v1/peers/%s/containers-metrics", localPeer.getId() );
 
             RestResult<Object> restResult = restClient.post( path, containersMetricsDto );
 
-            for ( HostMetricsDto metricsDto : containersMetricsDto.getContainerHostMetricsDto() )
-            {//todo add check canWorkWithHub
-                if ( restResult.isSuccess() )
-                {
-                    //remove the ones that are already in DB
-                    if ( metricsDto.getDbId() != null )
-                    {
-                        containerMetricsService.removeMetrics( metricsDto.getDbId() );
-                    }
-                }
-                else if ( metricsDto.getDbId() == null )
-                {
-                    //save the ones that are new
-                    ContainerMetrics containerMetrics = new ContainerMetricsEntity();
-
-                    containerMetrics.setHostId( metricsDto.getHostId() );
-                    containerMetrics.setHostName( metricsDto.getHostName() );
-                    containerMetrics.setEndTime( metricsDto.getEndTime() );
-                    containerMetrics.setStartTime( metricsDto.getStartTime() );
-                    containerMetrics.setCpu( metricsDto.getCpu() );
-                    containerMetrics.setDisk( metricsDto.getDisk() );
-                    containerMetrics.setMemory( metricsDto.getMemory() );
-                    containerMetrics.setNet( metricsDto.getNet() );
-
-                    containerMetricsService.save( containerMetrics );
-                }
-            }
-
-            if ( !restResult.isSuccess() )
+            if ( restResult.isSuccess() )
             {
+                removeMetrics( containersMetricsDto );
+            }
+            else
+            {
+                saveMetrics( containersMetricsDto );
+
                 log.error( "Failed to send container metrics: {} - {}", restResult.getReasonPhrase(),
                         restResult.getError() );
             }
@@ -218,6 +204,47 @@ public class ContainerMetricsProcessor extends HubRequester
         catch ( Exception e )
         {
             log.error( "Error sending container metrics: {}", e.getMessage() );
+        }
+    }
+
+
+    private void removeMetrics( ContainersMetricsDto containersMetricsDto )
+    {
+        for ( HostMetricsDto metricsDto : containersMetricsDto.getContainerHostMetricsDto() )
+        {
+            //skip removing if the metrics are not from db
+            if ( metricsDto.getDbId() == null )
+            {
+                return;
+            }
+
+            containerMetricsService.removeMetrics( metricsDto.getDbId() );
+        }
+    }
+
+
+    private void saveMetrics( ContainersMetricsDto containersMetricsDto )
+    {
+        for ( HostMetricsDto metricsDto : containersMetricsDto.getContainerHostMetricsDto() )
+        {
+            //skip saving if the fetched metrics are already from db
+            if ( metricsDto.getDbId() != null )
+            {
+                return;
+            }
+
+            ContainerMetrics containerMetrics = new ContainerMetricsEntity();
+
+            containerMetrics.setHostId( metricsDto.getHostId() );
+            containerMetrics.setHostName( metricsDto.getHostName() );
+            containerMetrics.setEndTime( metricsDto.getEndTime() );
+            containerMetrics.setStartTime( metricsDto.getStartTime() );
+            containerMetrics.setCpu( metricsDto.getCpu() );
+            containerMetrics.setDisk( metricsDto.getDisk() );
+            containerMetrics.setMemory( metricsDto.getMemory() );
+            containerMetrics.setNet( metricsDto.getNet() );
+
+            containerMetricsService.save( containerMetrics );
         }
     }
 
