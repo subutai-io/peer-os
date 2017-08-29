@@ -243,15 +243,21 @@ public class EnvironmentUserHelper
         String url = String.format( baseHubTokenUrl, userTokenDto.getOwnerId() );
 
         User user = identityManager.getUser( userTokenDto.getSsUserId() );
-        UserToken userToken = identityManager.updateTokenAndSession( user.getId() );
 
-        //set new token and valid date
-        userTokenDto.setToken( userToken.getFullToken() );
-        userTokenDto.setValidDate( userToken.getValidDate() );
-        userTokenDto.setState( UserTokenDto.State.READY );
+        if ( user != null )
+        {
+            UserToken userToken = identityManager.updateTokenAndSession( user.getId() );
 
-        restClient.post( url, userTokenDto );
-        return userToken;
+            //set new token and valid date
+            userTokenDto.setToken( userToken.getFullToken() );
+            userTokenDto.setValidDate( userToken.getValidDate() );
+            userTokenDto.setState( UserTokenDto.State.READY );
+
+            restClient.post( url, userTokenDto );
+            return userToken;
+        }
+
+        return null;
     }
 
 

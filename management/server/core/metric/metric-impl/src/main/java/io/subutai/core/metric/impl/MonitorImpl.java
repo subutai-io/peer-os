@@ -551,6 +551,7 @@ public class MonitorImpl implements Monitor, HostListener
 
             if ( null != commandResult && commandResult.hasSucceeded() )
             {
+                LOG.debug( "OBTAINED METRIC: \n {}", commandResult.getStdOut() );
                 result = mapper.readValue( commandResult.getStdOut(), HistoricalMetrics.class );
                 result.setStartTime( startTime );
                 result.setEndTime( endTime );

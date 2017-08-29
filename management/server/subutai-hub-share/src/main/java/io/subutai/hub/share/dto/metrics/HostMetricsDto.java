@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -58,6 +59,27 @@ public class HostMetricsDto
 
     @JsonProperty( "createdTime" )
     private Date createdTime = new Date();
+
+    @JsonProperty( "startTime" )
+    private Date startTime;
+
+    @JsonProperty( "endTime" )
+    private Date endTime;
+
+    @JsonIgnore
+    private transient Long dbId = null;
+
+
+    public Long getDbId()
+    {
+        return dbId;
+    }
+
+
+    public void setDbId( final long dbId )
+    {
+        this.dbId = dbId;
+    }
 
 
     public String getHostId()
@@ -191,6 +213,30 @@ public class HostMetricsDto
     }
 
 
+    public Date getStartTime()
+    {
+        return startTime;
+    }
+
+
+    public void setStartTime( final Date startTime )
+    {
+        this.startTime = startTime;
+    }
+
+
+    public Date getEndTime()
+    {
+        return endTime;
+    }
+
+
+    public void setEndTime( final Date endTime )
+    {
+        this.endTime = endTime;
+    }
+
+
     @Override
     public String toString()
     {
@@ -205,6 +251,8 @@ public class HostMetricsDto
         sb.append( ", containersCount=" ).append( containersCount );
         sb.append( ", management=" ).append( management );
         sb.append( ", createdTime=" ).append( createdTime );
+        sb.append( ", startTime=" ).append( startTime );
+        sb.append( ", endTime=" ).append( endTime );
         sb.append( '}' );
         return sb.toString();
     }

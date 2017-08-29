@@ -1,12 +1,18 @@
 package io.subutai.hub.share.dto.metrics;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 public class DiskDto
 {
+    @JsonProperty( "total" )
     private double total = 0.0D;
 
+    @JsonProperty( "available" )
     private double available = 0.0D;
 
+    @JsonProperty( "used" )
     private double used = 0.0D;
 
 

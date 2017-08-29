@@ -7,10 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MemoryDto
 {
     @JsonProperty( "total" )
-    private Double total= 0.0D;
+    private Double total = 0.0D;
 
     @JsonProperty( "available" )
-    private Double available= 0.0D;
+    private Double available = 0.0D;
 
     @JsonProperty( "active" )
     private double active = 0.0D;
@@ -23,6 +23,9 @@ public class MemoryDto
 
     @JsonProperty( "buffers" )
     private double buffers = 0.0D;
+
+    @JsonProperty( "rss" )
+    private double rss = 0.0D;
 
 
     public Double getTotal()
@@ -97,17 +100,22 @@ public class MemoryDto
     }
 
 
+    public double getRss()
+    {
+        return rss;
+    }
+
+
+    public void setRss( final double rss )
+    {
+        this.rss = rss;
+    }
+
+
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "MemoryDto{" );
-        sb.append( "total=" ).append( total );
-        sb.append( ", available=" ).append( available );
-        sb.append( ", active=" ).append( active );
-        sb.append( ", cached=" ).append( cached );
-        sb.append( ", memFree=" ).append( memFree );
-        sb.append( ", buffers=" ).append( buffers );
-        sb.append( '}' );
-        return sb.toString();
+        return "MemoryDto{" + "total=" + total + ", available=" + available + ", active=" + active + ", cached="
+                + cached + ", memFree=" + memFree + ", buffers=" + buffers + ", rss=" + rss + '}';
     }
 }

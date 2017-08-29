@@ -44,15 +44,18 @@ import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
+import io.subutai.core.hubmanager.api.dao.ContainerMetricsService;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
+import io.subutai.core.hubmanager.impl.dao.ContainerMetricsServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.processor.ContainerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
@@ -88,6 +91,7 @@ public class HubManagerImpl implements HubManager, HostListener
     private static final long TIME_15_MINUTES = 900;
 
     private static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
+    private static final int CONTAINER_METRIC_SEND_INTERVAL_MIN = 15;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -114,6 +118,9 @@ public class HubManagerImpl implements HubManager, HostListener
     private final ScheduledExecutorService registrationRequestExecutor = Executors.newSingleThreadScheduledExecutor();
 
     private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
+
+    private final ScheduledExecutorService containersMetricsExecutorService =
+            Executors.newSingleThreadScheduledExecutor();
 
     private SecurityManager securityManager;
 
@@ -155,6 +162,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private PeerMetricsProcessor peerMetricsProcessor;
 
+    private ContainerMetricsService containerMetricsService;
+
 
     public HubManagerImpl( DaoManager daoManager )
     {
@@ -167,6 +176,8 @@ public class HubManagerImpl implements HubManager, HostListener
         try
         {
             localPeer = peerManager.getLocalPeer();
+
+            containerMetricsService = new ContainerMetricsServiceImpl( daoManager );
 
             configDataService = new ConfigDataServiceImpl( daoManager );
 
@@ -247,6 +258,14 @@ public class HubManagerImpl implements HubManager, HostListener
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
 
         environmentTelemetryService.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
+
+        //***********
+        final ContainerMetricsProcessor containersMetricsProcessor =
+                new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService,
+                        CONTAINER_METRIC_SEND_INTERVAL_MIN );
+        containersMetricsExecutorService
+                .scheduleWithFixedDelay( containersMetricsProcessor, 1, CONTAINER_METRIC_SEND_INTERVAL_MIN,
+                        TimeUnit.MINUTES );
     }
 
 
