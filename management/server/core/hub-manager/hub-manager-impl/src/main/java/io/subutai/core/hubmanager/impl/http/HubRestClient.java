@@ -20,6 +20,7 @@ import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -128,6 +129,7 @@ public class HubRestClient implements RestClient
             {
                 attemptNo++;
                 response = webClient.invoke( httpMethod, requestBody );
+                TaskUtil.sleep( 500 );
             }
             // <<< retry on 503 http code
 
