@@ -42,7 +42,7 @@
                ng-click="nodeRegCtrl.changeNamePopup( clusterNode )" style="visibility: visible">
             </a>
           </td>
-          <td>{{ nodeRegCtrl.findIp(clusterNode.interfaces) }}</td>
+          <td>{{ clusterNode.ip }}</td>
           <td>{{ clusterNode.status == 'APPROVED' ? 'Yes' : 'No' }}</td>
           <td>
             <button ng-if="clusterNode.status == 'REQUESTED'" class="b-btn b-btn_green"

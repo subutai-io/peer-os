@@ -34,6 +34,8 @@ public class RequestedHostJson implements RequestedHost
     private boolean isConnected = false;
     @Expose
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
+    @Expose
+    private String ip;
 
 
     public RequestedHostJson( RequestedHost requestedHost )
@@ -106,6 +108,12 @@ public class RequestedHostJson implements RequestedHost
     public void setConnected( final boolean connected )
     {
         isConnected = connected;
+    }
+
+
+    public void setIp( final String ip )
+    {
+        this.ip = ip;
     }
 
 

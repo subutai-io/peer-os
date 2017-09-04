@@ -20,7 +20,6 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 	vm.approve = approve;
 	vm.reject = reject;
 	vm.remove = remove;
-	vm.findIp = findIp;
 	vm.editingRh = {};
 	vm.changeNamePopup = changeNamePopup;
 	vm.setHostName = setHostName;
@@ -36,16 +35,6 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 		DTColumnDefBuilder.newColumnDef(1),
 		DTColumnDefBuilder.newColumnDef(2)
 	];
-
-    function findIp(interfaces){
-        var i=0, len=interfaces.length;
-        for (; i<len; i++) {
-          if (interfaces[i].interfaceName == 'wan') {
-            return interfaces[i].ip;
-          }
-        }
-        return 'No IP detected';
-    }
 
 	function getNodes() {
 		nodeRegSrv.getData().success(function(data){

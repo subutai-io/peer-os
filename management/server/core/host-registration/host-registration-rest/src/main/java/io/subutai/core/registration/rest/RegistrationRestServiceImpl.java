@@ -226,6 +226,8 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
                     ResourceHost resourceHost = localPeer.getResourceHostById( requestedHost.getId() );
 
                     requestedHostJson.setConnected( resourceHost.isConnected() );
+
+                    requestedHostJson.setIp( resourceHost.getAddress() );
                 }
                 catch ( HostNotFoundException e )
                 {
