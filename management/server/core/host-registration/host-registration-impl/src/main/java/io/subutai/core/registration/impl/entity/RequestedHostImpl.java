@@ -13,7 +13,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -23,7 +22,6 @@ import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -42,12 +40,6 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Column( name = "hostname" )
     @Expose
     private String hostname;
-
-    @JoinColumn( name = "net_interfaces" )
-    @OneToMany( orphanRemoval = true, targetEntity = HostInterfaceImpl.class, cascade = CascadeType.ALL, fetch =
-            FetchType.EAGER )
-    @Expose
-    private Set<HostInterface> interfaces = Sets.newHashSet();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -100,13 +92,6 @@ public class RequestedHostImpl implements RequestedHost, Serializable
             this.arch = HostArchitecture.AMD64;
         }
 
-        Set<HostInterface> netHostInterfaces = requestedHost.getInterfaces();
-        for ( final HostInterface netHostInterface : netHostInterfaces )
-        {
-            HostInterfaceImpl hostInterfaceImpl = new HostInterfaceImpl( netHostInterface );
-            this.interfaces.add( hostInterfaceImpl );
-        }
-
         Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfos();
         for ( final ContainerInfo containerInfo : hostInfoSet )
         {
@@ -129,22 +114,10 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         this.publicKey = publicKey;
         this.status = status;
 
-        for ( final HostInterface anHostInterface : interfaces )
-        {
-            this.interfaces.add( new HostInterfaceImpl( anHostInterface ) );
-        }
-
         if ( this.arch == null )
         {
             this.arch = HostArchitecture.AMD64;
         }
-    }
-
-
-    @Override
-    public Set<HostInterface> getInterfaces()
-    {
-        return interfaces;
     }
 
 
@@ -222,19 +195,6 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     }
 
 
-    public void setInterfaces( final HostInterfaces hostInterfaces )
-    {
-        this.interfaces.clear();
-
-        for ( final HostInterface netHostInterface : hostInterfaces.getAll() )
-        {
-            HostInterfaceImpl hostInterfaceImpl = new HostInterfaceImpl( netHostInterface );
-
-            this.interfaces.add( hostInterfaceImpl );
-        }
-    }
-
-
     @Override
     public boolean equals( final Object o )
     {
@@ -265,6 +225,6 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     {
         return "RequestedHostImpl{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", status=" + status
                 + ", arch=" + arch + ", secret='" + secret + '\'' + ", publicKey='" + publicKey + '\''
-                + ", hostInterfaces=" + interfaces + ", hostInfos=" + hostInfos + ", cert=" + cert + '}';
+                + ", hostInfos=" + hostInfos + ", cert=" + cert + '}';
     }
 }

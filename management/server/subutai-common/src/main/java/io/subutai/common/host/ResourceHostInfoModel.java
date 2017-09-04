@@ -93,7 +93,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     public String toString()
     {
         return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                          .add( "instance", instance ).add( "interfaces", getHostInterfaces() )
+                          .add( "instance", instance )
                           .add( "containers", containers ).toString();
     }
 

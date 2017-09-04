@@ -343,7 +343,7 @@ public class EnvironmentAdapter
 
             peerJson.put( "rhId", ch.getResourceHostId().getId() );
 
-            String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
+            String ip = ch.getIp();
 
             peerJson.put( "ip", ip );
 

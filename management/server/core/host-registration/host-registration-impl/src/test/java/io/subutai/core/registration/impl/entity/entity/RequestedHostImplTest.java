@@ -7,20 +7,13 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 
 public class RequestedHostImplTest
@@ -52,25 +45,6 @@ public class RequestedHostImplTest
         assertEquals( "hostname", requestedHost.getHostname() );
     }
 
-
-    @Test
-    public void testGetInterfaces() throws Exception
-    {
-        assertArrayEquals( Sets.newHashSet().toArray(), requestedHost.getInterfaces().toArray() );
-    }
-
-
-    @Test
-    public void testSetInterfaces() throws Exception
-    {
-        HostInterfaces hostInterfaces = mock( HostInterfaces.class );
-        HostInterfaceModel hostInterfaceModel = mock( HostInterfaceModel.class );
-        doReturn( Sets.newHashSet( hostInterfaceModel ) ).when( hostInterfaces ).getAll();
-        doReturn( "name" ).when( hostInterfaceModel ).getName();
-        doReturn( "ip" ).when( hostInterfaceModel ).getIp();
-        requestedHost.setInterfaces( hostInterfaces );
-        assertEquals( 1, requestedHost.getInterfaces().size() );
-    }
 
 
     @Test

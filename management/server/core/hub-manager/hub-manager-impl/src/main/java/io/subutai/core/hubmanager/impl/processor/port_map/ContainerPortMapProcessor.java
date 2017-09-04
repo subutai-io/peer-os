@@ -195,7 +195,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 // 'external port -> internal port' mapping should occur.
 
                 ResourceHost mngHost = ctx.localPeer.getManagementHost();
-                String rhIpAddr = resourceHost.getInterfaceByName( "wan" ).getIp();
+                String rhIpAddr = resourceHost.getAddress();
 
                 if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
                         portMapDto.getExternalPort() ) )

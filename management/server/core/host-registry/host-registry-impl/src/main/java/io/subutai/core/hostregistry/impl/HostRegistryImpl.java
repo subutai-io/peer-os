@@ -24,8 +24,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.HostNotFoundException;
@@ -457,37 +455,8 @@ public class HostRegistryImpl implements HostRegistry
     WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action )
     {
         return RestUtil.createWebClient(
-                String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ), Common.DEFAULT_AGENT_PORT,
+                String.format( "http://%s:%d/%s",resourceHostInfo.getAddress(), Common.DEFAULT_AGENT_PORT,
                         action ), 3000, 5000, 1 );
-    }
-
-
-    @Override
-    public String getResourceHostIp( ResourceHostInfo resourceHostInfo )
-    {
-
-        HostInterface hostInterface;
-
-        if ( resourceHostInfo instanceof ResourceHost )
-        {
-            Set<HostInterface> hostInterfaces = ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces();
-
-            hostInterface = ipUtil.findInterfaceByName( hostInterfaces, Common.WAN_INTERFACE );
-        }
-        else
-        {
-            Set<HostInterface> hostInterfaces = Sets.newHashSet();
-            hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
-
-            hostInterface = ipUtil.findInterfaceByName( hostInterfaces, Common.WAN_INTERFACE );
-        }
-
-        if ( hostInterface instanceof NullHostInterface )
-        {
-            throw new IllegalStateException( "Network interface not found" );
-        }
-
-        return hostInterface.getIp();
     }
 
 

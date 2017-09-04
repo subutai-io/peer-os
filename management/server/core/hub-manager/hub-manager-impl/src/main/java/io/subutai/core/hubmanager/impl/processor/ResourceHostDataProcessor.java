@@ -13,8 +13,6 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import com.google.common.collect.Lists;
 
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -224,22 +222,8 @@ public class ResourceHostDataProcessor extends HubRequester
 
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        // TODO Totally incorrect implementation
-        // TODO Use host registry to obtain interfaces
         if ( hubManager.canWorkWithHub() )
         {
-            HostInterfaces as = resourceHostInfo.getHostInterfaces();
-            Set<HostInterfaceModel> test = as.getAll();
-
-            for ( final HostInterfaceModel hostInterfaceModel : test )
-            {
-                HostInterfaceDto dto = new HostInterfaceDto();
-                dto.setName( hostInterfaceModel.getName() );
-                dto.setIp( hostInterfaceModel.getIp() );
-
-                interfaces.add( dto );
-            }
-
             processConfigs();
         }
     }

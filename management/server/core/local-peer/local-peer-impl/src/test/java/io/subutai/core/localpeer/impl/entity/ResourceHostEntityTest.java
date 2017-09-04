@@ -104,9 +104,6 @@ public class ResourceHostEntityTest
         when( hostInfo.getId() ).thenReturn( HOST_ID );
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
-        when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
-        when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
-        when( anHostInterface.getIp() ).thenReturn( IP );
 
         resourceHostEntity = new ResourceHostEntity( PEER_ID, hostInfo );
         resourceHostEntity.setPeer( peer );

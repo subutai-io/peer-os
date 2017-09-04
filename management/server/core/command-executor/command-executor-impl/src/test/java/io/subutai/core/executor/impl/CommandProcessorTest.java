@@ -246,7 +246,7 @@ public class CommandProcessorTest
         WebClient webClient = mock( WebClient.class );
         Response response = mock( Response.class );
 
-        doReturn( "IP" ).when( hostRegistry ).getResourceHostIp( resourceHostInfo );
+        doReturn( "IP" ).when( resourceHostInfo ).getAddress();
         doReturn( webClient ).when( commandProcessor ).getWebClient( resourceHostInfo );
         doReturn( response ).when( webClient ).form( any( Form.class ) );
         doReturn( Response.Status.ACCEPTED.getStatusCode() ).when( response ).getStatus();

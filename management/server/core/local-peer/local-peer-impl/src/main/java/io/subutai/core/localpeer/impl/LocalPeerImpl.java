@@ -1327,7 +1327,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         resourceHostDataService.remove( rhId );
 
         //remove from host registry cache
-        hostRegistry.removeResourceHost( rhId);
+        hostRegistry.removeResourceHost( rhId );
 
         ResourceHost resourceHost = getResourceHostById( rhId );
 
@@ -1472,7 +1472,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        if ( isInitialized() && !CollectionUtil.isCollectionEmpty( resourceHostInfo.getHostInterfaces().getAll() ) )
+        if ( isInitialized() && !StringUtils.isBlank( resourceHostInfo.getAddress() ) )
         {
             boolean firstMhRegistration = false;
 
@@ -2122,13 +2122,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public HostInterfaces getInterfaces() throws HostNotFoundException
-    {
-        return getManagementHost().getHostInterfaces();
-    }
-
-
-    @Override
     public synchronized Integer reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
 
@@ -2211,35 +2204,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public UsedNetworkResources getUsedNetworkResources() throws PeerException
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
-
-        // todo uncomment (commented out until reserved resources are properly cleaned up on subos level)
-        // see https://github.com/subutai-io/p2p/issues/174
-        //        Set<ResourceHost> resourceHostSet = getResourceHosts();
-        //
-        //        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
-        //
-        //        for ( final ResourceHost resourceHost : resourceHostSet )
-        //        {
-        //            hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost,
-        // usedNetworkResources ) );
-        //        }
-        //
-        //        HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
-        //
-        //        if ( results.hasFailures() )
-        //        {
-        //            HostUtil.Task task = results.getFirstFailedTask();
-        //
-        //            String errMsg =
-        //                    String.format( "Error gathering reserved net resources on host %s: %s", task.getHost()
-        // .getId(),
-        //                            task.getFailureReason() );
-        //
-        //            LOG.error( errMsg );
-        //
-        //            throw new PeerException( errMsg, task.getException() );
-        //        }
-
 
         //add reserved ones too
         for ( NetworkResource networkResource : getReservedNetworkResources().getNetworkResources() )

@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
-import java.io.Serializable;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -18,14 +16,13 @@ import io.subutai.common.host.HostInterface;
 
 /**
  * {@link HostInterfaceEntity} stores host network interface information. <p> {@link #interfaceName} - host interface
- * name</p> <p> {@link #ip} - ip address</p> <p> {@link #mac} - mac address</p> <p> {@link #host} - target host whose
- * metadata being saved</p>
+ * name</p> <p> {@link #ip} - ip address</p> <p> {@link #host} - target host whose metadata being saved</p>
  *
  * @see HostInterface
  * @see ContainerHostEntity
  */
 @Entity
-@Table( name = "r_intf" )
+@Table( name = "net_intf" )
 @Access( AccessType.FIELD )
 public class HostInterfaceEntity implements HostInterface
 {
@@ -40,7 +37,7 @@ public class HostInterfaceEntity implements HostInterface
 
     @ManyToOne
     @JoinColumn( name = "host_id" )
-    private ResourceHostEntity host;
+    private ContainerHostEntity host;
 
 
     protected HostInterfaceEntity()
@@ -81,13 +78,13 @@ public class HostInterfaceEntity implements HostInterface
     }
 
 
-    public ResourceHostEntity getHost()
+    public ContainerHostEntity getHost()
     {
         return host;
     }
 
 
-    public void setHost( final ResourceHostEntity host )
+    public void setHost( final ContainerHostEntity host )
     {
         this.host = host;
     }

@@ -46,11 +46,7 @@ public class ListHostsCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "%s\t%s", resourceHostInfo.getHostname(),
                     abbreviate ? StringUtils.abbreviate( resourceHostInfo.getId(), 7 ) : resourceHostInfo.getId() ) );
 
-            System.out.println( "\tNetwork interfaces:" );
-            for ( HostInterface hostInterface : resourceHostInfo.getHostInterfaces().getAll() )
-            {
-                System.out.println( String.format( "\t\t%s: %s", hostInterface.getName(), hostInterface.getIp() ) );
-            }
+            System.out.println( String.format( "\tIp address: %s", resourceHostInfo.getAddress() ) );
 
             System.out.println( "\tContainers:" );
             Set<ContainerHostInfo> containerHostInfos = resourceHostInfo.getContainers();

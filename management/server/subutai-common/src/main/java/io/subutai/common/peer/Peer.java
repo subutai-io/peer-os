@@ -224,13 +224,6 @@ public interface Peer extends RelationLink
 
 
     /**
-     * Gets network interfaces
-     */
-
-    HostInterfaces getInterfaces() throws PeerException;
-
-
-    /**
      * Resets a secret key for a given P2P network on all RHs
      *
      * @param p2PCredentials - P2P network credentials

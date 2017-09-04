@@ -34,7 +34,6 @@ import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -90,7 +89,6 @@ import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -883,13 +881,6 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( e.getMessage() );
         }
-    }
-
-
-    @Override
-    public HostInterfaces getInterfaces() throws PeerException
-    {
-        return peerWebClient.getInterfaces();
     }
 
 
