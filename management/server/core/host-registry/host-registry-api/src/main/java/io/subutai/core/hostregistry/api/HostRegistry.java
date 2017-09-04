@@ -128,5 +128,4 @@ public interface HostRegistry
 
     void removeResourceHost( String id );
 
-    String getResourceHostIp( ResourceHostInfo resourceHostInfo );
 }

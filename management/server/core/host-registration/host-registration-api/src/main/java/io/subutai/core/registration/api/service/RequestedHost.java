@@ -14,8 +14,6 @@ public interface RequestedHost
 
     String getHostname();
 
-    Set<HostInterface> getInterfaces();
-
     Set<ContainerInfo> getHostInfos();
 
     HostArchitecture getArch();

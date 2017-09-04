@@ -258,8 +258,6 @@ public class LocalPeerImplTest
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
-        when( managementHost.getHostInterfaces() ).thenReturn( hostInterfaces );
-        when( managementHost.getInterfaceByName( INTERFACE_NAME ) ).thenReturn( anHostInterface );
 
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
@@ -293,11 +291,6 @@ public class LocalPeerImplTest
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
         when( environmentId.getId() ).thenReturn( ENV_ID );
-        when( hostInfo.getId() ).thenReturn( HOST_ID );
-        when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
-        when( hostInfo.getArch() ).thenReturn( ARCH );
-        when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
-        when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
 
         localPeer.serviceLocator = serviceLocator;
         when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
@@ -614,7 +607,7 @@ public class LocalPeerImplTest
     {
         when( resourceHostInfo.getHostname() ).thenReturn( Common.MANAGEMENT_HOSTNAME );
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
-        when( resourceHostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
+        doReturn(IP).when( resourceHostInfo ).getAddress();
         doReturn( managementHost ).when( localPeer ).getManagementHost();
 
         localPeer.initialized = true;

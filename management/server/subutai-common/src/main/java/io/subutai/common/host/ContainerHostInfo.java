@@ -20,4 +20,9 @@ public interface ContainerHostInfo extends HostInfo
     String getContainerName();
 
     Quota getRawQuota();
+
+    /**
+     * Returns network interfaces of host
+     */
+    HostInterfaces getHostInterfaces();
 }

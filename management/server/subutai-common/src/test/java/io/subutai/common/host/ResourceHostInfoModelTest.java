@@ -68,7 +68,6 @@ public class ResourceHostInfoModelTest
     {
         assertEquals( HOST_HOSTNAME, resourceHostInfo.getHostname() );
         assertEquals( HOST_ID, resourceHostInfo.getId() );
-        assertEquals( HOST_IP, resourceHostInfo.getHostInterfaces().getAll().iterator().next().getIp() );
         assertEquals( ARCH, resourceHostInfo.getArch() );
     }
 
@@ -94,7 +93,6 @@ public class ResourceHostInfoModelTest
         String toString = resourceHostInfo.toString();
 
         assertThat( toString, containsString( HOST_HOSTNAME ) );
-        assertThat( toString, containsString( HOST_IP ) );
         assertThat( toString, containsString( HOST_ID ) );
         assertThat( toString, containsString( CONTAINER_HOSTNAME ) );
         assertThat( toString, containsString( CONTAINER_IP ) );

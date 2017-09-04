@@ -1,6 +1,9 @@
 package io.subutai.common.host;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.gson.annotations.SerializedName;
@@ -21,6 +24,9 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     @SerializedName( "quota" )
     @JsonProperty( "quota" )
     protected Quota quota;
+    @SerializedName( "interfaces" )
+    @JsonProperty( "interfaces" )
+    protected Set<HostInterfaceModel> hostInterfaces = new HashSet<>();
 
 
     @Override
@@ -37,9 +43,23 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
                                    @JsonProperty( "arch" ) final HostArchitecture hostArchitecture,
                                    @JsonProperty( "status" ) final ContainerHostState state )
     {
-        super( id, hostname, hostInterfaces, hostArchitecture );
+        super( id, hostname, hostArchitecture );
         this.state = state;
         this.name = containerName;
+        setHostInterfaces( hostInterfaces );
+    }
+
+
+    @Override
+    public HostInterfaces getHostInterfaces()
+    {
+        return new HostInterfaces( this.id, this.hostInterfaces );
+    }
+
+
+    public void setHostInterfaces( final HostInterfaces hostInterfaces )
+    {
+        this.hostInterfaces.addAll( hostInterfaces.getAll() );
     }
 
 

@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
@@ -47,10 +46,7 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.InstanceType;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
@@ -115,10 +111,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Enumerated( EnumType.STRING )
     private InstanceType instanceType;
 
-    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
-            HostInterfaceEntity.class, orphanRemoval = true )
-    @JsonIgnore
-    private Set<HostInterface> netInterfaces = new HashSet<>();
 
     @Column( name = "address" )
     private String address;
@@ -156,30 +148,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         this.address = resourceHostInfo.getAddress();
 
-        setSavedHostInterfaces( resourceHostInfo.getHostInterfaces() );
-
         init();
-    }
-
-
-    @Override
-    public Set<HostInterface> getSavedHostInterfaces()
-    {
-        return netInterfaces;
-    }
-
-
-    protected void setSavedHostInterfaces( HostInterfaces hostInterfaces )
-    {
-        Preconditions.checkNotNull( hostInterfaces );
-
-        this.netInterfaces.clear();
-        for ( HostInterface iface : hostInterfaces.getAll() )
-        {
-            HostInterfaceEntity netInterface = new HostInterfaceEntity( iface );
-            netInterface.setHost( this );
-            this.netInterfaces.add( netInterface );
-        }
     }
 
 
@@ -240,7 +209,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
 
             //skip if own IP
-            boolean ownIp = !( getHostInterfaces().findByIp( rhP2pIp.getP2pIp() ) instanceof NullHostInterface );
+            boolean ownIp = getAddress().equals( rhP2pIp.getP2pIp() );
             if ( ownIp )
             {
                 continue;
@@ -981,8 +950,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void updateHostInfo( final HostInfo hostInfo )
     {
         super.updateHostInfo( hostInfo );
-
-        setSavedHostInterfaces( hostInfo.getHostInterfaces() );
 
         ResourceHostInfo resourceHostInfo = ( ResourceHostInfo ) hostInfo;
 

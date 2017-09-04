@@ -3,6 +3,7 @@ package io.subutai.common.peer;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostId;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.Template;
 import io.subutai.hub.share.quota.ContainerQuota;
@@ -64,4 +65,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
     HostId getResourceHostId();
 
     String getIp();
+
+    HostInterface getInterfaceByName( String interfaceName );
 }

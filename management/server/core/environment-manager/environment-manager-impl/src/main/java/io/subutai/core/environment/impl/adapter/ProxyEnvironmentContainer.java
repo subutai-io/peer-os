@@ -21,6 +21,7 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshKeys;
@@ -37,7 +38,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
     private static final RequestBuilder WHOAMI = new RequestBuilder( "whoami" );
 
-    private Host proxyContainer;
+    private ContainerHost proxyContainer;
 
     private final boolean local;
 
@@ -112,7 +113,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     }
 
 
-    void setProxyContainer( Host proxyContainer )
+    void setProxyContainer( ContainerHost proxyContainer )
     {
         this.proxyContainer = proxyContainer;
 
@@ -150,9 +151,9 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
     private RequestBuilder wrapForProxy( RequestBuilder requestBuilder )
     {
-        String proxyIp = proxyContainer.getHostInterfaces().getAll().iterator().next().getIp();
+        String proxyIp = proxyContainer.getIp();
 
-        String targetHostIp = getHostInterfaces().getAll().iterator().next().getIp();
+        String targetHostIp = getIp();
 
         if ( targetHostIp.contains( "/" ) )
         {

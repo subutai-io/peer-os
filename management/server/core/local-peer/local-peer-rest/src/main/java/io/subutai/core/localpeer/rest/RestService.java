@@ -98,12 +98,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     Integer reserveNetResources( NetworkResourceImpl networkResource );
 
-    @GET
-    @Path( "interfaces" )
-    @Produces( MediaType.APPLICATION_JSON )
-    @Consumes( MediaType.APPLICATION_JSON )
-    HostInterfaces getNetworkInterfaces();
-
     @POST
     @Path( "p2presetkey" )
     @Produces( MediaType.APPLICATION_JSON )

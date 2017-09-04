@@ -70,11 +70,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
     /**
-     * Returns network interfaces from db
-     */
-    Set<HostInterface> getSavedHostInterfaces();
-
-    /**
      * Returns state of hosted container
      */
     ContainerHostState getContainerHostState( final ContainerHost container ) throws ResourceHostException;

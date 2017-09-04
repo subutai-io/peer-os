@@ -27,7 +27,7 @@ class ProxyContainerHelper
     {
         Set<String> localContainerIds = getLocalContainerIds();
 
-        Host proxyContainer = getProxyContainer( envContainers, localContainerIds );
+        ContainerHost proxyContainer = getProxyContainer( envContainers, localContainerIds );
 
         for ( ProxyEnvironmentContainer c : envContainers )
         {
@@ -40,7 +40,7 @@ class ProxyContainerHelper
 
 
     // Returns a first local container which will be used as to execute SSH commands to remote containers
-    private Host getProxyContainer( Set<ProxyEnvironmentContainer> envContainers, Set<String> localContainerIds )
+    private ContainerHost getProxyContainer( Set<ProxyEnvironmentContainer> envContainers, Set<String> localContainerIds )
     {
         for ( ProxyEnvironmentContainer host : envContainers )
         {

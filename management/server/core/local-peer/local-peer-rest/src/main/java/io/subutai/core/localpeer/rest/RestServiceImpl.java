@@ -228,21 +228,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public HostInterfaces getNetworkInterfaces()
-    {
-        try
-        {
-            return localPeer.getInterfaces();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
     public ResourceHostMetrics getResources()
     {
         try

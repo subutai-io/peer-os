@@ -6,14 +6,13 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.Host;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -25,7 +24,7 @@ public class RegisterHostsStep
     private final Topology topology;
     private final LocalEnvironment environment;
     private final TrackerOperation trackerOperation;
-    protected PeerUtil<Object> hostUtil = new PeerUtil<>();
+    PeerUtil<Object> hostUtil = new PeerUtil<>();
 
 
     public RegisterHostsStep( final Topology topology, final LocalEnvironment environment,
@@ -39,28 +38,23 @@ public class RegisterHostsStep
 
     public void execute() throws EnvironmentManagerException, PeerException
     {
-        Set<Host> hosts = Sets.newHashSet();
-
-        hosts.addAll( environment.getContainerHosts() );
-
-        if ( !hosts.isEmpty() && topology.registerHosts() )
+        if ( !environment.getContainerHosts().isEmpty() && topology.registerHosts() )
         {
-            registerHosts( hosts );
+            registerHosts( environment.getContainerHosts() );
         }
     }
 
 
-    protected void registerHosts( Set<Host> hosts ) throws EnvironmentManagerException, PeerException
+    void registerHosts( Set<EnvironmentContainerHost> hosts ) throws EnvironmentManagerException, PeerException
     {
 
         Set<Peer> peers = environment.getPeers();
 
         final Map<String, String> hostAddresses = Maps.newHashMap();
 
-        for ( Host host : hosts )
+        for ( ContainerHost host : hosts )
         {
-            hostAddresses
-                    .put( host.getHostname(), host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() );
+            hostAddresses.put( host.getHostname(), host.getIp() );
         }
 
 

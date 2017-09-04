@@ -404,7 +404,6 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
             if ( registrationRequest != null )
             {
                 registrationRequest.setHostname( resourceHostInfo.getHostname() );
-                registrationRequest.setInterfaces( resourceHostInfo.getHostInterfaces() );
 
                 requestDataService.update( registrationRequest );
             }

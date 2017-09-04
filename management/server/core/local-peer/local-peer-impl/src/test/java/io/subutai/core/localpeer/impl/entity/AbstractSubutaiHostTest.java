@@ -54,8 +54,6 @@ public class AbstractSubutaiHostTest
 
 
     AbstractSubutaiHost host;
-    @Mock
-    private HostInterfaces hostInterfaces;
 
 
     static class HostImpl extends AbstractSubutaiHost
@@ -119,13 +117,9 @@ public class AbstractSubutaiHostTest
     @Before
     public void setUp() throws Exception
     {
-        when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
         when( hostInfo.getId() ).thenReturn( HOST_ID );
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
-        when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
-        when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
-        when( anHostInterface.getIp() ).thenReturn( IP );
         host = new HostImpl( PEER_ID, hostInfo );
         host.setPeer( peer );
         host.init();
@@ -215,13 +209,6 @@ public class AbstractSubutaiHostTest
     public void testGetLastHeartbeat() throws Exception
     {
         assertTrue( host.getLastHeartbeat() == 0 );
-    }
-
-
-    @Test
-    public void testGetInterfaces() throws Exception
-    {
-        assertFalse( host.getHostInterfaces().getAll().isEmpty() );
     }
 
 
