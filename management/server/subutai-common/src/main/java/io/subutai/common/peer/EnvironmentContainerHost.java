@@ -4,7 +4,6 @@ package io.subutai.common.peer;
 import java.util.Set;
 
 import io.subutai.common.security.SshKeys;
-import io.subutai.hub.share.quota.ContainerSize;
 
 
 public interface EnvironmentContainerHost extends ContainerHost
@@ -14,8 +13,6 @@ public interface EnvironmentContainerHost extends ContainerHost
     EnvironmentContainerHost removeTag( String tag );
 
     Set<String> getTags();
-
-//    EnvironmentContainerHost setContainerQuota( ContainerSize size ) throws PeerException;
 
     SshKeys getAuthorizedKeys() throws PeerException;
 

@@ -39,7 +39,6 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -48,7 +47,6 @@ import io.subutai.common.network.LogLevel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
@@ -164,42 +162,6 @@ public class MonitorImpl implements Monitor, HostListener
         }
 
         return result;
-    }
-
-
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid )
-            throws MonitorException
-    {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkArgument( pid > 0 );
-        try
-        {
-
-            Host c = peerManager.getLocalPeer().findHostByName( containerId.getHostName() );
-            ResourceHost resourceHost =
-                    peerManager.getLocalPeer().getResourceHostByContainerHostName( c.getHostname() );
-
-            CommandResult commandResult =
-                    resourceHost.execute( commands.getProcessResourceUsageCommand( c.getHostname(), pid ) );
-            if ( !commandResult.hasSucceeded() )
-            {
-                throw new MonitorException(
-                        String.format( "Error getting process resource usage of pid=%d on %s: %s %s", pid,
-                                c.getHostname(), commandResult.getStatus(), commandResult.getStdErr() ) );
-            }
-
-            ProcessResourceUsage result = JsonUtil.fromJson( commandResult.getStdOut(), ProcessResourceUsage.class );
-            result.setContainerId( containerId );
-
-            return result;
-        }
-        catch ( Exception e )
-        {
-            LOG.error( String.format( "Could not obtain process resource usage for container %s, pid %d",
-                    containerId.getId(), pid ), e );
-            throw new MonitorException( e );
-        }
     }
 
 

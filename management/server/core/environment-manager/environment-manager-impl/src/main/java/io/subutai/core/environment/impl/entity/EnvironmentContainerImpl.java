@@ -46,7 +46,6 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -573,13 +572,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     public HostArchitecture getArch()
     {
         return this.hostArchitecture;
-    }
-
-
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
-    {
-        return getPeer().getProcessResourceUsage( getContainerId(), processPid );
     }
 
 

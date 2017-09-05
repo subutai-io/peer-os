@@ -8,12 +8,10 @@ import java.util.Set;
 
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
@@ -24,17 +22,6 @@ import io.subutai.core.metric.api.pojo.P2Pinfo;
  */
 public interface Monitor
 {
-    /**
-     * Returns process resource usage on a given container host
-     *
-     * @param containerId - container ID
-     * @param pid - process ID
-     *
-     * @return - {@code ProcessResourceUsage}
-     */
-
-    ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid ) throws MonitorException;
-
 
     ResourceHostMetrics getResourceHostMetrics();
 

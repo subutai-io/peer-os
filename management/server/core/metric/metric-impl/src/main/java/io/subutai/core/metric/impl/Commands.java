@@ -32,10 +32,4 @@ public class Commands
                 host instanceof ContainerHost ? ( ( ContainerHost ) host ).getContainerName() : host.getHostname(),
                 startTimestamp, endTimestamp ) );
     }
-
-
-    public RequestBuilder getProcessResourceUsageCommand( String containerName, int pid )
-    {
-        return new RequestBuilder( String.format( "subutai monitor -i %s %s", pid, containerName ) );
-    }
 }

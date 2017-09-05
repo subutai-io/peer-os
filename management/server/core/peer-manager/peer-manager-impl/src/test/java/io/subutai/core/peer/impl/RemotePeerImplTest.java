@@ -222,16 +222,6 @@ public class RemotePeerImplTest
 
 
     @Test( expected = PeerException.class )
-    public void testGetProcessResourceUsage() throws Exception
-    {
-        remotePeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
-
-
-        remotePeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
-    }
-
-
-    @Test( expected = PeerException.class )
     public void testGetContainerHostState() throws Exception
     {
         remotePeer.getContainerState( containerHost.getContainerId() );
