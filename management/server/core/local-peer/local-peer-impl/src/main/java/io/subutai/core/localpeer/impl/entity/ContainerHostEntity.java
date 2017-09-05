@@ -34,7 +34,6 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -303,14 +302,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public HostInterface getInterfaceByName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName );
-    }
-
-
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
-    {
-        Peer peer = getPeer();
-        return peer.getProcessResourceUsage( getContainerId(), processPid );
     }
 
 

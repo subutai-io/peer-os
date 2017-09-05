@@ -164,15 +164,6 @@ public class ContainerHostEntityTest
 
 
     @Test
-    public void testGetProcessResourceUsage() throws Exception
-    {
-        containerHostEntity.getProcessResourceUsage( PID );
-
-        verify( peer ).getProcessResourceUsage( containerHostEntity.getContainerId(), PID );
-    }
-
-
-    @Test
     public void testGetQuota() throws Exception
     {
         containerHostEntity.getQuota();

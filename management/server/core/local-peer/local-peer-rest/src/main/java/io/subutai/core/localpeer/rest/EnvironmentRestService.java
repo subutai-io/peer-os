@@ -15,7 +15,6 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.CustomProxyConfig;
@@ -60,13 +59,6 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Quota getRawQuota( @PathParam( "containerId" ) ContainerId containerId );
-
-    @GET
-    @Path( "{environmentId}/container/{containerId}/usage/{pid}" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    ProcessResourceUsage getProcessResourceUsage( @PathParam( "containerId" ) ContainerId containerId,
-                                                  @PathParam( "pid" ) int pid );
 
 
     @GET

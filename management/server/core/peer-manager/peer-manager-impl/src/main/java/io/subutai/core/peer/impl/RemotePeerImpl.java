@@ -36,7 +36,6 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
 import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -318,18 +317,6 @@ public class RemotePeerImpl implements RemotePeer
             LOG.error( "Error getting container state #isConnected", e );
             return false;
         }
-    }
-
-
-    @PermitAll
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Container id is null" );
-        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
-        Preconditions.checkArgument( pid > 0, "Process pid must be greater than 0" );
-
-        return environmentWebClient.getProcessResourceUsage( containerId, pid );
     }
 
 

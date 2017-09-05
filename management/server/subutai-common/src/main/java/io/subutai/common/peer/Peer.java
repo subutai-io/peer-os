@@ -19,10 +19,8 @@ import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
 import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -179,19 +177,6 @@ public interface Peer extends RelationLink
      * Returns set of container information of the environment
      */
     Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
-
-    //******** Quota functions ***********
-
-    //    void setContainerQuota( final ContainerId containerHostId, final ContainerQuota containerQuota ) throws
-    // PeerException;
-
-    /**
-     * Returns resource usage of process on container by its PID
-     *
-     * @param containerId - target container
-     * @param pid - pid of process
-     */
-    ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
 
 
     //networking

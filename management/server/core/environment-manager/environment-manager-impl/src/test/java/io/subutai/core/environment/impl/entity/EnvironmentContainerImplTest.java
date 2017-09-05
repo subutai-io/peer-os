@@ -155,7 +155,6 @@ public class EnvironmentContainerImplTest
     }
 
 
-
     @Test
     public void testDestroy() throws Exception
     {
@@ -329,15 +328,6 @@ public class EnvironmentContainerImplTest
     public void testGetArch() throws Exception
     {
         assertEquals( HostArchitecture.AMD64, environmentContainer.getArch() );
-    }
-
-
-    @Test
-    public void testGetProcessResourceUsage() throws Exception
-    {
-        environmentContainer.getProcessResourceUsage( PID );
-
-        verify( peer ).getProcessResourceUsage( environmentContainer.getContainerId(), PID );
     }
 
 
