@@ -4,7 +4,6 @@ package io.subutai.core.hubmanager.impl.http;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 import javax.ws.rs.core.Response;
 
@@ -17,9 +16,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -235,8 +232,7 @@ public class HubRestClient implements RestClient
         }
         else
         {
-            restResult.setEntity(
-                    ( T ) EntityUtils.toString( ( HttpEntity ) response.getEntity(), Charset.forName( "UTF-8" ) ) );
+            restResult.setEntity( response.readEntity( clazz ) );
         }
 
         return restResult;
