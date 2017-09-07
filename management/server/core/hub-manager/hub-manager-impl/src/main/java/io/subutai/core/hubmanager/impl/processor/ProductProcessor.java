@@ -235,7 +235,7 @@ public class ProductProcessor implements StateLinkProcessor
         String path = String.format( "/rest/v1/marketplace/products/%s", productId );
         try
         {
-            RestResult<String> restResult = restClient.get( path, String.class );
+            RestResult<String> restResult = restClient.getPlain( path, String.class );
 
             if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
