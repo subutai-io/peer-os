@@ -28,7 +28,6 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO put 2 retries on 503
 public class HubRestClient implements RestClient
 {
     private static final String ERROR = "Error executing request to Hub: ";
@@ -49,6 +48,13 @@ public class HubRestClient implements RestClient
     public <T> RestResult<T> get( String url, Class<T> clazz )
     {
         return execute( "GET", url, null, clazz, true );
+    }
+
+
+    @Override
+    public <T> RestResult<T> getPlain( String url, Class<T> clazz )
+    {
+        return execute( "GET", url, null, clazz, false );
     }
 
 
