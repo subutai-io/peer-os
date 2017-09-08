@@ -1,9 +1,6 @@
 package io.subutai.core.hubmanager.api;
 
 
-import org.apache.http.HttpStatus;
-
-
 public class RestResult<T>
 {
     private final int status;
@@ -28,7 +25,7 @@ public class RestResult<T>
 
     public boolean isSuccess()
     {
-        return status == HttpStatus.SC_OK || status == HttpStatus.SC_NO_CONTENT || status == HttpStatus.SC_CREATED;
+        return status >= 200 && status < 300;
     }
 
 
