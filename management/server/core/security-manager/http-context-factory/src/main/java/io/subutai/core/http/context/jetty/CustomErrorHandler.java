@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.server.handler.ErrorHandler;
 
+import org.apache.commons.io.IOUtils;
+
 
 public class CustomErrorHandler extends ErrorHandler
 {
@@ -19,5 +21,9 @@ public class CustomErrorHandler extends ErrorHandler
         super.writeErrorPageBody( request, writer, code, message, showStacks );
 
         writer.write( "Oops, you did it again" );
+        writer.write( "<div>" );
+        writer.write( IOUtils.toString( CustomErrorHandler.class.getClassLoader().getResourceAsStream( "logo.svg" ),
+                "UTF-8" ) );
+        writer.write( "</div>" );
     }
 }
