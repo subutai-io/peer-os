@@ -46,11 +46,6 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
-  <error-page>
-    <error-code>404</error-code>
-    <location>/404</location>
-  </error-page>
-
   <servlet>
     <servlet-name>NotFound</servlet-name>
     <servlet-class>io.subutai.webui.NotFound</servlet-class>
@@ -58,6 +53,12 @@
 
   <servlet-mapping>
     <servlet-name>NotFound</servlet-name>
-    <url-pattern>/404</url-pattern>
+    <url-pattern>/not-found</url-pattern>
   </servlet-mapping>
+
+  <error-page>
+    <error-code>404</error-code>
+    <location>/not-found</location>
+  </error-page>
+
 </web-app>
