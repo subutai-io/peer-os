@@ -233,13 +233,22 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
         {
             RequestedHost requestedHost = requestDataService.find( requestId );
 
-            if ( requestedHost != null )
+            if ( requestedHost == null )
             {
-                LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
+                return;
+            }
 
+            if ( requestedHost.getStatus() == ResourceHostRegistrationStatus.APPROVED )
+            {
                 requestDataService.remove( requestedHost.getId() );
 
+                LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
+
                 localPeer.removeResourceHost( requestedHost.getId() );
+            }
+            else if ( requestedHost.getStatus() == ResourceHostRegistrationStatus.REQUESTED )
+            {
+                requestDataService.remove( requestedHost.getId() );
             }
         }
         catch ( HostNotFoundException e )
