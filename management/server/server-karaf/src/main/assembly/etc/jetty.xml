@@ -102,7 +102,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
   <Call name="addBean">
     <Arg>
       <New class="io.subutai.core.http.context.jetty.CustomErrorHandler">
-        <Set name="server"><Ref refid="Server" /></Set>
+        <!--<Set name="server"><Ref refid="Server" /></Set>-->
       </New>
     </Arg>
   </Call>
