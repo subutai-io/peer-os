@@ -10,6 +10,8 @@ public interface RestClient
 
     <T> RestResult<T> get( String url, Class<T> clazz );
 
+    <T> RestResult<T> getPlain( String url, Class<T> clazz );
+
     <T> T getStrict( String url, Class<T> clazz ) throws HubManagerException;
 
     <T> RestResult<T> post( String url, Object body, Class<T> clazz );

@@ -152,37 +152,35 @@ public class ProductProcessor implements StateLinkProcessor
                 }
             }
 
-            // downloading plugin files
-            for ( String url : productDTO.getMetadata() )
-            {
-                //Using WebClient directly here since we need to close it only after request is processed
-                WebClient webClient = null;
-                try
-                {
-                    webClient = RestUtil.createTrustedWebClient( url );
+            //Assume plugin has 1 file, all other files should go as dependencies
+            String url = productDTO.getMetadata().iterator().next();
 
-                    File product = webClient.get( File.class );
-                    initialStream = FileUtils.openInputStream( product );
-                    File targetFile = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
-                    FileUtils.copyInputStreamToFile( initialStream, targetFile );
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error downloading plugin", e );
-                }
-                finally
-                {
-                    RestUtil.close( webClient );
-                }
+            //Using WebClient directly here since we need to close it only after request is processed
+            WebClient webClient = null;
+            try
+            {
+                webClient = RestUtil.createTrustedWebClient( url );
+
+                File product = webClient.get( File.class );
+                initialStream = FileUtils.openInputStream( product );
+                File targetFile = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
+                FileUtils.copyInputStreamToFile( initialStream, targetFile );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error downloading plugin", e );
+
+                throw e;
+            }
+            finally
+            {
+                SafeCloseUtil.close( initialStream );
+                RestUtil.close( webClient );
             }
         }
         catch ( Exception e )
         {
             throw new HubManagerException( e );
-        }
-        finally
-        {
-            SafeCloseUtil.close( initialStream );
         }
 
         LOG.debug( "Product installed successfully..." );
@@ -201,24 +199,15 @@ public class ProductProcessor implements StateLinkProcessor
         // remove file from deploy package
         LOG.debug( "Removing product from Local Peer..." );
         ProductDtoV1_2 productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
-        int deleteFileCounter = 0;
 
-        // TODO: check that there is no installed plugins, which depends on this plugin
-
-        //TODO check what we are deleting here!!!
+        // TODO: check that there are no installed plugins, that depend on this plugin
         assert productDTO != null;
-        for ( String ignored : productDTO.getMetadata() )
-        {
-            File file = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
-            if ( file.delete() )
-            {
-                LOG.debug( file.getName() + " is removed." );
-                deleteFileCounter++;
-            }
-        }
+        File file = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
 
-        if ( deleteFileCounter == productDTO.getMetadata().size() )
+        if ( file.delete() || !file.exists() )
         {
+            LOG.debug( file.getName() + " is removed." );
+
             LOG.debug( " Product uninstalled successfully." );
             deletePeerProductData( peerProductDataDTO );
 
@@ -235,7 +224,7 @@ public class ProductProcessor implements StateLinkProcessor
         String path = String.format( "/rest/v1/marketplace/products/%s", productId );
         try
         {
-            RestResult<String> restResult = restClient.get( path, String.class );
+            RestResult<String> restResult = restClient.getPlain( path, String.class );
 
             if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
