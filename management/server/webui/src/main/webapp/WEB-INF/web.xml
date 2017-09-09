@@ -15,7 +15,7 @@
     <servlet-name>Login</servlet-name>
     <url-pattern>/login</url-pattern>
   </servlet-mapping>
-  
+
   <filter>
     <filter-name>AngularApp</filter-name>
     <filter-class>io.subutai.webui.AngularAppFilter</filter-class>
@@ -25,7 +25,6 @@
     <filter-name>AngularApp</filter-name>
     <url-pattern>/subutai-app/subutai-app.js</url-pattern>
   </filter-mapping>
-
 
   <filter>
     <filter-name>Plugins</filter-name>
@@ -37,7 +36,6 @@
     <url-pattern>/js/plugins.json</url-pattern>
   </filter-mapping>
 
-
   <filter>
     <filter-name>IndexFilter</filter-name>
     <filter-class>io.subutai.webui.IndexFilter</filter-class>
@@ -47,4 +45,19 @@
     <filter-name>IndexFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404</location>
+  </error-page>
+
+  <servlet>
+    <servlet-name>NotFound</servlet-name>
+    <servlet-class>io.subutai.webui.NotFound</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>NotFound</servlet-name>
+    <url-pattern>/404</url-pattern>
+  </servlet-mapping>
 </web-app>
