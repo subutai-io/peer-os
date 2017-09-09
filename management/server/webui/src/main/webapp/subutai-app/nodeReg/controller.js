@@ -85,20 +85,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 		if(nodeId === undefined) return;
 
 		LOADING_SCREEN();
-		if(status == 'APPROVED'){
-            nodeRegSrv.removeReq( nodeId ).success(function (data) {
-                SweetAlert.swal(
-                    "Success!",
-                    "Host has been removed",
-                    "success"
-                );
-                LOADING_SCREEN('none');
-                getNodes();
-            }).error(function(error){
-                LOADING_SCREEN('none');
-                SweetAlert.swal("ERROR!", error.ERROR, "error");
-            });
-		}else if(status == 'REJECTED'){
+        if(status == 'REJECTED'){
             nodeRegSrv.unblockReq( nodeId ).success(function (data) {
                 SweetAlert.swal(
                     "Success!",
@@ -111,7 +98,20 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
                 LOADING_SCREEN('none');
                 SweetAlert.swal("ERROR!", error.ERROR, "error");
             });
-		}
+		} else {
+             nodeRegSrv.removeReq( nodeId ).success(function (data) {
+                 SweetAlert.swal(
+                     "Success!",
+                     "Host has been removed",
+                     "success"
+                 );
+                 LOADING_SCREEN('none');
+                 getNodes();
+             }).error(function(error){
+                 LOADING_SCREEN('none');
+                 SweetAlert.swal("ERROR!", error.ERROR, "error");
+             });
+        }
 	}
 
     function changeNamePopup( rh ) {

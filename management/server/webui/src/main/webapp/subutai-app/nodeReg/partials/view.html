@@ -15,46 +15,47 @@
           <th>Status</th>
           <th>Name</th>
           <th></th>
+          <th>ID</th>
           <th>IP</th>
           <th>Approved</th>
           <th>Action</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="clusterNode in nodeRegCtrl.nodes">
+        <tr ng-repeat="rh in nodeRegCtrl.nodes">
           <td class="b-main-table__container-status">
             <div
-                ng-init="status = (clusterNode.status != 'APPROVED' ? 'UNKNOWN' : (clusterNode.isConnected ? 'ONLINE':'OFFLINE'))"
+                ng-init="status = (rh.status != 'APPROVED' ? 'UNKNOWN' : (rh.isConnected ? 'ONLINE':'OFFLINE'))"
                 tooltips
                 tooltip-template="{{ status }}"
                 class="b-status-icon b-status-icon_{{ status }}">
             </div>
           </td>
-          <td>{{ clusterNode.hostname }}
-            <span ng-if="clusterNode.isManagement"> [ Management ]</span>
+          <td>{{ rh.hostname }}
+            <span ng-if="rh.isManagement"> [ Management ]</span>
           </td>
           <td>
             <a href
-               ng-if="clusterNode.isConnected"
+               ng-if="rh.isConnected"
                class="b-icon b-icon_edit"
                tooltips
                tooltip-template='Change hostname'
-               ng-click="nodeRegCtrl.changeNamePopup( clusterNode )" style="visibility: visible">
+               ng-click="nodeRegCtrl.changeNamePopup( rh )" style="visibility: visible">
             </a>
           </td>
-          <td>{{ clusterNode.ip }}</td>
-          <td>{{ clusterNode.status == 'APPROVED' ? 'Yes' : 'No' }}</td>
+          <td>{{ rh.id }}</td>
+          <td>{{ rh.ip }}</td>
+          <td>{{ rh.status == 'APPROVED' ? 'Yes' : 'No' }}</td>
           <td>
-            <button ng-if="clusterNode.status == 'REQUESTED'" class="b-btn b-btn_green"
-                    ng-click="nodeRegCtrl.approve( clusterNode.id )">Approve
+            <button ng-if="rh.status == 'REQUESTED'" class="b-btn b-btn_green"
+                    ng-click="nodeRegCtrl.approve( rh.id )">Approve
             </button>
-            <button ng-if="clusterNode.status == 'REQUESTED'" class="b-btn b-btn_red"
-                    ng-click="nodeRegCtrl.reject( clusterNode.id )">Reject
+            <button ng-if="rh.status == 'REQUESTED'" class="b-btn b-btn_red"
+                    ng-click="nodeRegCtrl.reject( rh.id )">Reject
             </button>
-            <button ng-if="clusterNode.status == 'APPROVED' || clusterNode.status == 'REJECTED'"
-                    class="b-btn b-btn_{{ clusterNode.status == 'APPROVED' ? 'dark' : 'grey'}}"
-                    ng-click="nodeRegCtrl.remove( clusterNode.id, clusterNode.status )">{{ clusterNode.status == 'APPROVED' ? 'Remove' :
-              'Unblock' }}
+            <button
+                class="b-btn b-btn_{{ rh.status == 'REJECTED' ? 'grey' : 'dark' }}"
+                ng-click="nodeRegCtrl.remove( rh.id, rh.status )">{{ rh.status == 'REJECTED' ? 'Unblock' : 'Remove' }}
             </button>
           </td>
         </tr>
