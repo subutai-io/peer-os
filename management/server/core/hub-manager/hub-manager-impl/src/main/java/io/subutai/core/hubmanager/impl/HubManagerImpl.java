@@ -465,7 +465,7 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
-            RestResult<String> restResult = restClient.get( "/rest/v1/marketplace/products/public", String.class );
+            RestResult<String> restResult = restClient.getPlain( "/rest/v1/marketplace/products/public", String.class );
 
             if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
@@ -648,7 +648,8 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
-            RestResult<String> restResult = restClient.get( "/rest/v1/marketplace/products/checksum", String.class );
+            RestResult<String> restResult =
+                    restClient.getPlain( "/rest/v1/marketplace/products/checksum", String.class );
 
             if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
