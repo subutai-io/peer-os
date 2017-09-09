@@ -24,6 +24,8 @@ public class NotFound extends HttpServlet
         try
         {
             setResponse( resp, "Oops, you did it again", 404 );
+
+            logger.debug( "in 404 handler" );
         }
         catch ( Exception e )
         {
