@@ -284,9 +284,7 @@ public class EnvironmentAdapter
 
             environmentContainersToJson( env, envJson );
 
-            hubAdapter.uploadPeerOwnerEnvironment( envJson.toString() );
-
-            return true;
+            return hubAdapter.uploadPeerOwnerEnvironment( envJson.toString() );
         }
         catch ( Exception e )
         {
