@@ -31,11 +31,11 @@ import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.RestClient;
+import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -163,12 +163,14 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
 
     @Override
-    public void uploadPeerOwnerEnvironment( final String json )
+    public boolean uploadPeerOwnerEnvironment( final String json )
     {
         //obtain Hub peer owner id
         String userId = getOwnerId();
 
-        getRestClient().post( format( USER_ENVIRONMENTS_URL, userId ), json );
+        RestResult restResult = getRestClient().post( format( USER_ENVIRONMENTS_URL, userId ), json );
+
+        return restResult.isSuccess();
     }
 
 
