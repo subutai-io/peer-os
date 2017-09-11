@@ -11,7 +11,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
 
-@Command( scope = "peer", name = "ls" )
+@Command( scope = "peer", name = "list" )
 public class ListCommand extends SubutaiShellCommandSupport
 {
 

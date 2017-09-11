@@ -1,7 +1,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/ls">
+    <command name="peer/list">
       <action class="io.subutai.core.peer.cli.ListCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
