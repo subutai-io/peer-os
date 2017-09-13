@@ -41,7 +41,7 @@ public class RegistrationRequestProcessor extends HubRequester
     @Override
     public void request() throws HubManagerException
     {
-        sendRegistrationRequests();
+//        sendRegistrationRequests();
     }
 
 

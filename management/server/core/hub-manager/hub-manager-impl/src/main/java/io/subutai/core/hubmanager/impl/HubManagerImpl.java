@@ -245,12 +245,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
         versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
-        //***********
-
-        registrationRequestProcessor =
-                new RegistrationRequestProcessor( this, peerManager, hostRegistrationManager, restClient );
-
-        registrationRequestExecutor.scheduleWithFixedDelay( registrationRequestProcessor, 20, 60, TimeUnit.SECONDS );
 
         //***********
 
@@ -372,7 +366,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
         notifyRegistrationListeners();
 
-        registrationRequestProcessor.run();
+//        registrationRequestProcessor.run();
 
         peerMetricsProcessor.request();
     }
