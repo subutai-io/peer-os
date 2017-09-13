@@ -66,13 +66,16 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             }
         }
 
-        TaskUtil.TaskResults<Object> taskResults = taskUtil.executeParallel();
-
-        for ( TaskUtil.TaskResult<Object> taskResult : taskResults.getResults() )
+        if ( taskUtil.hasTasks() )
         {
-            if ( !taskResult.hasSucceeded() )
+            TaskUtil.TaskResults<Object> taskResults = taskUtil.executeParallel();
+
+            for ( TaskUtil.TaskResult<Object> taskResult : taskResults.getResults() )
             {
-                log.error( "Error processing state link: {}", taskResult.getFailureReason() );
+                if ( !taskResult.hasSucceeded() )
+                {
+                    log.error( "Error processing state link: {}", taskResult.getFailureReason() );
+                }
             }
         }
 
