@@ -41,7 +41,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
 
     @Override
-    public synchronized boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
+    public boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
     {
         boolean fastMode = false;
 
