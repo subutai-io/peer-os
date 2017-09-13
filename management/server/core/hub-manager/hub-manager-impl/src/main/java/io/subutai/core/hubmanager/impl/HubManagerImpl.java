@@ -62,7 +62,6 @@ import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
-import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
@@ -147,8 +146,6 @@ public class HubManagerImpl implements HubManager, HostListener
     private ResourceHostDataProcessor resourceHostDataProcessor;
 
     private ContainerEventProcessor containerEventProcessor;
-
-    private RegistrationRequestProcessor registrationRequestProcessor;
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
@@ -365,8 +362,6 @@ public class HubManagerImpl implements HubManager, HostListener
         sendResourceHostInfo();
 
         notifyRegistrationListeners();
-
-//        registrationRequestProcessor.run();
 
         peerMetricsProcessor.request();
     }
