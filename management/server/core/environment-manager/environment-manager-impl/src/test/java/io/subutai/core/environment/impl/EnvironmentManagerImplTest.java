@@ -30,6 +30,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Node;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.AlertValue;
@@ -245,6 +246,7 @@ public class EnvironmentManagerImplTest
         doReturn( TestHelper.SSH_KEY ).when( topology ).getSshKey();
 
         doReturn( true ).when( localPeer ).isOnline();
+        doReturn( true ).when( localPeer ).canAccommodate( any( Nodes.class ) );
         doReturn( trackerOperation ).when( tracker )
                                     .createTrackerOperation( eq( environmentManager.MODULE_NAME ), anyString() );
         doReturn( user ).when( identityManager ).getActiveUser();
