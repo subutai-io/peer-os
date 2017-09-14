@@ -8,7 +8,7 @@ import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
-import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
+import io.subutai.core.hubmanager.impl.model.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;

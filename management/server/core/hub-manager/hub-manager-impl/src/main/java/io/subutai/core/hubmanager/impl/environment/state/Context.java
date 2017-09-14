@@ -4,7 +4,7 @@ package io.subutai.core.hubmanager.impl.environment.state;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.RestClient;
-import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
+import io.subutai.core.hubmanager.impl.util.EnvironmentUserHelper;
 import io.subutai.core.identity.api.IdentityManager;
 
 

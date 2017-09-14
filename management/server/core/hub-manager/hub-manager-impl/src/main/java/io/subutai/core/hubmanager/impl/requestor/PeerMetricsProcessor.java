@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.processor;
+package io.subutai.core.hubmanager.impl.requestor;
 
 
 import java.util.Calendar;
