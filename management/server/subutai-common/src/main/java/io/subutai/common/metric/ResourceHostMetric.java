@@ -125,6 +125,7 @@ public class ResourceHostMetric extends BaseMetric
     }
 
 
+    @JsonIgnore
     public Double getAvailableCpu()
     {
         return 100 - ( getUsedCpu() == null ? 100 : getUsedCpu() );

@@ -14,7 +14,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Containers;
-import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.HistoricalMetrics;
@@ -620,7 +620,7 @@ public class PeerWebClient
     }
 
 
-    public Boolean canAccommodate( final CreateEnvironmentContainersRequest request ) throws PeerException
+    public Boolean canAccommodate( final Nodes nodes ) throws PeerException
     {
         WebClient client = null;
         Response response;
@@ -632,7 +632,7 @@ public class PeerWebClient
 
             client.type( MediaType.APPLICATION_JSON );
 
-            response = client.post( request );
+            response = client.post( nodes );
         }
         catch ( Exception e )
         {

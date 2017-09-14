@@ -141,6 +141,7 @@ public enum ContainerSize
     }
 
 
+    @JsonIgnore
     public Double getRamQuota()
     {
         for ( Quota quota : containerQuotas.get( this ).getAll() )
@@ -157,6 +158,7 @@ public enum ContainerSize
     }
 
 
+    @JsonIgnore
     public Double getDiskQuota()
     {
         for ( Quota quota : containerQuotas.get( this ).getAll() )
@@ -173,6 +175,7 @@ public enum ContainerSize
     }
 
 
+    @JsonIgnore
     public Double getCpuQuota()
     {
         for ( Quota quota : containerQuotas.get( this ).getAll() )

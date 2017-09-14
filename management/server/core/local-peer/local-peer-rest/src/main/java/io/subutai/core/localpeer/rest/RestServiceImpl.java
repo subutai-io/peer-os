@@ -17,7 +17,7 @@ import org.apache.karaf.bundle.core.BundleStateService;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -275,13 +275,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Boolean canAccommodate( final CreateEnvironmentContainersRequest request )
+    public Boolean canAccommodate( final Nodes nodes )
     {
         try
         {
-            Preconditions.checkNotNull( request );
+            Preconditions.checkNotNull( nodes );
+            Preconditions.checkArgument( !nodes.getNodes().isEmpty() );
 
-            return localPeer.canAccommodate( request );
+            return localPeer.canAccommodate( nodes );
         }
         catch ( Exception e )
         {

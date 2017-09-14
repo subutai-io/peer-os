@@ -45,6 +45,8 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -832,10 +834,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Read" )
     @Override
-    public boolean canAccommodate( final CreateEnvironmentContainersRequest request ) throws PeerException
+    public boolean canAccommodate( final Nodes nodes ) throws PeerException
     {
-        Preconditions.checkNotNull( request );
-        Preconditions.checkArgument( !request.getRequests().isEmpty() );
+        Preconditions.checkNotNull( nodes );
+        Preconditions.checkArgument( !nodes.getNodes().isEmpty() );
 
         double overheadFactor = 1.01;
 
@@ -845,13 +847,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Double requestedDisk = 0D;
         Double requestedCpu = 0D;
 
-        for ( CloneRequest cloneRequest : request.getRequests() )
+        for ( Node node : nodes.getNodes() )
         {
-            rhIds.add( cloneRequest.getResourceHostId() );
+            rhIds.add( node.getHostId() );
 
-            requestedRam += cloneRequest.getContainerQuota().getContainerSize().getRamQuota();
-            requestedDisk += cloneRequest.getContainerQuota().getContainerSize().getDiskQuota();
-            requestedCpu += cloneRequest.getContainerQuota().getContainerSize().getCpuQuota();
+            requestedRam += node.getQuota().getContainerSize().getRamQuota();
+            requestedDisk += node.getQuota().getContainerSize().getDiskQuota();
+            requestedCpu += node.getQuota().getContainerSize().getCpuQuota();
         }
 
         Double availPeerRam = 0D;

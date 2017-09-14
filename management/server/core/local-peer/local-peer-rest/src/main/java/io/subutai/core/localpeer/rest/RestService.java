@@ -12,7 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -101,7 +101,7 @@ public interface RestService
     @POST
     @Path( "canaccommodate" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Boolean canAccommodate( CreateEnvironmentContainersRequest request );
+    Boolean canAccommodate( Nodes nodes );
 
     @POST
     @Path( "p2presetkey" )
