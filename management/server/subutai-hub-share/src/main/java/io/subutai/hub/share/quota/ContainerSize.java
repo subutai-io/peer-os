@@ -4,6 +4,7 @@ package io.subutai.hub.share.quota;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.subutai.hub.share.parser.CommonResourceValueParser;
+import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.ResourceValueParser;
 
@@ -48,6 +50,21 @@ public enum ContainerSize
         {
             LOGGER.error( "Error loading quota.cfg: {}", e.getMessage() );
 
+            try
+            {
+                quotaSettings.load( new StringReader(
+                        "TINY.ram=256MiB\n" + "TINY.cpu=10\n" + "TINY.disk=4GiB\n" + "SMALL.ram=512MiB\n"
+                                + "SMALL.cpu=25\n" + "SMALL.disk=10GiB\n" + "MEDIUM.ram=1024MiB\n" + "MEDIUM.cpu=50\n"
+                                + "MEDIUM.disk=20GiB\n" + "LARGE.ram=2048MiB\n" + "LARGE.cpu=75\n"
+                                + "LARGE.disk=40GiB\n" + "HUGE.ram=4096MiB\n" + "HUGE.cpu=100\n"
+                                + "HUGE.disk=100GiB\n" ) );
+
+                initQuotas();
+            }
+            catch ( Exception e1 )
+            {
+                LOGGER.error( "Error loading quota.cfg: {}", e.getMessage() );
+            }
         }
     }
 
@@ -79,8 +96,9 @@ public enum ContainerSize
 
                 quotaParser = getResourceValueParser( ContainerResourceType.DISK );
                 quota.add( new Quota( ContainerResourceFactory.createContainerResource( ContainerResourceType.DISK,
-                        quotaParser.parse( quotaSettings.getProperty(
-                                containerSize.name() + "." + ContainerResourceType.DISK.getKey() ) ) ), 0 ) );
+                        quotaParser.parse( quotaSettings
+                                .getProperty( containerSize.name() + "." + ContainerResourceType.DISK.getKey() ) ) ),
+                        0 ) );
 
                 containerQuotas.put( containerSize, quota );
 
@@ -120,5 +138,53 @@ public enum ContainerSize
     public static Map<ContainerSize, ContainerQuota> getDefaultQuotas()
     {
         return Collections.unmodifiableMap( containerQuotas );
+    }
+
+
+    public Double getRamQuotaInMb()
+    {
+        for ( Quota quota : containerQuotas.get( this ).getAll() )
+        {
+            if ( quota.getResource().getContainerResourceType() == ContainerResourceType.RAM )
+            {
+                ContainerRamResource ramResource = quota.getAsRamResource();
+
+                return ramResource.doubleValue( ByteUnit.MB );
+            }
+        }
+
+        return null;
+    }
+
+
+    public Double getDiskQuotaInGb()
+    {
+        for ( Quota quota : containerQuotas.get( this ).getAll() )
+        {
+            if ( quota.getResource().getContainerResourceType() == ContainerResourceType.DISK )
+            {
+                ContainerDiskResource diskResource = quota.getAsDiskResource();
+
+                return diskResource.doubleValue( ByteUnit.GB );
+            }
+        }
+
+        return null;
+    }
+
+
+    public Double getCpuQuotaInPercent()
+    {
+        for ( Quota quota : containerQuotas.get( this ).getAll() )
+        {
+            if ( quota.getResource().getContainerResourceType() == ContainerResourceType.CPU )
+            {
+                ContainerCpuResource cpuResource = quota.getAsCpuResource();
+
+                return Double.valueOf( cpuResource.getWriteValue() );
+            }
+        }
+
+        return null;
     }
 }
