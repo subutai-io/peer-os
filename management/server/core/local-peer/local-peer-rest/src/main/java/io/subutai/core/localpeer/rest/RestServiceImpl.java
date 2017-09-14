@@ -17,8 +17,8 @@ import org.apache.karaf.bundle.core.BundleStateService;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -265,6 +265,23 @@ public class RestServiceImpl implements RestService
             Preconditions.checkNotNull( networkResource );
 
             return localPeer.reserveNetworkResource( networkResource );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Boolean canAccommodate( final CreateEnvironmentContainersRequest request )
+    {
+        try
+        {
+            Preconditions.checkNotNull( request );
+
+            return localPeer.canAccommodate( request );
         }
         catch ( Exception e )
         {

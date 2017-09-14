@@ -627,6 +627,16 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public boolean canAccommodate( final CreateEnvironmentContainersRequest request ) throws PeerException
+    {
+        Preconditions.checkNotNull( request, "Invalid request" );
+
+        return peerWebClient.canAccommodate( request );
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public CreateEnvironmentContainersResponse createEnvironmentContainers(

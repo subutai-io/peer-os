@@ -141,7 +141,7 @@ public enum ContainerSize
     }
 
 
-    public Double getRamQuotaInMb()
+    public Double getRamQuota()
     {
         for ( Quota quota : containerQuotas.get( this ).getAll() )
         {
@@ -149,7 +149,7 @@ public enum ContainerSize
             {
                 ContainerRamResource ramResource = quota.getAsRamResource();
 
-                return ramResource.doubleValue( ByteUnit.MB );
+                return ramResource.doubleValue( ByteUnit.BYTE );
             }
         }
 
@@ -157,7 +157,7 @@ public enum ContainerSize
     }
 
 
-    public Double getDiskQuotaInGb()
+    public Double getDiskQuota()
     {
         for ( Quota quota : containerQuotas.get( this ).getAll() )
         {
@@ -165,7 +165,7 @@ public enum ContainerSize
             {
                 ContainerDiskResource diskResource = quota.getAsDiskResource();
 
-                return diskResource.doubleValue( ByteUnit.GB );
+                return diskResource.doubleValue( ByteUnit.BYTE );
             }
         }
 
@@ -173,7 +173,7 @@ public enum ContainerSize
     }
 
 
-    public Double getCpuQuotaInPercent()
+    public Double getCpuQuota()
     {
         for ( Quota quota : containerQuotas.get( this ).getAll() )
         {

@@ -65,11 +65,21 @@ public interface Peer extends RelationLink
     PeerInfo getPeerInfo();
 
     /**
+     * Checks if peer can accommodate the requested container group
+     *
+     * @param request container creation request
+     *
+     * @return true - can accommodate, false - otherwise
+     */
+    boolean canAccommodate( CreateEnvironmentContainersRequest request ) throws PeerException;
+
+
+    /**
      * Creates environment container group on the peer
      *
-     * @param request - container creation request
+     * @param request container creation request
      */
-    CreateEnvironmentContainersResponse createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+    CreateEnvironmentContainersResponse createEnvironmentContainers( CreateEnvironmentContainersRequest request )
             throws PeerException;
 
 

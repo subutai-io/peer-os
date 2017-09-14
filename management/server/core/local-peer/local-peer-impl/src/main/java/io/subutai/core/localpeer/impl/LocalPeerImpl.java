@@ -254,10 +254,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             resourceHosts.clear();
 
-            for ( ResourceHost resourceHost : resourceHostDataService.getAll() )
-            {
-                resourceHosts.add( resourceHost );
-            }
+            resourceHosts.addAll( resourceHostDataService.getAll() );
 
             setResourceHostTransientFields( getResourceHosts() );
 
@@ -830,6 +827,74 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         response.addResults( results );
 
         return response;
+    }
+
+
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public boolean canAccommodate( final CreateEnvironmentContainersRequest request ) throws PeerException
+    {
+        Preconditions.checkNotNull( request );
+        Preconditions.checkArgument( !request.getRequests().isEmpty() );
+
+        double overheadFactor = 1.01;
+
+        Set<String> rhIds = Sets.newHashSet();
+
+        Double requestedRam = 0D;
+        Double requestedDisk = 0D;
+        Double requestedCpu = 0D;
+
+        for ( CloneRequest cloneRequest : request.getRequests() )
+        {
+            rhIds.add( cloneRequest.getResourceHostId() );
+
+            requestedRam += cloneRequest.getContainerQuota().getContainerSize().getRamQuota();
+            requestedDisk += cloneRequest.getContainerQuota().getContainerSize().getDiskQuota();
+            requestedCpu += cloneRequest.getContainerQuota().getContainerSize().getCpuQuota();
+        }
+
+        Double availPeerRam = 0D;
+        Double availPeerDisk = 0D;
+        Double availPeerCpu = 0D;
+
+        for ( String rhId : rhIds )
+        {
+            ResourceHost resourceHost = getResourceHostById( rhId );
+            ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( resourceHost );
+
+            availPeerRam += resourceHostMetric.getAvailableRam();
+            availPeerDisk += resourceHostMetric.getAvailableSpace();
+            availPeerCpu += resourceHostMetric.getCpuCore() * resourceHostMetric.getAvailableCpu();
+        }
+
+        boolean canAccommodate = true;
+
+        if ( requestedRam * overheadFactor > availPeerRam )
+        {
+            LOG.warn( "Requested RAM volume {}MB can not be accommodated on local peer. Available RAM volume is {}MB",
+                    requestedRam / 1024 * 1024, availPeerRam / 1024 * 1024 );
+
+            canAccommodate = false;
+        }
+
+        if ( requestedDisk * overheadFactor > availPeerDisk )
+        {
+            LOG.warn( "Requested DISK volume {}GB can not be accommodated on local peer. Available DISK volume is {}GB",
+                    requestedDisk / 1024 * 1024 * 1024, availPeerDisk / 1024 * 1024 * 1024 );
+
+            canAccommodate = false;
+        }
+
+        if ( requestedCpu * overheadFactor > availPeerCpu )
+        {
+            LOG.warn( "Requested CPU {} can not be accommodated on local peer. Available CPU is {}", requestedCpu,
+                    availPeerCpu );
+
+            canAccommodate = false;
+        }
+
+        return canAccommodate;
     }
 
 

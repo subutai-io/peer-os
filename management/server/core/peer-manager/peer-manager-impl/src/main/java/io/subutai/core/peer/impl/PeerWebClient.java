@@ -14,8 +14,10 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Containers;
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -32,7 +34,6 @@ import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.util.DateTimeParam;
-import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -616,5 +617,33 @@ public class PeerWebClient
         }
 
         return WebClientBuilder.checkResponse( response, Integer.class );
+    }
+
+
+    public Boolean canAccommodate( final CreateEnvironmentContainersRequest request ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            String path = "/canaccommodate";
+
+            client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
+            response = client.post( request );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error checking peer capacity: %s", e.getMessage() ) );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        return WebClientBuilder.checkResponse( response, Boolean.class );
     }
 }
