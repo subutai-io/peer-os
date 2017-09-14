@@ -1,13 +1,12 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -17,7 +16,7 @@ import io.subutai.hub.share.dto.UserTokenDto;
 
 public class UserTokenProcessor implements StateLinkProcessor
 {
-    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
+    private static final Set<String> LINKS_IN_PROGRESS = Sets.newConcurrentHashSet();
 
     private final Context ctx;
 

@@ -2,13 +2,14 @@ package io.subutai.core.hubmanager.impl.processor.port_map;
 
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.StringUtils;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
@@ -31,8 +32,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
-    private static final HashSet<PortMapDto> PORT_CACHE = new HashSet<>();
+    private static final Set<String> LINKS_IN_PROGRESS = Sets.newConcurrentHashSet();
+    private static final Set<PortMapDto> PORT_CACHE = Sets.newConcurrentHashSet();
 
     private Context ctx;
 

@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.entity;
+package io.subutai.core.hubmanager.impl.model;
 
 
 import javax.persistence.Column;

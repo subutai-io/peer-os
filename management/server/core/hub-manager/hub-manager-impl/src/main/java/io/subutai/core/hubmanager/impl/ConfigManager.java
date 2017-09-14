@@ -15,6 +15,7 @@ import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
+import io.subutai.core.hubmanager.impl.http.HttpClient;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
