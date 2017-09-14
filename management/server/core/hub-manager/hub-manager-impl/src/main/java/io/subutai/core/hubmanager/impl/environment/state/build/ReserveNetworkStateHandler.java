@@ -6,7 +6,7 @@ import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
-import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
+import io.subutai.core.hubmanager.impl.model.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;

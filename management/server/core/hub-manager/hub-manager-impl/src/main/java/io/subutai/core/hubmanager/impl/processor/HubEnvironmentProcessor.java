@@ -1,12 +1,14 @@
-package io.subutai.core.hubmanager.impl.environment;
+package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
+
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -17,7 +19,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 public class HubEnvironmentProcessor implements StateLinkProcessor
 {
-    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
+    private static final Set<String> LINKS_IN_PROGRESS = Sets.newConcurrentHashSet();
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -39,17 +41,41 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
 
     @Override
-    public synchronized boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
+    public boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
     {
         boolean fastMode = false;
 
-        for ( String link : stateLinks )
+        TaskUtil<Object> taskUtil = new TaskUtil<>();
+
+        for ( final String link : stateLinks )
         {
             if ( link.matches( linkPattern ) )
             {
                 fastMode = true;
 
-                processStateLink( link );
+                taskUtil.addTask( new TaskUtil.Task<Object>()
+                {
+                    @Override
+                    public Object call() throws Exception
+                    {
+                        processStateLink( link );
+
+                        return null;
+                    }
+                } );
+            }
+        }
+
+        if ( taskUtil.hasTasks() )
+        {
+            TaskUtil.TaskResults<Object> taskResults = taskUtil.executeParallel();
+
+            for ( TaskUtil.TaskResult<Object> taskResult : taskResults.getResults() )
+            {
+                if ( !taskResult.hasSucceeded() )
+                {
+                    log.error( "Error processing state link: {}", taskResult.getFailureReason() );
+                }
             }
         }
 

@@ -36,6 +36,12 @@ public class TaskUtil<T>
     }
 
 
+    public boolean hasTasks()
+    {
+        return !tasks.isEmpty();
+    }
+
+
     /**
      * Executes tasks in parallel.
      */

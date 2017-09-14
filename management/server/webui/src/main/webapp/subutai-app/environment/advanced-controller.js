@@ -188,10 +188,13 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         }
     }
 
+    var timeoutId;
+
     function getLogById(id, checkLast, prevLogs, envId) {
         if (checkLast === undefined || checkLast === null) checkLast = false;
         if (prevLogs === undefined || prevLogs === null) prevLogs = false;
 
+        clearTimeout(timeoutId);
 
         trackerSrv.getDownloadProgress(envId)
             .success(function (data) {
@@ -299,7 +302,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
                     vm.logMessages = vm.logMessages.concat(result);
 
-                    setTimeout(function () {
+                    timeoutId = setTimeout(function () {
                         getLogById(id, false, logs, envId);
                     }, 2000);
 

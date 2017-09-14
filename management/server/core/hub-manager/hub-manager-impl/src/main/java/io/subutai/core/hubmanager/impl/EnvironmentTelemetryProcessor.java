@@ -2,10 +2,8 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -14,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.http.HttpStatus;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -47,7 +46,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
     private static final String SCP_FILE_COMMAND = "scp /tmp/tmpfile root@%s:/tmp";
     private static final String DELETE_PREPARED_FILE = "rm /tmp/tmpfile";
 
-    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
+    private static final Set<String> LINKS_IN_PROGRESS = Sets.newConcurrentHashSet();
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -300,7 +299,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
 
     @Override
-    public synchronized boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
+    public boolean processStateLinks( Set<String> stateLinks ) throws HubManagerException
     {
         for ( String link : stateLinks )
         {

@@ -1,9 +1,7 @@
 package io.subutai.core.hubmanager.impl.tunnel;
 
 
-import java.util.HashSet;
 import java.util.Set;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.http.HttpStatus;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.peer.HostNotFoundException;
@@ -33,7 +32,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
     private static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s:%s";
 
-    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
+    private static final Set<String> LINKS_IN_PROGRESS = Sets.newConcurrentHashSet();
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
     private final RestClient restClient;
@@ -49,7 +48,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
 
     @Override
-    public synchronized boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
+    public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
         for ( String stateLink : stateLinks )
         {
