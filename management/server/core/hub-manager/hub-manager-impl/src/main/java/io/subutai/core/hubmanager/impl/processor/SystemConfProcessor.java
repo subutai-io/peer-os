@@ -18,7 +18,8 @@ import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.hub.share.dto.SystemConfDto;
 
-
+@Deprecated
+//TODO remove since it does not perform any meaningful operations
 public class SystemConfProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemConfProcessor.class.getName() );
