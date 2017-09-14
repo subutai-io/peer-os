@@ -68,19 +68,19 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
     private void processLink( String stateLink )
     {
+        log.info( "Link process - START: {}", stateLink );
+
+        if ( LINKS_IN_PROGRESS.contains( stateLink ) )
+        {
+            log.info( "This link is in progress: {}", stateLink );
+
+            return;
+        }
+
+        LINKS_IN_PROGRESS.add( stateLink );
+
         try
         {
-
-            log.info( "Link process - START: {}", stateLink );
-
-            if ( LINKS_IN_PROGRESS.contains( stateLink ) )
-            {
-                log.info( "This link is in progress: {}", stateLink );
-
-                return;
-            }
-
-            LINKS_IN_PROGRESS.add( stateLink );
 
             RestResult<ContainerPortMapDto> restResult = ctx.restClient.get( stateLink, ContainerPortMapDto.class );
 

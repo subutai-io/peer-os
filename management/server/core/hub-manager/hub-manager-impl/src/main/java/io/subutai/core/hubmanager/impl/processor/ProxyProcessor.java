@@ -32,7 +32,6 @@ public class ProxyProcessor implements StateLinkProcessor
 
     private static final Set<String> LINKS_IN_PROGRESS = Sets.newConcurrentHashSet();
 
-
     private PeerManager peerManager;
 
     private RestClient restClient;
@@ -62,16 +61,17 @@ public class ProxyProcessor implements StateLinkProcessor
 
     private void processStateLink( String stateLink )
     {
+        if ( LINKS_IN_PROGRESS.contains( stateLink ) )
+        {
+            log.info( "This link is in progress: {}", stateLink );
+
+            return;
+        }
+
+        LINKS_IN_PROGRESS.add( stateLink );
+
         try
         {
-            if ( LINKS_IN_PROGRESS.contains( stateLink ) )
-            {
-                log.info( "This link is in progress: {}", stateLink );
-
-                return;
-            }
-
-            LINKS_IN_PROGRESS.add( stateLink );
 
             boolean isPortCleaned = false;
 
