@@ -17,5 +17,5 @@ public interface EntryExpiryCallback<V>
      *
      * @param entry - cache entry being expired
      */
-    public void onEntryExpiry( V entry );
+    void onEntryExpiry( V entry );
 }
