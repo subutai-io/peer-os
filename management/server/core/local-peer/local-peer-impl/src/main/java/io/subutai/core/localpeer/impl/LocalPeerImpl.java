@@ -875,7 +875,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( requestedRam * overheadFactor > availPeerRam )
         {
             LOG.warn( "Requested RAM volume {}MB can not be accommodated on local peer. Available RAM volume is {}MB",
-                    requestedRam / 1024 * 1024, availPeerRam / 1024 * 1024 );
+                    requestedRam / ( 1024 * 1024 ), availPeerRam / ( 1024 * 1024 ) );
 
             canAccommodate = false;
         }
@@ -883,7 +883,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( requestedDisk * overheadFactor > availPeerDisk )
         {
             LOG.warn( "Requested DISK volume {}GB can not be accommodated on local peer. Available DISK volume is {}GB",
-                    requestedDisk / 1024 * 1024 * 1024, availPeerDisk / 1024 * 1024 * 1024 );
+                    requestedDisk / ( 1024 * 1024 * 1024 ), availPeerDisk / ( 1024 * 1024 * 1024 ) );
 
             canAccommodate = false;
         }
