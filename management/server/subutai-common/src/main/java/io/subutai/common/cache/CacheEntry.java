@@ -35,9 +35,9 @@ public class CacheEntry<V>
     private ReentrantLock lock = new ReentrantLock( true );
 
 
-    boolean lock()
+    void lock()
     {
-        return lock.tryLock();
+        lock.lock();
     }
 
 
