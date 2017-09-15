@@ -1472,7 +1472,7 @@ function drop(event) {
 
 function addContainerToHost(model, template, img, size, quota, containerId, name, templateId) {
     if (size === undefined || size === null) {
-        size = 'SMALL';
+        size = 'TINY';
         if (template == 'appscale') {
             size = 'HUGE';
         }
