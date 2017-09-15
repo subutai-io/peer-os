@@ -14,6 +14,7 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -65,11 +66,21 @@ public interface Peer extends RelationLink
     PeerInfo getPeerInfo();
 
     /**
+     * Checks if peer can accommodate the requested container group
+     *
+     * @param nodes requested nodes (containers)
+     *
+     * @return true - can accommodate, false - otherwise
+     */
+    boolean canAccommodate( Nodes nodes ) throws PeerException;
+
+
+    /**
      * Creates environment container group on the peer
      *
-     * @param request - container creation request
+     * @param request container creation request
      */
-    CreateEnvironmentContainersResponse createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+    CreateEnvironmentContainersResponse createEnvironmentContainers( CreateEnvironmentContainersRequest request )
             throws PeerException;
 
 

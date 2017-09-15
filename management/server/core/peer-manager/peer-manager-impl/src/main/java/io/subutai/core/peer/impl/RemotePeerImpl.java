@@ -29,6 +29,7 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -624,6 +625,17 @@ public class RemotePeerImpl implements RemotePeer
         }
 
         return messageRequest;
+    }
+
+
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public boolean canAccommodate( final Nodes nodes ) throws PeerException
+    {
+        Preconditions.checkNotNull( nodes, "Invalid nodes" );
+        Preconditions.checkArgument( !nodes.getNodes().isEmpty(), "Empty nodes" );
+
+        return peerWebClient.canAccommodate( nodes );
     }
 
 

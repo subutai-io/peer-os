@@ -37,6 +37,10 @@ public class ReserveNetworkStateHandler extends StateHandler
 
             return resultDto;
         }
+        catch ( HubManagerException e )
+        {
+            throw e;
+        }
         catch ( Exception e )
         {
             throw new HubManagerException( e );

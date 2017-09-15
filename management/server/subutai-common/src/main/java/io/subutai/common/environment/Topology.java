@@ -96,6 +96,20 @@ public class Topology
     }
 
 
+    public Set<Node> getPeerNodes( String peerId )
+    {
+        for ( Map.Entry<String, Set<Node>> placementEntry : nodeGroupPlacement.entrySet() )
+        {
+            if ( placementEntry.getKey().equalsIgnoreCase( peerId ) )
+            {
+                return placementEntry.getValue();
+            }
+        }
+
+        return Sets.newHashSet();
+    }
+
+
     public Set<String> getAllPeers()
     {
         return Collections.unmodifiableSet( nodeGroupPlacement.keySet() );

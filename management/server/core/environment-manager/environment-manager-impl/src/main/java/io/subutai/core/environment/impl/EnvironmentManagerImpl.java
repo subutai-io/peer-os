@@ -45,6 +45,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.ContainerHostInfo;
@@ -418,15 +419,31 @@ public class EnvironmentManagerImpl
             throw new EnvironmentCreationException( e.getMessage() );
         }
 
-        //check if peers are accessible
         for ( Peer peer : allPeers )
         {
+            //check if peers are accessible
             if ( !peer.isOnline() )
             {
                 operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getName() ) );
                 throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
+
+            //check if peer can accommodate the requested nodes
+            try
+            {
+                if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
+                {
+                    throw new EnvironmentCreationException(
+                            String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
+                }
+            }
+            catch ( PeerException e )
+            {
+                operationTracker.addLogFailed( e.getMessage() );
+                throw new EnvironmentCreationException( e.getMessage() );
+            }
         }
+
 
         //create empty environment
         final LocalEnvironment environment = createEmptyEnvironment( topology );
@@ -582,14 +599,33 @@ public class EnvironmentManagerImpl
             throw new EnvironmentModificationException( e.getMessage() );
         }
 
-        //check if peers are accessible
         for ( Peer peer : allPeers )
         {
+            //check if peers are accessible
             if ( !peer.isOnline() )
             {
                 operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getName() ) );
 
                 throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getName() ) );
+            }
+
+            //check if peer can accommodate the requested nodes
+            if ( hasContainerCreation && !topology.getPeerNodes( peer.getId() ).isEmpty() )
+            {
+                try
+                {
+                    if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
+                    {
+                        throw new EnvironmentModificationException(
+                                String.format( "Peer %s can not accommodate the requested containers",
+                                        peer.getName() ) );
+                    }
+                }
+                catch ( PeerException e )
+                {
+                    operationTracker.addLogFailed( e.getMessage() );
+                    throw new EnvironmentModificationException( e.getMessage() );
+                }
             }
         }
 

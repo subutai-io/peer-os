@@ -60,6 +60,10 @@ public class ConfigureContainerStateHandler extends StateHandler
 
             return peerDto;
         }
+        catch ( HubManagerException e )
+        {
+            throw e;
+        }
         catch ( Exception e )
         {
             throw new HubManagerException( e );

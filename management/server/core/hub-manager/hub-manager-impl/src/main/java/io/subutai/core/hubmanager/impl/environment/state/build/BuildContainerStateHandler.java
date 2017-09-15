@@ -74,6 +74,10 @@ public class BuildContainerStateHandler extends StateHandler
 
             return result;
         }
+        catch ( HubManagerException e )
+        {
+            throw e;
+        }
         catch ( Exception e )
         {
             throw new HubManagerException( e );

@@ -126,6 +126,13 @@ public class ResourceHostMetric extends BaseMetric
 
 
     @JsonIgnore
+    public Double getAvailableCpu()
+    {
+        return 100 - ( getUsedCpu() == null ? 100 : getUsedCpu() );
+    }
+
+
+    @JsonIgnore
     public String getCpuModel()
     {
         return cpu != null ? cpu.model : null;
@@ -135,7 +142,7 @@ public class ResourceHostMetric extends BaseMetric
     @JsonIgnore
     public int getCpuCore()
     {
-        return cpu != null ? cpu.coreCount : 0;
+        return cpu != null ? cpu.coreCount : 1;
     }
 
 
