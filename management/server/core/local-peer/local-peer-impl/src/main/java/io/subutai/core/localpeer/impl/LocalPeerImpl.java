@@ -120,6 +120,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.TaskUtil;
+import io.subutai.common.util.UnitUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -875,7 +876,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( requestedRam * overheadFactor > availPeerRam )
         {
             LOG.warn( "Requested RAM volume {}MB can not be accommodated on local peer. Available RAM volume is {}MB",
-                    requestedRam / ( 1024 * 1024 ), availPeerRam / ( 1024 * 1024 ) );
+                    UnitUtil.convert( requestedRam, UnitUtil.Unit.B, UnitUtil.Unit.MB ),
+                    UnitUtil.convert( availPeerRam, UnitUtil.Unit.B, UnitUtil.Unit.MB ) );
 
             canAccommodate = false;
         }
@@ -883,7 +885,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( requestedDisk * overheadFactor > availPeerDisk )
         {
             LOG.warn( "Requested DISK volume {}GB can not be accommodated on local peer. Available DISK volume is {}GB",
-                    requestedDisk / ( 1024 * 1024 * 1024 ), availPeerDisk / ( 1024 * 1024 * 1024 ) );
+                    UnitUtil.convert( requestedDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    UnitUtil.convert( availPeerDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ) );
 
             canAccommodate = false;
         }

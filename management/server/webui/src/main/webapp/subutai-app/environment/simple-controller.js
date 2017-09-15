@@ -809,7 +809,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		if($event === undefined || $event === null) $event = false;
 
 		if (size === undefined || size === null) {
-			size = 'SMALL';
+			size = 'TINY';
 			if (template == 'appscale') {
 				size = 'HUGE';
 			}
