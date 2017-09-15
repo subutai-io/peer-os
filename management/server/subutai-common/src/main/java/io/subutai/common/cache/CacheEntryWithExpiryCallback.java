@@ -23,7 +23,7 @@ class CacheEntryWithExpiryCallback<V> extends CacheEntry<V>
 
 
     /**
-     * Initialized the {@code CacheEntryWithExpiryCallback}
+     * Initializes the {@code CacheEntryWithExpiryCallback}
      *
      * @param value - entry value
      * @param ttlMs - entry ttl in milliseconds
