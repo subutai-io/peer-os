@@ -27,7 +27,7 @@ public class ExpiringCache<K, V>
 {
     private static final Logger LOG = LoggerFactory.getLogger( ExpiringCache.class.getName() );
 
-    private static final long EVICTION_RUN_INTERVAL_MS = 10;
+    private static final long EVICTION_RUN_INTERVAL_MS = 100;
     private final Map<K, CacheEntry<V>> entries = new ConcurrentHashMap<>();
 
     private final ScheduledExecutorService evictor;
