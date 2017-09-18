@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,19 +42,19 @@ public class PeerMetricsProcessor extends HubRequester
 
     private ConcurrentLinkedDeque<PeerMetricsDto> queue = new ConcurrentLinkedDeque<>();
 
-    private int interval;
+    private int intervalInSec;
 
 
     public PeerMetricsProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
                                  final ConfigManager configManager, final Monitor monitor, final RestClient restClient,
-                                 final int interval )
+                                 final int intervalInSec )
     {
         super( hubManager, restClient );
 
         this.peerManager = peerManager;
         this.configManager = configManager;
         this.monitor = monitor;
-        this.interval = interval;
+        this.intervalInSec = intervalInSec;
     }
 
 
@@ -71,7 +69,7 @@ public class PeerMetricsProcessor extends HubRequester
     {
         Calendar cal = Calendar.getInstance();
         Date endTime = cal.getTime();
-        cal.add( Calendar.SECOND, -interval );
+        cal.add( Calendar.SECOND, -intervalInSec );
         Date startTime = cal.getTime();
         PeerMetricsDto peerMetricsDto =
                 new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );

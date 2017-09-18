@@ -84,9 +84,8 @@ import io.subutai.hub.share.json.JsonUtil;
 
 public class HubManagerImpl implements HubManager, HostListener
 {
-    private static final long TIME_15_MINUTES = 900;
-
-    private static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
+    private static final long RH_CONF_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 15 );
+    private static final long METRICS_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 10 );
     private static final int CONTAINER_METRIC_SEND_INTERVAL_MIN = 15;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -199,15 +198,15 @@ public class HubManagerImpl implements HubManager, HostListener
         resourceHostDataProcessor = new ResourceHostDataProcessor( this, localPeer, monitor, restClient );
 
         resourceHostConfExecutorService
-                .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
+                .scheduleWithFixedDelay( resourceHostDataProcessor, 20, RH_CONF_SEND_INTERVAL_SEC, TimeUnit.SECONDS );
 
         //***********
 
         peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient,
-                ( int ) METRICS_SEND_DELAY );
+                ( int ) METRICS_SEND_INTERVAL_SEC );
 
         peerMetricsExecutorService
-                .scheduleWithFixedDelay( peerMetricsProcessor, 30, METRICS_SEND_DELAY, TimeUnit.SECONDS );
+                .scheduleWithFixedDelay( peerMetricsProcessor, 30, METRICS_SEND_INTERVAL_SEC, TimeUnit.SECONDS );
 
         //***********
 
