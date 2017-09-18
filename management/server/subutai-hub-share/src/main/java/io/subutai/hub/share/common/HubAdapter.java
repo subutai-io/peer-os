@@ -20,7 +20,7 @@ public interface HubAdapter
 
     void uploadEnvironment( String json );
 
-    void uploadPeerOwnerEnvironment( String json );
+    boolean uploadPeerOwnerEnvironment( String json );
 
     void removeEnvironment( String envId );
 

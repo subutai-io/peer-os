@@ -23,8 +23,6 @@ import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
@@ -361,25 +359,4 @@ public class HostRegistryImplTest
         verify( registry ).requestHeartbeat( resourceHost );
     }
 
-
-    @Test
-    public void testGetResourceHostIp() throws Exception
-    {
-        HostInterfaces hostInterfaces = mock( HostInterfaces.class );
-        HostInterface hostInterface = mock( HostInterface.class );
-        doReturn( Sets.newHashSet( hostInterface ) ).when( hostInterfaces ).getAll();
-        doReturn( hostInterfaces ).when( resourceHostInfo ).getHostInterfaces();
-        doReturn( hostInterface ).when( ipUtil ).findInterfaceByName( anySet(), anyString() );
-
-        registry.getResourceHostIp( resourceHostInfo );
-
-        verify( hostInterface ).getIp();
-
-        ResourceHost resourceHost = mock( ResourceHost.class );
-        doReturn( hostInterfaces ).when( resourceHost ).getHostInterfaces();
-
-        registry.getResourceHostIp( resourceHost );
-
-        verify( hostInterface, times( 2 ) ).getIp();
-    }
 }

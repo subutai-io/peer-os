@@ -208,7 +208,16 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         {
             List<RequestedHost> requestedHosts = registrationManager.getRequests();
 
-            ResourceHost managementHost = localPeer.getManagementHost();
+            String managementId = null;
+            try
+            {
+                ResourceHost managementHost = localPeer.getManagementHost();
+
+                managementId = managementHost.getId();
+            }
+            catch ( HostNotFoundException ignore )
+            {
+            }
 
             List<RequestedHostJson> requestedHostList = Lists.newArrayList();
 
@@ -216,7 +225,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             {
                 RequestedHostJson requestedHostJson = new RequestedHostJson( requestedHost );
 
-                if ( managementHost.getId().equalsIgnoreCase( requestedHost.getId() ) )
+                if ( requestedHost.getId().equalsIgnoreCase( managementId ) )
                 {
                     requestedHostJson.setManagement( true );
                 }
@@ -226,6 +235,8 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
                     ResourceHost resourceHost = localPeer.getResourceHostById( requestedHost.getId() );
 
                     requestedHostJson.setConnected( resourceHost.isConnected() );
+
+                    requestedHostJson.setIp( resourceHost.getAddress() );
                 }
                 catch ( HostNotFoundException e )
                 {

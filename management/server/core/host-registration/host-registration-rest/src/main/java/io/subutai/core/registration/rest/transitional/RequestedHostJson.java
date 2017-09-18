@@ -7,7 +7,6 @@ import com.google.common.collect.Sets;
 import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInterface;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -19,8 +18,6 @@ public class RequestedHostJson implements RequestedHost
     private String id;
     @Expose
     private String hostname;
-    @Expose
-    private Set<HostInterfaceJson> interfaces = Sets.newHashSet();
     @Expose
     private HostArchitecture arch;
     @Expose
@@ -37,6 +34,8 @@ public class RequestedHostJson implements RequestedHost
     private boolean isConnected = false;
     @Expose
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
+    @Expose
+    private String ip;
 
 
     public RequestedHostJson( RequestedHost requestedHost )
@@ -48,11 +47,6 @@ public class RequestedHostJson implements RequestedHost
         this.cert = requestedHost.getCert();
         this.arch = requestedHost.getArch();
         this.status = requestedHost.getStatus();
-
-        for ( HostInterface hostInterface : requestedHost.getInterfaces() )
-        {
-            this.interfaces.add( new HostInterfaceJson( hostInterface ) );
-        }
 
         for ( ContainerInfo containerInfo : requestedHost.getHostInfos() )
         {
@@ -79,15 +73,6 @@ public class RequestedHostJson implements RequestedHost
     public String getCert()
     {
         return cert;
-    }
-
-
-    @Override
-    public Set<HostInterface> getInterfaces()
-    {
-        Set<HostInterface> temp = Sets.newHashSet();
-        temp.addAll( interfaces );
-        return temp;
     }
 
 
@@ -123,6 +108,12 @@ public class RequestedHostJson implements RequestedHost
     public void setConnected( final boolean connected )
     {
         isConnected = connected;
+    }
+
+
+    public void setIp( final String ip )
+    {
+        this.ip = ip;
     }
 
 
@@ -168,9 +159,8 @@ public class RequestedHostJson implements RequestedHost
     @Override
     public String toString()
     {
-        return "RequestedHostJson{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", interfaces="
-                + interfaces + ", hostInfos=" + hostInfos + ", arch=" + arch + ", secret='" + secret + '\''
-                + ", publicKey='" + publicKey + '\'' + ", status=" + status + ", connected=" + isConnected
-                + ", hostInfos=" + hostInfos + ", cert=" + cert + '}';
+        return "RequestedHostJson{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", hostInfos=" + hostInfos
+                + ", arch=" + arch + ", secret='" + secret + '\'' + ", publicKey='" + publicKey + '\'' + ", status="
+                + status + ", connected=" + isConnected + ", hostInfos=" + hostInfos + ", cert=" + cert + '}';
     }
 }

@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl;
+package io.subutai.core.hubmanager.impl.http;
 
 
 import java.security.KeyStore;
@@ -13,6 +13,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
+import io.subutai.core.hubmanager.impl.FingerprintTrustManager;
 
 
 public class HttpClient

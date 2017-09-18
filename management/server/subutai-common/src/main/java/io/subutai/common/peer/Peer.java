@@ -14,15 +14,14 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
 import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -67,11 +66,21 @@ public interface Peer extends RelationLink
     PeerInfo getPeerInfo();
 
     /**
+     * Checks if peer can accommodate the requested container group
+     *
+     * @param nodes requested nodes (containers)
+     *
+     * @return true - can accommodate, false - otherwise
+     */
+    boolean canAccommodate( Nodes nodes ) throws PeerException;
+
+
+    /**
      * Creates environment container group on the peer
      *
-     * @param request - container creation request
+     * @param request container creation request
      */
-    CreateEnvironmentContainersResponse createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+    CreateEnvironmentContainersResponse createEnvironmentContainers( CreateEnvironmentContainersRequest request )
             throws PeerException;
 
 
@@ -180,19 +189,6 @@ public interface Peer extends RelationLink
      */
     Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
-    //******** Quota functions ***********
-
-    //    void setContainerQuota( final ContainerId containerHostId, final ContainerQuota containerQuota ) throws
-    // PeerException;
-
-    /**
-     * Returns resource usage of process on container by its PID
-     *
-     * @param containerId - target container
-     * @param pid - pid of process
-     */
-    ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
-
 
     //networking
 
@@ -221,13 +217,6 @@ public interface Peer extends RelationLink
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
-
-
-    /**
-     * Gets network interfaces
-     */
-
-    HostInterfaces getInterfaces() throws PeerException;
 
 
     /**

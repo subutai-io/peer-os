@@ -155,8 +155,8 @@ public class MonitorImplTest
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         when( alertListener.getId() ).thenReturn( SUBSCRIBER_ID );
         monitor.setAlertListeners( Sets.newHashSet( alertListener ) );
-        when( monitorDataService
-                .findHandlersByEnvironment( ENVIRONMENT_ID ) ).thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
+        when( monitorDataService.findHandlersByEnvironment( ENVIRONMENT_ID ) )
+                .thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
         when( environment.getId() ).thenReturn( ENVIRONMENT_ID );
         when( environment.getUserId() ).thenReturn( USER_ID );
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
@@ -247,21 +247,5 @@ public class MonitorImplTest
             e.printStackTrace();
         }
         assert monitor1 != null;
-    }
-
-
-    @Test( expected = MonitorException.class )
-    public void testGetProcessResourceUsage() throws Exception
-    {
-        CommandResult commandResult = mock( CommandResult.class );
-        when( commandResult.hasSucceeded() ).thenReturn( true ).thenReturn( false );
-        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
-        when( localPeer.getResourceHostByContainerHostName( containerHost.getHostname() ) ).thenReturn( resourceHost );
-
-        monitor.getProcessResourceUsage( containerId, PID );
-
-        verify( commandResult ).getStdOut();
-
-        monitor.getProcessResourceUsage( containerId, PID );
     }
 }

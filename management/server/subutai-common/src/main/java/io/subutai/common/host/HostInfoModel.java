@@ -1,9 +1,6 @@
 package io.subutai.common.host;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
@@ -16,22 +13,17 @@ public class HostInfoModel implements HostInfo
     @SerializedName( "hostname" )
     @JsonProperty( "hostname" )
     protected String hostname;
-    @SerializedName( "interfaces" )
-    @JsonProperty( "interfaces" )
-    protected Set<HostInterfaceModel> hostInterfaces = new HashSet<>();
     @SerializedName( "arch" )
     @JsonProperty( "arch" )
     protected HostArchitecture hostArchitecture;
 
 
     public HostInfoModel( @JsonProperty( "id" ) final String id, @JsonProperty( "hostname" ) final String hostname,
-                          @JsonProperty( "interfaces" ) final HostInterfaces hostInterfaces,
                           @JsonProperty( "arch" ) final HostArchitecture hostArchitecture )
     {
         this.id = id;
         this.hostname = hostname;
         this.hostArchitecture = hostArchitecture;
-        setHostInterfaces( hostInterfaces );
     }
 
 
@@ -44,7 +36,6 @@ public class HostInfoModel implements HostInfo
         {
             hostArchitecture = HostArchitecture.AMD64;
         }
-        this.hostInterfaces = hostInfo.getHostInterfaces().getAll();
     }
 
 
@@ -59,13 +50,6 @@ public class HostInfoModel implements HostInfo
     public String getHostname()
     {
         return hostname;
-    }
-
-
-    @Override
-    public HostInterfaces getHostInterfaces()
-    {
-        return new HostInterfaces( this.id, this.hostInterfaces );
     }
 
 
@@ -97,8 +81,7 @@ public class HostInfoModel implements HostInfo
 
         final HostInfoModel that = ( HostInfoModel ) o;
 
-        return hostArchitecture == that.hostArchitecture && hostname.equals( that.hostname ) && id.equals( that.id )
-                && hostInterfaces.equals( that.hostInterfaces );
+        return hostArchitecture == that.hostArchitecture && hostname.equals( that.hostname ) && id.equals( that.id );
     }
 
 
@@ -107,14 +90,7 @@ public class HostInfoModel implements HostInfo
     {
         int result = id.hashCode();
         result = 31 * result + hostname.hashCode();
-        result = 31 * result + hostInterfaces.hashCode();
         result = 31 * result + hostArchitecture.hashCode();
         return result;
-    }
-
-
-    public void setHostInterfaces( final HostInterfaces hostInterfaces )
-    {
-        this.hostInterfaces.addAll( hostInterfaces.getAll() );
     }
 }

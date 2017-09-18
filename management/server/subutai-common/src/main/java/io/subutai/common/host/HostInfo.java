@@ -27,12 +27,6 @@ public interface HostInfo extends Comparable<HostInfo>, Serializable
 
 
     /**
-     * Returns network interfaces of host
-     */
-    HostInterfaces getHostInterfaces();
-
-
-    /**
      * Returns architecture of host
      */
     HostArchitecture getArch();

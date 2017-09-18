@@ -1,30 +1,39 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -79,6 +88,11 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "template_id", nullable = false )
     private String templateId;
 
+    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
+            HostInterfaceEntity.class, orphanRemoval = true )
+    @JsonIgnore
+    private Set<HostInterface> hostInterfaces = new HashSet<>();
+
 
     protected ContainerHostEntity()
     {
@@ -105,13 +119,28 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
                                 final String ownerId, final String initiatorPeerId,
                                 final ContainerQuota containerQuota )
     {
-        super( peerId, hostId, hostname, architecture, hostInterfaces );
+        super( peerId, hostId, hostname, architecture );
         this.containerName = containerName;
         this.templateId = templateId;
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
         this.containerSize = containerQuota.getContainerSize();
+        setSavedHostInterfaces( hostInterfaces );
+    }
+
+
+    private void setSavedHostInterfaces( HostInterfaces hostInterfaces )
+    {
+        Preconditions.checkNotNull( hostInterfaces );
+
+        this.hostInterfaces.clear();
+        for ( HostInterface iface : hostInterfaces.getAll() )
+        {
+            HostInterfaceEntity netInterface = new HostInterfaceEntity( iface );
+            netInterface.setHost( this );
+            this.hostInterfaces.add( netInterface );
+        }
     }
 
 
@@ -250,14 +279,29 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         super.updateHostInfo( hostInfo );
 
         this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
+
+        setSavedHostInterfaces( ( ( ContainerHostInfo ) hostInfo ).getHostInterfaces() );
     }
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
+    public HostInterfaces getHostInterfaces()
     {
-        Peer peer = getPeer();
-        return peer.getProcessResourceUsage( getContainerId(), processPid );
+        Set<HostInterfaceModel> hostInterfaceModels = Sets.newHashSet();
+
+        for ( HostInterface hostInterface : hostInterfaces )
+        {
+            hostInterfaceModels.add( new HostInterfaceModel( hostInterface ) );
+        }
+
+        return new HostInterfaces( getId(), hostInterfaceModels );
+    }
+
+
+    @Override
+    public HostInterface getInterfaceByName( final String interfaceName )
+    {
+        return getHostInterfaces().findByName( interfaceName );
     }
 
 

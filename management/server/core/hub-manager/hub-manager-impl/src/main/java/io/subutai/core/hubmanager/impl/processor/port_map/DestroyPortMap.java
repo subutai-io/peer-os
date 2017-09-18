@@ -68,7 +68,7 @@ public class DestroyPortMap
 
                 if ( !mappingIsInUseOnRH )
                 {
-                    String rhIpAddr = resourceHost.getInterfaceByName( "wan" ).getIp();
+                    String rhIpAddr = resourceHost.getAddress();
 
                     if ( protocol == Protocol.HTTP || protocol == Protocol.HTTPS )
                     {

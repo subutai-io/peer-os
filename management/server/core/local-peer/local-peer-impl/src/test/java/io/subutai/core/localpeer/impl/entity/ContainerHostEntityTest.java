@@ -87,7 +87,6 @@ public class ContainerHostEntityTest
         when( containerHostInfo.getState() ).thenReturn( CONTAINER_HOST_STATE );
         when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anHostInterface.getIp() ).thenReturn( IP );
-        //        when( anHostInterface.getMac() ).thenReturn( MAC );
         when( hostRegistry.getHostInfoById( anyString() ) ).thenReturn( containerHostInfo );
 
         containerHostEntity = spy( new ContainerHostEntity() );
@@ -161,15 +160,6 @@ public class ContainerHostEntityTest
         containerHostEntity.updateHostInfo( containerHostInfo );
 
         assertEquals( containerHostInfo.getContainerName(), containerHostEntity.getContainerName() );
-    }
-
-
-    @Test
-    public void testGetProcessResourceUsage() throws Exception
-    {
-        containerHostEntity.getProcessResourceUsage( PID );
-
-        verify( peer ).getProcessResourceUsage( containerHostEntity.getContainerId(), PID );
     }
 
 

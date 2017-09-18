@@ -10,7 +10,7 @@ import io.subutai.core.karaf.manager.api.KarafManager;
 /**
  *
  */
-@Command( scope = "karaf", name = "command", description = "List P2P connection" )
+@Command( scope = "karaf", name = "command", description = "execute karaf shell command" )
 public class KarafShellCommand extends SubutaiShellCommandSupport
 {
     private KarafManager karafManager = null;

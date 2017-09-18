@@ -15,7 +15,6 @@ import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -149,23 +148,6 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
     }
 
-
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( pid > 0 );
-
-            return localPeer.getProcessResourceUsage( containerId, pid );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
 
     //*********** Quota functions ***************
 

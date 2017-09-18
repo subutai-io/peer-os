@@ -120,9 +120,13 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 		}
 	}
 
+    var timeoutId;
 	function getLogById(id, checkLast, prevLogs) {
 		if(checkLast === undefined || checkLast === null) checkLast = false;
 		if(prevLogs === undefined || prevLogs === null) prevLogs = false;
+
+		clearTimeout(timeoutId);
+
 		trackerSrv.getOperation(vm.selectedModule, id)
 			.success(function (data) {
 				if(data.state == 'RUNNING') {
@@ -174,7 +178,7 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 
 					vm.currentLog = vm.currentLog.concat(result);
 
-					setTimeout(function() {
+					timeoutId = setTimeout(function() {
 						getLogById(id, false, logs);
 					}, 2000);
 

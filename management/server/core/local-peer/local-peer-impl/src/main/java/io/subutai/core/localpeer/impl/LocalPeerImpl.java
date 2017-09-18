@@ -45,6 +45,8 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -60,7 +62,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -113,13 +114,13 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.TaskUtil;
+import io.subutai.common.util.UnitUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -145,7 +146,6 @@ import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
 import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -257,10 +257,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             resourceHosts.clear();
 
-            for ( ResourceHost resourceHost : resourceHostDataService.getAll() )
-            {
-                resourceHosts.add( resourceHost );
-            }
+            resourceHosts.addAll( resourceHostDataService.getAll() );
 
             setResourceHostTransientFields( getResourceHosts() );
 
@@ -836,6 +833,76 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public boolean canAccommodate( final Nodes nodes ) throws PeerException
+    {
+        Preconditions.checkNotNull( nodes );
+        Preconditions.checkArgument( !nodes.getNodes().isEmpty() );
+
+        double overheadFactor = 1.01;
+
+        Set<String> rhIds = Sets.newHashSet();
+
+        Double requestedRam = 0D;
+        Double requestedDisk = 0D;
+        Double requestedCpu = 0D;
+
+        for ( Node node : nodes.getNodes() )
+        {
+            rhIds.add( node.getHostId() );
+
+            requestedRam += node.getQuota().getContainerSize().getRamQuota();
+            requestedDisk += node.getQuota().getContainerSize().getDiskQuota();
+            requestedCpu += node.getQuota().getContainerSize().getCpuQuota();
+        }
+
+        Double availPeerRam = 0D;
+        Double availPeerDisk = 0D;
+        Double availPeerCpu = 0D;
+
+        for ( String rhId : rhIds )
+        {
+            ResourceHost resourceHost = getResourceHostById( rhId );
+            ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( resourceHost );
+
+            availPeerRam += resourceHostMetric.getAvailableRam();
+            availPeerDisk += resourceHostMetric.getAvailableSpace();
+            availPeerCpu += resourceHostMetric.getCpuCore() * resourceHostMetric.getAvailableCpu();
+        }
+
+        boolean canAccommodate = true;
+
+        if ( requestedRam * overheadFactor > availPeerRam )
+        {
+            LOG.warn( "Requested RAM volume {}MB can not be accommodated on local peer. Available RAM volume is {}MB",
+                    UnitUtil.convert( requestedRam, UnitUtil.Unit.B, UnitUtil.Unit.MB ),
+                    UnitUtil.convert( availPeerRam, UnitUtil.Unit.B, UnitUtil.Unit.MB ) );
+
+            canAccommodate = false;
+        }
+
+        if ( requestedDisk * overheadFactor > availPeerDisk )
+        {
+            LOG.warn( "Requested DISK volume {}GB can not be accommodated on local peer. Available DISK volume is {}GB",
+                    UnitUtil.convert( requestedDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    UnitUtil.convert( availPeerDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ) );
+
+            canAccommodate = false;
+        }
+
+        if ( requestedCpu * overheadFactor > availPeerCpu )
+        {
+            LOG.warn( "Requested CPU {} can not be accommodated on local peer. Available CPU is {}", requestedCpu,
+                    availPeerCpu );
+
+            canAccommodate = false;
+        }
+
+        return canAccommodate;
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public CreateEnvironmentContainersResponse createEnvironmentContainers(
@@ -1327,7 +1394,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         resourceHostDataService.remove( rhId );
 
         //remove from host registry cache
-        hostRegistry.removeResourceHost( rhId);
+        hostRegistry.removeResourceHost( rhId );
 
         ResourceHost resourceHost = getResourceHostById( rhId );
 
@@ -1472,7 +1539,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        if ( isInitialized() && !CollectionUtil.isCollectionEmpty( resourceHostInfo.getHostInterfaces().getAll() ) )
+        if ( isInitialized() && !StringUtils.isBlank( resourceHostInfo.getAddress() ) )
         {
             boolean firstMhRegistration = false;
 
@@ -1560,24 +1627,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkArgument( pid > 0, "Process pid must be greater than 0" );
-
-        try
-        {
-            return monitor.getProcessResourceUsage( containerId, pid );
-        }
-        catch ( MonitorException e )
-        {
-            LOG.error( e.getMessage() );
             throw new PeerException( e );
         }
     }
@@ -2122,13 +2171,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public HostInterfaces getInterfaces() throws HostNotFoundException
-    {
-        return getManagementHost().getHostInterfaces();
-    }
-
-
-    @Override
     public synchronized Integer reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
 
@@ -2211,35 +2253,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public UsedNetworkResources getUsedNetworkResources() throws PeerException
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
-
-        // todo uncomment (commented out until reserved resources are properly cleaned up on subos level)
-        // see https://github.com/subutai-io/p2p/issues/174
-        //        Set<ResourceHost> resourceHostSet = getResourceHosts();
-        //
-        //        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
-        //
-        //        for ( final ResourceHost resourceHost : resourceHostSet )
-        //        {
-        //            hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost,
-        // usedNetworkResources ) );
-        //        }
-        //
-        //        HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
-        //
-        //        if ( results.hasFailures() )
-        //        {
-        //            HostUtil.Task task = results.getFirstFailedTask();
-        //
-        //            String errMsg =
-        //                    String.format( "Error gathering reserved net resources on host %s: %s", task.getHost()
-        // .getId(),
-        //                            task.getFailureReason() );
-        //
-        //            LOG.error( errMsg );
-        //
-        //            throw new PeerException( errMsg, task.getException() );
-        //        }
-
 
         //add reserved ones too
         for ( NetworkResource networkResource : getReservedNetworkResources().getNetworkResources() )

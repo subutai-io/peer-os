@@ -20,7 +20,8 @@ import io.subutai.hub.share.dto.host.RequestedHostDto;
 
 import static java.lang.String.format;
 
-
+@Deprecated
+//TODO remove b/c we removed RH approval functionality on Hub side
 public class ResourceHostRegisterProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostRegisterProcessor.class.getName() );

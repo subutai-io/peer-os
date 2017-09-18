@@ -31,7 +31,7 @@ import static java.lang.String.format;
 
 
 //TODO update peer name from Hub periodically since it can change on Hub side
-public class RegistrationManager
+class RegistrationManager
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -44,7 +44,7 @@ public class RegistrationManager
     private final RestClient restClient;
 
 
-    public RegistrationManager( HubManagerImpl hubManager, ConfigManager configManager )
+    RegistrationManager( HubManagerImpl hubManager, ConfigManager configManager )
     {
         this.hubManager = hubManager;
         this.configManager = configManager;
@@ -54,7 +54,7 @@ public class RegistrationManager
     }
 
 
-    public void registerPeer( String email, String password, String peerName, String peerScope )
+    void registerPeer( String email, String password, String peerName, String peerScope )
             throws HubManagerException
     {
         registerPeerPubKey();
@@ -153,7 +153,7 @@ public class RegistrationManager
     }
 
 
-    public void unregister() throws HubManagerException
+    void unregister() throws HubManagerException
     {
         log.info( "Unregistering peer..." );
 

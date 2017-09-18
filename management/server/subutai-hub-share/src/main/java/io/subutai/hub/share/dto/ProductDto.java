@@ -9,7 +9,7 @@ public class ProductDto
 {
     public enum Type
     {
-        PLUGIN
+        PLUGIN, BLUEPRINT
     }
     private String id;
 

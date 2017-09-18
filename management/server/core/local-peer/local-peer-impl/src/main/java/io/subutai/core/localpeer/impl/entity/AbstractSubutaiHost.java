@@ -21,9 +21,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 
@@ -50,8 +47,6 @@ public abstract class AbstractSubutaiHost implements Host
     @Enumerated( EnumType.STRING )
     private HostArchitecture hostArchitecture;
 
-    @Transient
-    protected HostInterfaces hostInterfaces = new HostInterfaces();
 
     @Transient
     protected volatile long lastHeartbeat = 0;
@@ -68,19 +63,17 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     protected AbstractSubutaiHost( final String peerId, final String hostId, final String hostname,
-                                   HostArchitecture architecture, HostInterfaces hostInterfaces )
+                                   HostArchitecture architecture )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkNotNull( architecture );
-        Preconditions.checkNotNull( hostInterfaces );
 
         this.peerId = peerId;
         this.hostId = hostId;
         this.hostname = hostname;
         this.hostArchitecture = architecture;
-        this.hostInterfaces = hostInterfaces;
     }
 
 
@@ -93,7 +86,6 @@ public abstract class AbstractSubutaiHost implements Host
         this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
         this.hostArchitecture = hostInfo.getArch();
-        this.hostInterfaces = hostInfo.getHostInterfaces();
     }
 
 
@@ -172,8 +164,6 @@ public abstract class AbstractSubutaiHost implements Host
 
         this.lastHeartbeat = System.currentTimeMillis();
 
-        this.hostInterfaces = hostInfo.getHostInterfaces();
-
         this.hostname = hostInfo.getHostname();
     }
 
@@ -181,28 +171,6 @@ public abstract class AbstractSubutaiHost implements Host
     public long getLastHeartbeat()
     {
         return lastHeartbeat;
-    }
-
-
-    @Override
-    public HostInterfaces getHostInterfaces()
-    {
-        return hostInterfaces;
-    }
-
-
-    @Override
-    public HostInterface getInterfaceByName( final String interfaceName )
-    {
-        return getHostInterfaces().findByName( interfaceName );
-    }
-
-
-    public void addInterface( HostInterfaceModel hostInterface )
-    {
-        Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
-
-        hostInterfaces.addHostInterface( hostInterface );
     }
 
 

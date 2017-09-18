@@ -772,7 +772,8 @@ public class RestServiceImpl implements RestService
             }
         }
 
-        return Response.status( Response.Status.NOT_FOUND ).entity( JsonUtil.toJson( ERROR_KEY, "Container not found" ) ).build();
+        return Response.status( Response.Status.NOT_FOUND )
+                       .entity( JsonUtil.toJson( ERROR_KEY, "Container not found" ) ).build();
     }
 
 
@@ -939,14 +940,12 @@ public class RestServiceImpl implements RestService
         {
             for ( Peer peer : peers )
             {
-                taskCompletionService.submit( () ->
-                {
+                taskCompletionService.submit( () -> {
                     PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(), peer.isLocal() );
                     if ( peer.isOnline() )
                     {
                         Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                        for ( ResourceHostMetric metric : collection
-                                .toArray( new ResourceHostMetric[collection.size()] ) )
+                        for ( ResourceHostMetric metric : collection )
                         {
                             peerDto.addResourceHostDto(
                                     new ResourceHostDto( metric.getHostInfo().getId(), metric.getHostName(),
@@ -1125,8 +1124,7 @@ public class RestServiceImpl implements RestService
         {
             List<Peer> peers = Lists.newArrayList( environmentManager.loadEnvironment( environmentId ).getPeers() );
 
-            List<PeerTemplatesDownloadProgress> result = peers.stream().map( p ->
-            {
+            List<PeerTemplatesDownloadProgress> result = peers.stream().map( p -> {
                 try
                 {
                     return p.getTemplateDownloadProgress( new EnvironmentId( environmentId ) );

@@ -20,7 +20,7 @@
 <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//
 DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
 
-<Configure class="org.eclipse.jetty.server.Server">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
 
   <!-- One way SSL for peer Handshake -->
   <Call name="addConnector">
@@ -94,6 +94,15 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
             </Item>
           </Array>
         </Set>
+      </New>
+    </Arg>
+  </Call>
+
+
+  <Call name="addBean">
+    <Arg>
+      <New class="io.subutai.core.http.context.jetty.CustomErrorHandler">
+        <!--<Set name="server"><Ref refid="Server" /></Set>-->
       </New>
     </Arg>
   </Call>

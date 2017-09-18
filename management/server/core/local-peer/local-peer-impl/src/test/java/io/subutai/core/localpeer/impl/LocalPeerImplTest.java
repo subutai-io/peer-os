@@ -63,7 +63,6 @@ import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -258,8 +257,6 @@ public class LocalPeerImplTest
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
-        when( managementHost.getHostInterfaces() ).thenReturn( hostInterfaces );
-        when( managementHost.getInterfaceByName( INTERFACE_NAME ) ).thenReturn( anHostInterface );
 
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
@@ -293,11 +290,6 @@ public class LocalPeerImplTest
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
         when( environmentId.getId() ).thenReturn( ENV_ID );
-        when( hostInfo.getId() ).thenReturn( HOST_ID );
-        when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
-        when( hostInfo.getArch() ).thenReturn( ARCH );
-        when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
-        when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
 
         localPeer.serviceLocator = serviceLocator;
         when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
@@ -614,7 +606,7 @@ public class LocalPeerImplTest
     {
         when( resourceHostInfo.getHostname() ).thenReturn( Common.MANAGEMENT_HOSTNAME );
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
-        when( resourceHostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
+        doReturn( IP ).when( resourceHostInfo ).getAddress();
         doReturn( managementHost ).when( localPeer ).getManagementHost();
 
         localPeer.initialized = true;
@@ -650,18 +642,5 @@ public class LocalPeerImplTest
 
 
         resourceHost.updateHostInfo( resourceHostInfo );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetProcessResourceUsage() throws Exception
-    {
-        localPeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
-
-        verify( monitor ).getProcessResourceUsage( containerHost.getContainerId(), PID );
-
-        doThrow( new MonitorException( "" ) ).when( monitor ).getProcessResourceUsage( containerId, PID );
-
-        localPeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
     }
 }

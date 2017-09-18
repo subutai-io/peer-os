@@ -2,13 +2,14 @@ package io.subutai.core.hubmanager.impl.processor.port_map;
 
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.StringUtils;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
@@ -31,8 +32,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
-    private static final HashSet<PortMapDto> PORT_CACHE = new HashSet<>();
+    private static final Set<String> LINKS_IN_PROGRESS = Sets.newConcurrentHashSet();
+    private static final Set<PortMapDto> PORT_CACHE = Sets.newConcurrentHashSet();
 
     private Context ctx;
 
@@ -67,19 +68,19 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
     private void processLink( String stateLink )
     {
+        log.info( "Link process - START: {}", stateLink );
+
+        if ( LINKS_IN_PROGRESS.contains( stateLink ) )
+        {
+            log.info( "This link is in progress: {}", stateLink );
+
+            return;
+        }
+
+        LINKS_IN_PROGRESS.add( stateLink );
+
         try
         {
-
-            log.info( "Link process - START: {}", stateLink );
-
-            if ( LINKS_IN_PROGRESS.contains( stateLink ) )
-            {
-                log.info( "This link is in progress: {}", stateLink );
-
-                return;
-            }
-
-            LINKS_IN_PROGRESS.add( stateLink );
 
             RestResult<ContainerPortMapDto> restResult = ctx.restClient.get( stateLink, ContainerPortMapDto.class );
 
@@ -195,7 +196,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 // 'external port -> internal port' mapping should occur.
 
                 ResourceHost mngHost = ctx.localPeer.getManagementHost();
-                String rhIpAddr = resourceHost.getInterfaceByName( "wan" ).getIp();
+                String rhIpAddr = resourceHost.getAddress();
 
                 if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
                         portMapDto.getExternalPort() ) )

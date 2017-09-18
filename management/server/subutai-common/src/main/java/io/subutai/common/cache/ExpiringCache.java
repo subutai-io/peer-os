@@ -27,7 +27,7 @@ public class ExpiringCache<K, V>
 {
     private static final Logger LOG = LoggerFactory.getLogger( ExpiringCache.class.getName() );
 
-    private static final long EVICTION_RUN_INTERVAL_MS = 10;
+    private static final long EVICTION_RUN_INTERVAL_MS = 100;
     private final Map<K, CacheEntry<V>> entries = new ConcurrentHashMap<>();
 
     private final ScheduledExecutorService evictor;
@@ -67,24 +67,23 @@ public class ExpiringCache<K, V>
         {
             final Map.Entry<K, CacheEntry<V>> entry = it.next();
 
-            if ( entry.getValue().lock() )
-            {
-                try
-                {
-                    if ( entry.getValue().isExpired() )
-                    {
-                        it.remove();
+            entry.getValue().lock();
 
-                        if ( entry.getValue() instanceof CacheEntryWithExpiryCallback )
-                        {
-                            evictEntry( ( CacheEntryWithExpiryCallback ) entry.getValue() );
-                        }
+            try
+            {
+                if ( entry.getValue().isExpired() )
+                {
+                    it.remove();
+
+                    if ( entry.getValue() instanceof CacheEntryWithExpiryCallback )
+                    {
+                        evictEntry( ( CacheEntryWithExpiryCallback ) entry.getValue() );
                     }
                 }
-                finally
-                {
-                    entry.getValue().unlock();
-                }
+            }
+            finally
+            {
+                entry.getValue().unlock();
             }
         }
     }
@@ -116,8 +115,10 @@ public class ExpiringCache<K, V>
         {
             CacheEntry<V> entry = entries.get( key );
 
-            if ( entry != null && entry.lock() )
+            if ( entry != null )
             {
+                entry.lock();
+
                 try
                 {
                     if ( !entry.isExpired() )

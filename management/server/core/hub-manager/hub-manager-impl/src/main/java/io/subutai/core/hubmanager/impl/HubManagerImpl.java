@@ -51,23 +51,22 @@ import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.dao.ContainerMetricsServiceImpl;
-import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
+import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.processor.ContainerMetricsProcessor;
-import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
+import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
+import io.subutai.core.hubmanager.impl.util.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.processor.PeerMetricsProcessor;
+import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.requestor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
-import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
-import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
+import io.subutai.core.hubmanager.impl.requestor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.UserTokenProcessor;
-import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
+import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
@@ -115,8 +114,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
 
-    private final ScheduledExecutorService registrationRequestExecutor = Executors.newSingleThreadScheduledExecutor();
-
     private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
 
     private final ScheduledExecutorService containersMetricsExecutorService =
@@ -147,8 +144,6 @@ public class HubManagerImpl implements HubManager, HostListener
     private ResourceHostDataProcessor resourceHostDataProcessor;
 
     private ContainerEventProcessor containerEventProcessor;
-
-    private RegistrationRequestProcessor registrationRequestProcessor;
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
@@ -245,12 +240,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
         versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
-        //***********
-
-        registrationRequestProcessor =
-                new RegistrationRequestProcessor( this, peerManager, hostRegistrationManager, restClient );
-
-        registrationRequestExecutor.scheduleWithFixedDelay( registrationRequestProcessor, 20, 60, TimeUnit.SECONDS );
 
         //***********
 
@@ -372,8 +361,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
         notifyRegistrationListeners();
 
-        registrationRequestProcessor.run();
-
         peerMetricsProcessor.request();
     }
 
@@ -465,7 +452,7 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
-            RestResult<String> restResult = restClient.get( "/rest/v1/marketplace/products/public", String.class );
+            RestResult<String> restResult = restClient.getPlain( "/rest/v1/marketplace/products/public", String.class );
 
             if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
@@ -648,7 +635,8 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
-            RestResult<String> restResult = restClient.get( "/rest/v1/marketplace/products/checksum", String.class );
+            RestResult<String> restResult =
+                    restClient.getPlain( "/rest/v1/marketplace/products/checksum", String.class );
 
             if ( restResult.getStatus() != HttpStatus.SC_OK )
             {

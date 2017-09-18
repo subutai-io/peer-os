@@ -284,9 +284,7 @@ public class EnvironmentAdapter
 
             environmentContainersToJson( env, envJson );
 
-            hubAdapter.uploadPeerOwnerEnvironment( envJson.toString() );
-
-            return true;
+            return hubAdapter.uploadPeerOwnerEnvironment( envJson.toString() );
         }
         catch ( Exception e )
         {
@@ -343,7 +341,7 @@ public class EnvironmentAdapter
 
             peerJson.put( "rhId", ch.getResourceHostId().getId() );
 
-            String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
+            String ip = ch.getIp();
 
             peerJson.put( "ip", ip );
 

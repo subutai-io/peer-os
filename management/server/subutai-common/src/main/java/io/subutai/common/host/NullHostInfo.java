@@ -36,13 +36,6 @@ public class NullHostInfo implements HostInfo
 
 
     @Override
-    public HostInterfaces getHostInterfaces()
-    {
-        return new HostInterfaces();
-    }
-
-
-    @Override
     public HostArchitecture getArch()
     {
         return HostArchitecture.UNKNOWN;

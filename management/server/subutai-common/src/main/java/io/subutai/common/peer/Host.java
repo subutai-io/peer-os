@@ -33,7 +33,4 @@ public interface Host extends HostInfo, RelationLink
     void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
 
     boolean isConnected();
-
-
-    HostInterface getInterfaceByName( String interfaceName );
 }

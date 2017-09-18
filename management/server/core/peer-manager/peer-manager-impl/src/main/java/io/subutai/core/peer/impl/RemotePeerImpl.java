@@ -29,15 +29,14 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
 import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -90,7 +89,6 @@ import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 import io.subutai.hub.share.resource.PeerResources;
 
 
@@ -320,18 +318,6 @@ public class RemotePeerImpl implements RemotePeer
             LOG.error( "Error getting container state #isConnected", e );
             return false;
         }
-    }
-
-
-    @PermitAll
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Container id is null" );
-        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
-        Preconditions.checkArgument( pid > 0, "Process pid must be greater than 0" );
-
-        return environmentWebClient.getProcessResourceUsage( containerId, pid );
     }
 
 
@@ -642,6 +628,17 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public boolean canAccommodate( final Nodes nodes ) throws PeerException
+    {
+        Preconditions.checkNotNull( nodes, "Invalid nodes" );
+        Preconditions.checkArgument( !nodes.getNodes().isEmpty(), "Empty nodes" );
+
+        return peerWebClient.canAccommodate( nodes );
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public CreateEnvironmentContainersResponse createEnvironmentContainers(
@@ -883,13 +880,6 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( e.getMessage() );
         }
-    }
-
-
-    @Override
-    public HostInterfaces getInterfaces() throws PeerException
-    {
-        return peerWebClient.getInterfaces();
     }
 
 

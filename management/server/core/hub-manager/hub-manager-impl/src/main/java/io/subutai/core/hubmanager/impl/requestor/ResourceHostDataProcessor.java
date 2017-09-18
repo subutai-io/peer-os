@@ -1,10 +1,11 @@
-package io.subutai.core.hubmanager.impl.processor;
+package io.subutai.core.hubmanager.impl.requestor;
 
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,6 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import com.google.common.collect.Lists;
 
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -36,6 +35,8 @@ import static java.lang.String.format;
 
 public class ResourceHostDataProcessor extends HubRequester
 {
+    private static final long MIN_INTERVAL_BETWEEN_CFG_SENDING_MIN = 1;
+
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private LocalPeer localPeer;
@@ -45,6 +46,8 @@ public class ResourceHostDataProcessor extends HubRequester
     private Date p2pLogsEndDate;
 
     private Set<HostInterfaceDto> interfaces = new HashSet<>();
+
+    private volatile long lastConfigSendingTime;
 
 
     public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
@@ -75,6 +78,8 @@ public class ResourceHostDataProcessor extends HubRequester
 
     private void processConfigs()
     {
+        lastConfigSendingTime = System.currentTimeMillis();
+
         for ( ResourceHostMetric rhMetric : monitor.getResourceHostMetrics().getResources() )
         {
             try
@@ -224,22 +229,9 @@ public class ResourceHostDataProcessor extends HubRequester
 
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        // TODO Totally incorrect implementation
-        // TODO Use host registry to obtain interfaces
-        if ( hubManager.canWorkWithHub() )
+        if ( hubManager.canWorkWithHub() && ( System.currentTimeMillis() - lastConfigSendingTime > TimeUnit.MINUTES
+                .toMillis( MIN_INTERVAL_BETWEEN_CFG_SENDING_MIN ) ) )
         {
-            HostInterfaces as = resourceHostInfo.getHostInterfaces();
-            Set<HostInterfaceModel> test = as.getAll();
-
-            for ( final HostInterfaceModel hostInterfaceModel : test )
-            {
-                HostInterfaceDto dto = new HostInterfaceDto();
-                dto.setName( hostInterfaceModel.getName() );
-                dto.setIp( hostInterfaceModel.getIp() );
-
-                interfaces.add( dto );
-            }
-
             processConfigs();
         }
     }
