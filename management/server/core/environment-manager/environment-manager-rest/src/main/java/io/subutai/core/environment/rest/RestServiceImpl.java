@@ -25,9 +25,6 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.hub.share.quota.ContainerQuota;
 
 
-/**
- * TODO Seems obsolete. Check and delete
- */
 public class RestServiceImpl implements RestService
 {
     private static Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );

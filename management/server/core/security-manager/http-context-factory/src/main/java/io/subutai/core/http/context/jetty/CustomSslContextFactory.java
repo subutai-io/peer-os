@@ -19,7 +19,6 @@ public class CustomSslContextFactory extends SslContextFactory
 
     private boolean customStart = false;
 
-    //TODO take these parameters from config file
     private String _keyStorePassword = "subutai";
     private String _trustStorePassword = "subutai";
 
