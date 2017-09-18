@@ -51,30 +51,27 @@ import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.dao.ContainerMetricsServiceImpl;
-import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
-import io.subutai.core.hubmanager.impl.util.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.requestor.PeerMetricsProcessor;
+import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
-import io.subutai.core.hubmanager.impl.requestor.ResourceHostDataProcessor;
-import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
-import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.UserTokenProcessor;
-import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
+import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
+import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.requestor.PeerMetricsProcessor;
+import io.subutai.core.hubmanager.impl.requestor.ResourceHostDataProcessor;
+import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
+import io.subutai.core.hubmanager.impl.util.EnvironmentUserHelper;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
@@ -136,8 +133,6 @@ public class HubManagerImpl implements HubManager, HostListener
     private Monitor monitor;
 
     private IdentityManager identityManager;
-
-    private HostRegistrationManager hostRegistrationManager;
 
     private HeartbeatProcessor heartbeatProcessor;
 
@@ -266,18 +261,12 @@ public class HubManagerImpl implements HubManager, HostListener
 
         StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
-        StateLinkProcessor systemConfProcessor = new SystemConfProcessor( restClient );
-
         ProductProcessor productProcessor = new ProductProcessor( configManager, this.hubEventListeners, restClient );
 
         AppScaleProcessor appScaleProcessor = new AppScaleProcessor( new AppScaleManager( peerManager ), restClient );
 
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
-
-        StateLinkProcessor resourceHostRegisterProcessor =
-                new ResourceHostRegisterProcessor( hostRegistrationManager, peerManager, restClient );
-
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
@@ -290,11 +279,8 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor( tunnelProcessor )
                                                                              .addProcessor(
                                                                                      environmentTelemetryProcessor )
-                                                                             .addProcessor( systemConfProcessor )
                                                                              .addProcessor( productProcessor )
                                                                              .addProcessor( appScaleProcessor )
-                                                                             .addProcessor(
-                                                                                     resourceHostRegisterProcessor )
                                                                              .addProcessor( proxyProcessor )
                                                                              .addProcessor( containerPortMapProcessor )
                                                                              .addProcessor( userTokenProcessor );
@@ -795,12 +781,6 @@ public class HubManagerImpl implements HubManager, HostListener
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
-    }
-
-
-    public void setHostRegistrationManager( final HostRegistrationManager hostRegistrationManager )
-    {
-        this.hostRegistrationManager = hostRegistrationManager;
     }
 
 

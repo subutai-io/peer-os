@@ -178,8 +178,6 @@ public class PeerMetricsProcessor extends HubRequester
         {
             PeerMetricsDto dto = iterator.next();
 
-            Response r = null;
-
             try
             {
                 RestResult<Object> restResult = restClient.post( path, dto );

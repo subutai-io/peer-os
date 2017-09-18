@@ -2,6 +2,7 @@ package io.subutai.core.hubmanager.impl.dao;
 
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,45 @@ public class ConfigDataServiceImpl implements ConfigDataService
     public ConfigDataServiceImpl( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
+    }
+
+
+    public String getPeerOwnerId( String peerId )
+    {
+        return executeQuery( " select user_id from h_config where peer_id = ? ", peerId );
+    }
+
+
+    public boolean isPeerRegisteredToHub( String peerId )
+    {
+        Integer count = executeQuery( " select count(*) from h_config where peer_id = ? ", peerId );
+
+        return count != null && count > 0;
+    }
+
+
+    private <T> T executeQuery( String sql, String peerId )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            Query q = em.createNativeQuery( sql );
+
+            q.setParameter( 1, peerId );
+
+            return ( T ) q.getSingleResult();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error to execute query: ", e );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
+        return null;
     }
 
 
@@ -55,8 +95,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
 
         try
         {
-            ConfigEntity configuration = em.find( ConfigEntity.class, peerId );
-            return configuration;
+            return em.find( ConfigEntity.class, peerId );
         }
         catch ( Exception ex )
         {
