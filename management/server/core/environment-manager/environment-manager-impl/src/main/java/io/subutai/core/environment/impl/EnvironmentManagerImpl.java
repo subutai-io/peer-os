@@ -2599,6 +2599,19 @@ public class EnvironmentManagerImpl
     }
 
 
+    @Override
+    public void onRhConnected( final ResourceHostInfo resourceHostInfo )
+    {
+        // not needed
+    }
+
+    @Override
+    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
+    {
+        // not needed
+    }
+
+
     private ContainerHost getContainerHostById( String containerId )
     {
         try

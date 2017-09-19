@@ -508,4 +508,17 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     {
         //not used
     }
+
+
+    @Override
+    public void onRhConnected( final ResourceHostInfo resourceHostInfo )
+    {
+        // not needed
+    }
+
+    @Override
+    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
+    {
+        // not needed
+    }
 }

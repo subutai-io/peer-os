@@ -3525,6 +3525,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public void onRhConnected( final ResourceHostInfo newRhInfo )
+    {
+        // not needed
+    }
+
+
+    @Override
+    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
+    {
+        // not needed
+    }
+
+
     public void addListener( LocalPeerEventListener listener )
     {
         if ( listener != null )

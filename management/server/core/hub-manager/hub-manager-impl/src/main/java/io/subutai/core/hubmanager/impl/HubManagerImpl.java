@@ -813,4 +813,32 @@ public class HubManagerImpl implements HubManager, HostListener
     {
 
     }
+
+
+    @Override
+    public void onRhConnected( final ResourceHostInfo newRhInfo )
+    {
+        try
+        {
+            peerMetricsProcessor.request();
+        }
+        catch ( HubManagerException e )
+        {
+            log.error( "Error sending peer metrics", e );
+        }
+    }
+
+
+    @Override
+    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
+    {
+        try
+        {
+            peerMetricsProcessor.request();
+        }
+        catch ( HubManagerException e )
+        {
+            log.error( "Error sending peer metrics", e );
+        }
+    }
 }

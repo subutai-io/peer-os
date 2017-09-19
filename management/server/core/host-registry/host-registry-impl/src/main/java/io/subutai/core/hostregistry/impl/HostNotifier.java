@@ -25,6 +25,7 @@ public class HostNotifier implements Runnable
     private ResourceHostInfo oldRhInfo;
     private ResourceHostInfo newRhInfo;
     private Set<QuotaAlertValue> alerts;
+    private boolean rhDisconnected = false;
 
 
     HostNotifier( final HostListener listener, final ResourceHostInfo oldRhInfo, final ResourceHostInfo newRhInfo,
@@ -34,6 +35,14 @@ public class HostNotifier implements Runnable
         this.oldRhInfo = oldRhInfo;
         this.newRhInfo = newRhInfo;
         this.alerts = alerts;
+    }
+
+
+    HostNotifier( final HostListener listener, final ResourceHostInfo oldRhInfo )
+    {
+        this.listener = listener;
+        this.oldRhInfo = oldRhInfo;
+        this.rhDisconnected = true;
     }
 
 
@@ -56,8 +65,33 @@ public class HostNotifier implements Runnable
             LOG.warn( ERR_MSG_TEMPLATE, e );
         }
 
+        if ( rhDisconnected )
+        {
+            // notify on RH disconnection
+            try
+            {
+                listener.onRhDisconnected( oldRhInfo );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( ERR_MSG_TEMPLATE, e );
+            }
+
+            return;
+        }
+
         if ( oldRhInfo == null )
         {
+            // notify on RH connection
+            try
+            {
+                listener.onRhConnected( newRhInfo );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( ERR_MSG_TEMPLATE, e );
+            }
+
             return;
         }
 

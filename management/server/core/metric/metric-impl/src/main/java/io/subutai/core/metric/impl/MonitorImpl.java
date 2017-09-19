@@ -607,4 +607,18 @@ public class MonitorImpl implements Monitor, HostListener
     {
 
     }
+
+
+    @Override
+    public void onRhConnected( final ResourceHostInfo newRhInfo )
+    {
+        // not needed
+    }
+
+
+    @Override
+    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
+    {
+        // not needed
+    }
 }
