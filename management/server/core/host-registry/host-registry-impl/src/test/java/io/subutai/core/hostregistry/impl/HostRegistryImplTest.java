@@ -299,6 +299,8 @@ public class HostRegistryImplTest
     @Test
     public void testRemoveResourceHost() throws Exception
     {
+        doReturn( resourceHostInfo ).when( hosts ).getIfPresent(HOST_ID  );
+
         registry.removeResourceHost( HOST_ID );
 
         verify( hosts ).invalidate( HOST_ID );

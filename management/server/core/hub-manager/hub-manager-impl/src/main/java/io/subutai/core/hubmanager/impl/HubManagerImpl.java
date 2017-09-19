@@ -820,9 +820,12 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
-            peerMetricsProcessor.request();
+            if ( isRegisteredWithHub() )
+            {
+                peerMetricsProcessor.request();
+            }
         }
-        catch ( HubManagerException e )
+        catch ( Exception e )
         {
             log.error( "Error sending peer metrics", e );
         }
@@ -834,9 +837,12 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         try
         {
-            peerMetricsProcessor.request();
+            if ( isRegisteredWithHub() )
+            {
+                peerMetricsProcessor.request();
+            }
         }
-        catch ( HubManagerException e )
+        catch ( Exception e )
         {
             log.error( "Error sending peer metrics", e );
         }
