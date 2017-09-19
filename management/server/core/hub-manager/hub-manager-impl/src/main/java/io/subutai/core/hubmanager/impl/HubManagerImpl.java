@@ -153,6 +153,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private ContainerMetricsService containerMetricsService;
 
+    private ProductProcessor productProcessor;
+
 
     public HubManagerImpl( DaoManager daoManager )
     {
@@ -260,7 +262,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
         StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
-        ProductProcessor productProcessor = new ProductProcessor( configManager, this.hubEventListeners, restClient );
+        productProcessor = new ProductProcessor( configManager, this.hubEventListeners, restClient );
 
         AppScaleProcessor appScaleProcessor = new AppScaleProcessor( new AppScaleManager( peerManager ), restClient );
 
@@ -479,9 +481,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
             if ( isRegisteredWithHub() )
             {
-                //TODO use already existing this.productProcessor
-                ProductProcessor productProcessor =
-                        new ProductProcessor( this.configManager, this.hubEventListeners, this.restClient );
                 PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
                 peerProductDataDto.setProductId( uid );
                 peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
@@ -523,9 +522,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
         if ( isRegisteredWithHub() )
         {
-            //TODO use already existing this.productProcessor
-            ProductProcessor productProcessor =
-                    new ProductProcessor( this.configManager, this.hubEventListeners, this.restClient );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
             peerProductDataDto.setProductId( uid );
             peerProductDataDto.setState( PeerProductDataDto.State.REMOVE );
