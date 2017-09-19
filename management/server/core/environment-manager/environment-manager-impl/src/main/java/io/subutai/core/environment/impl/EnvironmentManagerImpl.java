@@ -425,6 +425,7 @@ public class EnvironmentManagerImpl
             if ( !peer.isOnline() )
             {
                 operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getName() ) );
+
                 throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
 
@@ -433,6 +434,10 @@ public class EnvironmentManagerImpl
             {
                 if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
                 {
+                    operationTracker.addLogFailed(
+                            String.format( "Peer %s can not accommodate the requested containers",
+                                    peer.getName() ) );
+
                     throw new EnvironmentCreationException(
                             String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
                 }
@@ -447,8 +452,6 @@ public class EnvironmentManagerImpl
 
         //create empty environment
         final LocalEnvironment environment = createEmptyEnvironment( topology );
-        // TODO add additional step for receiving trust message
-
 
         //launch environment creation workflow
         final EnvironmentCreationWorkflow environmentCreationWorkflow =
@@ -616,6 +619,10 @@ public class EnvironmentManagerImpl
                 {
                     if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
                     {
+                        operationTracker.addLogFailed(
+                                String.format( "Peer %s can not accommodate the requested containers",
+                                        peer.getName() ) );
+
                         throw new EnvironmentModificationException(
                                 String.format( "Peer %s can not accommodate the requested containers",
                                         peer.getName() ) );
@@ -624,6 +631,7 @@ public class EnvironmentManagerImpl
                 catch ( PeerException e )
                 {
                     operationTracker.addLogFailed( e.getMessage() );
+
                     throw new EnvironmentModificationException( e.getMessage() );
                 }
             }
