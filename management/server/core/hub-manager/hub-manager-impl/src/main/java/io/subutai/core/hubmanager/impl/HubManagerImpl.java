@@ -36,6 +36,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -822,6 +823,10 @@ public class HubManagerImpl implements HubManager, HostListener
         {
             if ( isRegisteredWithHub() )
             {
+                //delay to let peer register the RH
+
+                TaskUtil.sleep( 1000 );
+
                 peerMetricsProcessor.request();
             }
         }
