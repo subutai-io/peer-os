@@ -87,7 +87,7 @@ public class PeerMetricsProcessor extends HubRequester
 
             if ( resourceHostMetric == null )
             {
-                log.error( "Failed to obtain metric for host %s", host.getHostname() );
+                log.error( "Failed to obtain metric for host {}", host.getHostname() );
 
                 continue;
             }
@@ -98,7 +98,7 @@ public class PeerMetricsProcessor extends HubRequester
 
             if ( historicalMetrics.getMetrics() == null )
             {
-                log.error( "Failed to obtain metric for host %s", host.getHostname() );
+                log.error( "Failed to obtain metric for host {}", host.getHostname() );
 
                 continue;
             }
