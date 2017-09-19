@@ -122,7 +122,7 @@ class ContainerMetricsDAO
     }
 
 
-    public void purgeOldMetrics( int daysOld )
+    void purgeOldMetrics( int daysOld )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try

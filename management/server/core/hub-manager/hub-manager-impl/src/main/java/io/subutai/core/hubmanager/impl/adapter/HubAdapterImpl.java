@@ -32,7 +32,9 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
+import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
+import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
@@ -42,7 +44,6 @@ import io.subutai.hub.share.json.JsonUtil;
 import static java.lang.String.format;
 
 
-//TODO use ConfigDataServiceimpl instead of DaoHelper
 public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, HostListener
 {
     private static final String USER_ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
@@ -65,7 +66,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
     private final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private final DaoHelper daoHelper;
+    private final ConfigDataService configDataService;
 
 
     private final IdentityManager identityManager;
@@ -78,7 +79,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     public HubAdapterImpl( DaoManager daoManager, PeerManager peerManager, IdentityManager identityManager )
             throws HubManagerException
     {
-        daoHelper = new DaoHelper( daoManager );
+        configDataService = new ConfigDataServiceImpl( daoManager );
 
         this.identityManager = identityManager;
 
@@ -96,13 +97,13 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
     private boolean isRegistered()
     {
-        return daoHelper.isPeerRegisteredToHub( peerId );
+        return configDataService.isPeerRegisteredToHub( peerId );
     }
 
 
     private String getOwnerId()
     {
-        return daoHelper.getPeerOwnerId( peerId );
+        return configDataService.getPeerOwnerId( peerId );
     }
 
 

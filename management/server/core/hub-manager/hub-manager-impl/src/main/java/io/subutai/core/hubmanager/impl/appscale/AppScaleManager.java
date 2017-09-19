@@ -53,7 +53,7 @@ public class AppScaleManager
 
         installAppScale( controllerHost, config );
 
-        setupRevproxy( controllerHost, config );
+        setupRevproxy( config );
 
         log.debug( "AppScale installation done" );
     }
@@ -98,18 +98,18 @@ public class AppScaleManager
 
     private String formatIps( Map<String, String> ipList, List<String> hosts )
     {
-        String s = "";
+        StringBuilder s = new StringBuilder();
 
         for ( String hostname : hosts )
         {
-            s += ipList.get( hostname ) + " ";
+            s.append( ipList.get( hostname ) ).append( " " );
         }
 
-        return s.replace( "/24", "" );
+        return s.toString().replace( "/24", "" );
     }
 
 
-    private void setupRevproxy( ContainerHost containerHost, AppScaleConfigDto config )
+    private void setupRevproxy( AppScaleConfigDto config )
     {
         String ipAddress = config.getContainerAddresses().get( config.getClusterName() ).replace( "/24", "" );
 
@@ -213,6 +213,6 @@ public class AppScaleManager
             log.error( e.getMessage() );
         }
 
-        return 0l;
+        return 0L;
     }
 }

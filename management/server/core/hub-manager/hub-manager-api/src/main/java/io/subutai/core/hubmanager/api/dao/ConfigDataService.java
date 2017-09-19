@@ -11,4 +11,8 @@ public interface ConfigDataService
     Config getHubConfig( String peerId );
 
     void deleteConfig( final String peerId );
+
+    String getPeerOwnerId( String peerId );
+
+    boolean isPeerRegisteredToHub( String peerId );
 }

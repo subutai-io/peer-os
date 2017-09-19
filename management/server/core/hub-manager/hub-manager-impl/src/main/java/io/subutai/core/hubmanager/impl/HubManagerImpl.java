@@ -51,30 +51,27 @@ import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.dao.ContainerMetricsServiceImpl;
-import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
-import io.subutai.core.hubmanager.impl.util.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.requestor.PeerMetricsProcessor;
+import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
-import io.subutai.core.hubmanager.impl.requestor.ResourceHostDataProcessor;
-import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
-import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.UserTokenProcessor;
-import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
+import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
+import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.requestor.PeerMetricsProcessor;
+import io.subutai.core.hubmanager.impl.requestor.ResourceHostDataProcessor;
+import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
+import io.subutai.core.hubmanager.impl.util.EnvironmentUserHelper;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
@@ -87,9 +84,8 @@ import io.subutai.hub.share.json.JsonUtil;
 
 public class HubManagerImpl implements HubManager, HostListener
 {
-    private static final long TIME_15_MINUTES = 900;
-
-    private static final long METRICS_SEND_DELAY = TimeUnit.MINUTES.toSeconds( 10 );
+    private static final long RH_CONF_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 15 );
+    private static final long METRICS_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 10 );
     private static final int CONTAINER_METRIC_SEND_INTERVAL_MIN = 15;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -137,8 +133,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private IdentityManager identityManager;
 
-    private HostRegistrationManager hostRegistrationManager;
-
     private HeartbeatProcessor heartbeatProcessor;
 
     private ResourceHostDataProcessor resourceHostDataProcessor;
@@ -158,6 +152,8 @@ public class HubManagerImpl implements HubManager, HostListener
     private PeerMetricsProcessor peerMetricsProcessor;
 
     private ContainerMetricsService containerMetricsService;
+
+    private ProductProcessor productProcessor;
 
 
     public HubManagerImpl( DaoManager daoManager )
@@ -204,15 +200,15 @@ public class HubManagerImpl implements HubManager, HostListener
         resourceHostDataProcessor = new ResourceHostDataProcessor( this, localPeer, monitor, restClient );
 
         resourceHostConfExecutorService
-                .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
+                .scheduleWithFixedDelay( resourceHostDataProcessor, 20, RH_CONF_SEND_INTERVAL_SEC, TimeUnit.SECONDS );
 
         //***********
 
         peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient,
-                ( int ) METRICS_SEND_DELAY );
+                ( int ) METRICS_SEND_INTERVAL_SEC );
 
         peerMetricsExecutorService
-                .scheduleWithFixedDelay( peerMetricsProcessor, 30, METRICS_SEND_DELAY, TimeUnit.SECONDS );
+                .scheduleWithFixedDelay( peerMetricsProcessor, 30, METRICS_SEND_INTERVAL_SEC, TimeUnit.SECONDS );
 
         //***********
 
@@ -266,18 +262,12 @@ public class HubManagerImpl implements HubManager, HostListener
 
         StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
-        StateLinkProcessor systemConfProcessor = new SystemConfProcessor( restClient );
-
-        ProductProcessor productProcessor = new ProductProcessor( configManager, this.hubEventListeners, restClient );
+        productProcessor = new ProductProcessor( configManager, this.hubEventListeners, restClient );
 
         AppScaleProcessor appScaleProcessor = new AppScaleProcessor( new AppScaleManager( peerManager ), restClient );
 
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
-
-        StateLinkProcessor resourceHostRegisterProcessor =
-                new ResourceHostRegisterProcessor( hostRegistrationManager, peerManager, restClient );
-
 
         ContainerPortMapProcessor containerPortMapProcessor = new ContainerPortMapProcessor( ctx );
 
@@ -290,11 +280,8 @@ public class HubManagerImpl implements HubManager, HostListener
                                                                              .addProcessor( tunnelProcessor )
                                                                              .addProcessor(
                                                                                      environmentTelemetryProcessor )
-                                                                             .addProcessor( systemConfProcessor )
                                                                              .addProcessor( productProcessor )
                                                                              .addProcessor( appScaleProcessor )
-                                                                             .addProcessor(
-                                                                                     resourceHostRegisterProcessor )
                                                                              .addProcessor( proxyProcessor )
                                                                              .addProcessor( containerPortMapProcessor )
                                                                              .addProcessor( userTokenProcessor );
@@ -494,9 +481,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
             if ( isRegisteredWithHub() )
             {
-                //TODO use already existing this.productProcessor
-                ProductProcessor productProcessor =
-                        new ProductProcessor( this.configManager, this.hubEventListeners, this.restClient );
                 PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
                 peerProductDataDto.setProductId( uid );
                 peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
@@ -538,9 +522,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
         if ( isRegisteredWithHub() )
         {
-            //TODO use already existing this.productProcessor
-            ProductProcessor productProcessor =
-                    new ProductProcessor( this.configManager, this.hubEventListeners, this.restClient );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
             peerProductDataDto.setProductId( uid );
             peerProductDataDto.setState( PeerProductDataDto.State.REMOVE );
@@ -795,12 +776,6 @@ public class HubManagerImpl implements HubManager, HostListener
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
-    }
-
-
-    public void setHostRegistrationManager( final HostRegistrationManager hostRegistrationManager )
-    {
-        this.hostRegistrationManager = hostRegistrationManager;
     }
 
 

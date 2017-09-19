@@ -38,8 +38,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 
 
-//TODO this is for temporary period
-//@Ignore
 public class PGPEncryptionUtilTest
 {
     private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtilTest.class );
