@@ -55,16 +55,6 @@ public class HostNotifier implements Runnable
 
     private void processHeartbeat( ResourceHostInfo oldRhInfo, ResourceHostInfo newRhInfo, Set<QuotaAlertValue> alerts )
     {
-        // 0. notify on heartbeat
-        try
-        {
-            listener.onHeartbeat( newRhInfo, alerts );
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( ERR_MSG_TEMPLATE, e );
-        }
-
         if ( rhDisconnected )
         {
             // notify on RH disconnection
@@ -80,6 +70,18 @@ public class HostNotifier implements Runnable
             return;
         }
 
+
+        // 0. notify on heartbeat
+        try
+        {
+            listener.onHeartbeat( newRhInfo, alerts );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( ERR_MSG_TEMPLATE, e );
+        }
+
+
         if ( oldRhInfo == null )
         {
             // notify on RH connection
@@ -94,6 +96,7 @@ public class HostNotifier implements Runnable
 
             return;
         }
+
 
         for ( final ContainerHostInfo newContainerInfo : newRhInfo.getContainers() )
         {
