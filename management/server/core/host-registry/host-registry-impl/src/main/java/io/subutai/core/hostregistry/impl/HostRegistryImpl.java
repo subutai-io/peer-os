@@ -226,17 +226,7 @@ public class HostRegistryImpl implements HostRegistry
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
 
-        ResourceHostInfo resourceHostInfo = hosts.getIfPresent( id );
-
-        if ( resourceHostInfo != null )
-        {
-            hosts.invalidate( id );
-
-            for ( HostListener listener : hostListeners )
-            {
-                threadPool.execute( new HostNotifier( listener, resourceHostInfo ) );
-            }
-        }
+        hosts.invalidate( id );
     }
 
 
