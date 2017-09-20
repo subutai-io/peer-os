@@ -192,6 +192,7 @@ public class HistoricalMetrics
 
         if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
         {
+            //TODO use actual disk partitions from metric
             for ( String mount : HostMetricsDto.RESOURCE_HOST_PARTITIONS )
             {
                 DiskDto dto = new DiskDto();
@@ -220,6 +221,7 @@ public class HistoricalMetrics
 
         if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
         {
+            //TODO use actual network interfaces from metric
             for ( String iface : HostMetricsDto.RESOURCE_HOST_INTERFACES )
             {
                 double in = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "in" ) );

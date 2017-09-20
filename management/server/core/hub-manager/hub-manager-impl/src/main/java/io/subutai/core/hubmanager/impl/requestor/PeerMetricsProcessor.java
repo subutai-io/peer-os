@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +33,6 @@ import io.subutai.hub.share.dto.metrics.PeerMetricsDto;
 public class PeerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
-
-    private static final long DTO_TTL = TimeUnit.DAYS.toMillis( 2 );
 
     private ConfigManager configManager;
 
@@ -201,7 +198,7 @@ public class PeerMetricsProcessor extends HubRequester
             }
             catch ( Exception e )
             {
-                log.warn( "Could not send peer monitoring data to {}", dto.getPeerId(), e );
+                log.warn( "Could not send peer monitoring data of {}", dto.getPeerId(), e );
             }
         }
 
@@ -210,7 +207,7 @@ public class PeerMetricsProcessor extends HubRequester
         while ( i.hasNext() )
         {
             final PeerMetricsDto dto = i.next();
-            if ( dto.getCreatedTime() + DTO_TTL < System.currentTimeMillis() )
+            if ( dto.getCreatedTime() + intervalInSec * 1000 < System.currentTimeMillis() )
             {
                 log.warn( "Removing peer monitoring data {}", dto );
                 i.remove();
