@@ -1531,6 +1531,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
+        if ( resourceHostInfo == null )
+        {
+            return;
+        }
+
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
 
         if ( StringUtils.isBlank( resourceHostInfo.getId() ) )
