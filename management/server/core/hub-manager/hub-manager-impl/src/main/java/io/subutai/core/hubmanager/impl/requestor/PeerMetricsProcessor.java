@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.impl.requestor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
@@ -11,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.http.HttpStatus;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -74,13 +77,17 @@ public class PeerMetricsProcessor extends HubRequester
         PeerMetricsDto peerMetricsDto =
                 new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
 
+        Set<String> registeredRhIds = Sets.newHashSet();
+
         for ( ResourceHost host : peerManager.getLocalPeer().getResourceHosts() )
         {
+            registeredRhIds.add( host.getId() );
+
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
 
             if ( resourceHostMetric == null )
             {
-                log.error( "Failed to obtain metric for host %s", host.getHostname() );
+                log.error( "Failed to obtain metric for host {}", host.getHostname() );
 
                 continue;
             }
@@ -91,7 +98,7 @@ public class PeerMetricsProcessor extends HubRequester
 
             if ( historicalMetrics.getMetrics() == null )
             {
-                log.error( "Failed to obtain metric for host %s", host.getHostname() );
+                log.error( "Failed to obtain metric for host {}", host.getHostname() );
 
                 continue;
             }
@@ -151,6 +158,8 @@ public class PeerMetricsProcessor extends HubRequester
 
             peerMetricsDto.addHostMetrics( hostMetrics );
         }
+
+        peerMetricsDto.setRegisteredRhIds( registeredRhIds );
 
         queue( peerMetricsDto );
 

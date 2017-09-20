@@ -36,6 +36,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -62,8 +63,8 @@ import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProces
 import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.requestor.P2pLogsSender;
 import io.subutai.core.hubmanager.impl.requestor.PeerMetricsProcessor;
-import io.subutai.core.hubmanager.impl.requestor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
@@ -84,7 +85,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 public class HubManagerImpl implements HubManager, HostListener
 {
-    private static final long RH_CONF_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 15 );
+    private static final long P2P_LOG_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 15 );
     private static final long METRICS_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 10 );
     private static final int CONTAINER_METRIC_SEND_INTERVAL_MIN = 15;
 
@@ -92,8 +93,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final ScheduledExecutorService heartbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-    private final ScheduledExecutorService resourceHostConfExecutorService =
-            Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService peerLogsExecutor = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService resourceHostMonitorExecutorService =
             Executors.newSingleThreadScheduledExecutor();
@@ -135,7 +135,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private HeartbeatProcessor heartbeatProcessor;
 
-    private ResourceHostDataProcessor resourceHostDataProcessor;
+    private P2pLogsSender p2pLogsSender;
 
     private ContainerEventProcessor containerEventProcessor;
 
@@ -191,16 +191,14 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        resourceHostDataProcessor.onHeartbeat( resourceHostInfo, alerts );
     }
 
 
     private void initHubRequesters()
     {
-        resourceHostDataProcessor = new ResourceHostDataProcessor( this, localPeer, monitor, restClient );
+        p2pLogsSender = new P2pLogsSender( this, localPeer, monitor, restClient );
 
-        resourceHostConfExecutorService
-                .scheduleWithFixedDelay( resourceHostDataProcessor, 20, RH_CONF_SEND_INTERVAL_SEC, TimeUnit.SECONDS );
+        peerLogsExecutor.scheduleWithFixedDelay( p2pLogsSender, 20, P2P_LOG_SEND_INTERVAL_SEC, TimeUnit.SECONDS );
 
         //***********
 
@@ -295,7 +293,7 @@ public class HubManagerImpl implements HubManager, HostListener
     @Override
     public void sendHeartbeat() throws HubManagerException
     {
-        resourceHostDataProcessor.process();
+        p2pLogsSender.process();
         heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
     }
@@ -325,13 +323,6 @@ public class HubManagerImpl implements HubManager, HostListener
     }
 
 
-    @Override
-    public void sendResourceHostInfo() throws HubManagerException
-    {
-        resourceHostDataProcessor.process();
-    }
-
-
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void registerPeer( String email, String password, String peerName, String peerScope )
@@ -343,8 +334,6 @@ public class HubManagerImpl implements HubManager, HostListener
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.registerPeer( email, password, peerName, peerScope );
-
-        sendResourceHostInfo();
 
         notifyRegistrationListeners();
 
@@ -714,7 +703,7 @@ public class HubManagerImpl implements HubManager, HostListener
     public void destroy()
     {
         heartbeatExecutorService.shutdown();
-        resourceHostConfExecutorService.shutdown();
+        peerLogsExecutor.shutdown();
         resourceHostMonitorExecutorService.shutdown();
     }
 
@@ -824,5 +813,49 @@ public class HubManagerImpl implements HubManager, HostListener
                                                 final HostInterfaceModel netInterface )
     {
 
+    }
+
+
+    @Override
+    public void onRhConnected( final ResourceHostInfo newRhInfo )
+    {
+        try
+        {
+            if ( isRegisteredWithHub() )
+            {
+                //delay to let peer register the RH
+                TaskUtil.sleep( 1000 );
+
+                log.debug( "Notifying Hub about RH connection" );
+
+                peerMetricsProcessor.request();
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error sending peer metrics", e );
+        }
+    }
+
+
+    @Override
+    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
+    {
+        try
+        {
+            if ( isRegisteredWithHub() )
+            {
+                //delay to let peer unregister the RH
+                TaskUtil.sleep( 1000 );
+
+                log.debug( "Notifying Hub about RH disconnection" );
+
+                peerMetricsProcessor.request();
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error sending peer metrics", e );
+        }
     }
 }
