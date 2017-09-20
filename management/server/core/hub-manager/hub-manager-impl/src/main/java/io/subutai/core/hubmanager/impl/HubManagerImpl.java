@@ -824,7 +824,6 @@ public class HubManagerImpl implements HubManager, HostListener
             if ( isRegisteredWithHub() )
             {
                 //delay to let peer register the RH
-
                 TaskUtil.sleep( 1000 );
 
                 log.debug( "Notifying Hub about RH connection" );
@@ -846,6 +845,9 @@ public class HubManagerImpl implements HubManager, HostListener
         {
             if ( isRegisteredWithHub() )
             {
+                //delay to let peer unregister the RH
+                TaskUtil.sleep( 1000 );
+
                 log.debug( "Notifying Hub about RH disconnection" );
 
                 peerMetricsProcessor.request();
