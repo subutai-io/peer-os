@@ -147,6 +147,8 @@ public class PeerMetricsProcessor extends HubRequester
 
             try
             {
+                //Note: here we are overwriting historical 'idle' with the current one
+                //since it is more correct to use on  Hub side
                 hostMetrics.getCpu().setIdle( resourceHostMetric.getCpuIdle() );
                 hostMetrics.getCpu().setModel( resourceHostMetric.getCpuModel() );
                 hostMetrics.getCpu().setCoreCount( resourceHostMetric.getCpuCore() );
