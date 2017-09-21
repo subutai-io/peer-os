@@ -1,4 +1,4 @@
-package io.subutai.core.metric;
+package io.subutai.core.metric.impl;
 
 
 import java.io.InputStream;

@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HostMetricsDto
 {
-    public static final String MNT_PARTITION = "/mnt";
+    public static final String CURRENT = "current";
 
 
     public enum HostType

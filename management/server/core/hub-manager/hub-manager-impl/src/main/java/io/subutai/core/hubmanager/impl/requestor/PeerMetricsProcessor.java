@@ -137,11 +137,11 @@ public class PeerMetricsProcessor extends HubRequester
                 DiskDto diskDto = new DiskDto();
                 diskDto.setTotal( resourceHostMetric.getTotalSpace() );
                 diskDto.setUsed( resourceHostMetric.getUsedSpace() );
-                hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, diskDto );
+                hostMetrics.getDisk().put( HostMetricsDto.CURRENT, diskDto );
             }
             catch ( Exception e )
             {
-                hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, new DiskDto() );
+                hostMetrics.getDisk().put( HostMetricsDto.CURRENT, new DiskDto() );
                 log.info( e.getMessage(), "No info about used DISK" );
             }
 
