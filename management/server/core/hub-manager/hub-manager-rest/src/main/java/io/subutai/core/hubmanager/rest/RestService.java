@@ -32,12 +32,6 @@ public interface RestService
     Response register( @FormParam( "email" ) String email, @FormParam( "password" ) String password,
                        @FormParam( "peerName" ) String peerName, @FormParam( "peerScope" ) String peerScope );
 
-    //Send resource host configurations
-    @POST
-    @Path( "/send-rh-configurations" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response sendRHConfigurations();
-
     //Register to HUB
     @GET
     @Path( "/dns" )

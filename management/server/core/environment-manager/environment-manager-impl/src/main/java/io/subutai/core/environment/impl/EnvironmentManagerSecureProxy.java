@@ -913,6 +913,20 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
+    public void onRhConnected( final ResourceHostInfo resourceHostInfo )
+    {
+        environmentManager.onRhConnected( resourceHostInfo );
+    }
+
+
+    @Override
+    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
+    {
+        environmentManager.onRhDisconnected( resourceHostInfo );
+    }
+
+
+    @Override
     public Set<String> getDeletedEnvironmentsFromHub()
     {
         return environmentManager.getDeletedEnvironmentsFromHub();

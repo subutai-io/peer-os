@@ -22,8 +22,6 @@ public interface HubManager
 
     void triggerHeartbeat();
 
-    void sendResourceHostInfo() throws HubManagerException;
-
     String getHubDns() throws HubManagerException;
 
     String getProducts() throws HubManagerException;

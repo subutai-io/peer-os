@@ -74,23 +74,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response sendRHConfigurations()
-    {
-        try
-        {
-            hubManager.sendResourceHostInfo();
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage() );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
-        }
-    }
-
-
-    @Override
     public Response getHubDns()
     {
         try

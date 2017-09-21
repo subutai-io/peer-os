@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.impl.requestor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
@@ -11,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.http.HttpStatus;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -32,7 +35,7 @@ public class PeerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final long DTO_TTL = TimeUnit.DAYS.toMillis( 2 );
+    private static final int METRIC_TTL_DAYS = 1;
 
     private ConfigManager configManager;
 
@@ -40,6 +43,8 @@ public class PeerMetricsProcessor extends HubRequester
 
     private Monitor monitor;
 
+    //Since peer metrics are less important than container metrics, we hold unsent peer metrics in memory rather than
+    // in db, unlike container metrics
     private ConcurrentLinkedDeque<PeerMetricsDto> queue = new ConcurrentLinkedDeque<>();
 
     private int intervalInSec;
@@ -74,13 +79,17 @@ public class PeerMetricsProcessor extends HubRequester
         PeerMetricsDto peerMetricsDto =
                 new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
 
+        Set<String> registeredRhIds = Sets.newHashSet();
+
         for ( ResourceHost host : peerManager.getLocalPeer().getResourceHosts() )
         {
+            registeredRhIds.add( host.getId() );
+
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
 
             if ( resourceHostMetric == null )
             {
-                log.error( "Failed to obtain metric for host %s", host.getHostname() );
+                log.error( "Failed to obtain metric for host {}", host.getHostname() );
 
                 continue;
             }
@@ -91,7 +100,7 @@ public class PeerMetricsProcessor extends HubRequester
 
             if ( historicalMetrics.getMetrics() == null )
             {
-                log.error( "Failed to obtain metric for host %s", host.getHostname() );
+                log.error( "Failed to obtain metric for host {}", host.getHostname() );
 
                 continue;
             }
@@ -128,16 +137,18 @@ public class PeerMetricsProcessor extends HubRequester
                 DiskDto diskDto = new DiskDto();
                 diskDto.setTotal( resourceHostMetric.getTotalSpace() );
                 diskDto.setUsed( resourceHostMetric.getUsedSpace() );
-                hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, diskDto );
+                hostMetrics.getDisk().put( HostMetricsDto.CURRENT, diskDto );
             }
             catch ( Exception e )
             {
-                hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, new DiskDto() );
+                hostMetrics.getDisk().put( HostMetricsDto.CURRENT, new DiskDto() );
                 log.info( e.getMessage(), "No info about used DISK" );
             }
 
             try
             {
+                //Note: here we are overwriting historical 'idle' with the current one
+                //since it is more correct to use on  Hub side
                 hostMetrics.getCpu().setIdle( resourceHostMetric.getCpuIdle() );
                 hostMetrics.getCpu().setModel( resourceHostMetric.getCpuModel() );
                 hostMetrics.getCpu().setCoreCount( resourceHostMetric.getCpuCore() );
@@ -152,15 +163,17 @@ public class PeerMetricsProcessor extends HubRequester
             peerMetricsDto.addHostMetrics( hostMetrics );
         }
 
+        peerMetricsDto.setRegisteredRhIds( registeredRhIds );
+
         queue( peerMetricsDto );
 
         send();
     }
 
 
-    private boolean queue( final PeerMetricsDto peerMetricsDto )
+    private void queue( final PeerMetricsDto peerMetricsDto )
     {
-        return queue.offer( peerMetricsDto );
+        queue.offer( peerMetricsDto );
     }
 
 
@@ -192,7 +205,7 @@ public class PeerMetricsProcessor extends HubRequester
             }
             catch ( Exception e )
             {
-                log.warn( "Could not send peer monitoring data to {}", dto.getPeerId(), e );
+                log.warn( "Could not send peer monitoring data of {}", dto.getPeerId(), e );
             }
         }
 
@@ -201,7 +214,7 @@ public class PeerMetricsProcessor extends HubRequester
         while ( i.hasNext() )
         {
             final PeerMetricsDto dto = i.next();
-            if ( dto.getCreatedTime() + DTO_TTL < System.currentTimeMillis() )
+            if ( dto.getCreatedTime() + TimeUnit.DAYS.toMillis( METRIC_TTL_DAYS ) < System.currentTimeMillis() )
             {
                 log.warn( "Removing peer monitoring data {}", dto );
                 i.remove();

@@ -113,7 +113,7 @@ public class HistoricalMetricsTest
         Map<String, DiskDto> disk = metrics.getDisk();
 
         assertNotNull( disk );
-        assertEquals( 2, disk.keySet().size() );
+        assertEquals( 5, disk.keySet().size() );
 
         // root partition
         DiskDto root = disk.get( "/" );

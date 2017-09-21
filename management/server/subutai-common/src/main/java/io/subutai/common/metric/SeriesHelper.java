@@ -2,9 +2,12 @@ package io.subutai.common.metric;
 
 
 import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 
-class SeriesHelper
+public class SeriesHelper
 {
 
     private SeriesHelper()
@@ -13,7 +16,7 @@ class SeriesHelper
     }
 
 
-    static double getAvg( final List<Series> series, final Tag... tags )
+    public static double getAvg( final List<Series> series, final Tag... tags )
     {
         double result = 0;
 
@@ -42,6 +45,24 @@ class SeriesHelper
         }
 
         return count > 0 ? result / count : result;
+    }
+
+
+    public static Set<String> getTagValues( final List<Series> series, String tag )
+    {
+        Set<String> tagValues = Sets.newHashSet();
+
+        for ( Series s : series )
+        {
+            String tagValue = s.getTags().get( tag );
+
+            if ( tagValue != null )
+            {
+                tagValues.add( tagValue );
+            }
+        }
+
+        return tagValues;
     }
 
 

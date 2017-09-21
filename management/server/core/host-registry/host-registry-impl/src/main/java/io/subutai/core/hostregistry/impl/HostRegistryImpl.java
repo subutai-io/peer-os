@@ -20,6 +20,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
@@ -268,6 +270,19 @@ public class HostRegistryImpl implements HostRegistry
     {
         hosts = CacheBuilder.newBuilder().
                 expireAfterAccess( HOST_EXPIRATION_SEC, TimeUnit.SECONDS ).
+                                    removalListener( new RemovalListener<String, ResourceHostInfo>()
+                                    {
+                                        @Override
+                                        public void onRemoval(
+                                                final RemovalNotification<String, ResourceHostInfo> notification )
+                                        {
+                                            for ( HostListener listener : hostListeners )
+                                            {
+                                                threadPool.execute(
+                                                        new HostNotifier( listener, notification.getValue() ) );
+                                            }
+                                        }
+                                    } ).
                                     build();
 
         hostUpdater.scheduleWithFixedDelay( new Runnable()
@@ -358,7 +373,7 @@ public class HostRegistryImpl implements HostRegistry
     }
 
 
-    void requestHeartbeats( Set<ResourceHostInfo> resourceHosts )
+    private void requestHeartbeats( Set<ResourceHostInfo> resourceHosts )
     {
         for ( final ResourceHostInfo resourceHostInfo : resourceHosts )
         {
@@ -455,8 +470,8 @@ public class HostRegistryImpl implements HostRegistry
     WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action )
     {
         return RestUtil.createWebClient(
-                String.format( "http://%s:%d/%s",resourceHostInfo.getAddress(), Common.DEFAULT_AGENT_PORT,
-                        action ), 3000, 5000, 1 );
+                String.format( "http://%s:%d/%s", resourceHostInfo.getAddress(), Common.DEFAULT_AGENT_PORT, action ),
+                3000, 5000, 1 );
     }
 
 
