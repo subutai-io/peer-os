@@ -35,7 +35,7 @@ public class PeerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final long DTO_TTL = TimeUnit.DAYS.toMillis( 2 );
+    private static final int METRIC_TTL_DAYS = 1;
 
     private ConfigManager configManager;
 
@@ -43,6 +43,8 @@ public class PeerMetricsProcessor extends HubRequester
 
     private Monitor monitor;
 
+    //Since peer metrics are less important than container metrics, we hold unsent peer metrics in memory rather than
+    // in db, unlike container metrics
     private ConcurrentLinkedDeque<PeerMetricsDto> queue = new ConcurrentLinkedDeque<>();
 
     private int intervalInSec;
@@ -167,9 +169,9 @@ public class PeerMetricsProcessor extends HubRequester
     }
 
 
-    private boolean queue( final PeerMetricsDto peerMetricsDto )
+    private void queue( final PeerMetricsDto peerMetricsDto )
     {
-        return queue.offer( peerMetricsDto );
+        queue.offer( peerMetricsDto );
     }
 
 
@@ -201,7 +203,7 @@ public class PeerMetricsProcessor extends HubRequester
             }
             catch ( Exception e )
             {
-                log.warn( "Could not send peer monitoring data to {}", dto.getPeerId(), e );
+                log.warn( "Could not send peer monitoring data of {}", dto.getPeerId(), e );
             }
         }
 
@@ -210,7 +212,7 @@ public class PeerMetricsProcessor extends HubRequester
         while ( i.hasNext() )
         {
             final PeerMetricsDto dto = i.next();
-            if ( dto.getCreatedTime() + DTO_TTL < System.currentTimeMillis() )
+            if ( dto.getCreatedTime() + TimeUnit.DAYS.toMillis( METRIC_TTL_DAYS ) < System.currentTimeMillis() )
             {
                 log.warn( "Removing peer monitoring data {}", dto );
                 i.remove();
