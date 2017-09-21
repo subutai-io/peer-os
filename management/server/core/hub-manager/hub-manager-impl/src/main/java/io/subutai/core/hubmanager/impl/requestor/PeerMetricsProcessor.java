@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +35,16 @@ public class PeerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
+    private static final int METRIC_TTL_DAYS = 1;
+
     private ConfigManager configManager;
 
     private PeerManager peerManager;
 
     private Monitor monitor;
 
+    //Since peer metrics are less important than container metrics, we hold unsent peer metrics in memory rather than
+    // in db, unlike container metrics
     private ConcurrentLinkedDeque<PeerMetricsDto> queue = new ConcurrentLinkedDeque<>();
 
     private int intervalInSec;
@@ -164,9 +169,9 @@ public class PeerMetricsProcessor extends HubRequester
     }
 
 
-    private boolean queue( final PeerMetricsDto peerMetricsDto )
+    private void queue( final PeerMetricsDto peerMetricsDto )
     {
-        return queue.offer( peerMetricsDto );
+        queue.offer( peerMetricsDto );
     }
 
 
@@ -207,7 +212,7 @@ public class PeerMetricsProcessor extends HubRequester
         while ( i.hasNext() )
         {
             final PeerMetricsDto dto = i.next();
-            if ( dto.getCreatedTime() + intervalInSec * 1000 < System.currentTimeMillis() )
+            if ( dto.getCreatedTime() + TimeUnit.DAYS.toMillis( METRIC_TTL_DAYS ) < System.currentTimeMillis() )
             {
                 log.warn( "Removing peer monitoring data {}", dto );
                 i.remove();
