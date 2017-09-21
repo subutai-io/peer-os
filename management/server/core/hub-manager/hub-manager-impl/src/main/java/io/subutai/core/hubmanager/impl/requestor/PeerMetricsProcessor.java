@@ -137,16 +137,18 @@ public class PeerMetricsProcessor extends HubRequester
                 DiskDto diskDto = new DiskDto();
                 diskDto.setTotal( resourceHostMetric.getTotalSpace() );
                 diskDto.setUsed( resourceHostMetric.getUsedSpace() );
-                hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, diskDto );
+                hostMetrics.getDisk().put( HostMetricsDto.CURRENT, diskDto );
             }
             catch ( Exception e )
             {
-                hostMetrics.getDisk().put( HostMetricsDto.MNT_PARTITION, new DiskDto() );
+                hostMetrics.getDisk().put( HostMetricsDto.CURRENT, new DiskDto() );
                 log.info( e.getMessage(), "No info about used DISK" );
             }
 
             try
             {
+                //Note: here we are overwriting historical 'idle' with the current one
+                //since it is more correct to use on  Hub side
                 hostMetrics.getCpu().setIdle( resourceHostMetric.getCpuIdle() );
                 hostMetrics.getCpu().setModel( resourceHostMetric.getCpuModel() );
                 hostMetrics.getCpu().setCoreCount( resourceHostMetric.getCpuCore() );
