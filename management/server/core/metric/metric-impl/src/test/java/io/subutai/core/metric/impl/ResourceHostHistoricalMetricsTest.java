@@ -1,11 +1,18 @@
-package io.subutai.core.metric.impl;
+package io.subutai.core.metric;
 
 
-import java.util.UUID;
+import java.io.InputStream;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import io.subutai.common.metric.ResourceHostMetric;
+import org.apache.cxf.helpers.IOUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.subutai.common.metric.HistoricalMetrics;
+import io.subutai.common.metric.SeriesBatch;
+import io.subutai.common.metric.SeriesHelper;
 
 
 /**
@@ -13,27 +20,29 @@ import io.subutai.common.metric.ResourceHostMetric;
  */
 public class ResourceHostHistoricalMetricsTest
 {
+    private ObjectMapper mapper = new ObjectMapper();
 
-    @Test
-    public void testSetPeerId() throws Exception
+    private HistoricalMetrics metric;
+
+
+    @Before
+    public void setUp() throws Exception
     {
-        String peerId = UUID.randomUUID().toString();
-        ResourceHostMetric resourceHostMetric = new ResourceHostMetric();
+        InputStream is =
+                ResourceHostHistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "rh-metric.dat" );
 
-        //        resourceHostMetric.setPeerId( peerId );
+        String metricString = IOUtils.readStringFromStream( is );
 
-        //        assertEquals( peerId, resourceHostMetric.getPeerId() );
+        metric = mapper.readValue( metricString, HistoricalMetrics.class );
     }
 
 
     @Test
-    public void testToString() throws Exception
+    public void testGetTagValues() throws Exception
     {
-        String peerId = UUID.randomUUID().toString();
-        ResourceHostMetric resourceHostMetric = new ResourceHostMetric();
-
-        //        resourceHostMetric.setPeerId( peerId );
-
-        //        assertThat( resourceHostMetric.toString(), containsString( peerId.toString() ) );
+        System.out.println(
+                SeriesHelper.getTagValues( metric.getSeriesMap().get( SeriesBatch.SeriesType.NET ), "iface" ) );
+        System.out.println(
+                SeriesHelper.getTagValues( metric.getSeriesMap().get( SeriesBatch.SeriesType.DISK ), "mount" ) );
     }
 }
