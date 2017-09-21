@@ -1,6 +1,8 @@
 package io.subutai.core.hubmanager.impl.requestor;
 
 
+import org.apache.commons.lang.StringUtils;
+
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.core.hubmanager.api.HubRequester;
@@ -65,7 +67,15 @@ public class VersionInfoProcessor extends HubRequester
 
         RestResult<Object> restResult = restClient.post( path, versionInfoDto );
 
-        if ( !restResult.isSuccess() )
+        if ( restResult.isSuccess() )
+        {
+            if ( restResult.getEntity() != null && restResult.getEntity() instanceof String && StringUtils
+                    .isNotBlank( ( String ) restResult.getEntity() ) )
+            {
+                ( ( HubManagerImpl ) hubManager ).setPeerName( ( String ) restResult.getEntity() );
+            }
+        }
+        else
         {
             throw new HubManagerException( "Error on sending version info to hub: " + restResult.getError() );
         }
