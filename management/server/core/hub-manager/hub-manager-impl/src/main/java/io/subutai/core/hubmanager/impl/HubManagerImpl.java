@@ -54,6 +54,7 @@ import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.dao.ContainerMetricsServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
+import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
@@ -338,6 +339,16 @@ public class HubManagerImpl implements HubManager, HostListener
         notifyRegistrationListeners();
 
         peerMetricsProcessor.request();
+    }
+
+
+    public void setPeerName( String peerName )
+    {
+        Preconditions.checkArgument( !StringUtils.isBlank( peerName ), "Invalid peer name" );
+
+        ConfigEntity configEntity = ( ConfigEntity ) getConfigDataService().getHubConfig( localPeer.getId() );
+        configEntity.setPeerName( peerName );
+        getConfigDataService().saveHubConfig( configEntity );
     }
 
 

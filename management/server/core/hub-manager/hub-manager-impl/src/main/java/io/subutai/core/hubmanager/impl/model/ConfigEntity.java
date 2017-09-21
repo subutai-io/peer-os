@@ -62,9 +62,9 @@ public class ConfigEntity implements Config
     }
 
 
-    public void setPeerId( String peerId )
+    public void setPeerName( final String peerName )
     {
-        this.peerId = peerId;
+        this.peerName = peerName;
     }
 
 
