@@ -129,6 +129,8 @@ public class RestServiceImpl implements RestService
 
         pojo.setRegisteredToHub( hubManager.isRegisteredWithHub() );
 
+        pojo.setHubReachable( hubManager.isHubReachable() );
+
         String hubRegistrationInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( hubRegistrationInfo ).build();

@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.rest.pojo;
 public class RegistrationPojo
 {
     private boolean isRegisteredToHub;
+    private boolean isHubReachable;
     private String ownerId;
     private String currentUserEmail;
     private String peerName;
@@ -18,6 +19,18 @@ public class RegistrationPojo
     public void setRegisteredToHub( boolean isRegisteredToHub )
     {
         this.isRegisteredToHub = isRegisteredToHub;
+    }
+
+
+    public boolean isHubReachable()
+    {
+        return isHubReachable;
+    }
+
+
+    public void setHubReachable( final boolean hubReachable )
+    {
+        isHubReachable = hubReachable;
     }
 
 

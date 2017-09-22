@@ -3356,8 +3356,12 @@ td.b-main-table__status-col {
 	width: 60px;
 }
 
-.b-hub-status_active .b-hub-menu-icon path {
+.b-hub-status_regged .b-hub-menu-icon path {
 	fill: #8CC63F;
+}
+
+.b-hub-status_unregged .b-hub-menu-icon path {
+	fill: #E6EAF5;
 }
 
 .b-hub-status_offline .b-hub-menu-icon path {
