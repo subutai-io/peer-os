@@ -104,7 +104,7 @@
 				</g>
 			</svg>
       <div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
-        <span data-hub-email="{{ currentUserCtrl.userEmail }}">{ currentUserCtrl.online ? 'Online' : 'Offline'}</span>
+        <span data-hub-email="{{ currentUserCtrl.userEmail }}">{{ currentUserCtrl.online ? 'Online' : 'Offline' }}</span>
       </div>
       <span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus && subutaiController.adminMenus">
 				Register Peer
