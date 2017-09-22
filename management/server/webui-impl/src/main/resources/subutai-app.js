@@ -35,7 +35,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     var vm = this;
     vm.currentUser = localStorage.getItem('currentUser');
     vm.hubStatus = false;
-    vm.offline = false;
+    vm.online = false;
     vm.userId = "";
     vm.userEmail = "";
     vm.notifications = [];
@@ -112,7 +112,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         }).success(function (data) {
 
             vm.hubStatus = data.isRegisteredToHub;
-            vm.offline = data.isHubReachable;
+            vm.online = data.isHubReachable;
             vm.userId = data.ownerId;
             vm.userEmail = data.currentUserEmail;
 
@@ -140,13 +140,10 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         checkIfRegistered();
     }, 120000);
 
-
     $scope.getHubStatusIcon = function(){
-
         return vm.hubStatus ?
-          ( vm.offline ? 'b-hub-status_offline' : 'b-hub-status_regged' )
-          : 'b-hub-status_unregged';
-
+          ( vm.online ? 'b-hub-status_regged' : 'b-hub-status_offline' )
+          : 'b-hub-status_unregged' ;
     }
 
     vm.hub = {
