@@ -296,7 +296,7 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
   // Get token
   def slackToken = getSlackToken('ss-bots-slack-token')
   // Send notifications
-  slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
+  slackSend (color: colorCode, message: summary, teamDomain: 'optdyn', token: "${slackToken}")
 }
 
 // get slack token from global jenkins credentials store
