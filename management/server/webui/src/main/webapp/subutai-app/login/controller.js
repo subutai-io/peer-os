@@ -52,6 +52,14 @@ function LoginCtrl( $scope, loginSrv, $http, $rootScope )
 	vm.resetPwd=false;
 	vm.requestPwdReset=requestPwdReset;
 
+    function checkIfUserIsLoggedIn(){
+        if(getCookie('sptoken')){
+            window.location = '/';
+        }
+    }
+
+    checkIfUserIsLoggedIn();
+
     function getSignToken(){
         loginSrv.getSignToken().success(function(data){
             vm.requestSign = data;
