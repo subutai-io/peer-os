@@ -141,6 +141,14 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     }, 120000);
 
 
+    $scope.getHubStatusIcon = function(){
+
+        return vm.hubStatus ?
+          ( vm.offline ? 'b-hub-status_offline' : 'b-hub-status_regged' )
+          : 'b-hub-status_unregged';
+
+    }
+
     vm.hub = {
         login: "",
         password: "",
