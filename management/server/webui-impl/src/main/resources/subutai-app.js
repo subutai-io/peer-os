@@ -1042,6 +1042,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
         return {
             'responseError': function (rejection) {
                 if (rejection.status == 401 && $.inArray($location.path(), ['/login']) === -1) {
+                    removeCookie('sptoken');
                     $location.path('/login');
                 }
                 return $q.reject(rejection);
