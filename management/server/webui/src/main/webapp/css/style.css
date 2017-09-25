@@ -2946,6 +2946,7 @@ td.b-main-table__status-col {
     background: #fff url("../assets/elements/patter-stripes.png");
 }
 .b-cloud-space__work {
+    overflow: scroll;
     height: 550px;
 	position: relative;
 	z-index: 2;

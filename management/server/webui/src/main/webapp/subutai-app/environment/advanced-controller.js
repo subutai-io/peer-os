@@ -1418,6 +1418,34 @@ function checkResourceHost(model) {
 
 }
 
+var lastUsedRhIdx = -1;
+function clickIt(event){
+
+    var rhs = [];
+    for(var peerId in PEER_MAP){
+        for(var rhId in PEER_MAP[peerId].rh){
+            rhs.push(graph.getCell(PEER_MAP[peerId].rh[rhId]));
+        }
+    }
+
+    if(rhs.length == 0) return;
+
+    var theRH;
+    if(rhs.length > lastUsedRhIdx + 1){
+        lastUsedRhIdx++;
+    }else{
+        lastUsedRhIdx = 0;
+    }
+    theRH = rhs[lastUsedRhIdx];
+
+    var containerImage = $(event.target).parent().find('img');
+    var template = $(event.target).data('template');
+    var templateId = $(event.target).data('template-id');
+    var img = containerImage.attr('src');
+
+    addContainerToHost(theRH, template, img, null, null, null, null, templateId);
+}
+
 function startDrag(event) {
 
     var containerImage = $(event.target).parent().find('img');
