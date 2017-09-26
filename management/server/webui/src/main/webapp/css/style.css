@@ -2492,6 +2492,12 @@ td.b-main-table__status-col {
     top: 50px;
 }
 
+.b-progress-download{
+    background: url("../assets/elements/progress.svg") no-repeat;
+    background-position: center;
+    margin-left: 10px;
+}
+
 .b-login:after {
     content: "";
     position: absolute;
