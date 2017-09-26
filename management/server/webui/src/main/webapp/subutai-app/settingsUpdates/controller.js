@@ -28,6 +28,7 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
                 removeUpdateMessage();
                 scheduleUpdateCheck();
              }else{
+               vm.updateInProgress = false;
     		   SettingsUpdatesSrv.isEnvironmentWorkflowInProgress().success(function (data){
     			 if (data == true || data == 'true') {
     				LOADING_SCREEN("none");
@@ -113,6 +114,7 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 	function update() {
 		LOADING_SCREEN();
 		vm.updateText = 'Please wait, update is in progress. System will restart automatically';
+		vm.updateInProgress = true;
 		SettingsUpdatesSrv.update(vm.config).success(function (data, status) {
 			LOADING_SCREEN('none');
 			sessionStorage.removeItem('notifications');
