@@ -3,10 +3,7 @@ package io.subutai.core.hubmanager.impl.requestor;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,31 +32,25 @@ public class PeerMetricsProcessor extends HubRequester
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final int METRIC_TTL_DAYS = 1;
-
     private ConfigManager configManager;
 
     private PeerManager peerManager;
 
     private Monitor monitor;
 
-    //Since peer metrics are less important than container metrics, we hold unsent peer metrics in memory rather than
-    // in db, unlike container metrics
-    private ConcurrentLinkedDeque<PeerMetricsDto> queue = new ConcurrentLinkedDeque<>();
-
-    private int intervalInSec;
+    private int intervalInMin;
 
 
     public PeerMetricsProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
                                  final ConfigManager configManager, final Monitor monitor, final RestClient restClient,
-                                 final int intervalInSec )
+                                 final int intervalInMin )
     {
         super( hubManager, restClient );
 
         this.peerManager = peerManager;
         this.configManager = configManager;
         this.monitor = monitor;
-        this.intervalInSec = intervalInSec;
+        this.intervalInMin = intervalInMin;
     }
 
 
@@ -74,7 +65,7 @@ public class PeerMetricsProcessor extends HubRequester
     {
         Calendar cal = Calendar.getInstance();
         Date endTime = cal.getTime();
-        cal.add( Calendar.SECOND, -intervalInSec );
+        cal.add( Calendar.MINUTE, -intervalInMin );
         Date startTime = cal.getTime();
         PeerMetricsDto peerMetricsDto =
                 new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
@@ -165,60 +156,30 @@ public class PeerMetricsProcessor extends HubRequester
 
         peerMetricsDto.setRegisteredRhIds( registeredRhIds );
 
-        queue( peerMetricsDto );
-
-        send();
+        send( peerMetricsDto );
     }
 
 
-    private void queue( final PeerMetricsDto peerMetricsDto )
-    {
-        queue.offer( peerMetricsDto );
-    }
-
-
-    private void send()
+    private void send( PeerMetricsDto peerMetricsDto )
     {
         String path = String.format( "/rest/v1/peers/%s/monitor", configManager.getPeerId() );
 
-        log.debug( "Peer monitor queue size = {}", queue.size() );
-
-        final Iterator<PeerMetricsDto> iterator = queue.iterator();
-
-        while ( iterator.hasNext() )
+        try
         {
-            PeerMetricsDto dto = iterator.next();
+            RestResult<Object> restResult = restClient.post( path, peerMetricsDto );
 
-            try
+            if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                RestResult<Object> restResult = restClient.post( path, dto );
-
-                if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
-                {
-                    iterator.remove();
-                    log.debug( "Peer monitoring data sent successfully. {}", dto );
-                }
-                else
-                {
-                    log.warn( "Could not send peer monitoring data: " + restResult.getError() + " " + dto.toString() );
-                }
+                log.debug( "Peer monitoring data has been sent successfully" );
             }
-            catch ( Exception e )
+            else
             {
-                log.warn( "Could not send peer monitoring data of {}", dto.getPeerId(), e );
+                log.warn( "Could not send peer monitoring data: {} ", restResult.getError() );
             }
         }
-
-        // clean up queue to avoid memory exhaustion
-        Iterator<PeerMetricsDto> i = queue.iterator();
-        while ( i.hasNext() )
+        catch ( Exception e )
         {
-            final PeerMetricsDto dto = i.next();
-            if ( dto.getCreatedTime() + TimeUnit.DAYS.toMillis( METRIC_TTL_DAYS ) < System.currentTimeMillis() )
-            {
-                log.warn( "Removing peer monitoring data {}", dto );
-                i.remove();
-            }
+            log.warn( "Could not send peer monitoring data: {}", e.getMessage() );
         }
     }
 }

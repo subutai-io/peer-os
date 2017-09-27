@@ -86,8 +86,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 public class HubManagerImpl implements HubManager, HostListener
 {
-    private static final long P2P_LOG_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 15 );
-    private static final long METRICS_SEND_INTERVAL_SEC = TimeUnit.MINUTES.toSeconds( 10 );
+    private static final long PEER_METRICS_SEND_INTERVAL_MIN = 10;
     private static final int CONTAINER_METRIC_SEND_INTERVAL_MIN = 15;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -199,15 +198,15 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         p2pLogsSender = new P2pLogsSender( this, localPeer, monitor, restClient );
 
-        peerLogsExecutor.scheduleWithFixedDelay( p2pLogsSender, 20, P2P_LOG_SEND_INTERVAL_SEC, TimeUnit.SECONDS );
+        peerLogsExecutor.scheduleWithFixedDelay( p2pLogsSender, 20, 3600, TimeUnit.SECONDS );
 
         //***********
 
         peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient,
-                ( int ) METRICS_SEND_INTERVAL_SEC );
+                ( int ) PEER_METRICS_SEND_INTERVAL_MIN );
 
         peerMetricsExecutorService
-                .scheduleWithFixedDelay( peerMetricsProcessor, 30, METRICS_SEND_INTERVAL_SEC, TimeUnit.SECONDS );
+                .scheduleWithFixedDelay( peerMetricsProcessor, 1, PEER_METRICS_SEND_INTERVAL_MIN, TimeUnit.MINUTES );
 
         //***********
 
