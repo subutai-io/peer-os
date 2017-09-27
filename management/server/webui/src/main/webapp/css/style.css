@@ -578,12 +578,24 @@ input[type=checkbox] {
 }
 
 .b-main-table_auto-width {
-	width: auto;
+    table-layout: fixed;
+    width: 99% !important;
 	margin: 0 0 0 0;
+    font-size: 13px;
+    color: #04346E;
+    text-align: left;
+    margin: 5px;
 }
 
 .b-main-table_auto-width td {
 	vertical-align: top;
+	padding-right: 5px;
+}
+
+.log-btns-tbl{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    float: right;
 }
 
 .b-main-table_auto-width tr:hover {
@@ -2480,6 +2492,12 @@ td.b-main-table__status-col {
     top: 50px;
 }
 
+.b-progress-download{
+    background: url("../assets/elements/progress.svg") no-repeat;
+    background-position: center;
+    margin-left: 10px;
+}
+
 .b-login:after {
     content: "";
     position: absolute;
@@ -2934,6 +2952,7 @@ td.b-main-table__status-col {
     background: #fff url("../assets/elements/patter-stripes.png");
 }
 .b-cloud-space__work {
+    overflow: scroll;
     height: 550px;
 	position: relative;
 	z-index: 2;
@@ -3356,8 +3375,12 @@ td.b-main-table__status-col {
 	width: 60px;
 }
 
-.b-hub-status_active .b-hub-menu-icon path {
+.b-hub-status_regged .b-hub-menu-icon path {
 	fill: #8CC63F;
+}
+
+.b-hub-status_unregged .b-hub-menu-icon path {
+	fill: #E6EAF5;
 }
 
 .b-hub-status_offline .b-hub-menu-icon path {
@@ -3724,8 +3747,7 @@ td.b-main-table__status-col {
 	background-color: #f8fbfd;
     padding: 10px 14px;
     overflow: auto;
-	width: 800px;
-	height: 550px;
+	height: 500px;
 	border: 1px solid #CCCEEE;
 }
 

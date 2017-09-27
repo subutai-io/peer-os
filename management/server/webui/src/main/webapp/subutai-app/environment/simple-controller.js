@@ -848,6 +848,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				title: {text: containerName + " ('" + template + "') " + size}
 			}
 		});
+
+        var theDiv = $("#js-environment-creation");
+
+        theDiv.width ( theDiv.width() > devElement.attributes.position.x + 100
+        ? theDiv.width() :devElement.attributes.position.x + 100) ;
+
+        theDiv.height ( theDiv.height() > devElement.attributes.position.y + 100
+        ? theDiv.height() :devElement.attributes.position.y + 100) ;
+
 		vm.isEditing ? vm.currentEnvironment.includedContainers.push(devElement) : null;
 		graph.addCell(devElement);
 		filterPluginsList();

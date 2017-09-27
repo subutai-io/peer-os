@@ -80,6 +80,11 @@ public class HeartbeatProcessor implements Runnable
             {
                 try
                 {
+                    if ( !hubManager.isRegisteredWithHub() )
+                    {
+                        return;
+                    }
+
                     log.warn( "Shutting down hub manager" );
                     String url = path + "shutdown-hook";
 

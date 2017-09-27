@@ -140,6 +140,13 @@ public class HistoricalMetrics
     }
 
 
+    public Map<SeriesBatch.SeriesType, List<Series>> getSeriesMap()
+    {
+        splitSeries();
+        return seriesMap;
+    }
+
+
     private void splitSeries()
     {
         for ( SeriesBatch.SeriesType type : SeriesBatch.SeriesType.values() )
@@ -192,7 +199,7 @@ public class HistoricalMetrics
 
         if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
         {
-            for ( String mount : HostMetricsDto.RESOURCE_HOST_PARTITIONS )
+            for ( String mount : SeriesHelper.getTagValues( series, "mount" ) )
             {
                 DiskDto dto = new DiskDto();
                 dto.setAvailable(
@@ -220,7 +227,7 @@ public class HistoricalMetrics
 
         if ( getHostType() == HostMetricsDto.HostType.RESOURCE_HOST )
         {
-            for ( String iface : HostMetricsDto.RESOURCE_HOST_INTERFACES )
+            for ( String iface : SeriesHelper.getTagValues( series, "iface" ) )
             {
                 double in = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "in" ) );
                 double out = SeriesHelper.getAvg( series, new Tag( "iface", iface ), new Tag( "type", "out" ) );

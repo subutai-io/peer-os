@@ -35,6 +35,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     var vm = this;
     vm.currentUser = localStorage.getItem('currentUser');
     vm.hubStatus = false;
+    vm.online = false;
     vm.userId = "";
     vm.userEmail = "";
     vm.notifications = [];
@@ -111,6 +112,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         }).success(function (data) {
 
             vm.hubStatus = data.isRegisteredToHub;
+            vm.online = data.isHubReachable;
             vm.userId = data.ownerId;
             vm.userEmail = data.currentUserEmail;
 
@@ -138,6 +140,11 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         checkIfRegistered();
     }, 120000);
 
+    $scope.getHubStatusIcon = function(){
+        return vm.hubStatus ?
+          ( vm.online ? 'b-hub-status_regged' : 'b-hub-status_offline' )
+          : 'b-hub-status_unregged' ;
+    }
 
     vm.hub = {
         login: "",
@@ -189,16 +196,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
                     vm.hubRegisterError = error;
                 });
 
-                $http.post(SERVER_URL + 'rest/v1/hub/send-rh-configurations', {
-                    withCredentials: true,
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-                })
-                    .success(function () {
-                    }).error(function (error) {
-                    console.log('hub/register error: ', error);
-                    vm.hubRegisterError = error;
-                });
-
 				vm.peerNameValue = vm.hub.peerName;
 
             }).error(function (error) {
@@ -231,9 +228,11 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             .success(function () {
                 hubPopupLoadScreen();
                 vm.hubStatus = true;
+                vm.online = true;
                 SweetAlert.swal("Success!", "Heartbeat sent successfully.", "success");
             }).error(function (error) {
             hubPopupLoadScreen();
+            vm.online = false;
             SweetAlert.swal("ERROR!", "Error performing heartbeat: " + error.replace(/\\n/g, " "), "error");
         });
     }
@@ -1042,6 +1041,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
         return {
             'responseError': function (rejection) {
                 if (rejection.status == 401 && $.inArray($location.path(), ['/login']) === -1) {
+                    removeCookie('sptoken');
                     $location.path('/login');
                 }
                 return $q.reject(rejection);

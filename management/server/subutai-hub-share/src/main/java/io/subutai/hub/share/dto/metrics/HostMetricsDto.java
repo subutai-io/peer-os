@@ -14,14 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HostMetricsDto
 {
-    public static final String ROOT_PARTITION = "/";
-    public static final String MNT_PARTITION = "/mnt";
-    public static final List<String> RESOURCE_HOST_PARTITIONS =
-            Collections.unmodifiableList( Arrays.asList( ROOT_PARTITION, MNT_PARTITION ) );
-
-    public static final String WAN_INTERFACE = "wan";
-    public static final List<String> RESOURCE_HOST_INTERFACES =
-            Collections.unmodifiableList( Collections.singletonList( WAN_INTERFACE ) );
+    public static final String CURRENT = "current";
 
 
     public enum HostType

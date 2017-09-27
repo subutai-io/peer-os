@@ -470,4 +470,18 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     {
 
     }
+
+
+    @Override
+    public void onRhConnected( final ResourceHostInfo resourceHostInfo )
+    {
+
+    }
+
+
+    @Override
+    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
+    {
+
+    }
 }

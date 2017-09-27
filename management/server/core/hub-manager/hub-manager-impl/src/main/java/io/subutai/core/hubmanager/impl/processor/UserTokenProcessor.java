@@ -32,19 +32,15 @@ public class UserTokenProcessor implements StateLinkProcessor
     @Override
     public boolean processStateLinks( final Set<String> stateLinks ) throws HubManagerException
     {
-        boolean fastMode = false;
-
         for ( String link : stateLinks )
         {
             if ( link.contains( "token" ) )
             {
-                fastMode = true;
-
                 processStateLink( link );
             }
         }
 
-        return fastMode;
+        return false;
     }
 
 

@@ -1,62 +1,64 @@
 <div ng-controller="CurrentUserCtrl as currentUserCtrl" class="b-personal-space">
-	<div class="b-header__userbar b-header__userbar_right">
-		<!--<i class="fa fa-sign-in b-plugin-version"></i>-->
+  <div class="b-header__userbar b-header__userbar_right">
+    <!--<i class="fa fa-sign-in b-plugin-version"></i>-->
 
-		<span ng-if="currentUserCtrl.peerNameValue" class="b-header-userbar-name" style="text-decoration: none;">
+    <span ng-if="currentUserCtrl.peerNameValue" class="b-header-userbar-name" style="text-decoration: none;">
 			{{ currentUserCtrl.peerNameValue }} / 
 		</span>
 
-		<span ng-if="currentUserCtrl.currentUser" class="b-header-userbar-name">
+    <span ng-if="currentUserCtrl.currentUser" class="b-header-userbar-name">
 			<a href ng-click="currentUserCtrl.logout()" class="b-header-userbar-name">
 				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
 			</a>
 		</span>
-		<a href ui-sref="login"
-			 class="b-header-userbar-name"
-			 ng-if="!currentUserCtrl.currentUser">
-			Login
-		</a>
-	</div>
+    <a href ui-sref="login"
+       class="b-header-userbar-name"
+       ng-if="!currentUserCtrl.currentUser">
+      Login
+    </a>
+  </div>
 
-	<script>
+  <script>
 		$('.js-notifications-scrollbar').perfectScrollbar();
-	</script>
-	<div class="b-hub-status b-notification js-header-dropdown g-right"
-			 ng-class="{'b-notification_active' : currentUserCtrl.notificationNew }"
-	>
-		<div class="b-notification-count">{{ currentUserCtrl.notificationsCount }}</div>
-		<a class="b-icon b-icon_bell js-notification"
-			 ng-click="currentUserCtrl.notificationNew = false">
-		</a>
 
-		<div class="b-hub-status__dropdown">
-			<div class="b-hub-status-dropdown js-notifications-scrollbar">
-				<ul class="list">
-					<li ng-repeat="notification in currentUserCtrl.notifications" class="b-notification__{{ notification.type }}">
+  </script>
+  <div class="b-hub-status b-notification js-header-dropdown g-right"
+       ng-class="{'b-notification_active' : currentUserCtrl.notificationNew }"
+  >
+    <div class="b-notification-count">{{ currentUserCtrl.notificationsCount }}</div>
+    <a class="b-icon b-icon_bell js-notification"
+       ng-click="currentUserCtrl.notificationNew = false">
+    </a>
+
+    <div class="b-hub-status__dropdown">
+      <div class="b-hub-status-dropdown js-notifications-scrollbar">
+        <ul class="list">
+          <li ng-repeat="notification in currentUserCtrl.notifications" class="b-notification__{{ notification.type }}">
 						<span ng-if="notification.logId == undefined">
 							{{ notification.message }}
 						</span>
 
-						<a href ng-if="notification.logId" ng-click="currentUserCtrl.viewLogs(notification.logId)">
-							{{ notification.message }}
-						</a>
+            <a href ng-if="notification.logId" ng-click="currentUserCtrl.viewLogs(notification.logId)">
+              {{ notification.message }}
+            </a>
 
-						<div class="date">
-							{{ notification.date }}
-						</div>
-						<div class="b-dropdown-buttons" ng-if="notification.links">
-							<a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green" target="{{ link.newTab ? '_blank' : '_self' }}">
-								<span ng-if="!link.tooltip">{{ link.text }}</span>
-								<span ng-if="link.tooltip" tooltips tooltip-template="{{ link.tooltip }}" tooltip-side="bottom">
+            <div class="date">
+              {{ notification.date }}
+            </div>
+            <div class="b-dropdown-buttons" ng-if="notification.links">
+              <a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green"
+                 target="{{ link.newTab ? '_blank' : '_self' }}">
+                <span ng-if="!link.tooltip">{{ link.text }}</span>
+                <span ng-if="link.tooltip" tooltips tooltip-template="{{ link.tooltip }}" tooltip-side="bottom">
 									{{ link.text }}
 								</span>
-							</a>
-						</div>
-					</li>
-					<li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
-						<span>No logs</span>
-					</li>
-					<!--<li><a href="#">Your SS version is obsolete, please update
+              </a>
+            </div>
+          </li>
+          <li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
+            <span>No logs</span>
+          </li>
+          <!--<li><a href="#">Your SS version is obsolete, please update
           it to X version</a>
           <div class="date">8 February at 22:25</div>
           <div class="buttons">
@@ -64,17 +66,17 @@
           <a href="#" class="b-btn b-btn_white">Ignore</a>
           </div>
           </li>-->
-				</ul>
-			</div>
-			<a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
-		</div>
-	</div>
-	{{isRegistrationForVisible}}
-	<div class="b-hub-status js-header-dropdown g-right"
-			 ng-click="currentUserCtrl.isRegistrationFormVisible = !currentUserCtrl.isRegistrationFormVisible"
-			 ng-class="{'b-hub-status_active' : currentUserCtrl.hubStatus }">
-		<div class="b-hub-menu js-notification">
-			<svg class="b-hub-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
+        </ul>
+      </div>
+      <a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
+    </div>
+  </div>
+  {{isRegistrationForVisible}}
+  <div id="hub-button" class="b-hub-status js-header-dropdown g-right"
+       ng-click="currentUserCtrl.isRegistrationFormVisible = !currentUserCtrl.isRegistrationFormVisible"
+       ng-class="getHubStatusIcon()">
+    <div class="b-hub-menu js-notification">
+      <svg class="b-hub-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
 				<path fill="#E6EAF5" d="M6.1,7H0.9C0.5,7,0.1,6.6,0.1,6.2V0.8C0.1,0.4,0.5,0,0.9,0h5.1c0.5,0,0.8,0.4,0.8,0.8v5.3
 				C6.9,6.6,6.5,7,6.1,7z M0.9,0.3c-0.3,0-0.5,0.2-0.5,0.5v5.3c0,0.3,0.2,0.5,0.5,0.5h5.1c0.3,0,0.5-0.2,0.5-0.5V0.8
 				c0-0.3-0.2-0.5-0.5-0.5H0.9z"/>
@@ -101,98 +103,99 @@
 				C2.8,1.5,2.9,1.6,2.9,1.6z"/>
 				</g>
 			</svg>
-			<div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
-				<span data-hub-email="{{ currentUserCtrl.userEmail }}">Online</span>
-			</div>
-			<span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus && subutaiController.adminMenus">
+      <div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
+        <span data-hub-email="{{ currentUserCtrl.userEmail }}">{{ currentUserCtrl.online ? 'Online' : 'Offline' }}</span>
+      </div>
+      <span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus && subutaiController.adminMenus">
 				Register Peer
 			</span>
-			<div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus == false && subutaiController.adminMenus == false">
-				Offline
-			</div>
-		</div>
-		<div class="b-hub-status__dropdown" ng-if="subutaiController.adminMenus">
-			<div ng-if="!currentUserCtrl.hubStatus">
-				<div class="header">
-					Register Peer
-				</div>
-				<form ng-submit="currentUserCtrl.hubRegister()">
-					<div class="body">
-						<!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
-						<input style="display:none" type="text" name="hidden-login"/>
-						<input style="display:none" type="password" name="hidden-password"/>
-						<div class="b-form__error-message" ng-if="currentUserCtrl.hubRegisterError">
-							{{ currentUserCtrl.hubRegisterError }}
-						</div>
-						<div class="b-form-group g-margin-bottom">
-							<div class="g-text g-margin-bottom-half">Login</div>
-							<input type="text"
-										 class="b-form-input b-form-input_full"
-										 focus-input="currentUserCtrl.getRegistrationFormVisibilityStatus()"
-										 tabindex=1
-										 ng-model="currentUserCtrl.hub.login">
-						</div>
-						<div class="b-form-group">
-							<div class="g-text g-margin-bottom-half">Password</div>
-							<input type="password"
-										 class="b-form-input b-form-input_full"
-										 tabindex=2
-										 ng-model="currentUserCtrl.hub.password">
-						</div>
-						<div class="b-form-group">
-							<div class="g-text g-margin-bottom-half">Peer name</div>
-							<input type="text"
-										 class="b-form-input b-form-input_full"
-										 tabindex=3
-										 ng-model="currentUserCtrl.hub.peerName">
-						</div>
-						<div class="b-form-group">
-							<div class="g-text g-margin-bottom-half">Scope</div>
-							<select class="b-form-input b-form-input_full" tabindex="4" ng-model="currentUserCtrl.hub.peerScope">
-								<option value="Public" selected>Public</option>
-								<option value="Private">Private</option>
-							</select>
-						</div>
-					</div>
-					<div class="footer">
-						<a href="https://{{ currentUserCtrl.hubIp }}" target="_blank" tabindex=3 class="b-form-label">Sign Up</a>
-						<button type="submit" class="b-btn b-btn_green g-right" tabindex=5
-										ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
-							Register
-						</button>
-					</div>
-				</form>
-			</div>
-			<div ng-if="currentUserCtrl.hubStatus">
-				<ul class="list">
-					<li style="text-align: center;">
-						<a href="https://{{ currentUserCtrl.hubIp }}/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to HUB</a>
-						<div class="date"></div>
-					</li>
-					<li>
-						<div style="width: 100%; text-align: center">
-							<button class="b-btn b-btn_green" ng-click="currentUserCtrl.hubHeartbeat()">Send Heartbeat</button>
-						</div>
-					</li>
-				</ul>
-				<a href ng-click="currentUserCtrl.hubUnregister()" class="show-more">Unregister</a>
-			</div>
-			<div class="b-loading-screen js-hub-screen">
-				<div class="b-load-icon"></div>
-			</div>
-		</div>
-		<div class="b-hub-status__dropdown" ng-if="!subutaiController.adminMenus">
-			<div>
-				<ul class="list">
-					<li style="text-align: center;">
-						<a href="https://{{ currentUserCtrl.hubIp }}" target="_blank">Go to HUB</a>
-						<div class="date"></div>
-					</li>
-				</ul>
-			</div>
-			<div class="b-loading-screen js-hub-screen">
-				<div class="b-load-icon"></div>
-			</div>
-		</div>
-	</div>
+      <div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus == false && subutaiController.adminMenus == false">
+        Standalone
+      </div>
+    </div>
+    <div class="b-hub-status__dropdown" ng-if="subutaiController.adminMenus">
+      <div ng-if="!currentUserCtrl.hubStatus">
+        <div class="header">
+          Register Peer
+        </div>
+        <form ng-submit="currentUserCtrl.hubRegister()">
+          <div class="body">
+            <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+            <input style="display:none" type="text" name="hidden-login"/>
+            <input style="display:none" type="password" name="hidden-password"/>
+            <div class="b-form__error-message" ng-if="currentUserCtrl.hubRegisterError">
+              {{ currentUserCtrl.hubRegisterError }}
+            </div>
+            <div class="b-form-group g-margin-bottom">
+              <div class="g-text g-margin-bottom-half">Login</div>
+              <input type="text"
+                     class="b-form-input b-form-input_full"
+                     focus-input="currentUserCtrl.getRegistrationFormVisibilityStatus()"
+                     tabindex=1
+                     ng-model="currentUserCtrl.hub.login">
+            </div>
+            <div class="b-form-group">
+              <div class="g-text g-margin-bottom-half">Password</div>
+              <input type="password"
+                     class="b-form-input b-form-input_full"
+                     tabindex=2
+                     ng-model="currentUserCtrl.hub.password">
+            </div>
+            <div class="b-form-group">
+              <div class="g-text g-margin-bottom-half">Peer name</div>
+              <input type="text"
+                     class="b-form-input b-form-input_full"
+                     tabindex=3
+                     ng-model="currentUserCtrl.hub.peerName">
+            </div>
+            <div class="b-form-group">
+              <div class="g-text g-margin-bottom-half">Scope</div>
+              <select class="b-form-input b-form-input_full" tabindex="4" ng-model="currentUserCtrl.hub.peerScope">
+                <option value="Public" selected>Public</option>
+                <option value="Private">Private</option>
+              </select>
+            </div>
+          </div>
+          <div class="footer">
+            <a href="https://{{ currentUserCtrl.hubIp }}" target="_blank" tabindex=3 class="b-form-label">Sign Up</a>
+            <button type="submit" class="b-btn b-btn_green g-right" tabindex=5
+                    ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
+              Register
+            </button>
+          </div>
+        </form>
+      </div>
+      <div ng-if="currentUserCtrl.hubStatus">
+        <ul class="list">
+          <li style="text-align: center;">
+            <a href="https://{{ currentUserCtrl.hubIp }}/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to
+              HUB</a>
+            <div class="date"></div>
+          </li>
+          <li>
+            <div style="width: 100%; text-align: center">
+              <button class="b-btn b-btn_green" ng-click="currentUserCtrl.hubHeartbeat()">Send Heartbeat</button>
+            </div>
+          </li>
+        </ul>
+        <a href ng-click="currentUserCtrl.hubUnregister()" class="show-more">Unregister</a>
+      </div>
+      <div class="b-loading-screen js-hub-screen">
+        <div class="b-load-icon"></div>
+      </div>
+    </div>
+    <div class="b-hub-status__dropdown" ng-if="!subutaiController.adminMenus">
+      <div>
+        <ul class="list">
+          <li style="text-align: center;">
+            <a href="https://{{ currentUserCtrl.hubIp }}" target="_blank">Go to HUB</a>
+            <div class="date"></div>
+          </li>
+        </ul>
+      </div>
+      <div class="b-loading-screen js-hub-screen">
+        <div class="b-load-icon"></div>
+      </div>
+    </div>
+  </div>
 </div>
