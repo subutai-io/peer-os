@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>test-parent</artifactId>
-    <version>6.0.3-SNAPSHOT</version>
+    <version>6.0.2</version>
   </parent>
 
   <artifactId>test-cli</artifactId>
