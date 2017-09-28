@@ -4,6 +4,8 @@ package io.subutai.core.hubmanager.impl.requestor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,26 +40,38 @@ public class PeerMetricsProcessor extends HubRequester
 
     private Monitor monitor;
 
-    private int intervalInMin;
+    private long lastSendTime;
+
+    private ReentrantLock lock = new ReentrantLock();
 
 
     public PeerMetricsProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
                                  final ConfigManager configManager, final Monitor monitor, final RestClient restClient,
-                                 final int intervalInMin )
+                                 final long intervalInMin )
     {
         super( hubManager, restClient );
 
         this.peerManager = peerManager;
         this.configManager = configManager;
         this.monitor = monitor;
-        this.intervalInMin = intervalInMin;
+        this.lastSendTime = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis( intervalInMin );
     }
 
 
     @Override
     public void request() throws HubManagerException
     {
-        sendPeerMetrics();
+        if ( lock.tryLock() )
+        {
+            try
+            {
+                sendPeerMetrics();
+            }
+            finally
+            {
+                lock.unlock();
+            }
+        }
     }
 
 
@@ -65,8 +79,10 @@ public class PeerMetricsProcessor extends HubRequester
     {
         Calendar cal = Calendar.getInstance();
         Date endTime = cal.getTime();
-        cal.add( Calendar.MINUTE, -intervalInMin );
+        cal.add( Calendar.MILLISECOND,
+                -( int ) Math.min( TimeUnit.DAYS.toMillis( 1 ), System.currentTimeMillis() - lastSendTime ) );
         Date startTime = cal.getTime();
+
         PeerMetricsDto peerMetricsDto =
                 new PeerMetricsDto( peerManager.getLocalPeer().getId(), startTime.getTime(), endTime.getTime() );
 
@@ -139,7 +155,7 @@ public class PeerMetricsProcessor extends HubRequester
             try
             {
                 //Note: here we are overwriting historical 'idle' with the current one
-                //since it is more correct to use on  Hub side
+                //since it is more correct to use on Hub side
                 hostMetrics.getCpu().setIdle( resourceHostMetric.getCpuIdle() );
                 hostMetrics.getCpu().setModel( resourceHostMetric.getCpuModel() );
                 hostMetrics.getCpu().setCoreCount( resourceHostMetric.getCpuCore() );
@@ -156,11 +172,14 @@ public class PeerMetricsProcessor extends HubRequester
 
         peerMetricsDto.setRegisteredRhIds( registeredRhIds );
 
-        send( peerMetricsDto );
+        if ( send( peerMetricsDto ) )
+        {
+            lastSendTime = System.currentTimeMillis();
+        }
     }
 
 
-    private void send( PeerMetricsDto peerMetricsDto )
+    private boolean send( PeerMetricsDto peerMetricsDto )
     {
         String path = String.format( "/rest/v1/peers/%s/monitor", configManager.getPeerId() );
 
@@ -171,6 +190,8 @@ public class PeerMetricsProcessor extends HubRequester
             if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 log.debug( "Peer monitoring data has been sent successfully" );
+
+                return true;
             }
             else
             {
@@ -181,5 +202,7 @@ public class PeerMetricsProcessor extends HubRequester
         {
             log.warn( "Could not send peer monitoring data: {}", e.getMessage() );
         }
+
+        return false;
     }
 }

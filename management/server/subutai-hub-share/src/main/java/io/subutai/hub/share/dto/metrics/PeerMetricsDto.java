@@ -39,13 +39,15 @@ public class PeerMetricsDto
                            @JsonProperty( value = "endTime", required = true ) final Long endTime,
                            @JsonProperty( value = "metrics", required = true ) final Set<HostMetricsDto> metrics,
                            @JsonProperty( value = "registeredRhIds", required = true )
-                           final Set<String> registeredRhIds )
+                           final Set<String> registeredRhIds,
+                           @JsonProperty( value = "createdTime", required = true ) Long createdTime )
     {
         this.peerId = peerId;
         this.startTime = startTime;
         this.endTime = endTime;
         this.metrics = metrics;
         this.registeredRhIds = registeredRhIds;
+        this.createdTime = createdTime;
     }
 
 
@@ -54,6 +56,7 @@ public class PeerMetricsDto
         this.peerId = peerId;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.createdTime = System.currentTimeMillis();
     }
 
 

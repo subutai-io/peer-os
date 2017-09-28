@@ -203,7 +203,7 @@ public class HubManagerImpl implements HubManager, HostListener
         //***********
 
         peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient,
-                ( int ) PEER_METRICS_SEND_INTERVAL_MIN );
+                PEER_METRICS_SEND_INTERVAL_MIN );
 
         peerMetricsExecutorService
                 .scheduleWithFixedDelay( peerMetricsProcessor, 1, PEER_METRICS_SEND_INTERVAL_MIN, TimeUnit.MINUTES );
