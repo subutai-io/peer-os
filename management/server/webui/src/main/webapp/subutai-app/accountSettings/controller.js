@@ -17,18 +17,16 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	$timeout(function () {
 		vm.hasPGPplugin = hasPGPplugin();
 		if (!vm.hasPGPplugin) {
-			var pluginUrl = 'https://github.com/subutai-io/browsers/releases/tag/2.0.12';
+			var pluginUrl = 'https://github.com/subutai-io/browsers/releases/tag/3.0.0';
 			var isFirefox = typeof InstallTrigger !== 'undefined';
 			var isChrome = !!window.chrome && !!window.chrome.webstore;
 
-			if (isChrome) {
-				pluginUrl = 'https://chrome.google.com/webstore/detail/subutai-social-e2e-plugin/kpmiofpmlciacjblommkcinncmneeoaa?utm_source=chrome-ntp-icon';
-			} else if (isFirefox) {
-				pluginUrl = 'https://addons.mozilla.org/en-US/firefox/addon/subutai-social-e2e-plugin/';
+			if (isChrome || isFirefox) {
+                pluginUrl = 'https://chrome.google.com/webstore/detail/subutai-e2e-plugin/ffddnlbamkjlbngpekmdpnoccckapcnh?utm_source=chrome-ntp-icon';
 			}
 
 			$rootScope.notifications = {
-				"message": "Install the subutai browser plugin for added security with end to end encryption.",
+				"message": "Install the Subutai browser plugin for added security with end to end encryption.",
 				"browserPluginMessage": true,
 				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
 				"links": [
