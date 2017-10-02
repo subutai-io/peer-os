@@ -435,8 +435,7 @@ public class EnvironmentManagerImpl
                 if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
                 {
                     operationTracker.addLogFailed(
-                            String.format( "Peer %s can not accommodate the requested containers",
-                                    peer.getName() ) );
+                            String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
 
                     throw new EnvironmentCreationException(
                             String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
@@ -613,11 +612,14 @@ public class EnvironmentManagerImpl
             }
 
             //check if peer can accommodate the requested nodes
-            if ( hasContainerCreation && !topology.getPeerNodes( peer.getId() ).isEmpty() )
+            if ( ( hasContainerCreation && !topology.getPeerNodes( peer.getId() ).isEmpty() ) || ( hasQuotaModification
+                    && !getPeerChangedContainers( peer.getId(), changedContainers, environment ).isEmpty() ) )
             {
                 try
                 {
-                    if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
+                    if ( !peer.canAccommodate(
+                            new Nodes( topology == null ? null : topology.getPeerNodes( peer.getId() ),
+                                    getPeerChangedContainers( peer.getId(), changedContainers, environment ) ) ) )
                     {
                         operationTracker.addLogFailed(
                                 String.format( "Peer %s can not accommodate the requested containers",
@@ -697,6 +699,42 @@ public class EnvironmentManagerImpl
         }
 
         return new EnvironmentCreationRef( operationTracker.getId().toString(), environmentId );
+    }
+
+
+    private Map<String, ContainerQuota> getPeerChangedContainers( final String peerId,
+                                                                  final Map<String, ContainerQuota>
+                                                                          allChangedContainers,
+                                                                  final LocalEnvironment environment )
+            throws EnvironmentModificationException
+    {
+        try
+        {
+            if ( allChangedContainers == null )
+            {
+                return Maps.newHashMap();
+            }
+            else
+            {
+                Map<String, ContainerQuota> peerChangedContainers = Maps.newHashMap();
+
+                for ( Map.Entry<String, ContainerQuota> entry : allChangedContainers.entrySet() )
+                {
+                    String containerId = entry.getKey();
+                    EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
+                    if ( Objects.equals( containerHost.getPeerId(), peerId ) )
+                    {
+                        peerChangedContainers.put( containerId, entry.getValue() );
+                    }
+                }
+
+                return peerChangedContainers;
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new EnvironmentModificationException( e );
+        }
     }
 
 
@@ -2604,6 +2642,7 @@ public class EnvironmentManagerImpl
     {
         // not needed
     }
+
 
     @Override
     public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )

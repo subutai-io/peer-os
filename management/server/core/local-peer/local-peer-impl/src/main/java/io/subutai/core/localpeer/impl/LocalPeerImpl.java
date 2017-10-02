@@ -114,6 +114,7 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
@@ -184,7 +185,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
     private static final BigDecimal ONE_HUNDRED = new BigDecimal( "100.00" );
-
+    private static final double ACCOMMODATION_OVERHEAD_FACTOR = 1.01;
 
     private transient DaoManager daoManager;
     private transient TemplateManager templateManager;
@@ -837,10 +838,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public boolean canAccommodate( final Nodes nodes ) throws PeerException
     {
-        Preconditions.checkNotNull( nodes );
-        Preconditions.checkArgument( !nodes.getNodes().isEmpty() );
-
-        double overheadFactor = 1.01;
+        Preconditions.checkArgument(
+                nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
+                        .isCollectionEmpty( nodes.getNodes() ) ), "Invalid nodes" );
 
         Set<String> rhIds = Sets.newHashSet();
 
@@ -848,18 +848,43 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Double requestedDisk = 0D;
         Double requestedCpu = 0D;
 
-        for ( Node node : nodes.getNodes() )
-        {
-            rhIds.add( node.getHostId() );
-
-            requestedRam += node.getQuota().getContainerSize().getRamQuota();
-            requestedDisk += node.getQuota().getContainerSize().getDiskQuota();
-            requestedCpu += node.getQuota().getContainerSize().getCpuQuota();
-        }
-
         Double availPeerRam = 0D;
         Double availPeerDisk = 0D;
         Double availPeerCpu = 0D;
+
+        if ( nodes.getQuotas() != null )
+        {
+            for ( Map.Entry<String, ContainerQuota> entry : nodes.getQuotas().entrySet() )
+            {
+                String containerId = entry.getKey();
+                ContainerHost containerHost = getContainerHostById( containerId );
+                rhIds.add( containerHost.getResourceHostId().getId() );
+                ContainerQuota newQuota = entry.getValue();
+                ContainerQuota currentQuota = containerHost.getQuota();
+
+                //add new quota's resources to requested minus current
+                requestedRam +=
+                        newQuota.getContainerSize().getRamQuota() - currentQuota.getContainerSize().getRamQuota();
+                requestedDisk +=
+                        newQuota.getContainerSize().getDiskQuota() - currentQuota.getContainerSize().getDiskQuota();
+                requestedCpu +=
+                        newQuota.getContainerSize().getCpuQuota() - currentQuota.getContainerSize().getCpuQuota();
+            }
+        }
+
+
+        if ( nodes.getNodes() != null )
+        {
+            for ( Node node : nodes.getNodes() )
+            {
+                rhIds.add( node.getHostId() );
+
+                requestedRam += node.getQuota().getContainerSize().getRamQuota();
+                requestedDisk += node.getQuota().getContainerSize().getDiskQuota();
+                requestedCpu += node.getQuota().getContainerSize().getCpuQuota();
+            }
+        }
+
 
         for ( String rhId : rhIds )
         {
@@ -871,9 +896,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             availPeerCpu += resourceHostMetric.getCpuCore() * resourceHostMetric.getAvailableCpu();
         }
 
+
         boolean canAccommodate = true;
 
-        if ( requestedRam * overheadFactor > availPeerRam )
+        if ( requestedRam * ACCOMMODATION_OVERHEAD_FACTOR > availPeerRam )
         {
             LOG.warn( "Requested RAM volume {}MB can not be accommodated on local peer. Available RAM volume is {}MB",
                     UnitUtil.convert( requestedRam, UnitUtil.Unit.B, UnitUtil.Unit.MB ),
@@ -882,16 +908,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             canAccommodate = false;
         }
 
-        if ( requestedDisk * overheadFactor > availPeerDisk )
+        if ( requestedDisk * ACCOMMODATION_OVERHEAD_FACTOR > availPeerDisk )
         {
-            LOG.warn( "Requested DISK volume {}GB can not be accommodated on local peer. Available DISK volume is {}GB",
-                    UnitUtil.convert( requestedDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+            LOG.warn( "Requested DISK volume {}GB can not be accommodated on local peer. Available DISK volume is "
+                            + "{}GB", UnitUtil.convert( requestedDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ),
                     UnitUtil.convert( availPeerDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ) );
 
             canAccommodate = false;
         }
 
-        if ( requestedCpu * overheadFactor > availPeerCpu )
+        if ( requestedCpu * ACCOMMODATION_OVERHEAD_FACTOR > availPeerCpu )
         {
             LOG.warn( "Requested CPU {} can not be accommodated on local peer. Available CPU is {}", requestedCpu,
                     availPeerCpu );
