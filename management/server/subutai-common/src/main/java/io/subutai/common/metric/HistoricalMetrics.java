@@ -24,6 +24,7 @@ import io.subutai.hub.share.dto.metrics.NetDto;
 @JsonIgnoreProperties( ignoreUnknown = true )
 public class HistoricalMetrics
 {
+    private static String CONTAINER_PARTITION = "total";
     @JsonProperty( "startTime" )
     private Date startTime;
 
@@ -213,10 +214,23 @@ public class HistoricalMetrics
         {
             DiskDto dto = new DiskDto();
             dto.setUsed( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", "total" ) ) );
-            result.put( "total", dto );
+            result.put( CONTAINER_PARTITION, dto );
         }
 
         return result;
+    }
+
+
+    public double getContainerDiskUsed()
+    {
+        if ( getHostType() == HostMetricsDto.HostType.CONTAINER_HOST )
+        {
+            return getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ).get( CONTAINER_PARTITION ).getUsed();
+        }
+        else
+        {
+            return 0D;
+        }
     }
 
 
@@ -276,7 +290,7 @@ public class HistoricalMetrics
             isZero &= hostMetricsDto.getMemory().getCached() == 0D;
             isZero &= hostMetricsDto.getMemory().getRss() == 0D;
             //check disk
-            isZero &= hostMetricsDto.getDisk().get( "total" ).getUsed() == 0D;
+            isZero &= hostMetricsDto.getDisk().get( CONTAINER_PARTITION ).getUsed() == 0D;
             //check network
             isZero &= hostMetricsDto.getNet().get( "eth0" ).getIn() == 0D;
             isZero &= hostMetricsDto.getNet().get( "eth0" ).getOut() == 0D;

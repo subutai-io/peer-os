@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -155,6 +156,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
+import io.subutai.hub.share.dto.metrics.HostMetricsDto;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerCpuResource;
 import io.subutai.hub.share.quota.ContainerDiskResource;
@@ -854,21 +856,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( nodes.getQuotas() != null )
         {
+            Calendar cal = Calendar.getInstance();
+            Date endTime = cal.getTime();
+            //1 hour interval is enough
+            cal.add( Calendar.MINUTE, -60 );
+            Date startTime = cal.getTime();
+
             for ( Map.Entry<String, ContainerQuota> entry : nodes.getQuotas().entrySet() )
             {
                 String containerId = entry.getKey();
                 ContainerHost containerHost = getContainerHostById( containerId );
                 rhIds.add( containerHost.getResourceHostId().getId() );
                 ContainerQuota newQuota = entry.getValue();
-                ContainerQuota currentQuota = containerHost.getQuota();
+                //                ContainerQuota currentQuota = containerHost.getQuota();
 
-                //add new quota's resources to requested minus current
-                requestedRam +=
-                        newQuota.getContainerSize().getRamQuota() - currentQuota.getContainerSize().getRamQuota();
-                requestedDisk +=
-                        newQuota.getContainerSize().getDiskQuota() - currentQuota.getContainerSize().getDiskQuota();
-                requestedCpu +=
-                        newQuota.getContainerSize().getCpuQuota() - currentQuota.getContainerSize().getCpuQuota();
+                //figure out current container resource consumption based on historical metrics
+                HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
+                HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
+
+                double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
+                double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
+                double diskUsed = historicalMetrics.getContainerDiskUsed();
+
+                requestedRam += newQuota.getContainerSize().getRamQuota() - ramUsed;
+                requestedDisk += newQuota.getContainerSize().getDiskQuota() - cpuUsed;
+                requestedCpu += newQuota.getContainerSize().getCpuQuota() - diskUsed;
             }
         }
 

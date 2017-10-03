@@ -145,7 +145,7 @@ public class MonitorImpl implements Monitor, HostListener
         {
 
             CommandResult commandResult =
-                    resourceHost.execute( commands.getCurrentMetricCommand( resourceHost.getHostname() ) );
+                    resourceHost.execute( commands.getRhMetricCommand( resourceHost.getHostname() ) );
             if ( commandResult.hasSucceeded() )
             {
                 result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
