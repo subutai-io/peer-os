@@ -857,25 +857,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //existing nodes
         if ( nodes.getEnvironmentId() != null )
         {
-            for ( ContainerHostInfo containerHost : getEnvironmentContainers(
+            for ( ContainerHostInfo containerHostInfo : getEnvironmentContainers(
                     new EnvironmentId( nodes.getEnvironmentId() ) ).getContainers() )
             {
+                ContainerHost containerHost = getContainerHostById( containerHostInfo.getId() );
+                rhIds.add( containerHost.getResourceHostId().getId() );
+
                 ContainerQuota newQuota = null;
                 if ( nodes.getQuotas() != null )
                 {
-                    newQuota = nodes.getQuotas().get( containerHost.getId() );
+                    newQuota = nodes.getQuotas().get( containerHostInfo.getId() );
                 }
 
                 //use current quota as requested amount unless the container has a change order of quota
                 requestedRam += newQuota != null ? newQuota.getContainerSize().getRamQuota() :
-                                UnitUtil.convert( containerHost.getRawQuota().getRam(), UnitUtil.Unit.MB,
+                                UnitUtil.convert( containerHostInfo.getRawQuota().getRam(), UnitUtil.Unit.MB,
                                         UnitUtil.Unit.B );
 
                 requestedCpu += newQuota != null ? newQuota.getContainerSize().getCpuQuota() :
-                                containerHost.getRawQuota().getCpu();
+                                containerHostInfo.getRawQuota().getCpu();
 
                 requestedDisk += newQuota != null ? newQuota.getContainerSize().getDiskQuota() :
-                                 UnitUtil.convert( containerHost.getRawQuota().getDisk(), UnitUtil.Unit.GB,
+                                 UnitUtil.convert( containerHostInfo.getRawQuota().getDisk(), UnitUtil.Unit.GB,
                                          UnitUtil.Unit.B );
 
                 //figure out current container resource consumption based on historical metrics
@@ -886,7 +889,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 Date startTime = cal.getTime();
 
                 HistoricalMetrics historicalMetrics =
-                        monitor.getMetricsSeries( getContainerHostById( containerHost.getId() ), startTime, endTime );
+                        monitor.getMetricsSeries( containerHost, startTime, endTime );
                 HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
                 if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
                 {
