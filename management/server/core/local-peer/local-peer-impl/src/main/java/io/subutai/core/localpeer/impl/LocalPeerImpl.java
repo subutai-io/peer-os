@@ -879,8 +879,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 double diskUsed = historicalMetrics.getContainerDiskUsed();
 
                 requestedRam += newQuota.getContainerSize().getRamQuota() - ramUsed;
-                requestedDisk += newQuota.getContainerSize().getDiskQuota() - cpuUsed;
-                requestedCpu += newQuota.getContainerSize().getCpuQuota() - diskUsed;
+                requestedCpu += newQuota.getContainerSize().getCpuQuota() - cpuUsed;
+                requestedDisk += newQuota.getContainerSize().getDiskQuota() - diskUsed;
             }
         }
 
