@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,6 +27,8 @@ import io.subutai.hub.share.dto.metrics.NetDto;
 @JsonIgnoreProperties( ignoreUnknown = true )
 public class HistoricalMetrics
 {
+    private static final Logger LOG = LoggerFactory.getLogger( HistoricalMetrics.class );
+
     private static String CONTAINER_PARTITION = "total";
     @JsonProperty( "startTime" )
     private Date startTime;
@@ -266,14 +271,21 @@ public class HistoricalMetrics
     {
         HostMetricsDto result = new HostMetricsDto();
 
-        HostMetricsDto.HostType hostType = getHostType();
-        result.setType( hostType );
-        splitSeries();
+        try
+        {
+            HostMetricsDto.HostType hostType = getHostType();
+            result.setType( hostType );
+            splitSeries();
 
-        result.setCpu( getCpuDto( seriesMap.get( SeriesBatch.SeriesType.CPU ) ) );
-        result.setMemory( getMemoryDto( seriesMap.get( SeriesBatch.SeriesType.MEMORY ) ) );
-        result.setDisk( getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ) );
-        result.setNet( getNetDto( seriesMap.get( SeriesBatch.SeriesType.NET ) ) );
+            result.setCpu( getCpuDto( seriesMap.get( SeriesBatch.SeriesType.CPU ) ) );
+            result.setMemory( getMemoryDto( seriesMap.get( SeriesBatch.SeriesType.MEMORY ) ) );
+            result.setDisk( getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ) );
+            result.setNet( getNetDto( seriesMap.get( SeriesBatch.SeriesType.NET ) ) );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error parsing metric: {}", e.getMessage() );
+        }
 
         return result;
     }

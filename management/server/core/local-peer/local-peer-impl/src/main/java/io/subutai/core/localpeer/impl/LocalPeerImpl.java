@@ -873,6 +873,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 //figure out current container resource consumption based on historical metrics
                 HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
                 HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
+                if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
+                {
+                    continue;
+                }
 
                 double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
                 double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
