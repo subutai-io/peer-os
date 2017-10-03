@@ -14,7 +14,7 @@ public abstract class UnitUtil
 
     public static double convert( Double value, Unit from, Unit to )
     {
-        Preconditions.checkArgument( value > 0, "Value must be greater than 0" );
+        Preconditions.checkNotNull( value );
         Preconditions.checkNotNull( from );
         Preconditions.checkNotNull( to );
 
