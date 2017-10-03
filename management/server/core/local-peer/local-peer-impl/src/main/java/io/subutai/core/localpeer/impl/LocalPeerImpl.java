@@ -3,7 +3,6 @@ package io.subutai.core.localpeer.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -156,7 +155,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
-import io.subutai.hub.share.dto.metrics.HostMetricsDto;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerCpuResource;
 import io.subutai.hub.share.quota.ContainerDiskResource;
@@ -856,12 +854,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( nodes.getQuotas() != null )
         {
-            Calendar cal = Calendar.getInstance();
-            Date endTime = cal.getTime();
-            //1 hour interval is enough
-            cal.add( Calendar.MINUTE, -60 );
-            Date startTime = cal.getTime();
-
             for ( Map.Entry<String, ContainerQuota> entry : nodes.getQuotas().entrySet() )
             {
                 String containerId = entry.getKey();
@@ -869,8 +861,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 rhIds.add( containerHost.getResourceHostId().getId() );
                 ContainerQuota newQuota = entry.getValue();
 
-                requestedRam += newQuota.getContainerSize().getRamQuota() ;
-                requestedCpu += newQuota.getContainerSize().getCpuQuota() ;
+                requestedRam += newQuota.getContainerSize().getRamQuota();
+                requestedCpu += newQuota.getContainerSize().getCpuQuota();
                 requestedDisk += newQuota.getContainerSize().getDiskQuota();
             }
         }
