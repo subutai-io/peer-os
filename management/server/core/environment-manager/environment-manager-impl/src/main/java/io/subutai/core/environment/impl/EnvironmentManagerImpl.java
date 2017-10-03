@@ -623,7 +623,7 @@ public class EnvironmentManagerImpl
             {
                 try
                 {
-                    if ( !peer.canAccommodate( new Nodes( newNodes, changedQuotas ) ) )
+                    if ( !peer.canAccommodate( new Nodes( environmentId, newNodes, changedQuotas ) ) )
                     {
                         operationTracker.addLogFailed(
                                 String.format( "Peer %s can not accommodate the requested containers",

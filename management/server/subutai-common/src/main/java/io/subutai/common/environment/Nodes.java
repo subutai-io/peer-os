@@ -16,7 +16,10 @@ public class Nodes
     private Set<Node> nodes = new HashSet<>();
 
     @JsonProperty( value = "quotas" )
-    Map<String, ContainerQuota> quotas;
+    private Map<String, ContainerQuota> quotas;
+
+    @JsonProperty( value = "environmentId" )
+    private String environmentId;
 
 
     public Nodes( @JsonProperty( value = "nodes" ) final Set<Node> nodes )
@@ -25,9 +28,11 @@ public class Nodes
     }
 
 
-    public Nodes( @JsonProperty( value = "nodes" ) final Set<Node> nodes,
+    public Nodes( @JsonProperty( value = "environmentId" ) String environmentId,
+                  @JsonProperty( value = "nodes" ) final Set<Node> nodes,
                   @JsonProperty( value = "quotas" ) final Map<String, ContainerQuota> quotas )
     {
+        this.environmentId = environmentId;
         this.nodes = nodes;
         this.quotas = quotas;
     }
@@ -42,5 +47,11 @@ public class Nodes
     public Set<Node> getNodes()
     {
         return nodes;
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
     }
 }

@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -155,6 +156,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
+import io.subutai.hub.share.dto.metrics.HostMetricsDto;
 import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.hub.share.quota.ContainerCpuResource;
 import io.subutai.hub.share.quota.ContainerDiskResource;
@@ -852,22 +854,57 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Double availPeerDisk = 0D;
         Double availPeerCpu = 0D;
 
-        if ( nodes.getQuotas() != null )
+        //existing nodes
+        if ( nodes.getEnvironmentId() != null )
         {
-            for ( Map.Entry<String, ContainerQuota> entry : nodes.getQuotas().entrySet() )
+            for ( ContainerHostInfo containerHost : getEnvironmentContainers(
+                    new EnvironmentId( nodes.getEnvironmentId() ) ).getContainers() )
             {
-                String containerId = entry.getKey();
-                ContainerHost containerHost = getContainerHostById( containerId );
-                rhIds.add( containerHost.getResourceHostId().getId() );
-                ContainerQuota newQuota = entry.getValue();
+                ContainerQuota newQuota = null;
+                if ( nodes.getQuotas() != null )
+                {
+                    newQuota = nodes.getQuotas().get( containerHost.getId() );
+                }
 
-                requestedRam += newQuota.getContainerSize().getRamQuota();
-                requestedCpu += newQuota.getContainerSize().getCpuQuota();
-                requestedDisk += newQuota.getContainerSize().getDiskQuota();
+                //use current quota as requested amount unless the container has a change order of quota
+                requestedRam += newQuota != null ? newQuota.getContainerSize().getRamQuota() :
+                                UnitUtil.convert( containerHost.getRawQuota().getRam(), UnitUtil.Unit.MB,
+                                        UnitUtil.Unit.B );
+
+                requestedCpu += newQuota != null ? newQuota.getContainerSize().getCpuQuota() :
+                                containerHost.getRawQuota().getCpu();
+
+                requestedDisk += newQuota != null ? newQuota.getContainerSize().getDiskQuota() :
+                                 UnitUtil.convert( containerHost.getRawQuota().getDisk(), UnitUtil.Unit.GB,
+                                         UnitUtil.Unit.B );
+
+                //figure out current container resource consumption based on historical metrics
+                Calendar cal = Calendar.getInstance();
+                Date endTime = cal.getTime();
+                //1 hour interval is enough
+                cal.add( Calendar.MINUTE, -60 );
+                Date startTime = cal.getTime();
+
+                HistoricalMetrics historicalMetrics =
+                        monitor.getMetricsSeries( getContainerHostById( containerHost.getId() ), startTime, endTime );
+                HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
+                if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
+                {
+                    continue;
+                }
+
+                double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
+                double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
+                double diskUsed = historicalMetrics.getContainerDiskUsed();
+
+                //subtract current consumption resource amount from the requested amount
+                requestedRam -= ramUsed;
+                requestedCpu -= cpuUsed;
+                requestedDisk -= diskUsed;
             }
         }
 
-
+        //new nodes
         if ( nodes.getNodes() != null )
         {
             for ( Node node : nodes.getNodes() )
