@@ -45,6 +45,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.exception.ActionFailedException;
@@ -613,15 +614,16 @@ public class EnvironmentManagerImpl
                 throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
 
+            Set<Node> newNodes = topology == null ? Sets.<Node>newHashSet() : topology.getPeerNodes( peer.getId() );
+            Map<String, ContainerQuota> changedQuotas =
+                    getPeerChangedContainers( peer.getId(), changedContainers, environment );
             //check if peer can accommodate the requested nodes
-            if ( ( hasContainerCreation && !topology.getPeerNodes( peer.getId() ).isEmpty() ) || ( hasQuotaModification
-                    && !getPeerChangedContainers( peer.getId(), changedContainers, environment ).isEmpty() ) )
+            if ( ( hasContainerCreation && !newNodes.isEmpty() ) || ( hasQuotaModification && !changedQuotas
+                    .isEmpty() ) )
             {
                 try
                 {
-                    if ( !peer.canAccommodate(
-                            new Nodes( topology == null ? null : topology.getPeerNodes( peer.getId() ),
-                                    getPeerChangedContainers( peer.getId(), changedContainers, environment ) ) ) )
+                    if ( !peer.canAccommodate( new Nodes( newNodes, changedQuotas ) ) )
                     {
                         operationTracker.addLogFailed(
                                 String.format( "Peer %s can not accommodate the requested containers",
