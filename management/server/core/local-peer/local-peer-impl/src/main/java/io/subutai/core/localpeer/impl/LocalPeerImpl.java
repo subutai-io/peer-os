@@ -881,29 +881,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                  UnitUtil.convert( containerHostInfo.getRawQuota().getDisk(), UnitUtil.Unit.GB,
                                          UnitUtil.Unit.B );
 
+                //TODO remove the calculation below
                 //figure out current container resource consumption based on historical metrics
-                Calendar cal = Calendar.getInstance();
-                Date endTime = cal.getTime();
-                //1 hour interval is enough
-                cal.add( Calendar.MINUTE, -60 );
-                Date startTime = cal.getTime();
-
-                HistoricalMetrics historicalMetrics =
-                        monitor.getMetricsSeries( containerHost, startTime, endTime );
-                HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
-                if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
-                {
-                    continue;
-                }
-
-                double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
-                double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
-                double diskUsed = historicalMetrics.getContainerDiskUsed();
-
-                //subtract current consumption resource amount from the requested amount
-                requestedRam -= ramUsed;
-                requestedCpu -= cpuUsed;
-                requestedDisk -= diskUsed;
+//                Calendar cal = Calendar.getInstance();
+//                Date endTime = cal.getTime();
+//                //1 hour interval is enough
+//                cal.add( Calendar.MINUTE, -60 );
+//                Date startTime = cal.getTime();
+//
+//                HistoricalMetrics historicalMetrics =
+//                        monitor.getMetricsSeries( containerHost, startTime, endTime );
+//                HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
+//                if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
+//                {
+//                    continue;
+//                }
+//
+//                double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
+//                double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
+//                double diskUsed = historicalMetrics.getContainerDiskUsed();
+//
+//                //subtract current consumption resource amount from the requested amount
+//                requestedRam -= ramUsed;
+//                requestedCpu -= cpuUsed;
+//                requestedDisk -= diskUsed;
             }
         }
 
