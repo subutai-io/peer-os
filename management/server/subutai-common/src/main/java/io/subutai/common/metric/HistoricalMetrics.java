@@ -302,10 +302,13 @@ public class HistoricalMetrics
             isZero &= hostMetricsDto.getMemory().getCached() == 0D;
             isZero &= hostMetricsDto.getMemory().getRss() == 0D;
             //check disk
-            isZero &= hostMetricsDto.getDisk().get( CONTAINER_PARTITION ).getUsed() == 0D;
+            isZero &= hostMetricsDto.getDisk().get( CONTAINER_PARTITION ) == null
+                    || hostMetricsDto.getDisk().get( CONTAINER_PARTITION ).getUsed() == 0D;
             //check network
-            isZero &= hostMetricsDto.getNet().get( "eth0" ).getIn() == 0D;
-            isZero &= hostMetricsDto.getNet().get( "eth0" ).getOut() == 0D;
+            isZero &= hostMetricsDto.getNet().get( "eth0" ) == null
+                    || hostMetricsDto.getNet().get( "eth0" ).getIn() == 0D;
+            isZero &= hostMetricsDto.getNet().get( "eth0" ) == null
+                    || hostMetricsDto.getNet().get( "eth0" ).getOut() == 0D;
 
             return isZero;
         }
