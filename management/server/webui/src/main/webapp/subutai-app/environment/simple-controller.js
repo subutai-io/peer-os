@@ -514,10 +514,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			initScrollbar();
 			$rootScope.notificationsUpdate = 'modifyEnvironment';
 		}).error(function (data) {
+            if (error && error.ERROR === undefined) {
+                VARS_MODAL_ERROR(SweetAlert, 'Error: ' + error);
+            } else {
+                VARS_MODAL_ERROR(SweetAlert, 'Error: ' + error.ERROR);
+            }
 			vm.currentEnvironment.modifyStatus = 'error';
 			clearWorkspace();
 			vm.isApplyingChanges = false;
-
 			checkLastLog(false);
 			$rootScope.notificationsUpdate = 'modifyEnvironmentError';
 		});
