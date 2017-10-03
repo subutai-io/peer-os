@@ -310,10 +310,15 @@ public class EnvironmentManagerImpl
     protected Set<Peer> getPeers( final Topology topology ) throws PeerException
     {
         final Set<Peer> result = new HashSet<>();
-        for ( String peerId : topology.getAllPeers() )
+
+        if ( topology != null )
         {
-            result.add( peerManager.getPeer( peerId ) );
+            for ( String peerId : topology.getAllPeers() )
+            {
+                result.add( peerManager.getPeer( peerId ) );
+            }
         }
+
         return result;
     }
 
@@ -588,11 +593,8 @@ public class EnvironmentManagerImpl
 
         try
         {
-            if ( topology != null )
-            {
-                allPeers.addAll( getPeers( topology ) );
-                allPeers.addAll( environment.getPeers() );
-            }
+            allPeers.addAll( getPeers( topology ) );
+            allPeers.addAll( environment.getPeers() );
         }
         catch ( PeerException e )
         {
