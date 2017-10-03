@@ -868,23 +868,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 ContainerHost containerHost = getContainerHostById( containerId );
                 rhIds.add( containerHost.getResourceHostId().getId() );
                 ContainerQuota newQuota = entry.getValue();
-                //                ContainerQuota currentQuota = containerHost.getQuota();
 
-                //figure out current container resource consumption based on historical metrics
-                HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
-                HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
-                if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
-                {
-                    continue;
-                }
-
-                double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
-                double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
-                double diskUsed = historicalMetrics.getContainerDiskUsed();
-
-                requestedRam += newQuota.getContainerSize().getRamQuota() - ramUsed;
-                requestedCpu += newQuota.getContainerSize().getCpuQuota() - cpuUsed;
-                requestedDisk += newQuota.getContainerSize().getDiskQuota() - diskUsed;
+                requestedRam += newQuota.getContainerSize().getRamQuota() ;
+                requestedCpu += newQuota.getContainerSize().getCpuQuota() ;
+                requestedDisk += newQuota.getContainerSize().getDiskQuota();
             }
         }
 
