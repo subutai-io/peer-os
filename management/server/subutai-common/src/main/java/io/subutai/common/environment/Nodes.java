@@ -1,7 +1,6 @@
 package io.subutai.common.environment;
 
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,7 +12,7 @@ import io.subutai.hub.share.quota.ContainerQuota;
 public class Nodes
 {
     @JsonProperty( value = "nodes" )
-    private Set<Node> nodes = new HashSet<>();
+    private Set<Node> nodes;
 
     @JsonProperty( value = "quotas" )
     private Map<String, ContainerQuota> quotas;
@@ -22,15 +21,18 @@ public class Nodes
     private String environmentId;
 
 
-    public Nodes( @JsonProperty( value = "nodes" ) final Set<Node> nodes )
+    public Nodes()
+    {
+    }
+
+
+    public Nodes( final Set<Node> nodes )
     {
         this.nodes = nodes;
     }
 
 
-    public Nodes( @JsonProperty( value = "environmentId" ) String environmentId,
-                  @JsonProperty( value = "nodes" ) final Set<Node> nodes,
-                  @JsonProperty( value = "quotas" ) final Map<String, ContainerQuota> quotas )
+    public Nodes( final String environmentId, final Set<Node> nodes, final Map<String, ContainerQuota> quotas )
     {
         this.environmentId = environmentId;
         this.nodes = nodes;

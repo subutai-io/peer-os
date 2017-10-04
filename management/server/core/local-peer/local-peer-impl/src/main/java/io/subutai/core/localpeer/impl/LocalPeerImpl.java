@@ -854,57 +854,74 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Double availPeerDisk = 0D;
         Double availPeerCpu = 0D;
 
+        boolean useSimpleCalculation = true;
+
         //existing nodes
-        if ( nodes.getEnvironmentId() != null )
+        if ( nodes.getEnvironmentId() != null && nodes.getQuotas() != null )
         {
-            for ( ContainerHostInfo containerHostInfo : getEnvironmentContainers(
-                    new EnvironmentId( nodes.getEnvironmentId() ) ).getContainers() )
+            if ( useSimpleCalculation )
             {
-                ContainerHost containerHost = getContainerHostById( containerHostInfo.getId() );
-                rhIds.add( containerHost.getResourceHostId().getId() );
-
-                ContainerQuota newQuota = null;
-                if ( nodes.getQuotas() != null )
+                for ( Map.Entry<String, ContainerQuota> containerQuotaEntry : nodes.getQuotas().entrySet() )
                 {
-                    newQuota = nodes.getQuotas().get( containerHostInfo.getId() );
+                    ContainerHost containerHost = getContainerHostById( containerQuotaEntry.getKey() );
+                    rhIds.add( containerHost.getResourceHostId().getId() );
+
+                    ContainerQuota containerQuota = containerQuotaEntry.getValue();
+
+                    requestedCpu += containerQuota.getContainerSize().getCpuQuota();
+                    requestedDisk += containerQuota.getContainerSize().getDiskQuota();
+                    requestedRam += containerQuota.getContainerSize().getRamQuota();
                 }
+            }
+            else
+            {
+                for ( ContainerHostInfo containerHostInfo : getEnvironmentContainers(
+                        new EnvironmentId( nodes.getEnvironmentId() ) ).getContainers() )
+                {
+                    ContainerHost containerHost = getContainerHostById( containerHostInfo.getId() );
+                    rhIds.add( containerHost.getResourceHostId().getId() );
 
-                //use current quota as requested amount unless the container has a change order of quota
-                requestedRam += newQuota != null ? newQuota.getContainerSize().getRamQuota() :
-                                UnitUtil.convert( containerHostInfo.getRawQuota().getRam(), UnitUtil.Unit.MB,
-                                        UnitUtil.Unit.B );
+                    ContainerQuota newQuota = null;
+                    if ( nodes.getQuotas() != null )
+                    {
+                        newQuota = nodes.getQuotas().get( containerHostInfo.getId() );
+                    }
 
-                requestedCpu += newQuota != null ? newQuota.getContainerSize().getCpuQuota() :
-                                containerHostInfo.getRawQuota().getCpu();
+                    //use current quota as requested amount unless the container has a change order of quota
+                    requestedRam += newQuota != null ? newQuota.getContainerSize().getRamQuota() :
+                                    UnitUtil.convert( containerHostInfo.getRawQuota().getRam(), UnitUtil.Unit.MB,
+                                            UnitUtil.Unit.B );
 
-                requestedDisk += newQuota != null ? newQuota.getContainerSize().getDiskQuota() :
-                                 UnitUtil.convert( containerHostInfo.getRawQuota().getDisk(), UnitUtil.Unit.GB,
-                                         UnitUtil.Unit.B );
+                    requestedCpu += newQuota != null ? newQuota.getContainerSize().getCpuQuota() :
+                                    containerHostInfo.getRawQuota().getCpu();
 
-                //TODO remove the calculation below
-                //figure out current container resource consumption based on historical metrics
-//                Calendar cal = Calendar.getInstance();
-//                Date endTime = cal.getTime();
-//                //1 hour interval is enough
-//                cal.add( Calendar.MINUTE, -60 );
-//                Date startTime = cal.getTime();
-//
-//                HistoricalMetrics historicalMetrics =
-//                        monitor.getMetricsSeries( containerHost, startTime, endTime );
-//                HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
-//                if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
-//                {
-//                    continue;
-//                }
-//
-//                double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
-//                double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
-//                double diskUsed = historicalMetrics.getContainerDiskUsed();
-//
-//                //subtract current consumption resource amount from the requested amount
-//                requestedRam -= ramUsed;
-//                requestedCpu -= cpuUsed;
-//                requestedDisk -= diskUsed;
+                    requestedDisk += newQuota != null ? newQuota.getContainerSize().getDiskQuota() :
+                                     UnitUtil.convert( containerHostInfo.getRawQuota().getDisk(), UnitUtil.Unit.GB,
+                                             UnitUtil.Unit.B );
+
+                    //figure out current container resource consumption based on historical metrics
+                    Calendar cal = Calendar.getInstance();
+                    Date endTime = cal.getTime();
+                    //1 hour interval is enough
+                    cal.add( Calendar.MINUTE, -60 );
+                    Date startTime = cal.getTime();
+
+                    HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
+                    HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
+                    if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
+                    {
+                        continue;
+                    }
+
+                    double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
+                    double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
+                    double diskUsed = historicalMetrics.getContainerDiskUsed();
+
+                    //subtract current consumption resource amount from the requested amount
+                    requestedRam -= ramUsed;
+                    requestedCpu -= cpuUsed;
+                    requestedDisk -= diskUsed;
+                }
             }
         }
 
