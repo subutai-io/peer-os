@@ -882,35 +882,52 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             cal.add( Calendar.MINUTE, -60 );
             Date startTime = cal.getTime();
 
-            ContainerHost containerHost = getContainerHostById( containerHostInfo.getId() );
-
-            HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
-            HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
-
-            //skip partial metric, b/c this happens for new containers
-            if ( !HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
+            try
             {
+                ContainerHost containerHost = getContainerHostById( containerHostInfo.getId() );
 
-                double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
-                double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
-                double diskUsed = historicalMetrics.getContainerDiskUsed();
+                HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
+                HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
 
-                //subtract current consumption resource amount from the requested amount
-                if ( requestedRam > 0 )
+                //skip partial metric, b/c this happens for new containers
+                if ( !HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
                 {
-                    requestedRam -= ramUsed;
-                }
-                if ( requestedCpu > 0 )
-                {
-                    requestedCpu -= cpuUsed;
-                }
-                if ( requestedDisk > 0 )
-                {
-                    requestedDisk -= diskUsed;
+
+                    double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
+                    double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
+                    double diskUsed = historicalMetrics.getContainerDiskUsed();
+
+                    //subtract current consumption resource amount from the requested amount
+                    if ( requestedRam > 0 )
+                    {
+                        requestedRam -= ramUsed;
+                    }
+                    if ( requestedCpu > 0 )
+                    {
+                        requestedCpu -= cpuUsed;
+                    }
+                    if ( requestedDisk > 0 )
+                    {
+                        requestedDisk -= diskUsed;
+                    }
                 }
             }
+            catch ( HostNotFoundException e )
+            {
+                //skip unregistered containers, b/c their quotas are not considered
+            }
 
-            ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
+            ResourceHostInfo resourceHostInfo;
+            try
+            {
+                resourceHostInfo = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+            }
+            catch ( HostDisconnectedException e )
+            {
+                throw new PeerException( e );
+            }
+
+            ResourceHost resourceHost = getResourceHostById( resourceHostInfo.getId() );
 
             ResourceHostCapacity resourceHostCapacity = requestedResources.get( resourceHost );
 
