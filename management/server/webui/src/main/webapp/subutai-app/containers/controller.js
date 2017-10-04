@@ -429,7 +429,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
             vm.disabled = false;
             LOADING_SCREEN('none');
             ngDialog.closeAll();
-            SweetAlert.swal ("ERROR!", error, "error");
+            SweetAlert.swal ("ERROR!", error.ERROR, "error");
         } );
     }
 
