@@ -230,12 +230,16 @@ public class HistoricalMetrics
     {
         if ( getHostType() == HostMetricsDto.HostType.CONTAINER_HOST )
         {
-            return getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ).get( CONTAINER_PARTITION ).getUsed();
+            try
+            {
+                return getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ).get( CONTAINER_PARTITION ).getUsed();
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Error getting disk metrics: {}", e.getMessage() );
+            }
         }
-        else
-        {
-            return 0D;
-        }
+        return 0D;
     }
 
 

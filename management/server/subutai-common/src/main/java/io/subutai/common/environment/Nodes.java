@@ -17,9 +17,6 @@ public class Nodes
     @JsonProperty( value = "quotas" )
     private Map<String, ContainerQuota> quotas;
 
-    @JsonProperty( value = "environmentId" )
-    private String environmentId;
-
 
     public Nodes()
     {
@@ -32,9 +29,8 @@ public class Nodes
     }
 
 
-    public Nodes( final String environmentId, final Set<Node> nodes, final Map<String, ContainerQuota> quotas )
+    public Nodes( final Set<Node> nodes, final Map<String, ContainerQuota> quotas )
     {
-        this.environmentId = environmentId;
         this.nodes = nodes;
         this.quotas = quotas;
     }
@@ -49,11 +45,5 @@ public class Nodes
     public Set<Node> getNodes()
     {
         return nodes;
-    }
-
-
-    public String getEnvironmentId()
-    {
-        return environmentId;
     }
 }

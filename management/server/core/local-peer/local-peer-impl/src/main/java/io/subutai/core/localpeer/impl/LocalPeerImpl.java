@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -844,85 +845,87 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
                         .isCollectionEmpty( nodes.getNodes() ) ), "Invalid nodes" );
 
-        Set<String> rhIds = Sets.newHashSet();
+        Map<ResourceHost, ResourceHostCapacity> requestedResources = Maps.newHashMap();
 
-        Double requestedRam = 0D;
-        Double requestedDisk = 0D;
-        Double requestedCpu = 0D;
-
-        Double availPeerRam = 0D;
-        Double availPeerDisk = 0D;
-        Double availPeerCpu = 0D;
-
-        boolean useSimpleCalculation = true;
-
-        //existing nodes
-        if ( nodes.getEnvironmentId() != null && nodes.getQuotas() != null )
+        for ( ContainerHostInfo containerHostInfo : hostRegistry.getContainerHostsInfo() )
         {
-            if ( useSimpleCalculation )
+            //use new quota instead of current if present
+            ContainerQuota newQuota = null;
+            if ( nodes.getQuotas() != null )
             {
-                for ( Map.Entry<String, ContainerQuota> containerQuotaEntry : nodes.getQuotas().entrySet() )
-                {
-                    ContainerHost containerHost = getContainerHostById( containerQuotaEntry.getKey() );
-                    rhIds.add( containerHost.getResourceHostId().getId() );
-
-                    ContainerQuota containerQuota = containerQuotaEntry.getValue();
-
-                    requestedCpu += containerQuota.getContainerSize().getCpuQuota();
-                    requestedDisk += containerQuota.getContainerSize().getDiskQuota();
-                    requestedRam += containerQuota.getContainerSize().getRamQuota();
-                }
+                newQuota = nodes.getQuotas().get( containerHostInfo.getId() );
             }
-            else
+
+            //use current quota as requested amount unless the container has a change of quota
+            //note: we use 0 for containers that have unset quota since we don't know what the effective limit is
+            double requestedRam = newQuota != null ? newQuota.getContainerSize().getRamQuota() :
+                                  containerHostInfo.getRawQuota() == null
+                                          || containerHostInfo.getRawQuota().getRam() == null ? 0 :
+                                  UnitUtil.convert( containerHostInfo.getRawQuota().getRam(), UnitUtil.Unit.MB,
+                                          UnitUtil.Unit.B );
+
+            double requestedCpu = newQuota != null ? newQuota.getContainerSize().getCpuQuota() :
+                                  containerHostInfo.getRawQuota() == null
+                                          || containerHostInfo.getRawQuota().getCpu() == null ? 0 :
+                                  containerHostInfo.getRawQuota().getCpu();
+
+            double requestedDisk = newQuota != null ? newQuota.getContainerSize().getDiskQuota() :
+                                   containerHostInfo.getRawQuota() == null
+                                           || containerHostInfo.getRawQuota().getDisk() == null ? 0 :
+                                   UnitUtil.convert( containerHostInfo.getRawQuota().getDisk(), UnitUtil.Unit.GB,
+                                           UnitUtil.Unit.B );
+
+            //figure out current container resource consumption based on historical metrics
+            Calendar cal = Calendar.getInstance();
+            Date endTime = cal.getTime();
+            //1 hour interval is enough
+            cal.add( Calendar.MINUTE, -60 );
+            Date startTime = cal.getTime();
+
+            ContainerHost containerHost = getContainerHostById( containerHostInfo.getId() );
+
+            HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
+            HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
+
+            //skip partial metric, b/c this happens for new containers
+            if ( !HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
             {
-                for ( ContainerHostInfo containerHostInfo : getEnvironmentContainers(
-                        new EnvironmentId( nodes.getEnvironmentId() ) ).getContainers() )
+
+                double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
+                double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
+                double diskUsed = historicalMetrics.getContainerDiskUsed();
+
+                //subtract current consumption resource amount from the requested amount
+                if ( requestedRam > 0 )
                 {
-                    ContainerHost containerHost = getContainerHostById( containerHostInfo.getId() );
-                    rhIds.add( containerHost.getResourceHostId().getId() );
-
-                    ContainerQuota newQuota = null;
-                    if ( nodes.getQuotas() != null )
-                    {
-                        newQuota = nodes.getQuotas().get( containerHostInfo.getId() );
-                    }
-
-                    //use current quota as requested amount unless the container has a change order of quota
-                    requestedRam += newQuota != null ? newQuota.getContainerSize().getRamQuota() :
-                                    UnitUtil.convert( containerHostInfo.getRawQuota().getRam(), UnitUtil.Unit.MB,
-                                            UnitUtil.Unit.B );
-
-                    requestedCpu += newQuota != null ? newQuota.getContainerSize().getCpuQuota() :
-                                    containerHostInfo.getRawQuota().getCpu();
-
-                    requestedDisk += newQuota != null ? newQuota.getContainerSize().getDiskQuota() :
-                                     UnitUtil.convert( containerHostInfo.getRawQuota().getDisk(), UnitUtil.Unit.GB,
-                                             UnitUtil.Unit.B );
-
-                    //figure out current container resource consumption based on historical metrics
-                    Calendar cal = Calendar.getInstance();
-                    Date endTime = cal.getTime();
-                    //1 hour interval is enough
-                    cal.add( Calendar.MINUTE, -60 );
-                    Date startTime = cal.getTime();
-
-                    HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
-                    HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
-                    if ( HistoricalMetrics.isZeroMetric( hostMetricsDto ) )
-                    {
-                        continue;
-                    }
-
-                    double ramUsed = hostMetricsDto.getMemory().getCached() + hostMetricsDto.getMemory().getRss();
-                    double cpuUsed = hostMetricsDto.getCpu().getSystem() + hostMetricsDto.getCpu().getUser();
-                    double diskUsed = historicalMetrics.getContainerDiskUsed();
-
-                    //subtract current consumption resource amount from the requested amount
                     requestedRam -= ramUsed;
+                }
+                if ( requestedCpu > 0 )
+                {
                     requestedCpu -= cpuUsed;
+                }
+                if ( requestedDisk > 0 )
+                {
                     requestedDisk -= diskUsed;
                 }
             }
+
+            ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
+
+            ResourceHostCapacity resourceHostCapacity = requestedResources.get( resourceHost );
+
+            if ( resourceHostCapacity != null )
+            {
+                resourceHostCapacity.setRam( resourceHostCapacity.getRam() + requestedRam );
+                resourceHostCapacity.setDisk( resourceHostCapacity.getDisk() + requestedDisk );
+                resourceHostCapacity.setCpu( resourceHostCapacity.getCpu() + requestedCpu );
+            }
+            else
+            {
+                resourceHostCapacity = new ResourceHostCapacity( requestedRam, requestedDisk, requestedCpu );
+            }
+
+            requestedResources.put( resourceHost, resourceHostCapacity );
         }
 
         //new nodes
@@ -930,53 +933,83 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( Node node : nodes.getNodes() )
             {
-                rhIds.add( node.getHostId() );
+                double requestedRam = node.getQuota().getContainerSize().getRamQuota();
+                double requestedDisk = node.getQuota().getContainerSize().getDiskQuota();
+                double requestedCpu = node.getQuota().getContainerSize().getCpuQuota();
 
-                requestedRam += node.getQuota().getContainerSize().getRamQuota();
-                requestedDisk += node.getQuota().getContainerSize().getDiskQuota();
-                requestedCpu += node.getQuota().getContainerSize().getCpuQuota();
+                ResourceHost resourceHost = getResourceHostById( node.getHostId() );
+
+                ResourceHostCapacity resourceHostCapacity = requestedResources.get( resourceHost );
+
+                if ( resourceHostCapacity != null )
+                {
+                    resourceHostCapacity.setRam( resourceHostCapacity.getRam() + requestedRam );
+                    resourceHostCapacity.setDisk( resourceHostCapacity.getDisk() + requestedDisk );
+                    resourceHostCapacity.setCpu( resourceHostCapacity.getCpu() + requestedCpu );
+                }
+                else
+                {
+                    resourceHostCapacity = new ResourceHostCapacity( requestedRam, requestedDisk, requestedCpu );
+                }
+
+                requestedResources.put( resourceHost, resourceHostCapacity );
             }
         }
 
+        Map<ResourceHost, ResourceHostCapacity> availableResources = Maps.newHashMap();
 
-        for ( String rhId : rhIds )
+        for ( ResourceHost resourceHost : getResourceHosts() )
         {
-            ResourceHost resourceHost = getResourceHostById( rhId );
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( resourceHost );
 
-            availPeerRam += resourceHostMetric.getAvailableRam();
-            availPeerDisk += resourceHostMetric.getAvailableSpace();
-            availPeerCpu += resourceHostMetric.getCpuCore() * resourceHostMetric.getAvailableCpu();
+            double availPeerRam = resourceHostMetric.getAvailableRam();
+            double availPeerDisk = resourceHostMetric.getAvailableSpace();
+            double availPeerCpu = resourceHostMetric.getCpuCore() * resourceHostMetric.getAvailableCpu();
+
+            availableResources
+                    .put( resourceHost, new ResourceHostCapacity( availPeerRam, availPeerDisk, availPeerCpu ) );
         }
 
 
         boolean canAccommodate = true;
 
-        if ( requestedRam * ACCOMMODATION_OVERHEAD_FACTOR > availPeerRam )
+        for ( Map.Entry<ResourceHost, ResourceHostCapacity> resourceEntry : requestedResources.entrySet() )
         {
-            LOG.warn( "Requested RAM volume {}MB can not be accommodated on local peer. Available RAM volume is {}MB",
-                    UnitUtil.convert( requestedRam, UnitUtil.Unit.B, UnitUtil.Unit.MB ),
-                    UnitUtil.convert( availPeerRam, UnitUtil.Unit.B, UnitUtil.Unit.MB ) );
+            ResourceHost resourceHost = resourceEntry.getKey();
+            ResourceHostCapacity requestedCapacity = resourceEntry.getValue();
 
-            canAccommodate = false;
+            ResourceHostCapacity availableCapacity = availableResources.get( resourceHost );
+
+            if ( requestedCapacity.getRam() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getRam() )
+            {
+                LOG.warn( "Requested RAM volume {}MB can not be accommodated on RH {}: available RAM volume is {}MB",
+                        UnitUtil.convert( requestedCapacity.getRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ),
+                        resourceHost.getHostname(),
+                        UnitUtil.convert( availableCapacity.getRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ) );
+
+                canAccommodate = false;
+            }
+
+            if ( requestedCapacity.getDisk() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getDisk() )
+            {
+                LOG.warn( "Requested DISK volume {}GB can not be accommodated on RH {}: available DISK volume is "
+                                + "{}GB", UnitUtil.convert( requestedCapacity.getDisk(), UnitUtil.Unit.B, UnitUtil
+                                .Unit.GB ),
+                        resourceHost.getHostname(),
+                        UnitUtil.convert( availableCapacity.getDisk(), UnitUtil.Unit.B, UnitUtil.Unit.GB ) );
+
+                canAccommodate = false;
+            }
+
+            if ( requestedCapacity.getCpu() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getCpu() )
+            {
+                LOG.warn( "Requested CPU {} can not be accommodated on RH {}: available CPU is {}",
+                        resourceHost.getHostname(), requestedCapacity.getCpu(), availableCapacity.getCpu() );
+
+                canAccommodate = false;
+            }
         }
 
-        if ( requestedDisk * ACCOMMODATION_OVERHEAD_FACTOR > availPeerDisk )
-        {
-            LOG.warn( "Requested DISK volume {}GB can not be accommodated on local peer. Available DISK volume is "
-                            + "{}GB", UnitUtil.convert( requestedDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ),
-                    UnitUtil.convert( availPeerDisk, UnitUtil.Unit.B, UnitUtil.Unit.GB ) );
-
-            canAccommodate = false;
-        }
-
-        if ( requestedCpu * ACCOMMODATION_OVERHEAD_FACTOR > availPeerCpu )
-        {
-            LOG.warn( "Requested CPU {} can not be accommodated on local peer. Available CPU is {}", requestedCpu,
-                    availPeerCpu );
-
-            canAccommodate = false;
-        }
 
         return canAccommodate;
     }
