@@ -16,7 +16,7 @@ import io.subutai.common.peer.Host;
 public class Commands
 {
 
-    public RequestBuilder getCurrentMetricCommand( String hostname )
+    public RequestBuilder getRhMetricCommand( String hostname )
     {
         return new RequestBuilder( String.format( "subutai info system %s", hostname ) );
     }

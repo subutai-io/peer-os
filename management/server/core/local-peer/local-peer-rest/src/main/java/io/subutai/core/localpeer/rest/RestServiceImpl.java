@@ -33,6 +33,7 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.DateTimeParam;
 import io.subutai.common.util.ServiceLocator;
 
@@ -279,8 +280,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Preconditions.checkNotNull( nodes );
-            Preconditions.checkArgument( !nodes.getNodes().isEmpty() );
+            Preconditions.checkArgument(
+                    nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
+                            .isCollectionEmpty( nodes.getNodes() ) ), "Invalid nodes" );
 
             return localPeer.canAccommodate( nodes );
         }

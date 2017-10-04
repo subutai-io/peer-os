@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,6 +27,9 @@ import io.subutai.hub.share.dto.metrics.NetDto;
 @JsonIgnoreProperties( ignoreUnknown = true )
 public class HistoricalMetrics
 {
+    private static final Logger LOG = LoggerFactory.getLogger( HistoricalMetrics.class );
+
+    private static String CONTAINER_PARTITION = "total";
     @JsonProperty( "startTime" )
     private Date startTime;
 
@@ -213,10 +219,27 @@ public class HistoricalMetrics
         {
             DiskDto dto = new DiskDto();
             dto.setUsed( SeriesHelper.getAvg( series, new Tag( "type", "used" ), new Tag( "mount", "total" ) ) );
-            result.put( "total", dto );
+            result.put( CONTAINER_PARTITION, dto );
         }
 
         return result;
+    }
+
+
+    public double getContainerDiskUsed()
+    {
+        if ( getHostType() == HostMetricsDto.HostType.CONTAINER_HOST )
+        {
+            try
+            {
+                return getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ).get( CONTAINER_PARTITION ).getUsed();
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Error getting disk metrics: {}", e.getMessage() );
+            }
+        }
+        return 0D;
     }
 
 
@@ -252,14 +275,21 @@ public class HistoricalMetrics
     {
         HostMetricsDto result = new HostMetricsDto();
 
-        HostMetricsDto.HostType hostType = getHostType();
-        result.setType( hostType );
-        splitSeries();
+        try
+        {
+            HostMetricsDto.HostType hostType = getHostType();
+            result.setType( hostType );
+            splitSeries();
 
-        result.setCpu( getCpuDto( seriesMap.get( SeriesBatch.SeriesType.CPU ) ) );
-        result.setMemory( getMemoryDto( seriesMap.get( SeriesBatch.SeriesType.MEMORY ) ) );
-        result.setDisk( getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ) );
-        result.setNet( getNetDto( seriesMap.get( SeriesBatch.SeriesType.NET ) ) );
+            result.setCpu( getCpuDto( seriesMap.get( SeriesBatch.SeriesType.CPU ) ) );
+            result.setMemory( getMemoryDto( seriesMap.get( SeriesBatch.SeriesType.MEMORY ) ) );
+            result.setDisk( getDiskDto( seriesMap.get( SeriesBatch.SeriesType.DISK ) ) );
+            result.setNet( getNetDto( seriesMap.get( SeriesBatch.SeriesType.NET ) ) );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error parsing metric: {}", e.getMessage() );
+        }
 
         return result;
     }
@@ -276,10 +306,13 @@ public class HistoricalMetrics
             isZero &= hostMetricsDto.getMemory().getCached() == 0D;
             isZero &= hostMetricsDto.getMemory().getRss() == 0D;
             //check disk
-            isZero &= hostMetricsDto.getDisk().get( "total" ).getUsed() == 0D;
+            isZero &= hostMetricsDto.getDisk().get( CONTAINER_PARTITION ) == null
+                    || hostMetricsDto.getDisk().get( CONTAINER_PARTITION ).getUsed() == 0D;
             //check network
-            isZero &= hostMetricsDto.getNet().get( "eth0" ).getIn() == 0D;
-            isZero &= hostMetricsDto.getNet().get( "eth0" ).getOut() == 0D;
+            isZero &= hostMetricsDto.getNet().get( "eth0" ) == null
+                    || hostMetricsDto.getNet().get( "eth0" ).getIn() == 0D;
+            isZero &= hostMetricsDto.getNet().get( "eth0" ) == null
+                    || hostMetricsDto.getNet().get( "eth0" ).getOut() == 0D;
 
             return isZero;
         }
