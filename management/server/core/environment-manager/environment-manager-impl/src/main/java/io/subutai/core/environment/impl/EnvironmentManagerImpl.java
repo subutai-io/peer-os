@@ -233,10 +233,15 @@ public class EnvironmentManagerImpl
 
     public void init()
     {
-        //TODO update all local environments that are UNDER_MODIFICATION to be UNHEALTHY
+        //update all local environments that are UNDER_MODIFICATION to be UNHEALTHY
         for ( LocalEnvironment environment : environmentService.getAll() )
         {
+            if ( environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION ) )
+            {
+                environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
+                update( environment );
+            }
         }
     }
 
