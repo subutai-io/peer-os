@@ -244,10 +244,11 @@ public class EnvironmentManagerImpl
 
                 LocalPeer localPeer = peerManager.getLocalPeer();
 
-                //wait until db layer completes initialization
-                while ( localPeer.getState() != LocalPeer.State.READY )
+                //due to karaf bundle loading scheme, this bundle can be loaded several times
+                //skip the loads when local peer is not ready yet
+                if ( localPeer.getState() != LocalPeer.State.READY )
                 {
-                    TaskUtil.sleep( TimeUnit.SECONDS.toMillis( 1000 ) );
+                   return;
                 }
 
                 for ( LocalEnvironment environment : environmentService.getAll() )
