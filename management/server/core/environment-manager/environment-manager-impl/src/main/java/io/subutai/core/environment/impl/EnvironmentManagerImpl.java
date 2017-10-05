@@ -91,6 +91,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -151,6 +152,8 @@ public class EnvironmentManagerImpl
     private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 10;
     private static final String REMOTE_OWNER_NAME = "remote";
     private static final String UKNOWN_OWNER_NAME = "unknown";
+    private static final int MAX_ERRORS = 5;
+    private static final long DB_WAIT_INTERVAL_SEC = 1;
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
@@ -234,15 +237,45 @@ public class EnvironmentManagerImpl
     public void init()
     {
         //update all local environments that are UNDER_MODIFICATION to be UNHEALTHY
-        for ( LocalEnvironment environment : environmentService.getAll() )
+        executor.submit( new Runnable()
         {
-            if ( environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION ) )
+            @Override
+            public void run()
             {
-                environment.setStatus( EnvironmentStatus.UNHEALTHY );
+                //wait until db layer inits
+                int countErrors = 0;
+                do
+                {
+                    try
+                    {
+                        environmentService.getAll();
+                        countErrors = MAX_ERRORS + 1;
+                    }
+                    catch ( Exception e )
+                    {
+                        countErrors++;
+                        TaskUtil.sleep( TimeUnit.SECONDS.toMillis( DB_WAIT_INTERVAL_SEC ) );
+                    }
+                }
+                while ( countErrors < MAX_ERRORS );
 
-                update( environment );
+                if ( countErrors == MAX_ERRORS )
+                {
+                    //failed to wait for db init completion, skip db update
+                    return;
+                }
+
+                for ( LocalEnvironment environment : environmentService.getAll() )
+                {
+                    if ( environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION ) )
+                    {
+                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+                        update( environment );
+                    }
+                }
             }
-        }
+        } );
     }
 
 
