@@ -248,8 +248,11 @@ public class EnvironmentManagerImpl
                 //skip the loads when local peer is not ready yet
                 if ( localPeer.getState() != LocalPeer.State.READY )
                 {
-                   return;
+                    return;
                 }
+
+                //wait for db to complete initialization
+                TaskUtil.sleep( 3000 );
 
                 for ( LocalEnvironment environment : environmentService.getAll() )
                 {
