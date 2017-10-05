@@ -236,7 +236,7 @@ public class EnvironmentManagerImpl
     public void init()
     {
         //update all local environments that are UNDER_MODIFICATION to be UNHEALTHY
-        executor.submit( new Runnable()
+        executor.execute( new Runnable()
         {
             @Override
             public void run()
@@ -251,8 +251,23 @@ public class EnvironmentManagerImpl
                     return;
                 }
 
-                //wait for db to complete initialization
-                TaskUtil.sleep( 3000 );
+                boolean dbReady = false;
+                do
+                {
+                    TaskUtil.sleep( 1000 );
+
+                    try
+                    {
+                        LOG.debug( "Waiting for db initialization" );
+                        environmentService.getAll();
+                        dbReady = true;
+                    }
+                    catch ( Exception e )
+                    {
+                        //ignore
+                    }
+                }
+                while ( !dbReady );
 
                 for ( LocalEnvironment environment : environmentService.getAll() )
                 {
