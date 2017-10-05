@@ -70,6 +70,7 @@ import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.LocalPeerEventListener;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -152,8 +153,6 @@ public class EnvironmentManagerImpl
     private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 10;
     private static final String REMOTE_OWNER_NAME = "remote";
     private static final String UKNOWN_OWNER_NAME = "unknown";
-    private static final int MAX_ERRORS = 5;
-    private static final long DB_WAIT_INTERVAL_SEC = 1;
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
@@ -242,27 +241,13 @@ public class EnvironmentManagerImpl
             @Override
             public void run()
             {
-                //wait until db layer inits
-                int countErrors = 0;
-                do
-                {
-                    try
-                    {
-                        environmentService.getAll();
-                        countErrors = MAX_ERRORS + 1;
-                    }
-                    catch ( Exception e )
-                    {
-                        countErrors++;
-                        TaskUtil.sleep( TimeUnit.SECONDS.toMillis( DB_WAIT_INTERVAL_SEC ) );
-                    }
-                }
-                while ( countErrors < MAX_ERRORS );
 
-                if ( countErrors == MAX_ERRORS )
+                LocalPeer localPeer = peerManager.getLocalPeer();
+
+                //wait until db layer completes initialization
+                while ( localPeer.getState() != LocalPeer.State.READY )
                 {
-                    //failed to wait for db init completion, skip db update
-                    return;
+                    TaskUtil.sleep( TimeUnit.SECONDS.toMillis( 1000 ) );
                 }
 
                 for ( LocalEnvironment environment : environmentService.getAll() )
