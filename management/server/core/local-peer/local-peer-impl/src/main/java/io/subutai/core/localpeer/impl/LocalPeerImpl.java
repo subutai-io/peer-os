@@ -837,6 +837,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    //TODO add dateCreated to ContainerHostEntity
+    //when quota change is requested, check for the time passed since the dateCreated
+    //must be at least 30 seconds otherwise throw an exception
     @RolesAllowed( "Environment-Management|Read" )
     @Override
     public boolean canAccommodate( final Nodes nodes ) throws PeerException

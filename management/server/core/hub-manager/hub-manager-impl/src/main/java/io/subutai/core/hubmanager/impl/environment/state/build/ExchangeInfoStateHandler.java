@@ -39,6 +39,7 @@ public class ExchangeInfoStateHandler extends StateHandler
         {
             logStart();
 
+            //TODO here we might disable this check to let the Hub side do the check on its own
             checkResources( peerDto );
 
             EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );

@@ -231,6 +231,16 @@ public class EnvironmentManagerImpl
     }
 
 
+    public void init()
+    {
+        //TODO update all local environments that are UNDER_MODIFICATION to be UNHEALTHY
+        for ( LocalEnvironment environment : environmentService.getAll() )
+        {
+
+        }
+    }
+
+
     public void dispose()
     {
         executor.shutdown();
