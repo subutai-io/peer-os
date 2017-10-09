@@ -157,15 +157,15 @@ public class UsedNetworkResources
     }
 
 
-    //TODO review this method when "p2p show" returns p2p names
-    //it should not just increase vlan but should reuse empty slots with lowest vlan first
+    //TODO remove workaround when "p2p show" returns p2p names
     public int calculateFreeVlan()
     {
         //workaround implementation
-        Path vlanFile = Paths.get( Common.KARAF_DATA, "current_vlan.dat" );
-        File file = vlanFile.toFile();
         try
         {
+            Path vlanFile = Paths.get( Common.KARAF_DATA, "current_vlan.dat" );
+            File file = vlanFile.toFile();
+
             int vlan = file.createNewFile() ? Common.MIN_VLAN_ID - 1 :
                        Integer.parseInt( Files.readFirstLine( file, Charset.defaultCharset() ) );
 
@@ -185,6 +185,9 @@ public class UsedNetworkResources
         //default implementation
         catch ( Exception e )
         {
+            //TODO review this method when "p2p show" returns p2p names
+            //it should not just increase vlan but should reuse empty slots with lowest vlan first
+
             if ( vlans.isEmpty() )
             {
                 return Common.MIN_VLAN_ID;
