@@ -77,6 +77,7 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.task.CloneResponse;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -632,8 +633,9 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean canAccommodate( final Nodes nodes ) throws PeerException
     {
-        Preconditions.checkNotNull( nodes, "Invalid nodes" );
-        Preconditions.checkArgument( !nodes.getNodes().isEmpty(), "Empty nodes" );
+        Preconditions.checkArgument(
+                nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
+                        .isCollectionEmpty( nodes.getNodes() ) ), "Invalid nodes" );
 
         return peerWebClient.canAccommodate( nodes );
     }

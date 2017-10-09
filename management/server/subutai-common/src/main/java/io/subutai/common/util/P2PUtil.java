@@ -38,7 +38,7 @@ public abstract class P2PUtil
 
     public static String generateContainerSubnet( final Set<String> excludedIPs )
     {
-        int maxIterations = 10000;
+        int maxIterations = 4080;
         int currentIteration = 0;
         String ip;
 
@@ -55,7 +55,7 @@ public abstract class P2PUtil
 
     public static String generateP2PSubnet( final Set<String> excludedIPs )
     {
-        int maxIterations = 10000;
+        int maxIterations = 62220;
         int currentIteration = 0;
         String ip;
 
@@ -72,7 +72,7 @@ public abstract class P2PUtil
 
     public static String generateTunnelName( Tunnels tunnels )
     {
-        int maxIterations = 10000;
+        int maxIterations = 90000;
         int currentIteration = 0;
         String name;
 

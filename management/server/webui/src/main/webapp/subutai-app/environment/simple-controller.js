@@ -513,11 +513,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			getLogById(data, true, undefined, vm.currentEnvironment.modificationData.environmentId);
 			initScrollbar();
 			$rootScope.notificationsUpdate = 'modifyEnvironment';
-		}).error(function (data) {
+		}).error(function (error) {
+            if (error && error.ERROR === undefined) {
+                VARS_MODAL_ERROR(SweetAlert, 'Error: ' + error);
+            } else {
+                VARS_MODAL_ERROR(SweetAlert, 'Error: ' + error.ERROR);
+            }
 			vm.currentEnvironment.modifyStatus = 'error';
 			clearWorkspace();
 			vm.isApplyingChanges = false;
-
 			checkLastLog(false);
 			$rootScope.notificationsUpdate = 'modifyEnvironmentError';
 		});

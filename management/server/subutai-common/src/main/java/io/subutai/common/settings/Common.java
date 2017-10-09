@@ -22,6 +22,7 @@ public class Common
     public static final Pattern P2P_INTERFACE_NAME_PATTERN = Pattern.compile( P2P_INTERFACE_NAME_REGEX );
     public static final String SUBUTAI_HTTP_HEADER = "sbt-hdr";
     public static final String KARAF_ETC = System.getProperty( "karaf.etc" );
+    public static final String KARAF_DATA = System.getProperty( "karaf.data" );
     public static final String SUBUTAI_APP_DATA_PATH = System.getProperty( "subutaiAppDataPath" );
     public static final String HUB_IP = System.getProperty( "hubIp" );
     public static final String P2P_PORT_RANGE_START = System.getProperty( "p2pPortRangeStart" );
@@ -60,7 +61,7 @@ public class Common
 
     public static final long MIN_VNI_ID = 0;
     public static final long MAX_VNI_ID = 16777216;//2^24
-    public static final int MIN_VLAN_ID = 100;
+    public static final int MIN_VLAN_ID = 1;
     public static final int MAX_VLAN_ID = 4096;
 
     //constants that can be converted into settings in the future

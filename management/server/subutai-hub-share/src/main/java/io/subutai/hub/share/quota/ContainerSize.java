@@ -154,7 +154,7 @@ public enum ContainerSize
             }
         }
 
-        return null;
+        throw new IllegalStateException( "No RAM quota" );
     }
 
 
@@ -171,7 +171,7 @@ public enum ContainerSize
             }
         }
 
-        return null;
+        throw new IllegalStateException( "No DISK quota" );
     }
 
 
@@ -188,6 +188,6 @@ public enum ContainerSize
             }
         }
 
-        return null;
+        throw new IllegalStateException( "No CPU quota" );
     }
 }

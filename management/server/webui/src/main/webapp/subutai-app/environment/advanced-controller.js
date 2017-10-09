@@ -1348,7 +1348,6 @@ function movePeer(peerId, posMod, counter) {
         var x = posMod;
         if (counter && counter > 0) {
             x = counter * posMod;
-            counter++;
         }
 
         PEER_MAP[peerKeys[i]].position--;
