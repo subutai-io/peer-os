@@ -1,6 +1,10 @@
 package io.subutai.common.network;
 
 
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
@@ -152,22 +157,52 @@ public class UsedNetworkResources
     }
 
 
+    //TODO remove workaround when "p2p show" returns p2p names
     public int calculateFreeVlan()
     {
-        if ( vlans.isEmpty() )
+        //workaround implementation
+        try
         {
-            return Common.MIN_VLAN_ID;
+            Path vlanFile = Paths.get( Common.KARAF_DATA, "current_vlan.dat" );
+            File file = vlanFile.toFile();
+
+            int vlan = file.createNewFile() ? Common.MIN_VLAN_ID - 1 :
+                       Integer.parseInt( Files.readFirstLine( file, Charset.defaultCharset() ) );
+
+            if ( vlan < Common.MAX_VLAN_ID )
+            {
+                vlan++;
+            }
+            else
+            {
+                vlan = Common.MIN_VLAN_ID;
+            }
+
+            Files.write( String.valueOf( vlan ).getBytes(), file );
+
+            return vlan;
         }
-
-        List<Integer> sortedVlans = CollectionUtil.asSortedList( vlans );
-
-        int maxUsedVlan = sortedVlans.get( sortedVlans.size() - 1 );
-
-        if ( maxUsedVlan + 1 <= Common.MAX_VLAN_ID )
+        //default implementation
+        catch ( Exception e )
         {
-            return maxUsedVlan + 1;
-        }
+            //TODO review this method when "p2p show" returns p2p names
+            //it should not just increase vlan but should reuse empty slots with lowest vlan first
 
-        return -1;
+            if ( vlans.isEmpty() )
+            {
+                return Common.MIN_VLAN_ID;
+            }
+
+            List<Integer> sortedVlans = CollectionUtil.asSortedList( vlans );
+
+            int maxUsedVlan = sortedVlans.get( sortedVlans.size() - 1 );
+
+            if ( maxUsedVlan + 1 <= Common.MAX_VLAN_ID )
+            {
+                return maxUsedVlan + 1;
+            }
+
+            return -1;
+        }
     }
 }
