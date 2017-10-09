@@ -148,6 +148,7 @@ import io.subutai.core.localpeer.impl.tasks.DeleteTunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
 import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
+import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -2336,7 +2337,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 int freeVlan = usedNetworkResources.calculateFreeVlan();
                 if ( freeVlan == -1 )
                 {
-                    throw new PeerException( "No free VLANs slots are left" );
+                    throw new PeerException( "No free VLAN slots are left" );
                 }
 
                 NetworkResourceEntity networkResourceEntity = new NetworkResourceEntity( networkResource, freeVlan );
@@ -2382,6 +2383,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public UsedNetworkResources getUsedNetworkResources() throws PeerException
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
+
+        Set<ResourceHost> resourceHostSet = getResourceHosts();
+
+        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
+
+        for ( final ResourceHost resourceHost : resourceHostSet )
+        {
+            hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
+        }
+
+        HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
+
+        if ( results.hasFailures() )
+        {
+            HostUtil.Task task = results.getFirstFailedTask();
+
+            String errMsg =
+                    String.format( "Error gathering reserved net resources on host %s: %s", task.getHost().getId(),
+                            task.getFailureReason() );
+
+            LOG.error( errMsg );
+
+            throw new PeerException( errMsg, task.getException() );
+        }
+
 
         //add reserved ones too
         for ( NetworkResource networkResource : getReservedNetworkResources().getNetworkResources() )
