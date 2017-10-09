@@ -91,6 +91,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -104,8 +105,8 @@ import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.tasks.EnvironmentManagerInitTask;
-import io.subutai.core.environment.impl.tasks.UploadEnvironmentsTask;
 import io.subutai.core.environment.impl.tasks.RemoveEnvironmentsTask;
+import io.subutai.core.environment.impl.tasks.UploadEnvironmentsTask;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
@@ -2239,6 +2240,9 @@ public class EnvironmentManagerImpl
     @Override
     public void onRegistrationSucceeded()
     {
+        //let peer registration complete before sending environments for the first time
+        TaskUtil.sleep( TimeUnit.SECONDS.toMillis( 10 ) );
+        //upload local environments to Hub
         uploadPeerOwnerEnvironmentsToHub();
     }
 
