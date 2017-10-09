@@ -123,6 +123,12 @@ public class EnvironmentManagerSecureProxy
     }
 
 
+    public void init()
+    {
+        environmentManager.init();
+    }
+
+
     public void dispose()
     {
         environmentManager.dispose();

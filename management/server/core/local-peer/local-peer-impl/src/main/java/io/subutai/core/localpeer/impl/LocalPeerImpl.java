@@ -23,10 +23,15 @@ import javax.annotation.security.RolesAllowed;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.karaf.bundle.core.BundleState;
+import org.apache.karaf.bundle.core.BundleStateService;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -187,6 +192,8 @@ import io.subutai.hub.share.resource.ResourceValue;
 @PermitAll
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
+    private static final int BUNDLE_COUNT = 278;
+
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
     private static final BigDecimal ONE_HUNDRED = new BigDecimal( "100.00" );
     private static final double ACCOMMODATION_OVERHEAD_FACTOR = 1.01;
@@ -838,6 +845,51 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public State getState()
+    {
+        boolean failed = false;
+
+        boolean ready = true;
+
+        BundleContext ctx = FrameworkUtil.getBundle( LocalPeerImpl.class ).getBundleContext();
+
+        BundleStateService bundleStateService = ServiceLocator.lookup( BundleStateService.class );
+
+        Bundle[] bundles = ctx.getBundles();
+
+        if ( bundles.length < BUNDLE_COUNT )
+        {
+            LOG.warn( "Bundle count is {}", bundles.length );
+
+            return State.LOADING;
+        }
+
+        for ( Bundle bundle : bundles )
+        {
+            if ( bundleStateService.getState( bundle ) == BundleState.Failure )
+            {
+                failed = true;
+
+                break;
+            }
+
+            if ( !( ( bundle.getState() == Bundle.ACTIVE ) || ( bundle.getState() == Bundle.RESOLVED ) ) )
+            {
+                ready = false;
+
+                break;
+            }
+        }
+
+        return failed ? State.FAILED : ready ? State.READY : State.LOADING;
+    }
+
+
+    //TODO add dateCreated to ContainerHostEntity
+    //when quota change is requested, check for the time passed since the dateCreated
+    //or since the last quota change
+    //must be at least 30 seconds otherwise throw an exception
     @RolesAllowed( "Environment-Management|Read" )
     @Override
     public boolean canAccommodate( final Nodes nodes ) throws PeerException

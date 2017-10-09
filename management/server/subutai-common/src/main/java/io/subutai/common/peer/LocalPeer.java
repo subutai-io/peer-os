@@ -210,11 +210,17 @@ public interface LocalPeer extends Peer
     //deletes tunnels to the given p2p ips from local RHs
     void deleteTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
 
-    Quota getQuota( ContainerId containerId, ContainerResourceType containerResourceType )
-            throws PeerException;
+    Quota getQuota( ContainerId containerId, ContainerResourceType containerResourceType ) throws PeerException;
 
     void setRhHostname( String rhId, String hostname ) throws PeerException;
 
     void removeQuota( ContainerId containerId );
+
+    State getState();
+
+    enum State
+    {
+        LOADING, FAILED, READY
+    }
 }
 

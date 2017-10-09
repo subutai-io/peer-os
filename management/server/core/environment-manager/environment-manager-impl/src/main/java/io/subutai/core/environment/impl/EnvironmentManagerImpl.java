@@ -91,6 +91,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -103,6 +104,9 @@ import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.core.environment.impl.tasks.EnvironmentManagerInitTask;
+import io.subutai.core.environment.impl.tasks.RemoveEnvironmentsTask;
+import io.subutai.core.environment.impl.tasks.UploadEnvironmentsTask;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
@@ -231,6 +235,13 @@ public class EnvironmentManagerImpl
     }
 
 
+    public void init()
+    {
+        getCachedExecutor()
+                .execute( new EnvironmentManagerInitTask( peerManager.getLocalPeer(), this, environmentService ) );
+    }
+
+
     public void dispose()
     {
         executor.shutdown();
@@ -352,7 +363,7 @@ public class EnvironmentManagerImpl
     }
 
 
-    protected void setTransientFields( Set<Environment> envs )
+    public void setTransientFields( Set<Environment> envs )
     {
         for ( Environment env : envs )
         {
@@ -2229,6 +2240,9 @@ public class EnvironmentManagerImpl
     @Override
     public void onRegistrationSucceeded()
     {
+        //let peer registration complete before sending environments for the first time
+        TaskUtil.sleep( TimeUnit.SECONDS.toMillis( 10 ) );
+        //upload local environments to Hub
         uploadPeerOwnerEnvironmentsToHub();
     }
 
@@ -2316,7 +2330,7 @@ public class EnvironmentManagerImpl
     }
 
 
-    private Set<RemoteEnvironment> getLocallyRegisteredHubEnvironments()
+    public Set<RemoteEnvironment> getLocallyRegisteredHubEnvironments()
     {
         Set<RemoteEnvironment> hubEnvironments = Sets.newHashSet();
 
@@ -2355,67 +2369,6 @@ public class EnvironmentManagerImpl
             resetP2pKeys();
 
             LOG.debug( "Environment background tasks finished." );
-        }
-    }
-
-
-    //todo run in a thread
-    protected void uploadPeerOwnerEnvironmentsToHub()
-    {
-        //0. check if peer is registered with Hub and Hub is reachable
-        if ( !environmentAdapter.canWorkWithHub() )
-        {
-            return;
-        }
-
-
-        //1. obtain peer owner
-        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
-
-
-        //2. filter out not peer owner's environments or uploaded environments
-        Set<LocalEnvironment> envs = new HashSet<>();
-
-        envs.addAll( environmentService.getAll() );
-
-        for ( Iterator<LocalEnvironment> iterator = envs.iterator(); iterator.hasNext(); )
-        {
-            final LocalEnvironment environment = iterator.next();
-
-            if ( environment.isUploaded() || !Objects.equals( environment.getUserId(), peerOwner.getId() ) )
-            {
-                iterator.remove();
-            }
-        }
-
-        if ( envs.isEmpty() )
-        {
-            return;
-        }
-
-
-        //3. upload them to Hub
-        Set<Environment> environments = Sets.newHashSet();
-
-        environments.addAll( envs );
-
-        setTransientFields( environments );
-
-        for ( LocalEnvironment environment : envs )
-        {
-            try
-            {
-                if ( environmentAdapter.uploadPeerOwnerEnvironment( environment ) )
-                {
-                    environment.markAsUploaded();
-
-                    environmentService.merge( environment );
-                }
-            }
-            catch ( Exception e )
-            {
-                LOG.error( "Error uploading environment {} to Hub: {}", environment.getName(), e.getMessage() );
-            }
         }
     }
 
@@ -2478,7 +2431,7 @@ public class EnvironmentManagerImpl
                 {
                     uploadPeerOwnerEnvironmentsToHub();
 
-                    doSyncEnvironments();
+                    syncRemovedEnvironmentsWithHub();
 
                     return null;
                 }
@@ -2487,110 +2440,16 @@ public class EnvironmentManagerImpl
     }
 
 
-    //todo run in a thread
-    private void doSyncEnvironments()
+    void uploadPeerOwnerEnvironmentsToHub()
     {
-        if ( !environmentAdapter.canWorkWithHub() )
-        {
-            return;
-        }
-
-        try
-        {
-            Set<HubEnvironment> environmentsObtainedFromHub = environmentAdapter.getEnvironments( true );
-
-            Set<RemoteEnvironment> locallyRegisteredHubEnvironments = getLocallyRegisteredHubEnvironments();
+        getCachedExecutor()
+                .execute( new UploadEnvironmentsTask( environmentAdapter, identityManager, environmentService, this ) );
+    }
 
 
-            // 1. remove environments on Hub that are missing locally
-
-            Set<Environment> environmentsMissingLocally = Sets.newHashSet();
-
-            for ( Environment hubEnvironment : environmentsObtainedFromHub )
-            {
-                boolean isMissingLocally = true;
-
-                for ( Environment localEnvironment : locallyRegisteredHubEnvironments )
-                {
-                    if ( hubEnvironment.getId().equalsIgnoreCase( localEnvironment.getId() ) )
-                    {
-                        isMissingLocally = false;
-
-                        break;
-                    }
-                }
-
-                if ( isMissingLocally )
-                {
-                    environmentsMissingLocally.add( hubEnvironment );
-                }
-            }
-
-            // remove all missing env-s from Hub
-
-            for ( Environment environment : environmentsMissingLocally )
-            {
-                environmentAdapter.removeEnvironment( ( LocalEnvironment ) environment );
-            }
-
-
-            // 2. remove local environments that are missing on Hub
-
-            Set<String> deletedEnvironmentsIdsOnHub = environmentAdapter.getDeletedEnvironmentsIds();
-            Set<Environment> environmentsMissingOnHub = Sets.newHashSet();
-
-            for ( Environment localEnvironment : locallyRegisteredHubEnvironments )
-            {
-                boolean isMissingOnHub = false;
-
-                for ( String hubEnvironmentId : deletedEnvironmentsIdsOnHub )
-                {
-                    if ( localEnvironment.getId().equalsIgnoreCase( hubEnvironmentId ) )
-                    {
-                        isMissingOnHub = true;
-
-                        break;
-                    }
-                }
-
-                if ( isMissingOnHub )
-                {
-                    environmentsMissingOnHub.add( localEnvironment );
-                }
-            }
-
-            // destroy local env-s missing on Hub
-
-            for ( Environment environment : environmentsMissingOnHub )
-            {
-                cleanupEnvironment( environment.getEnvironmentId() );
-
-                notifyOnEnvironmentDestroyed( environment.getId() );
-            }
-
-            // notify Hub about environment deletion
-
-            for ( String hubEnvironmentId : deletedEnvironmentsIdsOnHub )
-            {
-                environmentAdapter.removeEnvironment( hubEnvironmentId );
-            }
-
-            // 3. Remove deleted local env-s from Hub
-
-            Collection<LocalEnvironment> deletedEnvs = environmentService.getDeleted();
-
-            for ( LocalEnvironment deletedEnvironment : deletedEnvs )
-            {
-                if ( environmentAdapter.removeEnvironment( deletedEnvironment ) )
-                {
-                    environmentService.remove( deletedEnvironment.getId() );
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage() );
-        }
+    private void syncRemovedEnvironmentsWithHub()
+    {
+        getCachedExecutor().execute( new RemoveEnvironmentsTask( environmentAdapter, this, environmentService ) );
     }
 
 
@@ -2621,7 +2480,7 @@ public class EnvironmentManagerImpl
                                                 final HostInterfaceModel oldNetInterface,
                                                 final HostInterfaceModel newNetInterface )
     {
-        // todo implement
+        // not needed
     }
 
 
@@ -2629,7 +2488,7 @@ public class EnvironmentManagerImpl
     public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
                                               final HostInterfaceModel netInterface )
     {
-        // todo implement
+        // not needed
     }
 
 
@@ -2637,7 +2496,7 @@ public class EnvironmentManagerImpl
     public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
                                                 final HostInterfaceModel netInterface )
     {
-        // todo implement
+        // not needed
     }
 
 
@@ -3002,7 +2861,7 @@ public class EnvironmentManagerImpl
     }
 
 
-    private void cleanupEnvironment( EnvironmentId environmentId )
+    public void cleanupEnvironment( EnvironmentId environmentId )
     {
         try
         {
