@@ -166,16 +166,16 @@ public class UsedNetworkResources
         File file = vlanFile.toFile();
         try
         {
-            int vlan = file.createNewFile() ? 0 :
+            int vlan = file.createNewFile() ? Common.MIN_VLAN_ID - 1 :
                        Integer.parseInt( Files.readFirstLine( file, Charset.defaultCharset() ) );
 
-            if ( vlan < 4096 )
+            if ( vlan < Common.MAX_VLAN_ID )
             {
                 vlan++;
             }
             else
             {
-                vlan = 1;
+                vlan = Common.MIN_VLAN_ID;
             }
 
             Files.write( String.valueOf( vlan ).getBytes(), file );
