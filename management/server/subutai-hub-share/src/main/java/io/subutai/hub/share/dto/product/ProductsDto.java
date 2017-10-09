@@ -1,7 +1,6 @@
 package io.subutai.hub.share.dto.product;
 
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,7 +38,7 @@ public class ProductsDto
                 ProductDtoV1_2 productDto = new ProductDtoV1_2( product );
                 this.productsDto.add( productDto );
             }
-            catch ( ParseException e )
+            catch ( Exception e )
             {
                 LOG.warn( e.getMessage() );
             }
