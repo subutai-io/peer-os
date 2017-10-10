@@ -18,7 +18,7 @@ import io.subutai.common.util.NumUtil;
 
 public class UsedNetworkResources
 {
-    private static final long VLAN_CACHING_INTERVAL_SEC = 10;
+    private static final long VLAN_CACHING_INTERVAL_SEC = 60;
     private static Cache<Integer, Boolean> cachedVlans = CacheBuilder.newBuilder().
             expireAfterWrite( VLAN_CACHING_INTERVAL_SEC, TimeUnit.SECONDS ).build();
 
