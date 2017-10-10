@@ -37,6 +37,12 @@ public abstract class P2PUtil
     }
 
 
+    public static int getVlanFromInterfaceName( final String p2pInterfaceName )
+    {
+        return Integer.parseInt( p2pInterfaceName.replace( Common.P2P_INTERFACE_PREFIX, "" ) );
+    }
+
+
     public static String generateContainerSubnet( final Set<String> excludedIPs )
     {
         int maxIterations = 4080;

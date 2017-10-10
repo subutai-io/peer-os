@@ -190,7 +190,12 @@ public class NetworkManagerImpl implements NetworkManager
 
         while ( st.hasMoreTokens() )
         {
-            p2pIfaceNames.add( st.nextToken() );
+            String p2pIface = st.nextToken();
+
+            if ( p2pIface.matches( Common.P2P_INTERFACE_NAME_REGEX ) )
+            {
+                p2pIfaceNames.add( p2pIface );
+            }
         }
 
         return p2pIfaceNames;
