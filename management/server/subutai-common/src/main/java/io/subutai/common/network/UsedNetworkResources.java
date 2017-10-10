@@ -159,10 +159,6 @@ public class UsedNetworkResources
 
     public synchronized int calculateFreeVlan()
     {
-        if ( vlans.isEmpty() )
-        {
-            return Common.MIN_VLAN_ID;
-        }
 
         for ( Integer nextVlan = Common.MIN_VLAN_ID; nextVlan <= Common.MAX_VLAN_ID; nextVlan++ )
         {
