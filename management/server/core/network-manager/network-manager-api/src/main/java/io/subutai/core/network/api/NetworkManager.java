@@ -3,6 +3,7 @@ package io.subutai.core.network.api;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.P2pLogs;
@@ -53,6 +54,8 @@ public interface NetworkManager
     String getP2pVersion( Host host ) throws NetworkManagerException;
 
     P2pLogs getP2pLogs( Host host, LogLevel logLevel, Date from, Date till ) throws NetworkManagerException;
+
+    Set<String> getUsedP2pIfaceNames( final Host host ) throws NetworkManagerException;
 
     void createTunnel( Host host, String tunnelName, String tunnelIp, int vlan, long vni )
             throws NetworkManagerException;

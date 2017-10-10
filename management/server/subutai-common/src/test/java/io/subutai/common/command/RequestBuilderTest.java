@@ -1,9 +1,7 @@
 package io.subutai.common.command;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -84,10 +82,7 @@ public class RequestBuilderTest
     @Test
     public void testWithCmdArgs() throws Exception
     {
-        List<String> myList = new ArrayList<>();
-        myList.add( "test" );
-
-        assertNotNull( requestBuilder.withCmdArgs( myList ) );
+        assertNotNull( requestBuilder.withCmdArgs( "test" ) );
     }
 
 

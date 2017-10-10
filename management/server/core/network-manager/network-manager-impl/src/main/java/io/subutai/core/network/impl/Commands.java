@@ -33,41 +33,47 @@ public class Commands
 
     RequestBuilder getGetReservedPortsCommand()
     {
-        return new RequestBuilder( INFO_BINDING ).withCmdArgs( Lists.newArrayList( "ports" ) );
+        return new RequestBuilder( INFO_BINDING ).withCmdArgs( "ports" );
     }
 
 
     RequestBuilder getGetP2pVersionCommand()
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.newArrayList( "-v" ) );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-v" );
     }
 
 
     RequestBuilder getP2PConnectionsCommand()
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.newArrayList( "-p" ) );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-p" );
     }
 
 
     RequestBuilder getJoinP2PSwarmCommand( String interfaceName, String localIp, String p2pHash, String secretKey,
                                            long secretKeyTtlSec, String portRange )
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ), localIp,
-                        portRange ) ).withTimeout( 90 );
+        return new RequestBuilder( P2P_BINDING )
+                .withCmdArgs( "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ), localIp,
+                        portRange ).withTimeout( 90 );
     }
 
 
     RequestBuilder getRemoveP2PSwarmCommand( String p2pHash )
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( Lists.newArrayList( "-d", p2pHash ) ).withTimeout( 90 );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-d", p2pHash ).withTimeout( 90 );
     }
 
 
     RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( P2P_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-u", p2pHash, newSecretKey, String.valueOf( ttlSeconds ) ) );
+                .withCmdArgs( "-u", p2pHash, newSecretKey, String.valueOf( ttlSeconds ) );
+    }
+
+
+    RequestBuilder getGetUsedP2pIfaceNamesCommand()
+    {
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-i" );
     }
 
 
@@ -82,40 +88,39 @@ public class Commands
             args.add( logLevel.getCliParam() );
         }
 
-        return new RequestBuilder( LOG_BINDING ).withCmdArgs( args );
+        return new RequestBuilder( LOG_BINDING ).withCmdArgs( args.toArray( new String[args.size()] ) );
     }
 
 
     RequestBuilder getCreateTunnelCommand( String tunnelName, String tunnelIp, int vlan, long vni )
     {
-        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-create", tunnelName, "-remoteip", tunnelIp, "-vlan", String.valueOf( vlan ),
-                        "-vni", String.valueOf( vni ) ) );
+        return new RequestBuilder( VXLAN_BINDING )
+                .withCmdArgs( "-create", tunnelName, "-remoteip", tunnelIp, "-vlan", String.valueOf( vlan ), "-vni",
+                        String.valueOf( vni ) );
     }
 
 
     RequestBuilder getDeleteTunnelCommand( final String tunnelName )
     {
-        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( Lists.newArrayList( "-delete", tunnelName ) );
+        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( "-delete", tunnelName );
     }
 
 
     RequestBuilder getGetTunnelsCommand()
     {
-        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( Lists.newArrayList( "-list" ) );
+        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( "-list" );
     }
 
 
     RequestBuilder getGetVlanDomainCommand( int vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING )
-                .withCmdArgs( Lists.newArrayList( "check", String.valueOf( vLanId ), "-d" ) );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "check", String.valueOf( vLanId ), "-d" );
     }
 
 
     RequestBuilder getRemoveVlanDomainCommand( final String vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( Lists.newArrayList( "del", vLanId, "-d" ) );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "del", vLanId, "-d" );
     }
 
 
@@ -137,58 +142,57 @@ public class Commands
             args.add( sslCertPath );
         }
 
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( args );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( args.toArray( new String[args.size()] ) );
     }
 
 
     RequestBuilder getCheckIpInVlanDomainCommand( final String hostIp, final int vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING )
-                .withCmdArgs( Lists.newArrayList( "check", String.valueOf( vLanId ), "-h", hostIp ) );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "check", String.valueOf( vLanId ), "-h", hostIp );
     }
 
 
     RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final String vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( Lists.newArrayList( "add", vLanId, "-h", hostIp ) );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "add", vLanId, "-h", hostIp );
     }
 
 
     RequestBuilder getRemoveIpFromVlanDomainCommand( final String hostIp, final int vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING )
-                .withCmdArgs( Lists.newArrayList( "del", String.valueOf( vLanId ), "-h", hostIp ) );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "del", String.valueOf( vLanId ), "-h", hostIp );
     }
 
 
     RequestBuilder getSetupContainerSshTunnelCommand( final String containerIp, final int sshIdleTimeout )
     {
-        return new RequestBuilder( TUNNEL_BINDING )
-                .withCmdArgs( Lists.newArrayList( "add", containerIp, String.valueOf( sshIdleTimeout ) ) );
+        return new RequestBuilder( TUNNEL_BINDING ).withCmdArgs( "add", containerIp, String.valueOf( sshIdleTimeout ) );
     }
 
 
     RequestBuilder getMapContainerPortToRandomPortCommand( final Protocol protocol, final String containerIp,
                                                            final int containerPort )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( protocol.name().toLowerCase(), "-i",
-                String.format( "%s:%s", containerIp, containerPort ) ) );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( protocol.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ) );
     }
 
 
     RequestBuilder getMapContainerPortToSpecificPortCommand( final Protocol protocol, final String containerIp,
                                                              final int containerPort, final int rhPort )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( protocol.name().toLowerCase(), "-i",
-                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ) ) );
+        return new RequestBuilder( MAP_BINDING )
+                .withCmdArgs( protocol.name().toLowerCase(), "-i", String.format( "%s:%s", containerIp, containerPort ),
+                        "-e", String.valueOf( rhPort ) );
     }
 
 
     RequestBuilder getRemoveContainerPortMappingCommand( final Protocol protocol, final String containerIp,
                                                          final int containerPort, final int rhPort )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( protocol.name().toLowerCase(), "-i",
-                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-r" ) );
+        return new RequestBuilder( MAP_BINDING )
+                .withCmdArgs( protocol.name().toLowerCase(), "-i", String.format( "%s:%s", containerIp, containerPort ),
+                        "-e", String.valueOf( rhPort ), "-r" );
     }
 
 
@@ -217,7 +221,7 @@ public class Commands
             args.add( loadBalancing.name().toLowerCase() );
         }
 
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[args.size()] ) );
     }
 
 
@@ -225,15 +229,15 @@ public class Commands
                                                                final int containerPort, final int rhPort,
                                                                final String domain )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( protocol.name().toLowerCase(), "-i",
-                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain,
-                "-r" ) );
+        return new RequestBuilder( MAP_BINDING )
+                .withCmdArgs( protocol.name().toLowerCase(), "-i", String.format( "%s:%s", containerIp, containerPort ),
+                        "-e", String.valueOf( rhPort ), "-d", domain, "-r" );
     }
 
 
     RequestBuilder getListOfReservedPortMappingCommand()
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "-l" );
     }
 
 
@@ -246,12 +250,12 @@ public class Commands
             args.add( protocol.name().toLowerCase() );
         }
 
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[args.size()] ) );
     }
 
 
     RequestBuilder getGetIPAddressCommand()
     {
-        return new RequestBuilder( INFO_BINDING ).withCmdArgs( Lists.newArrayList( "ipaddr" ) );
+        return new RequestBuilder( INFO_BINDING ).withCmdArgs( "ipaddr" );
     }
 }
