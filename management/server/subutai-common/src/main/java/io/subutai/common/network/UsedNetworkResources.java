@@ -1,35 +1,35 @@
 package io.subutai.common.network;
 
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.NumUtil;
 
 
 public class UsedNetworkResources
 {
+    private static final long VLAN_CACHING_INTERVAL_SEC = 60;
+    private static Cache<Integer, Boolean> cachedVlans = CacheBuilder.newBuilder().
+            expireAfterWrite( VLAN_CACHING_INTERVAL_SEC, TimeUnit.SECONDS ).build();
+
     @JsonProperty( "vnis" )
-    Set<Long> vnis = Sets.newConcurrentHashSet();
+    private Set<Long> vnis = Sets.newConcurrentHashSet();
     @JsonProperty( "p2pSubnets" )
-    Set<String> p2pSubnets = Sets.newConcurrentHashSet();
+    private Set<String> p2pSubnets = Sets.newConcurrentHashSet();
     @JsonProperty( "containerSubnets" )
-    Set<String> containerSubnets = Sets.newConcurrentHashSet();
+    private Set<String> containerSubnets = Sets.newConcurrentHashSet();
     @JsonProperty( "vlans" )
-    Set<Integer> vlans = Sets.newConcurrentHashSet();
+    private Set<Integer> vlans = Sets.newConcurrentHashSet();
 
 
     public UsedNetworkResources( @JsonProperty( "vnis" ) final Set<Long> vnis,
@@ -157,52 +157,30 @@ public class UsedNetworkResources
     }
 
 
-    //TODO remove workaround when "p2p show" returns p2p names
-    public int calculateFreeVlan()
+    public synchronized int calculateFreeVlan()
     {
-        //workaround implementation
-        try
+
+        for ( Integer nextVlan = Common.MIN_VLAN_ID; nextVlan <= Common.MAX_VLAN_ID; nextVlan++ )
         {
-            Path vlanFile = Paths.get( Common.KARAF_DATA, "current_vlan.dat" );
-            File file = vlanFile.toFile();
-
-            int vlan = file.createNewFile() ? Common.MIN_VLAN_ID - 1 :
-                       Integer.parseInt( Files.readFirstLine( file, Charset.defaultCharset() ) );
-
-            if ( vlan < Common.MAX_VLAN_ID )
+            //check in reserved vlans
+            if ( vlans.contains( nextVlan ) )
             {
-                vlan++;
-            }
-            else
-            {
-                vlan = Common.MIN_VLAN_ID;
+                continue;
             }
 
-            Files.write( String.valueOf( vlan ).getBytes(), file );
+            //check in cached vlans
+            if ( cachedVlans.getIfPresent( nextVlan ) != null )
+            {
+                continue;
+            }
 
-            return vlan;
+            //cache vlan to make it "look" reserved for parallel reservation attempts
+            //when reserved vlans don't contain it yet
+            cachedVlans.put( nextVlan, true );
+
+            return nextVlan;
         }
-        //default implementation
-        catch ( Exception e )
-        {
-            //TODO review this method when "p2p show" returns p2p names
-            //it should not just increase vlan but should reuse empty slots with lowest vlan first
 
-            if ( vlans.isEmpty() )
-            {
-                return Common.MIN_VLAN_ID;
-            }
-
-            List<Integer> sortedVlans = CollectionUtil.asSortedList( vlans );
-
-            int maxUsedVlan = sortedVlans.get( sortedVlans.size() - 1 );
-
-            if ( maxUsedVlan + 1 <= Common.MAX_VLAN_ID )
-            {
-                return maxUsedVlan + 1;
-            }
-
-            return -1;
-        }
+        return -1;
     }
 }

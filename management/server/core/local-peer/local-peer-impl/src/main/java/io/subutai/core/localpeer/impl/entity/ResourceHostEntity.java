@@ -1411,4 +1411,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException( String.format( "Failed to get ip: %s", e.getMessage() ), e );
         }
     }
+
+
+    @Override
+    public Set<String> getUsedP2pIfaceNames() throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getUsedP2pIfaceNames( this );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Failed to get reserved p2p interface names: %s", e.getMessage() ), e );
+        }
+    }
 }

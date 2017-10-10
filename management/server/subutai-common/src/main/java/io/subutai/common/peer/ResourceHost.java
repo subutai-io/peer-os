@@ -208,4 +208,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException;
 
     String getIp() throws ResourceHostException;
+
+    Set<String> getUsedP2pIfaceNames() throws ResourceHostException;
 }

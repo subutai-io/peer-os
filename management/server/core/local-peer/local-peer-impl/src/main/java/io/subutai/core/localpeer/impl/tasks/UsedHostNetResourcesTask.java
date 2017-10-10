@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl.tasks;
 
 
+import java.util.Set;
+
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.network.UsedNetworkResources;
@@ -10,6 +12,7 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.util.HostUtil;
+import io.subutai.common.util.P2PUtil;
 
 
 public class UsedHostNetResourcesTask extends HostUtil.Task<Object>
@@ -59,6 +62,13 @@ public class UsedHostNetResourcesTask extends HostUtil.Task<Object>
         for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
         {
             usedNetworkResources.addP2pSubnet( p2PConnection.getIp() );
+        }
+
+        //p2p iface names
+        Set<String> reservedP2pIfaceNames = resourceHost.getUsedP2pIfaceNames();
+        for ( String p2pIface : reservedP2pIfaceNames )
+        {
+            usedNetworkResources.addVlan( P2PUtil.getVlanFromInterfaceName( p2pIface ) );
         }
 
         return null;

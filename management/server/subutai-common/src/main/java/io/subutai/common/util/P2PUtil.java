@@ -7,6 +7,7 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.protocol.Tunnels;
+import io.subutai.common.settings.Common;
 
 
 /**
@@ -32,7 +33,13 @@ public abstract class P2PUtil
 
     public static String generateInterfaceName( final int vlan )
     {
-        return String.format( "p2p%d", vlan );
+        return String.format( "%s%d", Common.P2P_INTERFACE_PREFIX, vlan );
+    }
+
+
+    public static int getVlanFromInterfaceName( final String p2pInterfaceName )
+    {
+        return Integer.parseInt( p2pInterfaceName.replace( Common.P2P_INTERFACE_PREFIX, "" ) );
     }
 
 

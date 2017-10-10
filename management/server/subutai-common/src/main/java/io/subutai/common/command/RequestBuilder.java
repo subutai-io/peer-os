@@ -6,6 +6,7 @@
 package io.subutai.common.command;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -207,10 +208,10 @@ public class RequestBuilder
      *
      * @param cmdArgs - command line arguments
      */
-    public RequestBuilder withCmdArgs( List<String> cmdArgs )
+    public RequestBuilder withCmdArgs( String... cmdArgs )
     {
 
-        this.cmdArgs = cmdArgs;
+        this.cmdArgs = Arrays.asList( cmdArgs );
 
         return this;
     }

@@ -4,6 +4,7 @@ package io.subutai.core.network.impl;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,6 +12,7 @@ import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -175,6 +177,29 @@ public class NetworkManagerImpl implements NetworkManager
         return p2pLogs;
     }
 
+
+    public Set<String> getUsedP2pIfaceNames( final Host host ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+
+        CommandResult result = execute( host, commands.getGetUsedP2pIfaceNamesCommand() );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Set<String> p2pIfaceNames = Sets.newHashSet();
+
+        while ( st.hasMoreTokens() )
+        {
+            String p2pIface = st.nextToken();
+
+            if ( p2pIface.matches( Common.P2P_INTERFACE_NAME_REGEX ) )
+            {
+                p2pIfaceNames.add( p2pIface );
+            }
+        }
+
+        return p2pIfaceNames;
+    }
     //------------------ P2P SECTION END --------------------------------
 
 
