@@ -16,6 +16,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	var currentTemplate = {};
 	$scope.identity = angular.identity;
 
+    vm.logMessages = [];
+
 	vm.popupLogState = 'full';
 
 	vm.currentEnvironment = {};
@@ -139,6 +141,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function checkLastLog(status, log) {
 		if (log === undefined || log === null) log = false;
+		if(vm.logMessages.length == 0) return;
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
 
 		if (log) {
@@ -159,11 +162,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
     var timeoutId;
 
-	function getLogById(id, checkLast, prevLogs, envId) {
+	function getLogById(id, checkLast, prevLogs, envId, isTimeout) {
 		if (checkLast === undefined || checkLast === null) checkLast = false;
 		if (prevLogs === undefined || prevLogs === null) prevLogs = false;
-
-		clearTimeout(timeoutId);
 
 		trackerSrv.getDownloadProgress(envId)
 			.success(function (data) {
@@ -266,11 +267,17 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						}
 					}
 
-					vm.logMessages = vm.logMessages.concat(result);
+                    clearTimeout(timeoutId);
 
-					timeoutId = setTimeout(function () {
-						getLogById(id, false, logs, envId);
-					}, 2000);
+                    if( !isTimeout ){
+                        vm.logMessages = [];
+                    }
+
+                    vm.logMessages = vm.logMessages.concat(result);
+
+                    timeoutId = setTimeout(function(){
+                        getLogById(id, false, logs, envId, true);
+                    }, 2000);
 
 					return result;
 				} else {
@@ -343,7 +350,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			});
 	}
 
-	vm.logMessages = [];
+
 	function buildEnvironment() {
 		vm.buildStep = 'showLogs';
 
@@ -398,7 +405,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
 		vm.currentEnvironment.includedContainersByQuota =
 			getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
-		console.log(vm.currentEnvironment);
 
 		vm.currentEnvironment.numChangedContainers = 0;
 		for (var key in vm.currentEnvironment.changingContainers) {
@@ -953,7 +959,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	function buildEnvironmentByJoint() {
 
 		vm.buildCompleted = false;
-
+		clearTimeout(timeoutId);
+        vm.logMessages = [];
 		vm.newEnvID = [];
 
 		var allElements = graph.getCells();
@@ -1018,7 +1025,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 			return;
 		}
-
+        vm.logMessages = [];
 		clearWorkspace();
 		vm.isApplyingChanges = false;
 		vm.currentEnvironment = environment;
@@ -1087,16 +1094,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function addSettingsToTemplate(templateSettings, sizeDetails) {
         var isCustom = templateSettings.quotaSize == 'CUSTOM';
-
-        if(isCustom){
-            //custom quota
-            console.log('CUSTOM');
-            console.log(templateSettings);
-        }else{
-            //predefined size
-            console.log('PREDEFINED: ' + templateSettings.quotaSize);
-            console.log(sizeDetails);
-        }
 
         currentTemplate.set('quotaSize', templateSettings.quotaSize);
 
