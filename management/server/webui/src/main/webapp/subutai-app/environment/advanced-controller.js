@@ -170,6 +170,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     function checkLastLog(status, log) {
         if (log === undefined || log === null) log = false;
+        if(vm.logMessages.length == 0) return;
         var lastLog = vm.logMessages[vm.logMessages.length - 1];
 
         if (log) {
@@ -190,11 +191,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     var timeoutId;
 
-    function getLogById(id, checkLast, prevLogs, envId) {
+    function getLogById(id, checkLast, prevLogs, envId, isTimeout) {
         if (checkLast === undefined || checkLast === null) checkLast = false;
         if (prevLogs === undefined || prevLogs === null) prevLogs = false;
-
-        clearTimeout(timeoutId);
 
         trackerSrv.getDownloadProgress(envId)
             .success(function (data) {
@@ -300,10 +299,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                         }
                     }
 
+                    clearTimeout(timeoutId);
+
+                    if( !isTimeout ){
+                        vm.logMessages = [];
+                    }
+
                     vm.logMessages = vm.logMessages.concat(result);
 
                     timeoutId = setTimeout(function () {
-                        getLogById(id, false, logs, envId);
+                        getLogById(id, false, logs, envId, true);
                     }, 2000);
 
                     return result;
@@ -973,7 +978,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         vm.buildCompleted = false;
         vm.newEnvID = [];
         vm.buildStep = 'confirm';
-
+        clearTimeout(timeoutId);
+        vm.logMessages = [];
         vm.env2Build = {};
         vm.containers2Build = [];
         vm.env2Remove = {};
@@ -1016,7 +1022,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
             return;
         }
-
+        vm.logMessages = [];
         clearWorkspace();
         vm.isEditing = true;
         vm.editingEnv = environment;
@@ -1039,7 +1045,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 }
             }
 
-            console.log(container);
             vm.rhId = container.rhId;
             var resourceHostItemId = addResource2Build(container.rhId, container.peerId, i);
             var resourceHost = graph.getCell(resourceHostItemId);
@@ -1249,16 +1254,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     function addSettingsToTemplate(templateSettings, sizeDetails) {
         var isCustom = templateSettings.quotaSize == 'CUSTOM';
-
-        if (isCustom) {
-            //custom quota
-            console.log('CUSTOM');
-            console.log(templateSettings);
-        } else {
-            //predefined size
-            console.log('PREDEFINED: ' + templateSettings.quotaSize);
-            console.log(sizeDetails);
-        }
 
         currentTemplate.set('quotaSize', templateSettings.quotaSize);
 

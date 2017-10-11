@@ -192,8 +192,6 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
         identitySrv.getKurjunAuthId().success(function (authId) {
 
-            console.log(authId);
-
             var signedAuthIdTextArea = document.createElement("textarea");
             signedAuthIdTextArea.setAttribute('class', 'bp-sign-target');
             signedAuthIdTextArea.style.width = '1px';
@@ -205,11 +203,8 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
             $(signedAuthIdTextArea).on('change', function() {
 
                var signedAuthId = $(this).val();
-               console.log(signedAuthId);
 
                identitySrv.obtainKurjunToken(signedAuthId).success(function (kurjunToken) {
-
-                   console.log(kurjunToken);
 
                    localStorage.setItem('kurjunToken', kurjunToken);
 
