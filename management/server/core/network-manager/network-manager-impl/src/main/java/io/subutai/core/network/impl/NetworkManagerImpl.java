@@ -534,6 +534,7 @@ public class NetworkManagerImpl implements NetworkManager
                     ReservedPortMapping mapping = new ReservedPortMapping();
 
                     mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
+                    parts.nextToken();// 0.0.0.0 we need skip output
                     mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
                     mapping.setIpAddress( parts.nextToken() );
                     mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
