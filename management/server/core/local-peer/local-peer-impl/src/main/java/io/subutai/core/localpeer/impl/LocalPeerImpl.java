@@ -3079,9 +3079,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
 
-            resourceHost.setContainerQuota( containerHost, containerQuota );
+            resourceHost.setContainerQuota( containerHost, quota );
 
-            containerHost.setContainerSize( containerQuota.getContainerSize() );
+            containerHost.setContainerSize( quota.getContainerSize() );
 
             resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
         }
