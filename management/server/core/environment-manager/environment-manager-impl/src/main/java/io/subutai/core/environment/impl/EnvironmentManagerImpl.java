@@ -447,22 +447,22 @@ public class EnvironmentManagerImpl
             }
 
             //check if peer can accommodate the requested nodes
-            try
-            {
-                if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
-                {
-                    operationTracker.addLogFailed(
-                            String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
-
-                    throw new EnvironmentCreationException(
-                            String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
-                }
-            }
-            catch ( PeerException e )
-            {
-                operationTracker.addLogFailed( e.getMessage() );
-                throw new EnvironmentCreationException( e.getMessage() );
-            }
+//            try
+//            {
+//                if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
+//                {
+//                    operationTracker.addLogFailed(
+//                            String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
+//
+//                    throw new EnvironmentCreationException(
+//                            String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
+//                }
+//            }
+//            catch ( PeerException e )
+//            {
+//                operationTracker.addLogFailed( e.getMessage() );
+//                throw new EnvironmentCreationException( e.getMessage() );
+//            }
         }
 
 
@@ -625,33 +625,34 @@ public class EnvironmentManagerImpl
                 throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
 
-            Set<Node> newNodes = topology == null ? Sets.<Node>newHashSet() : topology.getPeerNodes( peer.getId() );
-            Map<String, ContainerQuota> changedQuotas =
-                    getPeerChangedContainers( peer.getId(), changedContainers, environment );
+//            Set<Node> newNodes = topology == null ? Sets.<Node>newHashSet() : topology.getPeerNodes( peer.getId() );
+//            Map<String, ContainerQuota> changedQuotas =
+//                    getPeerChangedContainers( peer.getId(), changedContainers, environment );
+//
             //check if peer can accommodate the requested nodes
-            if ( ( hasContainerCreation && !newNodes.isEmpty() ) || ( hasQuotaModification && !changedQuotas
-                    .isEmpty() ) )
-            {
-                try
-                {
-                    if ( !peer.canAccommodate( new Nodes( newNodes, changedQuotas ) ) )
-                    {
-                        operationTracker.addLogFailed(
-                                String.format( "Peer %s can not accommodate the requested containers",
-                                        peer.getName() ) );
-
-                        throw new EnvironmentModificationException(
-                                String.format( "Peer %s can not accommodate the requested containers",
-                                        peer.getName() ) );
-                    }
-                }
-                catch ( PeerException e )
-                {
-                    operationTracker.addLogFailed( e.getMessage() );
-
-                    throw new EnvironmentModificationException( e.getMessage() );
-                }
-            }
+//            if ( ( hasContainerCreation && !newNodes.isEmpty() ) || ( hasQuotaModification && !changedQuotas
+//                    .isEmpty() ) )
+//            {
+//                try
+//                {
+//                    if ( !peer.canAccommodate( new Nodes( newNodes, changedQuotas ) ) )
+//                    {
+//                        operationTracker.addLogFailed(
+//                                String.format( "Peer %s can not accommodate the requested containers",
+//                                        peer.getName() ) );
+//
+//                        throw new EnvironmentModificationException(
+//                                String.format( "Peer %s can not accommodate the requested containers",
+//                                        peer.getName() ) );
+//                    }
+//                }
+//                catch ( PeerException e )
+//                {
+//                    operationTracker.addLogFailed( e.getMessage() );
+//
+//                    throw new EnvironmentModificationException( e.getMessage() );
+//                }
+//            }
         }
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
