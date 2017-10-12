@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
@@ -339,6 +340,7 @@ public class TemplateManagerImpl implements TemplateManager
 
                                     String json = response.readEntity( String.class ).trim();
 
+                                    Template template;
                                     if ( json.startsWith( "[" ) )
                                     {
                                         Set<Template> templates =
@@ -346,12 +348,15 @@ public class TemplateManagerImpl implements TemplateManager
                                                 {
                                                 }.getType() );
 
-                                        return templates.iterator().next();
+                                        template = templates.iterator().next();
                                     }
                                     else
                                     {
-                                        return JsonUtil.fromJson( json, Template.class );
+                                        template = JsonUtil.fromJson( json, Template.class );
                                     }
+
+                                    return template == null || StringUtils.isBlank( template.getId() ) ? null :
+                                           template;
                                 }
                                 finally
                                 {
