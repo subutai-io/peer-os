@@ -3066,8 +3066,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( quota == null )
         {
             quota = ContainerSize.getDefaultContainerQuota( ContainerSize.SMALL );
+        }
+
+        if ( quota.getAll().isEmpty() )
+        {
             quota.copyValues( containerQuota );
         }
+
         try
         {
             ContainerHost containerHost = getContainerHostById( containerId.getId() );
