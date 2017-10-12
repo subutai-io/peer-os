@@ -355,7 +355,8 @@ public class TemplateManagerImpl implements TemplateManager
                                         template = JsonUtil.fromJson( json, Template.class );
                                     }
 
-                                    return StringUtils.isBlank( template.getId() ) ? null : template;
+                                    return template == null || StringUtils.isBlank( template.getId() ) ? null :
+                                           template;
                                 }
                                 finally
                                 {
