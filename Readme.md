@@ -219,8 +219,8 @@ For development purposes, access to management container can be opened
 by executing the following commands on RH-with-MH:
 
 ```
-sudo iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
-sudo iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp --dport 5005 -j DNAT --to-destination 10.10.10.1:5005
+sudo iptables -t nat -A PREROUTING -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
+sudo iptables -t nat -A PREROUTING -p tcp -m tcp --dport 5005 -j DNAT --to-destination 10.10.10.1:5005
 ```
 
 This would open ports **2222** for ssh access and **5005** for debugger.
