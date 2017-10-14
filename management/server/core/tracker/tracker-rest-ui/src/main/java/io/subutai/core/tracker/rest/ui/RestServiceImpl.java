@@ -13,10 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.tracker.api.Tracker;
 
 
@@ -25,7 +24,6 @@ public class RestServiceImpl implements RestService
 
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final Tracker tracker;
 
 
@@ -34,6 +32,12 @@ public class RestServiceImpl implements RestService
         Preconditions.checkNotNull( tracker, "Tracker is null" );
 
         this.tracker = tracker;
+    }
+
+
+    private String prepareAsJson( Object t )
+    {
+        return JsonUtil.toJson( t ).replace( "\n", "" ).replace( "\r", "" );
     }
 
 
@@ -48,7 +52,7 @@ public class RestServiceImpl implements RestService
 
             if ( trackerOperationView != null )
             {
-                return Response.ok().entity( GSON.toJson( trackerOperationView ) ).build();
+                return Response.ok().entity( prepareAsJson( trackerOperationView ) ).build();
             }
             else
             {
@@ -75,7 +79,7 @@ public class RestServiceImpl implements RestService
 
             List<TrackerOperationView> pos = tracker.getTrackerOperations( source, fromDat, toDat, limit );
 
-            return Response.ok().entity( GSON.toJson( pos ) ).build();
+            return Response.ok().entity( prepareAsJson( pos ) ).build();
         }
         catch ( ParseException e )
         {
@@ -88,21 +92,23 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getTrackerOperationSources()
     {
-        return Response.ok().entity( GSON.toJson( tracker.getTrackerOperationSources() ) ).build();
+        return Response.ok().entity( JsonUtil.toJson( tracker.getTrackerOperationSources() ) ).build();
     }
+
 
     @Override
     public Response getNotification()
     {
         try
         {
-            return Response.ok( GSON.toJson( tracker.getNotifications() ) ).build();
+            return Response.ok( prepareAsJson( tracker.getNotifications() ) ).build();
         }
-        catch (Exception e)
+        catch ( Exception e )
         {
-            return Response.serverError().entity( GSON.toJson( e ) ).build();
+            return Response.serverError().entity( JsonUtil.toJson( e ) ).build();
         }
     }
+
 
     @Override
     public Response clearAllNotifications()
@@ -112,14 +118,15 @@ public class RestServiceImpl implements RestService
             tracker.setOperationsViewStates( false );
             return Response.ok().build();
         }
-        catch (Exception e)
+        catch ( Exception e )
         {
             return Response.serverError().entity( e ).build();
         }
     }
 
+
     @Override
-    public Response clearNotification(String source, String uuid)
+    public Response clearNotification( String source, String uuid )
     {
         try
         {
@@ -127,7 +134,7 @@ public class RestServiceImpl implements RestService
             tracker.setOperationViewState( source, poUUID, false );
             return Response.ok().build();
         }
-        catch (Exception e)
+        catch ( Exception e )
         {
             return Response.serverError().entity( e ).build();
         }
