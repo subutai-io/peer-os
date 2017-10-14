@@ -1,10 +1,14 @@
 package io.subutai.core.systemmanager.impl;
 
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,6 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.comparator.LastModifiedFileComparator;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -151,16 +159,50 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     @RolesAllowed( "System-Management|Read" )
-    public AdvancedSettings getAdvancedSettings()
+    public AdvancedSettings getAdvancedSettings( String logFile )
     {
-        AdvancedSettings pojo = new AdvancedSettingsPojo();
+        AdvancedSettingsPojo pojo = new AdvancedSettingsPojo();
 
         String content;
         try
         {
-            content = new String( Files.readAllBytes(
-                    Paths.get( System.getenv( "SUBUTAI_APP_DATA_PATH" ) + "/data/log/karaf.log" ) ) );
+            Path karafLogDirPath = Paths.get( System.getenv( "SUBUTAI_APP_DATA_PATH" ), "/data/log/" );
+
+            Path currentKarafLogFilePath;
+            if ( Strings.isNullOrEmpty( logFile ) )
+            {
+                currentKarafLogFilePath = karafLogDirPath.resolve( "karaf.log" );
+            }
+            else
+            {
+                currentKarafLogFilePath = karafLogDirPath.resolve( logFile );
+            }
+
+            content = new String( Files.readAllBytes( currentKarafLogFilePath ) );
+
             pojo.setKarafLogs( content );
+
+            File[] karafLogFiles = karafLogDirPath.toFile().listFiles( new FileFilter()
+            {
+                @Override
+                public boolean accept( final File pathname )
+                {
+                    return pathname.isFile() && pathname.getName().startsWith( "karaf.log" );
+                }
+            } );
+
+            assert karafLogFiles != null;
+
+            Arrays.sort( karafLogFiles, LastModifiedFileComparator.LASTMODIFIED_REVERSE );
+
+            List<String> karafLogFileNames = Lists.newArrayList();
+
+            for ( File karafLogFile : karafLogFiles )
+            {
+                karafLogFileNames.add( karafLogFile.getName() );
+            }
+
+            pojo.setKarafLogFiles( karafLogFileNames );
         }
         catch ( IOException e )
         {

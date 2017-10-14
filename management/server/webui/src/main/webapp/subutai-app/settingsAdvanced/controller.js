@@ -19,6 +19,8 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
     var vm = this;
     vm.config = {};
     vm.karafLogs = '';
+    vm.karafLogFile = 'karaf.log';
+    vm.karafLogFiles = [];
     vm.logLevel = 'all';
     vm.activeTab = "karaflogs";
     vm.admin = false;
@@ -121,10 +123,11 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 
     function getConfig() {
         $('.js-karaflogs-load-screen').show();
-        SettingsAdvancedSrv.getConfig().success(function (data) {
+        SettingsAdvancedSrv.getConfig(vm.karafLogFile).success(function (data) {
             $('.js-karaflogs-load-screen').hide();
             vm.config = data;
             vm.karafLogs = getFilteredLogs(data.karafLogs);
+            vm.karafLogFiles = data.karafLogFiles;
             setTimeout(function () {
                 var codeBlock = document.getElementById('js-highlight-block');
                 codeBlock.scrollTop = codeBlock.scrollHeight;
@@ -134,8 +137,6 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
             $('.js-karaflogs-load-screen').hide();
         });
     }
-
-    //getConfig();
 
     function updateConfig() {
         SettingsAdvancedSrv.updateConfig(vm.config).success(function (data) {

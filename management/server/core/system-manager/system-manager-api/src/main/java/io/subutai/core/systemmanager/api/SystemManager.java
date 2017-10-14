@@ -25,7 +25,7 @@ public interface SystemManager
 
     void setNetworkSettings( final String publicUrl, final String publicSecurePort ) throws ConfigurationException;
 
-    AdvancedSettings getAdvancedSettings();
+    AdvancedSettings getAdvancedSettings( String logFile );
 
     SystemInfo getManagementUpdates();
 

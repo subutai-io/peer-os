@@ -141,9 +141,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getAdvancedSettings()
+    public Response getAdvancedSettings( String logFile )
     {
-        AdvancedSettings pojo = systemManager.getAdvancedSettings();
+        AdvancedSettings pojo = systemManager.getAdvancedSettings(logFile);
 
         String advancedSettingsInfo = JsonUtil.GSON.toJson( pojo );
 

@@ -1,10 +1,12 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
+import java.util.List;
+
+
 public interface AdvancedSettings
 {
     String getKarafLogs();
 
-    //todo remove setter from interface
-    void setKarafLogs( final String karafLogs );
+    List<String> getKarafLogFiles();
 }

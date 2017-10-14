@@ -12,8 +12,8 @@ function SettingsAdvancedSrv($http) {
 		sendCommand: sendCommand
 	};
 
-	function getConfig() {
-		return $http.get(SERVER_URL + "rest/v1/system/advanced_settings", {
+	function getConfig(logFile) {
+		return $http.get(SERVER_URL + "rest/v1/system/advanced_settings" + (logFile ? "?logfile=" + logFile : ""), {
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		});
