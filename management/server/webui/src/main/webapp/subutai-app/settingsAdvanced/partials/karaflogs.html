@@ -6,6 +6,13 @@
         <table class="log-btns-tbl">
           <tr>
             <td>
+              <select class="b-popup-body-input" ng-model="settingsAdvancedCtrl.karafLogFile" >
+                <option ng-repeat="logFile in settingsAdvancedCtrl.karafLogFiles" value="{{ logFile }}">
+                  {{ logFile }}
+                </option>
+              </select>
+            </td>
+            <td>
               <select class="b-popup-body-input"
                       ng-model="settingsAdvancedCtrl.logLevel"
                       ng-change="settingsAdvancedCtrl.setLevel()">

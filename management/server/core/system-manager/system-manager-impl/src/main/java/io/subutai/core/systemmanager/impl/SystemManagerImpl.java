@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.comparator.LastModifiedFileComparator;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -190,9 +192,11 @@ public class SystemManagerImpl implements SystemManager
                 }
             } );
 
-            Set<String> karafLogFileNames = Sets.newHashSet();
-
             assert karafLogFiles != null;
+
+            Arrays.sort( karafLogFiles, LastModifiedFileComparator.LASTMODIFIED_REVERSE );
+
+            Set<String> karafLogFileNames = Sets.newHashSet();
 
             for ( File karafLogFile : karafLogFiles )
             {
