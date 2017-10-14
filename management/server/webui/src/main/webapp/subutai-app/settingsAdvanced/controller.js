@@ -19,7 +19,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
     var vm = this;
     vm.config = {};
     vm.karafLogs = '';
-    vm.karafLogFile = '';
+    vm.karafLogFile = 'karaf.log';
     vm.karafLogFiles = [];
     vm.logLevel = 'all';
     vm.activeTab = "karaflogs";
