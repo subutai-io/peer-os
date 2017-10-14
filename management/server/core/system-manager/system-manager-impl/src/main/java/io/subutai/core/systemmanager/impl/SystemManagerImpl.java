@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
@@ -157,7 +158,7 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     @RolesAllowed( "System-Management|Read" )
-    public AdvancedSettings getAdvancedSettings()
+    public AdvancedSettings getAdvancedSettings( String logFile )
     {
         AdvancedSettingsPojo pojo = new AdvancedSettingsPojo();
 
@@ -166,7 +167,15 @@ public class SystemManagerImpl implements SystemManager
         {
             Path karafLogDirPath = Paths.get( System.getenv( "SUBUTAI_APP_DATA_PATH" ), "/data/log/" );
 
-            Path currentKarafLogFilePath = karafLogDirPath.resolve( "karaf.log" );
+            Path currentKarafLogFilePath;
+            if ( Strings.isNullOrEmpty( logFile ) )
+            {
+                currentKarafLogFilePath = karafLogDirPath.resolve( "karaf.log" );
+            }
+            else
+            {
+                currentKarafLogFilePath = karafLogDirPath.resolve( logFile );
+            }
 
             content = new String( Files.readAllBytes( currentKarafLogFilePath ) );
 
