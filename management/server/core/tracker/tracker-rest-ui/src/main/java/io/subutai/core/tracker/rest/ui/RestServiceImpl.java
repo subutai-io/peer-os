@@ -37,7 +37,7 @@ public class RestServiceImpl implements RestService
 
     private String prepareAsJson( Object t )
     {
-        return JsonUtil.toJson( t ).replace( "\n", "" ).replace( "\r", "" );
+        return JsonUtil.toJson( t ).replaceAll( "\n", "" ).replaceAll( "\r", "" ).replaceAll( "\t", "" );
     }
 
 
