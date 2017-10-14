@@ -1,12 +1,12 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
-import java.util.Set;
+import java.util.List;
 
 
 public interface AdvancedSettings
 {
     String getKarafLogs();
 
-    Set<String> getKarafLogFiles();
+    List<String> getKarafLogFiles();
 }

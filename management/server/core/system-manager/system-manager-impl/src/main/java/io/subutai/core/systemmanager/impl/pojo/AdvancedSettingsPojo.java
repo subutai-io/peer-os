@@ -1,9 +1,10 @@
 package io.subutai.core.systemmanager.impl.pojo;
 
 
-import java.util.Set;
+import java.util.List;
 
-import com.google.common.collect.Sets;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 
@@ -12,17 +13,19 @@ public class AdvancedSettingsPojo implements AdvancedSettings
 {
     private String karafLogs;
 
-    private Set<String> karafLogFiles = Sets.newHashSet();
+    private List<String> karafLogFiles = Lists.newArrayList();
 
 
-    public Set<String> getKarafLogFiles()
+    public List<String> getKarafLogFiles()
     {
         return karafLogFiles;
     }
 
 
-    public void setKarafLogFiles( final Set<String> karafLogFiles )
+    public void setKarafLogFiles( final List<String> karafLogFiles )
     {
+        Preconditions.checkNotNull( karafLogFiles );
+
         this.karafLogFiles = karafLogFiles;
     }
 
@@ -35,6 +38,8 @@ public class AdvancedSettingsPojo implements AdvancedSettings
 
     public void setKarafLogs( final String karafLogs )
     {
+        Preconditions.checkNotNull( karafLogs );
+
         this.karafLogs = karafLogs;
     }
 }

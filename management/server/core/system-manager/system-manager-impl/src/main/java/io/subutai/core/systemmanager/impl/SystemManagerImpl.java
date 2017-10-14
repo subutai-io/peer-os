@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -22,7 +21,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -196,7 +195,7 @@ public class SystemManagerImpl implements SystemManager
 
             Arrays.sort( karafLogFiles, LastModifiedFileComparator.LASTMODIFIED_REVERSE );
 
-            Set<String> karafLogFileNames = Sets.newHashSet();
+            List<String> karafLogFileNames = Lists.newArrayList();
 
             for ( File karafLogFile : karafLogFiles )
             {
