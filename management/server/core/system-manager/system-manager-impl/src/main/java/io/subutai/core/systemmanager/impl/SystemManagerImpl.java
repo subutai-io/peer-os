@@ -1,12 +1,16 @@
 package io.subutai.core.systemmanager.impl;
 
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -14,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -153,14 +159,38 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Read" )
     public AdvancedSettings getAdvancedSettings()
     {
-        AdvancedSettings pojo = new AdvancedSettingsPojo();
+        AdvancedSettingsPojo pojo = new AdvancedSettingsPojo();
 
         String content;
         try
         {
-            content = new String( Files.readAllBytes(
-                    Paths.get( System.getenv( "SUBUTAI_APP_DATA_PATH" ) + "/data/log/karaf.log" ) ) );
+            Path karafLogDirPath = Paths.get( System.getenv( "SUBUTAI_APP_DATA_PATH" ), "/data/log/" );
+
+            Path currentKarafLogFilePath = karafLogDirPath.resolve( "karaf.log" );
+
+            content = new String( Files.readAllBytes( currentKarafLogFilePath ) );
+
             pojo.setKarafLogs( content );
+
+            File[] karafLogFiles = karafLogDirPath.toFile().listFiles( new FileFilter()
+            {
+                @Override
+                public boolean accept( final File pathname )
+                {
+                    return pathname.isFile() && pathname.getName().startsWith( "karaf.log" );
+                }
+            } );
+
+            Set<String> karafLogFileNames = Sets.newHashSet();
+
+            assert karafLogFiles != null;
+
+            for ( File karafLogFile : karafLogFiles )
+            {
+                karafLogFileNames.add( karafLogFile.getName() );
+            }
+
+            pojo.setKarafLogFiles( karafLogFileNames );
         }
         catch ( IOException e )
         {
