@@ -285,7 +285,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         vm.currentLogTitle = '';
 
         if (vm.notificationsLogs[logId].log.length > 0) {
-            var logsArray = vm.notificationsLogs[logId].log.split(/(?:\r\n|\r|\n)/g);
+            var logsArray = atob(vm.notificationsLogs[logId].log).split("},");
             vm.currentLogTitle = vm.notificationsLogs[logId].description;
 
             var trim = vm.currentLogTitle.length > 70;
@@ -296,9 +296,12 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
             var logs = [];
             for (var i = 0; i < logsArray.length; i++) {
-                var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
-                currentLog.date = moment(currentLog.date).format('HH:mm:ss');
-                logs.push(currentLog);
+                var logCheck = logsArray[i].replace(/ /g,'');
+                if(logCheck.length > 0) {
+                    var currentLog = JSON.parse(logsArray[i] + "}");
+                    currentLog.date = moment(currentLog.date).format('HH:mm:ss');
+                    logs.push(currentLog);
+                }
             }
             vm.currentLog = logs;
 
