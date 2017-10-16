@@ -158,7 +158,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             .success(function (data) {
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].description.includes(environmentId)) {
-                        getLogById(data[i].id, true, undefined, environmentId);
+                        getLogById(data[i].id, environmentId);
                         break;
                     }
                 }
@@ -168,32 +168,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         });
     }
 
-    function checkLastLog(status, log) {
-        if (log === undefined || log === null) log = false;
-        if(vm.logMessages.length == 0) return;
-        var lastLog = vm.logMessages[vm.logMessages.length - 1];
-
-        if (log) {
-            var logObj = JSON.parse(log.substring(0, log.length - 1));
-            lastLog.time = moment(logObj.date).format('HH:mm:ss');
-        } else {
-            lastLog.time = moment().format('HH:mm:ss');
-        }
-
-        if (status === true) {
-            lastLog.status = 'success';
-            lastLog.classes = ['fa-check', 'g-text-green'];
-        } else {
-            lastLog.status = 'success';
-            lastLog.classes = ['fa-times', 'g-text-red'];
-        }
-    }
-
     var timeoutId;
 
-    function getLogById(id, checkLast, prevLogs, envId, isTimeout) {
-        if (checkLast === undefined || checkLast === null) checkLast = false;
-        if (prevLogs === undefined || prevLogs === null) prevLogs = false;
+    function getLogById(id, envId) {
+
+        clearTimeout(timeoutId);
 
         trackerSrv.getDownloadProgress(envId)
             .success(function (data) {
@@ -256,132 +235,63 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
         trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
             .success(function (data) {
-                if (data.state == 'RUNNING') {
 
-                    if (checkLast) {
-                        checkLastLog(true);
-                    }
+                  if(data.state == 'RUNNING') {
+                      timeoutId = setTimeout(function() {
+                          getLogById(id, envId);
+                      }, 2000);
+                  }
 
-                    var logs = data.log.split('},');
-                    var result = [];
-                    var i = 0;
-                    if (prevLogs) {
-                        i = prevLogs.length;
-                        if (logs.length > prevLogs.length) {
-                            checkLastLog(true);
-                        }
-                    }
-                    for (i; i < logs.length; i++) {
+                  var logs = atob(data.log).split('},');
+                  var result = [];
+                  for(var i = 0; i < logs.length; i++) {
 
-                        var logCheck = logs[i].replace(/ /g, '');
-                        if (logCheck.length > 0) {
+                      var logCheck = logs[i].replace(/ /g,'');
+                      if(logCheck.length > 0) {
+                          var logObj = JSON.parse(logs[i] + '}');
+                          var logTime = moment(logObj.date).format('HH:mm:ss');
 
-                            logs[i] = logs[i].replace(/(?:\r\n|\r|\n)/g , '');
-							var logObj = JSON.parse(logs[i] + '}');
-                            var logTime = moment(logObj.date).format('HH:mm:ss');
+                          var logStatus = 'success';
+                          var logClasses = ['fa-check', 'g-text-green'];
 
-                            var logStatus = 'success';
-                            var logClasses = ['fa-check', 'g-text-green'];
+                          if(i+2 == logs.length) {
+                              if(data.state == 'RUNNING') {
+                                  logTime = '';
+                                  logStatus = 'in-progress';
+                                  logClasses = ['fa-spinner', 'fa-pulse'];
+                              }else if(data.state == 'FAILED') {
+                                  logStatus = 'success';
+                                  logClasses = ['fa-times', 'g-text-red'];
+                              }else{
+                                  logStatus = 'success';
+                                  logClasses = ['fa-check', 'g-text-green'];
+                              }
+                          }
 
-                            if (i + 1 == logs.length) {
-                                logTime = '';
-                                logStatus = 'in-progress';
-                                logClasses = ['fa-spinner', 'fa-pulse'];
-                            }
+                          var  currentLog = {
+                              "time": logTime,
+                              "status": logStatus,
+                              "classes": logClasses,
+                              "log": logObj.log
+                          };
+                          result.push(currentLog);
 
-                            var currentLog = {
-                                "time": logTime,
-                                "status": logStatus,
-                                "classes": logClasses,
-                                "text": logObj.log
-                            };
-                            result.push(currentLog);
+                      }
+                  }
 
-                        }
-                    }
+                  if(data.state != 'RUNNING') {
+                      vm.buildCompleted = true;
+                      vm.isEditing = false;
+                  }
 
-                    clearTimeout(timeoutId);
+                  vm.logMessages =result;
 
-                    if( !isTimeout ){
-                        vm.logMessages = [];
-                    }
 
-                    vm.logMessages = vm.logMessages.concat(result);
-
-                    timeoutId = setTimeout(function () {
-                        getLogById(id, false, logs, envId, true);
-                    }, 2000);
-
-                    return result;
-                } else {
-                    if (data.state == 'FAILED') {
-
-                        checkLastLog(false);
-
-                        var logs = data.log.split(/(?:\r\n|\r|\n)/g);
-                        var result = [];
-                        var i = 0;
-                        if (prevLogs) {
-                            i = prevLogs.length;
-                            if (logs.length > prevLogs.length) {
-                                checkLastLog(true, logs[i - 1]);
-                            }
-                        }
-
-                        var logs = data.log.split(/(?:\r\n|\r|\n)/g);
-					    for (i; i < logs.length; i++) {
-
-                            var logCheck = logs[i].replace(/ /g, '');
-
-                            logs[i] = logs[i].replace(/(?:\r\n|\r|\n)/g , '');
-                            var logObj = JSON.parse(logsArray[i] + '}');
-                            var logTime = moment(logObj.date).format('HH:mm:ss');
-
-							var logStatus = 'success';
-							var logClasses = ['fa-check', 'g-text-green'];
-
-							if (i + 1 == logs.length) {
-								logStatus = 'failed';
-								logClasses = ['fa-times', 'g-text-red'];
-							}
-
-                            var currentLog = {
-                                "time": logTime,
-                                "status": logStatus,
-                                "classes": logClasses,
-                                "text": logObj.log
-                            };
-                            vm.logMessages.push(currentLog);
-                        }
-
-                    } else {
-
-                        if (prevLogs) {
-                            var logs = data.log.split(/(?:\r\n|\r|\n)/g);
-                            if (logs.length > prevLogs.length) {
-                                checkLastLog(true, logs[logs.length - 1]);
-                            }
-                        } else {
-                            checkLastLog(true);
-                        }
-                        var currentLog = {
-                            "time": moment().format('HH:mm:ss'),
-                            "status": 'success',
-                            "classes": ['fa-check', 'g-text-green'],
-                            "text": 'Operation has been performed successfully'
-                        };
-                        vm.logMessages.push(currentLog);
-                        vm.buildCompleted = true;
-                        vm.editingEnv = false;
-                        vm.isEditing = false;
-
-                    }
 
                     $('.js-download-progress').html('');
                     $rootScope.notificationsUpdate = 'getLogByIdAdv';
                     $scope.$emit('reloadEnvironmentsList');
                     clearWorkspace();
-                }
             }).error(function (error) {
             console.log(error);
         });
@@ -404,8 +314,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             .success(function (data) {
                 vm.newEnvID = data;
 
-                checkLastLog(true);
-
                 currentLog = {
                     "time": '',
                     "status": 'in-progress',
@@ -414,7 +322,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 };
                 vm.logMessages.push(currentLog);
 
-                getLogById(data.trackerId, true, undefined, data.environmentId);
+                getLogById(data.trackerId, data.environmentId);
                 initScrollbar();
 
                 $rootScope.notificationsUpdate = 'startEnvironmentAdvancedBuild';
@@ -424,7 +332,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             } else {
                 VARS_MODAL_ERROR(SweetAlert, 'Error: ' + error.ERROR);
             }
-            checkLastLog(false);
             $rootScope.notificationsUpdate = 'startEnvironmentAdvancedBuildError';
         });
         vm.environment2BuildName = '';
@@ -455,11 +362,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             "environmentId": vm.editingEnv.id,
             "changingContainers": quotaContainers
         };
-        environmentService.modifyEnvironment(conteiners, 'advanced')
+        environmentService.modifyEnvironment(containers, 'advanced')
             .success(function (data) {
                 vm.newEnvID = data;
 
-                getLogById(data, true, undefined, conteiners.environmentId);
+                getLogById(data, containers.environmentId);
                 initScrollbar();
                 $scope.$emit('reloadEnvironmentsList');
 
@@ -470,7 +377,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             } else {
                 VARS_MODAL_ERROR(SweetAlert, 'Error: ' + error.ERROR);
             }
-            checkLastLog(false);
             $scope.$emit('reloadEnvironmentsList');
 
             $rootScope.notificationsUpdate = 'modifyEnvironmentAdvError';
