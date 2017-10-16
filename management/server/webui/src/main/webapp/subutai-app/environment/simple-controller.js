@@ -230,7 +230,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						checkLastLog(true);
 					}
 
-					var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+					var logs = data.log.split('},');
 					var result = [];
 					var i = 0;
 					if (prevLogs) {
@@ -244,7 +244,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						var logCheck = logs[i].replace(/ /g, '');
 						if (logCheck.length > 0) {
 
-							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+                            logs[i] = logs[i].replace(/(?:\r\n|\r|\n)/g , '');
+							var logObj = JSON.parse(logs[i] + '}');
 							var logTime = moment(logObj.date).format('HH:mm:ss');
 
 							var logStatus = 'success';
@@ -299,8 +300,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					    for (i; i < logs.length; i++) {
 
                             var logCheck = logs[i].replace(/ /g, '');
-
-                            var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+                            logs[i] = logs[i].replace(/(?:\r\n|\r|\n)/g , '');
+                            var logObj = JSON.parse(logs[i] + '}');
                             var logTime = moment(logObj.date).format('HH:mm:ss');
 
 							var logStatus = 'success';

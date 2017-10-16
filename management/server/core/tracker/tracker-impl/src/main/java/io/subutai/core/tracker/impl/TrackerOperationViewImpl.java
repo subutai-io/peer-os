@@ -4,6 +4,8 @@ package io.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
+import org.apache.commons.net.util.Base64;
+
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.tracker.OperationState;
@@ -47,11 +49,12 @@ public class TrackerOperationViewImpl implements TrackerOperationView
 
         id = po.getId();
         description = po.getDescription();
-        log = po.getLog();
+        log = new String( Base64.encodeBase64( po.getLog().getBytes() ) );
         state = po.getState();
         createDate = po.createDate();
         source = po.getSource().toUpperCase();
     }
+
 
     @Override
     public String getDescription()
@@ -59,11 +62,13 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         return description;
     }
 
+
     @Override
     public Date getCreateDate()
     {
         return ( Date ) createDate.clone();
     }
+
 
     @Override
     public UUID getId()
@@ -71,17 +76,20 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         return id;
     }
 
+
     @Override
     public String getLog()
     {
         return log;
     }
 
+
     @Override
     public OperationState getState()
     {
         return state;
     }
+
 
     @Override
     public String getSource()
@@ -116,12 +124,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
     @Override
     public String toString()
     {
-        return "TrackerOperationViewImpl{" +
-                "id=" + id +
-                ", description='" + description + '\'' +
-                ", log='" + log + '\'' +
-                ", state=" + state +
-                ", createDate=" + createDate +
-                '}';
+        return "TrackerOperationViewImpl{" + "id=" + id + ", description='" + description + '\'' + ", log='" + log
+                + '\'' + ", state=" + state + ", createDate=" + createDate + '}';
     }
 }

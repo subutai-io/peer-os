@@ -135,7 +135,6 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 						checkLastLog(true);
 					}
 
-					//var logs = data.log.split(/(?:\r\n|\r|\n)/g);
 					var logs = data.log.split('},');
 					var result = [];
 					var i = 0;
@@ -149,8 +148,6 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 
 						var logCheck = logs[i].replace(/ /g,'');
 						if(logCheck.length > 0) {
-
-							//var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
 
 							logs[i] = logs[i].replace(/(?:\r\n|\r|\n)/g , '');
 							var logObj = JSON.parse(logs[i] + '}');

@@ -35,12 +35,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private String prepareAsJson( Object t )
-    {
-        return JsonUtil.toJson( t ).replaceAll( "\\\\n", "" ).replaceAll( "\\\\r", "" ).replaceAll( "\\\\t", "" );
-    }
-
-
     @Override
     public Response getTrackerOperation( final String source, final String uuid )
     {
@@ -52,7 +46,7 @@ public class RestServiceImpl implements RestService
 
             if ( trackerOperationView != null )
             {
-                return Response.ok().entity( prepareAsJson( trackerOperationView ) ).build();
+                return Response.ok().entity( trackerOperationView ).build();
             }
             else
             {
@@ -79,7 +73,7 @@ public class RestServiceImpl implements RestService
 
             List<TrackerOperationView> pos = tracker.getTrackerOperations( source, fromDat, toDat, limit );
 
-            return Response.ok().entity( prepareAsJson( pos ) ).build();
+            return Response.ok().entity( pos ).build();
         }
         catch ( ParseException e )
         {
@@ -101,7 +95,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( prepareAsJson( tracker.getNotifications() ) ).build();
+            return Response.ok( tracker.getNotifications() ).build();
         }
         catch ( Exception e )
         {
