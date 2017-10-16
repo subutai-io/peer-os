@@ -166,6 +166,12 @@ public class EnvironmentAdapter
             return;
         }
 
+        if ( env.getContainerHosts().size() == 1 )
+        {
+            throw new IllegalStateException(
+                    "Environment will have 0 containers after modification. Please, destroy environment instead" );
+        }
+
         try
         {
             EnvironmentContainerHost ch = env.getContainerHostById( containerId );
