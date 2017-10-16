@@ -46,7 +46,7 @@ public class RestServiceImpl implements RestService
 
             if ( trackerOperationView != null )
             {
-                return Response.ok().entity( trackerOperationView ).build();
+                return Response.ok().entity( JsonUtil.toJson( trackerOperationView ) ).build();
             }
             else
             {
@@ -73,7 +73,7 @@ public class RestServiceImpl implements RestService
 
             List<TrackerOperationView> pos = tracker.getTrackerOperations( source, fromDat, toDat, limit );
 
-            return Response.ok().entity( pos ).build();
+            return Response.ok().entity( JsonUtil.toJson( pos ) ).build();
         }
         catch ( ParseException e )
         {
@@ -95,7 +95,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( tracker.getNotifications() ).build();
+            return Response.ok( JsonUtil.toJson( tracker.getNotifications() ) ).build();
         }
         catch ( Exception e )
         {

@@ -22,9 +22,6 @@
     <jaxrs:serviceBeans>
       <ref component-id="trackerRestUIImpl" />
     </jaxrs:serviceBeans>
-    <jaxrs:providers>
-      <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
-    </jaxrs:providers>
   </jaxrs:server>
 
 </blueprint>
