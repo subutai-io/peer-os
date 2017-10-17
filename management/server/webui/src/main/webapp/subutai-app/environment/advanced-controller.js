@@ -279,19 +279,17 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                       }
                   }
 
+``                  vm.logMessages =result;
+
                   if(data.state != 'RUNNING') {
                       vm.buildCompleted = true;
                       vm.isEditing = false;
+
+                      $('.js-download-progress').html('');
+                      $rootScope.notificationsUpdate = 'getLogByIdAdv';
+                      $scope.$emit('reloadEnvironmentsList');
+                      clearWorkspace();
                   }
-
-                  vm.logMessages =result;
-
-
-
-                    $('.js-download-progress').html('');
-                    $rootScope.notificationsUpdate = 'getLogByIdAdv';
-                    $scope.$emit('reloadEnvironmentsList');
-                    clearWorkspace();
             }).error(function (error) {
             console.log(error);
         });
@@ -306,7 +304,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             "time": '',
             "status": 'in-progress',
             "classes": ['fa-spinner', 'fa-pulse'],
-            "text": 'Registering environment'
+            "log": 'Registering environment'
         };
         vm.logMessages.push(currentLog);
 
@@ -318,7 +316,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     "time": '',
                     "status": 'in-progress',
                     "classes": ['fa-spinner', 'fa-pulse'],
-                    "text": 'Environment creation has been started'
+                    "log": 'Environment creation has been started'
                 };
                 vm.logMessages.push(currentLog);
 
@@ -346,7 +344,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             "time": '',
             "status": 'in-progress',
             "classes": ['fa-spinner', 'fa-pulse'],
-            "text": 'Environment changing has been started'
+            "log": 'Environment modification has been started'
         };
         vm.logMessages.push(currentLog);
 

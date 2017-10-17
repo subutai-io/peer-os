@@ -247,17 +247,17 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                         }
                     }
 
+                    vm.logMessages = result;
+
                     if(data.state != 'RUNNING') {
                         vm.buildCompleted = true;
                         vm.isEditing = false;
+
+                        $('.js-download-progress').html('');
+                        $rootScope.notificationsUpdate = 'getLogById';
+                        $scope.$emit('reloadEnvironmentsList');
+                        clearWorkspace();
                     }
-
-                    vm.logMessages =result;
-
-					$('.js-download-progress').html('');
-					$rootScope.notificationsUpdate = 'getLogById';
-					$scope.$emit('reloadEnvironmentsList');
-					clearWorkspace();
 			}).error(function (error) {
 				console.log(error);
 			});
@@ -288,7 +288,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					"time": '',
 					"status": 'in-progress',
 					"classes": ['fa-spinner', 'fa-pulse'],
-					"text": 'Environment creation has been started'
+					"log": 'Environment creation has been started'
 				};
 				vm.logMessages.push(currentLog);
 
@@ -420,7 +420,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			"time": '',
 			"status": 'in-progress',
 			"classes": ['fa-spinner', 'fa-pulse'],
-			"text": 'Applying your changes...'
+			"log": 'Environment modification has been started'
 		};
 		vm.logMessages.push(currentLog);
 
