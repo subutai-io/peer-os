@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 
-import io.subutai.common.mdc.SubutaiExecutors;
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.core.identity.api.IdentityManager;
@@ -41,7 +43,7 @@ public class KarafManagerImpl implements KarafManager
 
 
     private CommandProcessor commandProcessor = null;
-    protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
+    private ExecutorService executor = Executors.newCachedThreadPool();
 
 
     /* ***********************************************
@@ -53,7 +55,7 @@ public class KarafManagerImpl implements KarafManager
     @Override
     public String executeShellCommand( final String commandStr )
     {
-        String response = "";
+        StringBuilder response = new StringBuilder();
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final PrintStream printStream = new PrintStream( byteArrayOutputStream );
         final CommandSession commandSession = commandProcessor.createSession( System.in, printStream, System.err );
@@ -87,18 +89,18 @@ public class KarafManagerImpl implements KarafManager
 
             do
             {
-                response += commandFuture.get( Common.DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC, TimeUnit.SECONDS );
+                response.append( commandFuture.get( Common.DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC, TimeUnit.SECONDS ) );
             }
             while ( !commandFuture.isDone() );
         }
         catch ( Exception e )
         {
-            response += "Command Timeout: ";
+            response.append( "Command Timeout: " );
 
-            response += byteArrayOutputStream.toString();
+            response.append( byteArrayOutputStream.toString() );
         }
 
-        return response.replaceAll( "\u001B\\[[;\\d]*m", "" );
+        return response.toString().replaceAll( "\u001B\\[[;\\d]*m", "" );
     }
 
 
@@ -139,14 +141,10 @@ public class KarafManagerImpl implements KarafManager
     }
 
 
-    public CommandProcessor getCommandProcessor()
+    public KarafManagerImpl( final CommandProcessor commandProcessor )
     {
-        return commandProcessor;
-    }
+        Preconditions.checkNotNull( commandProcessor );
 
-
-    public void setCommandProcessor( final CommandProcessor commandProcessor )
-    {
         this.commandProcessor = commandProcessor;
     }
 }
