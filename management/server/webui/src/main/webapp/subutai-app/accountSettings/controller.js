@@ -69,7 +69,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	identitySrv.isAdminCheck().success(function (data) {
 		if (data == true || data == 'true') {
 			identitySrv.isUpdateInProgress().success(function (data){
-				console.log("Update in progress: " + data);
+
 				 if (data == true || data == 'true') {
 					removeUpdateMessage();
 				 }else{

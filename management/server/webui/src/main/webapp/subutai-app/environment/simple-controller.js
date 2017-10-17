@@ -127,7 +127,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			.success(function (data) {
 				for (var i = 0; i < data.length; i++) {
 					if (data[i].description.includes(environmentId)) {
-						getLogById(data[i].id, true, undefined, environmentId);
+						getLogById(data[i].id, environmentId);
 						break;
 					}
 				}
@@ -139,32 +139,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	var timezone = new Date().getTimezoneOffset();
 
-	function checkLastLog(status, log) {
-		if (log === undefined || log === null) log = false;
-		if(vm.logMessages.length == 0) return;
-		var lastLog = vm.logMessages[vm.logMessages.length - 1];
-
-		if (log) {
-			var logObj = JSON.parse(log.substring(0, log.length - 1));
-			lastLog.time = moment(logObj.date).format('HH:mm:ss');
-		} else {
-			lastLog.time = moment().format('HH:mm:ss');
-		}
-
-		if (status === true) {
-			lastLog.status = 'success';
-			lastLog.classes = ['fa-check', 'g-text-green'];
-		} else {
-			lastLog.status = 'success';
-			lastLog.classes = ['fa-times', 'g-text-red'];
-		}
-	}
-
     var timeoutId;
 
-	function getLogById(id, checkLast, prevLogs, envId, isTimeout) {
-		if (checkLast === undefined || checkLast === null) checkLast = false;
-		if (prevLogs === undefined || prevLogs === null) prevLogs = false;
+	function getLogById(id, envId) {
+
+        clearTimeout(timeoutId);
 
 		trackerSrv.getDownloadProgress(envId)
 			.success(function (data) {
@@ -224,127 +203,61 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 		trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
 			.success(function (data) {
-				if (data.state == 'RUNNING') {
 
-					if (checkLast) {
-						checkLastLog(true);
-					}
-
-					var logs = data.log.split(/(?:\r\n|\r|\n)/g);
-					var result = [];
-					var i = 0;
-					if (prevLogs) {
-						i = prevLogs.length;
-						if (logs.length > prevLogs.length) {
-							checkLastLog(true, logs[i - 1]);
-						}
-					}
-					for (i; i < logs.length; i++) {
-
-						var logCheck = logs[i].replace(/ /g, '');
-						if (logCheck.length > 0) {
-
-							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
-							var logTime = moment(logObj.date).format('HH:mm:ss');
-
-							var logStatus = 'success';
-							var logClasses = ['fa-check', 'g-text-green'];
-
-							if (i + 1 == logs.length) {
-								logTime = '';
-								logStatus = 'in-progress';
-								logClasses = ['fa-spinner', 'fa-pulse'];
-							}
-
-							var currentLog = {
-								"time": logTime,
-								"status": logStatus,
-								"classes": logClasses,
-								"text": logObj.log
-							};
-							result.push(currentLog);
-
-						}
-					}
-
-                    clearTimeout(timeoutId);
-
-                    if( !isTimeout ){
-                        vm.logMessages = [];
+                    if(data.state == 'RUNNING') {
+                        timeoutId = setTimeout(function() {
+                            getLogById(id, envId);
+                        }, 2000);
                     }
 
-                    vm.logMessages = vm.logMessages.concat(result);
+                    var logs = atob(data.log).split('},');
+                    var result = [];
+                    for(var i = 0; i < logs.length; i++) {
 
-                    timeoutId = setTimeout(function(){
-                        getLogById(id, false, logs, envId, true);
-                    }, 2000);
-
-					return result;
-				} else {
-					if (data.state == 'FAILED') {
-
-                        checkLastLog(false);
-
-                        var logs = data.log.split(/(?:\r\n|\r|\n)/g);
-                        var result = [];
-                        var i = 0;
-                        if (prevLogs) {
-                            i = prevLogs.length;
-                            if (logs.length > prevLogs.length) {
-                                checkLastLog(true, logs[i - 1]);
-                            }
-                        }
-
-                        var logs = data.log.split(/(?:\r\n|\r|\n)/g);
-					    for (i; i < logs.length; i++) {
-
-                            var logCheck = logs[i].replace(/ /g, '');
-
-                            var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+                        var logCheck = logs[i].replace(/ /g,'');
+                        if(logCheck.length > 0) {
+                            var logObj = JSON.parse(logs[i] + '}');
                             var logTime = moment(logObj.date).format('HH:mm:ss');
 
-							var logStatus = 'success';
-							var logClasses = ['fa-check', 'g-text-green'];
+                            var logStatus = 'success';
+                            var logClasses = ['fa-check', 'g-text-green'];
 
-							if (i + 1 == logs.length) {
-								logStatus = 'failed';
-								logClasses = ['fa-times', 'g-text-red'];
-							}
+                            if(i+2 == logs.length) {
+                                if(data.state == 'RUNNING') {
+                                    logTime = '';
+                                    logStatus = 'in-progress';
+                                    logClasses = ['fa-spinner', 'fa-pulse'];
+                                }else if(data.state == 'FAILED') {
+                                    logStatus = 'success';
+                                    logClasses = ['fa-times', 'g-text-red'];
+                                }else{
+                                    logStatus = 'success';
+                                    logClasses = ['fa-check', 'g-text-green'];
+                                }
+                            }
 
-                            var currentLog = {
+                            var  currentLog = {
                                 "time": logTime,
                                 "status": logStatus,
                                 "classes": logClasses,
-                                "text": logObj.log
+                                "log": logObj.log
                             };
-                            vm.logMessages.push(currentLog);
+                            result.push(currentLog);
+
                         }
+                    }
 
-					} else {
-						if (prevLogs) {
-							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
-							if (logs.length > prevLogs.length) {
-								checkLastLog(true, logs[logs.length - 1]);
-							}
-						} else {
-							checkLastLog(true);
-						}
-						var currentLog = {
-							"time": moment().format('HH:mm:ss'),
-							"status": 'success',
-							"classes": ['fa-check', 'g-text-green'],
-							"text": 'Operation has been performed successfully'
-						};
-						vm.logMessages.push(currentLog);
-						vm.buildCompleted = true;
-						vm.isEditing = false;
-					}
+                    vm.logMessages = result;
 
-					$('.js-download-progress').html('');
-					$rootScope.notificationsUpdate = 'getLogById';
-					$scope.$emit('reloadEnvironmentsList');
-					clearWorkspace();
-				}
+                    if(data.state != 'RUNNING') {
+                        vm.buildCompleted = true;
+                        vm.isEditing = false;
+
+                        $('.js-download-progress').html('');
+                        $rootScope.notificationsUpdate = 'getLogById';
+                        $scope.$emit('reloadEnvironmentsList');
+                        clearWorkspace();
+                    }
 			}).error(function (error) {
 				console.log(error);
 			});
@@ -360,7 +273,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			"time": '',
 			"status": 'in-progress',
 			"classes": ['fa-spinner', 'fa-pulse'],
-			"text": 'Registering environment'
+			"log": 'Registering environment'
 		};
 		vm.logMessages.push(currentLog);
 
@@ -375,11 +288,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					"time": '',
 					"status": 'in-progress',
 					"classes": ['fa-spinner', 'fa-pulse'],
-					"text": 'Environment creation has been started'
+					"log": 'Environment creation has been started'
 				};
 				vm.logMessages.push(currentLog);
 
-				getLogById(data.trackerId, true, undefined, data.environmentId);
+				getLogById(data.trackerId, data.environmentId);
 				initScrollbar();
 
 				$rootScope.notificationsUpdate = 'buildEnvironment';
@@ -507,7 +420,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			"time": '',
 			"status": 'in-progress',
 			"classes": ['fa-spinner', 'fa-pulse'],
-			"text": 'Applying your changes...'
+			"log": 'Environment modification has been started'
 		};
 		vm.logMessages.push(currentLog);
 
@@ -516,7 +429,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			clearWorkspace();
 			vm.isApplyingChanges = false;
 
-			getLogById(data, true, undefined, vm.currentEnvironment.modificationData.environmentId);
+			getLogById(data, vm.currentEnvironment.modificationData.environmentId);
 			initScrollbar();
 			$rootScope.notificationsUpdate = 'modifyEnvironment';
 		}).error(function (error) {
@@ -528,7 +441,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			vm.currentEnvironment.modifyStatus = 'error';
 			clearWorkspace();
 			vm.isApplyingChanges = false;
-			checkLastLog(false);
 			$rootScope.notificationsUpdate = 'modifyEnvironmentError';
 		});
 	}
