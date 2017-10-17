@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.subutai.hub.share.dto.PublicKeyContainer;
 import io.subutai.hub.share.dto.UserTokenDto;
+import io.subutai.hub.share.dto.ansible.AnsibleDto;
 
 
 public class EnvironmentPeerDto
@@ -61,6 +62,8 @@ public class EnvironmentPeerDto
     private String playbook;
 
     private String kurjunToken;
+
+    private AnsibleDto ansibleDto;
 
 
     public EnvironmentPeerDto()
@@ -121,13 +124,18 @@ public class EnvironmentPeerDto
         this.ownerId = ownerId;
     }
 
-    public Long getSsUserId() {
+
+    public Long getSsUserId()
+    {
         return ssUserId;
     }
 
-    public void setSsUserId(Long ssUserId) {
+
+    public void setSsUserId( Long ssUserId )
+    {
         this.ssUserId = ssUserId;
     }
+
 
     public Set<String> getP2pSubnets()
     {
@@ -351,11 +359,21 @@ public class EnvironmentPeerDto
     }
 
 
+    public AnsibleDto getAnsibleDto()
+    {
+        return ansibleDto;
+    }
+
+
+    public void setAnsibleDto( final AnsibleDto ansibleDto )
+    {
+        this.ansibleDto = ansibleDto;
+    }
+
+
     public void setError( String message )
     {
         setState( PeerState.ERROR );
         setMessage( message );
     }
-
-
 }

@@ -1,9 +1,8 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -14,11 +13,16 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
+import io.subutai.hub.share.dto.ansible.AnsibleDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 
 public class ConfigureEnvironmentStateHandler extends StateHandler
 {
+
+    private static final String ANSIBLE_LINK = "/rest/v1/environments/%s/ansible";
+    private static final String TMP_DIR = "/tmp/";
+
     private final CommandUtil commandUtil = new CommandUtil();
 
 
@@ -31,62 +35,124 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws HubManagerException
     {
-        try
+
+        logStart();
+
+        AnsibleDto ansibleDto = peerDto.getAnsibleDto();
+
+        if ( ansibleDto != null )
         {
-            logStart();
-
-            Object result = configure( peerDto );
-
-            logEnd();
-
-            return result;
+            startConfigureation( ansibleDto, peerDto );
         }
-        catch ( Exception e )
-        {
-            throw new HubManagerException( e );
-        }
-    }
 
-
-    private Object configure( final EnvironmentPeerDto peerDto )
-    {
-
-        if ( StringUtils.isNotEmpty( peerDto.getAnsible() ) && StringUtils.isNotEmpty( peerDto.getPlaybook() ) )
-        {
-            try
-            {
-                runPlaybook( peerDto.getAnsible(), peerDto.getPlaybook() );
-            }
-            catch ( HostNotFoundException ignore )
-            {
-                //ignore: skipping due to ansible container absence
-            }
-            catch ( CommandException ce )
-            {
-                peerDto.setError( ce.getMessage() );
-            }
-        }
-        else
-        {
-            peerDto.setMessage( "Skipping. Ansible settings is empty." );
-        }
+        logEnd();
 
         return peerDto;
     }
 
 
-    private String runPlaybook( String containerId, String playbook ) throws HostNotFoundException, CommandException
+    private void startConfigureation( AnsibleDto ansibleDto, EnvironmentPeerDto peerDto )
+    {
+        String containerId = ansibleDto.getAnsibleContainerId();
+        String repoLink = ansibleDto.getRepoLink();
+        String mainAnsibleScript = ansibleDto.getAnsibleRootFile();
+
+        prepareHostsFile( containerId, ansibleDto.getHosts() );
+
+        copyRepoUnpack( containerId, repoLink );
+
+        String out = runAnsibleScript( containerId, getDirLocation( repoLink ), mainAnsibleScript );
+
+        peerDto.getAnsibleDto().setLogs( out );
+    }
+
+
+    private String runAnsibleScript( final String containerId, final String dirLocation,
+                                     final String mainAnsibleScript )
+    {
+        String cmd = String.format( "cd %s; ansible-playbook  %s  -e 'ansible_python_interpreter=/usr/bin/python3' ",
+                TMP_DIR + dirLocation, mainAnsibleScript );
+        try
+        {
+            return runCmd( containerId, cmd );
+        }
+        catch ( HostNotFoundException e )
+        {
+            e.printStackTrace();
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+
+    private String getDirLocation( String repoLink )
+    {
+        repoLink = repoLink.replaceAll( "https://github.com/", "" );
+        repoLink = repoLink.replaceAll( "/archive/", "-" );
+        repoLink = repoLink.replaceAll( ".zip", "" );
+        return repoLink.split( "/" )[1];
+    }
+
+
+    private void copyRepoUnpack( final String containerId, final String repoLink )
+    {
+        String cmd = String.format( "cd %s; bash /root/get_unzip.sh %s", TMP_DIR, repoLink );
+
+        try
+        {
+            runCmd( containerId, cmd );
+        }
+        catch ( HostNotFoundException e )
+        {
+            e.printStackTrace();
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void prepareHostsFile( final String containerId, Set<io.subutai.hub.share.dto.ansible.Host> hosts )
+    {
+        for ( io.subutai.hub.share.dto.ansible.Host host : hosts )
+
+        {
+            try
+            {
+                runCmd( containerId, String.format( "echo %s >> /etc/ansible/hosts", format( host ).trim() ) );
+            }
+            catch ( HostNotFoundException e )
+            {
+                e.printStackTrace();
+            }
+            catch ( CommandException e )
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private static String format( io.subutai.hub.share.dto.ansible.Host host )
+    {
+        String f = "%s ansible_user=%s template=%s ansible_ssh_host=%s";
+        return String.format( f, host.getHostname(), host.getAnsibleUser(), host.getTemplateName(), host.getIp() );
+    }
+
+
+    private String runCmd( String containerId, String cmd ) throws HostNotFoundException, CommandException
     {
         CommandResult result;
 
         Host host = ctx.localPeer.getContainerHostById( containerId );
-        final String command = String.format( "cd /root/playbooks/%s && ansible-playbook site.yaml", playbook );
-
-        RequestBuilder rb = new RequestBuilder( command );
+        RequestBuilder rb = new RequestBuilder( cmd );
         rb.withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( 5 ) );
-
         result = commandUtil.execute( rb, host );
-
 
         return result.getStdOut();
     }

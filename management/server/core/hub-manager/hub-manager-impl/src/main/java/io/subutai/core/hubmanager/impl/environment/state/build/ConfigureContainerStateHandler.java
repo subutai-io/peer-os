@@ -45,8 +45,7 @@ public class ConfigureContainerStateHandler extends StateHandler
         {
             logStart();
 
-            EnvironmentDto envDto =
-                    ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
+            EnvironmentDto envDto =ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
             peerDto = configureSsh( peerDto, envDto );
 
