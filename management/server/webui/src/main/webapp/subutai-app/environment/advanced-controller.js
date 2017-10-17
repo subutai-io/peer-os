@@ -279,7 +279,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                       }
                   }
 
-``                  vm.logMessages =result;
+                  vm.logMessages =result;
 
                   if(data.state != 'RUNNING') {
                       vm.buildCompleted = true;
