@@ -139,13 +139,13 @@ public class TrackerOperationImpl implements TrackerOperation
 
         if ( !Strings.isNullOrEmpty( logString ) )
         {
-
             if ( log.length() > 0 )
             {
                 log.append( "\n" );
             }
             log.append( String.format( "{\"date\" : %s, \"log\" : \"%s\", \"state\" : \"%s\"},",
-                    new Timestamp( System.currentTimeMillis() ).getTime(), logString.replace( "\"", "\\\"" ), state ) );
+                    new Timestamp( System.currentTimeMillis() ).getTime(),
+                    logString.replaceAll( "\"", "\\\"" ).replaceAll( "\\{", "(" ).replaceAll( "}", ")" ), state ) );
         }
         this.state = state;
         tracker.saveTrackerOperation( source, this );

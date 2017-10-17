@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.junit.Test;
 
+import io.subutai.common.serialize.Base64Util;
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.util.UUIDUtil;
 
@@ -171,7 +172,7 @@ public class TrackerOperationImplTest
 
         assertEquals( poi.getId(), povi.getId() );
         assertEquals( poi.createDate(), povi.getCreateDate() );
-        assertEquals( poi.getLog(), povi.getLog() );
+        assertEquals( Base64Util.toBase64( poi.getLog() ), povi.getLog() );
         assertEquals( poi.getDescription(), povi.getDescription() );
         assertEquals( poi.getState(), povi.getState() );
     }

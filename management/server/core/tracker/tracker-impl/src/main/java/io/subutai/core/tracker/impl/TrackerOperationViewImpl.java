@@ -4,10 +4,9 @@ package io.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
-import org.apache.commons.net.util.Base64;
-
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.serialize.Base64Util;
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.tracker.TrackerOperationView;
@@ -49,7 +48,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
 
         id = po.getId();
         description = po.getDescription();
-        log = new String( Base64.encodeBase64( po.getLog().getBytes() ) );
+        log = Base64Util.toBase64( po.getLog() );
         state = po.getState();
         createDate = po.createDate();
         source = po.getSource().toUpperCase();
