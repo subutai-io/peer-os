@@ -213,7 +213,7 @@ public class MonitorImpl implements Monitor, HostListener
         }
         catch ( CommandException e )
         {
-            LOG.error( "Could not run command successfully! Error: {}", e );
+            LOG.error( "Could not run command successfully! Error: {}", e.getMessage() );
         }
         catch ( HostNotFoundException e )
         {
@@ -526,7 +526,7 @@ public class MonitorImpl implements Monitor, HostListener
         }
         catch ( Exception e )
         {
-            LOG.error( "Could not run command successfully! Error: {}", e );
+            LOG.error( "Could not run command successfully! Error: {}", e.getMessage() );
         }
 
 
