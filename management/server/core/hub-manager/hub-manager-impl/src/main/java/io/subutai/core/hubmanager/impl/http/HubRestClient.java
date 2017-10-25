@@ -150,8 +150,10 @@ public class HubRestClient implements RestClient
                 restResult.setReasonPhrase( response.getStatusInfo().getReasonPhrase() );
             }
 
-            if ( StringUtils.indexOfAny( ExceptionUtils.getStackTrace( e ),
-                    new String[] { "UnknownHostException", "SocketException", "SocketTimeoutException" } ) > -1 )
+            if ( StringUtils.indexOfAny( ExceptionUtils.getStackTrace( e ), new String[] {
+                    "ConnectException", "UnknownHostException", "BindException", "ConnectException",
+                    "NoRouteToHostException", "PortUnreachableException", "SocketTimeoutException"
+            } ) > -1 )
             {
                 restResult.setError( CONNECTION_EXCEPTION_MARKER );
             }
