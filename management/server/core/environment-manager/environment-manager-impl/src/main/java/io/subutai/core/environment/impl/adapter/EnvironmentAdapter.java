@@ -76,7 +76,7 @@ public class EnvironmentAdapter
         }
         catch ( ActionFailedException e )
         {
-            log.error( e.getMessage() );
+            log.warn( e.getMessage() );
         }
 
         return null;
