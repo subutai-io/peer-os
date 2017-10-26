@@ -171,6 +171,18 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
+    /**
+     * Performs http request to Hub to check if the local peer is registered with it
+     */
+    private boolean isRegisteredWithHub()
+    {
+        RestResult<String> restResult =
+                restClient.getPlain( String.format( "/rest/v1/peers/%s/register/check", peerId ), String.class );
+
+        return restResult.getStatus() == HttpStatus.SC_OK;
+    }
+
+
     private synchronized void doHeartbeat() throws HubManagerException
     {
         log.info( "Heartbeat - START" );
@@ -194,10 +206,11 @@ public class HeartbeatProcessor implements Runnable
 
             if ( !restResult.isSuccess() )
             {
-                //TODO here we need to use a dedicated http code for letting know that peer is not registered with Hub
-                //otherwise it gets unregistered for any auth error
-                if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
+                if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN && !isRegisteredWithHub() )
                 {
+                    log.warn( "Local peer {} is not registered with Hub, deleting registration record from db",
+                            peerId );
+
                     hubManager.getConfigDataService().deleteConfig( peerId );
                 }
                 else
