@@ -95,6 +95,7 @@
 	background: white;
 	-webkit-animation: ngdialog-fadein 0.5s;
 	animation: ngdialog-fadein 0.5s;
+	max-width: 60%;
 	/*position: absolute;
 	top: 50%;
 	left: 50%;
