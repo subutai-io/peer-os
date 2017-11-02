@@ -125,6 +125,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Transient
     protected int numberOfCpuCores = -1;
+    private String rhVersion = null;
+    private String p2pVersion = null;
 
 
     protected ResourceHostEntity()
@@ -1019,11 +1021,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            return commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+            rhVersion = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+            return rhVersion;
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( String.format( "Error obtaining RH version: %s", e.getMessage() ), e );
+            if ( rhVersion == null )
+            {
+                throw new ResourceHostException( String.format( "Error obtaining RH version: %s", e.getMessage() ), e );
+            }
+            else
+            {
+                LOG.error( "Error obtaining RH version", e );
+                return rhVersion;
+            }
         }
     }
 
@@ -1033,11 +1044,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            return getNetworkManager().getP2pVersion( this );
+            p2pVersion = getNetworkManager().getP2pVersion( this );
+            return p2pVersion;
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( String.format( "Error obtaining P2P version: %s", e.getMessage() ), e );
+            if ( p2pVersion == null )
+            {
+                throw new ResourceHostException( String.format( "Error obtaining P2P version: %s", e.getMessage() ),
+                        e );
+            }
+            else
+            {
+                LOG.error( "Error obtaining P2P version", e );
+                return p2pVersion;
+            }
         }
     }
 

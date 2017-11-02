@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
+import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -89,9 +90,17 @@ public class SystemManagerImpl implements SystemManager
         }
         catch ( HostNotFoundException | ResourceHostException e )
         {
-            LOG.warn( e.getMessage() );
+            LOG.error( "Error getting RH/P2P versions: {}", e.getMessage() );
 
-            pojo.setRhVersion( "No RH connected" );
+            if ( StringUtils.isBlank( pojo.getRhVersion() ) )
+            {
+                pojo.setRhVersion( "Failed to obtain version" );
+            }
+
+            if ( StringUtils.isBlank( pojo.getP2pVersion() ) )
+            {
+                pojo.setP2pVersion( "Failed to obtain version" );
+            }
 
             return pojo;
         }
