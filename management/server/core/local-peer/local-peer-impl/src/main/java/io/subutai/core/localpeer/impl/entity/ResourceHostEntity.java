@@ -1026,13 +1026,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
+            LOG.error( "Error obtaining RH version: {}", e.getMessage() );
+
             if ( rhVersion == null )
             {
                 throw new ResourceHostException( String.format( "Error obtaining RH version: %s", e.getMessage() ), e );
             }
             else
             {
-                LOG.error( "Error obtaining RH version", e );
                 return rhVersion;
             }
         }
@@ -1049,6 +1050,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( NetworkManagerException e )
         {
+            LOG.error( "Error obtaining P2P version: {}", e.getMessage() );
+
             if ( p2pVersion == null )
             {
                 throw new ResourceHostException( String.format( "Error obtaining P2P version: %s", e.getMessage() ),
@@ -1056,7 +1059,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             else
             {
-                LOG.error( "Error obtaining P2P version", e );
                 return p2pVersion;
             }
         }
