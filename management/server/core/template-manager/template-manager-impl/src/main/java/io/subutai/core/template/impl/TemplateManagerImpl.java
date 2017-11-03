@@ -41,9 +41,9 @@ public class TemplateManagerImpl implements TemplateManager
             Common.LOCAL_KURJUN_BASE_URL + "/template/info?owner=%s&token=%s";
     private static final String GORJUN_GET_VERIFIED_TEMPLATE_URL =
             Common.LOCAL_KURJUN_BASE_URL + "/template/info?name=%s&verified=true";
-    private static final int TEMPLATE_CACHE_TTL_SEC = 30;
+    private static final int TEMPLATE_CACHE_TTL_SEC = 60;
     private static final int HIT_CACHE_IF_ERROR_INTERVAL_SEC = 30;
-    private Set<Template> templatesCache = Sets.newHashSet();
+    private Set<Template> templatesCache = Sets.newConcurrentHashSet();
     private volatile long lastTemplatesFetchTime = 0L;
     private volatile long lastTemplatesFetchErrorTime = 0L;
     private final ReentrantLock lock = new ReentrantLock( true );
@@ -88,15 +88,20 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    @Override
-    public Set<Template> getTemplates( String kurjunToken )
+    private boolean needToUpdateCache()
     {
-        boolean needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
+        return templatesCache.isEmpty() || System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
                 .toMillis( TEMPLATE_CACHE_TTL_SEC )
                 && System.currentTimeMillis() - lastTemplatesFetchErrorTime > TimeUnit.SECONDS
                 .toMillis( HIT_CACHE_IF_ERROR_INTERVAL_SEC );
+    }
 
-        if ( !needToUpdate )
+
+    @Override
+    public Set<Template> getTemplates( String kurjunToken )
+    {
+
+        if ( !needToUpdateCache() )
         {
             return templatesCache;
         }
@@ -106,12 +111,7 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             //check again just in case
-            needToUpdate = System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
-                    .toMillis( TEMPLATE_CACHE_TTL_SEC )
-                    && System.currentTimeMillis() - lastTemplatesFetchErrorTime > TimeUnit.SECONDS
-                    .toMillis( HIT_CACHE_IF_ERROR_INTERVAL_SEC );
-
-            if ( !needToUpdate )
+            if ( !needToUpdateCache() )
             {
                 return templatesCache;
             }
