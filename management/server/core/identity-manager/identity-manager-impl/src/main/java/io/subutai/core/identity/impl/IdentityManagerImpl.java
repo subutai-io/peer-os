@@ -1285,9 +1285,11 @@ public class IdentityManagerImpl implements IdentityManager
         isValidPassword( userName, password );
         isValidEmail( email );
 
-        if ( identityDataService.getUserByUsername( userName ) != null )
+        User existingUser = identityDataService.getUserByUsername( userName );
+
+        if (  existingUser != null )
         {
-            throw new IllegalArgumentException( String.format( "User with name %s already exists", userName ) );
+            return existingUser;
         }
 
         try
