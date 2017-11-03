@@ -21,6 +21,7 @@ import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.exception.UserExistsException;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
@@ -187,7 +188,7 @@ public class EnvironmentUserHelper
 
             return user;
         }
-        catch ( EntityExistsException e )
+        catch ( UserExistsException e )
         {
             User existingUser = identityManager.getUserByUsername( userDto.getFingerprint() );
             if ( existingUser != null )

@@ -69,6 +69,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.SecurityController;
 import io.subutai.core.identity.api.SessionManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.exception.UserExistsException;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
@@ -1264,7 +1265,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
                             boolean generateKeyPair, boolean createUserDelegate )
-            throws SystemSecurityException, EntityExistsException
+            throws SystemSecurityException, UserExistsException
     {
         User user = new UserEntity();
 
@@ -1290,7 +1291,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( identityDataService.getUserByUsername( userName ) != null )
         {
-            throw new EntityExistsException( String.format( "User with name %s already exists", userName ) );
+            throw new UserExistsException( String.format( "User with name %s already exists", userName ) );
         }
 
         try
