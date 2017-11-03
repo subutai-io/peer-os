@@ -3,8 +3,6 @@ package io.subutai.core.hubmanager.impl.util;
 
 import java.io.IOException;
 
-import javax.persistence.EntityExistsException;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,11 +188,7 @@ public class EnvironmentUserHelper
         }
         catch ( UserExistsException e )
         {
-            User existingUser = identityManager.getUserByUsername( userDto.getFingerprint() );
-            if ( existingUser != null )
-            {
-                return existingUser;
-            }
+            return identityManager.getUserByUsername( userDto.getFingerprint() );
         }
         catch ( Exception e )
         {
