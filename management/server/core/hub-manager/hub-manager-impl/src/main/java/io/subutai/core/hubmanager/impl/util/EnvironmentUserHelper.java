@@ -3,6 +3,8 @@ package io.subutai.core.hubmanager.impl.util;
 
 import java.io.IOException;
 
+import javax.persistence.EntityExistsException;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.exception.UserExistsException;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
@@ -132,7 +135,7 @@ public class EnvironmentUserHelper
 
         UserDto userDto = getUserDataFromHub( envOwnerId );
 
-        return createUser( userDto );
+        return getOrCreateUser( userDto );
     }
 
 
@@ -165,7 +168,7 @@ public class EnvironmentUserHelper
     }
 
 
-    private User createUser( UserDto userDto )
+    private User getOrCreateUser( UserDto userDto )
     {
         log.info( "Creating new user: {}", userDto.getEmail() );
 
@@ -184,6 +187,14 @@ public class EnvironmentUserHelper
             log.info( "User created successfully" );
 
             return user;
+        }
+        catch ( UserExistsException e )
+        {
+            User existingUser = identityManager.getUserByUsername( userDto.getFingerprint() );
+            if ( existingUser != null )
+            {
+                return existingUser;
+            }
         }
         catch ( Exception e )
         {

@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.persistence.EntityExistsException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -68,6 +69,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.SecurityController;
 import io.subutai.core.identity.api.SessionManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.exception.UserExistsException;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
@@ -152,7 +154,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     //*****************************************************
-    private void createDefaultUsers() throws SystemSecurityException
+    private void createDefaultUsers() throws SystemSecurityException, UserExistsException
     {
         if ( identityDataService.getAllUsers().isEmpty() )
         {
@@ -223,13 +225,14 @@ public class IdentityManagerImpl implements IdentityManager
 
             // editable roles -----------------------------
 
-//            // pre-create env-owner role for regular users
-//            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
-//
-//            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
-//                    true, true, true, true );
-//
-//            assignRolePermission( role, per );
+            //            // pre-create env-owner role for regular users
+            //            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
+            //
+            //            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope
+            // .ALL_SCOPE.getId(),
+            //                    true, true, true, true );
+            //
+            //            assignRolePermission( role, per );
 
 
             //***** setPeer Owner By Default ***************
@@ -1261,7 +1264,8 @@ public class IdentityManagerImpl implements IdentityManager
     @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                            boolean generateKeyPair, boolean createUserDelegate ) throws SystemSecurityException
+                            boolean generateKeyPair, boolean createUserDelegate )
+            throws SystemSecurityException, UserExistsException
     {
         User user = new UserEntity();
 
@@ -1287,7 +1291,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( identityDataService.getUserByUsername( userName ) != null )
         {
-            throw new IllegalArgumentException( String.format( "User with name %s already exists", userName ) );
+            throw new UserExistsException( String.format( "User with name %s already exists", userName ) );
         }
 
         try
