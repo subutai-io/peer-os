@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
@@ -222,5 +223,7 @@ public interface LocalPeer extends Peer
     {
         LOADING, FAILED, READY
     }
+
+    void registerResourceHost( ResourceHostInfo resourceHostInfo );
 }
 
