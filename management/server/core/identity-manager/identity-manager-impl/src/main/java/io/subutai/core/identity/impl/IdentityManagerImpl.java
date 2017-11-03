@@ -154,7 +154,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     //*****************************************************
-    private void createDefaultUsers() throws SystemSecurityException
+    private void createDefaultUsers() throws SystemSecurityException, UserExistsException
     {
         if ( identityDataService.getAllUsers().isEmpty() )
         {
