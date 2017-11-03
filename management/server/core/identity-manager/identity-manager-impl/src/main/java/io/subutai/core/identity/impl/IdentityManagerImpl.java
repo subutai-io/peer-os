@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.persistence.EntityExistsException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -1285,11 +1286,9 @@ public class IdentityManagerImpl implements IdentityManager
         isValidPassword( userName, password );
         isValidEmail( email );
 
-        User existingUser = identityDataService.getUserByUsername( userName );
-
-        if (  existingUser != null )
+        if ( identityDataService.getUserByUsername( userName ) != null )
         {
-            return existingUser;
+            throw new EntityExistsException( String.format( "User with name %s already exists", userName ) );
         }
 
         try
