@@ -224,13 +224,14 @@ public class IdentityManagerImpl implements IdentityManager
 
             // editable roles -----------------------------
 
-//            // pre-create env-owner role for regular users
-//            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
-//
-//            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
-//                    true, true, true, true );
-//
-//            assignRolePermission( role, per );
+            //            // pre-create env-owner role for regular users
+            //            role = createRole( ENV_OWNER_ROLE, UserType.REGULAR.getId() );
+            //
+            //            per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope
+            // .ALL_SCOPE.getId(),
+            //                    true, true, true, true );
+            //
+            //            assignRolePermission( role, per );
 
 
             //***** setPeer Owner By Default ***************
@@ -1262,7 +1263,8 @@ public class IdentityManagerImpl implements IdentityManager
     @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                            boolean generateKeyPair, boolean createUserDelegate ) throws SystemSecurityException
+                            boolean generateKeyPair, boolean createUserDelegate )
+            throws SystemSecurityException, EntityExistsException
     {
         User user = new UserEntity();
 
