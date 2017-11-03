@@ -134,7 +134,7 @@ public class EnvironmentUserHelper
 
         UserDto userDto = getUserDataFromHub( envOwnerId );
 
-        return createUser( userDto );
+        return getOrCreateUser( userDto );
     }
 
 
@@ -167,7 +167,7 @@ public class EnvironmentUserHelper
     }
 
 
-    private User createUser( UserDto userDto )
+    private User getOrCreateUser( UserDto userDto )
     {
         log.info( "Creating new user: {}", userDto.getEmail() );
 
