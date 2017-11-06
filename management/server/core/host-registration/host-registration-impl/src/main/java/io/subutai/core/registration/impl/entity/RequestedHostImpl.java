@@ -20,8 +20,12 @@ import javax.persistence.Table;
 import com.google.common.collect.Sets;
 import com.google.gson.annotations.Expose;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.InstanceType;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -30,7 +34,7 @@ import io.subutai.core.registration.api.service.RequestedHost;
 @Entity
 @Table( name = "node_resource_host_requests" )
 @Access( AccessType.FIELD )
-public class RequestedHostImpl implements RequestedHost, Serializable
+public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Serializable
 {
     @Id
     @Column( name = "host_id", nullable = false )
@@ -40,6 +44,15 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Column( name = "hostname" )
     @Expose
     private String hostname;
+
+    @Column( name = "address" )
+    @Expose
+    private String address;
+
+    @Column( name = "instanceType" )
+    @Enumerated( EnumType.STRING )
+    @Expose
+    private InstanceType instanceType = InstanceType.LOCAL;
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -196,6 +209,31 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
 
     @Override
+    public Set<ContainerHostInfo> getContainers()
+    {
+        Set<ContainerHostInfo> containerHostInfos = Sets.newHashSet();
+
+        containerHostInfos.addAll( hostInfos );
+
+        return containerHostInfos;
+    }
+
+
+    @Override
+    public InstanceType getInstanceType()
+    {
+        return instanceType;
+    }
+
+
+    @Override
+    public String getAddress()
+    {
+        return address;
+    }
+
+
+    @Override
     public boolean equals( final Object o )
     {
         if ( this == o )
@@ -223,8 +261,20 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Override
     public String toString()
     {
-        return "RequestedHostImpl{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", status=" + status
-                + ", arch=" + arch + ", secret='" + secret + '\'' + ", publicKey='" + publicKey + '\''
-                + ", hostInfos=" + hostInfos + ", cert=" + cert + '}';
+        return "RequestedHostImpl{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", address='" + address
+                + '\'' + ", instanceType=" + instanceType + ", arch=" + arch + ", secret='" + secret + '\''
+                + ", publicKey='" + publicKey + '\'' + ", cert='" + cert + '\'' + ", status=" + status + ", hostInfos="
+                + hostInfos + '}';
+    }
+
+
+    @Override
+    public int compareTo( final HostInfo o )
+    {
+        if ( hostname != null && o != null )
+        {
+            return hostname.compareTo( o.getHostname() );
+        }
+        return -1;
     }
 }

@@ -209,6 +209,10 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
             {
                 importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey(), false );
             }
+
+            //register resource host
+            LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
+            localPeer.registerResourceHost( registrationRequest );
         }
         catch ( Exception e )
         {

@@ -1710,10 +1710,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
+    public void registerResourceHost( ResourceHostInfo resourceHostInfo )
     {
-        LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
 
         if ( StringUtils.isBlank( resourceHostInfo.getId() ) )
         {
@@ -1793,6 +1791,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
             }
         }
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
+    {
+        LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
+
+        registerResourceHost( resourceHostInfo );
     }
 
 
