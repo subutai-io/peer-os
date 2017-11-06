@@ -261,9 +261,10 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
     @Override
     public String toString()
     {
-        return "RequestedHostImpl{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", status=" + status
-                + ", arch=" + arch + ", secret='" + secret + '\'' + ", publicKey='" + publicKey + '\'' + ", hostInfos="
-                + hostInfos + ", cert=" + cert + '}';
+        return "RequestedHostImpl{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", address='" + address
+                + '\'' + ", instanceType=" + instanceType + ", arch=" + arch + ", secret='" + secret + '\''
+                + ", publicKey='" + publicKey + '\'' + ", cert='" + cert + '\'' + ", status=" + status + ", hostInfos="
+                + hostInfos + '}';
     }
 
 
