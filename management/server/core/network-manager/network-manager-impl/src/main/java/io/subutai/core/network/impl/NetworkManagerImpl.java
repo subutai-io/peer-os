@@ -138,7 +138,13 @@ public class NetworkManagerImpl implements NetworkManager
 
         CommandResult result = execute( host, commands.getGetP2pVersionCommand() );
 
-        return result.getStdOut();
+        String p2pVersion = result.getStdOut();
+        if ( p2pVersion != null )
+        {
+            p2pVersion = p2pVersion.replace( "p2p version", "" ).trim();
+        }
+
+        return p2pVersion;
     }
 
 
