@@ -1070,7 +1070,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            osName = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+            osName = commandUtil.execute( resourceHostCommands.getGetRhOsNameCommand(), this ).getStdOut();
             return osName;
         }
         catch ( CommandException e )
