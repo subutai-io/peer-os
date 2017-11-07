@@ -24,6 +24,7 @@ public class SystemInfoPojo implements SystemInfo
     private String gitCommitTime;
     private String gitClosestTagCommitCount;
     private String gitCommitIdDescribe;
+    private String osName;
 
     private boolean isUpdatesAvailable;
 
@@ -35,7 +36,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setProjectVersion( final String projectVersion )
     {
         this.projectVersion = projectVersion;
@@ -49,7 +49,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitBuildUserEmail( final String gitBuildUserEmail )
     {
         this.gitBuildUserEmail = gitBuildUserEmail;
@@ -63,7 +62,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitBuildHost( final String gitBuildHost )
     {
         this.gitBuildHost = gitBuildHost;
@@ -77,7 +75,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitClosestTagName( final String gitClosestTagName )
     {
         this.gitClosestTagName = gitClosestTagName;
@@ -91,7 +88,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitCommitIdDescribeShort( final String gitCommitIdDescribeShort )
     {
         this.gitCommitIdDescribeShort = gitCommitIdDescribeShort;
@@ -105,7 +101,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitCommitTime( final String gitCommitTime )
     {
         this.gitCommitTime = gitCommitTime;
@@ -119,7 +114,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitBranch( final String gitBranch )
     {
         this.gitBranch = gitBranch;
@@ -133,7 +127,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitBuildUserName( final String gitBuildUserName )
     {
         this.gitBuildUserName = gitBuildUserName;
@@ -147,7 +140,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitClosestTagCommitCount( final String gitClosestTagCommitCount )
     {
         this.gitClosestTagCommitCount = gitClosestTagCommitCount;
@@ -161,7 +153,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitCommitIdDescribe( final String gitCommitIdDescribe )
     {
         this.gitCommitIdDescribe = gitCommitIdDescribe;
@@ -175,7 +166,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitCommitId( final String gitCommitId )
     {
         this.gitCommitId = gitCommitId;
@@ -189,7 +179,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitBuildTime( final String gitBuildTime )
     {
         this.gitBuildTime = gitBuildTime;
@@ -203,7 +192,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitCommitUserName( final String gitCommitUserName )
     {
         this.gitCommitUserName = gitCommitUserName;
@@ -217,7 +205,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setGitCommitUserEmail( final String gitCommitUserEmail )
     {
         this.gitCommitUserEmail = gitCommitUserEmail;
@@ -231,7 +218,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setRhVersion( final String rhVersion )
     {
         this.rhVersion = rhVersion;
@@ -245,7 +231,6 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setP2pVersion( final String p2pVersion )
     {
         this.p2pVersion = p2pVersion;
@@ -259,9 +244,21 @@ public class SystemInfoPojo implements SystemInfo
     }
 
 
-    @Override
     public void setUpdatesAvailable( final boolean updatesAvailable )
     {
         isUpdatesAvailable = updatesAvailable;
+    }
+
+
+    @Override
+    public String getOsName()
+    {
+        return osName;
+    }
+
+
+    public void setOsName( final String osName )
+    {
+        this.osName = osName;
     }
 }

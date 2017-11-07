@@ -127,6 +127,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     protected int numberOfCpuCores = -1;
     private String rhVersion = null;
     private String p2pVersion = null;
+    private String osName = null;
 
 
     protected ResourceHostEntity()
@@ -1060,6 +1061,29 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             else
             {
                 return p2pVersion;
+            }
+        }
+    }
+
+
+    public String getOsName() throws ResourceHostException
+    {
+        try
+        {
+            osName = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+            return osName;
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( "Error obtaining RH OS name: {}", e.getMessage() );
+
+            if ( osName == null )
+            {
+                throw new ResourceHostException( String.format( "Error obtaining RH OS name: %s", e.getMessage() ), e );
+            }
+            else
+            {
+                return osName;
             }
         }
     }
