@@ -71,7 +71,7 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Read" )
     public SystemInfo getSystemInfo()
     {
-        SystemInfo pojo = new SystemInfoPojo();
+        SystemInfoPojo pojo = new SystemInfoPojo();
 
         pojo.setGitCommitId( SubutaiInfo.getCommitId() );
         pojo.setGitBranch( SubutaiInfo.getBranch() );
@@ -87,6 +87,7 @@ public class SystemManagerImpl implements SystemManager
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
             pojo.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
             pojo.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+            pojo.setOsName( host.getOsName() );
         }
         catch ( HostNotFoundException | ResourceHostException e )
         {
@@ -226,7 +227,7 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Read" )
     public SystemInfo getManagementUpdates()
     {
-        SystemInfo info = getSystemInfo();
+        SystemInfoPojo info = ( SystemInfoPojo ) getSystemInfo();
 
         try
         {
