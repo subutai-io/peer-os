@@ -67,7 +67,7 @@ public class VersionInfoProcessor extends HubRequester
         }
         catch ( Exception e )
         {
-            LOG.error( "Error getting RH/P2P versions: {}", e.getMessage() );
+            LOG.error( "Error getting system info: {}", e.getMessage() );
         }
 
         RestResult<Object> restResult = restClient.post( path, versionInfoDto );

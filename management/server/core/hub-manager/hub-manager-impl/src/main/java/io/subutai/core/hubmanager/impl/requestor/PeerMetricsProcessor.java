@@ -17,6 +17,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
@@ -126,7 +127,7 @@ public class PeerMetricsProcessor extends HubRequester
             catch ( Exception e )
             {
                 hostMetrics.getMemory().setTotal( 0.0 );
-                log.info( e.getMessage(), "No info about total RAM" );
+                log.info( "No info about total RAM" );
             }
 
             try
@@ -136,7 +137,7 @@ public class PeerMetricsProcessor extends HubRequester
             catch ( Exception e )
             {
                 hostMetrics.getMemory().setAvailable( 0.0 );
-                log.info( e.getMessage(), "No info about available RAM" );
+                log.info( "No info about available RAM" );
             }
 
             try
@@ -149,7 +150,7 @@ public class PeerMetricsProcessor extends HubRequester
             catch ( Exception e )
             {
                 hostMetrics.getDisk().put( HostMetricsDto.CURRENT, new DiskDto() );
-                log.info( e.getMessage(), "No info about used DISK" );
+                log.info( "No info about used DISK" );
             }
 
             try
@@ -164,7 +165,16 @@ public class PeerMetricsProcessor extends HubRequester
             catch ( Exception e )
             {
                 hostMetrics.getCpu().setIdle( 0.0 );
-                log.info( e.getMessage(), "No info about used CPU" );
+                log.info( "No info about used CPU" );
+            }
+
+            try
+            {
+                hostMetrics.setOsName( host.getOsName() );
+            }
+            catch ( ResourceHostException e )
+            {
+                //ignore
             }
 
             peerMetricsDto.addHostMetrics( hostMetrics );
