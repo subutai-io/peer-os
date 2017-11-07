@@ -1,11 +1,8 @@
 package io.subutai.hub.share.dto.metrics;
 
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,6 +55,9 @@ public class HostMetricsDto
 
     @JsonProperty( "endTime" )
     private Date endTime;
+
+    @JsonProperty( "osName" )
+    private String osName;
 
     @JsonIgnore
     private transient Long dbId = null;
@@ -230,6 +230,18 @@ public class HostMetricsDto
     }
 
 
+    public String getOsName()
+    {
+        return osName;
+    }
+
+
+    public void setOsName( final String osName )
+    {
+        this.osName = osName;
+    }
+
+
     @Override
     public String toString()
     {
@@ -242,6 +254,7 @@ public class HostMetricsDto
         sb.append( ", net=" ).append( net );
         sb.append( ", disk=" ).append( disk );
         sb.append( ", containersCount=" ).append( containersCount );
+        sb.append( ", osName=" ).append( osName );
         sb.append( ", management=" ).append( management );
         sb.append( ", createdTime=" ).append( createdTime );
         sb.append( ", startTime=" ).append( startTime );

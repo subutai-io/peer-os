@@ -91,7 +91,7 @@ public class SystemManagerImpl implements SystemManager
         }
         catch ( HostNotFoundException | ResourceHostException e )
         {
-            LOG.error( "Error getting RH/P2P versions: {}", e.getMessage() );
+            LOG.error( "Error getting system info: {}", e.getMessage() );
 
             if ( StringUtils.isBlank( pojo.getRhVersion() ) )
             {
