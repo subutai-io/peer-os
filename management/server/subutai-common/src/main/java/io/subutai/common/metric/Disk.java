@@ -50,7 +50,7 @@ public class Disk
     @JsonIgnore
     public Double getAvailableSpace()
     {
-        return total - used;
+        return total != null && used != null ? total - used : 0;
     }
 
 
