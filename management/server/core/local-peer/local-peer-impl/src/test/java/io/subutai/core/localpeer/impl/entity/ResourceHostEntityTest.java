@@ -40,6 +40,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -105,11 +106,13 @@ public class ResourceHostEntityTest
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
 
-        resourceHostEntity = new ResourceHostEntity( PEER_ID, hostInfo );
+        resourceHostEntity = spy( new ResourceHostEntity( PEER_ID, hostInfo ) );
         resourceHostEntity.setPeer( peer );
+        doReturn( true ).when( resourceHostEntity ).isManagementHost();
         resourceHostEntity.commandUtil = commandUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_NAME );
+        when( containerHost.getContainerName() ).thenReturn( CONTAINER_HOST_NAME );
         when( commandUtil.execute( any( RequestBuilder.class ), eq( resourceHostEntity ) ) )
                 .thenReturn( commandResult );
     }

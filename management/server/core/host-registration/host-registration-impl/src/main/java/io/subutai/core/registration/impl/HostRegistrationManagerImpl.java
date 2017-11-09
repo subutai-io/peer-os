@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
@@ -395,9 +394,9 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
 
     protected boolean containsManagementContainer( Set<ContainerInfo> containers )
     {
-        for ( HostInfo hostInfo : containers )
+        for ( ContainerHostInfo hostInfo : containers )
         {
-            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( hostInfo.getHostname() ) )
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( hostInfo.getContainerName() ) )
             {
                 return true;
             }

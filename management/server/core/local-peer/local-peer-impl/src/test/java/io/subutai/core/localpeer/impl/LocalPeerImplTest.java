@@ -521,7 +521,7 @@ public class LocalPeerImplTest
     {
 
         doThrow( new HostNotFoundException( "" ) ).when( localPeer )
-                                                  .getResourceHostByContainerHostName( Common.MANAGEMENT_HOSTNAME );
+                                                  .getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
 
         localPeer.getManagementHost();
     }

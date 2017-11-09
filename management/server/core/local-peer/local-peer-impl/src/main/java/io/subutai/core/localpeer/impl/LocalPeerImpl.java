@@ -1538,7 +1538,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHost getManagementHost() throws HostNotFoundException
     {
-        return getResourceHostByContainerHostName( Common.MANAGEMENT_HOSTNAME );
+        return getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
     }
 
 
@@ -1752,7 +1752,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                     {
-                        if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getHostname() ) )
+                        if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getContainerName() ) )
                         {
                             firstMhRegistration = true;
                             break;
@@ -1783,7 +1783,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 //setup security
                 try
                 {
-                    buildAdminHostRelation( getContainerHostByHostName( Common.MANAGEMENT_HOSTNAME ) );
+                    buildAdminHostRelation( getContainerHostByContainerName( Common.MANAGEMENT_HOSTNAME ) );
                 }
                 catch ( Exception e )
                 {
@@ -2210,7 +2210,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             relationTraits.put( "update", "true" );
             relationTraits.put( "delete", "true" );
 
-            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
+            if ( host instanceof ContainerHost && Common.MANAGEMENT_HOSTNAME
+                    .equalsIgnoreCase( ( ( ContainerHost ) host ).getContainerName() ) )
             {
                 relationTraits.put( "managementSupervisor", "true" );
             }
@@ -3417,7 +3418,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
             }
 
-            if ( registered )
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getContainerName() ) || registered )
             {
                 iterator.remove();
             }
@@ -3491,7 +3492,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
                 if ( unregisteredPeers.contains( containerHost.getInitiatorPeerId() ) && !Common.MANAGEMENT_HOSTNAME
-                        .equalsIgnoreCase( containerHost.getHostname() ) )
+                        .equalsIgnoreCase( containerHost.getContainerName() ) )
                 {
                     result.add( containerHost );
                 }
@@ -3790,7 +3791,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 boolean isContainerEligibleForRemoval = containerHost.getState() == ContainerHostState.UNKNOWN
                         && ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost ).getLastHeartbeat() )
                         > TimeUnit.SECONDS.toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2L )
-                        && !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHost.getHostname() );
+                        && !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHost.getContainerName() );
 
                 if ( !isContainerEligibleForRemoval )
                 {
