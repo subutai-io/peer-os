@@ -395,9 +395,9 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
 
     protected boolean containsManagementContainer( Set<ContainerInfo> containers )
     {
-        for ( HostInfo hostInfo : containers )
+        for ( ContainerHostInfo hostInfo : containers )
         {
-            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( hostInfo.getHostname() ) )
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( hostInfo.getContainerName() ) )
             {
                 return true;
             }

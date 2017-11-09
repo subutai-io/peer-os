@@ -445,6 +445,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
+        if ( isManagementHost() && Common.MANAGEMENT_HOSTNAME
+                .equalsIgnoreCase( containerHost.getContainerName().trim() ) )
+        {
+            throw new ResourceHostException( "Can not destroy management container" );
+        }
+
         try
         {
             //todo use commandExecutor.execute to avoid exception in case container does not exist
@@ -985,7 +991,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     //ignore
                 }
 
-                if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
+                if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getContainerName() ) )
                 {
                     try
                     {

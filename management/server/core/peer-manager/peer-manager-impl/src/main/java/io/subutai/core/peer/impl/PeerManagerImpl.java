@@ -1493,7 +1493,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
 
         for ( ContainerHostInfo containerHostInfo : heartBeat.getHostInfo().getContainers() )
         {
-            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getHostname() ) )
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getContainerName() ) )
             {
                 hasManagementContainer = true;
 
