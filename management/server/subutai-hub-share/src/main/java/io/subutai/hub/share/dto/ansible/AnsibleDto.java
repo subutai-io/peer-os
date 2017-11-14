@@ -15,8 +15,8 @@ public class AnsibleDto
     private String ansibleContainerId;
     private String repoLink;
     private String ansibleRootFile;
-    private Set<Host> hosts = new HashSet<>();
     private State state;
+    private Set<Group> groups = new HashSet();
     private String logs;
 
 
@@ -61,18 +61,6 @@ public class AnsibleDto
     }
 
 
-    public Set<Host> getHosts()
-    {
-        return hosts;
-    }
-
-
-    public void setHosts( final Set<Host> hosts )
-    {
-        this.hosts = hosts;
-    }
-
-
     public State getState()
     {
         return state;
@@ -94,5 +82,17 @@ public class AnsibleDto
     public void setLogs( final String logs )
     {
         this.logs = logs;
+    }
+
+
+    public Set<Group> getGroups()
+    {
+        return groups;
+    }
+
+
+    public void setGroups( final Set<Group> groups )
+    {
+        this.groups = groups;
     }
 }
