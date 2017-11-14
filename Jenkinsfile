@@ -52,7 +52,7 @@ node() {
 
 	// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 	switch (env.BRANCH_NAME) {
-		case ~/master/: cdnHost = "stagecdn.subut.ai"; break;
+		case ~/master/: cdnHost = "mastercdn.subut.ai"; break;
 		case ~/dev/: cdnHost = "devcdn.subut.ai"; break;
 		default: cdnHost = "cdn.subut.ai"
 	}
