@@ -3878,7 +3878,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     }
                     catch ( HostNotFoundException ignore )
                     {
-                        lostContainers.add( containerHostInfo );
+                        if ( !( resourceHost.isManagementHost() && Common.MANAGEMENT_HOSTNAME
+                                .equalsIgnoreCase( containerHostInfo.getContainerName().trim() ) ) )
+                        {
+                            lostContainers.add( containerHostInfo );
+                        }
                     }
                 }
             }
@@ -3943,10 +3947,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
             //cleanup empty environments (the ones with no containers on RH)
+            //a) filter out net resources missing on this RH
             Set<NetworkResource> missingNetResources = Sets.newHashSet();
             try
             {
-                //a) filter out net resources missing on this RH
                 missingNetResources = getReservedNetworkResources().getNetworkResources();
 
                 for ( Iterator<NetworkResource> iterator = missingNetResources.iterator(); iterator.hasNext(); )
