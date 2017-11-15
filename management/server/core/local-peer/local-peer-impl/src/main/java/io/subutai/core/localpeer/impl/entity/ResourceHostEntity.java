@@ -453,18 +453,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            //todo use commandExecutor.execute to avoid exception in case container does not exist
-            //todo check if exception is due to not existing container and ignore such exception
-            commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getId() ), this );
+            destroyContainer( containerHost.getId() );
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException(
-                    String.format( "Error destroying container %s: %s", containerHost.getHostname(), e.getMessage() ),
-                    e );
+            //silencing error since the container will be removed later by scheduled job
+            LOG.error( "Error destroying container {}: {}", containerHost.getContainerName(), e.getMessage() );
         }
 
         removeContainerHost( containerHost );
+    }
+
+
+    public void destroyContainer( String containerId ) throws CommandException
+    {
+        commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerId ), this );
     }
 
 
@@ -647,7 +650,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void cleanup( final EnvironmentId environmentId, final int vlan ) throws ResourceHostException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
         Preconditions
                 .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan" );
         try
@@ -660,13 +662,16 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     String.format( "Could not cleanup resource host %s: %s", hostname, e.getMessage() ) );
         }
 
-        Set<ContainerHost> containerHosts = getContainerHostsByEnvironmentId( environmentId.getId() );
-
-        if ( !containerHosts.isEmpty() )
+        if ( environmentId != null )
         {
-            for ( ContainerHost containerHost : containerHosts )
+            Set<ContainerHost> containerHosts = getContainerHostsByEnvironmentId( environmentId.getId() );
+
+            if ( !containerHosts.isEmpty() )
             {
-                removeContainerHost( containerHost );
+                for ( ContainerHost containerHost : containerHosts )
+                {
+                    removeContainerHost( containerHost );
+                }
             }
         }
     }
