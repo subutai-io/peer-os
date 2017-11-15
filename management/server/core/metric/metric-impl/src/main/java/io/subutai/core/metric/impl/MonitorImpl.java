@@ -213,7 +213,7 @@ public class MonitorImpl implements Monitor, HostListener
         }
         catch ( CommandException e )
         {
-            LOG.error( "Could not run command successfully! Error: {}", e );
+            LOG.error( "Could not run command successfully! Error: {}", e.getMessage() );
         }
         catch ( HostNotFoundException e )
         {
@@ -481,9 +481,9 @@ public class MonitorImpl implements Monitor, HostListener
 
                 info.setRhId( resourceHost.getId() );
                 info.setRhName( resourceHost.getHostname() );
+                info.setState( statusLines );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
-                info.setState( statusLines );
                 info.setP2pSystemLogs( Lists.newArrayList(
                         resourceHost.getP2pLogs( LogLevel.ERROR, logsStartDate, logsEndData ).getLogs() ) );
 
@@ -491,9 +491,7 @@ public class MonitorImpl implements Monitor, HostListener
             }
             catch ( Exception e )
             {
-                LOG.error( "Error while getting RH version and P2P status. Seems RH is not connected." );
-
-                info.setRhVersion( "No RH connected" );
+                LOG.error( "Error getting RH/P2P versions: {}", e.getMessage() );
             }
         }
 
@@ -526,7 +524,7 @@ public class MonitorImpl implements Monitor, HostListener
         }
         catch ( Exception e )
         {
-            LOG.error( "Could not run command successfully! Error: {}", e );
+            LOG.error( "Could not run command successfully! Error: {}", e.getMessage() );
         }
 
 

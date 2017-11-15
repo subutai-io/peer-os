@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
+import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -70,7 +71,7 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Read" )
     public SystemInfo getSystemInfo()
     {
-        SystemInfo pojo = new SystemInfoPojo();
+        SystemInfoPojo pojo = new SystemInfoPojo();
 
         pojo.setGitCommitId( SubutaiInfo.getCommitId() );
         pojo.setGitBranch( SubutaiInfo.getBranch() );
@@ -86,12 +87,21 @@ public class SystemManagerImpl implements SystemManager
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
             pojo.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
             pojo.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+            pojo.setOsName( host.getOsName() );
         }
         catch ( HostNotFoundException | ResourceHostException e )
         {
-            LOG.warn( e.getMessage() );
+            LOG.error( "Error getting system info: {}", e.getMessage() );
 
-            pojo.setRhVersion( "No RH connected" );
+            if ( StringUtils.isBlank( pojo.getRhVersion() ) )
+            {
+                pojo.setRhVersion( "Failed to obtain version" );
+            }
+
+            if ( StringUtils.isBlank( pojo.getP2pVersion() ) )
+            {
+                pojo.setP2pVersion( "Failed to obtain version" );
+            }
 
             return pojo;
         }
@@ -217,7 +227,7 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Read" )
     public SystemInfo getManagementUpdates()
     {
-        SystemInfo info = getSystemInfo();
+        SystemInfoPojo info = ( SystemInfoPojo ) getSystemInfo();
 
         try
         {

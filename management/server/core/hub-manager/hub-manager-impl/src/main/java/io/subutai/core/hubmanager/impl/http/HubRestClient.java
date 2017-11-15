@@ -4,6 +4,12 @@ package io.subutai.core.hubmanager.impl.http;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.BindException;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.net.PortUnreachableException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import javax.ws.rs.core.Response;
 
@@ -13,13 +19,13 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
@@ -150,7 +156,10 @@ public class HubRestClient implements RestClient
                 restResult.setReasonPhrase( response.getStatusInfo().getReasonPhrase() );
             }
 
-            if ( ExceptionUtils.getStackTrace( e ).contains( CONNECTION_EXCEPTION_MARKER ) )
+            Throwable rootCause = ExceptionUtil.getRootCauze( e );
+            if ( rootCause instanceof ConnectException || rootCause instanceof UnknownHostException
+                    || rootCause instanceof BindException || rootCause instanceof NoRouteToHostException
+                    || rootCause instanceof PortUnreachableException || rootCause instanceof SocketTimeoutException )
             {
                 restResult.setError( CONNECTION_EXCEPTION_MARKER );
             }

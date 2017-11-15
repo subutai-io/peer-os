@@ -12,6 +12,7 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.exception.UserExistsException;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
@@ -32,7 +33,7 @@ public interface IdentityManager
 
     String ENV_MANAGER_ROLE = "Environment-Manager";
     String TEMPLATE_MANAGER_ROLE = "Template-Manager";
-//    String ENV_OWNER_ROLE = "Environment-Owner";
+    //    String ENV_OWNER_ROLE = "Environment-Owner";
 
 
     /* *************************************************
@@ -212,7 +213,8 @@ public interface IdentityManager
     /* *************************************************
     */
     User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                     boolean generateKeyPair, boolean createUserDelegate ) throws SystemSecurityException;
+                     boolean generateKeyPair, boolean createUserDelegate )
+            throws SystemSecurityException, UserExistsException;
 
     User modifyUser( User user, String password ) throws SystemSecurityException;
 
@@ -256,8 +258,7 @@ public interface IdentityManager
 
     /**
      * Issues a token to be signed and passed to
-     * {@link IdentityManager#resetPassword(java.lang.String username,
-     * java.lang.String newPassword, java.lang.String sign)}. TTL of token is 30 seconds
+     * {@link IdentityManager#resetPassword(java.lang.String username, * java.lang.String newPassword, java.lang.String sign)}. TTL of token is 30 seconds
      *
      * @return token to be signed by user PGP key
      */

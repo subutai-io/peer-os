@@ -1,6 +1,9 @@
 package io.subutai.core.hubmanager.impl.requestor;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.lang.StringUtils;
 
 import io.subutai.common.peer.ResourceHost;
@@ -19,6 +22,8 @@ import static java.lang.String.format;
 
 public class VersionInfoProcessor extends HubRequester
 {
+    private static final Logger LOG = LoggerFactory.getLogger( VersionInfoProcessor.class );
+
     private ConfigManager configManager;
 
     private PeerManager peerManager;
@@ -57,12 +62,12 @@ public class VersionInfoProcessor extends HubRequester
         {
             ResourceHost host = configManager.getPeerManager().getLocalPeer().getManagementHost();
 
-            versionInfoDto.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
             versionInfoDto.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
+            versionInfoDto.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
         }
         catch ( Exception e )
         {
-            throw new HubManagerException( e );
+            LOG.error( "Error getting system info: {}", e.getMessage() );
         }
 
         RestResult<Object> restResult = restClient.post( path, versionInfoDto );

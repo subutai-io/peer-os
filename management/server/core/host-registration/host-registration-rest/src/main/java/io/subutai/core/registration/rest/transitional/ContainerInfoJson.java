@@ -19,7 +19,7 @@ public class ContainerInfoJson implements ContainerInfo
 {
     private String id;
     private String hostname;
-    private String containerName;
+    private String name;
     private Integer vlan;
     private String templateName;
     private Set<HostInterfaceJson> interfaces = new HashSet<>();
@@ -31,11 +31,11 @@ public class ContainerInfoJson implements ContainerInfo
     private Quota quota;
 
 
-    public ContainerInfoJson( ContainerInfo hostInfo )
+    ContainerInfoJson( ContainerInfo hostInfo )
     {
         this.id = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
-        this.containerName = hostInfo.getContainerName();
+        this.name = hostInfo.getContainerName();
         this.templateName = hostInfo.getTemplateName();
         this.vlan = hostInfo.getVlan();
         this.arch = hostInfo.getArch();
@@ -79,7 +79,7 @@ public class ContainerInfoJson implements ContainerInfo
     @Override
     public String getContainerName()
     {
-        return containerName;
+        return name;
     }
 
 
@@ -88,7 +88,6 @@ public class ContainerInfoJson implements ContainerInfo
     {
         return gateway;
     }
-
 
 
     @Override
@@ -129,14 +128,11 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-
     @Override
     public Integer getVlan()
     {
         return vlan;
     }
-
-
 
 
     @Override
@@ -146,15 +142,11 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-
-
     @Override
     public ResourceHostRegistrationStatus getStatus()
     {
         return status;
     }
-
-
 
 
     @Override
@@ -193,11 +185,7 @@ public class ContainerInfoJson implements ContainerInfo
     @Override
     public String toString()
     {
-        return "ContainerHostInfoModel{" +
-                "id='" + id + '\'' +
-                ", hostname='" + hostname + '\'' +
-                ", interfaces=" + interfaces +
-                ", arch=" + arch +
-                '}';
+        return "ContainerHostInfoModel{" + "id='" + id + '\'' + ", hostname='" + hostname + '\'' + ", interfaces="
+                + interfaces + ", arch=" + arch + '}';
     }
 }

@@ -125,6 +125,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Transient
     protected int numberOfCpuCores = -1;
+    private String rhVersion = null;
+    private String p2pVersion = null;
+    private String osName = null;
 
 
     protected ResourceHostEntity()
@@ -440,6 +443,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             throw new ResourceHostException(
                     String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+        if ( isManagementHost() && Common.MANAGEMENT_HOSTNAME
+                .equalsIgnoreCase( containerHost.getContainerName().trim() ) )
+        {
+            throw new ResourceHostException( "Can not destroy management container" );
         }
 
         try
@@ -982,7 +991,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     //ignore
                 }
 
-                if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
+                if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getContainerName() ) )
                 {
                     try
                     {
@@ -1019,11 +1028,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            return commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+            rhVersion = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+            return rhVersion;
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( String.format( "Error obtaining RH version: %s", e.getMessage() ), e );
+            LOG.error( "Error obtaining RH version: {}", e.getMessage() );
+
+            if ( rhVersion == null )
+            {
+                throw new ResourceHostException( String.format( "Error obtaining RH version: %s", e.getMessage() ), e );
+            }
+            else
+            {
+                return rhVersion;
+            }
         }
     }
 
@@ -1033,11 +1052,45 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            return getNetworkManager().getP2pVersion( this );
+            p2pVersion = getNetworkManager().getP2pVersion( this );
+            return p2pVersion;
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( String.format( "Error obtaining P2P version: %s", e.getMessage() ), e );
+            LOG.error( "Error obtaining P2P version: {}", e.getMessage() );
+
+            if ( p2pVersion == null )
+            {
+                throw new ResourceHostException( String.format( "Error obtaining P2P version: %s", e.getMessage() ),
+                        e );
+            }
+            else
+            {
+                return p2pVersion;
+            }
+        }
+    }
+
+
+    public String getOsName() throws ResourceHostException
+    {
+        try
+        {
+            osName = commandUtil.execute( resourceHostCommands.getGetRhOsNameCommand(), this ).getStdOut();
+            return osName;
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( "Error obtaining RH OS name: {}", e.getMessage() );
+
+            if ( osName == null )
+            {
+                throw new ResourceHostException( String.format( "Error obtaining RH OS name: %s", e.getMessage() ), e );
+            }
+            else
+            {
+                return osName;
+            }
         }
     }
 

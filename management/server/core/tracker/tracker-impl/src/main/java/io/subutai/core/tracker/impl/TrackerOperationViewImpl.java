@@ -79,7 +79,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
     @Override
     public String getLog()
     {
-        return log;
+        return Base64Util.fromBase64( log );
     }
 
 

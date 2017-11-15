@@ -7,7 +7,6 @@ import java.util.Set;
 
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
@@ -118,6 +117,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     String getRhVersion() throws ResourceHostException;
 
     String getP2pVersion() throws ResourceHostException;
+
+    String getOsName() throws ResourceHostException;
 
     P2pLogs getP2pLogs( LogLevel logLevel, Date from, Date till ) throws ResourceHostException;
 

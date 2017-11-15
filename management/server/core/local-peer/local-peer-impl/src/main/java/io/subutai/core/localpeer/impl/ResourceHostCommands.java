@@ -75,6 +75,12 @@ public class ResourceHostCommands
     }
 
 
+    public RequestBuilder getGetRhOsNameCommand()
+    {
+        return new RequestBuilder( "subutai info os" );
+    }
+
+
     public RequestBuilder getGetVlanCommand()
     {
         return new RequestBuilder( "cat /var/lib/apps/subutai/current/vlan" );
