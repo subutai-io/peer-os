@@ -57,7 +57,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         String repoLink = ansibleDto.getRepoLink();
         String mainAnsibleScript = ansibleDto.getAnsibleRootFile();
 
-        prepareHostsFile( containerId, ansibleDto.getHosts() );
+        prepareHostsFile( containerId, ansibleDto.getGroups() );
 
         copyRepoUnpack( containerId, repoLink );
 
@@ -117,14 +117,19 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private void prepareHostsFile( final String containerId, Set<io.subutai.hub.share.dto.ansible.Host> hosts )
+    private void prepareHostsFile( final String containerId, Set<io.subutai.hub.share.dto.ansible.Group> groups )
     {
-        for ( io.subutai.hub.share.dto.ansible.Host host : hosts )
-
+        for ( io.subutai.hub.share.dto.ansible.Group group : groups )
         {
             try
             {
-                runCmd( containerId, String.format( "echo %s >> /etc/ansible/hosts", format( host ).trim() ) );
+                runCmd( containerId,
+                        String.format( "echo %s >> /etc/ansible/hosts", String.format( "[%s]", group.getName() ) ) );
+
+                for ( io.subutai.hub.share.dto.ansible.Host host : group.getHosts() )
+                {
+                    runCmd( containerId, String.format( "echo %s >> /etc/ansible/hosts", format( host ).trim() ) );
+                }
             }
             catch ( HostNotFoundException e )
             {
