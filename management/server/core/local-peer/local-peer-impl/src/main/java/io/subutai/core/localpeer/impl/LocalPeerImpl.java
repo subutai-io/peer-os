@@ -3854,6 +3854,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 try
                 {
+                    LOG.warn( "Removing lost environment, vlan = {}", vlan );
+
                     resourceHost.cleanup( null, vlan );
                 }
                 catch ( ResourceHostException e )
@@ -3936,6 +3938,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     }
                     catch ( HostNotFoundException e )
                     {
+                        LOG.warn( "Removing lost container {}", lostContainer.getContainerName() );
+
                         ( ( ResourceHostEntity ) resourceHost ).destroyContainer( lostContainer.getId() );
                     }
                 }
@@ -3996,6 +4000,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     try
                     {
+                        LOG.warn( "Removing empty environment, vlan = {}", networkResource.getVlan() );
+
                         resourceHost.cleanup( null, networkResource.getVlan() );
                     }
                     catch ( ResourceHostException e )
