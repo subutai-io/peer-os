@@ -11,12 +11,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -221,6 +223,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private transient ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
     private transient ExecutorService threadPool = Executors.newCachedThreadPool();
     private transient Set<LocalPeerEventListener> peerEventListeners = Sets.newHashSet();
+    private AtomicInteger containerCreationCounter = new AtomicInteger();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, CommandExecutor commandExecutor,
@@ -1092,64 +1095,79 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( requestGroup );
 
-        NetworkResource reservedNetworkResource =
-                getReservedNetworkResources().findByEnvironmentId( requestGroup.getEnvironmentId() );
-
-        if ( reservedNetworkResource == null )
+        try
         {
-            throw new PeerException( String.format( "No reserved network resources found for environment %s",
-                    requestGroup.getEnvironmentId() ) );
-        }
+            containerCreationCounter.incrementAndGet();
 
-        Set<String> namesToExclude = Sets.newHashSet();
-        for ( ContainerHostInfo containerHostInfo : getNotRegisteredContainers() )
-        {
-            namesToExclude.add( containerHostInfo.getContainerName().toLowerCase() );
-        }
+            NetworkResource reservedNetworkResource =
+                    getReservedNetworkResources().findByEnvironmentId( requestGroup.getEnvironmentId() );
 
-
-        //clone containers
-        HostUtil.Tasks cloneTasks = new HostUtil.Tasks();
-
-        for ( final CloneRequest request : requestGroup.getRequests() )
-        {
-            ResourceHost resourceHost = getResourceHostById( request.getResourceHostId() );
-
-            CloneContainerTask task =
-                    new CloneContainerTask( request, templateManager.getTemplate( request.getTemplateId() ),
-                            resourceHost, reservedNetworkResource, this, namesToExclude );
-
-            cloneTasks.addTask( resourceHost, task );
-        }
-
-        HostUtil.Results cloneResults = hostUtil.execute( cloneTasks, reservedNetworkResource.getEnvironmentId() );
-
-        //register succeeded containers
-
-        for ( HostUtil.Task cloneTask : cloneResults.getTasks().getTasks() )
-        {
-            CloneRequest request = ( ( CloneContainerTask ) cloneTask ).getRequest();
-
-            if ( cloneTask.getTaskState() == HostUtil.Task.TaskState.SUCCEEDED )
+            if ( reservedNetworkResource == null )
             {
-
-                final HostInterfaces interfaces = new HostInterfaces();
-
-                interfaces.addHostInterface(
-                        new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, request.getIp().split( "/" )[0] ) );
-
-                ContainerHostEntity containerHostEntity =
-                        new ContainerHostEntity( getId(), ( ( CloneContainerTask ) cloneTask ).getResult(),
-                                request.getHostname(), request.getTemplateArch(), interfaces,
-                                request.getContainerName(), request.getTemplateId(), requestGroup.getEnvironmentId(),
-                                requestGroup.getOwnerId(), requestGroup.getInitiatorPeerId(),
-                                request.getContainerQuota() );
-
-                registerContainer( request.getResourceHostId(), containerHostEntity );
+                throw new PeerException( String.format( "No reserved network resources found for environment %s",
+                        requestGroup.getEnvironmentId() ) );
             }
-        }
 
-        return new CreateEnvironmentContainersResponse( cloneResults );
+            Set<String> namesToExclude = Sets.newHashSet();
+            for ( ContainerHostInfo containerHostInfo : getNotRegisteredContainers() )
+            {
+                namesToExclude.add( containerHostInfo.getContainerName().toLowerCase() );
+            }
+
+
+            //clone containers
+            HostUtil.Tasks cloneTasks = new HostUtil.Tasks();
+
+            for ( final CloneRequest request : requestGroup.getRequests() )
+            {
+                ResourceHost resourceHost = getResourceHostById( request.getResourceHostId() );
+
+                CloneContainerTask task =
+                        new CloneContainerTask( request, templateManager.getTemplate( request.getTemplateId() ),
+                                resourceHost, reservedNetworkResource, this, namesToExclude );
+
+                cloneTasks.addTask( resourceHost, task );
+            }
+
+            HostUtil.Results cloneResults = hostUtil.execute( cloneTasks, reservedNetworkResource.getEnvironmentId() );
+
+            //register succeeded containers
+
+            for ( HostUtil.Task cloneTask : cloneResults.getTasks().getTasks() )
+            {
+                CloneRequest request = ( ( CloneContainerTask ) cloneTask ).getRequest();
+
+                if ( cloneTask.getTaskState() == HostUtil.Task.TaskState.SUCCEEDED )
+                {
+
+                    final HostInterfaces interfaces = new HostInterfaces();
+
+                    interfaces.addHostInterface( new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE,
+                            request.getIp().split( "/" )[0] ) );
+
+                    ContainerHostEntity containerHostEntity =
+                            new ContainerHostEntity( getId(), ( ( CloneContainerTask ) cloneTask ).getResult(),
+                                    request.getHostname(), request.getTemplateArch(), interfaces,
+                                    request.getContainerName(), request.getTemplateId(),
+                                    requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
+                                    requestGroup.getInitiatorPeerId(), request.getContainerQuota() );
+
+                    registerContainer( request.getResourceHostId(), containerHostEntity );
+                }
+            }
+
+            return new CreateEnvironmentContainersResponse( cloneResults );
+        }
+        finally
+        {
+            containerCreationCounter.decrementAndGet();
+        }
+    }
+
+
+    private boolean isContainerCreationInProgress()
+    {
+        return containerCreationCounter.get() > 0;
     }
 
 
@@ -1484,7 +1502,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             resourceHost.destroyContainerHost( host );
-            removeQuota( containerId );
         }
         catch ( ResourceHostException e )
         {
@@ -1502,13 +1519,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             //don't remove local peer PEK, it is used for communication with remote peers
             cleanupEnvironment( host.getEnvironmentId(), !getId().equals( host.getInitiatorPeerId() ) );
         }
-    }
-
-
-    @Override
-    public void removeQuota( final ContainerId containerId )
-    {
-        // no-op
     }
 
 
@@ -3786,6 +3796,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 continue;
             }
 
+            //remove stale containers (the ones that are registered with Console but not appearing in heartbeats
+            //from agent)
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
                 boolean isContainerEligibleForRemoval = containerHost.getState() == ContainerHostState.UNKNOWN
@@ -3812,6 +3824,190 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 catch ( ResourceHostException e )
                 {
                     LOG.error( e.getMessage() );
+                }
+            }
+
+            //destroy lost environments (the ones that are present on RH but not registered with Console)
+            Set<Integer> lostEnvironmentsVlans = Sets.newHashSet();
+            try
+            {
+
+                Set<String> p2pIfNames = resourceHost.getUsedP2pIfaceNames();
+                ReservedNetworkResources reservedNetworkResources = getReservedNetworkResources();
+
+                for ( String p2pIfName : p2pIfNames )
+                {
+                    int vlan = Integer.valueOf( p2pIfName.replace( Common.P2P_INTERFACE_PREFIX, "" ) );
+                    NetworkResource networkResource = reservedNetworkResources.findByVlan( vlan );
+                    if ( networkResource == null )
+                    {
+                        lostEnvironmentsVlans.add( vlan );
+                    }
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage() );
+            }
+
+            for ( Integer vlan : lostEnvironmentsVlans )
+            {
+                try
+                {
+                    LOG.warn( "Removing lost environment, vlan = {}", vlan );
+
+                    resourceHost.cleanup( null, vlan );
+                }
+                catch ( ResourceHostException e )
+                {
+                    LOG.error( e.getMessage() );
+                }
+            }
+
+
+            //destroy lost containers (the ones that are present on RH but not registered with Console)
+            //a) filter out lost ones
+            Set<ContainerHostInfo> lostContainers = Sets.newHashSet();
+            try
+            {
+                ResourceHostInfo resourceHostInfo = hostRegistry.getResourceHostInfoById( resourceHost.getId() );
+
+                for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+                {
+                    try
+                    {
+                        resourceHost.getContainerHostById( containerHostInfo.getId() );
+                    }
+                    catch ( HostNotFoundException ignore )
+                    {
+                        if ( !( resourceHost.isManagementHost() && Common.MANAGEMENT_HOSTNAME
+                                .equalsIgnoreCase( containerHostInfo.getContainerName().trim() ) ) )
+                        {
+                            lostContainers.add( containerHostInfo );
+                        }
+                    }
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage() );
+            }
+
+            //b) ignore manually created containers
+            for ( Iterator<ContainerHostInfo> iterator = lostContainers.iterator(); iterator.hasNext(); )
+            {
+                ContainerHostInfo lostContainer = iterator.next();
+
+                //TODO: use container-name and ip as a workaround for now to figure out environment containers,
+                //TODO: until env-id is present in container metadata from heartbeat
+                //filter out containers created by system, not by user
+                try
+                {
+                    if ( !( lostContainer.getContainerName().matches( ".*-\\d+-\\d+" )
+
+                            && lostContainer.getHostInterfaces()
+
+                                            .findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp()
+                                            .startsWith( "172" ) ) )
+                    {
+                        iterator.remove();
+                    }
+                }
+                catch ( Exception e )
+                {
+                    iterator.remove();
+                    LOG.error( e.getMessage() );
+                }
+            }
+
+            //skip cleanup in case an environment workflow is in progress since this can lead to inconsistency
+            if ( isContainerCreationInProgress() )
+            {
+                continue;
+            }
+
+            //c) destroy lost containers
+            for ( ContainerHostInfo lostContainer : lostContainers )
+            {
+                try
+                {
+                    //do additional check here
+                    try
+                    {
+                        resourceHost.getContainerHostById( lostContainer.getId() );
+                    }
+                    catch ( HostNotFoundException e )
+                    {
+                        LOG.warn( "Removing lost container {}", lostContainer.getContainerName() );
+
+                        ( ( ResourceHostEntity ) resourceHost ).destroyContainer( lostContainer.getId() );
+                    }
+                }
+                catch ( CommandException e )
+                {
+                    LOG.error( e.getMessage() );
+                }
+            }
+
+
+            //cleanup empty environments (the ones with no containers on RH)
+            //a) filter out net resources missing on this RH
+            Set<NetworkResource> missingNetResources = Sets.newHashSet();
+            try
+            {
+                missingNetResources = getReservedNetworkResources().getNetworkResources();
+
+                for ( Iterator<NetworkResource> iterator = missingNetResources.iterator(); iterator.hasNext(); )
+                {
+                    final NetworkResource networkResource = iterator.next();
+
+                    boolean found = false;
+
+                    for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+                    {
+
+                        if ( Objects.equals( containerHost.getEnvironmentId().getId(),
+                                networkResource.getEnvironmentId() ) )
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if ( found )
+                    {
+                        iterator.remove();
+                    }
+                }
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( e.getMessage() );
+            }
+
+
+            //skip cleanup in case an environment workflow is in progress since this can lead to inconsistency
+            if ( isContainerCreationInProgress() )
+            {
+                continue;
+            }
+
+            //b) cleanup empty environments
+            for ( NetworkResource networkResource : missingNetResources )
+            {
+                //do additional check
+                if ( resourceHost.getContainerHostsByEnvironmentId( networkResource.getEnvironmentId() ).isEmpty() )
+                {
+                    try
+                    {
+                        LOG.warn( "Removing empty environment, vlan = {}", networkResource.getVlan() );
+
+                        resourceHost.cleanup( null, networkResource.getVlan() );
+                    }
+                    catch ( ResourceHostException e )
+                    {
+                        LOG.error( e.getMessage() );
+                    }
                 }
             }
         }
