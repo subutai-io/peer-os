@@ -713,8 +713,26 @@ public class HubManagerImpl implements HubManager, HostListener
     public void destroy()
     {
         heartbeatExecutorService.shutdown();
+
         peerLogsExecutor.shutdown();
+
         resourceHostMonitorExecutorService.shutdown();
+
+        containersMetricsExecutorService.shutdown();
+
+        asyncHeartbeatExecutor.shutdown();
+
+        peerMetricsExecutorService.shutdown();
+
+        hubLoggerExecutorService.shutdown();
+
+        containerEventExecutor.shutdown();
+
+        environmentTelemetryService.shutdown();
+
+        versionEventExecutor.shutdown();
+
+        tunnelEventService.shutdown();
     }
 
 
