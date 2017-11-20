@@ -1150,13 +1150,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                     request.getHostname(), request.getTemplateArch(), interfaces,
                                     request.getContainerName(), request.getTemplateId(),
                                     requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
-                                    requestGroup.getInitiatorPeerId(), request.getContainerQuota() );
+                                    requestGroup.getInitiatorPeerId(), request.getContainerQuota(),
+                                    reservedNetworkResource.getVlan() );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
                 }
             }
 
-            return new CreateEnvironmentContainersResponse( cloneResults );
+            return new CreateEnvironmentContainersResponse( cloneResults, reservedNetworkResource );
         }
         finally
         {

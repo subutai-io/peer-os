@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.network.NetworkResource;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.HostUtil;
@@ -34,7 +35,7 @@ public class CreateEnvironmentContainersResponse
     }
 
 
-    public CreateEnvironmentContainersResponse( HostUtil.Results results )
+    public CreateEnvironmentContainersResponse( HostUtil.Results results, NetworkResource networkResource )
     {
         Preconditions.checkNotNull( results );
 
@@ -48,7 +49,8 @@ public class CreateEnvironmentContainersResponse
             {
                 responses.add( new CloneResponse( task.getHost().getId(), request.getHostname(),
                         request.getContainerName(), request.getTemplateId(), request.getTemplateArch(), request.getIp(),
-                        cloneContainerTask.getResult(), task.getDuration(), request.getContainerQuota() ) );
+                        cloneContainerTask.getResult(), task.getDuration(), request.getContainerQuota(),
+                        networkResource.getVlan() ) );
 
                 this.messages.add( String
                         .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getHostname(),

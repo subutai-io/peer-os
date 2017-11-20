@@ -95,6 +95,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @JsonProperty( "containerName" )
     private String containerName;
 
+    @Column( name = "vlan" )
+    @JsonProperty( "vlan" )
+    private Integer vlan;
+
 
     @Column( name = "creator_peer_id", nullable = false )
     @JsonIgnore
@@ -186,6 +190,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         this.domainName = domainName;
         this.containerSize = containerQuota.getContainerSize();
         this.resourceHostId = resourceHostId;
+        this.vlan = hostInfo.getVlan();
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
 
@@ -203,6 +208,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         }
 
         return null;
+    }
+
+
+    @Override
+    public Integer getVlan()
+    {
+        return vlan;
     }
 
 
@@ -260,6 +272,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     public EnvironmentId getEnvironmentId()
     {
         return parent.getEnvironmentId();
+    }
+
+
+    @Override
+    public String getEnvId()
+    {
+        return parent.getId();
     }
 
 
