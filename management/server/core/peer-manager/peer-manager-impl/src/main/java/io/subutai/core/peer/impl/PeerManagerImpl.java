@@ -175,6 +175,8 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     public void destroy()
     {
         commandResponseListener.dispose();
+
+        localIpSetter.shutdown();
     }
 
 
@@ -1556,10 +1558,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
                         ( ( ResourceHostInfo ) hostRegistry.getHostInfoById( localPeer.getManagementHost().getId() ) )
                                 .getAddress();
 
-                if ( setLocalPeerUrl( ip ) )
-                {
-                    localIpSetter.shutdown();
-                }
+                setLocalPeerUrl( ip );
             }
             catch ( Exception e )
             {

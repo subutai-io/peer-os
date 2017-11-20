@@ -215,8 +215,6 @@ public interface LocalPeer extends Peer
 
     void setRhHostname( String rhId, String hostname ) throws PeerException;
 
-    void removeQuota( ContainerId containerId );
-
     State getState();
 
     enum State
