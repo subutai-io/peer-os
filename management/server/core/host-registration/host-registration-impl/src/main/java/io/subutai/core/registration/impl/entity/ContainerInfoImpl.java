@@ -63,6 +63,10 @@ public class ContainerInfoImpl implements ContainerInfo
     @Expose
     private Integer vlan;
 
+    @Column( name = "envId" )
+    @Expose
+    private String envId;
+
     @Column( name = "gateway" )
     @Expose
     private String gateway = "";
@@ -115,6 +119,7 @@ public class ContainerInfoImpl implements ContainerInfo
         this.status = hostInfo.getStatus();
         this.publicKey = hostInfo.getPublicKey();
         this.gateway = hostInfo.getGateway();
+        this.envId = hostInfo.getEnvId();
         if ( arch == null )
         {
             arch = HostArchitecture.AMD64;
@@ -231,6 +236,13 @@ public class ContainerInfoImpl implements ContainerInfo
     public Integer getVlan()
     {
         return vlan;
+    }
+
+
+    @Override
+    public String getEnvId()
+    {
+        return envId;
     }
 
 

@@ -180,7 +180,7 @@ public class ContainerCloneStep
         final ContainerHostInfoModel infoModel =
                 new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(),
                         cloneResponse.getContainerName(), interfaces, cloneResponse.getTemplateArch(),
-                        ContainerHostState.RUNNING );
+                        ContainerHostState.RUNNING, environment.getId(), cloneResponse.getVlan() );
 
         return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateId(),
                 defaultDomain, cloneResponse.getContainerQuota(), cloneResponse.getResourceHostId() );

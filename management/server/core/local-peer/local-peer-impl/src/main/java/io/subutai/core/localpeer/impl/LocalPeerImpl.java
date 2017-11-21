@@ -1150,13 +1150,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                     request.getHostname(), request.getTemplateArch(), interfaces,
                                     request.getContainerName(), request.getTemplateId(),
                                     requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
-                                    requestGroup.getInitiatorPeerId(), request.getContainerQuota() );
+                                    requestGroup.getInitiatorPeerId(), request.getContainerQuota(),
+                                    reservedNetworkResource.getVlan() );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
                 }
             }
 
-            return new CreateEnvironmentContainersResponse( cloneResults );
+            return new CreateEnvironmentContainersResponse( cloneResults, reservedNetworkResource );
         }
         finally
         {
@@ -3898,17 +3899,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 ContainerHostInfo lostContainer = iterator.next();
 
-                //TODO: use container-name and ip as a workaround for now to figure out environment containers,
-                //TODO: until env-id is present in container metadata from heartbeat
                 //filter out containers created by system, not by user
                 try
                 {
-                    if ( !( lostContainer.getContainerName().matches( ".*-\\d+-\\d+" )
-
-                            && lostContainer.getHostInterfaces()
-
-                                            .findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp()
-                                            .startsWith( "172" ) ) )
+                    //system containers should have both vlan and envId
+                    if ( lostContainer.getVlan() == null || lostContainer.getEnvId() == null )
                     {
                         iterator.remove();
                     }

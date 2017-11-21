@@ -54,7 +54,7 @@ public class EnvironmentContainerImplTest
     private static final String HOSTNAME = "container1";
     private static final ContainerHostState STATE = ContainerHostState.RUNNING;
     private static final String TAG = "tag";
-    private static final int PID = 123;
+    private static final int VLAN = 123;
 
 
     private EnvironmentContainerImpl environmentContainer;
@@ -85,7 +85,7 @@ public class EnvironmentContainerImplTest
 
         ContainerHostInfoModel containerHostInfoModel =
                 new ContainerHostInfoModel( CONTAINER_ID, HOSTNAME, HOSTNAME, hostInterfaces, HostArchitecture.AMD64,
-                        STATE );
+                        STATE, ENV_ID, VLAN );
 
         environmentContainer =
                 spy( new EnvironmentContainerImpl( INITIATOR_ID, PEER_ID, containerHostInfoModel, TEMPLATE_ID,
