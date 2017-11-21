@@ -21,6 +21,7 @@ public class ContainerInfoJson implements ContainerInfo
     private String hostname;
     private String name;
     private Integer vlan;
+    private String envId;
     private String templateName;
     private Set<HostInterfaceJson> interfaces = new HashSet<>();
     private HostArchitecture arch;
@@ -44,6 +45,7 @@ public class ContainerInfoJson implements ContainerInfo
         this.gateway = hostInfo.getGateway();
         this.state = hostInfo.getState();
         this.quota = hostInfo.getRawQuota();
+        this.envId = hostInfo.getEnvId();
         if ( arch == null )
         {
             arch = HostArchitecture.AMD64;
@@ -132,6 +134,13 @@ public class ContainerInfoJson implements ContainerInfo
     public Integer getVlan()
     {
         return vlan;
+    }
+
+
+    @Override
+    public String getEnvId()
+    {
+        return envId;
     }
 
 

@@ -25,4 +25,8 @@ public interface ContainerHostInfo extends HostInfo
      * Returns network interfaces of host
      */
     HostInterfaces getHostInterfaces();
+
+    String getEnvId();
+
+    Integer getVlan();
 }

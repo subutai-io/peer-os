@@ -27,6 +27,28 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     @SerializedName( "interfaces" )
     @JsonProperty( "interfaces" )
     protected Set<HostInterfaceModel> hostInterfaces = new HashSet<>();
+    @JsonProperty( "envId" )
+    protected String envId;
+    @JsonProperty( "vlan" )
+    protected Integer vlan;
+
+
+    public ContainerHostInfoModel( @JsonProperty( "id" ) final String id,
+                                   @JsonProperty( "hostname" ) final String hostname,
+                                   @JsonProperty( "containerName" ) final String containerName,
+                                   @JsonProperty( "interfaces" ) final HostInterfaces hostInterfaces,
+                                   @JsonProperty( "arch" ) final HostArchitecture hostArchitecture,
+                                   @JsonProperty( "status" ) final ContainerHostState state,
+                                   @JsonProperty( "envId" ) final String envId,
+                                   @JsonProperty( "vlan" ) final Integer vlan )
+    {
+        super( id, hostname, hostArchitecture );
+        this.state = state;
+        this.name = containerName;
+        this.envId = envId;
+        this.vlan = vlan;
+        setHostInterfaces( hostInterfaces );
+    }
 
 
     @Override
@@ -36,17 +58,17 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     }
 
 
-    public ContainerHostInfoModel( @JsonProperty( "id" ) final String id,
-                                   @JsonProperty( "hostname" ) final String hostname,
-                                   @JsonProperty( "containerName" ) final String containerName,
-                                   @JsonProperty( "interfaces" ) final HostInterfaces hostInterfaces,
-                                   @JsonProperty( "arch" ) final HostArchitecture hostArchitecture,
-                                   @JsonProperty( "status" ) final ContainerHostState state )
+    @Override
+    public String getEnvId()
     {
-        super( id, hostname, hostArchitecture );
-        this.state = state;
-        this.name = containerName;
-        setHostInterfaces( hostInterfaces );
+        return envId;
+    }
+
+
+    @Override
+    public Integer getVlan()
+    {
+        return vlan;
     }
 
 
@@ -91,7 +113,7 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     {
         return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
                           .add( "interfaces", hostInterfaces ).add( "status", state ).add( "arch", hostArchitecture )
-                          .toString();
+                          .add( "environmentId", envId ).add( "vlan", vlan ).toString();
     }
 
 

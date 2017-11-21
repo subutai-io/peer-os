@@ -72,6 +72,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "env_id", nullable = true )
     private String environmentId;
 
+    @Column( name = "vlan", nullable = true )
+    private Integer vlan;
+
     @Column( name = "initiator_peer_id", nullable = true )
     private String initiatorPeerId;
 
@@ -100,6 +103,20 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
+    public Integer getVlan()
+    {
+        return vlan;
+    }
+
+
+    @Override
+    public String getEnvId()
+    {
+        return environmentId;
+    }
+
+
+    @Override
     public HostId getResourceHostId()
     {
         return new HostId( parent.getId() );
@@ -116,8 +133,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ContainerHostEntity( final String peerId, final String hostId, final String hostname,
                                 HostArchitecture architecture, HostInterfaces hostInterfaces,
                                 final String containerName, final String templateId, final String environmentId,
-                                final String ownerId, final String initiatorPeerId,
-                                final ContainerQuota containerQuota )
+                                final String ownerId, final String initiatorPeerId, final ContainerQuota containerQuota,
+                                final Integer vlan )
     {
         super( peerId, hostId, hostname, architecture );
         this.containerName = containerName;
@@ -126,6 +143,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
         this.containerSize = containerQuota.getContainerSize();
+        this.vlan = vlan;
         setSavedHostInterfaces( hostInterfaces );
     }
 

@@ -1005,7 +1005,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                         info.getHostInterfaces(), info.getContainerName(),
                                         getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
                                         Common.MANAGEMENT_HOSTNAME, null, null,
-                                        new ContainerQuota( ContainerSize.SMALL ) );
+                                        new ContainerQuota( ContainerSize.SMALL ), info.getVlan() );
 
                         addContainerHost( containerHost );
                     }

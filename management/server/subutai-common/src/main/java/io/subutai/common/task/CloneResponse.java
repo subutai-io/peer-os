@@ -40,6 +40,8 @@ public class CloneResponse implements TaskResponse
 
     @JsonProperty( value = "containerQuota" )
     private ContainerQuota containerQuota;
+    @JsonProperty( value = "vlan" )
+    private Integer vlan;
 
 
     public CloneResponse( @JsonProperty( value = "resourceHostId" ) final String resourceHostId,
@@ -50,7 +52,8 @@ public class CloneResponse implements TaskResponse
                           @JsonProperty( value = "ip" ) final String ip,
                           @JsonProperty( value = "containerId" ) final String containerId,
                           @JsonProperty( value = "elapsedTime" ) final long elapsedTime,
-                          @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota )
+                          @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota,
+                          @JsonProperty( value = "vlan" ) final Integer vlan )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
@@ -61,6 +64,7 @@ public class CloneResponse implements TaskResponse
         this.containerId = containerId;
         this.elapsedTime = elapsedTime;
         this.containerQuota = containerQuota;
+        this.vlan = vlan;
     }
 
 
@@ -117,6 +121,12 @@ public class CloneResponse implements TaskResponse
     public ContainerQuota getContainerQuota()
     {
         return containerQuota;
+    }
+
+
+    public Integer getVlan()
+    {
+        return vlan;
     }
 
 
