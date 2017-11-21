@@ -113,7 +113,7 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     {
         return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
                           .add( "interfaces", hostInterfaces ).add( "status", state ).add( "arch", hostArchitecture )
-                          .toString();
+                          .add( "environmentId", envId ).add( "vlan", vlan ).toString();
     }
 
 
