@@ -9,23 +9,19 @@ sudo apt-get install -y oracle-java8-installer
 sudo apt-get install -y oracle-java8-unlimited-jce-policy
 echo "The below is the JAVA_HOME:"
 echo $JAVA_HOME
-echo """If the result is empty, do the below:
-oldIFS="$IFS"
-IFS=$'\n'
-choices=( $(find /usr/java -type d -maxdepth 1 -print) )
-select choice in "${choices[@]}"; do
-  [[ "$choice" ]] && break
-done
-IFS="$oldIFS"
-this = "export JAVA_HOME=$choice"
+echo "If its empty we need to configure it..."
+this = "export JAVA_HOME=/usr/lib/jvm/java-8-oracle"
 that = "export PATH=\$JAVA_HOME/bin:\$PATH"
-export JAVA_HOME=$choice
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 export PATH=$JAVA_HOME/bin:$PATH
-sudo echo $this > /etc/profile
-sudo echo $that > /etc/profile
+sudo echo $this > /etc/environment
+sudo echo $that > /etc/environment
 reset
 echo $this
 echo $that
+echo $JAVA_HOME
+echo $PATH
+java -version
 echo "Purging old mavens:"
 sudo apt-get purge maven maven2 maven3
 echo "Installing latest maven:"
