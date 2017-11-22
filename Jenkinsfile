@@ -208,7 +208,7 @@ node() {
 			""", returnStdout: true)
 		sh """
 			set +x
-			curl -s -k -Ffile=@${debFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/apt/upload
+			curl -s -k -Ffile=@${debFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/apt/upload
 		"""
 		// def signatureDeb = sh (script: "curl -s -k -Ffile=@${workspace}/${debFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
 		// sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" https://${cdnHost}:8338/kurjun/rest/auth/sign"
@@ -229,7 +229,7 @@ node() {
 			""", returnStdout: true)
 		def signatureTemplate = sh (script: """
 			set +x
-			curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
+			curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
 			""", returnStdout: true)
 		sh """
 			set +x
