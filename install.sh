@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 echo "Installing... Please wait! =^_^= This may take some time..."
 sudo apt-get install -y python-software-properties debconf-utils git build-essential tar
 sudo add-apt-repository -y ppa:webupd8team/java
@@ -9,15 +10,22 @@ sudo apt-get install -y oracle-java8-unlimited-jce-policy
 echo "The below is the JAVA_HOME:"
 echo $JAVA_HOME
 echo """If the result is empty, do the below:
-# update-java-alternatives -l
-# sudo nano /etc/profile
-# 
-# Add following lines at the end:
-# export JAVA_HOME="path that you found in update-java-alternatives for your JDK without quotes"
-# export PATH=$JAVA_HOME/bin:$PATH
-#
-# save file
-# reset"""
+oldIFS="$IFS"
+IFS=$'\n'
+choices=( $(find /usr/java -type d -maxdepth 1 -print) )
+select choice in "${choices[@]}"; do
+  [[ "$choice" ]] && break
+done
+IFS="$oldIFS"
+this = "export JAVA_HOME=$choice"
+that = "export PATH=\$JAVA_HOME/bin:\$PATH"
+export JAVA_HOME=$choice
+export PATH=$JAVA_HOME/bin:$PATH
+sudo echo $this > /etc/profile
+sudo echo $that > /etc/profile
+reset
+echo $this
+echo $that
 echo "Purging old mavens:"
 sudo apt-get purge maven maven2 maven3
 echo "Installing latest maven:"
