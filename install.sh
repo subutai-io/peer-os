@@ -43,6 +43,12 @@ echo "Untarring package"
 tar xvzf *.tar.gz
 echo """Now run {distr}/bin/karaf..."""
 echo """Then go here: https://your_host_ip:8443"""
-
+echo """attempting to execute..."""
+cd base/management/server/server-karaf/target
+cd subutai*
+cd bin/
+sudo mkdir /data
+echo "Launching in screen, you won't see anything here..."
+sudo screen -d -m bash -c "sudo ./karaf"
 
 
