@@ -25,22 +25,24 @@ java -version
 echo "Purging old mavens:"
 sudo apt-get purge maven maven2 maven3
 echo "Installing latest maven:"
-sudo apt-add-repository -y ppa:andrei-pozolotin/maven3
+sudo apt-get install -y software-properties-common
+sudo apt-add-repository -y universe
 sudo apt-get update
-sudo apt-get install -y maven3
+sudo apt install -y maven
 echo "Below is your maven version, please verify it is ABOVE version 3.2.2:"
-mvn --version
+mvn -version
 echo "If the version IS NOT ABOVE 3.2.2 something went wrong...."
 echo "Git cloning base p2p cluster software..."
 git clone https://github.com/Gr1dd/base.git
-cd base/management
+cd base/management/
 echo "Attempting build of base package"
 mvn clean install
 echo "Hopefully everything was successful!"
-cd server/server-karaf/target
+cd server/server-karaf/target/
 echo "Untarring package"
 tar xvzf *.tar.gz
 echo """Now run {distr}/bin/karaf..."""
+echo """Then go here: https://your_host_ip:8443"""
 
 
 
