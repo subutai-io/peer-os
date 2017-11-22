@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -57,6 +58,10 @@ public class NetworkResourceEntity implements NetworkResource
     @JsonProperty( "userId" )
     private String userId;
 
+    @Column( name = "dateCreated" )
+    @JsonIgnore
+    private Long dateCreated = System.currentTimeMillis();
+
 
     protected NetworkResourceEntity()
     {
@@ -76,6 +81,7 @@ public class NetworkResourceEntity implements NetworkResource
         this.initiatorPeerId = networkResource.getInitiatorPeerId();
         this.username = networkResource.getUsername();
         this.userId = networkResource.getUserId();
+        this.dateCreated = System.currentTimeMillis();
     }
 
 
@@ -102,6 +108,13 @@ public class NetworkResourceEntity implements NetworkResource
         this.initiatorPeerId = initiatorPeerId;
         this.username = username;
         this.userId = userId;
+        this.dateCreated = System.currentTimeMillis();
+    }
+
+
+    public Long getDateCreated()
+    {
+        return dateCreated;
     }
 
 
