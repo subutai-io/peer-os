@@ -41,7 +41,7 @@ echo "Hopefully everything was successful!"
 cd server/server-karaf/target/
 echo "Untarring package"
 tar xvzf *.tar.gz
-echo """Now run {distr}/bin/karaf..."""
+echo """Now run /base/management/server/server-karaf/target/subutai-6.2.1-SNAPSHOT/bin/karaf"""
 echo """Then go here: https://your_host_ip:8443"""
 echo """attempting to execute..."""
 cd base/management/server/server-karaf/target
@@ -50,5 +50,5 @@ cd bin/
 sudo mkdir /data
 echo "Launching in screen, you won't see anything here..."
 sudo screen -d -m bash -c "sudo ./karaf"
-
+echo "screen has been launched, go here: https://your_host_ip:8443"
 
