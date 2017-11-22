@@ -28,6 +28,7 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     @JsonProperty( "interfaces" )
     protected Set<HostInterfaceModel> hostInterfaces = new HashSet<>();
     @JsonProperty( "environmentId" )
+    @SerializedName( "environmentId" )
     protected String envId;
     @JsonProperty( "vlan" )
     protected Integer vlan;
