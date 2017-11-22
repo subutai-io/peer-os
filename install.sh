@@ -34,10 +34,13 @@ mvn -version
 echo "If the version IS NOT ABOVE 3.2.2 something went wrong...."
 echo "Git cloning base p2p cluster software..."
 git clone https://github.com/Gr1dd/base.git
-cd base/management/
-echo "Attempting build of base package"
+cd base/
+echo "Installing immortal! Cool software!"
+sudo apt install ./immortal_0.17.0_amd64.deb
+cd management/
+echo "ATTEMPTING BUILD OF BASE PACKAGE - THIS TAKES VERY VERY LONG"
 mvn clean install
-echo "Hopefully everything was successful!"
+echo "HOPEFULLY EVERYTHING WAS SUCCESSFUL"
 cd server/server-karaf/target/
 echo "Untarring package"
 tar xvzf *.tar.gz
@@ -48,7 +51,7 @@ cd base/management/server/server-karaf/target
 cd subutai*
 cd bin/
 sudo mkdir /data
-echo "Launching in screen, you won't see anything here..."
-sudo screen -d -m bash -c "sudo ./karaf"
-echo "screen has been launched, go here: https://your_host_ip:8443"
-
+echo "Launching in screen, you won't see anything here... It is also IMMORTAL!"
+sudo immortal screen -d -m bash -c "sudo ./karaf"
+echo """screen has been launched, go here: https://your_host_ip:8443"""
+echo """the executable is here if you need it /base/management/server/server-karaf/target/subutai-6.2.1-SNAPSHOT/bin/karaf"""
