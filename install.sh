@@ -1,6 +1,6 @@
 #!/bin/bash
 # First, install gpg-agent
-sudo apt-get install gnupg-agent
+sudo apt-get install -y gnupg-agent
 
 # Then, add the following to your .bashrc/.zshrc
 # Invoke GnuPG-Agent the first time we login.
