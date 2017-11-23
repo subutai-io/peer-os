@@ -1,17 +1,9 @@
 #!/bin/bash
-sudo apt-get install -y gnupg-agent gnupg2 dpkg
-echo "Starting gpg-agent... There will be no grabbing of input! Subutai works BEST on DEBIAN!!!!!"
-eval `gpg-agent --daemon --no-grab`
-eval `gpg-agent use-agent`
-export GPG_TTY=`tty`
-export GPG_AGENT_INFO
-sudo service apparmor stop
-sudo service apparmor teardown
 echo "PLEASE MAKE SURE IF YOU GIT CLONED ALREADY TO PLACE THIS SCRIPT ABOVE THE BASE DIRECTORY THAT WAS CLONED!"
 echo "THIS SCRIPT WILL GIT CLONE FOR YOU!!!! Waiting 15s....."
 sleep 15s
 echo "Installing... Please wait! =^_^= This may take some time... Get some coffee."
-sudo apt-get install -y python-software-properties debconf-utils git build-essential tar
+sudo apt-get install -y software-properties-common debconf-utils git build-essential tar
 sudo add-apt-repository -y ppa:webupd8team/java
 sudo apt-get update
 echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
