@@ -74,8 +74,10 @@ To build the project, you need to have the following tools:
    If you get any errors, or your java is not the oracle 8 revision, follow the below:
    
    ```bash
-   sudo echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre" > /etc/profile
-   sudo echo "export PATH=$JAVA_HOME/bin:$PATH" > /etc/profile
+   echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre'
+ | sudo tee --append /etc/profile
+ echo 'export PATH=$JAVA_HOME/bin:$PATH'
+ | sudo tee --append /etc/profile
    reset
    ```
    
