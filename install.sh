@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo apt-get install -y gnupg-agent gnupg2
+sudo apt-get install -y gnupg-agent gnupg2 dpkg
 echo "Starting gpg-agent... There will be no grabbing of input!"
 eval `gpg-agent --daemon --no-grab`
 eval `gpg-agent use-agent`
@@ -45,6 +45,9 @@ echo "If the version IS NOT ABOVE 3.2.2 something went wrong...."
 echo "Git cloning base p2p cluster software..."
 git clone https://github.com/Gr1dd/base.git
 cd base/
+echo "Installing some debian dependencies..."
+dpkg --set-selections < packages.txt
+sudo apt-get update && sudo apt-get -u dselect-upgrade
 echo "Installing immortal! Cool software!"
 sudo apt install ./immortal_0.17.0_amd64.deb
 cd management/
