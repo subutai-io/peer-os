@@ -6,9 +6,11 @@ sleep 15s
 echo "Installing... Please wait! =^_^= This may take some time... Get some coffee."
 sudo apt-get install -y dirmngr --fix-missing
 sudo apt-get install -y software-properties-common debconf-utils git build-essential tar --fix-missing
-sudo add-apt-repository -y ppa:webupd8team/java
+sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
 sudo apt-get update
-echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
+sudo echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
 sudo apt-get install -y oracle-java8-installer --fix-missing
 sudo apt-get install -y oracle-java8-unlimited-jce-policy --fix-missing
 echo "The below is the JAVA_HOME:"
