@@ -31,7 +31,6 @@ java -version
 echo "Purging old mavens:"
 sudo apt-get purge maven maven2 maven3
 echo "Installing latest maven:"
-sudo apt-add-repository -y universe
 sudo apt-get update
 sudo apt install -y maven --fix-missing
 echo "Below is your maven version, please verify it is ABOVE version 3.2.2:"
@@ -49,9 +48,7 @@ echo "HOPEFULLY EVERYTHING WAS SUCCESSFUL"
 cd server/server-karaf/target/
 echo "Untarring package"
 tar xvzf *.tar.gz
-echo """Now run /base/management/server/server-karaf/target/subutai-6.2.1-SNAPSHOT/bin/karaf"""
-echo """Then go here: https://your_host_ip:8443"""
-echo """attempting to execute..."""
+echo """A .deb was built as well... attempting to execute..."""
 echo $CWD
 cd subutai*
 cd bin/
