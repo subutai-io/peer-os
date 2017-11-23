@@ -3,6 +3,7 @@ echo "PLEASE MAKE SURE IF YOU GIT CLONED ALREADY TO PLACE THIS SCRIPT ABOVE THE 
 echo "THIS SCRIPT WILL GIT CLONE FOR YOU!!!! Waiting 15s....."
 sleep 15s
 echo "Installing... Please wait! =^_^= This may take some time... Get some coffee."
+sudo apt-get install -y dirmngr
 sudo apt-get install -y software-properties-common debconf-utils git build-essential tar
 sudo add-apt-repository -y ppa:webupd8team/java
 sudo apt-get update
