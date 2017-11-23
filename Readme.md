@@ -76,6 +76,7 @@ To build the project, you need to have the following tools:
    ```bash
    sudo echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre" > /etc/profile
    sudo echo "export PATH=$JAVA_HOME/bin:$PATH" > /etc/profile
+   reset
    ```
    
    __Note for NetBeans users!__
