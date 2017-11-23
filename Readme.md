@@ -115,7 +115,7 @@ To build the project, you need to have the following tools:
   
   ### Verify maven installation, check java (Must be >= 3.3.3)
   
-```bash
+  ```bash
   mvn --version
   Apache Maven 3.3.3 (12a6b3acb947671f09b81f49094c53f426d8cea1; 2014-12-14T17:29:23+00:00)
   Maven home: /usr/local/apache-maven-3.2.5
@@ -126,6 +126,7 @@ To build the project, you need to have the following tools:
   ```
 
   ### Build steps (Debian)
+  
     ```bash
     curl -L https://api.github.com/repos/subutai-io/base/tarball > base.tar.gz;mkdir -p base; tar xvf base.tar.gz -C base/ 
     cd base*/management
@@ -133,19 +134,23 @@ To build the project, you need to have the following tools:
     ```
     
   ### Build steps (Ubuntu)
-     ```bash
+  
+    ```bash
     curl -L https://api.github.com/repos/subutai-io/base/tarball > base.tar.gz;mkdir -p base; tar xvf base.tar.gz -C base/
     cd base*/management
     mvn clean install
     ```
     
     If you would like to build a .deb:
-     ```bash
+    
+    ```bash
     mvn clean install -P deb
     ```
 
   ##### After that go to `https://your_host_ip:8443` in your browser.
+  
   Login with:
+  
   ```
   username: admin
   password: secret
