@@ -56,5 +56,4 @@ sudo mkdir /data
 echo "Launching in screen, you won't see anything here... It is also IMMORTAL!"
 sudo immortal screen -d -m bash -c "sudo ./karaf"
 echo """screen has been launched, go here: https://your_host_ip:8443"""
-echo """the executable is here if you need it /base/management/server/server-karaf/target/subutai-6.2.1-SNAPSHOT/bin/karaf"""
-sudo service apparmor start
+echo """the executable is here if you need it /base/management/server/server-karaf/target/subutai-*.*.*/bin/karaf"""
