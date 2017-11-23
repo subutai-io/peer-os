@@ -49,7 +49,7 @@ echo "Installing immortal! Cool software!"
 sudo apt install ./immortal_0.17.0_amd64.deb
 cd management/
 echo "ATTEMPTING BUILD OF BASE PACKAGE - THIS TAKES VERY VERY LONG"
-mvn clean install
+mvn clean install -P deb
 echo "HOPEFULLY EVERYTHING WAS SUCCESSFUL"
 cd server/server-karaf/target/
 echo "Untarring package"
@@ -58,7 +58,6 @@ echo """Now run /base/management/server/server-karaf/target/subutai-6.2.1-SNAPSH
 echo """Then go here: https://your_host_ip:8443"""
 echo """attempting to execute..."""
 echo $CWD
-cd base/management/server/server-karaf/target
 cd subutai*
 cd bin/
 sudo mkdir /data
