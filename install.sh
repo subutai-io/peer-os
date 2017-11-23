@@ -60,10 +60,8 @@ tar xvzf *.tar.gz
 echo """Now run /base/management/server/server-karaf/target/subutai-6.2.1-SNAPSHOT/bin/karaf"""
 echo """Then go here: https://your_host_ip:8443"""
 echo """attempting to execute..."""
-cd ..
-cd ..
-cd ..
-cd management/server/server-karaf/target
+echo $CWD
+cd base/management/server/server-karaf/target
 cd subutai*
 cd bin/
 sudo mkdir /data
