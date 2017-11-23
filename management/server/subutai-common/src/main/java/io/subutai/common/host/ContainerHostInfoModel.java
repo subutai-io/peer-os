@@ -27,7 +27,8 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     @SerializedName( "interfaces" )
     @JsonProperty( "interfaces" )
     protected Set<HostInterfaceModel> hostInterfaces = new HashSet<>();
-    @JsonProperty( "envId" )
+    @JsonProperty( "environmentId" )
+    @SerializedName( "environmentId" )
     protected String envId;
     @JsonProperty( "vlan" )
     protected Integer vlan;
@@ -39,7 +40,7 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
                                    @JsonProperty( "interfaces" ) final HostInterfaces hostInterfaces,
                                    @JsonProperty( "arch" ) final HostArchitecture hostArchitecture,
                                    @JsonProperty( "status" ) final ContainerHostState state,
-                                   @JsonProperty( "envId" ) final String envId,
+                                   @JsonProperty( "environmentId" ) final String envId,
                                    @JsonProperty( "vlan" ) final Integer vlan )
     {
         super( id, hostname, hostArchitecture );

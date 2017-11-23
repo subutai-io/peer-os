@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
@@ -74,7 +75,7 @@ public class HostRegistryImplTest
     ConcurrentMap map;
 
     @Mock
-    ResourceHostInfo resourceHostInfo;
+    ResourceHostInfoModel resourceHostInfo;
 
     @Mock
     ContainerHostInfo containerHostInfo;
@@ -299,7 +300,7 @@ public class HostRegistryImplTest
     @Test
     public void testRemoveResourceHost() throws Exception
     {
-        doReturn( resourceHostInfo ).when( hosts ).getIfPresent(HOST_ID  );
+        doReturn( resourceHostInfo ).when( hosts ).getIfPresent( HOST_ID );
 
         registry.removeResourceHost( HOST_ID );
 
@@ -360,5 +361,4 @@ public class HostRegistryImplTest
 
         verify( registry ).requestHeartbeat( resourceHost );
     }
-
 }

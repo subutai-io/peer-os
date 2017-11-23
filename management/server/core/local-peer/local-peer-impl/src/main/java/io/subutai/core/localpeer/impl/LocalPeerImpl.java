@@ -70,6 +70,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -3873,18 +3874,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 ResourceHostInfo resourceHostInfo = hostRegistry.getResourceHostInfoById( resourceHost.getId() );
 
-                for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+                //consider only containers that got cached not less than 5 min ago
+                if ( System.currentTimeMillis() - ( ( ResourceHostInfoModel ) resourceHostInfo ).getDateCreated()
+                        > TimeUnit.MINUTES.toMillis( 5 ) )
+
                 {
-                    try
+                    for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                     {
-                        resourceHost.getContainerHostById( containerHostInfo.getId() );
-                    }
-                    catch ( HostNotFoundException ignore )
-                    {
-                        if ( !( resourceHost.isManagementHost() && Common.MANAGEMENT_HOSTNAME
-                                .equalsIgnoreCase( containerHostInfo.getContainerName().trim() ) ) )
+                        try
                         {
-                            lostContainers.add( containerHostInfo );
+                            resourceHost.getContainerHostById( containerHostInfo.getId() );
+                        }
+                        catch ( HostNotFoundException ignore )
+                        {
+                            if ( !( resourceHost.isManagementHost() && Common.MANAGEMENT_HOSTNAME
+                                    .equalsIgnoreCase( containerHostInfo.getContainerName().trim() ) ) )
+                            {
+                                lostContainers.add( containerHostInfo );
+                            }
                         }
                     }
                 }
@@ -3954,7 +3961,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 for ( Iterator<NetworkResource> iterator = missingNetResources.iterator(); iterator.hasNext(); )
                 {
-                    final NetworkResource networkResource = iterator.next();
+                    final NetworkResourceEntity networkResource = ( NetworkResourceEntity ) iterator.next();
 
                     boolean found = false;
 
@@ -3969,8 +3976,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         }
                     }
 
-                    if ( found )
+                    if ( found || System.currentTimeMillis() - networkResource.getDateCreated() < TimeUnit.MINUTES
+                            .toMillis( 5 ) )
                     {
+                        //don't cleanup the found ones and the ones that are created less than 5 min ago
                         iterator.remove();
                     }
                 }
