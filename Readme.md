@@ -129,7 +129,7 @@ To build the project, you need to have the following tools:
   ### Build steps (Debian)
   
     ```bash
-    curl -L https://api.github.com/repos/subutai-io/base/tarball > base.tar.gz;mkdir -p base; tar xvf base.tar.gz -C base/ 
+    curl -L https://api.github.com/repos/subutai-io/base/tarball > base.tar.gz; sudo mkdir -p base; sudo tar xvf base.tar.gz -C base/ 
     cd base*/management
     mvn clean install
     ```
@@ -137,7 +137,7 @@ To build the project, you need to have the following tools:
   ### Build steps (Ubuntu)
   
     ```bash
-    curl -L https://api.github.com/repos/subutai-io/base/tarball > base.tar.gz;mkdir -p base; tar xvf base.tar.gz -C base/
+    curl -L https://api.github.com/repos/subutai-io/base/tarball > base.tar.gz; sudo mkdir -p base; sudo tar xvf base.tar.gz -C base/
     cd base*/management
     mvn clean install
     ```
