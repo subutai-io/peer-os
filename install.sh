@@ -50,7 +50,8 @@ cd server/server-karaf/target/
 echo "Untarring package"
 tar xvzf *.tar.gz
 echo """A .deb was built as well... attempting to execute..."""
-echo $CWD
+BASEDIR=$(dirname $0)
+echo "Script location: ${BASEDIR}"
 cd subutai*
 cd bin/
 sudo mkdir /data
