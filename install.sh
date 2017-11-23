@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo apt-get install -y gnupg-agent
-echo "Starting gpg-agent"
+sudo apt-get install -y gnupg-agent gnupg2
+echo "Starting gpg-agent... There will be no grabbing of input!"
 eval `gpg-agent --daemon --no-grab`
 eval `gpg-agent use-agent`
 export GPG_TTY=`tty`
