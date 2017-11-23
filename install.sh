@@ -1,7 +1,22 @@
 #!/bin/bash
+# First, install gpg-agent
+sudo apt-get install gnupg-agent
+
+# Then, add the following to your .bashrc/.zshrc
+# Invoke GnuPG-Agent the first time we login.
+# Does `~/.gpg-agent-info' exist and points to gpg-agent process accepting signals?
+if test -f $HOME/.gpg-agent-info && \
+    kill -0 `cut -d: -f 2 $HOME/.gpg-agent-info` 2>/dev/null; then
+    GPG_AGENT_INFO=`cat $HOME/.gpg-agent-info | cut -c 16-`
+else
+    # No, gpg-agent not available; start gpg-agent
+    echo "Starting gpg-agent"
+    eval `gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info`
+fi
+export GPG_TTY=`tty`
+export GPG_AGENT_INFO
 sudo service apparmor stop
 sudo service apparmor teardown
-clear
 echo "PLEASE MAKE SURE IF YOU GIT CLONED ALREADY TO PLACE THIS SCRIPT ABOVE THE BASE DIRECTORY THAT WAS CLONED!"
 echo "THIS SCRIPT WILL GIT CLONE FOR YOU!!!! Waiting 5s....."
 sleep 5s
