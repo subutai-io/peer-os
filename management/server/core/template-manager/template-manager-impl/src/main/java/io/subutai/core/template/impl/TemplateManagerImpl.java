@@ -220,7 +220,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         for ( Template template : getTemplates() )
         {
-            if ( template.getName().equalsIgnoreCase( name ) )
+            if ( name.equalsIgnoreCase( template.getName() ) )
             {
                 return template;
             }
