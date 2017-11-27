@@ -11,7 +11,7 @@
   </bean>
 
   <bean id="registrationManager" scope="singleton" class="io.subutai.core.registration.impl.HostRegistrationManagerImpl"
-        init-method="init">
+        init-method="init" destroy-method="dispose">
     <argument ref="securityManagerRef" />
     <argument ref="daoManager" />
   </bean>
