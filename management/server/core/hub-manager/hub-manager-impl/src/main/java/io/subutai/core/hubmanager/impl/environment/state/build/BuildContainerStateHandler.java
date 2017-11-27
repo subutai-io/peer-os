@@ -321,7 +321,7 @@ public class BuildContainerStateHandler extends StateHandler
             RequestBuilder rb = new RequestBuilder( String.format(
                     "rm -rf %1$s && " + "mkdir -p %1$s && " + "chmod 700 %1$s && "
                             + "ssh-keygen -t rsa -P '' -f %1$s/id_rsa -q && " + "cat %1$s/id_rsa.pub",
-                    Common.CONTAINER_SSH_FOLDER ) );
+                    Common.CONTAINER_SSH_FOLDER ) ).withTimeout( 60 );
 
             result = commandUtil.execute( rb, host );
         }
