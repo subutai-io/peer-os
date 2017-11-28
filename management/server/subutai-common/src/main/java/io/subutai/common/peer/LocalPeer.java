@@ -4,6 +4,7 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.common.environment.PeerTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
@@ -223,5 +224,7 @@ public interface LocalPeer extends Peer
     }
 
     void registerResourceHost( ResourceHostInfo resourceHostInfo );
+
+    PeerTemplatesUploadProgress getTemplateUploadProgress( final String templateName ) throws PeerException;
 }
 

@@ -291,6 +291,11 @@ public class TemplateManagerImpl implements TemplateManager
 
                     response = webClient.get();
 
+                    if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+                    {
+                        return templates;
+                    }
+
                     String json = response.readEntity( String.class ).trim();
 
                     if ( json.startsWith( "[" ) )
