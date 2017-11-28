@@ -5,6 +5,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -50,10 +53,11 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostRegistrationManagerImpl.class );
     private SecurityManager securityManager;
-    protected RequestDataService requestDataService;
-    protected ContainerTokenDataService containerTokenDataService;
+    RequestDataService requestDataService;
+    ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
-    protected ServiceLocator serviceLocator = new ServiceLocator();
+    ServiceLocator serviceLocator = new ServiceLocator();
+    private ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
 
 
     public HostRegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
@@ -70,10 +74,36 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
+        cleaner.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                for ( RequestedHostImpl requestedHost : requestDataService.getAll() )
+                {
+                    if ( requestedHost.getStatus() == ResourceHostRegistrationStatus.REQUESTED &&
+                            System.currentTimeMillis() - ( requestedHost.getDateUpdated() == null ? 0L :
+                                                           requestedHost.getDateUpdated() ) > TimeUnit.MINUTES
+                                    .toMillis( 60 ) )
+                    {
+                        LOG.warn( "Deleting stale registration request {} : {}", requestedHost.getHostname(),
+                                requestedHost.getAddress() );
+
+                        requestDataService.remove( requestedHost.getId() );
+                    }
+                }
+            }
+        }, 3, 30, TimeUnit.MINUTES );
     }
 
 
-    protected RequestDataService getRequestDataService()
+    public void dispose()
+    {
+        cleaner.shutdown();
+    }
+
+
+    RequestDataService getRequestDataService()
     {
         return requestDataService;
     }
@@ -141,9 +171,11 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
                                                                                                                 .getHostname() ) )
                 {
                     requestedHostImpl.setHostname( requestedHost.getHostname() );
-
-                    requestDataService.update( requestedHostImpl );
                 }
+
+                requestedHostImpl.refreshDateUpdated();
+
+                requestDataService.update( requestedHostImpl );
             }
             else
             {
@@ -344,14 +376,14 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     }
 
 
-    protected void importHostSslCert( String hostId, String cert )
+    void importHostSslCert( String hostId, String cert )
     {
         securityManager.getKeyStoreManager().importCertAsTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT, hostId, cert );
         securityManager.getHttpContextManager().reloadKeyStore();
     }
 
 
-    protected void importHostPublicKey( String hostId, String publicKey, boolean rh )
+    void importHostPublicKey( String hostId, String publicKey, boolean rh )
     {
         KeyManager keyManager = securityManager.getKeyManager();
         keyManager.savePublicKeyRing( hostId,
@@ -360,7 +392,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     }
 
 
-    protected void checkManagement( RequestedHost requestedHost )
+    void checkManagement( RequestedHost requestedHost )
     {
         try
         {
@@ -392,7 +424,7 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
     }
 
 
-    protected boolean containsManagementContainer( Set<ContainerInfo> containers )
+    boolean containsManagementContainer( Set<ContainerInfo> containers )
     {
         for ( ContainerHostInfo hostInfo : containers )
         {
