@@ -312,11 +312,22 @@ public class TemplateManagerImpl implements TemplateManager
                         {
                         }.getType() );
 
-                        templates.addAll( privateTemplates );
+                        for ( Template template : privateTemplates )
+                        {
+                            if ( template != null )
+                            {
+                                templates.add( template );
+                            }
+                        }
                     }
                     else
                     {
-                        templates.add( JsonUtil.fromJson( json, Template.class ) );
+                        Template template = JsonUtil.fromJson( json, Template.class );
+
+                        if ( template != null )
+                        {
+                            templates.add( template );
+                        }
                     }
                 }
                 catch ( Exception e )
