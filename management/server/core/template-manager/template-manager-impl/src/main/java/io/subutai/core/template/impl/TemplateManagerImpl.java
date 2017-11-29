@@ -149,7 +149,15 @@ public class TemplateManagerImpl implements TemplateManager
                 {
                     lastTemplatesFetchTime = System.currentTimeMillis();
 
-                    templatesCache = freshTemplateList;
+                    templatesCache.clear();
+
+                    for ( Template template : freshTemplateList )
+                    {
+                        if ( template != null )
+                        {
+                            templatesCache.add( template );
+                        }
+                    }
                 }
             }
             catch ( Exception e )
@@ -290,6 +298,11 @@ public class TemplateManagerImpl implements TemplateManager
                             session.getUser().getFingerprint().toLowerCase(), kurjunToken ) );
 
                     response = webClient.get();
+
+                    if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+                    {
+                        return templates;
+                    }
 
                     String json = response.readEntity( String.class ).trim();
 
