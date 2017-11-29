@@ -3,6 +3,7 @@ package io.subutai.core.desktop.impl;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
@@ -23,7 +24,7 @@ public class DesktopManagerImpl implements DesktopManager
 
 
     @Override
-    public boolean isDesktop( final ContainerHost containerHost )
+    public boolean isDesktop( final ContainerHost containerHost ) throws CommandException
     {
         String result = getDesktopEnvironmentInfo( containerHost );
         if ( result != null )
@@ -36,7 +37,7 @@ public class DesktopManagerImpl implements DesktopManager
 
 
     @Override
-    public String getDesktopEnvironmentInfo( final ContainerHost containerHost )
+    public String getDesktopEnvironmentInfo( final ContainerHost containerHost ) throws CommandException
     {
         CommandResult result = containerHost.execute( Commands.getDeskEnvSpecifyCommand() );
         return result.getStdOut();
@@ -44,7 +45,7 @@ public class DesktopManagerImpl implements DesktopManager
 
 
     @Override
-    public String getRDServerInfo( final ContainerHost containerHost )
+    public String getRDServerInfo( final ContainerHost containerHost ) throws CommandException
     {
         CommandResult result = containerHost.execute( Commands.getRDServerSpecifyCommand() );
         return result.getStdOut();
