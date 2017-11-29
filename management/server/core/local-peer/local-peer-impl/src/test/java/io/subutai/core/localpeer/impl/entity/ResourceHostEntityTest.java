@@ -14,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -114,6 +115,9 @@ public class ResourceHostEntityTest
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_NAME );
         when( containerHost.getContainerName() ).thenReturn( CONTAINER_HOST_NAME );
         when( commandUtil.execute( any( RequestBuilder.class ), eq( resourceHostEntity ) ) )
+                .thenReturn( commandResult );
+        when( commandUtil
+                .execute( any( RequestBuilder.class ), eq( resourceHostEntity ), any( CommandCallback.class ) ) )
                 .thenReturn( commandResult );
     }
 

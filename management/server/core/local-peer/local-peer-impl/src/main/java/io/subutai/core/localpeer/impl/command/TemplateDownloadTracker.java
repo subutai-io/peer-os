@@ -16,15 +16,15 @@ public class TemplateDownloadTracker implements CommandCallback
     private final ResourceHostEntity resourceHostEntity;
     private final String environmentId;
 
-    final static String TEMPLATE_EXISTS_PATTERN = "\"(\\S+) instance exist";
-    final static String TEMPLATE_IS_BEING_INSTALLED_PATTERN = "Installing template (\\S+)\"";
-    final static String TEMPLATE_IS_BEING_DOWNLOADED_PATTERN = "Downloading (.+)\"";
-    final static String TEMPLATE_DOWNLOAD_PERCENT_PATTERN = "(\\d+\\.\\d+)%";
-    final static Pattern templateExistsPattern = Pattern.compile( TEMPLATE_EXISTS_PATTERN, Pattern.MULTILINE );
-    final static Pattern templateIsBeingInstalledPattern =
+    private final static String TEMPLATE_EXISTS_PATTERN = "\"(\\S+) instance exist";
+    private final static String TEMPLATE_IS_BEING_INSTALLED_PATTERN = "Installing template (\\S+)\"";
+    private final static String TEMPLATE_IS_BEING_DOWNLOADED_PATTERN = "Downloading (.+)\"";
+    private final static String TEMPLATE_DOWNLOAD_PERCENT_PATTERN = "(\\d+\\.\\d+)%";
+    private final static Pattern templateExistsPattern = Pattern.compile( TEMPLATE_EXISTS_PATTERN, Pattern.MULTILINE );
+    private final static Pattern templateIsBeingInstalledPattern =
             Pattern.compile( TEMPLATE_IS_BEING_INSTALLED_PATTERN, Pattern.MULTILINE );
-    final static Pattern templateIsBeingDownloadedPattern = Pattern.compile( TEMPLATE_IS_BEING_DOWNLOADED_PATTERN );
-    final static Pattern templateDownloadPercentPattern = Pattern.compile( TEMPLATE_DOWNLOAD_PERCENT_PATTERN );
+    private final static Pattern templateIsBeingDownloadedPattern = Pattern.compile( TEMPLATE_IS_BEING_DOWNLOADED_PATTERN );
+    private final static Pattern templateDownloadPercentPattern = Pattern.compile( TEMPLATE_DOWNLOAD_PERCENT_PATTERN );
 
     private String currentTemplate;
 

@@ -57,10 +57,12 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
+import io.subutai.common.environment.PeerTemplatesUploadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
+import io.subutai.common.environment.RhTemplatesUploadProgress;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -70,6 +72,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -3603,6 +3606,39 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public PeerTemplatesUploadProgress getTemplateUploadProgress( final String templateName ) throws PeerException
+    {
+        Preconditions.checkNotNull( templateName, "Invalid template name" );
+
+        PeerTemplatesUploadProgress peerProgress = new PeerTemplatesUploadProgress( getId() );
+
+        List<ResourceHost> resourceHosts = Lists.newArrayList( getResourceHosts() );
+
+        Collections.sort( resourceHosts, new Comparator<ResourceHost>()
+        {
+            @Override
+            public int compare( final ResourceHost o1, final ResourceHost o2 )
+            {
+                return o1.getId().compareTo( o2.getId() );
+            }
+        } );
+
+        for ( ResourceHost resourceHost : resourceHosts )
+        {
+            RhTemplatesUploadProgress rhProgress = resourceHost.getTemplateUploadProgress( templateName );
+
+            //add only RH with existing progress
+            if ( !rhProgress.getTemplatesUploadProgresses().isEmpty() )
+            {
+                peerProgress.addTemplateUploadProgress( rhProgress );
+            }
+        }
+
+        return peerProgress;
+    }
+
+
+    @Override
     public void promoteTemplate( final ContainerId containerId, final String templateName ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
@@ -3873,18 +3909,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 ResourceHostInfo resourceHostInfo = hostRegistry.getResourceHostInfoById( resourceHost.getId() );
 
-                for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+                //consider only containers that got cached not less than 5 min ago
+                if ( System.currentTimeMillis() - ( ( ResourceHostInfoModel ) resourceHostInfo ).getDateCreated()
+                        > TimeUnit.MINUTES.toMillis( 5 ) )
+
                 {
-                    try
+                    for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                     {
-                        resourceHost.getContainerHostById( containerHostInfo.getId() );
-                    }
-                    catch ( HostNotFoundException ignore )
-                    {
-                        if ( !( resourceHost.isManagementHost() && Common.MANAGEMENT_HOSTNAME
-                                .equalsIgnoreCase( containerHostInfo.getContainerName().trim() ) ) )
+                        try
                         {
-                            lostContainers.add( containerHostInfo );
+                            resourceHost.getContainerHostById( containerHostInfo.getId() );
+                        }
+                        catch ( HostNotFoundException ignore )
+                        {
+                            if ( !( resourceHost.isManagementHost() && Common.MANAGEMENT_HOSTNAME
+                                    .equalsIgnoreCase( containerHostInfo.getContainerName().trim() ) ) )
+                            {
+                                lostContainers.add( containerHostInfo );
+                            }
                         }
                     }
                 }
@@ -3954,7 +3996,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 for ( Iterator<NetworkResource> iterator = missingNetResources.iterator(); iterator.hasNext(); )
                 {
-                    final NetworkResource networkResource = iterator.next();
+                    final NetworkResourceEntity networkResource = ( NetworkResourceEntity ) iterator.next();
 
                     boolean found = false;
 
@@ -3969,8 +4011,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         }
                     }
 
-                    if ( found )
+                    if ( found || System.currentTimeMillis() - networkResource.getDateCreated() < TimeUnit.MINUTES
+                            .toMillis( 5 ) )
                     {
+                        //don't cleanup the found ones and the ones that are created less than 5 min ago
                         iterator.remove();
                     }
                 }

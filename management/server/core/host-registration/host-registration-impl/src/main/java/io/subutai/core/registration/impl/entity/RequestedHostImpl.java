@@ -73,6 +73,9 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
     @Expose
     private String cert;
 
+    @Column( name = "dateUpdated" )
+    private Long dateUpdated = System.currentTimeMillis();
+
 
     @Column( name = "status" )
     @Enumerated( EnumType.STRING )
@@ -92,6 +95,7 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
 
     public RequestedHostImpl( final RequestedHost requestedHost )
     {
+        this.dateUpdated = System.currentTimeMillis();
         this.id = requestedHost.getId();
         this.hostname = requestedHost.getHostname();
         this.arch = requestedHost.getArch();
@@ -116,6 +120,7 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
     }
 
 
+    @Deprecated
     public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
                               final String publicKey, final ResourceHostRegistrationStatus status,
                               Set<HostInterface> interfaces )
@@ -230,6 +235,18 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
     public String getAddress()
     {
         return address;
+    }
+
+
+    public Long getDateUpdated()
+    {
+        return dateUpdated;
+    }
+
+
+    public void refreshDateUpdated()
+    {
+        this.dateUpdated = System.currentTimeMillis();
     }
 
 

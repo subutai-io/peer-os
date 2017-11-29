@@ -1202,7 +1202,7 @@ public class EnvironmentManagerImpl
 
         for ( Template template : ownerTemplates )
         {
-            if ( template.getName().equalsIgnoreCase( templateName ) )
+            if ( templateName.equalsIgnoreCase( template.getName() ) )
             {
                 throw new IllegalStateException(
                         String.format( "Template with name %s already exists in your repository", templateName ) );

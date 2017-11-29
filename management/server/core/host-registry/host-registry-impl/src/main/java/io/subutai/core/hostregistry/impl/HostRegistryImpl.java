@@ -27,6 +27,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -255,6 +256,16 @@ public class HostRegistryImpl implements HostRegistry
         Preconditions.checkNotNull( newRhInfo, "Info is null" );
 
         ResourceHostInfo oldRhInfo = hosts.getIfPresent( newRhInfo.getId() );
+
+        if ( oldRhInfo != null )
+        {
+            ( ( ResourceHostInfoModel ) newRhInfo )
+                    .setDateCreated( ( ( ResourceHostInfoModel ) oldRhInfo ).getDateCreated() );
+        }
+        else
+        {
+            ( ( ResourceHostInfoModel ) newRhInfo ).setDateCreated( System.currentTimeMillis() );
+        }
 
         hosts.put( newRhInfo.getId(), newRhInfo );
 
