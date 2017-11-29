@@ -934,6 +934,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
+            updateTemplateUploadProgress( templateName, 0 );
+
             commandUtil.execute( resourceHostCommands.getPromoteTemplateCommand( containerName, templateName ), this );
         }
         catch ( CommandException e )
