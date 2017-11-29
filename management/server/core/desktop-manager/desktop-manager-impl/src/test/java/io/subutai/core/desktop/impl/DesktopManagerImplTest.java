@@ -1,6 +1,7 @@
 package io.subutai.core.desktop.impl;
 
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -9,21 +10,33 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.peer.api.PeerManager;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.mockito.Mockito.spy;
+
 
 @RunWith( MockitoJUnitRunner.class )
 public class DesktopManagerImplTest
 {
-
+    private final static String CONT_ID = "..."; //TODO;
     private DesktopManagerImpl desktopManager;
 
     @Mock
     PeerManager peerManager;
 
+    @Before
+    public void setUp() throws Exception
+    {
+        desktopManager = spy( new DesktopManagerImpl( peerManager ) );
+        //TODO add return cases for peerManager.getLocalPeer()..
+    }
 
     @Test
     public void isDesktop() throws Exception
     {
-        boolean isDekstop = desktopManager.isDesktop( null );
+        ContainerHost containerHost = peerManager.getLocalPeer().getContainerHostById( CONT_ID );
+        boolean isDekstop = desktopManager.isDesktop( containerHost );
+
+        assertTrue( isDekstop );
     }
 
 
