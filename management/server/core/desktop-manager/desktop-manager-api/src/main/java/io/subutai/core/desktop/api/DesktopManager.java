@@ -14,10 +14,10 @@ public interface DesktopManager
     /**
      * @return desktop environment (DE) information
      */
-    String getDesktopEnvironment( ContainerHost containerHost );
+    String getDesktopEnvironmentInfo( ContainerHost containerHost );
 
     /**
      * @return remote desktop server information, ex: X2Go Server
      */
-    String getRDServer( ContainerHost containerHost );
+    String getRDServerInfo( ContainerHost containerHost );
 }

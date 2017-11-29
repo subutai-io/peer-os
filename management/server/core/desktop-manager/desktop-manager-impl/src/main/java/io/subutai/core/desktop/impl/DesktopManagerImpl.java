@@ -15,14 +15,14 @@ public class DesktopManagerImpl implements DesktopManager
 
 
     @Override
-    public String getDesktopEnvironment( final ContainerHost containerHost )
+    public String getDesktopEnvironmentInfo( final ContainerHost containerHost )
     {
         return null;
     }
 
 
     @Override
-    public String getRDServer( final ContainerHost containerHost )
+    public String getRDServerInfo( final ContainerHost containerHost )
     {
         return null;
     }
