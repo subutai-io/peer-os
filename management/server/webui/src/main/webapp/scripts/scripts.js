@@ -149,7 +149,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
     var kurjunCheckInProgress = false;
 
-    function checkKurjunAuthToken(identitySrv, $scope){
+    function checkKurjunAuthToken(identitySrv, $scope, callback){
 
         if(!kurjunCheckInProgress){
 
@@ -158,7 +158,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
             identitySrv.getObtainedKurjunToken().success(function(data){
                 if (!$.trim(data)){
 
-                    obtainKurjunAuthToken(identitySrv, $scope);
+                    obtainKurjunAuthToken(identitySrv, $scope, callback);
 
                 }else{
 
@@ -170,11 +170,17 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
                     }
 
                     kurjunCheckInProgress = false;
+
+                    if(callback) callback();
                 }
             }).error(function(){
 
                 kurjunCheckInProgress = false;
+
+                if(callback) callback();
             });
+        }else{
+            if(callback) callback();
         }
     }
 
@@ -186,7 +192,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
         }
     }
 
-    function obtainKurjunAuthToken(identitySrv, $scope){
+    function obtainKurjunAuthToken(identitySrv, $scope, callback){
 
         localStorage.removeItem('kurjunToken');
 
@@ -210,7 +216,12 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
                    notifyKurjunTokenListeners($scope);
 
+                   if(callback) callback();
+
                }).error(function(error) {
+
+                 if(callback) callback();
+
                  console.log(error);
                });
 
@@ -222,6 +233,8 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
         }).error(function(error) {
 
             kurjunCheckInProgress = false;
+
+            if(callback) callback();
 
             console.log(error);
         });

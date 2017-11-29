@@ -149,4 +149,9 @@ public interface RestService
     @Path( "limits/{peerId}" )
     @Produces( MediaType.APPLICATION_JSON )
     Response getResourceLimits( @PathParam( "peerId" ) final PeerId peerId );
+
+    @GET
+    @Path( "templatesprogress/{templateName}" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getTemplateUploadProgress( @PathParam( "templateName" ) String templateName );
 }

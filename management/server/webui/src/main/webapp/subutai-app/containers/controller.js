@@ -18,7 +18,7 @@ ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'Swee
 
 function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar, identitySrv) {
 
-    checkKurjunAuthToken(identitySrv);
+    checkKurjunAuthToken(identitySrv, $rootScope);
 
 	var vm = this;
 
@@ -384,53 +384,104 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		}
 	}
 
-    vm.disabled = false;
 
+    var timeout;
+    vm.uploadPercent;
+    function showUploadProgress(templateName){
+
+        ngDialog.open({
+            template: 'subutai-app/containers/partials/uploadProgress.html',
+            scope: $scope,
+            className: 'b-build-environment-info'
+        });
+
+        clearTimeout(timeout);
+
+        environmentService.getUploadProgress(templateName).success(function (data) {
+
+            if($.trim(data) && $.trim(data.templatesUploadProgress) && data.templatesUploadProgress.length > 0
+                 && $.trim(data.templatesUploadProgress[0].templatesUploadProgress)
+                  && $.trim(data.templatesUploadProgress[0].templatesUploadProgress[templateName])){
+
+                var percent = parseInt(data.templatesUploadProgress[0].templatesUploadProgress[templateName]);
+
+                if( isNaN(percent) || percent < 100 ){
+                    timeout = setTimeout (function(){ showUploadProgress(templateName); }, 1000);
+                }
+
+                vm.uploadPercent = isNaN(percent) ? 0: percent;
+
+            }else{
+                timeout = setTimeout (function(){ showUploadProgress(templateName); }, 1000)
+            }
+        })
+        .error(function (error) {
+
+            console.log(error);
+        });
+    }
+
+
+    vm.disabled = false;
     function createTemplate( container, name, isPublic ) {
 
         vm.disabled = true;
 
+        vm.uploadPercent = 0;
+
+        ngDialog.closeAll();
+
         LOADING_SCREEN();
 
-        environmentService.createTemplate( container, name, !isPublic )
-        .success( function (hash) {
+        checkKurjunAuthToken(identitySrv, $rootScope, function(){
 
-            var signedHashTextArea = document.createElement("textarea");
-            signedHashTextArea.setAttribute('class', 'bp-sign-target');
-            signedHashTextArea.style.width = '1px';
-            signedHashTextArea.style.position = 'absolute';
-            signedHashTextArea.style.left = '-100px';
-            signedHashTextArea.value = hash;
-            document.body.appendChild(signedHashTextArea);
+                showUploadProgress(name);
 
-            $(signedHashTextArea).on('change', function() {
+                environmentService.createTemplate( container, name, !isPublic )
+                .success( function (hash) {
 
-               var signedHash = $(this).val();
-               console.log(signedHash);
+                    var signedHashTextArea = document.createElement("textarea");
+                    signedHashTextArea.setAttribute('class', 'bp-sign-target');
+                    signedHashTextArea.style.width = '1px';
+                    signedHashTextArea.style.position = 'absolute';
+                    signedHashTextArea.style.left = '-100px';
+                    signedHashTextArea.value = hash;
+                    document.body.appendChild(signedHashTextArea);
 
-               // submit signed hash
-               identitySrv.submitSignedHash(signedHash).success(function(){
-                   vm.disabled = false;
-                   LOADING_SCREEN('none');
-                   ngDialog.closeAll();
-                   SweetAlert.swal ("Success!", "Template has been created", "success");
-               }).error(function(error){
-                   vm.disabled = false;
-                   LOADING_SCREEN('none');
-                   ngDialog.closeAll();
-                   SweetAlert.swal ("ERROR!", error, "error");
-               });
+                    $(signedHashTextArea).on('change', function() {
 
-              $(this).remove();
-           });
+                       var signedHash = $(this).val();
+                       console.log(signedHash);
 
-        } )
-        .error( function (error) {
-            vm.disabled = false;
-            LOADING_SCREEN('none');
-            ngDialog.closeAll();
-            SweetAlert.swal ("ERROR!", error.ERROR, "error");
-        } );
+                       // submit signed hash
+                       identitySrv.submitSignedHash(signedHash).success(function(){
+                           vm.disabled = false;
+                           LOADING_SCREEN('none');
+                           ngDialog.closeAll();
+                           clearTimeout(timeout);
+                           SweetAlert.swal ("Success!", "Template has been created", "success");
+                       }).error(function(error){
+                           vm.disabled = false;
+                           LOADING_SCREEN('none');
+                           ngDialog.closeAll();
+                           clearTimeout(timeout);
+                           SweetAlert.swal ("ERROR!", error, "error");
+                       });
+
+                      $(this).remove();
+                   });
+
+                } )
+                .error( function (error) {
+                    vm.disabled = false;
+                    LOADING_SCREEN('none');
+                    ngDialog.closeAll();
+                    clearTimeout(timeout);
+                    SweetAlert.swal ("ERROR!", error.ERROR, "error");
+                } );
+
+        });
+
     }
 
     function hasKurjunToken(){

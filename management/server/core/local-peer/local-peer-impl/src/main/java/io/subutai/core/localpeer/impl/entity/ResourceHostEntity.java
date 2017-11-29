@@ -42,6 +42,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
+import io.subutai.common.environment.RhTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -78,6 +79,7 @@ import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.ResourceHostCommands;
 import io.subutai.core.localpeer.impl.binding.Commands;
 import io.subutai.core.localpeer.impl.command.TemplateDownloadTracker;
+import io.subutai.core.localpeer.impl.command.TemplateUploadTracker;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.HostRegistrationManager;
@@ -100,7 +102,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
     private static final Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
     private transient final Cache<String, Map<String, Integer>> envTemplatesDownloadPercent = CacheBuilder.newBuilder().
-            expireAfterAccess( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC, TimeUnit.HOURS ).build();
+            expireAfterAccess( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC, TimeUnit.SECONDS ).build();
+    private transient final Cache<String, Map<String, Integer>> templatesUploadPercent = CacheBuilder.newBuilder().
+            expireAfterAccess( Common.TEMPLATE_EXPORT_TIMEOUT_SEC, TimeUnit.SECONDS ).build();
 
 
     @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity =
@@ -862,6 +866,16 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    @Override
+    public RhTemplatesUploadProgress getTemplateUploadProgress( final String templateName )
+    {
+        Map<String, Integer> templateUploadPercent = templatesUploadPercent.getIfPresent( templateName );
+
+        return new RhTemplatesUploadProgress( getId(),
+                templateUploadPercent == null ? Maps.<String, Integer>newHashMap() : templateUploadPercent );
+    }
+
+
     public void updateTemplateDownloadProgress( String environmentId, final String templateName,
                                                 final int downloadPercent )
     {
@@ -885,6 +899,81 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( ExecutionException e )
         {
             LOG.error( "Error updating template download progress", e );
+        }
+    }
+
+
+    public void updateTemplateUploadProgress( final String templateName, final int uploadPercent )
+    {
+        try
+        {
+            Map<String, Integer> templateUploadPercent =
+
+                    templatesUploadPercent.get( templateName, new Callable<Map<String, Integer>>()
+                    {
+                        @Override
+                        public Map<String, Integer> call() throws Exception
+                        {
+
+                            return Maps.newConcurrentMap();
+                        }
+                    } );
+
+
+            templateUploadPercent.put( templateName, uploadPercent );
+        }
+        catch ( ExecutionException e )
+        {
+            LOG.error( "Error updating template upload progress", e );
+        }
+    }
+
+
+    @Override
+    public void promoteTemplate( final String containerName, final String templateName ) throws ResourceHostException
+    {
+        try
+        {
+            updateTemplateUploadProgress( templateName, 0 );
+
+            commandUtil.execute( resourceHostCommands.getPromoteTemplateCommand( containerName, templateName ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error promoting container to template: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String exportTemplate( final String templateName, final boolean isPrivateTemplate, final String token )
+            throws ResourceHostException
+    {
+        try
+        {
+            updateTemplateUploadProgress( templateName, 0 );
+
+            CommandResult result = commandUtil
+                    .execute( resourceHostCommands.getExportTemplateCommand( templateName, isPrivateTemplate, token ),
+                            this, new TemplateUploadTracker( this, templateName ) );
+
+            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*\"" );
+
+            Matcher m = p.matcher( result.getStdOut() );
+
+            if ( m.find() && m.groupCount() == 1 )
+            {
+                return m.group( 1 );
+            }
+            else
+            {
+                throw new ResourceHostException( "Template hash is not found in the output of subutai export command" );
+            }
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error exporting template: %s", e.getMessage() ), e );
         }
     }
 
@@ -1175,51 +1264,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 throw new ResourceHostException(
                         String.format( "Error setting resource host hostname: %s", e.getMessage() ), e );
             }
-        }
-    }
-
-
-    @Override
-    public void promoteTemplate( final String containerName, final String templateName ) throws ResourceHostException
-    {
-        try
-        {
-            commandUtil.execute( resourceHostCommands.getPromoteTemplateCommand( containerName, templateName ), this );
-        }
-        catch ( CommandException e )
-        {
-            throw new ResourceHostException(
-                    String.format( "Error promoting container to template: %s", e.getMessage() ), e );
-        }
-    }
-
-
-    @Override
-    public String exportTemplate( final String templateName, final boolean isPrivateTemplate, final String token )
-            throws ResourceHostException
-    {
-        try
-        {
-            CommandResult result = commandUtil
-                    .execute( resourceHostCommands.getExportTemplateCommand( templateName, isPrivateTemplate, token ),
-                            this );
-
-            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*\"" );
-
-            Matcher m = p.matcher( result.getStdOut() );
-
-            if ( m.find() && m.groupCount() == 1 )
-            {
-                return m.group( 1 );
-            }
-            else
-            {
-                throw new ResourceHostException( "Template hash is not found in the output of subutai export command" );
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new ResourceHostException( String.format( "Error exporting template: %s", e.getMessage() ), e );
         }
     }
 

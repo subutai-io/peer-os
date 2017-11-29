@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
+import io.subutai.common.environment.RhTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.LogLevel;
@@ -131,6 +132,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     boolean isManagementHost();
 
     RhTemplatesDownloadProgress getTemplateDownloadProgress( String environmentId );
+
+    RhTemplatesUploadProgress getTemplateUploadProgress( String templateName );
 
     void removeContainerHost( ContainerHost containerHost );
 

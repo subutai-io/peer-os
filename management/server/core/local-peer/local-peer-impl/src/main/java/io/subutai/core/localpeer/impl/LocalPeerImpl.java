@@ -57,10 +57,12 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
+import io.subutai.common.environment.PeerTemplatesUploadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
+import io.subutai.common.environment.RhTemplatesUploadProgress;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -3596,6 +3598,39 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             if ( !rhProgress.getTemplatesDownloadProgresses().isEmpty() )
             {
                 peerProgress.addTemplateDownloadProgress( rhProgress );
+            }
+        }
+
+        return peerProgress;
+    }
+
+
+    @Override
+    public PeerTemplatesUploadProgress getTemplateUploadProgress( final String templateName ) throws PeerException
+    {
+        Preconditions.checkNotNull( templateName, "Invalid template name" );
+
+        PeerTemplatesUploadProgress peerProgress = new PeerTemplatesUploadProgress( getId() );
+
+        List<ResourceHost> resourceHosts = Lists.newArrayList( getResourceHosts() );
+
+        Collections.sort( resourceHosts, new Comparator<ResourceHost>()
+        {
+            @Override
+            public int compare( final ResourceHost o1, final ResourceHost o2 )
+            {
+                return o1.getId().compareTo( o2.getId() );
+            }
+        } );
+
+        for ( ResourceHost resourceHost : resourceHosts )
+        {
+            RhTemplatesUploadProgress rhProgress = resourceHost.getTemplateUploadProgress( templateName );
+
+            //add only RH with existing progress
+            if ( !rhProgress.getTemplatesUploadProgresses().isEmpty() )
+            {
+                peerProgress.addTemplateUploadProgress( rhProgress );
             }
         }
 
