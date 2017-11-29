@@ -10,5 +10,43 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>desktop-manager-impl</artifactId>
+  <name>Desktop Manager Impl</name>
+  <description>Desktop Manager Impl</description>
 
+  <packaging>bundle</packaging>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>desktop-manager-api</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.core.desktop.impl</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

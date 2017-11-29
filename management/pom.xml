@@ -995,6 +995,21 @@
                 <version>2.2.0</version>
             </dependency>
 
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <!--desktop-manager-->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>desktop-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>desktop-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
         </dependencies>
     </dependencyManagement>
 
