@@ -41,6 +41,7 @@
     <module>common-plugin</module>
     <module>karaf-manager</module>
     <module>template-manager</module>
+    <module>desktop-manager</module>
   </modules>
 
 </project>
