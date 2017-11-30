@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.Topology;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 
 
@@ -25,14 +24,12 @@ public interface RestService
 {
     @Path( "/" )
     @POST
-    @Produces( MediaType.APPLICATION_JSON )
     Response createEnvironment( @FormParam( "topology" ) String topology ) throws EnvironmentCreationException;
 
     @Path( "/{environmentId}" )
     @PUT
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response growEnvironment( @PathParam( "environmentId" ) String environmentId, Topology topology )
+    Response growEnvironment( @PathParam( "environmentId" ) String environmentId,
+                              @FormParam( "topology" ) String topology )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     @Path( "/" )

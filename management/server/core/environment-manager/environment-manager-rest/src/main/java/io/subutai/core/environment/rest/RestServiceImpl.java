@@ -27,6 +27,7 @@ import io.subutai.common.environment.HubEnvironment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshEncryptionType;
@@ -52,89 +53,96 @@ public class RestServiceImpl implements RestService
     }
 
 
+    private Topology prepare( String topology, boolean create ) throws HostNotFoundException
+    {
+        Topology theTopology = JsonUtil.fromJson( topology, Topology.class );
+
+        Preconditions.checkNotNull( theTopology, "Invalid topology provided" );
+        Preconditions.checkArgument(
+                theTopology.getNodeGroupPlacement() != null && !theTopology.getNodeGroupPlacement().isEmpty(),
+                "No containers provided" );
+        Preconditions.checkArgument( !( create && Strings.isNullOrEmpty( theTopology.getEnvironmentName() ) ),
+                "Invalid environment name provided" );
+
+        TemplateManager templateManager = ServiceLocator.lookup( TemplateManager.class );
+        LocalPeer localPeer = ServiceLocator.lookup( LocalPeer.class );
+
+        //replace literal "local" with actual id of local peer
+        Set<Node> localNodes = theTopology.removePlacement( "local" );
+
+        if ( localNodes != null )
+        {
+            for ( Node node : localNodes )
+            {
+                theTopology.addNodePlacement( localPeer.getId(), node );
+            }
+        }
+
+        for ( Map.Entry<String, Set<Node>> entry : theTopology.getNodeGroupPlacement().entrySet() )
+        {
+            String peerId = entry.getKey();
+
+            for ( Node node : entry.getValue() )
+            {
+                Preconditions.checkArgument( !Strings.isNullOrEmpty( node.getName() ), "No container name provided" );
+                Preconditions.checkArgument( !Strings.isNullOrEmpty( node.getTemplateId() ) || !Strings
+                        .isNullOrEmpty( node.getTemplateName() ), "No template provided" );
+
+                //set peer id taken from placement to avoid supplying peer id for each node in JSON
+                node.setPeerId( peerId );
+
+                Preconditions.checkArgument(
+                        !Strings.isNullOrEmpty( node.getHostId() ) || ( Strings.isNullOrEmpty( node.getHostId() )
+                                && StringUtils.equals( node.getPeerId(), localPeer.getId() ) ),
+                        "Invalid host for container provided" );
+
+                //use name as hostname to avoid supplying in JSON, also name will be later suffixed by the system
+                // during clone
+                node.setHostname( node.getName().replaceAll( "\\s+", "" ) );
+
+                if ( Strings.isNullOrEmpty( node.getTemplateId() ) )
+                {
+                    Template template = templateManager.getVerifiedTemplateByName( node.getTemplateName() );
+
+                    Preconditions.checkNotNull( template,
+                            String.format( "Verified template not found by name %s", node.getTemplateName() ) );
+
+                    node.setTemplateId( template.getId() );
+                }
+
+                //for local peer if no RH specified, use MH
+                if ( Strings.isNullOrEmpty( node.getHostId() ) )
+                {
+                    node.setHostId( localPeer.getManagementHost().getId() );
+                }
+
+                if ( node.getQuota() == null )
+                {
+                    node.setDefaultQuota();
+                }
+            }
+        }
+
+        if ( !Strings.isNullOrEmpty( theTopology.getSshKey() ) )
+        {
+            theTopology.setSshKeyType( SshEncryptionType.parseTypeFromKey( theTopology.getSshKey() ) );
+        }
+
+        theTopology.setExchangeSshKeys( true );
+        theTopology.setRegisterHosts( true );
+
+        theTopology.setId( UUID.randomUUID() );
+
+        return theTopology;
+    }
+
+
     @Override
     public Response createEnvironment( final String topology ) throws EnvironmentCreationException
     {
         try
         {
-            Topology theTopology = JsonUtil.fromJson( topology, Topology.class );
-
-            Preconditions.checkNotNull( theTopology, "Invalid topology provided" );
-            Preconditions.checkArgument(
-                    theTopology.getNodeGroupPlacement() != null && !theTopology.getNodeGroupPlacement().isEmpty(),
-                    "No containers provided" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( theTopology.getEnvironmentName() ),
-                    "Invalid environment name provided" );
-
-            TemplateManager templateManager = ServiceLocator.lookup( TemplateManager.class );
-            LocalPeer localPeer = ServiceLocator.lookup( LocalPeer.class );
-
-            //replace literal "local" with actual id of local peer
-            Set<Node> localNodes = theTopology.removePlacement( "local" );
-
-            if ( localNodes != null )
-            {
-                for ( Node node : localNodes )
-                {
-                    theTopology.addNodePlacement( localPeer.getId(), node );
-                }
-            }
-
-            for ( Map.Entry<String, Set<Node>> entry : theTopology.getNodeGroupPlacement().entrySet() )
-            {
-                String peerId = entry.getKey();
-
-                for ( Node node : entry.getValue() )
-                {
-                    Preconditions
-                            .checkArgument( !Strings.isNullOrEmpty( node.getName() ), "No container name provided" );
-                    Preconditions.checkArgument( !Strings.isNullOrEmpty( node.getTemplateId() ) || !Strings
-                            .isNullOrEmpty( node.getTemplateName() ), "No template provided" );
-
-                    //set peer id taken from placement to avoid supplying peer id for each node in JSON
-                    node.setPeerId( peerId );
-
-                    Preconditions.checkArgument(
-                            !Strings.isNullOrEmpty( node.getHostId() ) || ( Strings.isNullOrEmpty( node.getHostId() )
-                                    && StringUtils.equals( node.getPeerId(), localPeer.getId() ) ),
-                            "Invalid host for container provided" );
-
-                    //use name as hostname to avoid supplying in JSON, also name will be later suffixed by the system
-                    // during clone
-                    node.setHostname( node.getName().replaceAll( "\\s+", "" ) );
-
-                    if ( Strings.isNullOrEmpty( node.getTemplateId() ) )
-                    {
-                        Template template = templateManager.getVerifiedTemplateByName( node.getTemplateName() );
-
-                        Preconditions.checkNotNull( template,
-                                String.format( "Verified template not found by name %s", node.getTemplateName() ) );
-
-                        node.setTemplateId( template.getId() );
-                    }
-
-                    //for local peer if no RH specified, use MH
-                    if ( Strings.isNullOrEmpty( node.getHostId() ) )
-                    {
-                        node.setHostId( localPeer.getManagementHost().getId() );
-                    }
-
-                    if ( node.getQuota() == null )
-                    {
-                        node.setDefaultQuota();
-                    }
-                }
-            }
-
-            if ( !Strings.isNullOrEmpty( theTopology.getSshKey() ) )
-            {
-                theTopology.setSshKeyType( SshEncryptionType.parseTypeFromKey( theTopology.getSshKey() ) );
-            }
-
-            theTopology.setExchangeSshKeys( true );
-            theTopology.setRegisterHosts( true );
-
-            theTopology.setId( UUID.randomUUID() );
+            Topology theTopology = prepare( topology, true );
 
             environmentManager.createEnvironment( theTopology, true );
 
@@ -149,12 +157,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response growEnvironment( final String environmentId, final Topology topology )
+    public Response growEnvironment( final String environmentId, final String topology )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         try
         {
-            environmentManager.modifyEnvironment( environmentId, topology, null, null, true );
+            Topology theTopology = prepare( topology, false );
+
+            environmentManager.modifyEnvironment( environmentId, theTopology, null, null, true );
 
             return Response.ok().build();
         }
