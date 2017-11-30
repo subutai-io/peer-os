@@ -12,6 +12,8 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -25,6 +27,7 @@ import io.subutai.common.environment.HubEnvironment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
@@ -64,10 +67,23 @@ public class RestServiceImpl implements RestService
                     "Invalid environment name provided" );
 
             TemplateManager templateManager = ServiceLocator.lookup( TemplateManager.class );
+            LocalPeer localPeer = ServiceLocator.lookup( LocalPeer.class );
+
+            //replace literal "local" with actual id of local peer
+            Set<Node> localNodes = theTopology.removePlacement( "local" );
+
+            if ( localNodes != null )
+            {
+                for ( Node node : localNodes )
+                {
+                    theTopology.addNodePlacement( localPeer.getId(), node );
+                }
+            }
 
             for ( Map.Entry<String, Set<Node>> entry : theTopology.getNodeGroupPlacement().entrySet() )
             {
                 String peerId = entry.getKey();
+
                 for ( Node node : entry.getValue() )
                 {
                     Preconditions
@@ -77,6 +93,12 @@ public class RestServiceImpl implements RestService
 
                     //set peer id taken from placement to avoid supplying peer id for each node in JSON
                     node.setPeerId( peerId );
+
+                    Preconditions.checkArgument(
+                            !Strings.isNullOrEmpty( node.getHostId() ) || ( Strings.isNullOrEmpty( node.getHostId() )
+                                    && StringUtils.equals( node.getPeerId(), localPeer.getId() ) ),
+                            "Invalid host for container provided" );
+
                     //use name as hostname to avoid supplying in JSON, also name will be later suffixed by the system
                     // during clone
                     node.setHostname( node.getName().replaceAll( "\\s+", "" ) );
@@ -89,6 +111,17 @@ public class RestServiceImpl implements RestService
                                 String.format( "Verified template not found by name %s", node.getTemplateName() ) );
 
                         node.setTemplateId( template.getId() );
+                    }
+
+                    //for local peer if no RH specified, use MH
+                    if ( Strings.isNullOrEmpty( node.getHostId() ) )
+                    {
+                        node.setHostId( localPeer.getManagementHost().getId() );
+                    }
+
+                    if ( node.getQuota() == null )
+                    {
+                        node.setDefaultQuota();
                     }
                 }
             }

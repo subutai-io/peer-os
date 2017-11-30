@@ -173,6 +173,12 @@ public class Topology
     }
 
 
+    public Set<Node> removePlacement( String peerId )
+    {
+        return nodeGroupPlacement.remove( peerId );
+    }
+
+
     public String getSshKey()
     {
         return sshKey;
