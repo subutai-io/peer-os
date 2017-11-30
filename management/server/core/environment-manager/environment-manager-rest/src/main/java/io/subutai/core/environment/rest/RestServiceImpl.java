@@ -2,13 +2,17 @@ package io.subutai.core.environment.rest;
 
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerQuotaDto;
@@ -17,9 +21,12 @@ import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HubEnvironment;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.hub.share.quota.ContainerQuota;
@@ -39,11 +46,40 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createEnvironment( final Topology topology ) throws EnvironmentCreationException
+    public Response createEnvironment( final String topology ) throws EnvironmentCreationException
     {
         try
         {
-            environmentManager.createEnvironment( topology, true );
+            Topology theTopology = JsonUtil.fromJson( topology, Topology.class );
+
+            //this loop sets peer id taken from placement to avoid supplying peer id for each node in JSON
+            for ( Map.Entry<String, Set<Node>> entry : theTopology.getNodeGroupPlacement().entrySet() )
+            {
+                String peerId = entry.getKey();
+                for ( Node node : entry.getValue() )
+                {
+                    node.setPeerId( peerId );
+                    //use name as hostname to avoid supplying in JSON, also name will be later suffixed by the system
+                    // during clone
+                    node.setHostname( node.getName().replaceAll( "\\s+", "" ) );
+                }
+            }
+
+            if ( !Strings.isNullOrEmpty( theTopology.getSshKey() ) )
+            {
+                theTopology.setSshKeyType( SshEncryptionType.parseTypeFromKey( theTopology.getSshKey() ) );
+            }
+            else
+            {
+                theTopology.setSshKeyType( SshEncryptionType.RSA );
+            }
+
+            theTopology.setExchangeSshKeys( true );
+            theTopology.setRegisterHosts( true );
+
+            theTopology.setId( UUID.randomUUID() );
+
+            environmentManager.createEnvironment( theTopology, true );
 
             return Response.ok().build();
         }
