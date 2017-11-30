@@ -135,6 +135,13 @@ public enum ContainerSize
 
 
     @JsonIgnore
+    public ContainerQuota getDefaultContainerQuota()
+    {
+        return getDefaultContainerQuota( this );
+    }
+
+
+    @JsonIgnore
     public static Map<ContainerSize, ContainerQuota> getDefaultQuotas()
     {
         return Collections.unmodifiableMap( containerQuotas );
@@ -190,4 +197,5 @@ public enum ContainerSize
 
         throw new IllegalStateException( "No CPU quota" );
     }
+
 }
