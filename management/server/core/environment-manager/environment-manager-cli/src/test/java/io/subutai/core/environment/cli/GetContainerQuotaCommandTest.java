@@ -10,10 +10,14 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
@@ -59,5 +63,19 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
         command.doExecute();
 
         assertTrue( getSysOut().contains( CONTAINER_NAME ) );
+    }
+
+
+    @Test
+    public void testJsonifyTopology() throws Exception
+    {
+        Node node =
+                new Node( "container-hostname", "container-name", ContainerSize.getDefaultContainerQuota( ContainerSize.TINY ),
+                        "peer-id", "host-id", "template-id" );
+
+        Topology topology = new Topology( "Environment name" );
+        topology.addNodePlacement( "peer-id", node );
+
+        System.out.println( JsonUtil.toJson( topology ));
     }
 }

@@ -2,6 +2,7 @@ package io.subutai.core.environment.rest;
 
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -24,9 +25,8 @@ public interface RestService
 {
     @Path( "/" )
     @POST
-    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response createEnvironment( Topology topology ) throws EnvironmentCreationException;
+    Response createEnvironment( @FormParam( "topology" ) String topology ) throws EnvironmentCreationException;
 
     @Path( "/{environmentId}" )
     @PUT

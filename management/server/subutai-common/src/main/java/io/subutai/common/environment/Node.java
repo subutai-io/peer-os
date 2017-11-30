@@ -115,4 +115,10 @@ public class Node
     {
         return templateId;
     }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
+    }
 }
