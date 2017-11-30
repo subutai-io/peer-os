@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint default-activation="eager" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
-
-  <bean id="desktopManager" scope="singleton" class="io.subutai.core.desktop.impl.DesktopManagerImpl">
-    <argument ref="peerManager" />
+  <bean id="desktopManager" scope="singleton" init-method="init" destroy-method="dispose" activation="eager" class="io.subutai.core.desktop.impl.DesktopManagerImpl">
   </bean>
 
   <service ref="desktopManager" interface="io.subutai.core.desktop.api.DesktopManager" />

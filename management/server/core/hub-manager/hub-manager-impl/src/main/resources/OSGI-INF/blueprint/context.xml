@@ -34,6 +34,9 @@
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />
 
+  <reference id="desktopManager"
+             interface="io.subutai.core.desktop.api.DesktopManager" />
+
   <!-- ***************************************************************** -->
   <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />
@@ -49,6 +52,7 @@
     <property name="monitor" ref="monitor" />
     <property name="commandExecutor" ref="commandExecutor" />
     <property name="logListener" ref="logListener" />
+    <property name="desktopManager" ref="desktopManager" />
     <argument ref="daoManagerHub" />
   </bean>
 
@@ -59,8 +63,7 @@
   <reference-list id="hubEventLstnr"
                   interface="io.subutai.hub.share.common.HubEventListener"
                   availability="optional">
-    <reference-listener ref="hubImpl"
-                        bind-method="addListener" unbind-method="removeListener" />
+    <reference-listener ref="hubImpl" bind-method="addListener" unbind-method="removeListener" />
   </reference-list>
 
   <bean id="hubAdapter" class="io.subutai.core.hubmanager.impl.adapter.HubAdapterImpl" activation="eager"

@@ -28,11 +28,6 @@
     </dependency>
 
     <dependency>
-      <groupId>io.subutai</groupId>
-      <artifactId>peer-manager-api</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>

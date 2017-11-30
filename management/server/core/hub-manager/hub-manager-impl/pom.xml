@@ -93,6 +93,11 @@
       <artifactId>host-registry-api</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>desktop-manager-api</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

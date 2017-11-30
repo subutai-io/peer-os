@@ -1,33 +1,27 @@
 package io.subutai.core.desktop.impl;
 
 
-import com.google.common.base.Preconditions;
-
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.desktop.api.DesktopManager;
-import io.subutai.core.peer.api.PeerManager;
 
 
 public class DesktopManagerImpl implements DesktopManager
 {
-    private final PeerManager peerManager;
 
-
-    public DesktopManagerImpl( final PeerManager peerManager )
+    public DesktopManagerImpl()
     {
-        Preconditions.checkNotNull( peerManager );
-        this.peerManager = peerManager;
     }
 
 
     @Override
     public boolean isDesktop( final ContainerHost containerHost ) throws CommandException
     {
-        String result = getDesktopEnvironmentInfo( containerHost );
-        if ( result != null )
+        String deskEnvResult = getDesktopEnvironmentInfo( containerHost );
+        String rdSerResult = getRDServerInfo( containerHost );
+
+        if ( deskEnvResult != null && rdSerResult != null )
         {
             return true;
         }

@@ -5,9 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
+import io.subutai.core.desktop.api.DesktopManager;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
@@ -23,13 +25,15 @@ public class ContainerEventProcessor extends HubRequester
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private PeerManager peerManager;
+    private DesktopManager desktopManager;
 
 
     public ContainerEventProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
-                                    final RestClient restClient )
+                                    final RestClient restClient, final DesktopManager desktopManager )
     {
         super( hubManager, restClient );
         this.peerManager = peerManager;
+        this.desktopManager = desktopManager;
     }
 
 
@@ -77,6 +81,18 @@ public class ContainerEventProcessor extends HubRequester
                 ch.getEnvironmentId(), ch.getState() );
 
         ContainerStateDto state = ContainerStateDto.valueOf( ch.getState().name() );
+        boolean isDesktopEnvExists = false;
+
+        try
+        {
+            isDesktopEnvExists = desktopManager.isDesktop( ch );
+        }
+        catch ( CommandException e )
+        {
+            log.error( e.getMessage() );
+        }
+
+        //TODO add isDesktop to container info
 
         ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
 
