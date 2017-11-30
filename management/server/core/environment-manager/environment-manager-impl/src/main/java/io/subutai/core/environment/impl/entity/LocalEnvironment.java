@@ -169,7 +169,7 @@ public class LocalEnvironment implements Environment, Serializable
     private boolean deleted = false;
 
     @Enumerated( EnumType.STRING )
-    @Column( name = "ssh_key_type", nullable = false )
+    @Column( name = "ssh_key_type" )
     @JsonProperty( "sshKeyType" )
     private SshEncryptionType sshKeyType = SshEncryptionType.RSA;
 

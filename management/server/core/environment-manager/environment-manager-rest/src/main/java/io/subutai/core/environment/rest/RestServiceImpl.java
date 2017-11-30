@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.ContainerDto;
@@ -24,11 +25,14 @@ import io.subutai.common.environment.HubEnvironment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
+import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
 
 
@@ -52,26 +56,46 @@ public class RestServiceImpl implements RestService
         {
             Topology theTopology = JsonUtil.fromJson( topology, Topology.class );
 
-            //this loop sets peer id taken from placement to avoid supplying peer id for each node in JSON
+            Preconditions.checkNotNull( theTopology, "Invalid topology provided" );
+            Preconditions.checkArgument(
+                    theTopology.getNodeGroupPlacement() != null && !theTopology.getNodeGroupPlacement().isEmpty(),
+                    "No containers provided" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( theTopology.getEnvironmentName() ),
+                    "Invalid environment name provided" );
+
+            TemplateManager templateManager = ServiceLocator.lookup( TemplateManager.class );
+
             for ( Map.Entry<String, Set<Node>> entry : theTopology.getNodeGroupPlacement().entrySet() )
             {
                 String peerId = entry.getKey();
                 for ( Node node : entry.getValue() )
                 {
+                    Preconditions
+                            .checkArgument( !Strings.isNullOrEmpty( node.getName() ), "No container name provided" );
+                    Preconditions.checkArgument( !Strings.isNullOrEmpty( node.getTemplateId() ) || !Strings
+                            .isNullOrEmpty( node.getTemplateName() ), "No template provided" );
+
+                    //set peer id taken from placement to avoid supplying peer id for each node in JSON
                     node.setPeerId( peerId );
                     //use name as hostname to avoid supplying in JSON, also name will be later suffixed by the system
                     // during clone
                     node.setHostname( node.getName().replaceAll( "\\s+", "" ) );
+
+                    if ( Strings.isNullOrEmpty( node.getTemplateId() ) )
+                    {
+                        Template template = templateManager.getVerifiedTemplateByName( node.getTemplateName() );
+
+                        Preconditions.checkNotNull( template,
+                                String.format( "Verified template not found by name %s", node.getTemplateName() ) );
+
+                        node.setTemplateId( template.getId() );
+                    }
                 }
             }
 
             if ( !Strings.isNullOrEmpty( theTopology.getSshKey() ) )
             {
                 theTopology.setSshKeyType( SshEncryptionType.parseTypeFromKey( theTopology.getSshKey() ) );
-            }
-            else
-            {
-                theTopology.setSshKeyType( SshEncryptionType.RSA );
             }
 
             theTopology.setExchangeSshKeys( true );

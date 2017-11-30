@@ -40,6 +40,8 @@ public class Node
     @JsonProperty( "templateId" )
     private String templateId;
 
+    private String templateName;
+
 
     private Node()
     {
@@ -77,12 +79,6 @@ public class Node
     }
 
 
-    public String getPeerId()
-    {
-        return peerId;
-    }
-
-
     public String getHostId()
     {
         return hostId;
@@ -117,8 +113,32 @@ public class Node
     }
 
 
+    public void setTemplateId( final String templateId )
+    {
+        this.templateId = templateId;
+    }
+
+
+    public String getPeerId()
+    {
+        return peerId;
+    }
+
+
     public void setPeerId( final String peerId )
     {
         this.peerId = peerId;
+    }
+
+
+    public String getTemplateName()
+    {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
     }
 }
