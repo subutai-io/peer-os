@@ -8,6 +8,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.gson.required.GsonRequired;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 /**
@@ -39,6 +40,8 @@ public class Node
 
     @JsonProperty( "templateId" )
     private String templateId;
+
+    private String templateName;
 
 
     private Node()
@@ -77,15 +80,9 @@ public class Node
     }
 
 
-    public String getPeerId()
+    public void setDefaultQuota()
     {
-        return peerId;
-    }
-
-
-    public String getHostId()
-    {
-        return hostId;
+        this.quota = ContainerSize.TINY.getDefaultContainerQuota();
     }
 
 
@@ -114,5 +111,47 @@ public class Node
     public String getTemplateId()
     {
         return templateId;
+    }
+
+
+    public void setTemplateId( final String templateId )
+    {
+        this.templateId = templateId;
+    }
+
+
+    public String getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    public String getTemplateName()
+    {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
+    }
+
+
+    public String getHostId()
+    {
+        return hostId;
+    }
+
+
+    public void setHostId( final String hostId )
+    {
+        this.hostId = hostId;
     }
 }
