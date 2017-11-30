@@ -45,8 +45,8 @@ node() {
 
 	// declare hub address
 	switch (env.BRANCH_NAME) {
-		case ~/master/: hubIp = "stage.subut.ai"; break;
-		case ~/dev/: hubIp = "dev.subut.ai"; break;
+		case ~/master/: hubIp = "masterhub.subut.ai"; break;
+		case ~/dev/: hubIp = "devhub.subut.ai"; break;
 		default: hubIp = "hub.subut.ai"
 	}
 
