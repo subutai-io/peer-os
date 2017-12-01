@@ -387,7 +387,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
     var timeout;
     vm.uploadPercent;
-    function showUploadProgress(templateName){
+    function showUploadProgress(templateName, isScheduled){
 
         ngDialog.open({
             template: 'subutai-app/containers/partials/uploadProgress.html',
@@ -405,14 +405,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
                 var percent = parseInt(data.templatesUploadProgress[0].templatesUploadProgress[templateName]);
 
-                if( isNaN(percent) || percent < 100 ){
-                    timeout = setTimeout (function(){ showUploadProgress(templateName); }, 1000);
-                }
+                timeout = setTimeout (function(){ showUploadProgress(templateName, true); }, 3000);
 
-                vm.uploadPercent = isNaN(percent) ? 0: percent;
+                if(isScheduled) vm.uploadPercent = isNaN(percent) ? 0: percent;
 
             }else{
-                timeout = setTimeout (function(){ showUploadProgress(templateName); }, 1000)
+                timeout = setTimeout (function(){ showUploadProgress(templateName, true); }, 3000)
             }
         })
         .error(function (error) {
@@ -425,13 +423,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
     vm.disabled = false;
     function createTemplate( container, name, isPublic ) {
 
+        clearTimeout(timeout);
+
         vm.disabled = true;
 
         vm.uploadPercent = 0;
 
         ngDialog.closeAll();
 
-        LOADING_SCREEN();
 
         checkKurjunAuthToken(identitySrv, $rootScope, function(){
 
@@ -456,13 +455,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
                        // submit signed hash
                        identitySrv.submitSignedHash(signedHash).success(function(){
                            vm.disabled = false;
-                           LOADING_SCREEN('none');
                            ngDialog.closeAll();
                            clearTimeout(timeout);
                            SweetAlert.swal ("Success!", "Template has been created", "success");
                        }).error(function(error){
                            vm.disabled = false;
-                           LOADING_SCREEN('none');
                            ngDialog.closeAll();
                            clearTimeout(timeout);
                            SweetAlert.swal ("ERROR!", error, "error");
@@ -474,7 +471,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
                 } )
                 .error( function (error) {
                     vm.disabled = false;
-                    LOADING_SCREEN('none');
                     ngDialog.closeAll();
                     clearTimeout(timeout);
                     SweetAlert.swal ("ERROR!", error.ERROR, "error");
