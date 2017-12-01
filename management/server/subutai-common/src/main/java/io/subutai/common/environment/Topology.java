@@ -223,7 +223,7 @@ public class Topology
 
     public SshEncryptionType getSshKeyType()
     {
-        return sshKeyType;
+        return sshKeyType == null ? SshEncryptionType.UNKNOWN : sshKeyType;
     }
 
 
