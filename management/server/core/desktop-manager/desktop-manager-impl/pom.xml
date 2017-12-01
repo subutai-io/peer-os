@@ -10,20 +10,20 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>desktop-manager-impl</artifactId>
-  <name>Desktop Manager Impl</name>
-  <description>Desktop Manager Impl</description>
+  <name>Subutai Desktop Manager Impl</name>
+  <description>Subutai Desktop Manager Impl</description>
 
   <packaging>bundle</packaging>
 
   <dependencies>
 
     <dependency>
-      <groupId>io.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>io.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>desktop-manager-api</artifactId>
     </dependency>
 

@@ -10,14 +10,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>desktop-manager-api</artifactId>
-  <name>Desktop Manager Api</name>
-  <description>Desktop Manager Api</description>
+  <name>Subutai Desktop Manager Api</name>
+  <description>Subutai Desktop Manager Api</description>
 
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
-      <groupId>io.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
   </dependencies>
@@ -34,9 +34,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.desktop.api</Bundle-SymbolicName>
-            <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
-            </Export-Package>
           </instructions>
         </configuration>
       </plugin>
