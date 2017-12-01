@@ -33,7 +33,10 @@ public class DesktopManagerImpl implements DesktopManager
 
         if ( deskEnvResult != null && rdSerResult != null )
         {
-            return true;
+            if ( !deskEnvResult.equals( "\n" ) && !deskEnvResult.isEmpty() && !rdSerResult.isEmpty() )
+            {
+                return true;
+            }
         }
 
         return false;
