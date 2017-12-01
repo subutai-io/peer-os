@@ -17,6 +17,7 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
+import io.subutai.hub.share.dto.environment.container.ContainerDesktopInfoDto;
 import io.subutai.hub.share.dto.environment.container.ContainerEventDto;
 
 
@@ -81,20 +82,23 @@ public class ContainerEventProcessor extends HubRequester
                 ch.getEnvironmentId(), ch.getState() );
 
         ContainerStateDto state = ContainerStateDto.valueOf( ch.getState().name() );
-        boolean isDesktopEnvExists = false;
+        ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
 
         try
         {
-            isDesktopEnvExists = desktopManager.isDesktop( ch );
+            boolean isDesktopEnvExists = desktopManager.isDesktop( ch );
+
+            if ( isDesktopEnvExists )
+            {
+                String type = desktopManager.getDesktopEnvironmentInfo( ch );
+                ContainerDesktopInfoDto desktopInfo = new ContainerDesktopInfoDto( ch.getId(), type );
+                dto.setDesktopInfo( desktopInfo );
+            }
         }
         catch ( CommandException e )
         {
             log.error( e.getMessage() );
         }
-
-        //TODO add isDesktop to container info
-
-        ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
 
         RestResult res = doRequest( dto );
 
