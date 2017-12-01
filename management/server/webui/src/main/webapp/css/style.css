@@ -1131,6 +1131,11 @@ tip.description-tooltip {
     width: 355px;
 }
 
+.b-popup_template_upload {
+    width: 400px;
+}
+
+
 .b-popup_environment-creation {
     width: 430px;
 }
@@ -1162,6 +1167,16 @@ tip.description-tooltip {
     color: #04346E;
     border-bottom: 1px solid #CCCEEE;
     text-transform: capitalize;
+    background-color: #f8fbfd;
+}
+
+.b-popup__header_small {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 5px;
+    font-size: 14px;
+    color: #04346E;
+    border-bottom: 1px solid #CCCEEE;
     background-color: #f8fbfd;
 }
 
