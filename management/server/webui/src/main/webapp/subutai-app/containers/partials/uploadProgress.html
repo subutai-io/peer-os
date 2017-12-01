@@ -1,15 +1,15 @@
-<div class="b-popup b-popup_min">
-  <div class="b-popup__header">
+<div class="b-popup b-popup_template_upload">
+  <div class="b-popup__header_small">
     Please, do not close this page until upload is complete!
-    <a href ng-click="closeThisDialog()">
-      <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-    </a>
   </div>
 
   <div class="b-popup__body">
 
     <div class="popup-body-box">
-      Uploaded: <span ng-bind="containerViewCtrl.uploadPercent"/>%
+      <div class="b-progress-cloud b-progress-cloud_white b-progress-cloud_big">
+        <div class="b-progress-cloud-fill" ng-style="{'width':containerViewCtrl.uploadPercent+'%'}"></div>
+        <span class="b-progress-cloud-text">Uploaded {{ containerViewCtrl.uploadPercent }} %</span>
+      </div>
     </div>
 
   </div>
