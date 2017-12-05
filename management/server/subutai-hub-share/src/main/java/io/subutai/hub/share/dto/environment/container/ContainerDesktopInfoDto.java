@@ -24,10 +24,11 @@ public class ContainerDesktopInfoDto
     }
 
 
-    public ContainerDesktopInfoDto( final String id, final String type )
+    public ContainerDesktopInfoDto( final String id, final String type, final String rdServer )
     {
         this.id = id;
         this.type = type;
+        this.rdServer = rdServer;
     }
 
 

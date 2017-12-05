@@ -86,12 +86,13 @@ public class ContainerEventProcessor extends HubRequester
 
         try
         {
-            boolean isDesktopEnvExists = desktopManager.isDesktop( ch );
+            //get information about desktop env and remote desktop server
+            String deskEnv = desktopManager.getDesktopEnvironmentInfo( ch );
+            String rDServer = desktopManager.getRDServerInfo( ch );
 
-            if ( isDesktopEnvExists )
+            if ( !deskEnv.isEmpty() && !rDServer.isEmpty() )
             {
-                String type = desktopManager.getDesktopEnvironmentInfo( ch );
-                ContainerDesktopInfoDto desktopInfo = new ContainerDesktopInfoDto( ch.getId(), type );
+                ContainerDesktopInfoDto desktopInfo = new ContainerDesktopInfoDto( ch.getId(), deskEnv, rDServer );
                 dto.setDesktopInfo( desktopInfo );
             }
         }

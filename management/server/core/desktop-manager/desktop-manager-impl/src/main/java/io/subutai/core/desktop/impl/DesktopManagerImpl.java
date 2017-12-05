@@ -33,7 +33,7 @@ public class DesktopManagerImpl implements DesktopManager
 
         if ( deskEnvResult != null && rdSerResult != null )
         {
-            if ( !deskEnvResult.equals( "\n" ) && !deskEnvResult.isEmpty() && !rdSerResult.isEmpty() )
+            if ( !deskEnvResult.isEmpty() && !rdSerResult.isEmpty() )
             {
                 return true;
             }
@@ -55,6 +55,12 @@ public class DesktopManagerImpl implements DesktopManager
     public String getRDServerInfo( final ContainerHost containerHost ) throws CommandException
     {
         CommandResult result = containerHost.execute( Commands.getRDServerSpecifyCommand() );
-        return result.getStdOut();
+        String stdOut = result.getStdOut();
+        if (stdOut!=null && !stdOut.isEmpty())
+        {
+            stdOut = stdOut.replace( " [ + ]  ", "" );
+            stdOut = stdOut.replace( "\n", "" );
+        }
+        return stdOut;
     }
 }
