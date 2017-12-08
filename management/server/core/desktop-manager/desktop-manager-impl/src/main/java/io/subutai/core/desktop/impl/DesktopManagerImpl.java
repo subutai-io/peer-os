@@ -14,17 +14,6 @@ public class DesktopManagerImpl implements DesktopManager
     {
     }
 
-
-    public void init()
-    {
-    }
-
-
-    public void dispose()
-    {
-    }
-
-
     @Override
     public boolean isDesktop( final ContainerHost containerHost ) throws CommandException
     {
