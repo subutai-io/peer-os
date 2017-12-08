@@ -37,6 +37,7 @@ import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.TaskUtil;
+import io.subutai.core.desktop.api.DesktopManager;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -155,6 +156,8 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private ProductProcessor productProcessor;
 
+    private DesktopManager desktopManager;
+
 
     public HubManagerImpl( DaoManager daoManager )
     {
@@ -210,7 +213,7 @@ public class HubManagerImpl implements HubManager, HostListener
 
         //***********
 
-        containerEventProcessor = new ContainerEventProcessor( this, peerManager, restClient );
+        containerEventProcessor = new ContainerEventProcessor( this, peerManager, restClient, desktopManager );
 
         containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
@@ -781,6 +784,12 @@ public class HubManagerImpl implements HubManager, HostListener
     public void setConfigDataService( final ConfigDataService configDataService )
     {
         this.configDataService = configDataService;
+    }
+
+
+    public void setDesktopManager( final DesktopManager desktopManager )
+    {
+        this.desktopManager = desktopManager;
     }
 
 

@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>6.2.3-SNAPSHOT</version>
+    <version>6.3.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -37,6 +37,7 @@
     <module>object-relation-manager</module>
     <module>system-manager</module>
     <module>bazaar-integration</module>
+    <module>desktop-manager</module>
     <module>hub-manager</module>
     <module>common-plugin</module>
     <module>karaf-manager</module>

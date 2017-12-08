@@ -5,9 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
+import io.subutai.core.desktop.api.DesktopManager;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
@@ -15,6 +17,7 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
+import io.subutai.hub.share.dto.environment.container.ContainerDesktopInfoDto;
 import io.subutai.hub.share.dto.environment.container.ContainerEventDto;
 
 
@@ -23,13 +26,15 @@ public class ContainerEventProcessor extends HubRequester
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private PeerManager peerManager;
+    private DesktopManager desktopManager;
 
 
     public ContainerEventProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
-                                    final RestClient restClient )
+                                    final RestClient restClient, final DesktopManager desktopManager )
     {
         super( hubManager, restClient );
         this.peerManager = peerManager;
+        this.desktopManager = desktopManager;
     }
 
 
@@ -77,8 +82,24 @@ public class ContainerEventProcessor extends HubRequester
                 ch.getEnvironmentId(), ch.getState() );
 
         ContainerStateDto state = ContainerStateDto.valueOf( ch.getState().name() );
-
         ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
+
+        try
+        {
+            //get information about desktop env and remote desktop server
+            String deskEnv = desktopManager.getDesktopEnvironmentInfo( ch );
+            String rDServer = desktopManager.getRDServerInfo( ch );
+
+            if ( !deskEnv.isEmpty() && !rDServer.isEmpty() )
+            {
+                ContainerDesktopInfoDto desktopInfo = new ContainerDesktopInfoDto( ch.getId(), deskEnv, rDServer );
+                dto.setDesktopInfo( desktopInfo );
+            }
+        }
+        catch ( CommandException e )
+        {
+            log.error( e.getMessage() );
+        }
 
         RestResult res = doRequest( dto );
 
