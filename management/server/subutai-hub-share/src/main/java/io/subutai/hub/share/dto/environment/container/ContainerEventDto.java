@@ -22,6 +22,8 @@ public class ContainerEventDto
 
     private ContainerStateDto state;
 
+    private ContainerDesktopInfoDto desktopInfo;
+
 
     public ContainerEventDto()
     {
@@ -72,6 +74,18 @@ public class ContainerEventDto
     public Date getTime()
     {
         return time;
+    }
+
+
+    public ContainerDesktopInfoDto getDesktopInfo()
+    {
+        return desktopInfo;
+    }
+
+
+    public void setDesktopInfo( final ContainerDesktopInfoDto desktopInfo )
+    {
+        this.desktopInfo = desktopInfo;
     }
 
 

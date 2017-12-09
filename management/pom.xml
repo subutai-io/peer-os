@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-parent</artifactId>
-    <version>6.2.3-SNAPSHOT</version>
+    <version>6.3.0-SNAPSHOT</version>
 
     <name>Subutai Server Project Parent</name>
 
@@ -994,6 +994,21 @@
                 <artifactId>git-commit-id-plugin</artifactId>
                 <version>2.2.0</version>
             </dependency>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <!--desktop-manager-->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>desktop-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>desktop-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
         </dependencies>
     </dependencyManagement>
