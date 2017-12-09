@@ -54,6 +54,8 @@ public class RestServiceImpl implements RestService
     }
 
 
+    //TODO simplify JSON for topology by removing map and adding plain array of nodes
+    //TODO because swagger does not fully support maps
     private Topology prepare( String topology, boolean create ) throws HostNotFoundException
     {
         Topology theTopology = JsonUtil.fromJson( topology, Topology.class );
@@ -187,7 +189,10 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                String dataSource = ( environment instanceof HubEnvironment ) ? Common.HUB_ID : Common.SUBUTAI_ID;
+                String dataSource = ( environment instanceof HubEnvironment || String.format( "Of %s", Common.HUB_ID )
+                                                                                     .equals(
+                                                                                             environment.getName() ) ) ?
+                                    Common.HUB_ID : Common.SUBUTAI_ID;
 
                 EnvironmentDto environmentDto =
                         new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
