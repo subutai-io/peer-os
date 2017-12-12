@@ -28,6 +28,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
@@ -102,7 +103,11 @@ public class RestServiceImpl implements RestService
                     new Node( node.getHostname(), node.getHostname(), quota, peerId, rhId, templateId ) );
         }
 
-        //TODO add sshkey to request dto
+        if ( !Strings.isNullOrEmpty( environmentCreationDto.getSshKey() ) )
+        {
+            topology.setSshKey( environmentCreationDto.getSshKey() );
+            topology.setSshKeyType( SshEncryptionType.parseTypeFromKey( environmentCreationDto.getSshKey() ) );
+        }
 
         topology.setExchangeSshKeys( true );
         topology.setRegisterHosts( true );
