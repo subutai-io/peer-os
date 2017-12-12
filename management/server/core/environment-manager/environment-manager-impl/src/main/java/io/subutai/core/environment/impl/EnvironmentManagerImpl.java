@@ -2199,8 +2199,9 @@ public class EnvironmentManagerImpl
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             environment.getContainerDtos(),
-                            environment instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID,
-                            getEnvironmentOwnerName( environment ) );
+                            environment instanceof HubEnvironment || String.format( "Of %s", Common.HUB_ID )
+                                                                           .equals( environment.getName() ) ?
+                            Common.HUB_ID : Common.SUBUTAI_ID, getEnvironmentOwnerName( environment ) );
 
             environmentDtos.add( environmentDto );
         }
@@ -2847,8 +2848,9 @@ public class EnvironmentManagerImpl
         EnvironmentDto environmentDto =
                 new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                         environment.getContainerDtos(),
-                        environment instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID,
-                        getEnvironmentOwnerName( environment ) );
+                        environment instanceof HubEnvironment || String.format( "Of %s", Common.HUB_ID )
+                                                                       .equals( environment.getName() ) ?
+                        Common.HUB_ID : Common.SUBUTAI_ID, getEnvironmentOwnerName( environment ) );
 
         placeInfoIntoContainer( environmentDto, containerHost );
     }
