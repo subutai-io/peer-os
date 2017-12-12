@@ -1,9 +1,7 @@
 package io.subutai.core.environment.rest;
 
 
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -30,14 +28,15 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerSize;
 
 
 public class RestServiceImpl implements RestService
@@ -54,100 +53,72 @@ public class RestServiceImpl implements RestService
     }
 
 
-    //TODO simplify JSON for topology by removing map and adding plain array of nodes
-    //TODO because swagger does not fully support maps
-    private Topology prepare( String topology, boolean create ) throws HostNotFoundException
+    private Topology prepare2( String request, boolean create ) throws HostNotFoundException
     {
-        Topology theTopology = JsonUtil.fromJson( topology, Topology.class );
+        EnvironmentCreationDto environmentCreationDto = JsonUtil.fromJson( request, EnvironmentCreationDto.class );
 
-        Preconditions.checkNotNull( theTopology, "Invalid topology provided" );
-        Preconditions.checkArgument(
-                theTopology.getNodeGroupPlacement() != null && !theTopology.getNodeGroupPlacement().isEmpty(),
+        Preconditions.checkNotNull( environmentCreationDto, "Invalid request" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( environmentCreationDto.getNodes() ),
                 "No containers provided" );
-        Preconditions.checkArgument( !( create && Strings.isNullOrEmpty( theTopology.getEnvironmentName() ) ),
-                "Invalid environment name provided" );
+        Preconditions
+                .checkArgument( !( create && Strings.isNullOrEmpty( environmentCreationDto.getEnvironmentName() ) ),
+                        "Invalid environment name" );
 
         TemplateManager templateManager = ServiceLocator.lookup( TemplateManager.class );
         LocalPeer localPeer = ServiceLocator.lookup( LocalPeer.class );
 
-        //replace literal "local" with actual id of local peer
-        Set<Node> localNodes = theTopology.removePlacement( "local" );
+        Topology topology = new Topology( environmentCreationDto.getEnvironmentName() );
 
-        if ( localNodes != null )
+        for ( NodeDto node : environmentCreationDto.getNodes() )
         {
-            for ( Node node : localNodes )
+            Preconditions
+                    .checkArgument( !Strings.isNullOrEmpty( node.getHostname() ), "No container hostname provided" );
+            Preconditions.checkArgument(
+                    !Strings.isNullOrEmpty( node.getTemplateId() ) || !Strings.isNullOrEmpty( node.getTemplateName() ),
+                    "No template provided" );
+
+            String peerId = Strings.isNullOrEmpty( node.getPeerId() ) ? localPeer.getId() : node.getPeerId();
+            String rhId = Strings.isNullOrEmpty( node.getResourceHostId() ) ? localPeer.getManagementHost().getId() :
+                          node.getResourceHostId();
+            String templateId = node.getTemplateId();
+
+            if ( Strings.isNullOrEmpty( templateId ) )
             {
-                theTopology.addNodePlacement( localPeer.getId(), node );
+                Template template = templateManager.getVerifiedTemplateByName( node.getTemplateName() );
+
+                Preconditions.checkNotNull( template,
+                        String.format( "Verified template not found by name %s", node.getTemplateName() ) );
+
+                templateId = template.getId();
             }
+
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( node.getResourceHostId() ) || (
+                    Strings.isNullOrEmpty( node.getResourceHostId() ) && StringUtils
+                            .equals( peerId, localPeer.getId() ) ), "Invalid host for container provided" );
+
+            ContainerQuota quota = new ContainerQuota( node.getSize() == null ? ContainerSize.TINY : node.getSize() );
+
+            topology.addNodePlacement( peerId,
+                    new Node( node.getHostname(), node.getHostname(), quota, peerId, rhId, templateId ) );
         }
 
-        for ( Map.Entry<String, Set<Node>> entry : theTopology.getNodeGroupPlacement().entrySet() )
-        {
-            String peerId = entry.getKey();
+        //TODO add sshkey to request dto
 
-            for ( Node node : entry.getValue() )
-            {
-                Preconditions.checkArgument( !Strings.isNullOrEmpty( node.getName() ), "No container name provided" );
-                Preconditions.checkArgument( !Strings.isNullOrEmpty( node.getTemplateId() ) || !Strings
-                        .isNullOrEmpty( node.getTemplateName() ), "No template provided" );
+        topology.setExchangeSshKeys( true );
+        topology.setRegisterHosts( true );
 
-                //set peer id taken from placement to avoid supplying peer id for each node in JSON
-                node.setPeerId( peerId );
-
-                Preconditions.checkArgument(
-                        !Strings.isNullOrEmpty( node.getHostId() ) || ( Strings.isNullOrEmpty( node.getHostId() )
-                                && StringUtils.equals( node.getPeerId(), localPeer.getId() ) ),
-                        "Invalid host for container provided" );
-
-                //use name as hostname to avoid supplying in JSON, also name will be later suffixed by the system
-                // during clone
-                node.setHostname( node.getName().replaceAll( "\\s+", "" ) );
-
-                if ( Strings.isNullOrEmpty( node.getTemplateId() ) )
-                {
-                    Template template = templateManager.getVerifiedTemplateByName( node.getTemplateName() );
-
-                    Preconditions.checkNotNull( template,
-                            String.format( "Verified template not found by name %s", node.getTemplateName() ) );
-
-                    node.setTemplateId( template.getId() );
-                }
-
-                //for local peer if no RH specified, use MH
-                if ( Strings.isNullOrEmpty( node.getHostId() ) )
-                {
-                    node.setHostId( localPeer.getManagementHost().getId() );
-                }
-
-                if ( node.getQuota() == null )
-                {
-                    node.setDefaultQuota();
-                }
-            }
-        }
-
-        if ( !Strings.isNullOrEmpty( theTopology.getSshKey() ) )
-        {
-            theTopology.setSshKeyType( SshEncryptionType.parseTypeFromKey( theTopology.getSshKey() ) );
-        }
-
-        theTopology.setExchangeSshKeys( true );
-        theTopology.setRegisterHosts( true );
-
-        theTopology.setId( UUID.randomUUID() );
-
-        return theTopology;
+        return topology;
     }
 
 
     @Override
-    public Response createEnvironment( final String topology )
+    public Response createEnvironment( final String request )
     {
         try
         {
-            Topology theTopology = prepare( topology, true );
+            Topology topology = prepare2( request, true );
 
-            environmentManager.createEnvironment( theTopology, true );
+            environmentManager.createEnvironment( topology, true );
 
             return Response.accepted().build();
         }
@@ -164,7 +135,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Topology theTopology = prepare( topology, false );
+            Topology theTopology = prepare2( topology, false );
 
             environmentManager.modifyEnvironment( environmentId, theTopology, null, null, true );
 
