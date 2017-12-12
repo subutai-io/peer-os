@@ -149,7 +149,15 @@ public class TemplateManagerImpl implements TemplateManager
                 {
                     lastTemplatesFetchTime = System.currentTimeMillis();
 
-                    templatesCache = freshTemplateList;
+                    templatesCache.clear();
+
+                    for ( Template template : freshTemplateList )
+                    {
+                        if ( template != null )
+                        {
+                            templatesCache.add( template );
+                        }
+                    }
                 }
             }
             catch ( Exception e )
@@ -220,7 +228,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         for ( Template template : getTemplates() )
         {
-            if ( template.getName().equalsIgnoreCase( name ) )
+            if ( name.equalsIgnoreCase( template.getName() ) )
             {
                 return template;
             }
@@ -291,6 +299,11 @@ public class TemplateManagerImpl implements TemplateManager
 
                     response = webClient.get();
 
+                    if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+                    {
+                        return templates;
+                    }
+
                     String json = response.readEntity( String.class ).trim();
 
                     if ( json.startsWith( "[" ) )
@@ -299,11 +312,22 @@ public class TemplateManagerImpl implements TemplateManager
                         {
                         }.getType() );
 
-                        templates.addAll( privateTemplates );
+                        for ( Template template : privateTemplates )
+                        {
+                            if ( template != null )
+                            {
+                                templates.add( template );
+                            }
+                        }
                     }
                     else
                     {
-                        templates.add( JsonUtil.fromJson( json, Template.class ) );
+                        Template template = JsonUtil.fromJson( json, Template.class );
+
+                        if ( template != null )
+                        {
+                            templates.add( template );
+                        }
                     }
                 }
                 catch ( Exception e )

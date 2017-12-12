@@ -59,6 +59,9 @@ public class HostMetricsDto
     @JsonProperty( "osName" )
     private String osName;
 
+    @JsonProperty( "ipAddress" )
+    private String ipAddress;
+
     @JsonIgnore
     private transient Long dbId = null;
 
@@ -242,6 +245,18 @@ public class HostMetricsDto
     }
 
 
+    public String getIpAddress()
+    {
+        return ipAddress;
+    }
+
+
+    public void setIpAddress( final String ipAddress )
+    {
+        this.ipAddress = ipAddress;
+    }
+
+
     @Override
     public String toString()
     {
@@ -259,6 +274,7 @@ public class HostMetricsDto
         sb.append( ", createdTime=" ).append( createdTime );
         sb.append( ", startTime=" ).append( startTime );
         sb.append( ", endTime=" ).append( endTime );
+        sb.append( ", ipAddress=" ).append( ipAddress );
         sb.append( '}' );
         return sb.toString();
     }

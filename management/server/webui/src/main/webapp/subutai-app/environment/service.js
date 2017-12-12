@@ -77,7 +77,7 @@ function environmentService($http, $q) {
 		getEnvQuota: getEnvQuota,
 		updateQuota: updateQuota,
 
-
+        getUploadProgress: getUploadProgress,
 
 		getPeers : getPeers,
 
@@ -144,6 +144,10 @@ function environmentService($http, $q) {
 			});
 
 		return callF.promise;
+	}
+
+	function getUploadProgress(templateName) {
+		return $http.get(SERVER_URL + "rest/v1/peer/templatesprogress/" + templateName);
 	}
 
 

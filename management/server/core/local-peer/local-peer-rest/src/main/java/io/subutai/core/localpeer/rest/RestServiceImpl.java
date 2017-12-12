@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Nodes;
+import io.subutai.common.environment.PeerTemplatesUploadProgress;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -29,6 +30,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.DateTimeParam;
+import io.subutai.common.util.JsonUtil;
 
 
 public class RestServiceImpl implements RestService
@@ -382,6 +384,26 @@ public class RestServiceImpl implements RestService
             Preconditions.checkNotNull( peerId );
 
             return Response.ok( localPeer.getResourceLimits( peerId ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response getTemplateUploadProgress( final String templateName )
+    {
+        try
+        {
+            Preconditions.checkNotNull( templateName );
+
+            PeerTemplatesUploadProgress uploadProgress = localPeer.getTemplateUploadProgress( templateName );
+
+            return uploadProgress.getTemplatesUploadProgress().isEmpty() ? Response.ok().build() :
+                   Response.ok( JsonUtil.toJson( uploadProgress ) ).build();
         }
         catch ( Exception e )
         {

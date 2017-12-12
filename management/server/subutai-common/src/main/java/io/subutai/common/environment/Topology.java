@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.annotations.SerializedName;
 
 import io.subutai.common.security.SshEncryptionType;
 
@@ -26,9 +27,11 @@ public class Topology
     private UUID id = UUID.randomUUID();
 
     @JsonProperty( "name" )
+    @SerializedName( "name" )
     private String environmentName;
 
     @JsonProperty( "placement" )
+    @SerializedName( "placement" )
     private Map<String, Set<Node>> nodeGroupPlacement = Maps.newHashMap();
 
     @JsonProperty( "sshKey" )
@@ -170,6 +173,12 @@ public class Topology
     }
 
 
+    public Set<Node> removePlacement( String peerId )
+    {
+        return nodeGroupPlacement.remove( peerId );
+    }
+
+
     public String getSshKey()
     {
         return sshKey;
@@ -214,7 +223,7 @@ public class Topology
 
     public SshEncryptionType getSshKeyType()
     {
-        return sshKeyType;
+        return sshKeyType == null ? SshEncryptionType.UNKNOWN : sshKeyType;
     }
 
 

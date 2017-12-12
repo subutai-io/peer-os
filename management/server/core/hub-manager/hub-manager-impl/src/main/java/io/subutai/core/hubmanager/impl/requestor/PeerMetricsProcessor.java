@@ -119,6 +119,7 @@ public class PeerMetricsProcessor extends HubRequester
             hostMetrics.setHostId( resourceHostMetric.getHostInfo().getId() );
             hostMetrics.setContainersCount( resourceHostMetric.getContainersCount() );
             hostMetrics.setManagement( host.isManagementHost() );
+            hostMetrics.setIpAddress( host.getAddress() );
 
             try
             {
