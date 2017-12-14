@@ -84,7 +84,7 @@ node() {
 			/apps/bin/subutai clone openjre16 management
 			/bin/sleep 20
 			/bin/cp /mnt/lib/lxc/jenkins/${workspace}/${debFileName} /mnt/lib/lxc/management/rootfs/tmp/
-			/apps/bin/lxc-attach -n management -- sh -c 'echo "deb http://${cdnHost}:8080/kurjun/rest/apt /" > /etc/apt/sources.list.d/subutai-repo.list'
+			/apps/bin/lxc-attach -n management -- sh -c 'echo "Acquire::http::Proxy \"http://${cdnHost}:8080/kurjun/rest/apt\"" >> /etc/apt/apt.conf'
 			/apps/bin/lxc-attach -n management -- apt-get update
 			/apps/bin/lxc-attach -n management -- sync
 			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install curl gorjun-local influxdb influxdb-certs
