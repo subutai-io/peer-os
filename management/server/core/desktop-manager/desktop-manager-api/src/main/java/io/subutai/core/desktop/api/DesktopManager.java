@@ -21,4 +21,14 @@ public interface DesktopManager
      * @return remote desktop server information, ex: X2Go Server
      */
     String getRDServerInfo( ContainerHost containerHost ) throws CommandException;
+
+    /**
+     * copies authorized keys to x2go client user
+     */
+    void copyKeys( ContainerHost containerHost ) throws CommandException;
+
+    /**
+     * creates default desktop user for Remote Desktop client
+     */
+    void createDesktopUser( ContainerHost containerHost ) throws CommandException;
 }
