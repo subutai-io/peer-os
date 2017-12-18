@@ -138,6 +138,8 @@ public class HeartbeatProcessor implements Runnable
      */
     public void sendHeartbeat( boolean force ) throws HubManagerException
     {
+        //TODO add check for Console update in progress
+
         if ( !hubManager.isRegisteredWithHub() )
         {
             return;

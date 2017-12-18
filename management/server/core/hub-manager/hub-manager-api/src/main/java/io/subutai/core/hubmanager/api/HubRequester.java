@@ -29,6 +29,7 @@ public abstract class HubRequester implements Runnable
     @Override
     public final void run()
     {
+        //TODO add check for Console update in progress
         if ( hubManager.canWorkWithHub() )
         {
             try
