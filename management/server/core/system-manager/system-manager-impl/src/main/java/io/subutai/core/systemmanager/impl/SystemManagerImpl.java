@@ -36,6 +36,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
@@ -265,6 +266,8 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Update" )
     public boolean updateManagement()
     {
+
+
         if ( isUpdateInProgress || isEnvironmentWorkflowInProgress() )
         {
             return false;
@@ -313,7 +316,6 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    @RolesAllowed( "System-Management|Read" )
     public boolean isUpdateInProgress()
     {
         return isUpdateInProgress;
@@ -324,7 +326,9 @@ public class SystemManagerImpl implements SystemManager
     public boolean isEnvironmentWorkflowInProgress()
     {
         EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
-        return !environmentManager.getActiveWorkflows().isEmpty();
+        HubManager hubManager = ServiceLocator.lookup( HubManager.class );
+
+        return !environmentManager.getActiveWorkflows().isEmpty() || hubManager.hasHubTasksInAction();
     }
 
 

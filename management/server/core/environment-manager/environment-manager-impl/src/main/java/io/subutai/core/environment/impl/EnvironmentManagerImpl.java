@@ -125,6 +125,7 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
@@ -167,7 +168,7 @@ public class EnvironmentManagerImpl
     protected ScheduledExecutorService backgroundTasksExecutorService;
     protected Map<String, CancellableWorkflow> activeWorkflows = Maps.newConcurrentMap();
     private Subject systemUser;
-
+    private SystemManager systemManager;
     private EnvironmentAdapter environmentAdapter;
     private EnvironmentService environmentService;
     protected JsonUtil jsonUtil = new JsonUtil();
@@ -179,7 +180,7 @@ public class EnvironmentManagerImpl
     public EnvironmentManagerImpl( final TemplateManager templateManager, final PeerManager peerManager,
                                    SecurityManager securityManager, final IdentityManager identityManager,
                                    final Tracker tracker, final RelationManager relationManager, HubAdapter hubAdapter,
-                                   final EnvironmentService environmentService )
+                                   final EnvironmentService environmentService, final SystemManager systemManager )
     {
         Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( peerManager );
@@ -187,6 +188,7 @@ public class EnvironmentManagerImpl
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( tracker );
+        Preconditions.checkNotNull( systemManager );
 
         this.templateManager = templateManager;
         this.peerManager = peerManager;
@@ -194,6 +196,7 @@ public class EnvironmentManagerImpl
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
+        this.systemManager = systemManager;
 
 
         //******************************************
@@ -420,7 +423,7 @@ public class EnvironmentManagerImpl
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
-
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         //collect participating peers
         Set<Peer> allPeers;
@@ -443,26 +446,6 @@ public class EnvironmentManagerImpl
 
                 throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
-
-            //check if peer can accommodate the requested nodes
-            //            try
-            //            {
-            //                if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
-            //                {
-            //                    operationTracker.addLogFailed(
-            //                            String.format( "Peer %s can not accommodate the requested containers", peer
-            // .getName() ) );
-            //
-            //                    throw new EnvironmentCreationException(
-            //                            String.format( "Peer %s can not accommodate the requested containers", peer
-            // .getName() ) );
-            //                }
-            //            }
-            //            catch ( PeerException e )
-            //            {
-            //                operationTracker.addLogFailed( e.getMessage() );
-            //                throw new EnvironmentCreationException( e.getMessage() );
-            //            }
         }
 
 
@@ -585,6 +568,7 @@ public class EnvironmentManagerImpl
                                                      final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         boolean hasQuotaModification = !CollectionUtil.isMapEmpty( changedContainers );
         boolean hasContainerDestruction = !CollectionUtil.isCollectionEmpty( removedContainers );
@@ -624,37 +608,6 @@ public class EnvironmentManagerImpl
 
                 throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
-
-            //            Set<Node> newNodes = topology == null ? Sets.<Node>newHashSet() : topology.getPeerNodes(
-            // peer.getId() );
-            //            Map<String, ContainerQuota> changedQuotas =
-            //                    getPeerChangedContainers( peer.getId(), changedContainers, environment );
-            //
-            //check if peer can accommodate the requested nodes
-            //            if ( ( hasContainerCreation && !newNodes.isEmpty() ) || ( hasQuotaModification &&
-            // !changedQuotas
-            //                    .isEmpty() ) )
-            //            {
-            //                try
-            //                {
-            //                    if ( !peer.canAccommodate( new Nodes( newNodes, changedQuotas ) ) )
-            //                    {
-            //                        operationTracker.addLogFailed(
-            //                                String.format( "Peer %s can not accommodate the requested containers",
-            //                                        peer.getName() ) );
-            //
-            //                        throw new EnvironmentModificationException(
-            //                                String.format( "Peer %s can not accommodate the requested containers",
-            //                                        peer.getName() ) );
-            //                    }
-            //                }
-            //                catch ( PeerException e )
-            //                {
-            //                    operationTracker.addLogFailed( e.getMessage() );
-            //
-            //                    throw new EnvironmentModificationException( e.getMessage() );
-            //                }
-            //            }
         }
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
@@ -762,6 +715,7 @@ public class EnvironmentManagerImpl
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( StringUtil.isValidSshPublicKey( sshKey ), "Invalid ssh key" );
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
@@ -814,6 +768,7 @@ public class EnvironmentManagerImpl
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
@@ -911,6 +866,7 @@ public class EnvironmentManagerImpl
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newP2pSecretKey ), "Invalid p2p secret key" );
         Preconditions.checkArgument( p2pSecretKeyTtlSec > 0, "Invalid p2p secret key time-to-live" );
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
@@ -960,6 +916,7 @@ public class EnvironmentManagerImpl
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         LocalEnvironment environment;
 
@@ -1074,6 +1031,7 @@ public class EnvironmentManagerImpl
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
@@ -1144,6 +1102,7 @@ public class EnvironmentManagerImpl
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         final LocalEnvironment environment =
                 ( LocalEnvironment ) loadEnvironment( containerId.getEnvironmentId().getId() );
@@ -2130,6 +2089,8 @@ public class EnvironmentManagerImpl
     public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
             throws EnvironmentNotFoundException, PeerException
     {
+        Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
+
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         EnvironmentContainerImpl containerHost =

@@ -42,6 +42,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
@@ -76,10 +77,10 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
 import io.subutai.hub.share.dto.PeerProductDataDto;
-import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -141,6 +142,8 @@ public class HubManagerImpl implements HubManager, HostListener
     private ProductProcessor productProcessor;
 
     private DesktopManager desktopManager;
+
+    private SystemManager systemManager;
 
 
     public HubManagerImpl( DaoManager daoManager )
@@ -233,9 +236,8 @@ public class HubManagerImpl implements HubManager, HostListener
         final ContainerMetricsProcessor containersMetricsProcessor =
                 new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService,
                         CONTAINER_METRIC_SEND_INTERVAL_MIN );
-        requestorsRunner
-                .scheduleWithFixedDelay( containersMetricsProcessor, 1, CONTAINER_METRIC_SEND_INTERVAL_MIN,
-                        TimeUnit.MINUTES );
+        requestorsRunner.scheduleWithFixedDelay( containersMetricsProcessor, 1, CONTAINER_METRIC_SEND_INTERVAL_MIN,
+                TimeUnit.MINUTES );
     }
 
 
@@ -547,6 +549,19 @@ public class HubManagerImpl implements HubManager, HostListener
     }
 
 
+    public boolean isPeerUpdating()
+    {
+        return systemManager.isUpdateInProgress();
+    }
+
+
+    @Override
+    public boolean hasHubTasksInAction()
+    {
+        return HubRequester.areRequestorsRunning() || HeartbeatProcessor.areProcessorsRunning();
+    }
+
+
     @Override
     public String getPeerName()
     {
@@ -626,36 +641,6 @@ public class HubManagerImpl implements HubManager, HostListener
     public RestClient getRestClient()
     {
         return restClient;
-    }
-
-
-    @Override
-    public void sendSystemConfiguration( final SystemConfDto dto )
-    {
-        if ( isRegisteredWithHub() )
-        {
-            try
-            {
-                String path = "/rest/v1/system-changes";
-
-                RestResult<Object> restResult = restClient.post( path, dto, Object.class );
-
-                log.info( "Sending Configuration of SS to Hub..." );
-
-                if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
-                {
-                    log.info( "SS configuration sent successfully." );
-                }
-                else
-                {
-                    log.error( "Could not send SS configuration to Hub: ", restResult.getError() );
-                }
-            }
-            catch ( Exception e )
-            {
-                log.error( "Could not send SS configuration to Hub", e );
-            }
-        }
     }
 
 
@@ -770,6 +755,12 @@ public class HubManagerImpl implements HubManager, HostListener
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+
+    public void setSystemManager( final SystemManager systemManager )
+    {
+        this.systemManager = systemManager;
     }
 
 

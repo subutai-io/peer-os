@@ -31,6 +31,7 @@ import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
@@ -81,23 +82,28 @@ public class EnvironmentManagerSecureProxyTest
     Topology topology;
     EnvironmentContainerImpl environmentContainer = TestHelper.ENV_CONTAINER();
 
+    @Mock
+    SystemManager systemManager;
+
 
     class EnvironmentManagerSecureProxySUT extends EnvironmentManagerSecureProxy
     {
         public EnvironmentManagerSecureProxySUT( final PeerManager peerManager, final SecurityManager securityManager,
                                                  final IdentityManager identityManager, final Tracker tracker,
                                                  final RelationManager relationManager, final HubAdapter hubAdapter,
-                                                 final EnvironmentService environmentService )
+                                                 final EnvironmentService environmentService,
+                                                 final SystemManager systemManager )
         {
             super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
-                    environmentService );
+                    environmentService, systemManager );
         }
 
 
         protected EnvironmentManagerImpl getEnvironmentManager( TemplateManager templateManager,
                                                                 PeerManager peerManager,
                                                                 SecurityManager securityManager, HubAdapter hubAdapter,
-                                                                EnvironmentService environmentService )
+                                                                EnvironmentService environmentService,
+                                                                SystemManager systemManager )
         {
             return environmentManager;
         }
@@ -112,7 +118,7 @@ public class EnvironmentManagerSecureProxyTest
     public void setUp() throws Exception
     {
         proxy = spy( new EnvironmentManagerSecureProxySUT( peerManager, securityManager, identityManager, tracker,
-                relationManager, hubAdapter, environmentService ) );
+                relationManager, hubAdapter, environmentService, systemManager ) );
 
         doNothing().when( proxy ).check( any( RelationLink.class ), any( RelationLink.class ), anyMap() );
         doNothing().when( proxy ).check( any( RelationLink.class ), any( Collection.class ), anyMap() );
