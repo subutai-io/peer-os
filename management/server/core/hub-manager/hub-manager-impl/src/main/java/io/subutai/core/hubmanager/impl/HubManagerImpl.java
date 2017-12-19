@@ -86,7 +86,6 @@ import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO figure out how to check if requestors are running, probably HubRequestor should register and deregister its run
 public class HubManagerImpl implements HubManager, HostListener
 {
     private static final long PEER_METRICS_SEND_INTERVAL_MIN = 10;
