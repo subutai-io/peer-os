@@ -14,6 +14,7 @@ public class DesktopManagerImpl implements DesktopManager
     {
     }
 
+
     @Override
     public boolean isDesktop( final ContainerHost containerHost ) throws CommandException
     {
@@ -45,11 +46,26 @@ public class DesktopManagerImpl implements DesktopManager
     {
         CommandResult result = containerHost.execute( Commands.getRDServerSpecifyCommand() );
         String stdOut = result.getStdOut();
-        if (stdOut!=null && !stdOut.isEmpty())
+        if ( stdOut != null && !stdOut.isEmpty() )
         {
             stdOut = stdOut.replace( " [ + ]  ", "" );
             stdOut = stdOut.replace( "\n", "" );
         }
         return stdOut;
+    }
+
+
+    @Override
+    public void copyKeys( final ContainerHost containerHost ) throws CommandException
+    {
+        containerHost.execute( Commands.getCreateDefaultSSHDirectoryCommand() );
+        containerHost.execute( Commands.getCopyAuthKeysCommand() );
+    }
+
+
+    @Override
+    public void createDesktopUser( final ContainerHost containerHost ) throws CommandException
+    {
+        containerHost.execute( Commands.getCreateDesktopUserCommand() );
     }
 }

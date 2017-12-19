@@ -94,6 +94,15 @@ public class ContainerEventProcessor extends HubRequester
             {
                 ContainerDesktopInfoDto desktopInfo = new ContainerDesktopInfoDto( ch.getId(), deskEnv, rDServer );
                 dto.setDesktopInfo( desktopInfo );
+                try
+                {
+                    desktopManager.createDesktopUser( ch );
+                    desktopManager.copyKeys( ch );
+                }
+                catch ( Exception e )
+                {
+                    log.error( e.getMessage() );
+                }
             }
         }
         catch ( CommandException e )

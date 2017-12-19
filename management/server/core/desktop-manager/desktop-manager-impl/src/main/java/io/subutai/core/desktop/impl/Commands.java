@@ -8,6 +8,7 @@ public class Commands
 {
     private static final String DESKTOP_ENV_VALUE = "echo $XDG_CURRENT_DESKTOP"; //
     private static final String X2GO_SERVER_SEARCH = "service --status-all | grep x2goserver";
+    private static final String USER = "x2go";
 
 
     /**
@@ -25,5 +26,32 @@ public class Commands
     public static RequestBuilder getRDServerSpecifyCommand()
     {
         return new RequestBuilder( X2GO_SERVER_SEARCH );
+    }
+
+
+    /**
+     * @return create default .ssh directory command
+     */
+    public static RequestBuilder getCreateDefaultSSHDirectoryCommand()
+    {
+        return new RequestBuilder( String.format( "mkdir /home/%s/.ssh", USER ) );
+    }
+
+
+    /**
+     * @return create remote desktop (RD) user
+     */
+    public static RequestBuilder getCreateDesktopUserCommand()
+    {
+        return new RequestBuilder( String.format( "sudo useradd -m %s", USER ) );
+    }
+
+
+    /**
+     * @return copy authenticated_keys to RD user home file command
+     */
+    public static RequestBuilder getCopyAuthKeysCommand()
+    {
+        return new RequestBuilder( String.format( "cp ~/.ssh/authorized_keys /home/%s/.ssh/", USER ) );
     }
 }
