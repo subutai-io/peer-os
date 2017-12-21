@@ -162,7 +162,7 @@ public class TemplateManagerImpl implements TemplateManager
             }
             catch ( Exception e )
             {
-                LOG.error( "Error getting templates from local Gorjun", e );
+                LOG.error( "Error getting templates from Kurjun", e );
 
                 lastTemplatesFetchErrorTime = System.currentTimeMillis();
             }
@@ -268,7 +268,7 @@ public class TemplateManagerImpl implements TemplateManager
         }
         catch ( Exception e )
         {
-            LOG.error( "Error getting verified template by name {} from local Gorjun: {}", templateName,
+            LOG.error( "Error getting verified template by name {} from Kurjun: {}", templateName,
                     e.getMessage() );
 
             return null;
@@ -332,7 +332,7 @@ public class TemplateManagerImpl implements TemplateManager
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( "Error getting private templates from local Gorjun", e );
+                    LOG.error( "Error getting private templates from Kurjun", e );
                 }
                 finally
                 {
