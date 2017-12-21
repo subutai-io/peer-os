@@ -62,6 +62,7 @@ node() {
 		cd management
 		export GIT_BRANCH=${env.BRANCH_NAME}
 		sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i server/server-karaf/src/main/assembly/bin/setenv
+`		sed 's/export CDN_IP=.*/export CDN_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
 			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}

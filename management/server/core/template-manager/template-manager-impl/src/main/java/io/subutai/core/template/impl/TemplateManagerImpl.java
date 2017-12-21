@@ -36,11 +36,11 @@ import io.subutai.core.template.api.TemplateManager;
 public class TemplateManagerImpl implements TemplateManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( TemplateManagerImpl.class.getName() );
-    private static final String GORJUN_LIST_TEMPLATES_URL = Common.LOCAL_KURJUN_BASE_URL + "/template/info?token=%s";
+    private static final String GORJUN_LIST_TEMPLATES_URL = Common.KURJUN_BASE_URL + "/template/info?token=%s";
     private static final String GORJUN_LIST_PRIVATE_TEMPLATES_URL =
-            Common.LOCAL_KURJUN_BASE_URL + "/template/info?owner=%s&token=%s";
+            Common.KURJUN_BASE_URL + "/template/info?owner=%s&token=%s";
     private static final String GORJUN_GET_VERIFIED_TEMPLATE_URL =
-            Common.LOCAL_KURJUN_BASE_URL + "/template/info?name=%s&verified=true";
+            Common.KURJUN_BASE_URL + "/template/info?name=%s&verified=true";
     private static final int TEMPLATE_CACHE_TTL_SEC = 60;
     private static final int HIT_CACHE_IF_ERROR_INTERVAL_SEC = 30;
     private Set<Template> templatesCache = Sets.newConcurrentHashSet();
