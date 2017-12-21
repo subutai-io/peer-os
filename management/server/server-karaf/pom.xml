@@ -320,7 +320,6 @@
                   <packageDependencies>
                     <packageDependencies>openjdk-8-jre-headless</packageDependencies>
                     <packageDependencies>curl</packageDependencies>
-                    <packageDependencies>gorjun-local</packageDependencies>
                     <packageDependencies>influxdb</packageDependencies>
                   </packageDependencies>
                   <excludeAllArtifacts>true</excludeAllArtifacts>
