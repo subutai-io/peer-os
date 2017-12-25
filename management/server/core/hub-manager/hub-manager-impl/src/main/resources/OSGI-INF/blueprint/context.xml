@@ -37,6 +37,9 @@
   <reference id="desktopManager"
              interface="io.subutai.core.desktop.api.DesktopManager" />
 
+  <reference id="systemManager"
+             interface="io.subutai.core.systemmanager.api.SystemManager" />
+
   <!-- ***************************************************************** -->
   <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />
@@ -53,6 +56,7 @@
     <property name="commandExecutor" ref="commandExecutor" />
     <property name="logListener" ref="logListener" />
     <property name="desktopManager" ref="desktopManager" />
+    <property name="systemManager" ref="systemManager" />
     <argument ref="daoManagerHub" />
   </bean>
 

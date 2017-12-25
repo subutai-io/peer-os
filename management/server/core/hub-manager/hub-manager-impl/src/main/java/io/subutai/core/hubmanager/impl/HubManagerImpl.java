@@ -42,6 +42,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
@@ -76,10 +77,10 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
 import io.subutai.hub.share.dto.PeerProductDataDto;
-import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -92,29 +93,12 @@ public class HubManagerImpl implements HubManager, HostListener
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
+
+    private final ScheduledExecutorService requestorsRunner = Executors.newScheduledThreadPool( 10 );
+
     private final ScheduledExecutorService heartbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-    private final ScheduledExecutorService peerLogsExecutor = Executors.newSingleThreadScheduledExecutor();
-
-    private final ScheduledExecutorService resourceHostMonitorExecutorService =
-            Executors.newSingleThreadScheduledExecutor();
-
-    private final ScheduledExecutorService peerMetricsExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private final ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private final ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
-
-    private final ScheduledExecutorService environmentTelemetryService = Executors.newSingleThreadScheduledExecutor();
-
-    private final ScheduledExecutorService versionEventExecutor = Executors.newSingleThreadScheduledExecutor();
-
-    private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
-
     private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
-
-    private final ScheduledExecutorService containersMetricsExecutorService =
-            Executors.newSingleThreadScheduledExecutor();
 
     private SecurityManager securityManager;
 
@@ -157,6 +141,8 @@ public class HubManagerImpl implements HubManager, HostListener
     private ProductProcessor productProcessor;
 
     private DesktopManager desktopManager;
+
+    private SystemManager systemManager;
 
 
     public HubManagerImpl( DaoManager daoManager )
@@ -201,41 +187,41 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         p2pLogsSender = new P2pLogsSender( this, localPeer, monitor, restClient );
 
-        peerLogsExecutor.scheduleWithFixedDelay( p2pLogsSender, 20, 3600, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( p2pLogsSender, 20, 3600, TimeUnit.SECONDS );
 
         //***********
 
         peerMetricsProcessor = new PeerMetricsProcessor( this, peerManager, configManager, monitor, restClient,
                 PEER_METRICS_SEND_INTERVAL_MIN );
 
-        peerMetricsExecutorService
+        requestorsRunner
                 .scheduleWithFixedDelay( peerMetricsProcessor, 1, PEER_METRICS_SEND_INTERVAL_MIN, TimeUnit.MINUTES );
 
         //***********
 
         containerEventProcessor = new ContainerEventProcessor( this, peerManager, restClient, desktopManager );
 
-        containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
         //***********
 
         HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this, logListener, restClient );
 
-        hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
         //***********
 
         TunnelEventProcessor tunnelEventProcessor =
                 new TunnelEventProcessor( this, peerManager, configManager, restClient );
 
-        tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
         //***********
 
         final VersionInfoProcessor versionInfoProcessor =
                 new VersionInfoProcessor( this, peerManager, configManager, restClient );
 
-        versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
 
         //***********
@@ -243,15 +229,14 @@ public class HubManagerImpl implements HubManager, HostListener
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
 
-        environmentTelemetryService.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
 
         //***********
         final ContainerMetricsProcessor containersMetricsProcessor =
                 new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService,
                         CONTAINER_METRIC_SEND_INTERVAL_MIN );
-        containersMetricsExecutorService
-                .scheduleWithFixedDelay( containersMetricsProcessor, 1, CONTAINER_METRIC_SEND_INTERVAL_MIN,
-                        TimeUnit.MINUTES );
+        requestorsRunner.scheduleWithFixedDelay( containersMetricsProcessor, 1, CONTAINER_METRIC_SEND_INTERVAL_MIN,
+                TimeUnit.MINUTES );
     }
 
 
@@ -563,6 +548,19 @@ public class HubManagerImpl implements HubManager, HostListener
     }
 
 
+    public boolean isPeerUpdating()
+    {
+        return systemManager.isUpdateInProgress();
+    }
+
+
+    @Override
+    public boolean hasHubTasksInAction()
+    {
+        return HubRequester.areRequestorsRunning() || HeartbeatProcessor.areProcessorsRunning();
+    }
+
+
     @Override
     public String getPeerName()
     {
@@ -646,36 +644,6 @@ public class HubManagerImpl implements HubManager, HostListener
 
 
     @Override
-    public void sendSystemConfiguration( final SystemConfDto dto )
-    {
-        if ( isRegisteredWithHub() )
-        {
-            try
-            {
-                String path = "/rest/v1/system-changes";
-
-                RestResult<Object> restResult = restClient.post( path, dto, Object.class );
-
-                log.info( "Sending Configuration of SS to Hub..." );
-
-                if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
-                {
-                    log.info( "SS configuration sent successfully." );
-                }
-                else
-                {
-                    log.error( "Could not send SS configuration to Hub: ", restResult.getError() );
-                }
-            }
-            catch ( Exception e )
-            {
-                log.error( "Could not send SS configuration to Hub", e );
-            }
-        }
-    }
-
-
-    @Override
     public String getCurrentUserEmail()
     {
         User currentUser = identityManager.getActiveUser();
@@ -717,25 +685,9 @@ public class HubManagerImpl implements HubManager, HostListener
     {
         heartbeatExecutorService.shutdown();
 
-        peerLogsExecutor.shutdown();
-
-        resourceHostMonitorExecutorService.shutdown();
-
-        containersMetricsExecutorService.shutdown();
+        requestorsRunner.shutdown();
 
         asyncHeartbeatExecutor.shutdown();
-
-        peerMetricsExecutorService.shutdown();
-
-        hubLoggerExecutorService.shutdown();
-
-        containerEventExecutor.shutdown();
-
-        environmentTelemetryService.shutdown();
-
-        versionEventExecutor.shutdown();
-
-        tunnelEventService.shutdown();
     }
 
 
@@ -802,6 +754,12 @@ public class HubManagerImpl implements HubManager, HostListener
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+
+    public void setSystemManager( final SystemManager systemManager )
+    {
+        this.systemManager = systemManager;
     }
 
 

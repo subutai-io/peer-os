@@ -75,6 +75,7 @@ import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
@@ -97,7 +98,8 @@ public class EnvironmentManagerSecureProxy
     public EnvironmentManagerSecureProxy( final TemplateManager templateManager, final PeerManager peerManager,
                                           SecurityManager securityManager, final IdentityManager identityManager,
                                           final Tracker tracker, final RelationManager relationManager,
-                                          HubAdapter hubAdapter, final EnvironmentService environmentService )
+                                          final HubAdapter hubAdapter, final EnvironmentService environmentService,
+                                          final SystemManager systemManager )
     {
         Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( peerManager );
@@ -105,21 +107,25 @@ public class EnvironmentManagerSecureProxy
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( tracker );
+        Preconditions.checkNotNull( environmentService );
+        Preconditions.checkNotNull( systemManager );
 
         this.relationManager = relationManager;
         this.tracker = tracker;
         this.identityManager = identityManager;
         this.environmentManager =
-                getEnvironmentManager( templateManager, peerManager, securityManager, hubAdapter, environmentService );
+                getEnvironmentManager( templateManager, peerManager, securityManager, hubAdapter, environmentService,
+                        systemManager );
     }
 
 
     protected EnvironmentManagerImpl getEnvironmentManager( TemplateManager templateManager, PeerManager peerManager,
                                                             SecurityManager securityManager, HubAdapter hubAdapter,
-                                                            EnvironmentService environmentService )
+                                                            EnvironmentService environmentService,
+                                                            SystemManager systemManager )
     {
         return new EnvironmentManagerImpl( templateManager, peerManager, securityManager, identityManager, tracker,
-                relationManager, hubAdapter, environmentService );
+                relationManager, hubAdapter, environmentService, systemManager );
     }
 
 
