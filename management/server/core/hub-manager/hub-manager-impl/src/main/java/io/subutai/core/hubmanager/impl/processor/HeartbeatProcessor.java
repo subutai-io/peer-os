@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ import io.subutai.hub.share.dto.HeartbeatResponseDto;
 
 public class HeartbeatProcessor implements Runnable
 {
+    private static final AtomicInteger runningCount = new AtomicInteger( 0 );
+
     private static final int FAST_MODE_MAX = 30; // For 5 min
 
     private static final int BIG_INTERVAL_SECONDS = 60;
@@ -138,7 +141,7 @@ public class HeartbeatProcessor implements Runnable
      */
     public void sendHeartbeat( boolean force ) throws HubManagerException
     {
-        if ( !hubManager.isRegisteredWithHub() )
+        if ( !hubManager.isRegisteredWithHub() || hubManager.isPeerUpdating() )
         {
             return;
         }
@@ -236,6 +239,12 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
+    public static boolean areProcessorsRunning()
+    {
+        return runningCount.get() > 0;
+    }
+
+
     private void processStateLinks( final Set<String> stateLinks )
     {
         log.info( "stateLinks: {}", stateLinks );
@@ -251,6 +260,8 @@ public class HeartbeatProcessor implements Runnable
                 {
                     try
                     {
+                        runningCount.incrementAndGet();
+
                         boolean fastModeAsked = processor.processStateLinks( unmodifiableSet );
 
                         if ( fastModeAsked )
@@ -261,6 +272,10 @@ public class HeartbeatProcessor implements Runnable
                     catch ( Exception e )
                     {
                         log.error( "Error to process state links: ", e );
+                    }
+                    finally
+                    {
+                        runningCount.decrementAndGet();
                     }
                 }
             } );

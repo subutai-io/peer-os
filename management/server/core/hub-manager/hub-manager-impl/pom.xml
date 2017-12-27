@@ -30,10 +30,13 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
 
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>metric-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>system-manager-api</artifactId>
     </dependency>
 
     <dependency>

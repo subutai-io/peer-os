@@ -5,7 +5,6 @@ import java.util.Map;
 
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
-import io.subutai.hub.share.dto.SystemConfDto;
 
 
 public interface HubManager
@@ -36,8 +35,6 @@ public interface HubManager
 
     String getChecksum();
 
-    void sendSystemConfiguration( SystemConfDto dto );
-
     String getCurrentUserEmail();
 
     boolean isRegisteredWithHub();
@@ -46,5 +43,9 @@ public interface HubManager
 
     boolean canWorkWithHub();
 
+    boolean isPeerUpdating();
+
     RestClient getRestClient();
+
+    boolean hasHubTasksInAction();
 }

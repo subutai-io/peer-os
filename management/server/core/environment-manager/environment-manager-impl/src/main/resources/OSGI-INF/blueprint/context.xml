@@ -35,6 +35,9 @@
   <reference id="relationManager"
              interface="io.subutai.common.security.relation.RelationManager" />
 
+  <reference id="systemManager"
+             interface="io.subutai.core.systemmanager.api.SystemManager" />
+
   <reference id="hubAdapter" availability="optional" interface="io.subutai.hub.share.common.HubAdapter" />
 
   <!-- JTA -->
@@ -87,6 +90,7 @@
     <argument ref="relationManager" />
     <argument ref="hubAdapter" />
     <argument ref="envMgrService" />
+    <argument ref="systemManager" />
   </bean>
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />

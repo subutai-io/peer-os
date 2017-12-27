@@ -84,6 +84,7 @@ import io.subutai.core.peer.api.PeerActionType;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
@@ -181,6 +182,8 @@ public class EnvironmentManagerImplTest
     PGPKeyUtil pgpKeyUtil;
     @Mock
     TemplateManager templateManager;
+    @Mock
+    SystemManager systemManager;
 
 
     class EnvironmentManagerImplSUT extends EnvironmentManagerImpl
@@ -188,10 +191,11 @@ public class EnvironmentManagerImplTest
         public EnvironmentManagerImplSUT( final TemplateManager templateManager, final PeerManager peerManager,
                                           final SecurityManager securityManager, final IdentityManager identityManager,
                                           final Tracker tracker, final RelationManager relationManager,
-                                          final HubAdapter hubAdapter, final EnvironmentService environmentService )
+                                          final HubAdapter hubAdapter, final EnvironmentService environmentService,
+                                          final SystemManager systemManager )
         {
             super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
-                    environmentService );
+                    environmentService, systemManager );
         }
 
 
@@ -222,7 +226,7 @@ public class EnvironmentManagerImplTest
 
         environmentManager =
                 spy( new EnvironmentManagerImplSUT( templateManager, peerManager, securityManager, identityManager,
-                        tracker, relationManager, hubAdapter, environmentService ) );
+                        tracker, relationManager, hubAdapter, environmentService, systemManager ) );
         environmentManager.jsonUtil = jsonUtil;
         environmentManager.pgpKeyUtil = pgpKeyUtil;
         environmentManager.activeWorkflows = activeWorkflows;
