@@ -81,29 +81,36 @@ public class HeartbeatProcessor implements Runnable
             @Override
             public void run()
             {
-                try
-                {
-                    if ( !hubManager.isRegisteredWithHub() )
-                    {
-                        return;
-                    }
-
-                    log.warn( "Shutting down hub manager" );
-                    String url = path + "shutdown-hook";
-
-                    RestResult<Object> restResult = restClient.post( url, null );
-
-                    if ( restResult.isSuccess() )
-                    {
-                        log.info( "Shutdown hook successfully sent to Hub" );
-                    }
-                }
-                catch ( Exception e )
-                {
-                    //ignore
-                }
+                notifyHubThatPeerIsOffline();
             }
         } );
+    }
+
+
+    public void notifyHubThatPeerIsOffline()
+    {
+        try
+        {
+            if ( !hubManager.isRegisteredWithHub() )
+            {
+                return;
+            }
+
+            log.warn( "Notifying Hub that peer is offline" );
+
+            String url = path + "shutdown-hook";
+
+            RestResult<Object> restResult = restClient.post( url, null );
+
+            if ( restResult.isSuccess() )
+            {
+                log.info( "'Peer offline' notification successfully sent to Hub" );
+            }
+        }
+        catch ( Exception e )
+        {
+            //ignore
+        }
     }
 
 

@@ -605,6 +605,13 @@ public class HubManagerImpl implements HubManager, HostListener
 
 
     @Override
+    public void notifyHubThatPeerIsOffline()
+    {
+        heartbeatProcessor.notifyHubThatPeerIsOffline();
+    }
+
+
+    @Override
     public Config getHubConfiguration()
     {
         return configDataService.getHubConfig( configManager.getPeerId() );
