@@ -47,6 +47,7 @@ node() {
 	switch (env.BRANCH_NAME) {
 		case ~/master/: hubIp = "masterhub.subut.ai"; break;
 		case ~/dev/: hubIp = "devhub.subut.ai"; break;
+		case ~/sysnet/: hubIp = "devhub.subut.ai"; break;
 		default: hubIp = "hub.subut.ai"
 	}
 
@@ -54,6 +55,7 @@ node() {
 	switch (env.BRANCH_NAME) {
 		case ~/master/: cdnHost = "mastercdn.subut.ai"; break;
 		case ~/dev/: cdnHost = "devcdn.subut.ai"; break;
+		case ~/sysnet/: cdnHost = "sysnetcdn.subut.ai"; break;
 		default: cdnHost = "cdn.subut.ai"
 	}
 
