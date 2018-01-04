@@ -47,6 +47,7 @@ node() {
 	switch (env.BRANCH_NAME) {
 		case ~/master/: hubIp = "masterhub.subut.ai"; break;
 		case ~/dev/: hubIp = "devhub.subut.ai"; break;
+		case ~/sysnet/: hubIp = "devhub.subut.ai"; break;
 		default: hubIp = "hub.subut.ai"
 	}
 
@@ -54,6 +55,7 @@ node() {
 	switch (env.BRANCH_NAME) {
 		case ~/master/: cdnHost = "mastercdn.subut.ai"; break;
 		case ~/dev/: cdnHost = "devcdn.subut.ai"; break;
+		case ~/sysnet/: cdnHost = "sysnetcdn.subut.ai"; break;
 		default: cdnHost = "cdn.subut.ai"
 	}
 
@@ -178,7 +180,7 @@ node() {
 		}
 	}
 
-	if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev') {
+	if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
 		stage("Deploy artifacts on kurjun")
 		deleteDir()
 
