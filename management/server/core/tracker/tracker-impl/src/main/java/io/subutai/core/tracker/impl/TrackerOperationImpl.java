@@ -145,8 +145,8 @@ public class TrackerOperationImpl implements TrackerOperation
             }
             log.append( String.format( "{\"date\" : %s, \"log\" : \"%s\", \"state\" : \"%s\"},",
                     new Timestamp( System.currentTimeMillis() ).getTime(),
-                    logString.replaceAll( "\r", "" ).replaceAll( "\n", "" ).replaceAll( "\"", "" )
-                             .replaceAll( "\\{", "" ).replaceAll( "}", "" ), state ) );
+                    logString.replaceAll( "\r", "" ).replaceAll( "\n", "" ).replaceAll( "\\\"", "" )
+                             .replaceAll( "\"", "" ).replaceAll( "\\{", "" ).replaceAll( "}", "" ), state ) );
         }
         this.state = state;
         tracker.saveTrackerOperation( source, this );
