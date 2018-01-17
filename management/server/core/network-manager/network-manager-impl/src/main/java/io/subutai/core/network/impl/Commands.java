@@ -30,6 +30,8 @@ public class Commands
     private static final String LOG_BINDING = "subutai log";
     private final SimpleDateFormat p2pDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
+    private static final String NETWORK_IFACE_REMOVAL = "ip link delete";
+
 
     RequestBuilder getGetReservedPortsCommand()
     {
@@ -58,9 +60,24 @@ public class Commands
     }
 
 
+    RequestBuilder getJoinP2PSwarmDHCPCommand( String interfaceName, String p2pHash, String secretKey,
+                                               long secretKeyTtlSec, String portRange )
+    {
+        return new RequestBuilder( P2P_BINDING )
+                .withCmdArgs( "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ), "dhcp",
+                        portRange ).withTimeout( 90 );
+    }
+
+
     RequestBuilder getRemoveP2PSwarmCommand( String p2pHash )
     {
         return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-d", p2pHash ).withTimeout( 90 );
+    }
+
+
+    RequestBuilder getRemoveP2PIfaceCommand( String interfaceName )
+    {
+        return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName ).withTimeout( 90 );
     }
 
 

@@ -83,11 +83,37 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void joinP2PSwarmDHCP( final Host host, final String interfaceName, final String p2pHash,
+                                  final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
+
+
+        execute( host, commands.getJoinP2PSwarmDHCPCommand( interfaceName, p2pHash, secretKey,
+                getUnixTimestampOffset( secretKeyTtlSec ),
+                String.format( "%s-%s", Common.P2P_PORT_RANGE_START, Common.P2P_PORT_RANGE_END ) ) );
+    }
+
+
+    @Override
     public void removeP2PSwarm( final Host host, String p2pHash ) throws NetworkManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
 
         execute( host, commands.getRemoveP2PSwarmCommand( p2pHash ) );
+    }
+
+
+    @Override
+    public void removeP2PIface( Host host, String interfaceName ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
+
+        execute( host, commands.getRemoveP2PIfaceCommand( interfaceName ) );
     }
 
 

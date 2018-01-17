@@ -29,6 +29,8 @@ public class PortMapDto
 
     private int externalPort;
 
+    private String ipAddr;
+
     private State state;
 
     private String stateDetails;
@@ -40,8 +42,6 @@ public class PortMapDto
     private boolean sslBackend;
 
     private String errorLog;
-
-    private String proxyIp;
 
     private boolean isProxied;
 
@@ -112,6 +112,18 @@ public class PortMapDto
     }
 
 
+    public String getIpAddr()
+    {
+        return ipAddr;
+    }
+
+
+    public void setIpAddr( final String ipAddr )
+    {
+        this.ipAddr = ipAddr;
+    }
+
+
     public State getState()
     {
         return state;
@@ -172,18 +184,6 @@ public class PortMapDto
     }
 
 
-    public String getProxyIp()
-    {
-        return proxyIp;
-    }
-
-
-    public void setProxyIp( final String proxyIp )
-    {
-        this.proxyIp = proxyIp;
-    }
-
-
     public boolean isProxied()
     {
         return isProxied;
@@ -193,5 +193,14 @@ public class PortMapDto
     public void setProxied( final boolean proxied )
     {
         isProxied = proxied;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "PortMapDto{" + "containerSSId=" + containerSSId + ", protocol=" + protocol + ", internalPort="
+                + internalPort + ", externalPort=" + externalPort + ", state=" + state + ", domain=" + domain
+                + ", sslBackend=" + sslBackend + ", ipAddr=" + ipAddr + ", isProxied=" + isProxied + '}';
     }
 }
