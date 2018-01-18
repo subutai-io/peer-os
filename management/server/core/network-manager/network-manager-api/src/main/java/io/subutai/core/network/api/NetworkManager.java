@@ -29,7 +29,15 @@ public interface NetworkManager
     void joinP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
                        long secretKeyTtlSec ) throws NetworkManagerException;
 
+    /**
+     * Sets up a P2P connection on given host with dynamic IP address.
+     */
+    void joinP2PSwarmDHCP( Host host, String interfaceName, String p2pHash, String secretKey, long secretKeyTtlSec )
+            throws NetworkManagerException;
+
     void removeP2PSwarm( Host host, String p2pHash ) throws NetworkManagerException;
+
+    void removeP2PIface( Host host, String interfaceName ) throws NetworkManagerException;
 
     /**
      * Resets a secret key for a given P2P network

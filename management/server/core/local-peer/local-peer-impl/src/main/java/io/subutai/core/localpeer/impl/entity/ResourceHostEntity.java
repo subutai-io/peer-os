@@ -747,6 +747,33 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public void joinP2PSwarmDHCP( final String interfaceName, final String p2pHash, final String secretKey,
+                                  final long secretKeyTtlSec ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret" );
+        Preconditions.checkArgument( secretKeyTtlSec > 0, "Ttl must be greater than 0" );
+
+        try
+        {
+            if ( getP2PConnections().findByHash( p2pHash ) != null )
+            {
+                getNetworkManager().resetSwarmSecretKey( this, p2pHash, secretKey, secretKeyTtlSec );
+            }
+            else
+            {
+                getNetworkManager().joinP2PSwarmDHCP( this, interfaceName, p2pHash, secretKey, secretKeyTtlSec );
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Failed to join P2P swarm: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public void removeP2PSwarm( String p2pHash ) throws ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
@@ -761,6 +788,23 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( String.format( "Failed to remove P2P swarm: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void removeP2PNetworkIface( String interfaceName ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
+
+        try
+        {
+            getNetworkManager().removeP2PIface( this, interfaceName );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Failed to remove P2P network interface: %s", e.getMessage() ), e );
         }
     }
 
