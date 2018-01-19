@@ -5,7 +5,7 @@
     </a>
   </div>
   <ul class="b-nav__menu">
-    <li class="b-nav-menu" ng-class="subutaiController.activeState == 'home' ? 'b-nav-menu_active' : ''">
+    <li class="b-nav-menu" ng-if="subutaiController.adminMenus" ng-class="subutaiController.activeState == 'home' ? 'b-nav-menu_active' : ''">
       <a ui-sref="home" class="b-nav-menu-link" id="subt-link__monitoring">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">

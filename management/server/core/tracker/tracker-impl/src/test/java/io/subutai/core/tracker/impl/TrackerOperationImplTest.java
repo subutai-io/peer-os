@@ -85,6 +85,16 @@ public class TrackerOperationImplTest
 
 
     @Test
+    public void testAddLogRemoveSymbols()
+    {
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+
+        poi.addLog( "test\rtest\ntest\\test\"test{}test" );
+        assertThat( poi.getLog(), containsString( "testtesttesttesttesttest" ) );
+    }
+
+
+    @Test
     public void shouldAddLogNSucceed()
     {
         TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
