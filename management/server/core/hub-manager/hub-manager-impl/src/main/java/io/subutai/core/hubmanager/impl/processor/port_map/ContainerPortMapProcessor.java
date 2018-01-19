@@ -55,7 +55,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
         for ( String stateLink : stateLinks )
         {
-            if ( stateLink.contains( "port" ) )
+            if ( stateLink.contains( "/ports/" ) )
             {
                 processLink( stateLink );
             }

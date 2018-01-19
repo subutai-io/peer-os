@@ -48,4 +48,6 @@ public interface HubManager
     RestClient getRestClient();
 
     boolean hasHubTasksInAction();
+
+    void notifyHubThatPeerIsOffline();
 }

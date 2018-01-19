@@ -273,6 +273,8 @@ public class SystemManagerImpl implements SystemManager
             return false;
         }
 
+        notifyHubThatPeerIsOffline();
+
         isUpdateInProgress = true;
 
         try
@@ -329,6 +331,13 @@ public class SystemManagerImpl implements SystemManager
         HubManager hubManager = ServiceLocator.lookup( HubManager.class );
 
         return !environmentManager.getActiveWorkflows().isEmpty() || hubManager.hasHubTasksInAction();
+    }
+
+
+    public void notifyHubThatPeerIsOffline()
+    {
+        HubManager hubManager = ServiceLocator.lookup( HubManager.class );
+        hubManager.notifyHubThatPeerIsOffline();
     }
 
 
