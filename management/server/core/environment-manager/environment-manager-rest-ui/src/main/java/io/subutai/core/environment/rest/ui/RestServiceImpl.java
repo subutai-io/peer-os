@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1193,6 +1194,13 @@ public class RestServiceImpl implements RestService
     public Response listTenantEnvironments()
     {
         Set<EnvironmentDto> tenantEnvs = environmentManager.getTenantEnvironments();
+
+        //remove remote containers
+        for ( EnvironmentDto environmentDto : tenantEnvs )
+        {
+            Set<ContainerDto> containerDtos = environmentDto.getContainers();
+            containerDtos.removeIf( containerDto -> !containerDto.isLocal() );
+        }
 
         return Response.ok( JsonUtil.toJson( removeXss( tenantEnvs ) ) ).build();
     }

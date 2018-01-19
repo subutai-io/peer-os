@@ -42,6 +42,7 @@ function environmentService($http, $q) {
 
 
 		getEnvironments : getEnvironments,
+		getTenants: getTenants,
 		startEnvironmentAdvancedBuild : startEnvironmentAdvancedBuild,
 		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
 		destroyEnvironment: destroyEnvironment,
@@ -153,6 +154,10 @@ function environmentService($http, $q) {
 
 	function getEnvironments() {
 		return $http.get(ENVIRONMENTS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function getTenants() {
+		return $http.get(TENANTS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 

@@ -4011,10 +4011,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         }
                     }
 
-                    if ( found || System.currentTimeMillis() - networkResource.getDateCreated() < TimeUnit.MINUTES
-                            .toMillis( 5 ) )
+                    if ( found || System.currentTimeMillis() - networkResource.getDateCreated() < TimeUnit.DAYS
+                            .toMillis( 7 ) )
                     {
-                        //don't cleanup the found ones and the ones that are created less than 5 min ago
+                        //don't cleanup the found ones and the ones that are created less than 7 days ago
                         iterator.remove();
                     }
                 }
