@@ -18,6 +18,8 @@ public class AnsibleDto
     private State state;
     private Set<Group> groups = new HashSet();
     private String logs;
+    private String vars;
+
 
 
     public AnsibleDto()
@@ -94,5 +96,17 @@ public class AnsibleDto
     public void setGroups( final Set<Group> groups )
     {
         this.groups = groups;
+    }
+
+
+    public String getVars()
+    {
+        return vars;
+    }
+
+
+    public void setVars( final String vars )
+    {
+        this.vars = vars;
     }
 }

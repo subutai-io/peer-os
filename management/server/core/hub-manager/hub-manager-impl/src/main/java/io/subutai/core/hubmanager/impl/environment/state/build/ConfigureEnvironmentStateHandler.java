@@ -4,6 +4,8 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -61,17 +63,24 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         copyRepoUnpack( containerId, repoLink );
 
-        String out = runAnsibleScript( containerId, getDirLocation( repoLink ), mainAnsibleScript );
+        String out =
+                runAnsibleScript( containerId, getDirLocation( repoLink ), mainAnsibleScript, ansibleDto.getVars() );
 
         peerDto.getAnsibleDto().setLogs( out );
     }
 
 
-    private String runAnsibleScript( final String containerId, final String dirLocation,
-                                     final String mainAnsibleScript )
+    private String runAnsibleScript( final String containerId, final String dirLocation, final String mainAnsibleScript,
+                                     String extraVars )
     {
-        String cmd = String.format( "cd %s; ansible-playbook  %s  -e 'ansible_python_interpreter=/usr/bin/python3' ",
-                TMP_DIR + dirLocation, mainAnsibleScript );
+        if ( extraVars == null || StringUtils.isEmpty( extraVars ) )
+        {
+            extraVars = "{}";
+        }
+
+        String cmd = String.format(
+                "cd %s; ansible-playbook  %s  -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars %s",
+                TMP_DIR + dirLocation, mainAnsibleScript, extraVars );
         try
         {
             return runCmd( containerId, cmd );
