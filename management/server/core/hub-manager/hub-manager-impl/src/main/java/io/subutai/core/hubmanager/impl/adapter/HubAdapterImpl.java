@@ -189,7 +189,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
 
         if ( userId != null )
         {
-            String path = format( USER_ENVIRONMENTS_URL, getUserId() ) + "/" + envId;
+            String path = format( USER_ENVIRONMENTS_URL, userId ) + "/" + envId;
 
             getRestClient().delete( path );
         }
@@ -515,6 +515,7 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     {
         // not needed
     }
+
 
     @Override
     public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )

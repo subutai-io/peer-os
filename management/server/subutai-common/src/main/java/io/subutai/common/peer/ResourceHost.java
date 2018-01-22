@@ -148,6 +148,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     Set<String> listExistingContainerNames() throws ResourceHostException;
 
+    Set<ContainerInfo> listExistingContainersInfo() throws ResourceHostException;
+
+
     ReservedPorts getReservedPorts() throws ResourceHostException;
 
     ReservedPorts getContainerPortMappings( final Protocol protocol ) throws ResourceHostException;
