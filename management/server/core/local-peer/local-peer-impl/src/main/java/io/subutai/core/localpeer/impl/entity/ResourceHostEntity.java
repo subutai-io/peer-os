@@ -53,6 +53,7 @@ import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -1399,6 +1400,50 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
         return containerNames;
+    }
+
+
+    @Override
+    public Set<ContainerInfo> listExistingContainersInfo() throws ResourceHostException
+    {
+
+        Set<ContainerInfo> containerInfos = Sets.newHashSet();
+        try
+        {
+            CommandResult result = commandUtil.execute( resourceHostCommands.getListContainersInfoCommand(), this );
+
+            StringTokenizer tokenizer = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
+
+            //foo		RUNNING	10.10.10.221	eth0
+            Pattern p = Pattern.compile( "\\s*(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)\\s*" );
+
+            int i = 0;
+            while ( tokenizer.hasMoreTokens() )
+            {
+                String token = tokenizer.nextToken();
+                //skip header
+                if ( i > 1 )
+                {
+                    Matcher m = p.matcher( token );
+
+                    if ( m.find() && m.groupCount() == 4 )
+                    {
+
+                        containerInfos.add( new ContainerInfo( m.group( 1 ), m.group( 3 ), m.group( 4 ),
+                                ContainerHostState.valueOf( m.group( 2 ).toUpperCase() ) ) );
+                    }
+                }
+                i++;
+            }
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error obtaining list of containers info %s", e.getMessage() ), e );
+        }
+
+
+        return containerInfos;
     }
 
 
