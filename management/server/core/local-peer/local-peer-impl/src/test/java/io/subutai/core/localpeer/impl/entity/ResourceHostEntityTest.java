@@ -25,6 +25,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHostException;
@@ -344,6 +345,19 @@ public class ResourceHostEntityTest
                 + "7d42f1d084c405b482938bb2620cce77\"" ).when( commandResult ).getStdOut();
 
         assertEquals( "7d42f1d084c405b482938bb2620cce77", resourceHostEntity.exportTemplate( "foo", false, "token" ) );
+    }
+
+
+    @Test
+    public void testListExistingContainersInfo() throws Exception
+    {
+        doReturn( "NAME\t\tSTATE\tIP\t\tInterface\n" + "----\t\t-----\t--\t\t---------\n"
+                + "foo\t\tRUNNING\t10.10.10.221\teth0\n" + "management\tRUNNING\t10.10.10.1\teth0" )
+                .when( commandResult ).getStdOut();
+
+        Set<ContainerInfo> containerInfos = resourceHostEntity.listExistingContainersInfo();
+
+        assertEquals( 2, containerInfos.size() );
     }
 }
 

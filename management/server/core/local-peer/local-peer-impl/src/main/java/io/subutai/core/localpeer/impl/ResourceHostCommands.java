@@ -15,6 +15,12 @@ public class ResourceHostCommands
     }
 
 
+    public RequestBuilder getListContainersInfoCommand()
+    {
+        return new RequestBuilder( "subutai list -i" );
+    }
+
+
     public RequestBuilder getListContainersCommand()
     {
         return new RequestBuilder( "subutai list -c" );

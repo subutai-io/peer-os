@@ -86,6 +86,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -281,6 +282,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             this.networkResourceDao = new NetworkResourceDaoImpl( daoManager.getEntityManagerFactory() );
 
+
             cleaner.scheduleWithFixedDelay( new Runnable()
             {
                 @Override
@@ -288,7 +290,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     removeStaleContainers();
                 }
-            }, TimeUnit.MINUTES.toSeconds( 3L ), HostRegistry.HOST_EXPIRATION_SEC * 2L, TimeUnit.SECONDS );
+            }, 30, 5, TimeUnit.MINUTES );
         }
         catch ( Exception e )
         {
@@ -3833,23 +3835,35 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 continue;
             }
 
-            //remove stale containers (the ones that are registered with Console but not appearing in heartbeats
-            //from agent)
-            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            try
             {
-                boolean isContainerEligibleForRemoval = containerHost.getState() == ContainerHostState.UNKNOWN
-                        && ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost ).getLastHeartbeat() )
-                        > TimeUnit.SECONDS.toMillis( HostRegistry.HOST_EXPIRATION_SEC * 2L )
-                        && !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHost.getContainerName() );
+                Set<ContainerInfo> existingContainers = resourceHost.listExistingContainersInfo();
 
-                if ( !isContainerEligibleForRemoval )
+                //remove stale containers (the ones that are registered with Console but not present on RH)
+                for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                 {
-                    continue;
-                }
+                    boolean isContainerEligibleForRemoval = containerHost.getState() == ContainerHostState.UNKNOWN &&
+                            ( System.currentTimeMillis() - ( ( ContainerHostEntity ) containerHost )
+                                    .getLastHeartbeat() ) > TimeUnit.MINUTES.toMillis( 60 )
+                            && !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHost.getContainerName() );
 
-                try
-                {
-                    if ( !resourceHost.listExistingContainerNames().contains( containerHost.getContainerName() ) )
+                    if ( !isContainerEligibleForRemoval )
+                    {
+                        continue;
+                    }
+
+                    boolean found = false;
+
+                    for ( ContainerInfo containerInfo : existingContainers )
+                    {
+                        if ( containerHost.getContainerName().equalsIgnoreCase( containerInfo.getName() ) )
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if ( !found )
                     {
                         LOG.warn( "Removing stale container {}", containerHost.getContainerName() );
 
@@ -3858,11 +3872,54 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         notifyPeerEventListeners( containerHost );
                     }
                 }
-                catch ( ResourceHostException e )
+
+
+                // destroy dead containers (the ones that exist on RH but not appearing in heartbeats and
+                // have a STOPPED state )
+                Set<String> deadContainerNames = Sets.newHashSet();
+                for ( ContainerInfo containerInfo : existingContainers )
                 {
-                    LOG.error( e.getMessage() );
+                    if ( !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerInfo.getName() )
+                            && ContainerHostState.STOPPED.equals( containerInfo.getState() ) )
+                    {
+                        try
+                        {
+                            hostRegistry.getContainerHostInfoByContainerName( containerInfo.getName() );
+                        }
+                        catch ( HostDisconnectedException e )
+                        {
+                            deadContainerNames.add( containerInfo.getName() );
+                        }
+                    }
+                }
+
+                //destroy dead containers
+                for ( String deadContainerName : deadContainerNames )
+                {
+                    //do additional check
+                    try
+                    {
+                        resourceHost.getContainerHostByContainerName( deadContainerName );
+                    }
+                    catch ( HostNotFoundException e )
+                    {
+                        try
+                        {
+                            commandExecutor.execute( resourceHost.getId(),
+                                    localPeerCommands.getDestroyContainerCommand( deadContainerName ) );
+                        }
+                        catch ( CommandException e1 )
+                        {
+                            LOG.error( e1.getMessage() );
+                        }
+                    }
                 }
             }
+            catch ( ResourceHostException e )
+            {
+                LOG.error( e.getMessage() );
+            }
+
 
             //destroy lost environments (the ones that are present on RH but not registered with Console)
             Set<Integer> lostEnvironmentsVlans = Sets.newHashSet();
@@ -3909,9 +3966,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 ResourceHostInfo resourceHostInfo = hostRegistry.getResourceHostInfoById( resourceHost.getId() );
 
-                //consider only containers that got cached not less than 5 min ago
+                //consider only containers that got cached not less than 30 min ago
                 if ( System.currentTimeMillis() - ( ( ResourceHostInfoModel ) resourceHostInfo ).getDateCreated()
-                        > TimeUnit.MINUTES.toMillis( 5 ) )
+                        > TimeUnit.MINUTES.toMillis( 60 ) )
 
                 {
                     for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
