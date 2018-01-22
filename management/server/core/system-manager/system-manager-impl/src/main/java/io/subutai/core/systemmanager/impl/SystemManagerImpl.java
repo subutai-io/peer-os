@@ -328,9 +328,8 @@ public class SystemManagerImpl implements SystemManager
     public boolean isEnvironmentWorkflowInProgress()
     {
         EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
-        HubManager hubManager = ServiceLocator.lookup( HubManager.class );
 
-        return !environmentManager.getActiveWorkflows().isEmpty() || hubManager.hasHubTasksInAction();
+        return !environmentManager.getActiveWorkflows().isEmpty() || !peerManager.getLocalPeer().getTasks().isEmpty();
     }
 
 
