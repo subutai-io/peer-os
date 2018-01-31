@@ -37,7 +37,7 @@ public class Common
 
     public static final String PEER_CERT_ALIAS = "peer_cert";
 
-    public static final int WAIT_CONTAINER_CONNECTION_SEC = 50;
+    public static final int WAIT_CONTAINER_CONNECTION_SEC = 60;
     public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 30;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
 
