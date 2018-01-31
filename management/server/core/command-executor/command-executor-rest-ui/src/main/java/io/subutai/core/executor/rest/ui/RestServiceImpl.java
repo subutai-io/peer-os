@@ -102,13 +102,6 @@ public class RestServiceImpl implements RestService
                 {
                     throw new AccessControlException( "Access denied" );
                 }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error executing command", e );
-
-                    return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
-                                   .entity( JsonUtil.toJson( e.getMessage() ) ).build();
-                }
             }
             // this command is intended to run on RH
             else
