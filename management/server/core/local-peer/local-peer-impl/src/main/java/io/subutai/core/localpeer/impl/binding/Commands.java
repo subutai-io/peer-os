@@ -6,6 +6,7 @@ import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.Quota;
+import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ContainerResourceType;
 
 
@@ -54,15 +55,26 @@ public abstract class Commands
             quotaCommand.addArgument( containerName );
             quotaCommand.addArgument( r.getResource().getContainerResourceType().getKey() );
             quotaCommand.addArgument( "-s" );
-            quotaCommand.addArgument( r.getResource().getWriteValue() );
+
+            if ( r.getResource().getContainerResourceType() == ContainerResourceType.DISK )
+            {
+                //temp workaround for btrfs quota issue https://github.com/subutai-io/agent/wiki/Switch-to-Soft-Quota
+
+                quotaCommand.addArgument( String.valueOf( r.getAsDiskResource().longValue( ByteUnit.GB ) * 2 ) );
+            }
+            else
+            {
+                quotaCommand.addArgument( r.getResource().getWriteValue() );
+            }
+
             if ( r.getThreshold() != null && r.getThreshold() != 0 && !(
                     r.getResource().getContainerResourceType() == ContainerResourceType.CPUSET
-                            //TODO fix atm threshold for disk is not supported and results in error on system level
                             || r.getResource().getContainerResourceType() == ContainerResourceType.DISK ) )
             {
                 quotaCommand.addArgument( "-t" );
                 quotaCommand.addArgument( r.getThreshold().toString() );
             }
+
             result.addCommand( quotaCommand );
         }
 
