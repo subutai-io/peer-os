@@ -16,6 +16,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
+import io.subutai.core.hubmanager.api.RestResult;
 
 
 //https://github.com/subutai-io/agent/wiki/Switch-to-Soft-Quota
@@ -68,22 +69,23 @@ public class ContainerDiskUsageChecker extends HubRequester
                     .execute( new RequestBuilder( "subutai info du " + containerDto.getContainerName() ),
                             containerHost );
 
-            double diskUsed = Double.parseDouble( result.getStdOut() );
+            long diskUsed = Long.parseLong( result.getStdOut() );
 
-            Double diskLimit = containerHost.getContainerSize().getDiskQuota();
+            long diskLimit = containerHost.getContainerSize().getDiskQuota().longValue();
 
             if ( diskUsed >= diskLimit * 0.9 )
             {
-                //notify Hub
-                notifyHub( false );
-            }
-            else if ( diskUsed >= diskLimit * 1.5 )
-            {
-                //stop container
-                containerHost.stop();
+                boolean stop = diskUsed >= diskLimit * 1.5;
+
+                if ( stop )
+                {
+                    //stop container
+                    containerHost.stop();
+                }
 
                 //notify Hub
-                notifyHub( true );
+                notifyHub( containerDto.getPeerId(), containerDto.getEnvironmentId(), containerDto.getId(), diskUsed,
+                        stop );
             }
         }
         catch ( Exception e )
@@ -93,8 +95,16 @@ public class ContainerDiskUsageChecker extends HubRequester
     }
 
 
-    private void notifyHub( final boolean containerWasStopped )
+    private void notifyHub( String peerId, String envId, String contId, long diskUsage, boolean containerWasStopped )
     {
-        //TODO
+        RestResult result = restClient.post( String
+                .format( "/rest/v1/peers/%s/environments/%s/containers/%s/disk_usage/%d/%s", peerId, envId, contId,
+                        diskUsage, containerWasStopped ), null );
+
+        if ( !result.isSuccess() )
+        {
+            LOG.error( "Error notifying Hub about container disk usage excess: HTTP {} - {}", result.getStatus(),
+                    result.getReasonPhrase() );
+        }
     }
 }
