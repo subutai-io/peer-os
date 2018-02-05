@@ -141,10 +141,9 @@ node() {
 				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
 				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
-				sed 's/URL =.*/URL = cdn.local/g' -i /var/snap/subutai-dev/current/agent.gcfg
+				sed 's/URL =.*/URL = devcdn.subut.ai/g' -i /var/snap/subutai-dev/current/agent.gcfg
 				subutai-dev import management --local
 				sed 's/cdn.local/devcdn.subut.ai/g' -i /var/snap/subutai-dev/common/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
-				sed 's/URL =.*/URL = devcdn.subut.ai/g' -i /var/snap/subutai-dev/current/agent.gcfg
 			EOF"""
 
 			/* wait until SS starts */
