@@ -1,6 +1,8 @@
 package io.subutai.core.hubmanager.impl.requestor;
 
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,7 @@ import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubRequester;
@@ -49,6 +52,9 @@ public class ContainerDiskUsageChecker extends HubRequester
                 for ( ContainerDto container : environment.getContainers() )
                 {
                     checkDiskUsage( container );
+
+                    //pause not to stress RH with disk usage checks
+                    TaskUtil.sleep( TimeUnit.SECONDS.toMillis( 5 ) );
                 }
             }
         }
