@@ -352,6 +352,8 @@ public class HostRegistrationManagerImpl implements HostRegistrationManager, Hos
 
         if ( containerToken == null )
         {
+            LOG.error( "Failed to verify container token " + token + " for host " + containerHostId );
+
             throw new HostRegistrationException( "Couldn't verify container token" );
         }
 
