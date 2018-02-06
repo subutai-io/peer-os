@@ -62,6 +62,12 @@ public class EnvironmentAdapter
     }
 
 
+    public HubAdapter getHubAdapter()
+    {
+        return hubAdapter;
+    }
+
+
     public HubEnvironment get( String id )
     {
         try
