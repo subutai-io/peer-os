@@ -238,7 +238,7 @@ public class HubManagerImpl implements HubManager, HostListener
                         CONTAINER_METRIC_SEND_INTERVAL_MIN ), 1, CONTAINER_METRIC_SEND_INTERVAL_MIN, TimeUnit.MINUTES );
         //***********
         requestorsRunner
-                .scheduleWithFixedDelay( new ContainerDiskUsageChecker( this, restClient, envManager, localPeer ), 3,
+                .scheduleWithFixedDelay( new ContainerDiskUsageChecker( this, restClient, envManager, localPeer ), 10,
                         6 * 60 /* 6 hours */, TimeUnit.MINUTES );
     }
 
