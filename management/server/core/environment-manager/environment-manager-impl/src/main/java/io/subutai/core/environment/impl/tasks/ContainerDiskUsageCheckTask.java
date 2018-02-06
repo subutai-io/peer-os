@@ -13,6 +13,7 @@ import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
@@ -65,13 +66,15 @@ public class ContainerDiskUsageCheckTask implements Runnable
         //  b.b if du is >= 150 %  of quota -> stop container, notify Hub
         try
         {
+            ResourceHost resourceHost = localPeer.getResourceHostById( containerDto.getRhId() );
+
             ContainerHost containerHost = localPeer.getContainerHostById( containerDto.getId() );
 
             CommandResult result = commandUtil
                     .execute( new RequestBuilder( "subutai info du " + containerDto.getContainerName() ),
-                            containerHost );
+                            resourceHost );
 
-            long diskUsed = Long.parseLong( result.getStdOut() );
+            long diskUsed = Long.parseLong( result.getStdOut().trim() );
 
             long diskLimit = containerHost.getContainerSize().getDiskQuota().longValue();
 
@@ -92,7 +95,8 @@ public class ContainerDiskUsageCheckTask implements Runnable
         }
         catch ( Exception e )
         {
-            LOG.error( "Error checking disk usage of container " + containerDto.getContainerName(), e.getMessage() );
+            LOG.error( "Error checking disk usage of container {}: {}", containerDto.getContainerName(),
+                    e.getMessage() );
         }
     }
 }
