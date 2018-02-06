@@ -63,7 +63,6 @@ import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
 import io.subutai.core.hubmanager.impl.processor.UserTokenProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
-import io.subutai.core.hubmanager.impl.requestor.ContainerDiskUsageChecker;
 import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
@@ -236,10 +235,6 @@ public class HubManagerImpl implements HubManager, HostListener
         requestorsRunner.scheduleWithFixedDelay(
                 new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService,
                         CONTAINER_METRIC_SEND_INTERVAL_MIN ), 1, CONTAINER_METRIC_SEND_INTERVAL_MIN, TimeUnit.MINUTES );
-        //***********
-        requestorsRunner
-                .scheduleWithFixedDelay( new ContainerDiskUsageChecker( this, restClient, envManager, localPeer ), 10,
-                        6 * 60 /* 6 hours */, TimeUnit.MINUTES );
     }
 
 

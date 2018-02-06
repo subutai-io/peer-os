@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.requestor;
+package io.subutai.core.environment.impl.tasks;
 
 
 import java.util.concurrent.TimeUnit;
@@ -15,34 +15,30 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.TaskUtil;
-import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.hubmanager.api.HubManager;
-import io.subutai.core.hubmanager.api.HubRequester;
-import io.subutai.core.hubmanager.api.RestClient;
-import io.subutai.core.hubmanager.api.RestResult;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.hub.share.common.HubAdapter;
 
 
-//https://github.com/subutai-io/agent/wiki/Switch-to-Soft-Quota
-public class ContainerDiskUsageChecker extends HubRequester
+public class ContainerDiskUsageCheckTask implements Runnable
 {
-    private final static Logger LOG = LoggerFactory.getLogger( ContainerDiskUsageChecker.class );
-
-    private final EnvironmentManager environmentManager;
+    private final static Logger LOG = LoggerFactory.getLogger( ContainerDiskUsageCheckTask.class );
+    private final EnvironmentManagerImpl environmentManager;
+    private final HubAdapter hubAdapter;
     private final LocalPeer localPeer;
     private final CommandUtil commandUtil = new CommandUtil();
 
 
-    public ContainerDiskUsageChecker( final HubManager hubManager, final RestClient restClient,
-                                      final EnvironmentManager environmentManager, final LocalPeer localPeer )
+    public ContainerDiskUsageCheckTask( final HubAdapter hubAdapter, final LocalPeer localPeer,
+                                        final EnvironmentManagerImpl environmentManager )
     {
-        super( hubManager, restClient );
         this.environmentManager = environmentManager;
+        this.hubAdapter = hubAdapter;
         this.localPeer = localPeer;
     }
 
 
     @Override
-    public void request() throws Exception
+    public void run()
     {
         for ( EnvironmentDto environment : environmentManager.getTenantEnvironments() )
         {
@@ -90,27 +86,13 @@ public class ContainerDiskUsageChecker extends HubRequester
                 }
 
                 //notify Hub
-                notifyHub( containerDto.getPeerId(), containerDto.getEnvironmentId(), containerDto.getId(), diskUsed,
-                        stop );
+                hubAdapter.notifyContainerDiskUsageExcess( containerDto.getPeerId(), containerDto.getEnvironmentId(),
+                        containerDto.getId(), diskUsed, stop );
             }
         }
         catch ( Exception e )
         {
             LOG.error( "Error checking disk usage of container " + containerDto.getContainerName(), e.getMessage() );
-        }
-    }
-
-
-    private void notifyHub( String peerId, String envId, String contId, long diskUsage, boolean containerWasStopped )
-    {
-        RestResult result = restClient.post( String
-                .format( "/rest/v1/peers/%s/environments/%s/containers/%s/disk_usage/%d/%s", peerId, envId, contId,
-                        diskUsage, containerWasStopped ), null );
-
-        if ( !result.isSuccess() )
-        {
-            LOG.error( "Error notifying Hub about container disk usage excess: HTTP {} - {}", result.getStatus(),
-                    result.getReasonPhrase() );
         }
     }
 }

@@ -102,6 +102,7 @@ import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
+import io.subutai.core.environment.impl.tasks.ContainerDiskUsageCheckTask;
 import io.subutai.core.environment.impl.tasks.EnvironmentManagerInitTask;
 import io.subutai.core.environment.impl.tasks.RemoveEnvironmentsTask;
 import io.subutai.core.environment.impl.tasks.UploadEnvironmentsTask;
@@ -154,6 +155,7 @@ public class EnvironmentManagerImpl
     private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 10;
     private static final String REMOTE_OWNER_NAME = "remote";
     private static final String UKNOWN_OWNER_NAME = "unknown";
+    private static final long CONTAINER_DISK_USAGE_CHECK_INTERVAL_MIN = 6 * 60; // 6 hrs
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
@@ -175,6 +177,7 @@ public class EnvironmentManagerImpl
     protected PGPKeyUtil pgpKeyUtil = new PGPKeyUtil();
     private volatile long lastP2pSecretKeyResetTs = 0L;
     private volatile long lastEnvSyncTs = 0L;
+    private volatile long lastContainerDiskUsageCheckTs = 0L;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateManager, final PeerManager peerManager,
@@ -2340,7 +2343,29 @@ public class EnvironmentManagerImpl
 
             resetP2pKeys();
 
+            checkContainerDiskUsage();
+
             LOG.debug( "Environment background tasks finished." );
+        }
+    }
+
+
+    private void checkContainerDiskUsage()
+    {
+        if ( System.currentTimeMillis() - lastContainerDiskUsageCheckTs >= TimeUnit.MINUTES
+                .toMillis( CONTAINER_DISK_USAGE_CHECK_INTERVAL_MIN ) )
+        {
+            lastContainerDiskUsageCheckTs = System.currentTimeMillis();
+
+            Subject.doAs( systemUser, new PrivilegedAction<Void>()
+            {
+                @Override
+                public Void run()
+                {
+                    doCheckContainerDiskUsage();
+                    return null;
+                }
+            } );
         }
     }
 
@@ -2409,6 +2434,14 @@ public class EnvironmentManagerImpl
                 }
             } );
         }
+    }
+
+
+    private void doCheckContainerDiskUsage()
+    {
+        getCachedExecutor().execute(
+                new ContainerDiskUsageCheckTask( environmentAdapter.getHubAdapter(), peerManager.getLocalPeer(),
+                        this ) );
     }
 
 

@@ -39,4 +39,7 @@ public interface HubAdapter
     boolean uploadPluginData( String pluginKey, String key, Object data );
 
     boolean deletePluginData( String pluginKey, String key );
+
+    void notifyContainerDiskUsageExcess( String peerId, String envId, String contId, long diskUsage,
+                                         boolean containerWasStopped );
 }
