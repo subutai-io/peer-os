@@ -17,40 +17,36 @@ public interface RestService
     @POST
     @Path( "gettoken" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public String createTokenPOST( @FormParam( "username" ) String userName, @FormParam( "password" ) String password );
+    Response createTokenPOST( @FormParam( "username" ) String userName, @FormParam( "password" ) String password );
 
     @GET
     @Path( "gettoken" )
     @Produces( MediaType.TEXT_PLAIN )
-    public String createTokenGET( @QueryParam( "username" ) String userName,
-                                  @QueryParam( "password" ) String password );
+    Response createTokenGET( @QueryParam( "username" ) String userName, @QueryParam( "password" ) String password );
 
     @GET
     @Path( "signtoken" )
     @Produces( MediaType.TEXT_PLAIN )
-    public String getSignToken();
+    Response getSignToken();
 
-    //TODO>>> Seems these are obsolete.  check and remove:
     @POST
     @Path( "auth" )
     @Produces( MediaType.APPLICATION_JSON )
-    //@Consumes({"application/x-www-form-urlencoded"})
-    public Response authenticate( @FormParam( "type" ) int type, @FormParam( "username" ) String userName,
-                                  @FormParam( "password" ) String password );
+    Response authenticate( @FormParam( "type" ) int type, @FormParam( "username" ) String userName,
+                           @FormParam( "password" ) String password );
 
+    //TODO>>> Seems these are obsolete.  check and remove:
     @PUT
     @Path( "authid" )
     @Produces( MediaType.TEXT_PLAIN )
-    //@Consumes({"application/x-www-form-urlencoded"})
     public Response updateAuthId( @FormParam( "type" ) int type, @FormParam( "username" ) String userName,
                                   @FormParam( "password" ) String password, @FormParam( "authid" ) String authId );
 
     @POST
     @Path( "authid" )
     @Produces( MediaType.TEXT_PLAIN )
-    //@Consumes({"application/x-www-form-urlencoded"})
-    public Response getAuthId( @FormParam( "type" ) int type, @FormParam( "username" ) String userName,
-                               @FormParam( "password" ) String password );
+    Response getAuthId( @FormParam( "type" ) int type, @FormParam( "username" ) String userName,
+                        @FormParam( "password" ) String password );
 
     //<<<TODO
 }

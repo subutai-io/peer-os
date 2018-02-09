@@ -31,32 +31,45 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String createTokenPOST( final String userName, final String password )
+    public Response createTokenPOST( final String userName, final String password )
     {
-        String token = identityManager.getUserToken( userName, password );
+        try
+        {
+            String token = identityManager.getUserToken( userName, password );
 
-        if ( !Strings.isNullOrEmpty( token ) )
-        {
-            return token;
+            if ( !Strings.isNullOrEmpty( token ) )
+            {
+                return Response.ok( token ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.UNAUTHORIZED ).entity( "Invalid credentials" ).build();
+            }
         }
-        else
+        catch ( InvalidLoginException e )
         {
-            return "Access Denied to the resource!";
+            return Response.status( Response.Status.UNAUTHORIZED ).entity( "Invalid credentials" ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage() );
+
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
 
 
     @Override
-    public String createTokenGET( final String userName, final String password )
+    public Response createTokenGET( final String userName, final String password )
     {
         return createTokenPOST( userName, password );
     }
 
 
     @Override
-    public String getSignToken()
+    public Response getSignToken()
     {
-        return identityManager.getSignToken();
+        return Response.ok( identityManager.getSignToken() ).build();
     }
 
 
@@ -75,7 +88,7 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid Login" ).build();
+                return Response.status( Response.Status.UNAUTHORIZED ).entity( "Invalid credentials" ).build();
             }
         }
         catch ( IdentityExpiredException e )
@@ -101,15 +114,16 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                return Response.status( Response.Status.NOT_FOUND ).build();
+                return Response.status( Response.Status.UNAUTHORIZED ).build();
             }
         }
         catch ( InvalidLoginException e )
         {
-            return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid Login" ).build();
+            return Response.status( Response.Status.UNAUTHORIZED ).entity( "Invalid credentials" ).build();
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
