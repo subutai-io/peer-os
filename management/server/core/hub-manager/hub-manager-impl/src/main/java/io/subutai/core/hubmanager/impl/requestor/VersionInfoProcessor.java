@@ -1,6 +1,8 @@
 package io.subutai.core.hubmanager.impl.requestor;
 
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ public class VersionInfoProcessor extends HubRequester
     private static final String KEY_SSV = "ss_version";
     private static final String KEY_RHV = "rh_version";
     private static final String KEY_P2PV = "p2p_version";
+    private static final String KEY_DATE = "update_date";
 
 
     private ConfigManager configManager;
@@ -126,6 +129,33 @@ public class VersionInfoProcessor extends HubRequester
             return true;
         }
 
+        //by force updates every 1 hour
+        if ( VERSION_CACHE.get( KEY_DATE ) != null )
+        {
+            try
+            {
+                Date lastUpdate = ( Date ) VERSION_CACHE.get( KEY_DATE );
+
+                Calendar cal = Calendar.getInstance();
+                cal.setTime( new Date() );
+                cal.add( Calendar.HOUR, -1 );
+                Date oneHourBack = cal.getTime();
+
+                if ( lastUpdate.before( oneHourBack ) )
+                {
+                    return true;
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage() );
+            }
+        }
+        else
+        {
+            return true;
+        }
+
         return false;
     }
 
@@ -135,5 +165,6 @@ public class VersionInfoProcessor extends HubRequester
         VERSION_CACHE.put( KEY_SSV, ssV );
         VERSION_CACHE.put( KEY_RHV, rhV );
         VERSION_CACHE.put( KEY_P2PV, p2pV );
+        VERSION_CACHE.put( KEY_DATE, new Date() );
     }
 }
