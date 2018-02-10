@@ -1,10 +1,14 @@
 package io.subutai.core.hubmanager.impl.requestor;
 
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.StringUtils;
+
+import com.google.common.collect.Maps;
 
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.SubutaiInfo;
@@ -23,6 +27,12 @@ import static java.lang.String.format;
 public class VersionInfoProcessor extends HubRequester
 {
     private static final Logger LOG = LoggerFactory.getLogger( VersionInfoProcessor.class );
+
+    private static final Map<String, Object> VERSION_CACHE = Maps.newConcurrentMap();
+    private static final String KEY_SSV = "ss_version";
+    private static final String KEY_RHV = "rh_version";
+    private static final String KEY_P2PV = "p2p_version";
+
 
     private ConfigManager configManager;
 
@@ -50,39 +60,80 @@ public class VersionInfoProcessor extends HubRequester
     {
         String path = format( "/rest/v1/peers/%s/version-info", peerManager.getLocalPeer().getId() );
 
-        VersionInfoDto versionInfoDto = new VersionInfoDto();
 
-        versionInfoDto.setPeerId( configManager.getPeerId() );
-        versionInfoDto.setSsVersion( SubutaiInfo.getVersion() );
-        versionInfoDto.setBuildTime( SubutaiInfo.getBuildTime() );
-        versionInfoDto.setBranch( SubutaiInfo.getBranch() );
-        versionInfoDto.setCommitId( SubutaiInfo.getCommitId() );
+        String ssV = "", rhV = "", p2pV = "";
 
         try
         {
             ResourceHost host = configManager.getPeerManager().getLocalPeer().getManagementHost();
 
-            versionInfoDto.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
-            versionInfoDto.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+            ssV = SubutaiInfo.getVersion();
+            rhV = host.getRhVersion().replace( "Subutai version", "" ).trim();
+            p2pV = host.getP2pVersion().replace( "p2p Cloud project", "" ).trim();
         }
         catch ( Exception e )
         {
             LOG.error( "Error getting system info: {}", e.getMessage() );
         }
 
-        RestResult<Object> restResult = restClient.post( path, versionInfoDto );
-
-        if ( restResult.isSuccess() )
+        if ( areVersionsChanged( ssV, rhV, p2pV ) )
         {
-            if ( restResult.getEntity() != null && restResult.getEntity() instanceof String && StringUtils
-                    .isNotBlank( ( String ) restResult.getEntity() ) )
+            VersionInfoDto versionInfoDto = new VersionInfoDto();
+
+            versionInfoDto.setPeerId( configManager.getPeerId() );
+            versionInfoDto.setSsVersion( ssV );
+            versionInfoDto.setRhVersion( rhV );
+            versionInfoDto.setP2pVersion( p2pV );
+            versionInfoDto.setBuildTime( SubutaiInfo.getBuildTime() );
+            versionInfoDto.setBranch( SubutaiInfo.getBranch() );
+            versionInfoDto.setCommitId( SubutaiInfo.getCommitId() );
+
+            RestResult<Object> restResult = restClient.post( path, versionInfoDto );
+
+            if ( restResult.isSuccess() )
             {
-                ( ( HubManagerImpl ) hubManager ).setPeerName( ( String ) restResult.getEntity() );
+                if ( restResult.getEntity() != null && restResult.getEntity() instanceof String && StringUtils
+                        .isNotBlank( ( String ) restResult.getEntity() ) )
+                {
+                    ( ( HubManagerImpl ) hubManager ).setPeerName( ( String ) restResult.getEntity() );
+                    setChangedVersions( ssV, rhV, p2pV );
+                }
+            }
+            else
+            {
+                throw new HubManagerException( "Error on sending version info to hub: " + restResult.getError() );
             }
         }
-        else
+    }
+
+
+    private boolean areVersionsChanged( String ssV, String rhV, String p2pV )
+    {
+        if ( VERSION_CACHE.get( KEY_SSV ) == null || !VERSION_CACHE.get( KEY_SSV ).equals( ssV ) )
         {
-            throw new HubManagerException( "Error on sending version info to hub: " + restResult.getError() );
+            return true;
         }
+
+
+        if ( VERSION_CACHE.get( KEY_RHV ) == null || !VERSION_CACHE.get( KEY_RHV ).equals( rhV ) )
+        {
+            return true;
+        }
+
+
+        if ( VERSION_CACHE.get( KEY_P2PV ) == null || !VERSION_CACHE.get( KEY_P2PV ).equals( p2pV ) )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private void setChangedVersions( String ssV, String rhV, String p2pV )
+    {
+        VERSION_CACHE.put( KEY_SSV, ssV );
+        VERSION_CACHE.put( KEY_RHV, rhV );
+        VERSION_CACHE.put( KEY_P2PV, p2pV );
     }
 }
