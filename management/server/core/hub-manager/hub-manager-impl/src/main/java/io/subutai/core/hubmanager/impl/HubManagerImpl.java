@@ -221,7 +221,7 @@ public class HubManagerImpl implements HubManager, HostListener
         final VersionInfoProcessor versionInfoProcessor =
                 new VersionInfoProcessor( this, peerManager, configManager, restClient );
 
-        requestorsRunner.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( versionInfoProcessor, 20, 60, TimeUnit.SECONDS );
 
 
         //***********
