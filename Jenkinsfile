@@ -66,9 +66,7 @@ node() {
 		sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 		sed 's/export CDN_IP=.*/export CDN_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 
-		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
-			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME} sonar:sonar -Dsonar.branch=${env.BRANCH_NAME}
-		elif [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
+		if [[ "${env.BRANCH_NAME}" == "dev" ]] || [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
 			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
@@ -84,13 +82,13 @@ node() {
 			set -e
 			
 			/apps/bin/subutai destroy management
-			/apps/bin/subutai clone openjre16 management
+			/apps/bin/subutai clone debian-stretch management
 			/bin/sleep 20
 			/bin/cp /mnt/lib/lxc/jenkins/${workspace}/${debFileName} /mnt/lib/lxc/management/rootfs/tmp/
 			/apps/bin/lxc-attach -n management -- sh -c 'echo "deb http://${cdnHost}:8080/kurjun/rest/apt /" > /etc/apt/sources.list.d/subutai-repo.list'
 			/apps/bin/lxc-attach -n management -- apt-get update
 			/apps/bin/lxc-attach -n management -- sync
-			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install curl influxdb influxdb-certs
+			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install curl influxdb influxdb-certs openjdk-8-jre
 			/apps/bin/lxc-attach -n management -- wget -q 'https://cdn.subut.ai:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf
 			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
 			/apps/bin/lxc-attach -n management -- systemctl stop management

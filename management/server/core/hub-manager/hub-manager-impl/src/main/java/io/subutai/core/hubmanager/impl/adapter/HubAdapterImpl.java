@@ -361,6 +361,22 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
     }
 
 
+    @Override
+    public void notifyContainerDiskUsageExcess( String peerId, String envId, String contId, long diskUsage,
+                                                boolean containerWasStopped )
+    {
+        RestResult result = getRestClient().post( String
+                .format( "/rest/v1/peers/%s/environments/%s/containers/%s/disk_usage/%d/%s", peerId, envId, contId,
+                        diskUsage, containerWasStopped ), null );
+
+        if ( !result.isSuccess() )
+        {
+            log.error( "Error notifying Hub about container disk usage excess: HTTP {} - {}", result.getStatus(),
+                    result.getReasonPhrase() );
+        }
+    }
+
+
     private void onContainerStateChange( String envId, String contId, String state )
     {
         if ( !isRegistered() )
