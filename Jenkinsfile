@@ -74,7 +74,7 @@ node() {
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${debFileName}
 	"""
 	// Start MNG-RH Lock
-	lock('rh-node') {
+	lock('SS_TEST_NODE_CORE16') {
 		// create management template
 		sh """
 			set +x
