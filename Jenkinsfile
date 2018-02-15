@@ -74,29 +74,29 @@ node() {
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${debFileName}
 	"""
 	// Start MNG-RH Lock
-	lock('rh-node') {
+	lock('SS_TEST_NODE_NEW') {
 		// create management template
 		sh """
 			set +x
-			ssh root@gw.intra.lan <<- EOF
+			ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
 			set -e
 			
-			/apps/bin/subutai destroy management
-			/apps/bin/subutai clone openjre16 management
+			subutai destroy management
+			subutai clone openjre16 management
 			/bin/sleep 20
-			/bin/cp /mnt/lib/lxc/jenkins/${workspace}/${debFileName} /mnt/lib/lxc/management/rootfs/tmp/
-			/apps/bin/lxc-attach -n management -- sh -c 'echo "deb http://${cdnHost}:8080/kurjun/rest/apt /" > /etc/apt/sources.list.d/subutai-repo.list'
-			/apps/bin/lxc-attach -n management -- apt-get update
-			/apps/bin/lxc-attach -n management -- sync
-			/apps/bin/lxc-attach -n management -- apt-get -y --allow-unauthenticated install curl influxdb influxdb-certs
-			/apps/bin/lxc-attach -n management -- wget -q 'https://cdn.subut.ai:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf
-			/apps/bin/lxc-attach -n management -- dpkg -i /tmp/${debFileName}
-			/apps/bin/lxc-attach -n management -- systemctl stop management
-			/apps/bin/lxc-attach -n management -- rm -rf /opt/subutai-mng/keystores/
+			cp /mnt/lib/lxc/jenkins/${workspace}/${debFileName} /mnt/lib/lxc/management/rootfs/tmp/
+			subutai attach management "echo "deb http://${cdnHost}:8080/kurjun/rest/apt /" > /etc/apt/sources.list.d/subutai-repo.list"
+			subutai attach management "apt-get update"
+			subutai attach management "sync"
+			subutai attach management "apt-get -y --allow-unauthenticated install curl influxdb influxdb-certs"
+			subutai attach management "wget -q 'https://cdn.subut.ai:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+			subutai attach management "dpkg -i /tmp/${debFileName}""
+			subutai attach management "systemctl stop management"
+			subutai attach management "rm -rf /opt/subutai-mng/keystores/""
 			
-			/apps/bin/lxc-attach -n management -- sync
-			/bin/rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
-			/apps/bin/subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
+			subutai attach management "sync"
+			rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
+			subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
 			mv /mnt/lib/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz /mnt/lib/lxc/jenkins/${workspace}
 		EOF"""
@@ -112,11 +112,11 @@ node() {
 
 	// Start Test-Peer Lock
 	if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/ || env.BRANCH_NAME == 'jenkinsfile') {
-		lock('test-node-core16') {
+		lock('SS_TEST_NODE_NEW') {
 			// destroy existing management template on test node and install latest available snap
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
+				ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
 				set -e
 				subutai-dev destroy everything
 				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
@@ -130,13 +130,13 @@ node() {
 			// copy generated management template on test node
 			sh """
 				set +x
-				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE_CORE16}:/var/snap/subutai-dev/common/lxc/tmpdir
+				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE_NEW}:/var/snap/subutai-dev/common/lxc/tmpdir
 			"""
 
 			// install generated management template
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
+				ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
 				set -e
 				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
 				sed 's/URL =.*/URL = devcdn.subut.ai/g' -i /var/snap/subutai-dev/current/agent.gcfg
@@ -149,7 +149,7 @@ node() {
 				sh """
 					set +x
 					echo "Waiting SS"
-					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE_CORE16}:8443/rest/v1/peer/ready') != "200" ]; do
+					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE_NEW}:8443/rest/v1/peer/ready') != "200" ]; do
 						sleep 5
 					done
 				"""
@@ -164,7 +164,7 @@ node() {
 			git url: "https://github.com/subutai-io/playbooks.git"
 			sh """
 				set +e
-				./run_tests_qa.sh -m ${env.SS_TEST_NODE_CORE16}
+				./run_tests_qa.sh -m ${env.SS_TEST_NODE_NEW}
 				./run_tests_qa.sh -s all
 				${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
 				OUT=\$?
