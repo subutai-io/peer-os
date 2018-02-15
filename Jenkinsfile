@@ -85,7 +85,7 @@ node() {
 			subutai clone openjre16 management
 			/bin/sleep 20
 			cp /mnt/lib/lxc/jenkins/${workspace}/${debFileName} /mnt/lib/lxc/management/rootfs/tmp/
-			subutai attach management "echo "deb http://${cdnHost}:8080/kurjun/rest/apt /" > /etc/apt/sources.list.d/subutai-repo.list"
+			subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
 			subutai attach management "apt-get update"
 			subutai attach management "sync"
 			subutai attach management "apt-get -y --allow-unauthenticated install curl influxdb influxdb-certs"
