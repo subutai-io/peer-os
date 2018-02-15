@@ -84,7 +84,7 @@ node() {
 			subutai destroy management
 			subutai clone openjre16 management
 			/bin/sleep 20
-			cp /mnt/lib/lxc/jenkins/${workspace}/${debFileName} /mnt/lib/lxc/management/rootfs/tmp/
+			scp root@172.31.7.147:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
 			subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
 			subutai attach management "apt-get update"
 			subutai attach management "sync"
@@ -95,10 +95,10 @@ node() {
 			subutai attach management "rm -rf /opt/subutai-mng/keystores/""
 			
 			subutai attach management "sync"
-			rm /mnt/lib/lxc/management/rootfs/tmp/${debFileName}
+			rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
 			subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
-			mv /mnt/lib/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz /mnt/lib/lxc/jenkins/${workspace}
+			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@172.31.7.147:/mnt/lib/lxc/jenkins/${workspace}
 		EOF"""
 	}
 
