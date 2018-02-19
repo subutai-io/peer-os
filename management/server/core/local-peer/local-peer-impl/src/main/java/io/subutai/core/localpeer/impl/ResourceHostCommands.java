@@ -47,7 +47,7 @@ public class ResourceHostCommands
 
     public RequestBuilder getCleanupEnvironmentCommand( int vlan )
     {
-        return new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ).withTimeout( 60 * 60 );
+        return new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ).withTimeout( 3600 );
     }
 
 
