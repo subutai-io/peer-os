@@ -39,7 +39,7 @@ public abstract class Commands
             result.addCommand( quotaCommand );
         }
 
-        return new RequestBuilder( result.toString() );
+        return new RequestBuilder( result.toString() ).withTimeout( 60 );
     }
 
 
@@ -78,6 +78,6 @@ public abstract class Commands
             result.addCommand( quotaCommand );
         }
 
-        return new RequestBuilder( result.toString() );
+        return new RequestBuilder( result.toString() ).withTimeout( 120 );
     }
 }
