@@ -1,6 +1,7 @@
 package io.subutai.core.environment.rest;
 
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
@@ -13,11 +14,13 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerQuotaDto;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HubEnvironment;
@@ -123,9 +126,13 @@ public class RestServiceImpl implements RestService
         {
             Topology topology = prepare2( request, true );
 
-            environmentManager.createEnvironment( topology, true );
+            EnvironmentCreationRef ref = environmentManager.createEnvironment( topology, true );
 
-            return Response.accepted().build();
+            Map<String, String> envCreationRef = Maps.newHashMap();
+            envCreationRef.put( "trackerId", ref.getTrackerId() );
+            envCreationRef.put( "environmentId", ref.getEnvironmentId() );
+
+            return Response.accepted( JsonUtil.toJson( envCreationRef ) ).build();
         }
         catch ( Exception e )
         {
