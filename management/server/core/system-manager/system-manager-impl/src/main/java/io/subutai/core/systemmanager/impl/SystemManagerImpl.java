@@ -235,7 +235,7 @@ public class SystemManagerImpl implements SystemManager
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
             CommandResult result =
-                    host.execute( new RequestBuilder( "subutai update management -c" ).withTimeout( 300 ) );
+                    host.execute( new RequestBuilder( "subutai update management -c" ).withTimeout( 900 ) );
 
             if ( result.hasSucceeded() )
             {
