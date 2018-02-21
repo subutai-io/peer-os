@@ -82,6 +82,7 @@ node() {
 			set -e
 			
 			subutai destroy management
+			subutai import debian-stretch
 			subutai clone debian-stretch management
 			/bin/sleep 20
 			scp root@172.31.7.147:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
