@@ -74,11 +74,11 @@ node() {
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${debFileName}
 	"""
 	// Start MNG-RH Lock
-	lock('SS_TEST_NODE_NEW') {
+	lock('debian_slave_node') {
 		// create management template
 		sh """
 			set +x
-			ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
+			ssh root@${env.debian_slave_node} <<- EOF
 			set -e
 			
 			subutai destroy management
@@ -113,11 +113,11 @@ node() {
 
 	// Start Test-Peer Lock
 	if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/ || env.BRANCH_NAME == 'jenkinsfile') {
-		lock('SS_TEST_NODE_NEW') {
+		lock('debian_slave_node') {
 			// destroy existing management template on test node and install latest available snap
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
+				ssh root@${env.debian_slave_node} <<- EOF
 				set -e
 				subutai-dev destroy everything
 				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
@@ -131,13 +131,13 @@ node() {
 			// copy generated management template on test node
 			sh """
 				set +x
-				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.SS_TEST_NODE_NEW}:/var/snap/subutai-dev/common/lxc/tmpdir
+				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.debian_slave_node}:/var/snap/subutai-dev/common/lxc/tmpdir
 			"""
 
 			// install generated management template
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
+				ssh root@${env.debian_slave_node} <<- EOF
 				set -e
 				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
 				sed 's/URL =.*/URL = devcdn.subut.ai/g' -i /var/snap/subutai-dev/current/agent.gcfg
@@ -150,7 +150,7 @@ node() {
 				sh """
 					set +x
 					echo "Waiting SS"
-					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE_NEW}:8443/rest/v1/peer/ready') != "200" ]; do
+					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.debian_slave_node}:8443/rest/v1/peer/ready') != "200" ]; do
 						sleep 5
 					done
 				"""
@@ -165,7 +165,7 @@ node() {
 			git url: "https://github.com/subutai-io/playbooks.git"
 			sh """
 				set +e
-				./run_tests_qa.sh -m ${env.SS_TEST_NODE_NEW}
+				./run_tests_qa.sh -m ${env.debian_slave_node}
 				./run_tests_qa.sh -s all
 				${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
 				OUT=\$?
