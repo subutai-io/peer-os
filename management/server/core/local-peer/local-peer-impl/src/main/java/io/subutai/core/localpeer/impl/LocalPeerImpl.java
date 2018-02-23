@@ -1816,6 +1816,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
 
         registerResourceHost( resourceHostInfo );
+
+        releaseUpdateLock( resourceHostInfo );
     }
 
 
@@ -4067,6 +4069,22 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                     }
                 }
             } );
+        }
+    }
+
+
+    //on heartbeat we may consider RH update as complete
+    //because it either arrives right before agent shutdown or upon agent startup
+    private void releaseUpdateLock( ResourceHostInfo resourceHostInfo )
+    {
+        try
+        {
+            ResourceHostEntity resourceHost = ( ResourceHostEntity ) getResourceHostById( resourceHostInfo.getId() );
+            resourceHost.markUpdateAsCompleted();
+        }
+        catch ( Exception e )
+        {
+            //ignore
         }
     }
 }

@@ -10,7 +10,12 @@ public class Common
     public static final String HUB_ID = "hub";
     public static final String SUBUTAI_ID = "subutai";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
-    public static String KURJUN_BASE_URL = String.format("https://%s:8338/kurjun/rest", System.getProperty( "cdnIp" ));
+    public static final long RH_UPDATE_TIMEOUT_MIN = 60;
+    public static final long RH_UPDATE_CHECK_TIMEOUT_MIN = 10;
+    public static final long MH_UPDATE_TIMEOUT_MIN = 60;
+    public static final long MH_UPDATE_CHECK_TIMEOUT_MIN = 15;
+    public static String KURJUN_BASE_URL =
+            String.format( "https://%s:8338/kurjun/rest", System.getProperty( "cdnIp" ) );
     public static final int DEFAULT_PUBLIC_PORT = 8443;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
     public static final int DEFAULT_AGENT_PORT = 7070;
