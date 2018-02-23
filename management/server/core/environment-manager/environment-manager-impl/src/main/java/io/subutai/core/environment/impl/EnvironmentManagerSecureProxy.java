@@ -85,9 +85,9 @@ import io.subutai.hub.share.quota.ContainerQuota;
 
 
 @PermitAll
-public class EnvironmentManagerSecureProxy
+public class EnvironmentManagerSecureProxy extends HostListener
         implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, HubEventListener,
-        HostListener, LocalPeerEventListener
+        LocalPeerEventListener
 {
     private final EnvironmentManagerImpl environmentManager;
     private final IdentityManager identityManager;

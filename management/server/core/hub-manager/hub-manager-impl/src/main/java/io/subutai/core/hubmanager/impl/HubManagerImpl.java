@@ -27,9 +27,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
@@ -86,7 +83,7 @@ import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-public class HubManagerImpl implements HubManager, HostListener
+public class HubManagerImpl extends HostListener implements HubManager
 {
     private static final long PEER_METRICS_SEND_INTERVAL_MIN = 10;
     private static final int CONTAINER_METRIC_SEND_INTERVAL_MIN = 15;
@@ -765,54 +762,6 @@ public class HubManagerImpl implements HubManager, HostListener
     public void setSystemManager( final SystemManager systemManager )
     {
         this.systemManager = systemManager;
-    }
-
-
-    @Override
-    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
-                                         final ContainerHostState currentState )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
-                                            final String currentHostname )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerCreated( final ContainerHostInfo containerInfo )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel oldNetInterface,
-                                                final HostInterfaceModel newNetInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
-                                              final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel netInterface )
-    {
-
     }
 
 

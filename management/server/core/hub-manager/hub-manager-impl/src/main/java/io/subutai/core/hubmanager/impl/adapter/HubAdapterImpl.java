@@ -19,9 +19,6 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
@@ -44,7 +41,7 @@ import io.subutai.hub.share.json.JsonUtil;
 import static java.lang.String.format;
 
 
-public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, HostListener
+public class HubAdapterImpl extends HostListener implements HubAdapter, EnvironmentEventListener
 {
     private static final String USER_ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
 
@@ -484,58 +481,5 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener, Hos
         {
             //ignore
         }
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel oldNetInterface,
-                                                final HostInterfaceModel newNetInterface )
-    {
-        //not used
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
-                                              final HostInterfaceModel netInterface )
-    {
-        //not used
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel netInterface )
-    {
-        //not used
-    }
-
-
-    @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
-    {
-        //not used
-    }
-
-
-    @Override
-    public void onContainerCreated( final ContainerHostInfo containerInfo )
-    {
-        //not used
-    }
-
-
-    @Override
-    public void onRhConnected( final ResourceHostInfo resourceHostInfo )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
-    {
-        // not needed
     }
 }

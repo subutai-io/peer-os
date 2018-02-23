@@ -196,7 +196,7 @@ import io.subutai.hub.share.resource.ResourceValue;
  * TODO add proper security annotations
  */
 @PermitAll
-public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
+public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 {
     private static final int BUNDLE_COUNT = 278;
 
@@ -3743,68 +3743,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public String getKeyId()
     {
         return getId();
-    }
-
-
-    @Override
-    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
-                                         final ContainerHostState currentState )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
-                                            final String currentHostname )
-    {
-        //not needed
-    }
-
-
-    @Override
-    public void onContainerCreated( final ContainerHostInfo containerInfo )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel oldNetInterface,
-                                                final HostInterfaceModel newNetInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
-                                              final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onRhConnected( final ResourceHostInfo newRhInfo )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
-    {
-        // not needed
     }
 
 
