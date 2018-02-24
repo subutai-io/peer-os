@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -234,8 +235,10 @@ public class SystemManagerImpl implements SystemManager
         {
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
-            CommandResult result =
-                    host.execute( new RequestBuilder( "subutai update management -c" ).withTimeout( 1800 ) );
+            CommandResult result = host.execute(
+                    new RequestBuilder( "subutai update management -c || subutai update rh -c" ).withTimeout(
+                            ( int ) TimeUnit.MINUTES.toSeconds(
+                                    Common.MH_UPDATE_CHECK_TIMEOUT_MIN + Common.RH_UPDATE_CHECK_TIMEOUT_MIN ) ) );
 
             if ( result.hasSucceeded() )
             {
@@ -268,7 +271,6 @@ public class SystemManagerImpl implements SystemManager
     public boolean updateManagement()
     {
 
-
         if ( isUpdateInProgress || isEnvironmentWorkflowInProgress() )
         {
             return false;
@@ -280,21 +282,22 @@ public class SystemManagerImpl implements SystemManager
 
         try
         {
-
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
             UpdateEntity updateEntity = new UpdateEntity( SubutaiInfo.getVersion(), SubutaiInfo.getCommitId() );
 
             updateDao.persist( updateEntity );
 
-            CommandResult result =
-                    host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
+            boolean rhUpdated = updateRH();
 
-            if ( result.hasSucceeded() )
+            CommandResult result = host.execute( new RequestBuilder( "subutai update management" )
+                    .withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( Common.MH_UPDATE_TIMEOUT_MIN ) ) );
+
+            if ( result.hasSucceeded() || rhUpdated )
             {
                 updateEntity.setCurrentVersion( "No change" );
 
-                updateEntity.setCurrentCommitId( "Other (system) components updated" );
+                updateEntity.setCurrentCommitId( "System components updated" );
 
                 updateDao.update( updateEntity );
             }
@@ -410,5 +413,20 @@ public class SystemManagerImpl implements SystemManager
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+    }
+
+
+    private boolean updateRH()
+    {
+        try
+        {
+            return peerManager.getLocalPeer().getManagementHost().update();
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( "Error updating MH: {}", e.getMessage() );
+        }
+
+        return false;
     }
 }

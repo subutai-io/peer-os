@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,9 +38,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.Response;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.environment.RhTemplatesUploadProgress;
@@ -1616,5 +1620,84 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException(
                     String.format( "Failed to get reserved p2p interface names: %s", e.getMessage() ), e );
         }
+    }
+
+
+    private final AtomicBoolean updateInProgress = new AtomicBoolean( false );
+
+
+    private void markUpdateAsStarted()
+    {
+        updateInProgress.set( true );
+    }
+
+
+    private void waitForUpdateCompletion()
+    {
+        long start = System.currentTimeMillis();
+
+        while ( System.currentTimeMillis() - start < TimeUnit.MINUTES.toMillis( Common.RH_UPDATE_TIMEOUT_MIN )
+                && updateInProgress.get() )
+        {
+            TaskUtil.sleep( 100 );
+        }
+    }
+
+
+    public void markUpdateAsCompleted()
+    {
+        updateInProgress.set( false );
+    }
+
+
+    @Override
+    public synchronized boolean update()
+    {
+
+        try
+        {
+            CommandResult result = execute( new RequestBuilder( "subutai update rh -c" )
+                    .withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( Common.RH_UPDATE_CHECK_TIMEOUT_MIN ) ) );
+
+            //RH has an available update
+            if ( result.hasSucceeded() )
+            {
+                markUpdateAsStarted();
+
+                try
+                {
+                    executeAsync( new RequestBuilder( "subutai update rh & disown" ), new CommandCallback()
+                    {
+                        @Override
+                        public void onResponse( final Response response, final CommandResult commandResult )
+                        {
+                            if ( commandResult.hasCompleted() || commandResult.hasTimedOut() )
+                            {
+                                //release semaphore just in case if command returns result
+                                //however this should not happen at all since agent gets restarted
+                                //and will not send final response
+                                markUpdateAsCompleted();
+                            }
+                        }
+                    } );
+
+                    waitForUpdateCompletion();
+                }
+                finally
+                {
+                    //mark as completed after timeout even if not completed
+                    //since by this time it should have completed of failed
+                    markUpdateAsCompleted();
+                }
+
+                return true;
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error updating RH: {}", e.getMessage() );
+        }
+
+        return false;
     }
 }

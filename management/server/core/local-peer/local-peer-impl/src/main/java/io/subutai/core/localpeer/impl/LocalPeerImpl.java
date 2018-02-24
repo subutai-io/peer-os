@@ -196,7 +196,7 @@ import io.subutai.hub.share.resource.ResourceValue;
  * TODO add proper security annotations
  */
 @PermitAll
-public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
+public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 {
     private static final int BUNDLE_COUNT = 278;
 
@@ -1816,6 +1816,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
 
         registerResourceHost( resourceHostInfo );
+
+        releaseUpdateLock( resourceHostInfo );
     }
 
 
@@ -3746,68 +3748,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
-                                         final ContainerHostState currentState )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
-                                            final String currentHostname )
-    {
-        //not needed
-    }
-
-
-    @Override
-    public void onContainerCreated( final ContainerHostInfo containerInfo )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel oldNetInterface,
-                                                final HostInterfaceModel newNetInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
-                                              final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onRhConnected( final ResourceHostInfo newRhInfo )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
-    {
-        // not needed
-    }
-
-
     public void addListener( LocalPeerEventListener listener )
     {
         if ( listener != null )
@@ -4129,6 +4069,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     }
                 }
             } );
+        }
+    }
+
+
+    //on heartbeat we may consider RH update as complete
+    //because it either arrives right before agent shutdown or upon agent startup
+    private void releaseUpdateLock( ResourceHostInfo resourceHostInfo )
+    {
+        try
+        {
+            ResourceHostEntity resourceHost = ( ResourceHostEntity ) getResourceHostById( resourceHostInfo.getId() );
+            resourceHost.markUpdateAsCompleted();
+        }
+        catch ( Exception e )
+        {
+            //ignore
         }
     }
 }

@@ -32,9 +32,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.DaoException;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
@@ -65,7 +62,7 @@ import io.subutai.core.peer.api.PeerManager;
 /**
  * Implementation of Monitor
  */
-public class MonitorImpl implements Monitor, HostListener
+public class MonitorImpl extends HostListener implements Monitor
 {
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
     private static final int ALERT_LIVE_TIME = 2;// alert live time in min
@@ -556,67 +553,5 @@ public class MonitorImpl implements Monitor, HostListener
         }
 
         return commandResult;
-    }
-
-
-    @Override
-    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
-                                         final ContainerHostState currentState )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerHostnameChanged( final ContainerHostInfo containerInfo, final String previousHostname,
-                                            final String currentHostname )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerCreated( final ContainerHostInfo containerInfo )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel oldNetInterface,
-                                                final HostInterfaceModel newNetInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
-                                              final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel netInterface )
-    {
-
-    }
-
-
-    @Override
-    public void onRhConnected( final ResourceHostInfo newRhInfo )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
-    {
-        // not needed
     }
 }

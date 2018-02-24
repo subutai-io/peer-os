@@ -222,4 +222,11 @@ public interface ResourceHost extends Host, ResourceHostInfo
     String getIp() throws ResourceHostException;
 
     Set<String> getUsedP2pIfaceNames() throws ResourceHostException;
+
+    /**
+     * Updates RH
+     *
+     * @return - true if update was available, false otherwise
+     */
+    boolean update();
 }

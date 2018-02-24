@@ -13,30 +13,56 @@ import io.subutai.common.metric.QuotaAlertValue;
 /**
  * Notifies listener on host heartbeat
  */
-public interface HostListener
+public abstract class HostListener
 {
     /**
      * Triggered on each heartbeat from any of connected resource hosts
      *
      * @param resourceHostInfo - resource host info of host from which this heartbeat came
      */
-    void onHeartbeat( ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts );
+    public void onHeartbeat( ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
+    {
+    }
 
-    void onContainerStateChanged( ContainerHostInfo containerInfo, ContainerHostState previousState,
-                                  ContainerHostState currentState );
 
-    void onContainerHostnameChanged( ContainerHostInfo containerInfo, String previousHostname, String currentHostname );
+    public void onContainerStateChanged( ContainerHostInfo containerInfo, ContainerHostState previousState,
+                                  ContainerHostState currentState )
+    {
+    }
 
-    void onContainerCreated( ContainerHostInfo containerInfo );
 
-    void onContainerNetInterfaceChanged( ContainerHostInfo containerInfo, HostInterfaceModel oldNetInterface,
-                                         HostInterfaceModel newNetInterface );
+    public void onContainerHostnameChanged( ContainerHostInfo containerInfo, String previousHostname, String currentHostname )
+    {
+    }
 
-    void onContainerNetInterfaceAdded( ContainerHostInfo containerInfo, HostInterfaceModel netInterface );
 
-    void onContainerNetInterfaceRemoved( ContainerHostInfo containerInfo, HostInterfaceModel netInterface );
+    public void onContainerCreated( ContainerHostInfo containerInfo )
+    {
+    }
 
-    void onRhConnected( ResourceHostInfo resourceHostInfo );
 
-    void onRhDisconnected( ResourceHostInfo resourceHostInfo );
+    public void onContainerNetInterfaceChanged( ContainerHostInfo containerInfo, HostInterfaceModel oldNetInterface,
+                                         HostInterfaceModel newNetInterface )
+    {
+    }
+
+
+    public void onContainerNetInterfaceAdded( ContainerHostInfo containerInfo, HostInterfaceModel netInterface )
+    {
+    }
+
+
+    public void onContainerNetInterfaceRemoved( ContainerHostInfo containerInfo, HostInterfaceModel netInterface )
+    {
+    }
+
+
+    public void onRhConnected( ResourceHostInfo resourceHostInfo )
+    {
+    }
+
+
+    public void onRhDisconnected( ResourceHostInfo resourceHostInfo )
+    {
+    }
 }

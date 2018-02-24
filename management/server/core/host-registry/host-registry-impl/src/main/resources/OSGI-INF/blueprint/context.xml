@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint
-    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
   <bean id="hostRegistry"
         class="io.subutai.core.hostregistry.impl.HostRegistryImpl"
@@ -9,7 +10,7 @@
 
   <reference-list id="hostLstnr"
                   interface="io.subutai.core.hostregistry.api.HostListener"
-                  availability="optional">
+                  availability="optional" ext:proxy-method="classes">
     <reference-listener ref="hostRegistry"
                         bind-method="addHostListener" unbind-method="removeHostListener" />
   </reference-list>
