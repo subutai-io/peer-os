@@ -41,6 +41,7 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
                   scheduleUpdateCheck();
                });
              }
+		     reloadHistory();
 		}).error(function (error) {
             scheduleUpdateCheck();
         });
@@ -119,7 +120,6 @@ function SettingsUpdatesCtrl($scope, $rootScope, SettingsUpdatesSrv, SweetAlert,
 			LOADING_SCREEN('none');
 			sessionStorage.removeItem('notifications');
 			if(status == 200){
-			    reloadHistory();
 				SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
 			}
 			checkActiveUpdate();

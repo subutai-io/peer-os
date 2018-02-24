@@ -48,11 +48,7 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.AlertValue;
-import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
@@ -144,9 +140,8 @@ import io.subutai.hub.share.quota.ContainerQuota;
  * 2) add secret key TTL property to environment (user should be able to change it - add to EM API), update background
  * task to consider this TTL (make background task run frequently with short intervals)
  **/
-public class EnvironmentManagerImpl
-        implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, HostListener,
-        LocalPeerEventListener
+public class EnvironmentManagerImpl extends HostListener
+        implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, LocalPeerEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
@@ -2455,67 +2450,6 @@ public class EnvironmentManagerImpl
     private void syncRemovedEnvironmentsWithHub()
     {
         getCachedExecutor().execute( new RemoveEnvironmentsTask( environmentAdapter, this, environmentService ) );
-    }
-
-
-    @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onContainerStateChanged( final ContainerHostInfo containerInfo, final ContainerHostState previousState,
-                                         final ContainerHostState currentState )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onContainerCreated( final ContainerHostInfo containerInfo )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel oldNetInterface,
-                                                final HostInterfaceModel newNetInterface )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
-                                              final HostInterfaceModel netInterface )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel netInterface )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onRhConnected( final ResourceHostInfo resourceHostInfo )
-    {
-        // not needed
-    }
-
-
-    @Override
-    public void onRhDisconnected( final ResourceHostInfo resourceHostInfo )
-    {
-        // not needed
     }
 
 
