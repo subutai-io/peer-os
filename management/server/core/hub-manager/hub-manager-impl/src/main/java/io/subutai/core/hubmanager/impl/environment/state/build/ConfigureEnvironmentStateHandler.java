@@ -8,8 +8,14 @@ import org.apache.commons.lang.StringUtils;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.HubEnvironment;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -78,9 +84,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             extraVars = "{}";
         }
 
-        String cmd = String.format(
-                "cd %s; ansible-playbook  %s  -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars %s",
-                TMP_DIR + dirLocation, mainAnsibleScript, extraVars );
+        String cmd = String.format( "cd %s; ansible-playbook  %s --extra-vars %s", TMP_DIR + dirLocation, mainAnsibleScript, extraVars );
         try
         {
             return runCmd( containerId, cmd );
@@ -154,7 +158,15 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
     private static String format( io.subutai.hub.share.dto.ansible.Host host )
     {
+
         String f = "%s ansible_user=%s template=%s ansible_ssh_host=%s";
+
+        //if template has python3, default is python2
+        if ( host.getPythonPath() != null )
+        {
+            f += " ansible_python_interpreter=" + host.getPythonPath();
+        }
+
         return String.format( f, host.getHostname(), host.getAnsibleUser(), host.getTemplateName(), host.getIp() );
     }
 
@@ -168,6 +180,14 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         rb.withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( 5 ) );
         result = commandUtil.execute( rb, host );
 
-        return result.getStdOut();
+        CommandStatus status = result.getStatus();
+        if ( status.equals( CommandStatus.SUCCEEDED ) )
+        {
+            return result.getStdOut();
+        }
+        else
+        {
+            return result.getStdErr();
+        }
     }
 }
