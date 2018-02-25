@@ -59,7 +59,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             localStorage.setItem("hubIp", data);
         }).error(function (error) {
             if(!$.trim(vm.hubIp)){
-                vm.hubIp = 'hub.subut.ai';
+                vm.hubIp = 'bazaar.subutai.io';
                 localStorage.setItem("hubIp", vm.hubIp);
             }
         });

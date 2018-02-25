@@ -45,18 +45,17 @@ node() {
 
 	// declare hub address
 	switch (env.BRANCH_NAME) {
-		case ~/master/: hubIp = "masterhub.subut.ai"; break;
-		case ~/dev/: hubIp = "devhub.subut.ai"; break;
-		case ~/sysnet/: hubIp = "devhub.subut.ai"; break;
-		default: hubIp = "hub.subut.ai"
+		case ~/master/: hubIp = "masterbazaar.subutai.io"; break;
+		case ~/dev/: hubIp = "devbazaar.subutai.io"; break;
+		case ~/sysnet/: hubIp = "devbazaar.subutai.io"; break;
+		default: hubIp = "bazaar.subutai.io"
 	}
 
-	// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 	switch (env.BRANCH_NAME) {
-		case ~/master/: cdnHost = "mastercdn.subut.ai"; break;
-		case ~/dev/: cdnHost = "devcdn.subut.ai"; break;
-		case ~/sysnet/: cdnHost = "sysnetcdn.subut.ai"; break;
-		default: cdnHost = "cdn.subut.ai"
+		case ~/master/: cdnHost = "mastercdn.subutai.io"; break;
+		case ~/dev/: cdnHost = "devcdn.subutai.io"; break;
+		case ~/sysnet/: cdnHost = "sysnetcdn.subutai.io"; break;
+		default: cdnHost = "cdn.subutai.io"
 	}
 
 	// build deb
@@ -87,10 +86,11 @@ node() {
 			/bin/sleep 20
 			scp root@172.31.7.147:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
 			subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
-			subutai attach management "apt-get update"
+			subutai attach management "gpg --keyserver pgp.mit.edu --recv 00FEFCE3FB006E60"
+			subutai attach management "gpg --export --armor 00FEFCE3FB006E60 | apt-get update"
 			subutai attach management "sync"
 			subutai attach management "apt-get -y --allow-unauthenticated install curl influxdb influxdb-certs openjdk-8-jre"
-			subutai attach management "wget -q 'https://cdn.subut.ai:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+			subutai attach management "wget -q 'https://cdn.subutai.io:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
 			subutai attach management "dpkg -i /tmp/${debFileName}"
 			subutai attach management "systemctl stop management"
 			subutai attach management "rm -rf /opt/subutai-mng/keystores/"
@@ -141,9 +141,9 @@ node() {
 				ssh root@${env.debian_slave_node} <<- EOF
 				set -e
 				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
-				sed 's/URL =.*/URL = devcdn.subut.ai/g' -i /var/snap/subutai-dev/current/agent.gcfg
+				sed 's/URL =.*/URL = devcdn.subutai.io/g' -i /var/snap/subutai-dev/current/agent.gcfg
 				subutai-dev import management --local
-				sed 's/cdn.local/devcdn.subut.ai/g' -i /var/snap/subutai-dev/common/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
+				sed 's/cdn.local/devcdn.subutai.io/g' -i /var/snap/subutai-dev/common/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
 			EOF"""
 
 			/* wait until SS starts */
