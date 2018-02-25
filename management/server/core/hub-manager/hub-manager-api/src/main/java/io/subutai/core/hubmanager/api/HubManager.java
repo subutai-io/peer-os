@@ -9,7 +9,7 @@ import io.subutai.core.hubmanager.api.model.Config;
 
 public interface HubManager
 {
-    String HUB_EMAIL_SUFFIX = "@hub.subut.ai";
+    String HUB_EMAIL_SUFFIX = "@bazaar.subutai.io";
 
     void registerPeer( String email, String password, String peerName, String peerScope ) throws HubManagerException;
 

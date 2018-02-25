@@ -76,7 +76,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	{
         if (container.dataSource == "hub") {
 
-            SweetAlert.swal("Feature coming soon...", "This container is created on Hub. Please use Hub to manage it.", "success");
+            SweetAlert.swal("Feature coming soon...", "This container is created on Bazaar. Please use Bazaar to manage it.", "success");
 
             return true;
         }
@@ -379,7 +379,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		} else {
 		    SweetAlert.swal(
 		    "Your key is not registered with Kurjun",
-		    "Please, register your key on Hub",
+		    "Please, register your key on Bazaar",
 		    "success");
 		}
 	}

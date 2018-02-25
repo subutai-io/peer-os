@@ -44,7 +44,7 @@ generate_keystore_certificate() {
     -validity 360 \
     -keysize 1024 \
     -keystore $file_path \
-    -dname "cn=subut.ai, ou=IT, o=Subutai, c=KG" \
+    -dname "cn=subutai.io, ou=IT, o=Subutai, c=KG" \
     -storepass subutai -keypass subutai
 }
 
