@@ -98,7 +98,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         catch ( CommandException e )
         {
             e.printStackTrace();
-            return "Failed to run Ansible scripts";
+            return "Failed to run Ansible scripts: "+e.getMessage();
         }
     }
 
