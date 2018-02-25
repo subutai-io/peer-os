@@ -17,7 +17,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	$timeout(function () {
 		vm.hasPGPplugin = hasPGPplugin();
 		if (!vm.hasPGPplugin) {
-			var pluginUrl = 'https://github.com/subutai-io/browsers/releases/tag/3.0.0';
+			var pluginUrl = 'https://github.com/subutai-io/browser-plugins/releases/tag/3.0.0';
 			var isFirefox = typeof InstallTrigger !== 'undefined';
 			var isChrome = !!window.chrome && !!window.chrome.webstore;
 

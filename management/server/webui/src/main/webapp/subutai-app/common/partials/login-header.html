@@ -21,6 +21,7 @@
   <script>
 		$('.js-notifications-scrollbar').perfectScrollbar();
 
+
   </script>
   <div class="b-hub-status b-notification js-header-dropdown g-right"
        ng-class="{'b-notification_active' : currentUserCtrl.notificationNew }"
@@ -104,7 +105,8 @@
 				</g>
 			</svg>
       <div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
-        <span data-hub-email="{{ currentUserCtrl.userEmail }}">{{ currentUserCtrl.online ? 'Online' : 'Offline' }}</span>
+        <span
+            data-hub-email="{{ currentUserCtrl.userEmail }}">{{ currentUserCtrl.online ? 'Online' : 'Offline' }}</span>
       </div>
       <span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus && subutaiController.adminMenus">
 				Register Peer
@@ -169,7 +171,7 @@
         <ul class="list">
           <li style="text-align: center;">
             <a href="https://{{ currentUserCtrl.hubIp }}/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to
-              HUB</a>
+              Bazaar</a>
             <div class="date"></div>
           </li>
           <li>
