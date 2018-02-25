@@ -11,11 +11,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.HubEnvironment;
-import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
@@ -32,6 +27,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     private static final String TMP_DIR = "/tmp/";
 
     private final CommandUtil commandUtil = new CommandUtil();
+    private long commandTimeout = 5L;
 
 
     public ConfigureEnvironmentStateHandler( Context ctx )
@@ -50,7 +46,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         if ( ansibleDto != null )
         {
-            startConfigureation( ansibleDto, peerDto );
+            startConfiguration( ansibleDto, peerDto );
         }
 
         logEnd();
@@ -59,11 +55,16 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private void startConfigureation( AnsibleDto ansibleDto, EnvironmentPeerDto peerDto )
+    private void startConfiguration( AnsibleDto ansibleDto, EnvironmentPeerDto peerDto )
     {
         String containerId = ansibleDto.getAnsibleContainerId();
         String repoLink = ansibleDto.getRepoLink();
         String mainAnsibleScript = ansibleDto.getAnsibleRootFile();
+
+        if ( ansibleDto.getCommandTimeout() != null )
+        {
+            commandTimeout = ansibleDto.getCommandTimeout();
+        }
 
         prepareHostsFile( containerId, ansibleDto.getGroups() );
 
@@ -177,7 +178,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         Host host = ctx.localPeer.getContainerHostById( containerId );
         RequestBuilder rb = new RequestBuilder( cmd );
-        rb.withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( 5 ) );
+        rb.withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
         result = commandUtil.execute( rb, host );
 
         CommandStatus status = result.getStatus();
