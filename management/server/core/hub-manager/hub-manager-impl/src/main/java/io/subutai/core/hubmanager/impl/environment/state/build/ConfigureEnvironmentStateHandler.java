@@ -92,13 +92,13 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         catch ( HostNotFoundException e )
         {
             e.printStackTrace();
+            return "Failed to run Ansible scripts inside container host";
         }
         catch ( CommandException e )
         {
             e.printStackTrace();
+            return "Failed to run Ansible scripts";
         }
-
-        return "";
     }
 
 
