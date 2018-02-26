@@ -89,7 +89,7 @@ node() {
 			subutai attach management "apt-get update"
 			subutai attach management "sync"
 			subutai attach management "apt-get -y --allow-unauthenticated install curl influxdb influxdb-certs openjdk-8-jre"
-			subutai attach management "wget -q 'https://cdn.subutai.io:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+			subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
 			subutai attach management "dpkg -i /tmp/${debFileName}"
 			subutai attach management "systemctl stop management"
 			subutai attach management "rm -rf /opt/subutai-mng/keystores/"
