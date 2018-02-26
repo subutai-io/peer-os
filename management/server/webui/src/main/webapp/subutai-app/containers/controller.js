@@ -74,7 +74,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function alertForHubContainer( container )
 	{
-        if (container.dataSource == "hub") {
+        if (container.dataSource != "subutai") {
 
             SweetAlert.swal("Feature coming soon...", "This container is created on Bazaar. Please use Bazaar to manage it.", "success");
 
@@ -256,7 +256,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 						// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
 						// @todo remove when implement on backend
 						var container = vm.environments[i].containers[j];
-						var remoteProxyContainer = !container.local && container.dataSource == "hub";
+						var remoteProxyContainer = !container.local && container.dataSource != "subutai";
 
 						if ( !remoteProxyContainer )
 						{
