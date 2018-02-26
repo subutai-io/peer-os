@@ -23,7 +23,7 @@
         <option value="" disabled>Select Container</option>
         <option
             ng-repeat="container in monitoringCtrl.containers"
-            ng-if="container.local || container.dataSource != 'hub'"
+            ng-if="container.local || container.dataSource == 'subutai'"
             value="{{ container.id }}">
           {{ container.hostname }}
         </option>

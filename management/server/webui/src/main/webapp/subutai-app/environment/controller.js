@@ -359,7 +359,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		for (var index = 0; index < containers.length; index++) {
 
 			var container = containers[index];
-			var remoteProxyContainer = !container.local && container.dataSource == "hub";
+			var remoteProxyContainer = !container.local && container.dataSource != "subutai";
 
 			// We don't show on UI containers created by Hub, located on other peers.
 			// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
@@ -513,7 +513,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	{
 		var env = getEnvironment( envId );
 
-		if ( env != null && env.dataSource == "hub" )
+		if ( env != null && env.dataSource != "subutai" )
 		{
 			SweetAlert.swal( "Feature coming soon...", "This environment created on Bazaar. Please use Bazaar to manage it.", "success");
 
