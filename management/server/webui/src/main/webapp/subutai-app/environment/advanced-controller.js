@@ -923,7 +923,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     function editEnvironment(environment) {
 
-        if (environment.dataSource == "hub") {
+        if (environment.dataSource != "subutai") {
             SweetAlert.swal("Feature coming soon...", "This environment is created on Bazaar. Please use Bazaar to manage it.", "success");
 
             return;
