@@ -101,9 +101,7 @@ node() {
 			rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
 			subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
-			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${
-                env.BRANCH_NAME
-            }_amd64.tar.gz root@172.31.7.147:/mnt/lib/lxc/jenkins/${workspace}
+			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@172.31.7.147:/mnt/lib/lxc/jenkins/${workspace}
 		EOF"""
         }
 
@@ -135,9 +133,7 @@ node() {
                 // copy generated management template on test node
                 sh """
 				set +x
-				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${
-                    env.debian_slave_node
-                }:/var/snap/subutai-dev/common/lxc/tmpdir
+				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.debian_slave_node}:/var/snap/subutai-dev/common/lxc/tmpdir
 			"""
 
                 // install generated management template
@@ -148,7 +144,6 @@ node() {
 				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
 				sed 's/URL =.*/URL = devcdn.subutai.io/g' -i /var/snap/subutai-dev/current/agent.gcfg
 				subutai-dev import management --local
-				sed 's/cdn.local/devcdn.subutai.io/g' -i /var/snap/subutai-dev/common/lxc/management/rootfs/etc/apt/sources.list.d/subutai-repo.list
 			EOF"""
 
                 /* wait until SS starts */
