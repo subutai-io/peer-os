@@ -25,7 +25,8 @@ node() {
     try {
         notifyBuild('STARTED')
 
-
+        def mvnHome = tool 'M3'
+        def workspace = pwd()
 
         stage("Build management deb/template")
         // Use maven to to build deb and template files of management
@@ -54,12 +55,8 @@ node() {
             default: cdnHost = "cdn.subutai.io"
         }
 
-        lock('debian_slave_node') {
-            def mvnHome = tool 'M3'
-            def workspace = pwd()
-
-            // build deb
-            sh """
+        // build deb
+        sh """
 		cd management
 		export GIT_BRANCH=${env.BRANCH_NAME}
 		sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i server/server-karaf/src/main/assembly/bin/setenv
@@ -71,11 +68,11 @@ node() {
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${
-                debFileName
-            }
+            debFileName
+        }
 	"""
-            // Start MNG-RH Lock
-
+        // Start MNG-RH Lock
+        lock('debian_slave_node') {
             // create management template
             sh """
 			set +x
