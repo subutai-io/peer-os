@@ -86,11 +86,12 @@ node() {
 			/bin/sleep 20
 			scp root@172.31.7.147:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
 			subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
-			subutai attach management "gpg --keyserver pgp.mit.edu --recv 00FEFCE3FB006E60"
-			subutai attach management "gpg --export --armor 00FEFCE3FB006E60 | apt-get update"
+			subutai attach management "gpg --keyserver pgp.mit.edu --recv 80260C65A4D79BC8"
+			subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
+			subutai attach management "apt-get update"
 			subutai attach management "sync"
 			subutai attach management "apt-get -y --allow-unauthenticated install curl influxdb influxdb-certs openjdk-8-jre"
-			subutai attach management "wget -q 'https://cdn.subutai.io:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+			subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
 			subutai attach management "dpkg -i /tmp/${debFileName}"
 			subutai attach management "systemctl stop management"
 			subutai attach management "rm -rf /opt/subutai-mng/keystores/"
