@@ -25,8 +25,7 @@ node() {
     try {
         notifyBuild('STARTED')
 
-        def mvnHome = tool 'M3'
-        def workspace = pwd()
+
 
         stage("Build management deb/template")
         // Use maven to to build deb and template files of management
@@ -56,6 +55,9 @@ node() {
         }
 
         lock('debian_slave_node') {
+            def mvnHome = tool 'M3'
+            def workspace = pwd()
+
             // build deb
             sh """
 		cd management
