@@ -7,6 +7,7 @@ public class Host
     private String templateName;
     private String ansibleUser;
     private String ip;
+    private String pythonPath;
 
 
     public Host()
@@ -59,5 +60,17 @@ public class Host
     public void setIp( final String ip )
     {
         this.ip = ip;
+    }
+
+
+    public String getPythonPath()
+    {
+        return pythonPath;
+    }
+
+
+    public void setPythonPath( final String pythonPath )
+    {
+        this.pythonPath = pythonPath;
     }
 }

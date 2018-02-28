@@ -10,7 +10,7 @@ public class CertificateData
 	private String localityName = "";
 	private String country = "KG";
 	private String state = "";
-	private String email = "support@subut.ai";
+	private String email = "support@subutai.io";
 	
 	/************************************************************************
 	 * ******************* Getter Setters **********************************

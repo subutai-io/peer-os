@@ -19,6 +19,7 @@ public class AnsibleDto
     private Set<Group> groups = new HashSet();
     private String logs;
     private String vars;
+    private Long commandTimeout; //this is for RequestBuilder timeout
 
 
 
@@ -108,5 +109,16 @@ public class AnsibleDto
     public void setVars( final String vars )
     {
         this.vars = vars;
+    }
+
+    public Long getCommandTimeout()
+    {
+        return commandTimeout;
+    }
+
+
+    public void setCommandTimeout( final Long commandTimeout )
+    {
+        this.commandTimeout = commandTimeout;
     }
 }

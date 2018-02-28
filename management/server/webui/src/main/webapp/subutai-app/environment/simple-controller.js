@@ -932,8 +932,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function editEnvironment(environment) {
 
-		if (environment.dataSource == "hub") {
-			SweetAlert.swal("Feature coming soon...", "This environment is created on Hub. Please use Hub to manage it.", "success");
+		if (environment.dataSource != "subutai") {
+			SweetAlert.swal("Feature coming soon...", "This environment is created on Bazaar. Please use Bazaar to manage it.", "success");
 
 			return;
 		}

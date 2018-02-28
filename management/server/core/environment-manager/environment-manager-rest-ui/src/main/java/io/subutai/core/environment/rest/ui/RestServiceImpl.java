@@ -204,7 +204,7 @@ public class RestServiceImpl implements RestService
         {
             return Response.status( Response.Status.FORBIDDEN ).
                     entity( JsonUtil.GSON.toJson(
-                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                            "You don't have permission to perform this operation, please visit Bazaar to perform"
                                     + " this operation." ) ).build();
         }
 
@@ -276,7 +276,7 @@ public class RestServiceImpl implements RestService
         {
             return Response.status( Response.Status.FORBIDDEN ).
                     entity( JsonUtil.GSON.toJson(
-                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                            "You don't have permission to perform this operation, please visit Bazaar to perform"
                                     + " this operation." ) ).build();
         }
 
@@ -327,7 +327,7 @@ public class RestServiceImpl implements RestService
         {
             return Response.status( Response.Status.FORBIDDEN ).
                     entity( JsonUtil.GSON.toJson(
-                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                            "You don't have permission to perform this operation, please visit Bazaar to perform"
                                     + " this operation." ) ).build();
         }
 
@@ -404,7 +404,7 @@ public class RestServiceImpl implements RestService
         {
             return Response.status( Response.Status.FORBIDDEN ).
                     entity( JsonUtil.GSON.toJson(
-                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                            "You don't have permission to perform this operation, please visit Bazaar to perform"
                                     + " this operation." ) ).build();
         }
 
@@ -826,7 +826,7 @@ public class RestServiceImpl implements RestService
         {
             return Response.status( Response.Status.FORBIDDEN ).
                     entity( JsonUtil.GSON.toJson(
-                            "You don't have permission to perform this operation, please visit Subutai Hub to perform"
+                            "You don't have permission to perform this operation, please visit Bazaar to perform"
                                     + " this operation." ) ).build();
         }
 
