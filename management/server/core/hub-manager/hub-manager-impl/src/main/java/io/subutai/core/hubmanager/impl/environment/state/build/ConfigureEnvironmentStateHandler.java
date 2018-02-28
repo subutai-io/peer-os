@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
@@ -26,6 +27,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     private static final String TMP_DIR = "/tmp/";
 
     private final CommandUtil commandUtil = new CommandUtil();
+    private long commandTimeout = 5L;
 
 
     public ConfigureEnvironmentStateHandler( Context ctx )
@@ -44,7 +46,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         if ( ansibleDto != null )
         {
-            startConfigureation( ansibleDto, peerDto );
+            startConfiguration( ansibleDto, peerDto );
         }
 
         logEnd();
@@ -53,11 +55,16 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private void startConfigureation( AnsibleDto ansibleDto, EnvironmentPeerDto peerDto )
+    private void startConfiguration( AnsibleDto ansibleDto, EnvironmentPeerDto peerDto )
     {
         String containerId = ansibleDto.getAnsibleContainerId();
         String repoLink = ansibleDto.getRepoLink();
         String mainAnsibleScript = ansibleDto.getAnsibleRootFile();
+
+        if ( ansibleDto.getCommandTimeout() != null )
+        {
+            commandTimeout = ansibleDto.getCommandTimeout();
+        }
 
         prepareHostsFile( containerId, ansibleDto.getGroups() );
 
@@ -78,9 +85,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             extraVars = "{}";
         }
 
-        String cmd = String.format(
-                "cd %s; ansible-playbook  %s  -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars %s",
-                TMP_DIR + dirLocation, mainAnsibleScript, extraVars );
+        String cmd = String.format( "cd %s; ansible-playbook  %s --extra-vars %s", TMP_DIR + dirLocation, mainAnsibleScript, extraVars );
         try
         {
             return runCmd( containerId, cmd );
@@ -88,13 +93,13 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         catch ( HostNotFoundException e )
         {
             e.printStackTrace();
+            return "Failed to run Ansible scripts inside container host";
         }
         catch ( CommandException e )
         {
             e.printStackTrace();
+            return "Failed to run Ansible scripts: "+e.getMessage();
         }
-
-        return "";
     }
 
 
@@ -154,7 +159,15 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
     private static String format( io.subutai.hub.share.dto.ansible.Host host )
     {
+
         String f = "%s ansible_user=%s template=%s ansible_ssh_host=%s";
+
+        //if template has python3, default is python2
+        if ( host.getPythonPath() != null )
+        {
+            f += " ansible_python_interpreter=" + host.getPythonPath();
+        }
+
         return String.format( f, host.getHostname(), host.getAnsibleUser(), host.getTemplateName(), host.getIp() );
     }
 
@@ -165,9 +178,17 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         Host host = ctx.localPeer.getContainerHostById( containerId );
         RequestBuilder rb = new RequestBuilder( cmd );
-        rb.withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( 5 ) );
+        rb.withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
         result = commandUtil.execute( rb, host );
 
-        return result.getStdOut();
+        CommandStatus status = result.getStatus();
+        if ( status.equals( CommandStatus.SUCCEEDED ) )
+        {
+            return result.getStdOut();
+        }
+        else
+        {
+            return result.getStdErr();
+        }
     }
 }
