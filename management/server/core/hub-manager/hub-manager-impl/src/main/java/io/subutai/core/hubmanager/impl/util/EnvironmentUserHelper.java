@@ -175,7 +175,7 @@ public class EnvironmentUserHelper
 
         try
         {
-            User user = identityManager.createUser( userDto.getFingerprint(), null, "[Hub] " + userDto.getName(), email,
+            User user = identityManager.createUser( userDto.getFingerprint(), null, "[Bazaar] " + userDto.getName(), email,
                     UserType.HUB.getId(), KeyTrustLevel.MARGINAL.getId(), false, true );
 
             identityManager.setUserPublicKey( user.getId(), userDto.getPublicKey() );
