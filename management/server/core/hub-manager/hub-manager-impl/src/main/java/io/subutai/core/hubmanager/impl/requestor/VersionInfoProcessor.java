@@ -129,7 +129,7 @@ public class VersionInfoProcessor extends HubRequester
             return true;
         }
 
-        //by force updates every 1 hour
+        //by force updates every 15 minutes
         if ( VERSION_CACHE.get( KEY_DATE ) != null )
         {
             try
@@ -138,10 +138,10 @@ public class VersionInfoProcessor extends HubRequester
 
                 Calendar cal = Calendar.getInstance();
                 cal.setTime( new Date() );
-                cal.add( Calendar.HOUR, -1 );
-                Date oneHourBack = cal.getTime();
+                cal.add( Calendar.MINUTE, -15 );
+                Date sendTimeout = cal.getTime();
 
-                if ( lastUpdate.before( oneHourBack ) )
+                if ( lastUpdate.before( sendTimeout ) )
                 {
                     return true;
                 }
