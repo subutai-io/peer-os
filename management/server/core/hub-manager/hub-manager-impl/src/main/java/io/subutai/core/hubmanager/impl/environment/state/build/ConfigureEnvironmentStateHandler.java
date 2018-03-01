@@ -85,21 +85,24 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             extraVars = "{}";
         }
 
-        String cmd = String.format( "cd %s; ansible-playbook  %s --extra-vars %s", TMP_DIR + dirLocation, mainAnsibleScript, extraVars );
+        String cmd =
+                String.format( "cd %s; ansible-playbook  %s --extra-vars %s", TMP_DIR + dirLocation, mainAnsibleScript,
+                        extraVars );
         try
         {
             return runCmd( containerId, cmd );
         }
-        catch ( HostNotFoundException e )
+        catch ( HostNotFoundException | CommandException e )
         {
             e.printStackTrace();
-            return "Failed to run Ansible scripts inside container host";
+            return e.getMessage();
         }
-        catch ( CommandException e )
+        catch ( Exception e )
         {
             e.printStackTrace();
-            return "Failed to run Ansible scripts: "+e.getMessage();
         }
+
+        return "";
     }
 
 
@@ -120,11 +123,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         {
             runCmd( containerId, cmd );
         }
-        catch ( HostNotFoundException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( CommandException e )
+        catch ( Exception e )
         {
             e.printStackTrace();
         }
@@ -145,11 +144,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                     runCmd( containerId, String.format( "echo %s >> /etc/ansible/hosts", format( host ).trim() ) );
                 }
             }
-            catch ( HostNotFoundException e )
-            {
-                e.printStackTrace();
-            }
-            catch ( CommandException e )
+            catch ( Exception e )
             {
                 e.printStackTrace();
             }
@@ -174,21 +169,19 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
     private String runCmd( String containerId, String cmd ) throws HostNotFoundException, CommandException
     {
-        CommandResult result;
 
         Host host = ctx.localPeer.getContainerHostById( containerId );
         RequestBuilder rb = new RequestBuilder( cmd );
         rb.withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
-        result = commandUtil.execute( rb, host );
 
-        CommandStatus status = result.getStatus();
-        if ( status.equals( CommandStatus.SUCCEEDED ) )
+        CommandResult result = host.execute( rb );
+
+        String msg = result.getStdOut();
+        if ( msg == null || msg.isEmpty() )
         {
-            return result.getStdOut();
+            msg = result.getStdErr();
         }
-        else
-        {
-            return result.getStdErr();
-        }
+
+        return msg;
     }
 }
