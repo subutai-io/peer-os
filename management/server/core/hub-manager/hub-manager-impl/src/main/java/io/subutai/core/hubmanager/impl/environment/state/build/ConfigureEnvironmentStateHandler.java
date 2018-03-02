@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
+import java.net.InetAddress;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -121,6 +122,21 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         try
         {
+
+            //check if connection to GitHub exists
+            InetAddress inetAddress = InetAddress.getByName( "www.github.com" );
+
+            int count = 1;
+            boolean reachable = isReachable( inetAddress, count * 2 );
+
+            while ( !reachable && count < 5 ) //break after 5th try
+            {
+                TimeUnit.SECONDS.sleep( count * 2 );
+                reachable = isReachable( inetAddress, count * 2 );
+                count++;
+                log.info( "No internet connection on container host {}", containerId );
+            }
+
             runCmd( containerId, cmd );
         }
         catch ( Exception e )
@@ -183,5 +199,26 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         }
 
         return msg;
+    }
+
+
+    private boolean isReachable( InetAddress address, int timeOutMillis ) throws Exception
+    {
+
+        Process p = new ProcessBuilder( "ping", "-c", "1", address.getHostAddress() ).start();
+        try
+        {
+            p.waitFor( timeOutMillis, TimeUnit.MILLISECONDS );
+        }
+        catch ( InterruptedException e )
+        {
+            return false;
+        }
+        if ( p.isAlive() )
+        {
+            return false;
+        }
+        int exitValue = p.exitValue();
+        return exitValue == 0;
     }
 }
