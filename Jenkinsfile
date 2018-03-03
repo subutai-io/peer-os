@@ -83,7 +83,7 @@ node() {
 			subutai import debian-stretch
 			subutai clone debian-stretch management
 			/bin/sleep 20
-			scp root@172.31.7.147:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
+			scp root@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
 			subutai attach management "apt-get update && apt-get install dirmngr -y"
             subutai attach management "gpg --keyserver pgp.mit.edu --recv 80260C65A4D79BC8"
 			subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
