@@ -8,8 +8,6 @@ import org.apache.commons.lang.StringUtils;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandStatus;
-import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -22,11 +20,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 public class ConfigureEnvironmentStateHandler extends StateHandler
 {
-
-    private static final String ANSIBLE_LINK = "/rest/v1/environments/%s/ansible";
     private static final String TMP_DIR = "/tmp/";
 
-    private final CommandUtil commandUtil = new CommandUtil();
     private long commandTimeout = 5L;
 
 
@@ -80,7 +75,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     private String runAnsibleScript( final String containerId, final String dirLocation, final String mainAnsibleScript,
                                      String extraVars )
     {
-        if ( extraVars == null || StringUtils.isEmpty( extraVars ) )
+        if ( StringUtils.isEmpty( extraVars ) )
         {
             extraVars = "{}";
         }
@@ -92,17 +87,12 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         {
             return runCmd( containerId, cmd );
         }
-        catch ( HostNotFoundException | CommandException e )
-        {
-            e.printStackTrace();
-            return e.getMessage();
-        }
         catch ( Exception e )
         {
-            e.printStackTrace();
-        }
+            log.error( "Error configuring environment", e );
 
-        return "";
+            return e.getMessage();
+        }
     }
 
 
@@ -117,24 +107,35 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
     private void copyRepoUnpack( final String containerId, final String repoLink )
     {
-        String cmd = String.format( "cd %s; bash /root/get_unzip.sh %s", TMP_DIR, repoLink );
 
         try
         {
+            int count = 1;
+            boolean reachable = isReachable( "www.github.com", containerId );
+
+            while ( !reachable && count < 5 ) //break after 5th try
+            {
+                TimeUnit.SECONDS.sleep( count * 2 );
+                reachable = isReachable( "www.github.com", containerId );
+                count++;
+                log.info( "No internet connection on container host {}", containerId );
+            }
+
+            String cmd = String.format( "cd %s; bash /root/get_unzip.sh %s", TMP_DIR, repoLink );
             runCmd( containerId, cmd );
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            log.error( "Error configuring environment", e );
         }
     }
 
 
     private void prepareHostsFile( final String containerId, Set<io.subutai.hub.share.dto.ansible.Group> groups )
     {
-        for ( io.subutai.hub.share.dto.ansible.Group group : groups )
+        try
         {
-            try
+            for ( io.subutai.hub.share.dto.ansible.Group group : groups )
             {
                 runCmd( containerId,
                         String.format( "echo %s >> /etc/ansible/hosts", String.format( "[%s]", group.getName() ) ) );
@@ -144,10 +145,10 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                     runCmd( containerId, String.format( "echo %s >> /etc/ansible/hosts", format( host ).trim() ) );
                 }
             }
-            catch ( Exception e )
-            {
-                e.printStackTrace();
-            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error configuring environment", e );
         }
     }
 
@@ -171,17 +172,30 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     {
 
         Host host = ctx.localPeer.getContainerHostById( containerId );
-        RequestBuilder rb = new RequestBuilder( cmd );
-        rb.withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
+        RequestBuilder rb =
+                new RequestBuilder( cmd ).withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
 
         CommandResult result = host.execute( rb );
 
         String msg = result.getStdOut();
-        if ( msg == null || msg.isEmpty() )
+
+        if ( !result.hasSucceeded() )
         {
-            msg = result.getStdErr();
+            msg += " " + result.getStdErr();
+            log.error( "Error configuring environment: {}", result );
         }
 
         return msg;
+    }
+
+
+    private boolean isReachable( String address, String containerId ) throws Exception
+    {
+        Host host = ctx.localPeer.getContainerHostById( containerId );
+
+        CommandResult result =
+                host.execute( new RequestBuilder( "ping" ).withCmdArgs( "-w", "10", "-c", "3", address ) );
+
+        return result.hasSucceeded();
     }
 }
