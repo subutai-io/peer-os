@@ -14,11 +14,7 @@
         <tr>
           <th>Status</th>
           <th>Name</th>
-          <th></th>
-          <th>ID</th>
-          <th>IP</th>
-          <th>Approved</th>
-          <th>Action</th>
+          <th>Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -31,22 +27,24 @@
                 class="b-status-icon b-status-icon_{{ status }}">
             </div>
           </td>
-          <td>{{ rh.hostname }}
-            <span ng-if="rh.isManagement"> [ Management ]</span>
-          </td>
-          <td>
+          <td><span tooltips
+                    tooltip-template='<span class="b-nowrap">ID: {{ rh.id }}</span><br/><span class="b-nowrap">IP: {{ rh.ip }}</span>'
+                    tooltip-side="right">
+            {{ rh.hostname }}
+            </span>
+            &nbsp;
             <a href
                ng-if="rh.isConnected"
                class="b-icon b-icon_edit"
                tooltips
                tooltip-template='Change hostname'
+               tooltip-side="right"
                ng-click="nodeRegCtrl.changeNamePopup( rh )" style="visibility: visible">
             </a>
+            <span ng-if="rh.isManagement"> [ Management ]</span>
           </td>
-          <td>{{ rh.id }}</td>
-          <td>{{ rh.ip }}</td>
-          <td>{{ rh.status == 'APPROVED' ? 'Yes' : 'No' }}</td>
           <td>
+            <button ng-if="rh.isConnected" class="b-btn b-btn_blue" ng-click="nodeRegCtrl.update( rh.id )">Update</button>
             <button ng-if="rh.status == 'REQUESTED'" class="b-btn b-btn_green"
                     ng-click="nodeRegCtrl.approve( rh.id )">Approve
             </button>
