@@ -336,7 +336,7 @@ public class RestServiceImpl implements RestService
 
             ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostId );
 
-            return Response.ok().entity( JsonUtil.toJson( RESULT_KEY, resourceHost.update() ) ).build();
+            return resourceHost.update() ? Response.ok().build() : Response.noContent().build();
         }
         catch ( HostNotFoundException he )
         {

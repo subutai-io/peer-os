@@ -86,10 +86,10 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 		if(nodeId === undefined) return;
 
 		LOADING_SCREEN();
-		nodeRegSrv.updateReq( nodeId ).success(function (data) {
+		nodeRegSrv.updateReq( nodeId ).success(function (data, status) {
 			SweetAlert.swal(
 				"Success!",
-				data.RESULT ? "Host has been updated": "No updates",
+				status == 200 ? "Host has been updated": "No updates",
 				"success"
 			);
 			LOADING_SCREEN('none');
