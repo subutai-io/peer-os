@@ -26,7 +26,7 @@ function TenantsViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTO
 		DTColumnBuilder.newColumn('id').withTitle('ID'),
 		DTColumnBuilder.newColumn('dataSource').withTitle('Source'),
 		DTColumnBuilder.newColumn('status').withTitle('Status').renderWith(actionStatus),
-		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
+		DTColumnBuilder.newColumn(null).withTitle('Delete').notSortable().renderWith(actionDelete)
 	];
 
 	function createdRow(row, data, dataIndex) {
