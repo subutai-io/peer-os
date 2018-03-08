@@ -209,6 +209,7 @@ node() {
             sh """
 			set +x
 			curl -s -k -Ffile=@${debFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/apt/upload
+            sleep 60
             curl -k -H "token: ${token}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
 		"""
             // def signatureDeb = sh (script: "curl -s -k -Ffile=@${workspace}/${debFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
