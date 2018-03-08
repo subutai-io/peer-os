@@ -31,6 +31,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.Common;
@@ -140,10 +141,12 @@ public class SystemManagerImpl implements SystemManager
     @RolesAllowed( "System-Management|Read" )
     public NetworkSettings getNetworkSettings() throws ConfigurationException
     {
-        NetworkSettings pojo = new NetworkSettingsPojo();
+        NetworkSettingsPojo pojo = new NetworkSettingsPojo();
 
-        pojo.setPublicUrl( peerManager.getLocalPeer().getPeerInfo().getPublicUrl() );
-        pojo.setPublicSecurePort( peerManager.getLocalPeer().getPeerInfo().getPublicSecurePort() );
+        PeerInfo localPeerInfo = peerManager.getLocalPeer().getPeerInfo();
+        pojo.setPublicUrl( localPeerInfo.getPublicUrl() );
+        pojo.setPublicSecurePort( localPeerInfo.getPublicSecurePort() );
+        pojo.setUseRhIp( !localPeerInfo.isManualSetting() );
         pojo.setStartRange( Integer.parseInt( Common.P2P_PORT_RANGE_START ) );
         pojo.setEndRange( Integer.parseInt( Common.P2P_PORT_RANGE_END ) );
         pojo.setHubIp( Common.HUB_IP );
@@ -154,13 +157,14 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     @RolesAllowed( "System-Management|Update" )
-    public void setNetworkSettings( final String publicUrl, final String publicSecurePort )
+    public void setNetworkSettings( final String publicUrl, final String publicSecurePort, final boolean useRhIp )
             throws ConfigurationException
     {
         try
         {
-            peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
-                    Integer.parseInt( publicSecurePort ) );
+            peerManager
+                    .setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl, Integer.parseInt( publicSecurePort ),
+                            useRhIp );
         }
         catch ( Exception e )
         {

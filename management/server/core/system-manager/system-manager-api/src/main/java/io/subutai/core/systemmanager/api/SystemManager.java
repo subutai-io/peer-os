@@ -23,7 +23,8 @@ public interface SystemManager
 
     PeerSettings getPeerSettings();
 
-    void setNetworkSettings( final String publicUrl, final String publicSecurePort ) throws ConfigurationException;
+    void setNetworkSettings( final String publicUrl, final String publicSecurePort, final boolean userRhIp )
+            throws ConfigurationException;
 
     AdvancedSettings getAdvancedSettings( String logFile );
 
