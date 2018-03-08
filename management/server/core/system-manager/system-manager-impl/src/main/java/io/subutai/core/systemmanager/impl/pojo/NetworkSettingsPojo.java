@@ -11,6 +11,20 @@ public class NetworkSettingsPojo implements NetworkSettings
     private int startRange;
     private int endRange;
     private String hubIp;
+    private boolean useRhIp;
+
+
+    @Override
+    public boolean getUseRhIp()
+    {
+        return useRhIp;
+    }
+
+
+    public void setUseRhIp( final boolean useRhIp )
+    {
+        this.useRhIp = useRhIp;
+    }
 
 
     @Override
@@ -20,7 +34,6 @@ public class NetworkSettingsPojo implements NetworkSettings
     }
 
 
-    @Override
     public void setHubIp( final String hubIp )
     {
         this.hubIp = hubIp;
@@ -34,7 +47,6 @@ public class NetworkSettingsPojo implements NetworkSettings
     }
 
 
-    @Override
     public void setPublicUrl( final String publicUrl )
     {
         this.publicUrl = publicUrl;
@@ -48,7 +60,6 @@ public class NetworkSettingsPojo implements NetworkSettings
     }
 
 
-    @Override
     public void setPublicSecurePort( final int publicSecurePort )
     {
         this.publicSecurePort = publicSecurePort;
@@ -62,7 +73,6 @@ public class NetworkSettingsPojo implements NetworkSettings
     }
 
 
-    @Override
     public void setStartRange( final int startRange )
     {
         this.startRange = startRange;
@@ -76,7 +86,6 @@ public class NetworkSettingsPojo implements NetworkSettings
     }
 
 
-    @Override
     public void setEndRange( final int endRange )
     {
         this.endRange = endRange;

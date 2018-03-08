@@ -122,11 +122,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setNetworkSettings( final String publicUrl, final String publicSecurePort )
+    public Response setNetworkSettings( final String publicUrl, final String publicSecurePort, boolean userRhIp )
     {
         try
         {
-            systemManager.setNetworkSettings( publicUrl, publicSecurePort );
+            systemManager.setNetworkSettings( publicUrl, publicSecurePort, userRhIp );
         }
         catch ( ConfigurationException e )
         {
@@ -143,7 +143,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getAdvancedSettings( String logFile )
     {
-        AdvancedSettings pojo = systemManager.getAdvancedSettings(logFile);
+        AdvancedSettings pojo = systemManager.getAdvancedSettings( logFile );
 
         String advancedSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
