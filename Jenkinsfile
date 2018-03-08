@@ -226,7 +226,7 @@ node() {
             //         token
             //     }
 			// """
-            }
+            //}
 
             // upload template
             String responseTemplate = sh(script: """
