@@ -218,14 +218,14 @@ node() {
             // sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" https://${cdnHost}:8338/kurjun/rest/auth/sign"
 
             // delete old deb
-            if (responseDeb != "Not found") {
-                def jsonDeb = jsonParse(responseDeb)
-                sh """
-				set +x
-				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${
-                    token
-                }
-			"""
+            // if (responseDeb != "Not found") {
+            //     def jsonDeb = jsonParse(responseDeb)
+            //     sh """
+			// 	set +x
+			// 	curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${
+            //         token
+            //     }
+			// """
             }
 
             // upload template
