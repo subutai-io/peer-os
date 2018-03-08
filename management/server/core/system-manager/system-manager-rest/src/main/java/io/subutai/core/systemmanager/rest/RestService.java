@@ -55,8 +55,8 @@ public interface RestService
     @Path( "update_network_settings" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response setNetworkSettings( @FormParam( "publicUrl" ) String publicUrl,
-                                 @FormParam( "publicSecurePort" ) String publicSecurePort )
-            throws ConfigurationException;
+                                 @FormParam( "publicSecurePort" ) String publicSecurePort,
+                                 @FormParam( "useRhIp" ) boolean userRhIp ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )
