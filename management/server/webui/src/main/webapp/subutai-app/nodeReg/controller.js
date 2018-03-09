@@ -87,11 +87,19 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 
 		LOADING_SCREEN();
 		nodeRegSrv.updateReq( nodeId ).success(function (data, status) {
-			SweetAlert.swal(
-				"Success!",
-				status == 200 ? "Host has been updated": "No updates",
-				"success"
-			);
+		    if(status == 200){
+                SweetAlert.swal(
+                    "Success!",
+                    "Host has been updated",
+                    "success"
+                );
+		    }else{
+                SweetAlert.swal(
+                    "Host is up to date!",
+                    "No updates",
+                    "info"
+                );
+			}
 			LOADING_SCREEN('none');
 		}).error(function(data){
 			LOADING_SCREEN('none');
