@@ -96,9 +96,12 @@ node() {
 			subutai attach management "systemctl stop management"
 			subutai attach management "rm -rf /opt/subutai-mng/keystores/"
 			subutai attach management "apt-get clean"
-			
 			subutai attach management "sync"
-			rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
+            subutai attach management "sed -i "s/weekly/dayly/g" /etc/logrotate.d/rsyslog"
+            subutai attach management "sed -i "/delaycompress/d" /etc/logrotate.d/rsyslog"
+            subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
+            subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
+  			rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
 			subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
 			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}
