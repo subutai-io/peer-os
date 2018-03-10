@@ -96,9 +96,12 @@ node() {
 			subutai attach management "systemctl stop management"
 			subutai attach management "rm -rf /opt/subutai-mng/keystores/"
 			subutai attach management "apt-get clean"
-			
 			subutai attach management "sync"
-			rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
+            subutai attach management "sed -i "s/weekly/dayly/g" /etc/logrotate.d/rsyslog"
+            subutai attach management "sed -i "/delaycompress/d" /etc/logrotate.d/rsyslog"
+            subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
+            subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
+  			rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
 			subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
 			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}
@@ -209,21 +212,25 @@ node() {
             sh """
 			set +x
 			curl -s -k -Ffile=@${debFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/apt/upload
+            """
+            sh """
+			set +x
             curl -k -H "token: ${token}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
-		"""
+		    """
+            
             // def signatureDeb = sh (script: "curl -s -k -Ffile=@${workspace}/${debFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
             // sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" https://${cdnHost}:8338/kurjun/rest/auth/sign"
 
             // delete old deb
-            if (responseDeb != "Not found") {
-                def jsonDeb = jsonParse(responseDeb)
-                sh """
-				set +x
-				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${
-                    token
-                }
-			"""
-            }
+            // if (responseDeb != "Not found") {
+            //     def jsonDeb = jsonParse(responseDeb)
+            //     sh """
+			// 	set +x
+			// 	curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${
+            //         token
+            //     }
+			// """
+            //}
 
             // upload template
             String responseTemplate = sh(script: """
@@ -237,7 +244,11 @@ node() {
             sh """
 			set +x
 			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" https://${cdnHost}:8338/kurjun/rest/auth/sign
-		"""
+		    """
+            sh """
+            set +x
+            echo "https://${cdnHost}:8338/kurjun/rest/template/list"
+            """
 
             // delete old template
             if (responseTemplate != "Not found") {
