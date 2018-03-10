@@ -1,33 +1,44 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 
+import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.Response;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.hub.share.dto.ansible.AnsibleDto;
+import io.subutai.hub.share.dto.ansible.Group;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 
 public class ConfigureEnvironmentStateHandler extends StateHandler
 {
-    private static final String TMP_DIR = "/tmp/";
+    private static final String ENV_APPS_URL = "/rest/v1/environments/%s/apps";
+
+    private static final String TMP_DIR = "/root/";
 
     private long commandTimeout = 5L;
+
+    public final RestClient restClient;
 
 
     public ConfigureEnvironmentStateHandler( Context ctx )
     {
         super( ctx, "Configure environment" );
+        restClient = ctx.restClient;
     }
 
 
@@ -52,30 +63,30 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
     private void startConfiguration( AnsibleDto ansibleDto, EnvironmentPeerDto peerDto )
     {
-        String containerId = ansibleDto.getAnsibleContainerId();
-        String repoLink = ansibleDto.getRepoLink();
-        String mainAnsibleScript = ansibleDto.getAnsibleRootFile();
-
         if ( ansibleDto.getCommandTimeout() != null )
         {
             commandTimeout = ansibleDto.getCommandTimeout();
         }
 
-        prepareHostsFile( containerId, ansibleDto.getGroups() );
+        prepareHostsFile( ansibleDto.getAnsibleContainerId(), ansibleDto.getGroups() );
 
-        copyRepoUnpack( containerId, repoLink );
+        copyRepoUnpack( ansibleDto.getAnsibleContainerId(), ansibleDto.getRepoLink() );
 
-        String out =
-                runAnsibleScript( containerId, getDirLocation( repoLink ), mainAnsibleScript, ansibleDto.getVars() );
+        String out = runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
 
         peerDto.getAnsibleDto().setLogs( out );
     }
 
 
-    private String runAnsibleScript( final String containerId, final String dirLocation, final String mainAnsibleScript,
-                                     String extraVars )
+    private String runAnsibleScript( AnsibleDto ansibleDto, String envSubutaiId )
     {
-        if ( StringUtils.isEmpty( extraVars ) )
+        final String containerId = ansibleDto.getAnsibleContainerId();
+        final String dirLocation = getDirLocation( ansibleDto.getRepoLink() );
+        final String mainAnsibleScript = ansibleDto.getAnsibleRootFile();
+        String extraVars = ansibleDto.getVars();
+
+
+        if ( StringUtils.isEmpty( ansibleDto.getVars() ) )
         {
             extraVars = "{}";
         }
@@ -85,7 +96,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                         extraVars );
         try
         {
-            return runCmd( containerId, cmd );
+            return runCmdAsync( containerId, cmd, envSubutaiId );
         }
         catch ( Exception e )
         {
@@ -121,71 +132,13 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                 log.info( "No internet connection on container host {}", containerId );
             }
 
-            String cmd = String.format( "cd %s; bash /root/get_unzip.sh %s", TMP_DIR, repoLink );
+            String cmd = String.format( "cd %s; bash get_unzip.sh %s", TMP_DIR, repoLink );
             runCmd( containerId, cmd );
         }
         catch ( Exception e )
         {
             log.error( "Error configuring environment", e );
         }
-    }
-
-
-    private void prepareHostsFile( final String containerId, Set<io.subutai.hub.share.dto.ansible.Group> groups )
-    {
-        try
-        {
-            for ( io.subutai.hub.share.dto.ansible.Group group : groups )
-            {
-                runCmd( containerId,
-                        String.format( "echo %s >> /etc/ansible/hosts", String.format( "[%s]", group.getName() ) ) );
-
-                for ( io.subutai.hub.share.dto.ansible.Host host : group.getHosts() )
-                {
-                    runCmd( containerId, String.format( "echo %s >> /etc/ansible/hosts", format( host ).trim() ) );
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            log.error( "Error configuring environment", e );
-        }
-    }
-
-
-    private static String format( io.subutai.hub.share.dto.ansible.Host host )
-    {
-
-        String f = "%s ansible_user=%s template=%s ansible_ssh_host=%s";
-
-        //if template has python3, default is python2
-        if ( host.getPythonPath() != null )
-        {
-            f += " ansible_python_interpreter=" + host.getPythonPath();
-        }
-
-        return String.format( f, host.getHostname(), host.getAnsibleUser(), host.getTemplateName(), host.getIp() );
-    }
-
-
-    private String runCmd( String containerId, String cmd ) throws HostNotFoundException, CommandException
-    {
-
-        Host host = ctx.localPeer.getContainerHostById( containerId );
-        RequestBuilder rb =
-                new RequestBuilder( cmd ).withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
-
-        CommandResult result = host.execute( rb );
-
-        String msg = result.getStdOut();
-
-        if ( !result.hasSucceeded() )
-        {
-            msg += " " + result.getStdErr();
-            log.error( "Error configuring environment: {}", result );
-        }
-
-        return msg;
     }
 
 
@@ -197,5 +150,146 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                 host.execute( new RequestBuilder( "ping" ).withCmdArgs( "-w", "10", "-c", "3", address ) );
 
         return result.hasSucceeded();
+    }
+
+
+    private void prepareHostsFile( final String containerId, Set<io.subutai.hub.share.dto.ansible.Group> groups )
+    {
+        String groupName = "";
+        String inventoryLine = "";
+        try
+        {
+            for ( Group group : groups )
+            {
+
+                groupName = String.format( "[%s]", group.getName() );
+
+                runCmd( containerId,
+                        String.format( "grep -q -F '%s' /etc/ansible/hosts || echo '%s' >> /etc/ansible/hosts",
+                                groupName, groupName ) );
+
+                for ( io.subutai.hub.share.dto.ansible.Host host : group.getHosts() )
+                {
+                    inventoryLine = format( host ).trim();
+                    runCmd( containerId,
+                            String.format( "grep -q -F '%s' /etc/ansible/hosts || echo '%s' >> /etc/ansible/hosts",
+                                    inventoryLine, inventoryLine ) );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error configuring environment", e );
+        }
+    }
+
+
+    private String runCmd( String containerId, String cmd ) throws HostNotFoundException, CommandException
+    {
+        Host host = ctx.localPeer.getContainerHostById( containerId );
+
+        RequestBuilder rb =
+                new RequestBuilder( cmd ).withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
+
+        CommandResult result = host.execute( rb );
+
+        String msg = result.getStdOut();
+
+        if ( !result.hasSucceeded() )
+        {
+            msg += " " + result.getStdErr();
+
+            log.error( "Error configuring environment: {}", result );
+        }
+
+        return msg;
+    }
+
+
+    private static String format( io.subutai.hub.share.dto.ansible.Host host )
+    {
+
+        String inventoryLineFormat = "%s ansible_user=%s template=%s ansible_ssh_host=%s";
+
+        //if template has python3, default is python2
+        if ( host.getPythonPath() != null )
+        {
+            inventoryLineFormat += " ansible_python_interpreter=" + host.getPythonPath();
+        }
+
+        return String.format( inventoryLineFormat, host.getHostname(), host.getAnsibleUser(), host.getTemplateName(),
+                host.getIp() );
+    }
+
+
+    private String runCmdAsync( String containerId, String cmd, String envSubutaiId )
+            throws HostNotFoundException, CommandException
+    {
+        Host host = ctx.localPeer.getContainerHostById( containerId );
+
+        RequestBuilder rb =
+                new RequestBuilder( cmd ).withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
+
+        host.executeAsync( rb, new AnsibleCallback( envSubutaiId ) );
+
+        String msg = "No logs yet";
+
+        return msg;
+    }
+
+
+    private class AnsibleCallback implements CommandCallback
+    {
+        final String envSubutaiId;
+
+        private List<Integer> cache = new ArrayList<>();
+
+
+        AnsibleCallback( String envSubutaiId )
+        {
+            this.envSubutaiId = envSubutaiId;
+        }
+
+
+        @Override
+        public void onResponse( final Response response, final CommandResult commandResult )
+        {
+
+            if ( cache.contains( response.getResponseNumber() ) )
+            {
+                return;
+            }
+            else
+            {
+                cache.add( response.getResponseNumber() );
+            }
+
+            AnsibleDto ansibleDto = new AnsibleDto();
+
+            ansibleDto.setState( AnsibleDto.State.IN_PROGRESS );
+
+            if ( commandResult.hasCompleted() )
+            {
+                if ( commandResult.getExitCode() != 0 )
+                {
+                    ansibleDto.setState( AnsibleDto.State.FAILED );
+                    ansibleDto.setLogs( commandResult.getStdErr() + commandResult.getStdOut() );
+                }
+                else
+                {
+                    ansibleDto.setState( AnsibleDto.State.SUCCESS );
+                    ansibleDto.setLogs( commandResult.getStdOut() );
+                    cache.clear();
+                }
+            }
+            else
+            {
+                ansibleDto.setLogs( commandResult.getStdOut() );
+            }
+
+            String path = String.format( ENV_APPS_URL, this.envSubutaiId );
+
+            restClient.post( path, ansibleDto );
+        }
     }
 }
