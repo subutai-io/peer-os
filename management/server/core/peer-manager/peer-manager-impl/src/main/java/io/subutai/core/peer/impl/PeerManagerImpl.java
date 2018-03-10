@@ -1441,14 +1441,8 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
 
 
     @Override
-    public void setPublicUrl( final String peerId, final String publicUrl, final int securePort ) throws PeerException
-    {
-        setPublicUrl( peerId, publicUrl, securePort, true );
-    }
-
-
-    private void setPublicUrl( final String peerId, final String publicUrl, final int securePort,
-                               boolean manualSetting ) throws PeerException
+    public void setPublicUrl( final String peerId, final String publicUrl, final int securePort, boolean useRhIp )
+            throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( publicUrl ) );
@@ -1471,7 +1465,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
                 peerInfo.setPublicUrl( publicUrl.toLowerCase() );
                 peerInfo.setPublicSecurePort( securePort );
 
-                peerInfo.setManualSetting( manualSetting );
+                peerInfo.setManualSetting( !useRhIp );
 
                 peerData.setInfo( toJson( peerInfo ) );
 
@@ -1526,7 +1520,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
                 if ( ( Common.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
                         .getPeerInfo().isManualSetting() ) && !ip.equals( localPeer.getPeerInfo().getIp() ) )
                 {
-                    setPublicUrl( localPeerId, ip, localPeer.getPeerInfo().getPublicSecurePort(), false );
+                    setPublicUrl( localPeerId, ip, localPeer.getPeerInfo().getPublicSecurePort(), true );
                 }
             }
             catch ( Exception e )

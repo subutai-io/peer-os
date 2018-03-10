@@ -25,8 +25,7 @@ public interface PeerManager
     List<RegistrationData> getRegistrationRequests();
 
     /**
-     * Returns peer instance by peer id
-     * throws PeerException if peer is not found
+     * Returns peer instance by peer id throws PeerException if peer is not found
      */
     Peer getPeer( String peerId ) throws PeerException;
 
@@ -81,7 +80,7 @@ public interface PeerManager
 
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
 
-    void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
+    void setPublicUrl( String peerId, String publicUrl, int securePort, boolean userRhIp ) throws PeerException;
 
     void checkHostAvailability( final String destinationHost ) throws PeerException;
 

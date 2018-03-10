@@ -19,9 +19,11 @@ import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
@@ -36,6 +38,8 @@ import io.subutai.common.util.JsonUtil;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
+    private static final String ERROR_KEY = "ERROR";
+    private static final String RESULT_KEY = "RESULT";
 
     private final LocalPeer localPeer;
 
@@ -319,6 +323,32 @@ public class RestServiceImpl implements RestService
         {
             LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response updateResourceHost( final String resourceHostId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( resourceHostId );
+
+            ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostId );
+
+            return resourceHost.update() ? Response.ok().build() : Response.noContent().build();
+        }
+        catch ( HostNotFoundException he )
+        {
+            return Response.status( Response.Status.NOT_FOUND )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Resource host not found" ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error updating resource host", e );
+
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, e.getMessage() == null ? "Internal error" : e.getMessage() ) ).build();
         }
     }
 
