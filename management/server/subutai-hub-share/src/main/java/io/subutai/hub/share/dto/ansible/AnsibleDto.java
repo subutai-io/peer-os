@@ -9,7 +9,7 @@ public class AnsibleDto
 {
     public enum State
     {
-        FAILED, SUCCESS
+        FAILED, SUCCESS, IN_PROGRESS
     }
 
     private String ansibleContainerId;
