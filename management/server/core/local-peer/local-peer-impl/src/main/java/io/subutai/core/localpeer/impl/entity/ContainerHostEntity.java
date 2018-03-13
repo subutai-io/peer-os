@@ -252,7 +252,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         {
             return getTemplate().getName();
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             logger.error( "Failed to get template by id", e.getMessage() );
         }
