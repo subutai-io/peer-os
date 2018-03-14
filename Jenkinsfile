@@ -70,7 +70,7 @@ node() {
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${
             debFileName
         }
-	"""
+	    """
         // Start MNG-RH Lock
         lock('debian_slave_node') {
             // create management template
@@ -104,10 +104,13 @@ node() {
   			sudo rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
-			sudo scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ubuntu@${env.master_node}:/mnt/lib/lxc/jenkins/${workspace}
-		EOF"""
+			EOF"""
         }
-
+        // upload template to jenkins master node
+        sh """
+        set +x
+        scp admin@${env.master_node}:/var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz /mnt/lib/lxc/jenkins/${workspace}
+        """
         /* stash p2p binary to use it in next node() */
         stash includes: "management-*.deb", name: 'deb'
         stash includes: "management-subutai-template*", name: 'template'
