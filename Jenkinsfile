@@ -104,7 +104,7 @@ node() {
   			sudo rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
-			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ubuntu@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}
+			sudo scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ubuntu@${env.master_node}:/mnt/lib/lxc/jenkins/${workspace}
 		EOF"""
         }
 
