@@ -83,7 +83,7 @@ node() {
 			sudo subutai import debian-stretch
 			sudo subutai clone debian-stretch management
 			/bin/sleep 20
-			scp admin@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
+			scp ubuntu@${master_node}:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
             sudo subutai attach management "gpg --keyserver pgp.mit.edu --recv 80260C65A4D79BC8"
 			sudo subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
@@ -104,7 +104,7 @@ node() {
   			sudo rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
-			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz admin@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}
+			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ubuntu@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}
 		EOF"""
         }
 
