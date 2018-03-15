@@ -3,6 +3,7 @@ package io.subutai.core.desktop.api;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 
 
 /**
@@ -25,10 +26,23 @@ public interface DesktopManager
     /**
      * copies authorized keys to x2go client user
      */
+    void createSSHDir( ContainerHost containerHost ) throws CommandException;
+
+    /**
+     * copies authorized keys to x2go client user
+     */
     void copyKeys( ContainerHost containerHost ) throws CommandException;
 
     /**
      * creates default desktop user for Remote Desktop client
      */
     void createDesktopUser( ContainerHost containerHost ) throws CommandException;
+
+    boolean existInCache( String containerId );
+
+    void containerIsDesktop( String containerId );
+
+    void containerIsNotDesktop( String containerId );
+
+    void cleanCache( String containerId );
 }

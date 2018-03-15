@@ -84,30 +84,49 @@ public class ContainerEventProcessor extends HubRequester
         ContainerStateDto state = ContainerStateDto.valueOf( ch.getState().name() );
         ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
 
-        try
+        if ( !desktopManager.existInCache( ch.getId() ) )
         {
-            //get information about desktop env and remote desktop server
-            String deskEnv = desktopManager.getDesktopEnvironmentInfo( ch );
-            String rDServer = desktopManager.getRDServerInfo( ch );
-
-            if ( !deskEnv.isEmpty() && !rDServer.isEmpty() )
+            try
             {
-                ContainerDesktopInfoDto desktopInfo = new ContainerDesktopInfoDto( ch.getId(), deskEnv, rDServer );
-                dto.setDesktopInfo( desktopInfo );
-                try
+                //get information about desktop env and remote desktop server
+                String deskEnv = desktopManager.getDesktopEnvironmentInfo( ch );
+                String rDServer = desktopManager.getRDServerInfo( ch );
+
+                if ( !deskEnv.isEmpty() && !rDServer.isEmpty() )
                 {
-                    desktopManager.createDesktopUser( ch );
-                    desktopManager.copyKeys( ch );
+                    //add to cache as a desktop container
+                    desktopManager.containerIsDesktop( ch.getId() );
+
+                    ContainerDesktopInfoDto desktopInfo = new ContainerDesktopInfoDto( ch.getId(), deskEnv, rDServer );
+                    dto.setDesktopInfo( desktopInfo );
+                    try
+                    {
+                        desktopManager.createDesktopUser( ch );
+                    }
+                    catch ( Exception e )
+                    {
+                        log.error( e.getMessage() );
+                    }
                 }
-                catch ( Exception e )
+                else
                 {
-                    log.error( e.getMessage() );
+                    //add to cache as not desktop container
+                    desktopManager.containerIsNotDesktop( ch.getId() );
                 }
             }
+            catch ( CommandException e )
+            {
+                log.error( e.getMessage() );
+            }
+        }
+
+        try
+        {
+            desktopManager.copyKeys( ch );
         }
         catch ( CommandException e )
         {
-            log.error( e.getMessage() );
+            log.error( "Could not copy SSH keys to x2go usr" );
         }
 
         RestResult res = doRequest( dto );
