@@ -138,6 +138,20 @@ public class DesktopManagerImpl implements DesktopManager
     }
 
 
+    @Override
+    public Set<String> getDesktopContainers()
+    {
+        return desktopContainerHosts;
+    }
+
+
+    @Override
+    public Set<String> getNotDesktopContainers()
+    {
+        return notDesktopContainerHosts;
+    }
+
+
     private boolean isCacheExpired( String containerId )
     {
         Date lastUpdate = lastContainerUpdateTime.get( containerId );

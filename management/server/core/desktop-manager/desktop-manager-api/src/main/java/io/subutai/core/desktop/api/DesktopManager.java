@@ -1,6 +1,8 @@
 package io.subutai.core.desktop.api;
 
 
+import java.util.Set;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -45,4 +47,8 @@ public interface DesktopManager
     void containerIsNotDesktop( String containerId );
 
     void cleanCache( String containerId );
+
+    Set<String> getDesktopContainers();
+
+    Set<String> getNotDesktopContainers();
 }
