@@ -1,33 +1,38 @@
 package io.subutai.core.desktop.impl;
 
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.core.desktop.api.DesktopManager;
 
 
 public class DesktopManagerImpl implements DesktopManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( DesktopManagerImpl.class.getName() );
 
     private static final int CACHE_TTL_MIN = 60; //1 hour in minutes
-    //Set of container host IDs
-    private static Set<String> desktopContainerHosts = Sets.newConcurrentHashSet();
-    private static Set<String> notDesktopContainerHosts = Sets.newConcurrentHashSet();
 
-    //Map of container ID and it's last cache update time
-    private static Map<String, Date> lastContainerUpdateTime = Maps.newConcurrentMap();
-
-    private volatile long lastUpdateTime;
+    //KEY, Boolean (if it's desktop or not)
+    private LoadingCache<String, Boolean> hostDesktopCaches =
+            CacheBuilder.newBuilder().maximumSize( 500 ).expireAfterWrite( CACHE_TTL_MIN, TimeUnit.MINUTES )
+                        .build( new CacheLoader<String, Boolean>()
+                        {
+                            @Override
+                            public Boolean load( final String containerId ) throws Exception
+                            {
+                                return null;
+                            }
+                        } );
 
 
     public DesktopManagerImpl()
@@ -101,71 +106,38 @@ public class DesktopManagerImpl implements DesktopManager
     @Override
     public boolean existInCache( final String containerId )
     {
-        if ( desktopContainerHosts.contains( containerId ) )
+        try
         {
-            if ( isCacheExpired( containerId ) )
+            if ( hostDesktopCaches.get( containerId ) != null )
             {
-                return false;
+                return true;
             }
         }
-
-        return desktopContainerHosts.contains( containerId ) || notDesktopContainerHosts.contains( containerId );
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+        return false;
     }
 
 
     @Override
     public void containerIsDesktop( final String containerId )
     {
-        desktopContainerHosts.add( containerId );
-        lastContainerUpdateTime.put( containerId, new Date() );
+        hostDesktopCaches.put( containerId, true );
     }
 
 
     @Override
     public void containerIsNotDesktop( final String containerId )
     {
-        notDesktopContainerHosts.add( containerId );
-        lastContainerUpdateTime.put( containerId, new Date() );
+        hostDesktopCaches.put( containerId, false );
     }
 
 
     @Override
-    public void cleanCache( final String containerId )
+    public LoadingCache<String, Boolean> getHostDesktopInfoCaches()
     {
-        desktopContainerHosts.remove( containerId );
-        notDesktopContainerHosts.remove( containerId );
-        lastContainerUpdateTime.remove( containerId );
-    }
-
-
-    @Override
-    public Set<String> getDesktopContainers()
-    {
-        return desktopContainerHosts;
-    }
-
-
-    @Override
-    public Set<String> getNotDesktopContainers()
-    {
-        return notDesktopContainerHosts;
-    }
-
-
-    private boolean isCacheExpired( String containerId )
-    {
-        Date lastUpdate = lastContainerUpdateTime.get( containerId );
-        if ( lastUpdate != null )
-        {
-            long period = System.currentTimeMillis() - lastUpdate.getTime();
-
-            if ( period < TimeUnit.MINUTES.toMillis( CACHE_TTL_MIN ) )
-            {
-                return false;
-            }
-        }
-
-        cleanCache( containerId );
-        return true;
+        return hostDesktopCaches;
     }
 }
