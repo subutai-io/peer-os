@@ -19,6 +19,7 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 	//functions
 	vm.approve = approve;
 	vm.reject = reject;
+	vm.update = update;
 	vm.remove = remove;
 	vm.editingRh = {};
 	vm.changeNamePopup = changeNamePopup;
@@ -78,6 +79,31 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 		}).error(function(error){
 			LOADING_SCREEN('none');
 			SweetAlert.swal("ERROR!", error.ERROR, "error");
+		});
+	}
+
+	function update(nodeId) {
+		if(nodeId === undefined) return;
+
+		LOADING_SCREEN();
+		nodeRegSrv.updateReq( nodeId ).success(function (data, status) {
+		    if(status == 200){
+                SweetAlert.swal(
+                    "Success!",
+                    "Host has been updated",
+                    "success"
+                );
+		    }else{
+                SweetAlert.swal(
+                    "Host is up to date!",
+                    "No updates",
+                    "info"
+                );
+			}
+			LOADING_SCREEN('none');
+		}).error(function(data){
+			LOADING_SCREEN('none');
+			SweetAlert.swal("ERROR!", data.ERROR, "error");
 		});
 	}
 

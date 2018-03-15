@@ -82,7 +82,7 @@ public class LocalPeerCommands
     protected RequestBuilder getReadOrCreateSSHCommand( SshEncryptionType encryptionType )
     {
         return new RequestBuilder( String.format(
-                "if [ -f %1$s/id_%2$s.pub ]; " + "then cat %1$s/id_%2$s.pub ;" + "else rm -rf %1$s && "
+                "if [ -f %1$s/id_%2$s.pub ]; " + "then cat %1$s/id_%2$s.pub ;" + "else rm -rf %1$s ; "
                         + "mkdir -p %1$s && " + "chmod 700 %1$s && " + "ssh-keygen -t %2$s -P '' -f %1$s/id_%2$s -q && "
                         + "cat %1$s/id_%2$s.pub; fi", Common.CONTAINER_SSH_FOLDER,
                 encryptionType.name().toLowerCase() ) ).withTimeout( 60 );

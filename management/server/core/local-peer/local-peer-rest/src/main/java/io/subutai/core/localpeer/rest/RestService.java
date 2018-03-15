@@ -126,6 +126,12 @@ public interface RestService
     void cleanupEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @POST
+    @Path( "hosts/{resourceHostId}/update" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response updateResourceHost( @PathParam( "resourceHostId" ) String resourceHostId );
+
+    @POST
     @Path( "alert" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )

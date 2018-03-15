@@ -9,11 +9,13 @@ nodeRegSrv.$inject = ['$http'];
 function nodeRegSrv($http) {
 	var BASE_URL = SERVER_URL + 'rest/v1/registration/';
 	var NODES_URL = BASE_URL + "requests/";
+	var UPDATE_URL = SERVER_URL + "rest/v1/peer/hosts/";
 
 	var nodeRegSrv = {
 		getData : getData,
 		approveReq : approveReq,
 		rejectReq : rejectReq,
+		updateReq : updateReq,
 		removeReq : removeReq,
 		unblockReq : unblockReq,
 		changeHostName : changeHostName
@@ -31,6 +33,10 @@ function nodeRegSrv($http) {
 
 	function rejectReq(nodeId) {
 		return $http.post(NODES_URL + nodeId + '/reject');
+	}
+
+	function updateReq(nodeId) {
+		return $http.post(UPDATE_URL + nodeId + '/update');
 	}
 
 	function unblockReq(nodeId) {

@@ -456,7 +456,7 @@ public class CommandUtil
 
 
     /**
-     * Callback that can be stopped from being triggered by calling stop() from inside onSuccess method
+     * Callback that can be stopped from being triggered by calling stop() from inside onResponse method
      */
     public static abstract class StoppableCallback implements CommandCallback
     {
