@@ -3,12 +3,8 @@ package io.subutai.core.desktop.impl;
 
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -18,26 +14,11 @@ import io.subutai.core.desktop.api.DesktopManager;
 
 public class DesktopManagerImpl implements DesktopManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( DesktopManagerImpl.class.getName() );
-
     private static final int CACHE_TTL_MIN = 60; //1 hour in minutes
 
     //KEY, Boolean (if it's desktop or not)
-    private LoadingCache<String, Boolean> hostDesktopCaches =
-            CacheBuilder.newBuilder().maximumSize( 500 ).expireAfterWrite( CACHE_TTL_MIN, TimeUnit.MINUTES )
-                        .build( new CacheLoader<String, Boolean>()
-                        {
-                            @Override
-                            public Boolean load( final String containerId ) throws Exception
-                            {
-                                return null;
-                            }
-                        } );
-
-
-    public DesktopManagerImpl()
-    {
-    }
+    private Cache<String, Boolean> hostDesktopCaches =
+            CacheBuilder.newBuilder().maximumSize( 500 ).expireAfterWrite( CACHE_TTL_MIN, TimeUnit.MINUTES ).build();
 
 
     @Override
@@ -106,18 +87,7 @@ public class DesktopManagerImpl implements DesktopManager
     @Override
     public boolean existInCache( final String containerId )
     {
-        try
-        {
-            if ( hostDesktopCaches.get( containerId ) != null )
-            {
-                return true;
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage() );
-        }
-        return false;
+        return hostDesktopCaches.getIfPresent( containerId ) != null;
     }
 
 
@@ -132,12 +102,5 @@ public class DesktopManagerImpl implements DesktopManager
     public void containerIsNotDesktop( final String containerId )
     {
         hostDesktopCaches.put( containerId, false );
-    }
-
-
-    @Override
-    public LoadingCache<String, Boolean> getHostDesktopInfoCaches()
-    {
-        return hostDesktopCaches;
     }
 }

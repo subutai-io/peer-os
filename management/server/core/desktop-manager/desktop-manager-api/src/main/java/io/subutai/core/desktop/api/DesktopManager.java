@@ -1,13 +1,8 @@
 package io.subutai.core.desktop.api;
 
 
-import java.util.Set;
-
-import com.google.common.cache.LoadingCache;
-
 import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerId;
 
 
 /**
@@ -47,6 +42,4 @@ public interface DesktopManager
     void containerIsDesktop( String containerId );
 
     void containerIsNotDesktop( String containerId );
-
-    LoadingCache<String, Boolean> getHostDesktopInfoCaches();
 }

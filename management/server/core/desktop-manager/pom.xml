@@ -10,7 +10,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>desktop-manager</artifactId>
+  <name>Subutai Desktop Manager Parent</name>
+  <description>Subutai Desktop Manager Parent</description>
   <packaging>pom</packaging>
+
   <modules>
     <module>desktop-manager-api</module>
     <module>desktop-manager-impl</module>
