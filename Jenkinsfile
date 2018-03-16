@@ -70,44 +70,47 @@ node() {
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${
             debFileName
         }
-	"""
+	    """
         // Start MNG-RH Lock
         lock('debian_slave_node') {
             // create management template
             sh """
 			set +x
-			ssh root@${env.debian_slave_node} <<- EOF
+			ssh admin@${env.debian_slave_node} <<- EOF
 			set -e
 			
-			subutai destroy management
-			subutai import debian-stretch
-			subutai clone debian-stretch management
+			sudo subutai destroy management
+			sudo subutai import debian-stretch
+			sudo subutai clone debian-stretch management
 			/bin/sleep 20
-			scp root@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
-			subutai attach management "apt-get update && apt-get install dirmngr -y"
-            subutai attach management "gpg --keyserver pgp.mit.edu --recv 80260C65A4D79BC8"
-			subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
-			subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
-            subutai attach management "apt-get update"
-			subutai attach management "sync"
-			subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
-			subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
-			subutai attach management "dpkg -i /tmp/${debFileName}"
-			subutai attach management "systemctl stop management"
-			subutai attach management "rm -rf /opt/subutai-mng/keystores/"
-			subutai attach management "apt-get clean"
-			subutai attach management "sync"
-            subutai attach management "sed -i "s/weekly/dayly/g" /etc/logrotate.d/rsyslog"
-            subutai attach management "sed -i "/delaycompress/d" /etc/logrotate.d/rsyslog"
-            subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
-            subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
-  			rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
-			subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
+			scp ubuntu@${env.master_node}:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/
+			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
+            sudo subutai attach management "gpg --keyserver pgp.mit.edu --recv 80260C65A4D79BC8"
+			sudo subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
+			sudo subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
+            sudo subutai attach management "apt-get update"
+			sudo subutai attach management "sync"
+			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
+			sudo subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
+			sudo subutai attach management "systemctl stop management"
+			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
+			sudo subutai attach management "apt-get clean"
+			sudo subutai attach management "sync"
+            sudo subutai attach management "sed -i "s/weekly/dayly/g" /etc/logrotate.d/rsyslog"
+            sudo subutai attach management "sed -i "/delaycompress/d" /etc/logrotate.d/rsyslog"
+            sudo subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
+            sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
+  			sudo rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
+			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
 
-			scp /var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@172.31.5.61:/mnt/lib/lxc/jenkins/${workspace}
-		EOF"""
+			EOF"""
         }
-
+        // upload template to jenkins master node
+        sh """
+        set +x
+        scp admin@${env.debian_slave_node}:/var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
+        """
         /* stash p2p binary to use it in next node() */
         stash includes: "management-*.deb", name: 'deb'
         stash includes: "management-subutai-template*", name: 'template'
@@ -122,31 +125,30 @@ node() {
                 // destroy existing management template on test node and install latest available snap
                 sh """
 				set +x
-				ssh root@${env.debian_slave_node} <<- EOF
+				ssh admin@${env.debian_slave_node} <<- EOF
 				set -e
-				subutai-dev destroy everything
-				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
-				find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
+				sudo subutai-dev destroy everything
+				if test -f /var/snap/subutai-dev/current/p2p.save; then sudo rm /var/snap/subutai-dev/current/p2p.save; fi
 				cd /tmp
-				find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
-				snap download subutai-dev --beta
-				snap install --dangerous --devmode /tmp/subutai-dev_*.snap
+				sudo find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
+				sudo snap download subutai-dev --beta
+				sudo snap install --dangerous --devmode /tmp/subutai-dev_*.snap
 			EOF"""
 
                 // copy generated management template on test node
-                sh """
+            /*    sh """
 				set +x
-				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz root@${env.debian_slave_node}:/var/snap/subutai-dev/common/lxc/tmpdir
-			"""
+				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz admin@${env.debian_slave_node}:/var/snap/subutai-dev/common/lxc/tmpdir
+			""" */
 
                 // install generated management template
                 sh """
 				set +x
-				ssh root@${env.debian_slave_node} <<- EOF
+				ssh admin@${env.debian_slave_node} <<- EOF
 				set -e
-				sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
-				sed 's/URL =.*/URL = devcdn.subutai.io/g' -i /var/snap/subutai-dev/current/agent.gcfg
-				subutai-dev import management --local
+				sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
+				sudo sed 's/URL =.*/URL = devcdn.subutai.io/g' -i /var/snap/subutai-dev/current/agent.gcfg
+				sudo subutai-dev import management --local
 			EOF"""
 
                 /* wait until SS starts */
