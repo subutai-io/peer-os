@@ -1,6 +1,11 @@
 package io.subutai.core.desktop.impl;
 
 
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.peer.ContainerHost;
@@ -9,10 +14,11 @@ import io.subutai.core.desktop.api.DesktopManager;
 
 public class DesktopManagerImpl implements DesktopManager
 {
+    private static final int CACHE_TTL_MIN = 60; //1 hour in minutes
 
-    public DesktopManagerImpl()
-    {
-    }
+    //KEY, Boolean (if it's desktop or not)
+    private Cache<String, Boolean> hostDesktopCaches =
+            CacheBuilder.newBuilder().maximumSize( 500 ).expireAfterWrite( CACHE_TTL_MIN, TimeUnit.MINUTES ).build();
 
 
     @Override
@@ -58,8 +64,14 @@ public class DesktopManagerImpl implements DesktopManager
     @Override
     public void copyKeys( final ContainerHost containerHost ) throws CommandException
     {
-        containerHost.execute( Commands.getCreateDefaultSSHDirectoryCommand() );
         containerHost.execute( Commands.getCopyAuthKeysCommand() );
+    }
+
+
+    @Override
+    public void createSSHDir( final ContainerHost containerHost ) throws CommandException
+    {
+        containerHost.execute( Commands.getCreateDefaultSSHDirectoryCommand() );
     }
 
 
@@ -67,5 +79,28 @@ public class DesktopManagerImpl implements DesktopManager
     public void createDesktopUser( final ContainerHost containerHost ) throws CommandException
     {
         containerHost.execute( Commands.getCreateDesktopUserCommand() );
+        createSSHDir( containerHost );
+        copyKeys( containerHost );
+    }
+
+
+    @Override
+    public boolean existInCache( final String containerId )
+    {
+        return hostDesktopCaches.getIfPresent( containerId ) != null;
+    }
+
+
+    @Override
+    public void containerIsDesktop( final String containerId )
+    {
+        hostDesktopCaches.put( containerId, true );
+    }
+
+
+    @Override
+    public void containerIsNotDesktop( final String containerId )
+    {
+        hostDesktopCaches.put( containerId, false );
     }
 }
