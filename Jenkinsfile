@@ -129,7 +129,6 @@ node() {
 				set -e
 				sudo subutai-dev destroy everything
 				if test -f /var/snap/subutai-dev/current/p2p.save; then sudo rm /var/snap/subutai-dev/current/p2p.save; fi
-				sudo find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
 				cd /tmp
 				sudo find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
 				sudo snap download subutai-dev --beta
@@ -137,10 +136,10 @@ node() {
 			EOF"""
 
                 // copy generated management template on test node
-                sh """
+            /*    sh """
 				set +x
 				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz admin@${env.debian_slave_node}:/var/snap/subutai-dev/common/lxc/tmpdir
-			"""
+			""" */
 
                 // install generated management template
                 sh """
