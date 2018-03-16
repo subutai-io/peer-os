@@ -229,19 +229,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         AnsibleCallback ansibleCallback = new AnsibleCallback( envSubutaiId );
 
-        host.executeAsync( rb, ansibleCallback );
-
-        while ( !ansibleCallback.hasCompleted() )
-        {
-            try
-            {
-                Thread.sleep( 5000 );
-            }
-            catch ( InterruptedException e )
-            {
-                log.error( e.getMessage() );
-            }
-        }
+        host.execute( rb, ansibleCallback );
     }
 
 
