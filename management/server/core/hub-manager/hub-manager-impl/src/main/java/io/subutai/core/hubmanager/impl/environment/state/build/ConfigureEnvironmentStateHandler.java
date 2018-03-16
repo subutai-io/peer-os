@@ -72,13 +72,11 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         copyRepoUnpack( ansibleDto.getAnsibleContainerId(), ansibleDto.getRepoLink() );
 
-        String out = runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
-
-        peerDto.getAnsibleDto().setLogs( out );
+        runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
     }
 
 
-    private String runAnsibleScript( AnsibleDto ansibleDto, String envSubutaiId )
+    private void runAnsibleScript( AnsibleDto ansibleDto, String envSubutaiId )
     {
         final String containerId = ansibleDto.getAnsibleContainerId();
         final String dirLocation = getDirLocation( ansibleDto.getRepoLink() );
@@ -96,13 +94,11 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                         extraVars );
         try
         {
-            return runCmdAsync( containerId, cmd, envSubutaiId );
+            runCmdAsync( containerId, cmd, envSubutaiId );
         }
         catch ( Exception e )
         {
             log.error( "Error configuring environment", e );
-
-            return e.getMessage();
         }
     }
 
@@ -222,7 +218,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private String runCmdAsync( String containerId, String cmd, String envSubutaiId )
+    private void runCmdAsync( String containerId, String cmd, String envSubutaiId )
             throws HostNotFoundException, CommandException
     {
         Host host = ctx.localPeer.getContainerHostById( containerId );
@@ -230,17 +226,30 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         RequestBuilder rb =
                 new RequestBuilder( cmd ).withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
 
-        host.executeAsync( rb, new AnsibleCallback( envSubutaiId ) );
 
-        String msg = "No logs yet";
+        AnsibleCallback ansibleCallback = new AnsibleCallback( envSubutaiId );
 
-        return msg;
+        host.executeAsync( rb, ansibleCallback );
+
+        while ( !ansibleCallback.hasCompleted() )
+        {
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException e )
+            {
+                log.error( e.getMessage() );
+            }
+        }
     }
 
 
     private class AnsibleCallback implements CommandCallback
     {
         final String envSubutaiId;
+
+        private boolean hasCompleted = false;
 
         private List<Integer> cache = new ArrayList<>();
 
@@ -281,6 +290,8 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                     ansibleDto.setLogs( commandResult.getStdOut() );
                     cache.clear();
                 }
+
+                hasCompleted = commandResult.hasCompleted();
             }
             else
             {
@@ -290,6 +301,12 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             String path = String.format( ENV_APPS_URL, this.envSubutaiId );
 
             restClient.post( path, ansibleDto );
+        }
+
+
+        public boolean hasCompleted()
+        {
+            return hasCompleted;
         }
     }
 }
