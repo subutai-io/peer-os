@@ -128,12 +128,12 @@ node() {
 				ssh admin@${env.debian_slave_node} <<- EOF
 				set -e
 				sudo subutai-dev destroy everything
-				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
-				find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
+				if test -f /var/snap/subutai-dev/current/p2p.save; then sudo rm /var/snap/subutai-dev/current/p2p.save; fi
+				sudo find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
 				cd /tmp
-				find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
-				snap download subutai-dev --beta
-				snap install --dangerous --devmode /tmp/subutai-dev_*.snap
+				sudo find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
+				sudo snap download subutai-dev --beta
+				sudo snap install --dangerous --devmode /tmp/subutai-dev_*.snap
 			EOF"""
 
                 // copy generated management template on test node
