@@ -73,6 +73,17 @@ node() {
 	    """
         // Start MNG-RH Lock
         lock('debian_slave_node') {
+            // cdn auth creadentials
+            String user = "jenkins"
+            def authID = sh(script: """
+			set +x
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
+			""", returnStdout: true)
+            def token = sh(script: """
+			set +x
+			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
+			""", returnStdout: true)
+
             // create management template
             sh """
 			set +x
@@ -102,7 +113,7 @@ node() {
             sudo subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
   			sudo rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
-			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME}
+			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
 			EOF"""
         }
@@ -135,11 +146,6 @@ node() {
 				sudo snap install --dangerous --devmode /tmp/subutai-dev_*.snap
 			EOF"""
 
-                // copy generated management template on test node
-            /*    sh """
-				set +x
-				scp ${workspace}/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz admin@${env.debian_slave_node}:/var/snap/subutai-dev/common/lxc/tmpdir
-			""" */
 
                 // install generated management template
                 sh """
@@ -219,20 +225,6 @@ node() {
 			set +x
             curl -k -H "token: ${token}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
 		    """
-            
-            // def signatureDeb = sh (script: "curl -s -k -Ffile=@${workspace}/${debFileName} -Ftoken=${token} https://${cdnHost}:8338/kurjun/rest/apt/upload | gpg --clearsign --no-tty", returnStdout: true)
-            // sh "curl -s -k -Ftoken=${token} -Fsignature=\"${signatureDeb}\" https://${cdnHost}:8338/kurjun/rest/auth/sign"
-
-            // delete old deb
-            // if (responseDeb != "Not found") {
-            //     def jsonDeb = jsonParse(responseDeb)
-            //     sh """
-			// 	set +x
-			// 	curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${
-            //         token
-            //     }
-			// """
-            //}
 
             // upload template
             String responseTemplate = sh(script: """
