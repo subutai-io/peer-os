@@ -49,5 +49,4 @@ public interface DesktopManager
      * invalidated cache of give container host
      */
     void invalidate( String containerId );
-    ConcurrentMap<String, Boolean> getCacheList();
 }

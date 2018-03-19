@@ -98,12 +98,6 @@ public class DesktopManagerImpl implements DesktopManager
         hostDesktopCaches.invalidate( containerId );
     }
 
-    @Override
-    public ConcurrentMap<String, Boolean> getCacheList()
-    {
-        return hostDesktopCaches.asMap();
-    }
-
 
     @Override
     public void containerIsDesktop( final String containerId )
