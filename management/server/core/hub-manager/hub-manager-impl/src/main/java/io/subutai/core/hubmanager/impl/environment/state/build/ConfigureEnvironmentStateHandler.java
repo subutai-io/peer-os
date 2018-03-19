@@ -78,13 +78,11 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
 
-        peerDto.getAnsibleDto().setLogs( out );
 
-        Environment environment = null;
-
+        //invalidate desktop information cache
         try
         {
-            environment = ctx.envManager.loadEnvironment( peerDto.getEnvironmentInfo().getId() );
+            Environment environment = ctx.envManager.loadEnvironment( peerDto.getEnvironmentInfo().getId() );
             for ( EnvironmentContainerHost host : environment.getContainerHostsByPeerId( peerDto.getPeerId() ) )
             {
                 ctx.desktopManager.invalidate( host.getId() );
