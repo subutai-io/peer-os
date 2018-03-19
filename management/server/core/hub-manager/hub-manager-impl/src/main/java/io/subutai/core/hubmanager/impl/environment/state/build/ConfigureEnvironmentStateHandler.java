@@ -88,7 +88,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                 ctx.desktopManager.invalidate( host.getId() );
             }
         }
-        catch ( EnvironmentNotFoundException e )
+        catch ( Exception e )
         {
             log.info( e.getMessage() );
         }
