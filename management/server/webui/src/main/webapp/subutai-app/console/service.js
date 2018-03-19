@@ -37,17 +37,20 @@ function consoleService($http, environmentService) {
 		);		
 	}
 
-	function sendCommand(cmd, peerId, path, daemon, timeOut, environmentId) {
-		var postData = 'command=' + encodeURIComponent(cmd) + '&hostId=' + peerId + '&path=' + path;
+	function sendCommand(cmd, hostId, path, daemon, timeout, environmentId) {
+		var postData = 'command=' + encodeURIComponent(cmd) + '&hostid=' + hostId;
 
 		if(daemon) {
 			postData += '&daemon=true';
 		}
-		if(timeOut !== undefined && timeOut > 0) {
-			postData += '&timeOut=' + parseInt(timeOut);
+		if(timeout !== undefined && timeout > 0) {
+			postData += '&timeout=' + parseInt(timeout);
 		}
 		if(environmentId && environmentId.length > 0) {
-			postData += '&environmentId=' + environmentId;
+			postData += '&environmentid=' + environmentId;
+		}
+		if(path && path.length > 0) {
+			postData += '&path=' + path;
 		}
 
 		return $http.post(

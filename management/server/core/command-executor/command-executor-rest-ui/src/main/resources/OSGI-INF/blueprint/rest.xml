@@ -14,8 +14,6 @@
     </cxf:features>
   </cxf:bus>
 
-  <reference id="commandExecutor" availability="mandatory"
-             interface="io.subutai.core.executor.api.CommandExecutor" />
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
   <reference id="identityManager" availability="mandatory"
@@ -24,7 +22,6 @@
              interface="io.subutai.common.peer.LocalPeer" />
 
   <bean id="executorRestUIServiceImpl" class="io.subutai.core.executor.rest.ui.RestServiceImpl">
-    <argument ref="commandExecutor" />
     <argument ref="environmentManager" />
     <argument ref="identityManager" />
     <argument ref="localPeer" />
