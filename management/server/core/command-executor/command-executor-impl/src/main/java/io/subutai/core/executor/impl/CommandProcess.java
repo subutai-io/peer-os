@@ -226,13 +226,14 @@ class CommandProcess
 
             exitCode = response.getExitCode();
 
-            if ( exitCode != null )
-            {
-                status = exitCode == 0 ? CommandStatus.SUCCEEDED : CommandStatus.FAILED;
-            }
-            else if ( response.getType() == ResponseType.EXECUTE_TIMEOUT )
+
+            if ( response.getType() == ResponseType.EXECUTE_TIMEOUT )
             {
                 status = CommandStatus.KILLED;
+            }
+            else if ( exitCode != null )
+            {
+                status = exitCode == 0 ? CommandStatus.SUCCEEDED : CommandStatus.FAILED;
             }
         }
     }
