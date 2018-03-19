@@ -239,7 +239,7 @@ public class HubManagerImpl extends HostListener implements HubManager
     {
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, restClient );
 
-        Context ctx = new Context( identityManager, envManager, envUserHelper, localPeer, restClient );
+        Context ctx = new Context( identityManager, envManager, envUserHelper, localPeer, restClient, desktopManager );
 
         StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 

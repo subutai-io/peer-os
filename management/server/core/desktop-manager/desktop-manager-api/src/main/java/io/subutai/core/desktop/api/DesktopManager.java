@@ -1,6 +1,8 @@
 package io.subutai.core.desktop.api;
 
 
+import java.util.concurrent.ConcurrentMap;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.ContainerHost;
 
@@ -42,4 +44,9 @@ public interface DesktopManager
     void containerIsDesktop( String containerId );
 
     void containerIsNotDesktop( String containerId );
+
+    /**
+     * invalidated cache of give container host
+     */
+    void invalidate( String containerId );
 }

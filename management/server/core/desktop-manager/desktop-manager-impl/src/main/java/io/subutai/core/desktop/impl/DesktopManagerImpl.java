@@ -1,6 +1,7 @@
 package io.subutai.core.desktop.impl;
 
 
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
@@ -88,6 +89,13 @@ public class DesktopManagerImpl implements DesktopManager
     public boolean existInCache( final String containerId )
     {
         return hostDesktopCaches.getIfPresent( containerId ) != null;
+    }
+
+
+    @Override
+    public void invalidate( final String containerId )
+    {
+        hostDesktopCaches.invalidate( containerId );
     }
 
 
