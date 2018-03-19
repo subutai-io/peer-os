@@ -1056,8 +1056,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                                   .contains( String.format( "%s already exist", containerName ) ) )
             {
                 throw new RuntimeException(
-                        String.format( "Failed to clone container: %s, exit code %d", result.getStdErr(),
-                                result.getExitCode() ) );
+                        String.format( "Failed to clone container: %s, result %s", result.getStdErr(),
+                                result.getStatus() ) );
             }
 
             //parse ID from output
