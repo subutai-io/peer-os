@@ -76,7 +76,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         copyRepoUnpack( ansibleDto.getAnsibleContainerId(), ansibleDto.getRepoLink() );
 
-        String out = runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
+        runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
 
         peerDto.getAnsibleDto().setLogs( out );
 
@@ -97,7 +97,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private String runAnsibleScript( AnsibleDto ansibleDto, String envSubutaiId )
+    private void runAnsibleScript( AnsibleDto ansibleDto, String envSubutaiId )
     {
         final String containerId = ansibleDto.getAnsibleContainerId();
         final String dirLocation = getDirLocation( ansibleDto.getRepoLink() );
@@ -115,13 +115,11 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                         extraVars );
         try
         {
-            return runCmdAsync( containerId, cmd, envSubutaiId );
+            runCmdAsync( containerId, cmd, envSubutaiId );
         }
         catch ( Exception e )
         {
             log.error( "Error configuring environment", e );
-
-            return e.getMessage();
         }
     }
 
@@ -141,12 +139,12 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         try
         {
             int count = 1;
-            boolean reachable = isReachable( "www.github.com", containerId );
+            boolean reachable = isGithubReachable( containerId );
 
             while ( !reachable && count < 5 ) //break after 5th try
             {
                 TimeUnit.SECONDS.sleep( count * 2 );
-                reachable = isReachable( "www.github.com", containerId );
+                reachable = isGithubReachable( containerId );
                 count++;
                 log.info( "No internet connection on container host {}", containerId );
             }
@@ -161,12 +159,12 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private boolean isReachable( String address, String containerId ) throws Exception
+    private boolean isGithubReachable( String containerId ) throws Exception
     {
         Host host = ctx.localPeer.getContainerHostById( containerId );
 
         CommandResult result =
-                host.execute( new RequestBuilder( "ping" ).withCmdArgs( "-w", "10", "-c", "3", address ) );
+                host.execute( new RequestBuilder( "ping" ).withCmdArgs( "-w", "10", "-c", "3", "www.github.com" ) );
 
         return result.hasSucceeded();
     }
@@ -174,8 +172,8 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
     private void prepareHostsFile( final String containerId, Set<io.subutai.hub.share.dto.ansible.Group> groups )
     {
-        String groupName = "";
-        String inventoryLine = "";
+        String groupName;
+        String inventoryLine;
         try
         {
             for ( Group group : groups )
@@ -203,7 +201,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private String runCmd( String containerId, String cmd ) throws HostNotFoundException, CommandException
+    private void runCmd( String containerId, String cmd ) throws HostNotFoundException, CommandException
     {
         Host host = ctx.localPeer.getContainerHostById( containerId );
 
@@ -212,16 +210,12 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         CommandResult result = host.execute( rb );
 
-        String msg = result.getStdOut();
 
         if ( !result.hasSucceeded() )
         {
-            msg += " " + result.getStdErr();
 
             log.error( "Error configuring environment: {}", result );
         }
-
-        return msg;
     }
 
 
@@ -241,7 +235,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private String runCmdAsync( String containerId, String cmd, String envSubutaiId )
+    private void runCmdAsync( String containerId, String cmd, String envSubutaiId )
             throws HostNotFoundException, CommandException
     {
         Host host = ctx.localPeer.getContainerHostById( containerId );
@@ -249,17 +243,17 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         RequestBuilder rb =
                 new RequestBuilder( cmd ).withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( commandTimeout ) );
 
-        host.executeAsync( rb, new AnsibleCallback( envSubutaiId ) );
 
-        String msg = "No logs yet";
+        AnsibleCallback ansibleCallback = new AnsibleCallback( envSubutaiId );
 
-        return msg;
+        host.execute( rb, ansibleCallback );
     }
 
 
     private class AnsibleCallback implements CommandCallback
     {
         final String envSubutaiId;
+
 
         private List<Integer> cache = new ArrayList<>();
 
@@ -289,7 +283,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
             if ( commandResult.hasCompleted() )
             {
-                if ( commandResult.getExitCode() != 0 )
+                if ( !commandResult.hasSucceeded() )
                 {
                     ansibleDto.setState( AnsibleDto.State.FAILED );
                     ansibleDto.setLogs( commandResult.getStdErr() + commandResult.getStdOut() );
@@ -298,7 +292,6 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                 {
                     ansibleDto.setState( AnsibleDto.State.SUCCESS );
                     ansibleDto.setLogs( commandResult.getStdOut() );
-                    cache.clear();
                 }
             }
             else
