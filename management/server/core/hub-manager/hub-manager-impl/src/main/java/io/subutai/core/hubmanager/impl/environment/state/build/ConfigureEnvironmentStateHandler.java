@@ -13,6 +13,10 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.command.Response;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.hubmanager.api.RestClient;
@@ -75,6 +79,21 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         String out = runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
 
         peerDto.getAnsibleDto().setLogs( out );
+
+        Environment environment = null;
+
+        try
+        {
+            environment = ctx.envManager.loadEnvironment( peerDto.getEnvironmentInfo().getId() );
+            for ( EnvironmentContainerHost host : environment.getContainerHostsByPeerId( peerDto.getPeerId() ) )
+            {
+                ctx.desktopManager.invalidate( host.getId() );
+            }
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            log.info( e.getMessage() );
+        }
     }
 
 

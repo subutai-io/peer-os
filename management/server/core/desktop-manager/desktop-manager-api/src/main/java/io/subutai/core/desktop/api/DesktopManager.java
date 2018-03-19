@@ -42,4 +42,9 @@ public interface DesktopManager
     void containerIsDesktop( String containerId );
 
     void containerIsNotDesktop( String containerId );
+
+    /**
+     * invalidated cache of give container host
+     */
+    void invalidate( String containerId );
 }
