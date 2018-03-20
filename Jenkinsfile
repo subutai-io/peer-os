@@ -103,7 +103,9 @@ node() {
 			sudo subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
             sudo subutai attach management "apt-get update"
 			sudo subutai attach management "sync"
-			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
+			sudo subutai attach management "apt-get -y install curl openjdk-8-jre"
+			sudo subutai attach management "wget https://dl.influxdata.com/influxdb/releases/influxdb_1.5.0_amd64.deb"
+			sudo subutai attach management "dpkg -i influxdb_1.5.0_amd64.deb"
 			sudo subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
@@ -118,6 +120,7 @@ node() {
             echo "Using CDN token ${token}"  
             sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
             sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/snap/subutai-dev/current/agent.gcfg
+            echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
 			EOF"""
@@ -240,6 +243,11 @@ node() {
 			set +x
 			curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
 			""", returnStdout: true)
+
+            sh """
+            echo "Uploading file ${templateFileName}"
+            """
+
             sh """
 			set +x
 			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" https://${cdnHost}:8338/kurjun/rest/auth/sign
