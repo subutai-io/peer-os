@@ -139,64 +139,64 @@ node() {
         notifyBuildDetails = "\nFailed on Stage - Update management on test node"
 
         // Start Test-Peer Lock
-        if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/ || env.BRANCH_NAME == 'jenkinsfile') {
-            lock('debian_slave_node') {
-                // destroy existing management template on test node and install latest available snap
-                sh """
-				set +x
-				ssh admin@${env.debian_slave_node} <<- EOF
-				set -e
-				sudo subutai-dev destroy everything
-				if test -f /var/snap/subutai-dev/current/p2p.save; then sudo rm /var/snap/subutai-dev/current/p2p.save; fi
-				cd /tmp
-				sudo find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
-				sudo snap download subutai-dev --beta
-				sudo snap install --dangerous --devmode /tmp/subutai-dev_*.snap
-			EOF"""
-
-
-                // install generated management template
-                sh """
-				set +x
-				ssh admin@${env.debian_slave_node} <<- EOF
-				set -e
-				sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
-				sudo sed 's/URL =.*/URL = devcdn.subutai.io/g' -i /var/snap/subutai-dev/current/agent.gcfg
-				sudo subutai-dev import management --local
-			EOF"""
-
-                /* wait until SS starts */
-                timeout(time: 5, unit: 'MINUTES') {
-                    sh """
-					set +x
-					echo "Waiting SS"
-					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.debian_slave_node}:8443/rest/v1/peer/ready') != "200" ]; do
-						sleep 5
-					done
-				"""
-                }
-
-                stage("Integration tests")
-                deleteDir()
-
-                // Run Serenity Tests
-                notifyBuildDetails = "\nFailed on Stage - Integration tests\nSerenity Tests Results:\n${env.JENKINS_URL}serenity/${commitId}"
-
-                git url: "https://github.com/subutai-io/playbooks.git"
-                sh """
-				set +e
-				./run_tests_qa.sh -m ${env.debian_slave_node}
-				./run_tests_qa.sh -s all
-				${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
-				OUT=\$?
-				${mvnHome}/bin/mvn serenity:aggregate
-				cp -rl target/site/serenity ${serenityReportDir}
-				if [ \$OUT -ne 0 ];then
-					exit 1
-				fi
-			"""
-            }
-        }
+//        if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME ==~ /hotfix-.*/ || env.BRANCH_NAME == 'jenkinsfile') {
+//            lock('debian_slave_node') {
+//                // destroy existing management template on test node and install latest available snap
+//                sh """
+//				set +x
+//				ssh admin@${env.debian_slave_node} <<- EOF
+//				set -e
+//				sudo subutai-dev destroy everything
+//				if test -f /var/snap/subutai-dev/current/p2p.save; then sudo rm /var/snap/subutai-dev/current/p2p.save; fi
+//				cd /tmp
+//				sudo find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
+//				sudo snap download subutai-dev --beta
+//				sudo snap install --dangerous --devmode /tmp/subutai-dev_*.snap
+//			EOF"""
+//
+//
+//                // install generated management template
+//                sh """
+//				set +x
+//				ssh admin@${env.debian_slave_node} <<- EOF
+//				set -e
+//				sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
+//				sudo sed 's/URL =.*/URL = devcdn.subutai.io/g' -i /var/snap/subutai-dev/current/agent.gcfg
+//				sudo subutai-dev import management --local
+//			EOF"""
+//
+//                /* wait until SS starts */
+//                timeout(time: 5, unit: 'MINUTES') {
+//                    sh """
+//					set +x
+//					echo "Waiting SS"
+//					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.debian_slave_node}:8443/rest/v1/peer/ready') != "200" ]; do
+//						sleep 5
+//					done
+//				"""
+//                }
+//
+//                stage("Integration tests")
+//                deleteDir()
+//
+//                // Run Serenity Tests
+//                notifyBuildDetails = "\nFailed on Stage - Integration tests\nSerenity Tests Results:\n${env.JENKINS_URL}serenity/${commitId}"
+//
+//                git url: "https://github.com/subutai-io/playbooks.git"
+//                sh """
+//				set +e
+//				./run_tests_qa.sh -m ${env.debian_slave_node}
+//				./run_tests_qa.sh -s all
+//				${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
+//				OUT=\$?
+//				${mvnHome}/bin/mvn serenity:aggregate
+//				cp -rl target/site/serenity ${serenityReportDir}
+//				if [ \$OUT -ne 0 ];then
+//					exit 1
+//				fi
+//			"""
+//            }
+//        }
 
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Deploy artifacts on kurjun")
