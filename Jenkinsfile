@@ -72,19 +72,19 @@ node() {
         }
 	    """
 
-        // cdn auth creadentials
-        String user = "jenkins"
-        def authID = sh(script: """
+        // Start MNG-RH Lock
+        lock('debian_slave_node') {
+
+            // cdn auth creadentials
+            String user = "jenkins"
+            def authID = sh(script: """
 			set +x
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | sudo gpg --clearsign --no-tty
 			""", returnStdout: true)
-        def token = sh(script: """
+            def token = sh(script: """
 			set +x
 			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
-
-        // Start MNG-RH Lock
-        lock('debian_slave_node') {
 
             // create management template
             sh """
@@ -204,15 +204,15 @@ node() {
             notifyBuildDetails = "\nFailed on Stage - Deploy artifacts on kurjun"
 
             // cdn auth creadentials
-//            String user = "jenkins"
-//            def authID = sh(script: """
-//			set +x
-//			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
-//			""", returnStdout: true)
-//            def token = sh(script: """
-//			set +x
-//			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
-//			""", returnStdout: true)
+            String user = "jenkins"
+            def authID = sh(script: """
+			set +x
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
+			""", returnStdout: true)
+            def token = sh(script: """
+			set +x
+			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
+			""", returnStdout: true)
 
             // upload artifacts on cdn
             // upload deb
