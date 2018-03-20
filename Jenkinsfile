@@ -106,7 +106,7 @@ node() {
 			sudo subutai attach management "apt-get -y install curl openjdk-8-jre"
 			sudo subutai attach management "wget https://dl.influxdata.com/influxdb/releases/influxdb_1.5.0_amd64.deb"
 			sudo subutai attach management "dpkg -i influxdb_1.5.0_amd64.deb"
-			sudo subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+			sudo subutai attach management "rm influxdb_1.5.0_amd64.deb"
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
