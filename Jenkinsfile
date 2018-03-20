@@ -76,7 +76,7 @@ node() {
         String user = "jenkins"
         def authID = sh(script: """
 			set +x
-			sudo curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
 			""", returnStdout: true)
         def token = sh(script: """
 			set +x
