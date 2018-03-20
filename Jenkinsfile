@@ -115,6 +115,7 @@ node() {
             sudo subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
   			sudo rm /var/snap/subutai-dev/common/lxc/management/rootfs/tmp/${debFileName}
+            echo "Using CDN token ${token}"  
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
 			EOF"""
