@@ -120,6 +120,7 @@ node() {
             echo "Using CDN token ${token}"  
             sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/snap/subutai-dev/current/agent.gcfg
             sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/snap/subutai-dev/current/agent.gcfg
+            echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
 			EOF"""
@@ -242,6 +243,11 @@ node() {
 			set +x
 			curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
 			""", returnStdout: true)
+
+            sh """
+            echo "Uploading file ${templateFileName}"
+            """
+
             sh """
 			set +x
 			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" https://${cdnHost}:8338/kurjun/rest/auth/sign
