@@ -92,6 +92,13 @@ public class DesktopManagerImpl implements DesktopManager
 
 
     @Override
+    public void invalidate( final String containerId )
+    {
+        hostDesktopCaches.invalidate( containerId );
+    }
+
+
+    @Override
     public void containerIsDesktop( final String containerId )
     {
         hostDesktopCaches.put( containerId, true );
