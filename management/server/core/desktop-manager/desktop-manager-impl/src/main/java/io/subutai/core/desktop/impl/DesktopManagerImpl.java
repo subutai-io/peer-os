@@ -14,7 +14,7 @@ import io.subutai.core.desktop.api.DesktopManager;
 
 public class DesktopManagerImpl implements DesktopManager
 {
-    private static final int CACHE_TTL_MIN = 15; //1 hour in minutes
+    private static final int CACHE_TTL_MIN = 15; //15 minutes cache timeout
 
     //KEY, Boolean (if it's desktop or not)
     private Cache<String, Boolean> hostDesktopCaches =
