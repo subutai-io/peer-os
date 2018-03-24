@@ -84,7 +84,6 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             for ( EnvironmentContainerHost host : environment.getContainerHostsByPeerId( peerDto.getPeerId() ) )
             {
                 ctx.desktopManager.invalidate( host.getId() );
-                ctx.desktopManager.hostRunViaBlueprint( host.getId() ); //save to cache as container host create via BP
             }
         }
         catch ( Exception e )

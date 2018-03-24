@@ -14,16 +14,12 @@ import io.subutai.core.desktop.api.DesktopManager;
 
 public class DesktopManagerImpl implements DesktopManager
 {
-    private static final int CACHE_TTL_MIN = 20; //20 minutes cache timeout
+    private static final int CACHE_TTL_MIN = 15; //15 minutes cache timeout
     private static final int BP_CACHE_TTL_MIN = 30; //30 minutes blueprint info cache timeout
 
     //KEY, Boolean (if it's desktop or not)
     private Cache<String, Boolean> hostDesktopCaches =
             CacheBuilder.newBuilder().maximumSize( 500 ).expireAfterWrite( CACHE_TTL_MIN, TimeUnit.MINUTES ).build();
-
-    //KEY, Boolean (if container host created via BP)
-    private Cache<String, Boolean> hostBlueprintCaches =
-            CacheBuilder.newBuilder().maximumSize( 500 ).expireAfterWrite( BP_CACHE_TTL_MIN, TimeUnit.MINUTES ).build();
 
 
     @Override
@@ -92,11 +88,6 @@ public class DesktopManagerImpl implements DesktopManager
     @Override
     public boolean existInCache( final String containerId )
     {
-        boolean viaBP = hostBlueprintCaches.getIfPresent( containerId ) != null;
-        if ( viaBP )
-        {
-            return false;
-        }
         return hostDesktopCaches.getIfPresent( containerId ) != null;
     }
 
@@ -105,7 +96,6 @@ public class DesktopManagerImpl implements DesktopManager
     public void invalidate( final String containerId )
     {
         hostDesktopCaches.invalidate( containerId );
-        hostBlueprintCaches.invalidate( containerId );
     }
 
 
@@ -113,12 +103,6 @@ public class DesktopManagerImpl implements DesktopManager
     public void hostIsDesktop( final String containerId )
     {
         hostDesktopCaches.put( containerId, true );
-    }
-
-    @Override
-    public void hostRunViaBlueprint( final String containerId )
-    {
-        hostBlueprintCaches.put( containerId, true );
     }
 
 

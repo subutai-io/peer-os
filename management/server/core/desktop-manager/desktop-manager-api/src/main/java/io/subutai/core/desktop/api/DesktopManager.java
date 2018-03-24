@@ -43,8 +43,6 @@ public interface DesktopManager
 
     void hostIsNotDesktop( String containerId );
 
-    void hostRunViaBlueprint( String containerId );
-
     /**
      * invalidated cache of give container host
      */
