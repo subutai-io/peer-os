@@ -135,11 +135,11 @@ public class ContainerEventProcessor extends HubRequester
         {
             if ( isDesktop )
             {
-                desktopManager.containerIsDesktop( ch.getId() );
+                desktopManager.hostIsDesktop( ch.getId() );
             }
             else
             {
-                desktopManager.containerIsNotDesktop( ch.getId() );
+                desktopManager.hostIsNotDesktop( ch.getId() );
             }
         }
 

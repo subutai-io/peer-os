@@ -39,9 +39,11 @@ public interface DesktopManager
 
     boolean existInCache( String containerId );
 
-    void containerIsDesktop( String containerId );
+    void hostIsDesktop( String containerId );
 
-    void containerIsNotDesktop( String containerId );
+    void hostIsNotDesktop( String containerId );
+
+    void hostRunViaBlueprint( String containerId );
 
     /**
      * invalidated cache of give container host
