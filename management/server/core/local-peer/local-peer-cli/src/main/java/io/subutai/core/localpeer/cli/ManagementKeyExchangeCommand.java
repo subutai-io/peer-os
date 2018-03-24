@@ -4,7 +4,6 @@ package io.subutai.core.localpeer.cli;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.settings.Common;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
@@ -24,9 +23,9 @@ public class ManagementKeyExchangeCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        localPeer.exchangeKeys( localPeer.getManagementHost(), Common.MANAGEMENT_HOSTNAME );
+        localPeer.registerManagementContainer( localPeer.getManagementHost() );
 
-        System.out.println( "Keys are exchanged successfully" );
+        System.out.println( "Management container registered successfully" );
 
         return null;
     }
