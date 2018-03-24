@@ -21,7 +21,7 @@ public class DesktopManagerImpl implements DesktopManager
     private Cache<String, Boolean> hostDesktopCaches =
             CacheBuilder.newBuilder().maximumSize( 500 ).expireAfterWrite( CACHE_TTL_MIN, TimeUnit.MINUTES ).build();
 
-    //KEY, Boolean (if it's desktop or not)
+    //KEY, Boolean (if container host created via BP)
     private Cache<String, Boolean> hostBlueprintCaches =
             CacheBuilder.newBuilder().maximumSize( 500 ).expireAfterWrite( BP_CACHE_TTL_MIN, TimeUnit.MINUTES ).build();
 
