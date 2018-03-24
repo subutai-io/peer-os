@@ -183,7 +183,7 @@ public interface LocalPeer extends Peer
 
     void cancelAllTasks();
 
-    void exchangeKeys( ResourceHost resourceHost, String containerName ) throws PeerException;
+    void registerManagementContainer( ResourceHost resourceHost ) throws PeerException;
 
     void setPeerInfo( PeerInfo peerInfo );
 
