@@ -1789,7 +1789,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 //exchange keys with MH container
                 try
                 {
-                    exchangeKeys( host, Common.MANAGEMENT_HOSTNAME );
+                    registerManagementContainer( host );
                 }
                 catch ( Exception e )
                 {
@@ -1822,7 +1822,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public void exchangeKeys( ResourceHost resourceHost, String containerName ) throws PeerException
+    public void registerManagementContainer( ResourceHost resourceHost ) throws PeerException
     {
         HostRegistrationManager registrationManager = ServiceLocator.lookup( HostRegistrationManager.class );
 
@@ -1830,7 +1830,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         {
             String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
 
-            commandUtil.execute( localPeerCommands.getExchangeKeyCommand( containerName, token ), resourceHost );
+            commandUtil.execute( localPeerCommands.getRegisterManagementContainerCommand( token ), resourceHost );
         }
         catch ( Exception e )
         {
