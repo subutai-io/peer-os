@@ -56,4 +56,9 @@ public interface ContainerHost extends Host, ContainerHostInfo
     String getIp();
 
     HostInterface getInterfaceByName( String interfaceName );
+
+    /**
+     * Returns creation timestamp
+     */
+    long getCreationTimestamp();
 }

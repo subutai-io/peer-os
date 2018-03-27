@@ -1,6 +1,8 @@
 package io.subutai.core.environment.cli;
 
 
+import java.util.Date;
+
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -9,7 +11,6 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.RegistrationStatus;
-import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
@@ -64,6 +65,7 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "Peer status: %s", peerStatus ) );
             System.out.println( String.format( "Template name: %s", containerHost.getTemplateName() ) );
             System.out.println( String.format( "IP: %s", containerHost.getIp() ) );
+            System.out.println( String.format( "Created: %s", new Date( containerHost.getCreationTimestamp() ) ) );
 
 
             if ( peerStatus == RegistrationStatus.APPROVED )
