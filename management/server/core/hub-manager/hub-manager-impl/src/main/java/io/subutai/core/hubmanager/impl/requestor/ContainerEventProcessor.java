@@ -84,6 +84,7 @@ public class ContainerEventProcessor extends HubRequester
         ContainerStateDto state = ContainerStateDto.valueOf( ch.getState().name() );
         ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
 
+        Boolean isDesktop = null;
         if ( !desktopManager.existInCache( ch.getId() ) )
         {
             try
@@ -95,8 +96,6 @@ public class ContainerEventProcessor extends HubRequester
                 if ( !deskEnv.isEmpty() && !rDServer.isEmpty() )
                 {
                     //add to cache as a desktop container
-                    desktopManager.containerIsDesktop( ch.getId() );
-
                     ContainerDesktopInfoDto desktopInfo = new ContainerDesktopInfoDto( ch.getId(), deskEnv, rDServer );
                     dto.setDesktopInfo( desktopInfo );
                     try
@@ -107,11 +106,12 @@ public class ContainerEventProcessor extends HubRequester
                     {
                         log.error( e.getMessage() );
                     }
+                    isDesktop = true;
                 }
                 else
                 {
                     //add to cache as not desktop container
-                    desktopManager.containerIsNotDesktop( ch.getId() );
+                    isDesktop = false;
                 }
             }
             catch ( CommandException e )
@@ -130,6 +130,18 @@ public class ContainerEventProcessor extends HubRequester
         }
 
         RestResult res = doRequest( dto );
+
+        if ( isDesktop != null )
+        {
+            if ( isDesktop )
+            {
+                desktopManager.hostIsDesktop( ch.getId() );
+            }
+            else
+            {
+                desktopManager.hostIsNotDesktop( ch.getId() );
+            }
+        }
 
         log.info( "Response status: {}", res.getStatus() );
     }

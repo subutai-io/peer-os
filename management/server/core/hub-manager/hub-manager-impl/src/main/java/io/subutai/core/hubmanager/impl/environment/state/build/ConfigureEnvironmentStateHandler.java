@@ -1,10 +1,13 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.security.auth.Subject;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -21,6 +24,8 @@ import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.ansible.AnsibleDto;
 import io.subutai.hub.share.dto.ansible.Group;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
@@ -77,9 +82,13 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
         runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
 
 
-        //invalidate desktop information cache
         try
         {
+            //authorize once again, Ansible script may run more than auth session timeout
+            String token = getToken( peerDto );
+            ctx.identityManager.login( IdentityManager.TOKEN_ID, token );
+
+            //invalidate desktop information cache
             Environment environment = ctx.envManager.loadEnvironment( peerDto.getEnvironmentInfo().getId() );
             for ( EnvironmentContainerHost host : environment.getContainerHostsByPeerId( peerDto.getPeerId() ) )
             {
