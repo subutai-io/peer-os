@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
@@ -96,6 +97,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @JsonIgnore
     private Set<HostInterface> hostInterfaces = new HashSet<>();
 
+    @Column( name = "create_time", nullable = false )
+    @JsonProperty( "created" )
+    private long creationTimestamp = System.currentTimeMillis();
 
     protected ContainerHostEntity()
     {
@@ -145,6 +149,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         this.containerSize = containerQuota.getContainerSize();
         this.vlan = vlan;
         setSavedHostInterfaces( hostInterfaces );
+        this.creationTimestamp = System.currentTimeMillis();
     }
 
 
@@ -412,5 +417,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public String getIp()
     {
         return getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
+    }
+
+
+    @Override
+    public long getCreationTimestamp()
+    {
+        return creationTimestamp;
     }
 }
