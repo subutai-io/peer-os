@@ -14,7 +14,8 @@ import io.subutai.core.desktop.api.DesktopManager;
 
 public class DesktopManagerImpl implements DesktopManager
 {
-    private static final int CACHE_TTL_MIN = 60; //1 hour in minutes
+    private static final int CACHE_TTL_MIN = 15; //15 minutes cache timeout
+    private static final int BP_CACHE_TTL_MIN = 30; //30 minutes blueprint info cache timeout
 
     //KEY, Boolean (if it's desktop or not)
     private Cache<String, Boolean> hostDesktopCaches =
@@ -99,14 +100,14 @@ public class DesktopManagerImpl implements DesktopManager
 
 
     @Override
-    public void containerIsDesktop( final String containerId )
+    public void hostIsDesktop( final String containerId )
     {
         hostDesktopCaches.put( containerId, true );
     }
 
 
     @Override
-    public void containerIsNotDesktop( final String containerId )
+    public void hostIsNotDesktop( final String containerId )
     {
         hostDesktopCaches.put( containerId, false );
     }
