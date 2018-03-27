@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl.entity;
 
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -145,6 +146,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Column
     private Integer domainPort = 80;
 
+    @Column( name = "create_time", nullable = false )
+    @JsonProperty( "created" )
+    private long creationTimestamp = System.currentTimeMillis();
+
     @Transient
     @JsonIgnore
     protected transient EnvironmentManagerImpl environmentManager;
@@ -192,6 +197,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         this.resourceHostId = resourceHostId;
         this.vlan = hostInfo.getVlan();
         setHostInterfaces( hostInfo.getHostInterfaces() );
+        this.creationTimestamp = System.currentTimeMillis();
     }
 
 
@@ -696,7 +702,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
                           .add( "initiatorPeerId", initiatorPeerId ).add( "templateId", templateId )
                           .add( "environmentId", envId ).add( "domainName", domainName ).add( "tags", tags )
                           .add( "hostArchitecture", hostArchitecture ).add( "resourceHostId", resourceHostId )
-                          .toString();
+                          .add( "createdAt", new Date( creationTimestamp ) ).toString();
     }
 
 
@@ -756,5 +762,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     public String getIp()
     {
         return getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
+    }
+
+
+    @Override
+    public long getCreationTimestamp()
+    {
+        return creationTimestamp;
     }
 }
