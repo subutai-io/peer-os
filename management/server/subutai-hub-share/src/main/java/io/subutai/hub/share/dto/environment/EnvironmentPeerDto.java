@@ -16,7 +16,7 @@ public class EnvironmentPeerDto
     public enum PeerState
     {
         EXCHANGE_INFO, RESERVE_NETWORK, SETUP_TUNNEL, BUILD_CONTAINER, CONFIGURE_CONTAINER, CONFIGURE_DOMAIN,
-        CHANGE_CONTAINER_STATE, CONFIGURE_ENVIRONMENT, DELETE_PEER, WAIT, READY, ERROR
+        CHANGE_CONTAINER_STATE, CONFIGURE_ENVIRONMENT, CHECK_NETWORK, DELETE_PEER, WAIT, READY, ERROR
     }
 
 
@@ -64,6 +64,8 @@ public class EnvironmentPeerDto
     private String kurjunToken;
 
     private AnsibleDto ansibleDto;
+
+    private EnvironmentTelemetryDto environmentTelemetryDto;
 
 
     public EnvironmentPeerDto()
@@ -368,6 +370,18 @@ public class EnvironmentPeerDto
     public void setAnsibleDto( final AnsibleDto ansibleDto )
     {
         this.ansibleDto = ansibleDto;
+    }
+
+
+    public EnvironmentTelemetryDto getEnvironmentTelemetryDto()
+    {
+        return environmentTelemetryDto;
+    }
+
+
+    public void setEnvironmentTelemetryDto( final EnvironmentTelemetryDto environmentTelemetryDto )
+    {
+        this.environmentTelemetryDto = environmentTelemetryDto;
     }
 
 

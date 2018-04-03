@@ -2,6 +2,7 @@ package io.subutai.core.hubmanager.impl.environment.state;
 
 
 import io.subutai.core.hubmanager.impl.environment.state.build.BuildContainerStateHandler;
+import io.subutai.core.hubmanager.impl.environment.state.build.CheckNetworkStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ConfigureContainerStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ConfigureEnvironmentStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ExchangeInfoStateHandler;
@@ -14,6 +15,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState;
 
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.BUILD_CONTAINER;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CHANGE_CONTAINER_STATE;
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CHECK_NETWORK;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_CONTAINER;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_DOMAIN;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_ENVIRONMENT;
@@ -45,6 +47,8 @@ public class StateHandlerFactory
 
     private final StateHandler configureEnvironmentStateHandler;
 
+    private final StateHandler checkNetworkStateHandler;
+
 
     public StateHandlerFactory( Context ctx )
     {
@@ -67,6 +71,8 @@ public class StateHandlerFactory
         notFoundStateHandler = new NotFoundStateHandler( ctx );
 
         configureEnvironmentStateHandler = new ConfigureEnvironmentStateHandler( ctx );
+
+        checkNetworkStateHandler = new CheckNetworkStateHandler( ctx );
     }
 
 
@@ -109,6 +115,10 @@ public class StateHandlerFactory
         else if ( state == CONFIGURE_ENVIRONMENT )
         {
             handler = configureEnvironmentStateHandler;
+        }
+        else if ( state == CHECK_NETWORK )
+        {
+            handler = checkNetworkStateHandler;
         }
 
         return handler;
