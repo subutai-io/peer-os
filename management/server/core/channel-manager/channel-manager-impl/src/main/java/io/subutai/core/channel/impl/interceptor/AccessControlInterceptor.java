@@ -53,13 +53,28 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             if ( InterceptorState.SERVER_IN.isActive( message ) )
             {
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
-
-                Session userSession = getUserSession( req, message );
+                Session userSession = getSession( message, req );
 
                 //******Authenticate************************************************
                 if ( userSession != null )
                 {
-                    doAs( message, userSession );
+                    Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
+                    {
+                        @Override
+                        public Void run()
+                        {
+                            try
+                            {
+                                message.getInterceptorChain().doIntercept( message );
+                            }
+                            catch ( Exception ex )
+                            {
+                                Throwable t = ExceptionUtils.getRootCause( ex );
+                                MessageContentUtil.abortChain( message, t );
+                            }
+                            return null;
+                        }
+                    } );
                 }
                 else
                 {
@@ -75,68 +90,22 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
 
-    private Session getUserSession( HttpServletRequest request, Message message )
+    private Session getSession( final Message message, final HttpServletRequest req )
     {
-        Session userSession;
-        if ( isPublicResource( request ) || isPublicSecureResource( request ) )
+        final Session userSession;
+        if ( isPublicSecureResource( req ) || isExcludedURI( req ) )
         {
             // auth with system user since bi-SSL port is already secured
+            // OR
+            // auth with system user b/c this is a public endpoint
             userSession = authenticateAccess( null, null );
         }
         else
         {
             //require token auth
-            userSession = authenticateAccess( message, request );
+            userSession = authenticateAccess( message, req );
         }
-
         return userSession;
-    }
-
-
-    private boolean isPublicSecureResource( HttpServletRequest request )
-    {
-        return request.getLocalPort() == Common.DEFAULT_PUBLIC_SECURE_PORT;
-    }
-
-
-    private String getBearerToken( HttpServletRequest request )
-    {
-        String authorization = request.getHeader( "Authorization" );
-        String result = null;
-        if ( authorization != null && authorization.startsWith( "Bearer" ) )
-        {
-            String[] splittedAuthString = authorization.split( "\\s" );
-            result = splittedAuthString.length == 2 ? splittedAuthString[1] : null;
-        }
-        return result;
-    }
-
-
-    private boolean isPublicResource( HttpServletRequest request )
-    {
-        return ChannelSettings.checkURLAccess( request.getRequestURI() );
-    }
-
-
-    private void doAs( final Message message, Session userSession )
-    {
-        Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
-        {
-            @Override
-            public Void run()
-            {
-                try
-                {
-                    message.getInterceptorChain().doIntercept( message );
-                }
-                catch ( Exception ex )
-                {
-                    Throwable t = ExceptionUtils.getRootCause( ex );
-                    MessageContentUtil.abortChain( message, t );
-                }
-                return null;
-            }
-        } );
     }
 
 
@@ -192,7 +161,30 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
         }
     }
-
-
     //******************************************************************
+
+
+    private boolean isPublicSecureResource( HttpServletRequest request )
+    {
+        return request.getLocalPort() == Common.DEFAULT_PUBLIC_SECURE_PORT;
+    }
+
+
+    private String getBearerToken( HttpServletRequest request )
+    {
+        String authorization = request.getHeader( "Authorization" );
+        String result = null;
+        if ( authorization != null && authorization.startsWith( "Bearer" ) )
+        {
+            String[] splittedAuthString = authorization.split( "\\s" );
+            result = splittedAuthString.length == 2 ? splittedAuthString[1] : null;
+        }
+        return result;
+    }
+
+
+    private boolean isExcludedURI( HttpServletRequest request )
+    {
+        return ChannelSettings.checkURLAccess( request.getRequestURI() );
+    }
 }
