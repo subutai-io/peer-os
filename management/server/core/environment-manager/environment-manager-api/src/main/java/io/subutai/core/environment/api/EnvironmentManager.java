@@ -286,6 +286,16 @@ public interface EnvironmentManager
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
 
     /**
+     * Places JWT token to container
+     *
+     * @param environmentId environment ID
+     * @param containerIp container IP
+     * @param token JWT token
+     */
+    void placeTokenToContainer( String environmentId, String containerIp, String token )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
+
+    /**
      * Creates template on Hub ( Global Kurjun ) out of a specified environment container
      *
      * @param environmentId env id

@@ -133,10 +133,10 @@ import io.subutai.hub.share.quota.ContainerQuota;
 
 /**
  * TODO
- *
+ * <p>
  * 1) add p2pSecret property to peerConf, set it only after successful p2p secret update on the associated peer (in
  * P2PSecretKeyResetStep)
- *
+ * <p>
  * 2) add secret key TTL property to environment (user should be able to change it - add to EM API), update background
  * task to consider this TTL (make background task run frequently with short intervals)
  **/
@@ -2756,6 +2756,25 @@ public class EnvironmentManagerImpl extends HostListener
     }
 
 
+    @Override
+    public void placeTokenToContainer( String environmentId, String containerIp, String token )
+            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
+    {
+        final LocalEnvironment environment = environmentService.find( environmentId );
+
+        if ( environment == null )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        EnvironmentContainerImpl containerHost =
+                ( EnvironmentContainerImpl ) environment.getContainerHostByIp( containerIp );
+        setTransientFields( Sets.<Environment>newHashSet( environment ) );
+
+        placeTokenIntoContainer( containerHost, token );
+    }
+
+
     //called by remote peer
     @Override
     public void placeEnvironmentInfoByContainerId( final String environmentId, final String containerId )
@@ -2797,6 +2816,22 @@ public class EnvironmentManagerImpl extends HostListener
         {
             containerHost.execute( new RequestBuilder(
                     String.format( "rm /root/env ; echo '%s' > /root/env", JsonUtil.toJson( environmentDto ) ) ) );
+        }
+    }
+
+
+    private void placeTokenIntoContainer( ContainerHost containerHost, String token ) throws CommandException
+    {
+        if ( containerHost instanceof EnvironmentContainerImpl )
+        {
+            // workaround to disable security checks for this call
+            ( ( EnvironmentContainerImpl ) containerHost ).executeUnsafe( new RequestBuilder(
+                    String.format( "mkdir -p /etc/subutai/ ; echo '%s' > /etc/subutai/jwttoken", token ) ) );
+        }
+        else
+        {
+            containerHost.execute( new RequestBuilder(
+                    String.format( "mkdir -p /etc/subutai/ ; echo '%s' > /etc/subutai/jwttoken", token ) ) );
         }
     }
 

@@ -42,6 +42,7 @@
     <module>common-plugin</module>
     <module>karaf-manager</module>
     <module>template-manager</module>
+    <module>environment-metadata-manager</module>
   </modules>
 
 </project>
