@@ -287,12 +287,10 @@ public interface EnvironmentManager
 
     /**
      * Places JWT token to container
+     *
      * @param environmentId environment ID
      * @param containerIp container IP
      * @param token JWT token
-     * @throws EnvironmentNotFoundException
-     * @throws ContainerHostNotFoundException
-     * @throws CommandException
      */
     void placeTokenToContainer( String environmentId, String containerIp, String token )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;

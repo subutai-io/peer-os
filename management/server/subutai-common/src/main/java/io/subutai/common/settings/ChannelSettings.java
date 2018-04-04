@@ -15,7 +15,8 @@ public class ChannelSettings
             "/rest/v1/security/keyman/getpublickey", "/rest/v1/security/keyman/getpublickeyfingerprint",
             "/rest/v1/handshake/info", "/rest/v1/handshake/register", "/rest/v1/handshake/approve",
             "/rest/v1/handshake/cancel", "/rest/v1/handshake/reject", "/rest/v1/handshake/unregister",
-            "/rest/v1/handshake/status/{$}", "/rest/v1/registration/public-key", "/rest/v1/environments/{$}/info", "/rest/v1/metadata/token/{$}"
+            "/rest/v1/handshake/status/{$}", "/rest/v1/registration/public-key", "/rest/v1/environments/{$}/info",
+            "/rest/v1/metadata/token/{$}"
     };
 
 

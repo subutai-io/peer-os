@@ -8,20 +8,24 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 
-@RunWith(MockitoJUnitRunner.class)
-public class EnvironmentMetadataManagerImplTest {
+@RunWith( MockitoJUnitRunner.class )
+public class EnvironmentMetadataManagerImplTest
+{
 
     @Mock
     EnvironmentMetadataManagerImpl environmentMetadataManager;
 
+
     @Before
-    public void setup() {
+    public void setup()
+    {
 
     }
+
 
     @Test
-    public void testTokenIssue() {
+    public void testTokenIssue()
+    {
 
     }
-
 }
