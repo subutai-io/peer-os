@@ -5,5 +5,27 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
+  <cxf:bus id="cxfBusEnvManager2">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <jaxrs:server address="/v1/metadata" id="environmentMetadataRest">
+    <jaxrs:serviceBeans>
+      <ref component-id="environmentMetadataManagerService" />
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
+
+
+  <bean id="environmentMetadataManagerService" class="io.subutai.core.environment.metadata.rest.RestServiceImpl">
+    <argument ref="environmentMetadataManager" />
+  </bean>
+
+  <reference id="environmentMetadataManager" availability="mandatory"
+             interface="io.subutai.core.environment.metadata.api.EnvironmentMetadataManager" />
 
 </blueprint>

@@ -17,12 +17,27 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
+      <artifactId>environment-metadata-manager-api</artifactId>
     </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>environment-metadata-manager-api</artifactId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>environment-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
     </dependency>
 
     <!-- Testing -->

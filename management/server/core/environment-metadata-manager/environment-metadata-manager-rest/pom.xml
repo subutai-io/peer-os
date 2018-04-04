@@ -20,6 +20,11 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>environment-metadata-manager-api</artifactId>
+    </dependency>
+
     <!--CXF-->
     <dependency>
       <groupId>org.apache.cxf</groupId>
@@ -43,6 +48,10 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>io.subutai</groupId>
+          <artifactId>environment-manager-api</artifactId>
+      </dependency>
 
   </dependencies>
 
