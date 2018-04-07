@@ -2757,6 +2757,13 @@ public class EnvironmentManagerImpl extends HostListener
 
 
     @Override
+    public Environment getEnvironment( String environmentId )
+    {
+        return environmentService.find( environmentId );
+    }
+
+
+    @Override
     public void placeTokenToContainer( String environmentId, String containerIp, String token )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
     {

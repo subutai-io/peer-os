@@ -983,4 +983,11 @@ public class EnvironmentManagerSecureProxy extends HostListener
     {
         environmentManager.onContainerDestroyed( containerHost );
     }
+
+
+    @Override
+    public Environment getEnvironment( final String environmentId )
+    {
+        return environmentManager.getEnvironment( environmentId );
+    }
 }
