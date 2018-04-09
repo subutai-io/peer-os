@@ -53,27 +53,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             if ( InterceptorState.SERVER_IN.isActive( message ) )
             {
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
-                Session userSession;
-
-                if ( req.getLocalPort() == Common.DEFAULT_PUBLIC_SECURE_PORT )
-                {
-                    // auth with system user since bi-SSL port is already secured
-                    userSession = authenticateAccess( null, null );
-                }
-                else
-                {
-
-                    if ( ChannelSettings.checkURLAccess( req.getRequestURI() ) )
-                    {
-                        // auth with system user b/c this is a public endpoint
-                        userSession = authenticateAccess( null, null );
-                    }
-                    else
-                    {
-                        //require token auth
-                        userSession = authenticateAccess( message, req );
-                    }
-                }
+                Session userSession = getSession( message, req );
 
                 //******Authenticate************************************************
                 if ( userSession != null )
@@ -110,8 +90,27 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
 
+    private Session getSession( final Message message, final HttpServletRequest req )
+    {
+        final Session userSession;
+        if ( isPublicSecureResource( req ) || isExcludedURI( req ) )
+        {
+            // auth with system user since bi-SSL port is already secured
+            // OR
+            // auth with system user b/c this is a public endpoint
+            userSession = authenticateAccess( null, null );
+        }
+        else
+        {
+            //require token auth
+            userSession = authenticateAccess( message, req );
+        }
+        return userSession;
+    }
+
+
     //******************************************************************
-    protected Session authenticateAccess( Message message, HttpServletRequest req )
+    protected Session authenticateAccess( Message message, HttpServletRequest request )
     {
         String sptoken;
 
@@ -122,37 +121,71 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         }
         else
         {
-            sptoken = req.getParameter( "sptoken" );
-
-            if ( Strings.isNullOrEmpty( sptoken ) )
+            String bearerToken = getBearerToken( request );
+            if ( bearerToken != null )
             {
-                HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
-                sptoken = headers.getHeaderString( "sptoken" );
-            }
-
-            //******************Get sptoken from cookies *****************
-
-            if ( Strings.isNullOrEmpty( sptoken ) )
-            {
-                Cookie[] cookies = req.getCookies();
-                for ( final Cookie cookie : cookies )
-                {
-                    if ( "sptoken".equals( cookie.getName() ) )
-                    {
-                        sptoken = cookie.getValue();
-                    }
-                }
-            }
-
-            if ( Strings.isNullOrEmpty( sptoken ) )
-            {
-                return null;
+                return identityManager.login( request, message );
             }
             else
             {
-                return identityManager.login( IdentityManager.TOKEN_ID, sptoken );
+                sptoken = request.getParameter( "sptoken" );
+
+                if ( Strings.isNullOrEmpty( sptoken ) )
+                {
+                    HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
+                    sptoken = headers.getHeaderString( "sptoken" );
+                }
+
+                //******************Get sptoken from cookies *****************
+
+                if ( Strings.isNullOrEmpty( sptoken ) )
+                {
+                    Cookie[] cookies = request.getCookies();
+                    for ( final Cookie cookie : cookies )
+                    {
+                        if ( "sptoken".equals( cookie.getName() ) )
+                        {
+                            sptoken = cookie.getValue();
+                        }
+                    }
+                }
+
+                if ( Strings.isNullOrEmpty( sptoken ) )
+                {
+                    return null;
+                }
+                else
+                {
+                    return identityManager.login( IdentityManager.TOKEN_ID, sptoken );
+                }
             }
         }
     }
+
     //******************************************************************
+
+
+    private boolean isPublicSecureResource( HttpServletRequest request )
+    {
+        return request.getLocalPort() == Common.DEFAULT_PUBLIC_SECURE_PORT;
+    }
+
+
+    private String getBearerToken( HttpServletRequest request )
+    {
+        String authorization = request.getHeader( "Authorization" );
+        String result = null;
+        if ( authorization != null && authorization.startsWith( "Bearer" ) )
+        {
+            String[] splittedAuthString = authorization.split( "\\s" );
+            result = splittedAuthString.length == 2 ? splittedAuthString[1] : null;
+        }
+        return result;
+    }
+
+
+    private boolean isExcludedURI( HttpServletRequest request )
+    {
+        return ChannelSettings.checkURLAccess( request.getRequestURI() );
+    }
 }
