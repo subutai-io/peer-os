@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.cxf.message.Message;
 
 import io.subutai.common.security.exception.SystemSecurityException;
 import io.subutai.common.security.objects.PermissionObject;
@@ -46,14 +49,16 @@ public interface IdentityManager
 
     void destroy();
 
+    TokenHelper buildTokenHelper( String token ) throws TokenParseException;
+
     /**
-     * Bearer token login
+     * Token auth login
      *
-     * @param bearerToken bearer token
+     * @param request HttpServletRequest
      *
      * @return Session @see Session
      */
-    Session login( String bearerToken );
+    Session login( HttpServletRequest request, Message message );
 
     /* *************************************************
      */
@@ -331,9 +336,9 @@ public interface IdentityManager
     Session loginSystemUser();
 
 
-    String issueJWTToken( String environmentId, String containerId ) throws TokenCreateException;
+    String issueJWTToken( final String origin ) throws TokenCreateException;
 
-    boolean verifyJWTToken( String token ) throws TokenParseException;
+    boolean verifyJWTToken( final String token ) throws TokenParseException;
 
     /* *************************************************
      *

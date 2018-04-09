@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -36,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.cxf.message.Message;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -68,6 +71,7 @@ import io.subutai.common.util.StringUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.SecurityController;
 import io.subutai.core.identity.api.SessionManager;
+import io.subutai.core.identity.api.TokenHelper;
 import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.exception.TokenCreateException;
 import io.subutai.core.identity.api.exception.TokenParseException;
@@ -86,7 +90,7 @@ import io.subutai.core.identity.impl.model.UserDelegateEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 import io.subutai.core.identity.impl.utils.SecurityUtil;
-import io.subutai.core.identity.impl.utils.TokenHelper;
+import io.subutai.core.identity.impl.utils.TokenHelperImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -160,6 +164,13 @@ public class IdentityManagerImpl implements IdentityManager
     {
         jwtTokenCache.invalidateAll();
         sessionManager.stopSessionController();
+    }
+
+
+    @Override
+    public TokenHelper buildTokenHelper( final String token ) throws TokenParseException
+    {
+        return new TokenHelperImpl( token );
     }
 
 
@@ -303,10 +314,29 @@ public class IdentityManagerImpl implements IdentityManager
 
     @PermitAll
     @Override
-    public Session login( String bearerToken )
+    public Session login( HttpServletRequest request, Message message )
     {
         try
         {
+
+            final String bearerToken = getBearerToken( request );
+            if ( bearerToken == null )
+            {
+                return null;
+            }
+
+            final TokenHelperImpl token = new TokenHelperImpl( bearerToken );
+            String subject = token.getSubject();
+            if ( subject == null )
+            {
+                return null;
+            }
+
+            Map<String, List<String>> headers = ( Map<String, List<String>> ) message.get( Message.PROTOCOL_HEADERS );
+            headers.put( "subutaiOrigin", Arrays.asList( token.getSubject() ) );
+
+            message.put( Message.PROTOCOL_HEADERS, headers );
+
             return verifyJWTToken( bearerToken ) ? loginSystemUser() : null;
         }
         catch ( TokenParseException e )
@@ -316,18 +346,30 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    private String getBearerToken( HttpServletRequest request )
+    {
+        String authorization = request.getHeader( "Authorization" );
+        String result = null;
+        if ( authorization != null && authorization.startsWith( "Bearer" ) )
+        {
+            String[] splittedAuthString = authorization.split( "\\s" );
+            result = splittedAuthString.length == 2 ? splittedAuthString[1] : null;
+        }
+        return result;
+    }
+
+
     @Override
-    public String issueJWTToken( String environmentId, String containerId ) throws TokenCreateException
+    public String issueJWTToken(String origin ) throws TokenCreateException
 
     {
         final String secret = UUID.randomUUID().toString();
         DateTime issueDate = DateTime.now();
         DateTime expireDate = issueDate.plusSeconds( JWT_TOKEN_EXPIRATION_TIME );
         String token =
-                new TokenHelper( TOKEN_ISSUER, environmentId, containerId, issueDate.toDate(), expireDate.toDate(),
-                        secret ).getToken();
+                new TokenHelperImpl( TOKEN_ISSUER, origin, issueDate.toDate(), expireDate.toDate(), secret ).getToken();
 
-        this.jwtTokenCache.put( containerId, secret );
+        this.jwtTokenCache.put( origin, secret );
         return token;
     }
 
@@ -336,7 +378,7 @@ public class IdentityManagerImpl implements IdentityManager
     public boolean verifyJWTToken( String token ) throws TokenParseException
 
     {
-        final TokenHelper signedToken = new TokenHelper( token );
+        final TokenHelperImpl signedToken = new TokenHelperImpl( token );
         if ( signedToken.getExpirationTime().before( new Date() ) )
         {
             return false;

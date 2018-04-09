@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.core.environment.metadata.api.EnvironmentMetadataManager;
 import io.subutai.core.identity.api.exception.TokenCreateException;
+import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
+import io.subutai.hub.share.event.EventMessage;
 
 
 public class RestServiceImpl implements RestService
@@ -40,8 +42,30 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response echo( String message )
+    public Response echo( final String containerId, String message )
     {
-        return Response.ok( message ).build();
+        return Response.ok( String.format( "You are %s and your message is %s.", containerId, message ) ).build();
+    }
+
+
+    @Override
+    public Response getEnvironmentDto( final String environmentId )
+    {
+        EnvironmentInfoDto environmentInfoDto = environmentMetadataManager.getEnvironmentInfoDto( environmentId );
+        return Response.ok( environmentInfoDto ).build();
+    }
+
+
+    @Override
+    public Response pushEvent( final String subutaiOrigin, final EventMessage event )
+    {
+        if ( event == null || !subutaiOrigin.equals( event.getOrigin().getId() ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).build();
+        }
+
+        event.addTrace( "peer:" + event.getOrigin().getPeerId() );
+        environmentMetadataManager.pushEvent( event );
+        return Response.noContent().build();
     }
 }

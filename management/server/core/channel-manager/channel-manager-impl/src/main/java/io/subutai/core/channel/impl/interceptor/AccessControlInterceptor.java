@@ -110,7 +110,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
 
     //******************************************************************
-    protected Session authenticateAccess( Message message, HttpServletRequest req )
+    protected Session authenticateAccess( Message message, HttpServletRequest request )
     {
         String sptoken;
 
@@ -121,14 +121,14 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         }
         else
         {
-            String bearerToken = getBearerToken( req );
+            String bearerToken = getBearerToken( request );
             if ( bearerToken != null )
             {
-                return identityManager.login( bearerToken );
+                return identityManager.login( request, message );
             }
             else
             {
-                sptoken = req.getParameter( "sptoken" );
+                sptoken = request.getParameter( "sptoken" );
 
                 if ( Strings.isNullOrEmpty( sptoken ) )
                 {
@@ -140,7 +140,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
                 if ( Strings.isNullOrEmpty( sptoken ) )
                 {
-                    Cookie[] cookies = req.getCookies();
+                    Cookie[] cookies = request.getCookies();
                     for ( final Cookie cookie : cookies )
                     {
                         if ( "sptoken".equals( cookie.getName() ) )
@@ -161,6 +161,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
         }
     }
+
     //******************************************************************
 
 

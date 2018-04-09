@@ -285,6 +285,8 @@ public interface EnvironmentManager
     void placeEnvironmentInfoByContainerId( String environmentId, String containerIp )
             throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException;
 
+    Environment getEnvironment( String environmentId );
+
     /**
      * Places JWT token to container
      *

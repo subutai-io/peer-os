@@ -3,7 +3,6 @@ package io.subutai.core.identity.impl.utils;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -15,22 +14,23 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
+import io.subutai.core.identity.api.TokenHelper;
 import io.subutai.core.identity.api.exception.TokenCreateException;
 import io.subutai.core.identity.api.exception.TokenParseException;
 
 
-public class TokenHelper
+public class TokenHelperImpl implements TokenHelper
 {
     private SignedJWT signedJWT;
     private String token;
 
 
-    public TokenHelper( String issuer, String environmentId, String containerId, Date issueTime, Date expireTime,
-                        String secret ) throws TokenCreateException
+    public TokenHelperImpl( String issuer, String subject, Date issueTime, Date expireTime, String secret )
+            throws TokenCreateException
     {
         try
         {
-            this.token = generate( issuer, environmentId, containerId, issueTime, expireTime, secret );
+            this.token = generate( issuer, subject, issueTime, expireTime, secret );
         }
         catch ( JOSEException e )
         {
@@ -39,12 +39,12 @@ public class TokenHelper
     }
 
 
-    public TokenHelper( String token ) throws TokenParseException
+    public TokenHelperImpl( String token ) throws TokenParseException
     {
-        this.token = token;
         try
         {
             this.signedJWT = SignedJWT.parse( token );
+            this.token = token;
         }
         catch ( ParseException e )
         {
@@ -53,13 +53,13 @@ public class TokenHelper
     }
 
 
-    protected String generate( String issuer, String environmentId, String containerId, Date issueTime, Date expireTime,
-                               String secret ) throws JOSEException
+    protected String generate( final String issuer, final String subject, final Date issueTime, final Date expireTime,
+                               final String secret ) throws JOSEException
     {
         JWSHeader jwtHeader = new JWSHeader( JWSAlgorithm.HS256 );
         JWTClaimsSet claimset =
                 new JWTClaimsSet.Builder().expirationTime( expireTime ).issuer( issuer ).issueTime( issueTime )
-                                          .subject( containerId ).audience( environmentId ).build();
+                                          .subject( subject ).build();
         SignedJWT jwt = new SignedJWT( jwtHeader, claimset );
 
         JWSSigner signer = new MACSigner( secret );
@@ -68,12 +68,14 @@ public class TokenHelper
     }
 
 
+    @Override
     public String getToken()
     {
         return token;
     }
 
 
+    @Override
     public boolean verify( String secret )
     {
         try
@@ -88,6 +90,7 @@ public class TokenHelper
     }
 
 
+    @Override
     public String getSubject() throws TokenParseException
     {
         try
@@ -101,24 +104,7 @@ public class TokenHelper
     }
 
 
-    public String getAudience() throws TokenParseException
-    {
-        try
-        {
-            List<String> audience = this.signedJWT.getJWTClaimsSet().getAudience();
-            if ( audience == null || audience.isEmpty() )
-            {
-                return null;
-            }
-            return audience.get( 0 );
-        }
-        catch ( ParseException e )
-        {
-            throw new TokenParseException( e.getMessage() );
-        }
-    }
-
-
+    @Override
     public Date getExpirationTime() throws TokenParseException
     {
         try
