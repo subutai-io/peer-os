@@ -126,7 +126,7 @@
         <org.bouncycastle.version>1.52</org.bouncycastle.version>
 
         <!-- JWT lib -->
-        <nimbus.jwt.version>4.3.1</nimbus.jwt.version>
+        <nimbus.jwt.version>5.9</nimbus.jwt.version>
 
         <!-- HTML Parser -->
         <jsoup.version>1.10.1</jsoup.version>
@@ -290,6 +290,25 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>environment-manager-rest-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+            <!-- environment-metadata-manager -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>environment-metadata-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>environment-metadata-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>environment-metadata-manager-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

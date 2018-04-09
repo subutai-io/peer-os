@@ -6,12 +6,17 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.cxf.message.Message;
 
 import io.subutai.common.security.exception.SystemSecurityException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.exception.TokenCreateException;
+import io.subutai.core.identity.api.exception.TokenParseException;
 import io.subutai.core.identity.api.exception.UserExistsException;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
@@ -26,15 +31,34 @@ import io.subutai.core.identity.api.model.UserToken;
  */
 public interface IdentityManager
 {
+    int JWT_TOKEN_EXPIRATION_TIME = 3600;
+    String TOKEN_ISSUER = "Subutai Peer OS";
     String SYSTEM_USERNAME = "internal";
     String ADMIN_USERNAME = "admin";
     String TOKEN_ID = "token";
+
+
     String ADMIN_DEFAULT_PWD = "secret";
 
     String ENV_MANAGER_ROLE = "Environment-Manager";
     String TEMPLATE_MANAGER_ROLE = "Template-Manager";
     //    String ENV_OWNER_ROLE = "Environment-Owner";
 
+
+    void init();
+
+    void destroy();
+
+    TokenHelper buildTokenHelper( String token ) throws TokenParseException;
+
+    /**
+     * Token auth login
+     *
+     * @param request HttpServletRequest
+     *
+     * @return Session @see Session
+     */
+    Session login( HttpServletRequest request, Message message );
 
     /* *************************************************
      */
@@ -92,7 +116,7 @@ public interface IdentityManager
     String updateUserAuthId( User user, String authId ) throws SystemSecurityException;
 
     /* *************************************************
-         */
+     */
     String getEncryptedUserAuthId( User user ) throws SystemSecurityException;
 
 
@@ -167,7 +191,7 @@ public interface IdentityManager
 
 
     /* *************************************************
-      */
+     */
     User getUser( long userId );
 
 
@@ -211,7 +235,7 @@ public interface IdentityManager
 
 
     /* *************************************************
-    */
+     */
     User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
                      boolean generateKeyPair, boolean createUserDelegate )
             throws SystemSecurityException, UserExistsException;
@@ -245,7 +269,7 @@ public interface IdentityManager
             throws SystemSecurityException;
 
     /* *************************************************
-         */
+     */
     boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws SystemSecurityException;
 
 
@@ -265,7 +289,7 @@ public interface IdentityManager
     String getSignToken();
 
     /* *************************************************
-         */
+     */
     void updateUser( User user );
 
     /*
@@ -311,6 +335,10 @@ public interface IdentityManager
      */
     Session loginSystemUser();
 
+
+    String issueJWTToken( final String origin ) throws TokenCreateException;
+
+    boolean verifyJWTToken( final String token ) throws TokenParseException;
 
     /* *************************************************
      *
@@ -372,7 +400,7 @@ public interface IdentityManager
 
 
     /* *************************************************
-    */
+     */
     UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
 
 

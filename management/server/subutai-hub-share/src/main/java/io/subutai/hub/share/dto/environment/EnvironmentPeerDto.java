@@ -67,6 +67,8 @@ public class EnvironmentPeerDto
 
     private EnvironmentTelemetryDto environmentTelemetryDto;
 
+    private Set<P2PStatusDto> p2pStatuses = new HashSet<>();
+
 
     public EnvironmentPeerDto()
     {
@@ -382,6 +384,18 @@ public class EnvironmentPeerDto
     public void setEnvironmentTelemetryDto( final EnvironmentTelemetryDto environmentTelemetryDto )
     {
         this.environmentTelemetryDto = environmentTelemetryDto;
+    }
+
+
+    public Set<P2PStatusDto> getP2pStatuses()
+    {
+        return p2pStatuses;
+    }
+
+
+    public void setP2pStatuses( final Set<P2PStatusDto> p2pStatuses )
+    {
+        this.p2pStatuses = p2pStatuses;
     }
 
 
