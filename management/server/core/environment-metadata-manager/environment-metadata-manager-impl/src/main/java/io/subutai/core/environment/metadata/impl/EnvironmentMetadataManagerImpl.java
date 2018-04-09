@@ -22,6 +22,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 /**
+ * Environment metadata manager
  **/
 public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManager
 {

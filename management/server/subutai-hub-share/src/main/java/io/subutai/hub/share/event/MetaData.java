@@ -51,17 +51,11 @@ public class MetaData
     }
 
 
-    public List<Meta> getAllMeta()
-    {
-        return this.items;
-    }
-
-
     public List<CustomMeta> getCustomMetaByKey( String key )
     {
         final List<CustomMeta> result =
-                this.items.stream().filter( m -> m instanceof CustomMeta ).map( CustomMeta.class::cast )
-                          .filter( m -> m.getKey().equals( key ) ).collect( Collectors.toList() );
+                getMetaByObjectClass( CustomMeta.class ).stream().filter( m -> m.getKey().equals( key ) )
+                                                        .collect( Collectors.toList() );
         return result;
     }
 
@@ -80,7 +74,7 @@ public class MetaData
     }
 
 
-    public void addMeta( final Meta meta )
+    void addMeta( final Meta meta )
     {
         Preconditions.checkNotNull( meta );
         this.items.add( meta );
