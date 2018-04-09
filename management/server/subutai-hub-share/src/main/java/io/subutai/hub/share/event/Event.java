@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.subutai.hub.share.event.meta.CustomMeta;
 import io.subutai.hub.share.event.meta.OriginMeta;
+import io.subutai.hub.share.event.meta.SourceMeta;
 import io.subutai.hub.share.event.payload.Payload;
 
 
@@ -17,6 +18,8 @@ public interface Event
     long getTimestamp();
 
     OriginMeta getOrigin();
+
+    SourceMeta getSource();
 
     void addCustomMeta( CustomMeta customMeta );
 

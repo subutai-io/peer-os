@@ -91,6 +91,7 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
         {
             LOG.debug( "Event received: {} {}", event, JsonUtil.toJson( event ) );
             LOG.debug( "OS: {}", event.getCustomMetaByKey( "OS" ) );
+            LOG.debug( "Nature: {}", event.getPayload().getNature() );
         }
         catch ( JsonProcessingException e )
         {
