@@ -32,7 +32,7 @@ public class ProgressPayload extends Payload
 
 
     @Override
-    Nature getNature()
+    public Nature getNature()
     {
         return Nature.PROGRESS;
     }

@@ -22,7 +22,7 @@ public class CustomPayload extends Payload
 
 
     @Override
-    Nature getNature()
+    public Nature getNature()
     {
         return Nature.CUSTOM;
     }

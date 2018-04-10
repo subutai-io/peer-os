@@ -49,6 +49,13 @@ public class EventMessage implements Event
 
 
     @Override
+    public SourceMeta getSource()
+    {
+        return this.metaData.getSource();
+    }
+
+
+    @Override
     public Payload getPayload()
     {
         return payload;

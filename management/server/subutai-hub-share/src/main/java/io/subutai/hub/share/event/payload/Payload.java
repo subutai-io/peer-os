@@ -22,5 +22,5 @@ abstract public class Payload
     }
 
 
-    abstract Nature getNature();
+    public abstract Nature getNature();
 }
