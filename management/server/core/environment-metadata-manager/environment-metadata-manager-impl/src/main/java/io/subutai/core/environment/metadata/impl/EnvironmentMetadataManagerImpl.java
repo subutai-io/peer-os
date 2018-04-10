@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.subutai.common.command.CommandException;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -64,9 +64,11 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
             String peerId = container.getPeerId();
             String origin = String.format( "%s.%s.%s", peerId, containerId, environmentId );
             final String token = identityManager.issueJWTToken( origin );
-            environmentManager.placeTokenToContainer( environmentId, containerIp, token );
+            //            environmentManager.placeTokenToContainer( environmentId, containerIp, token );
+
+            placeTokenIntoContainer( container, token );
         }
-        catch ( HostNotFoundException | EnvironmentNotFoundException | CommandException e )
+        catch ( HostNotFoundException | CommandException e )
         {
             throw new TokenCreateException( e.getMessage() );
         }
@@ -98,6 +100,13 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
             LOG.error( e.getMessage(), e );
         }
         // TODO: send event to consumers
+    }
+
+
+    private void placeTokenIntoContainer( ContainerHost containerHost, String token ) throws CommandException
+    {
+        containerHost.executeAsync( new RequestBuilder(
+                String.format( "mkdir -p /etc/subutai/ ; echo '%s' > /etc/subutai/jwttoken", token ) ) );
     }
 }
 
