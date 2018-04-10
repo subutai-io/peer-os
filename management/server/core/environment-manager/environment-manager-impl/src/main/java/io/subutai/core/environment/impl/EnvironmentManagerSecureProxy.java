@@ -961,14 +961,6 @@ public class EnvironmentManagerSecureProxy extends HostListener
 
 
     @Override
-    public void placeTokenToContainer( String environmentId, String containerIp, String token )
-            throws EnvironmentNotFoundException, ContainerHostNotFoundException, CommandException
-    {
-        environmentManager.placeTokenToContainer( environmentId, containerIp, token );
-    }
-
-
-    @Override
     public String createTemplate( final String environmentId, final String containerId, final String templateName,
                                   final boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException
     {
