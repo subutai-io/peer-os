@@ -36,7 +36,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( TokenCreateException e )
         {
-            return Response.status( Response.Status.UNAUTHORIZED ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
 
