@@ -16,6 +16,7 @@ import io.subutai.core.environment.metadata.api.EnvironmentMetadataManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.exception.TokenCreateException;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.Utils;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.event.Event;
 import io.subutai.hub.share.json.JsonUtil;
@@ -30,14 +31,16 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
     private final IdentityManager identityManager;
     private PeerManager peerManager;
     private EnvironmentManager environmentManager;
+    private String brokerURL;
 
 
     public EnvironmentMetadataManagerImpl( PeerManager peerManager, EnvironmentManager environmentManager,
-                                           IdentityManager identityManager )
+                                           IdentityManager identityManager, final String brokerURL )
     {
         this.peerManager = peerManager;
         this.environmentManager = environmentManager;
         this.identityManager = identityManager;
+        this.brokerURL = brokerURL;
     }
 
 
@@ -62,9 +65,8 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
             String environmentId = container.getEnvironmentId().getId();
             String containerId = container.getContainerId().getId();
             String peerId = container.getPeerId();
-            String origin = String.format( "%s.%s.%s", peerId, containerId, environmentId );
+            String origin = Utils.buildSubutaiOrigin( environmentId, peerId, containerId );
             final String token = identityManager.issueJWTToken( origin );
-            //            environmentManager.placeTokenToContainer( environmentId, containerIp, token );
 
             placeTokenIntoContainer( container, token );
         }
@@ -91,15 +93,26 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
     {
         try
         {
-            LOG.debug( "Event received: {} {}", event, JsonUtil.toJson( event ) );
+            String jsonEvent = JsonUtil.toJson( event );
+            LOG.debug( "Event received: {} {}", event, jsonEvent );
             LOG.debug( "OS: {}", event.getCustomMetaByKey( "OS" ) );
             LOG.debug( "Nature: {}", event.getPayload().getNature() );
+            String destination = "events." + event.getOrigin().getId();
+
+            thread( new EventProducer( brokerURL, destination, jsonEvent ), true );
         }
         catch ( JsonProcessingException e )
         {
             LOG.error( e.getMessage(), e );
         }
-        // TODO: send event to consumers
+    }
+
+
+    private void thread( Runnable runnable, boolean daemon )
+    {
+        Thread brokerThread = new Thread( runnable );
+        brokerThread.setDaemon( daemon );
+        brokerThread.start();
     }
 
 

@@ -40,6 +40,13 @@
       <artifactId>nimbus-jose-jwt</artifactId>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.apache.activemq/activemq-client -->
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-client</artifactId>
+      <version>5.15.3</version>
+    </dependency>
+
     <!-- Testing -->
 
     <dependency>
