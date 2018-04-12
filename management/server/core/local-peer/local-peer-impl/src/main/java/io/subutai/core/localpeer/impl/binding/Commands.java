@@ -59,7 +59,6 @@ public abstract class Commands
             if ( r.getResource().getContainerResourceType() == ContainerResourceType.DISK )
             {
                 //temp workaround for btrfs quota issue https://github.com/subutai-io/agent/wiki/Switch-to-Soft-Quota
-
                 quotaCommand.addArgument( String.valueOf( r.getAsDiskResource().longValue( ByteUnit.GB ) * 2 ) );
             }
             else
