@@ -20,6 +20,14 @@ public class Quota implements Serializable
     private Double disk;
 
 
+    public Quota( final Double cpu, final Double ram, final Double disk )
+    {
+        this.cpu = cpu;
+        this.ram = ram;
+        this.disk = disk;
+    }
+
+
     public Double getCpu()
     {
         return cpu;
