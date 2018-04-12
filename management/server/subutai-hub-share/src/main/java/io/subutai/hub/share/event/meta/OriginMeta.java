@@ -1,31 +1,39 @@
 package io.subutai.hub.share.event.meta;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
+import io.subutai.hub.share.Utils;
+
+
+@JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
+        setterVisibility = JsonAutoDetect.Visibility.NONE )
 
 public class OriginMeta implements Meta
 {
-    private String id;
-
-    @JsonIgnore
+    @JsonProperty
     private String peerId;
 
-    @JsonIgnore
+    @JsonProperty
     private String containerId;
 
-    @JsonIgnore
+    @JsonProperty
     private String environmentId;
 
 
-    @JsonCreator
     public OriginMeta( final String subutaiOrigin )
     {
         Preconditions.checkNotNull( subutaiOrigin );
-        this.id = subutaiOrigin;
-        prase();
+        final String[] parts = subutaiOrigin.split( "\\." );
+        if ( parts.length != 3 )
+        {
+            throw new IllegalArgumentException( "Invalid origin argument." );
+        }
+        this.environmentId = parts[0];
+        this.peerId = parts[1];
+        this.containerId = parts[2];
     }
 
 
@@ -34,24 +42,9 @@ public class OriginMeta implements Meta
     }
 
 
-    private void prase()
-    {
-        final String[] splittedOrigins = this.id.split( ":" );
-        this.peerId = splittedOrigins[0];
-        if ( splittedOrigins.length > 1 )
-        {
-            this.containerId = splittedOrigins[1];
-            if ( splittedOrigins.length > 2 )
-            {
-                this.environmentId = splittedOrigins[2];
-            }
-        }
-    }
-
-
     public String getId()
     {
-        return id;
+        return Utils.buildSubutaiOrigin( this.environmentId, this.peerId, this.containerId );
     }
 
 
@@ -76,6 +69,6 @@ public class OriginMeta implements Meta
     @Override
     public String toString()
     {
-        return String.format( "%s:%s:%s", peerId, environmentId, containerId );
+        return this.getId();
     }
 }
