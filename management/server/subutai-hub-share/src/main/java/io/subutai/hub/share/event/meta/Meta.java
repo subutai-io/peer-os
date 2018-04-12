@@ -1,7 +1,6 @@
 package io.subutai.hub.share.event.meta;
 
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -13,8 +12,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type( value = SourceMeta.class, name = "source" ),
         @JsonSubTypes.Type( value = OriginMeta.class, name = "origin" )
 } )
-@JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
-        setterVisibility = JsonAutoDetect.Visibility.NONE )
 public interface Meta
 {
 }

@@ -16,12 +16,15 @@
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="hubManager"
+             interface="io.subutai.core.hubmanager.api.HubManager" />
+
   <bean id="environmentMetadataManager" scope="singleton" init-method="init" destroy-method="dispose"
         class="io.subutai.core.environment.metadata.impl.EnvironmentMetadataManagerImpl">
     <argument ref="peerManager" />
     <argument ref="environmentManager" />
     <argument ref="identityManager" />
-    <argument value="tcp://brokerHost:61616" />
+    <argument ref="hubManager" />
   </bean>
 
   <service ref="environmentMetadataManager"

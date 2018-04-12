@@ -1,6 +1,12 @@
 package io.subutai.core.environment.metadata.impl;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,10 +19,12 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.metadata.api.EnvironmentMetadataManager;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.exception.TokenCreateException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.Utils;
+import io.subutai.hub.share.dto.BrokerSettingsDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.event.Event;
 import io.subutai.hub.share.json.JsonUtil;
@@ -31,16 +39,17 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
     private final IdentityManager identityManager;
     private PeerManager peerManager;
     private EnvironmentManager environmentManager;
-    private String brokerURL;
+    private BrokerSettings brokerSettings;
+    private HubManager hubManager;
 
 
     public EnvironmentMetadataManagerImpl( PeerManager peerManager, EnvironmentManager environmentManager,
-                                           IdentityManager identityManager, final String brokerURL )
+                                           IdentityManager identityManager, HubManager hubManager )
     {
         this.peerManager = peerManager;
         this.environmentManager = environmentManager;
         this.identityManager = identityManager;
-        this.brokerURL = brokerURL;
+        this.hubManager = hubManager;
     }
 
 
@@ -96,14 +105,53 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
             String jsonEvent = JsonUtil.toJson( event );
             LOG.debug( "Event received: {} {}", event, jsonEvent );
             LOG.debug( "OS: {}", event.getCustomMetaByKey( "OS" ) );
-            LOG.debug( "Nature: {}", event.getPayload().getNature() );
             String destination = "events." + event.getOrigin().getId();
 
-            thread( new EventProducer( brokerURL, destination, jsonEvent ), true );
+            checkBrokerSettings( false );
+            // TODO: 4/12/18 need to implement connections pool something like below;  while creating connection
+            // every time with random URI
+            //            ActiveMQConnectionFactory amq = new ActiveMQConnectionFactory(
+            //                    "vm://broker1?marshal=false&broker.persistent=false&broker.useJmx=false");
+            //            JmsPoolConnectionFactory cf = new JmsPoolConnectionFactory();
+            //            cf.setConnectionFactory(amq);
+            //            cf.setMaxConnections(3);
+            thread( new EventProducer( this.brokerSettings.getBroker(), destination, jsonEvent ), true );
         }
-        catch ( JsonProcessingException e )
+        catch ( JsonProcessingException | URISyntaxException | BrokerSettingException e )
         {
             LOG.error( e.getMessage(), e );
+        }
+    }
+
+
+    private void checkBrokerSettings( boolean retrieve ) throws BrokerSettingException
+    {
+        if ( !( brokerSettings == null || retrieve ) )
+        {
+            return;
+        }
+
+        try
+        {
+            final BrokerSettingsDto response = hubManager.getBrokers();
+            if ( response == null )
+            {
+                throw new BrokerSettingException( "Could not retrieve broker settings." );
+            }
+            List<URI> list = new ArrayList<>();
+            for ( String s : response.getBrokers() )
+            {
+                list.add( new URI( s ) );
+            }
+            if ( list.size() == 0 )
+            {
+                throw new BrokerSettingException( "Broker URI list is empty." );
+            }
+            this.brokerSettings = new BrokerSettings( list );
+        }
+        catch ( URISyntaxException e )
+        {
+            throw new BrokerSettingException( e );
         }
     }
 
@@ -120,6 +168,24 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
     {
         containerHost.executeAsync( new RequestBuilder(
                 String.format( "mkdir -p /etc/subutai/ ; echo '%s' > /etc/subutai/jwttoken", token ) ) );
+    }
+
+
+    private class BrokerSettings
+    {
+        List<URI> uriList;
+
+
+        public BrokerSettings( final List<URI> uriList )
+        {
+            this.uriList = uriList;
+        }
+
+
+        public URI getBroker()
+        {
+            return uriList.get( new Random().nextInt( uriList.size() ) );
+        }
     }
 }
 

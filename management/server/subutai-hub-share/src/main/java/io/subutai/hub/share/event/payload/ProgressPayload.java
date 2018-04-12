@@ -31,13 +31,6 @@ public class ProgressPayload extends Payload
     }
 
 
-    @Override
-    public Nature getNature()
-    {
-        return Nature.PROGRESS;
-    }
-
-
     public String getStep()
     {
         return step;

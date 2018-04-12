@@ -1,11 +1,15 @@
 package io.subutai.hub.share.event.meta;
 
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
 import io.subutai.hub.share.Utils;
 
+
+@JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
+        setterVisibility = JsonAutoDetect.Visibility.NONE )
 
 public class OriginMeta implements Meta
 {

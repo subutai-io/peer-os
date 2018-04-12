@@ -37,13 +37,6 @@ public class LogPayload extends Payload
     }
 
 
-    @Override
-    public Nature getNature()
-    {
-        return Nature.LOG;
-    }
-
-
     public String getSource()
     {
         return source;

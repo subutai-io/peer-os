@@ -21,13 +21,6 @@ public class CustomPayload extends Payload
     }
 
 
-    @Override
-    public Nature getNature()
-    {
-        return Nature.CUSTOM;
-    }
-
-
     public String getMessage()
     {
         return message;
