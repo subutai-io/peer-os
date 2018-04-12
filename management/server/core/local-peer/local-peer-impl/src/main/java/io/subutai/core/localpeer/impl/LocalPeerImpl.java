@@ -420,25 +420,6 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public io.subutai.common.host.Quota getRawQuota( final ContainerId containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId );
-
-        try
-        {
-            ContainerHostInfo containerHostInfo =
-                    ( ContainerHostInfo ) hostRegistry.getHostInfoById( containerId.getId() );
-            return containerHostInfo.getRawQuota();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException( String.format( "Error getting container quota: %s", e.getMessage() ), e );
-        }
-    }
-
-
-    @Override
     public Containers getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
@@ -3006,6 +2987,29 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
+    public io.subutai.common.host.Quota getRawQuota( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId );
+
+        try
+        {
+            ContainerHostInfo containerHostInfo =
+                    ( ContainerHostInfo ) hostRegistry.getHostInfoById( containerId.getId() );
+
+            io.subutai.common.host.Quota quota = containerHostInfo.getRawQuota();
+
+            //temp workaround for btrfs quota issue https://github.com/subutai-io/agent/wiki/Switch-to-Soft-Quota
+            return new io.subutai.common.host.Quota( quota.getCpu(), quota.getRam(), quota.getDisk() / 2 );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+            throw new PeerException( String.format( "Error getting container quota: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
         final ContainerHost containerHost = getContainerHostById( containerId.getId() );
@@ -3050,6 +3054,16 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Could not obtain quota values of %s.", containerId.getId() ) );
         }
+
+        //temp workaround for btrfs quota issue https://github.com/subutai-io/agent/wiki/Switch-to-Soft-Quota
+        if ( containerQuota.getContainerSize() == ContainerSize.CUSTOM )
+        {
+
+            containerQuota.add( new Quota( new ContainerDiskResource(
+                    containerQuota.get( ContainerResourceType.DISK ).getAsDiskResource().longValue( ByteUnit.GB ) / 2,
+                    ByteUnit.GB ), 0 ) );
+        }
+
         return containerQuota;
     }
 
