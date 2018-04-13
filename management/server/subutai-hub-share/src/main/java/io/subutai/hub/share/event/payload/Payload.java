@@ -20,7 +20,4 @@ abstract public class Payload
     {
         CUSTOM, LOG, PROGRESS
     }
-
-
-    public abstract Nature getNature();
 }
