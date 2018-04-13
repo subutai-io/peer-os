@@ -38,7 +38,7 @@ public class EventMessageTest extends ObjectMapperTest
 
         logPayload = new LogPayload("source", "initiated", LogPayload.Level.INFO);
 
-        origin = new OriginMeta( "subutaiPeer:subutaiContainer:subutaiEnvironment" );
+        origin = new OriginMeta( "subutaiPeer.subutaiContainer.subutaiEnvironment" );
 
         source = new SourceMeta( "cassandra-blueprint", SourceMeta.Type.BLUEPRINT );
     }
