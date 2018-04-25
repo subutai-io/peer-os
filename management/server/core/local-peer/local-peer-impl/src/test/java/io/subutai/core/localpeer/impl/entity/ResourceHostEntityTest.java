@@ -344,7 +344,8 @@ public class ResourceHostEntityTest
                 + ".gz\" \n" + "time=\"2017-04-11 10:01:38\" level=info msg=\"Template uploaded, hash: "
                 + "7d42f1d084c405b482938bb2620cce77\"" ).when( commandResult ).getStdOut();
 
-        assertEquals( "7d42f1d084c405b482938bb2620cce77", resourceHostEntity.exportTemplate( "foo", false, "token" ) );
+        assertEquals( "7d42f1d084c405b482938bb2620cce77",
+                resourceHostEntity.exportTemplate( "foo", "1.0.0", false, "token" ) );
     }
 
 

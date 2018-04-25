@@ -39,18 +39,20 @@ public class Commands
     }
 
 
+    //as-is
     RequestBuilder getGetP2pVersionCommand()
     {
         return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-v" );
     }
 
-
+    //as-is
     RequestBuilder getP2PConnectionsCommand()
     {
         return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-p" );
     }
 
 
+    //as-is
     RequestBuilder getJoinP2PSwarmCommand( String interfaceName, String localIp, String p2pHash, String secretKey,
                                            long secretKeyTtlSec, String portRange )
     {
@@ -59,7 +61,7 @@ public class Commands
                         portRange ).withTimeout( 90 );
     }
 
-
+    //as-is
     RequestBuilder getJoinP2PSwarmDHCPCommand( String interfaceName, String p2pHash, String secretKey,
                                                long secretKeyTtlSec, String portRange )
     {
@@ -68,19 +70,20 @@ public class Commands
                         portRange ).withTimeout( 90 );
     }
 
-
+    //as-is
     RequestBuilder getRemoveP2PSwarmCommand( String p2pHash )
     {
         return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-d", p2pHash ).withTimeout( 90 );
     }
 
 
+    //as-is
     RequestBuilder getRemoveP2PIfaceCommand( String interfaceName )
     {
         return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName ).withTimeout( 90 );
     }
 
-
+    //as-is
     RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( P2P_BINDING )
@@ -88,6 +91,7 @@ public class Commands
     }
 
 
+    //needs parsing
     RequestBuilder getGetUsedP2pIfaceNamesCommand()
     {
         return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-i" );

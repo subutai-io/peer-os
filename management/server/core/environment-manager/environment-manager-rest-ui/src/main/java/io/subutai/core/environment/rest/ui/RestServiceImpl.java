@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -170,14 +169,15 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createTemplate( final String environmentId, final String containerId, final String templateName,
+    public Response createTemplate( final String environmentId, final String containerId, final String version,
                                     final boolean privateTemplate )
     {
 
         try
         {
-            return Response.ok( environmentManager
-                    .createTemplate( environmentId, containerId, templateName, privateTemplate ) ).build();
+            return Response
+                    .ok( environmentManager.createTemplate( environmentId, containerId, version, privateTemplate ) )
+                    .build();
         }
         catch ( Exception e )
         {

@@ -132,13 +132,9 @@ import io.subutai.hub.share.quota.ContainerQuota;
 
 
 /**
- * TODO
- * <p>
- * 1) add p2pSecret property to peerConf, set it only after successful p2p secret update on the associated peer (in
- * P2PSecretKeyResetStep)
- * <p>
- * 2) add secret key TTL property to environment (user should be able to change it - add to EM API), update background
- * task to consider this TTL (make background task run frequently with short intervals)
+ * TODO <p> 1) add p2pSecret property to peerConf, set it only after successful p2p secret update on the associated peer
+ * (in P2PSecretKeyResetStep) <p> 2) add secret key TTL property to environment (user should be able to change it - add
+ * to EM API), update background task to consider this TTL (make background task run frequently with short intervals)
  **/
 public class EnvironmentManagerImpl extends HostListener
         implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, LocalPeerEventListener
@@ -1140,12 +1136,12 @@ public class EnvironmentManagerImpl extends HostListener
 
 
     @Override
-    public String createTemplate( final String environmentId, final String containerId, final String templateName,
+    public String createTemplate( final String environmentId, final String containerId, final String version,
                                   final boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
         String kurjunToken = identityManager.getActiveSession().getKurjunToken();
         Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing or expired" );
 
@@ -1159,18 +1155,18 @@ public class EnvironmentManagerImpl extends HostListener
 
         for ( Template template : ownerTemplates )
         {
-            if ( templateName.equalsIgnoreCase( template.getName() ) )
+            if ( containerHost.getContainerName().equalsIgnoreCase( template.getName() ) && version
+                    .equalsIgnoreCase( template.getVersion() ) )
             {
                 throw new IllegalStateException(
-                        String.format( "Template with name %s already exists in your repository", templateName ) );
+                        String.format( "Template with name %s and version %s already exists in your repository",
+                                containerHost.getContainerName(), version ) );
             }
         }
 
         Peer targetPeer = containerHost.getPeer();
 
-        targetPeer.promoteTemplate( containerHost.getContainerId(), templateName );
-
-        return targetPeer.exportTemplate( containerHost.getContainerId(), templateName, privateTemplate, kurjunToken );
+        return targetPeer.exportTemplate( containerHost.getContainerId(), version, privateTemplate, kurjunToken );
     }
 
 
