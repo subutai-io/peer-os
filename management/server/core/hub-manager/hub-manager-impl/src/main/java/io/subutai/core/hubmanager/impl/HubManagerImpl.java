@@ -142,6 +142,8 @@ public class HubManagerImpl extends HostListener implements HubManager
 
     private SystemManager systemManager;
 
+    private ContainerMetricsProcessor containerMetricsProcessor;
+
 
     public HubManagerImpl( DaoManager daoManager )
     {
@@ -230,9 +232,11 @@ public class HubManagerImpl extends HostListener implements HubManager
         requestorsRunner.scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
 
         //***********
-        requestorsRunner.scheduleWithFixedDelay(
+        containerMetricsProcessor =
                 new ContainerMetricsProcessor( this, localPeer, monitor, restClient, containerMetricsService,
-                        CONTAINER_METRIC_SEND_INTERVAL_MIN ), 1, CONTAINER_METRIC_SEND_INTERVAL_MIN, TimeUnit.MINUTES );
+                        CONTAINER_METRIC_SEND_INTERVAL_MIN );
+        requestorsRunner.scheduleWithFixedDelay( containerMetricsProcessor, 1, CONTAINER_METRIC_SEND_INTERVAL_MIN,
+                TimeUnit.MINUTES );
     }
 
 
@@ -280,6 +284,20 @@ public class HubManagerImpl extends HostListener implements HubManager
         p2pLogsSender.process();
         heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
+    }
+
+
+    @Override
+    public void sendPeersMertics() throws HubManagerException
+    {
+        peerMetricsProcessor.request();
+    }
+
+
+    @Override
+    public void sendContainerMertics() throws HubManagerException
+    {
+        containerMetricsProcessor.request();
     }
 
 
