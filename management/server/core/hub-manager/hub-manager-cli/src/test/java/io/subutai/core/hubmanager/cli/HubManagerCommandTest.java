@@ -2,6 +2,7 @@ package io.subutai.core.hubmanager.cli;
 
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -11,7 +12,7 @@ import io.subutai.core.hubmanager.api.HubManager;
 
 
 /**
- * Test for MetricListCommand
+ * Test for Hub Manager CLI
  */
 @RunWith( MockitoJUnitRunner.class )
 public class HubManagerCommandTest extends SystemOutRedirectTest
@@ -19,11 +20,19 @@ public class HubManagerCommandTest extends SystemOutRedirectTest
     @Mock
     HubManager hubManager;
 
-    private SendPeerMetricsCommand sendPeerMetricsCommand;
+    private SendContainerMetricsCommand command;
 
 
     @Before
     public void setUp() throws Exception
     {
+        command = new SendContainerMetricsCommand( hubManager );
+    }
+
+
+    @Test
+    public void testDoExecute() throws Exception
+    {
+        command.doExecute();
     }
 }
