@@ -169,15 +169,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createTemplate( final String environmentId, final String containerId, final String version,
-                                    final boolean privateTemplate )
+    public Response createTemplate( final String environmentId, final String containerId, final String templateName,
+                                    final String version, final boolean privateTemplate )
     {
 
         try
         {
-            return Response
-                    .ok( environmentManager.createTemplate( environmentId, containerId, version, privateTemplate ) )
-                    .build();
+            return Response.ok( environmentManager
+                    .createTemplate( environmentId, containerId, templateName, version, privateTemplate ) ).build();
         }
         catch ( Exception e )
         {

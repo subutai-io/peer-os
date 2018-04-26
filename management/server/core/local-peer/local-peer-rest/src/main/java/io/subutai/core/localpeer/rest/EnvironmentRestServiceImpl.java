@@ -577,7 +577,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response exportTemplate( final ContainerId containerId, final String version,
+    public Response exportTemplate( final ContainerId containerId, final String templateName, final String version,
                                     final boolean isPrivateTemplate, final String token )
     {
         try
@@ -586,7 +586,9 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( version ) );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( token ) );
 
-            return Response.ok( localPeer.exportTemplate( containerId, version, isPrivateTemplate, token ) ).build();
+            return Response
+                    .ok( localPeer.exportTemplate( containerId, templateName, version, isPrivateTemplate, token ) )
+                    .build();
         }
         catch ( Exception e )
         {

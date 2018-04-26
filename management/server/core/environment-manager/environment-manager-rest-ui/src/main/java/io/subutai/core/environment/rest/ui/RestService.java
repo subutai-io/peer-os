@@ -37,11 +37,11 @@ public interface RestService
     Response getVerifiedTemplate( @PathParam( "templateName" ) String templateName );
 
     @POST
-    @Path( "{environmentId}/containers/{containerId}/template/{version}/private/{private}" )
+    @Path( "{environmentId}/containers/{containerId}/export/{name}/{version}/{private}" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response createTemplate( @PathParam( "environmentId" ) String environmentId,
-                             @PathParam( "containerId" ) String containerId, @PathParam( "version" ) String version,
-                             @PathParam( "private" ) boolean privateTemplate );
+                             @PathParam( "containerId" ) String containerId, @PathParam( "name" ) String templateName,
+                             @PathParam( "version" ) String version, @PathParam( "private" ) boolean privateTemplate );
 
     /** Environments **************************************************** */
 

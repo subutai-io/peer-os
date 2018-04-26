@@ -105,10 +105,12 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getExportTemplateCommand( final String containerName, final String version,
-                                                    final boolean isPrivateTemplate, final String token )
+    public RequestBuilder getExportTemplateCommand( final String containerName, final String templateName,
+                                                    final String version, final boolean isPrivateTemplate,
+                                                    final String token )
     {
-        return new RequestBuilder( String.format( "subutai export %s -v %s -t %s %s", containerName, version, token,
-                isPrivateTemplate ? "-p" : "" ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
+        return new RequestBuilder(
+                String.format( "subutai export %s -n %s -v %s -t %s %s", containerName, templateName, version, token,
+                        isPrivateTemplate ? "-p" : "" ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
 }

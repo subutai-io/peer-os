@@ -979,16 +979,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public String exportTemplate( final String containerName, final String version, final boolean isPrivateTemplate,
-                                  final String token ) throws ResourceHostException
+    public String exportTemplate( final String containerName, final String templateName, final String version,
+                                  final boolean isPrivateTemplate, final String token ) throws ResourceHostException
     {
         try
         {
-            updateTemplateUploadProgress( containerName, 0 );
+            updateTemplateUploadProgress( templateName, 0 );
 
-            CommandResult result = commandUtil.execute(
-                    resourceHostCommands.getExportTemplateCommand( containerName, version, isPrivateTemplate, token ),
-                    this, new TemplateUploadTracker( this, containerName ) );
+            CommandResult result = commandUtil.execute( resourceHostCommands
+                            .getExportTemplateCommand( containerName, templateName, version, isPrivateTemplate, token
+                                                     ), this,
+                    new TemplateUploadTracker( this, templateName ) );
 
             Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*\"" );
 

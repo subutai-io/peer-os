@@ -1136,11 +1136,13 @@ public class EnvironmentManagerImpl extends HostListener
 
 
     @Override
-    public String createTemplate( final String environmentId, final String containerId, final String version,
-                                  final boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException
+    public String createTemplate( final String environmentId, final String containerId, final String templateName,
+                                  final String version, final boolean privateTemplate )
+            throws PeerException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
         String kurjunToken = identityManager.getActiveSession().getKurjunToken();
         Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing or expired" );
@@ -1155,18 +1157,19 @@ public class EnvironmentManagerImpl extends HostListener
 
         for ( Template template : ownerTemplates )
         {
-            if ( containerHost.getContainerName().equalsIgnoreCase( template.getName() ) && version
+            if ( templateName.equalsIgnoreCase( template.getName() ) && version
                     .equalsIgnoreCase( template.getVersion() ) )
             {
                 throw new IllegalStateException(
                         String.format( "Template with name %s and version %s already exists in your repository",
-                                containerHost.getContainerName(), version ) );
+                                templateName, version ) );
             }
         }
 
         Peer targetPeer = containerHost.getPeer();
 
-        return targetPeer.exportTemplate( containerHost.getContainerId(), version, privateTemplate, kurjunToken );
+        return targetPeer
+                .exportTemplate( containerHost.getContainerId(), templateName, version, privateTemplate, kurjunToken );
     }
 
 

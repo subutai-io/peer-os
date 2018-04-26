@@ -3657,8 +3657,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public String exportTemplate( final ContainerId containerId, final String version, final boolean isPrivateTemplate,
-                                  final String token ) throws PeerException
+    public String exportTemplate( final ContainerId containerId, final String templateName, final String version,
+                                  final boolean isPrivateTemplate, final String token ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
@@ -3668,7 +3668,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         try
         {
-            return resourceHost.exportTemplate( containerId.getContainerName(), version, isPrivateTemplate, token );
+            return resourceHost
+                    .exportTemplate( containerId.getContainerName(), templateName, version, isPrivateTemplate, token );
         }
         catch ( ResourceHostException e )
         {

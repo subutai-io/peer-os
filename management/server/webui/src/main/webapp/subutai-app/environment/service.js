@@ -259,8 +259,8 @@ function environmentService($http, $q) {
 			'?name=' + name );
 	}
 
-	function createTemplate( container, version, isPrivate ) {
-	    var URL = ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/template/' + version + "/private/" + ( isPrivate == true ? "true" : "false" ) ;
+	function createTemplate( container,name, version, isPrivate ) {
+	    var URL = ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/export/' + name + "/" + version + "/" + ( isPrivate == true ? "true" : "false" ) ;
 		return $http.post( URL );
 	}
 

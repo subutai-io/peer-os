@@ -142,8 +142,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void removeContainerHost( ContainerHost containerHost );
 
-    String exportTemplate( String containerName, String version, boolean isPrivateTemplate, String token )
-            throws ResourceHostException;
+    String exportTemplate( String containerName, String templateName, String version, boolean isPrivateTemplate,
+                           String token ) throws ResourceHostException;
 
     Set<String> listExistingContainerNames() throws ResourceHostException;
 

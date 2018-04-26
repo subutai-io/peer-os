@@ -345,7 +345,7 @@ public class ResourceHostEntityTest
                 + "7d42f1d084c405b482938bb2620cce77\"" ).when( commandResult ).getStdOut();
 
         assertEquals( "7d42f1d084c405b482938bb2620cce77",
-                resourceHostEntity.exportTemplate( "foo", "1.0.0", false, "token" ) );
+                resourceHostEntity.exportTemplate( "foo", "foo-template", "1.0.0", false, "token" ) );
     }
 
 
