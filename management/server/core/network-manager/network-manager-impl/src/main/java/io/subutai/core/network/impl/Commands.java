@@ -59,6 +59,11 @@ public class Commands
                         String.valueOf( secretKeyTtlSec ), "-ip", localIp, "-ports", portRange ).withTimeout( 90 );
     }
 
+    RequestBuilder getP2pStatusBySwarm ( String p2pHash )
+    {
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs("status", "-hash", p2pHash);
+    }
+
 
     RequestBuilder getJoinP2PSwarmDHCPCommand( String interfaceName, String p2pHash, String secretKey,
                                                long secretKeyTtlSec, String portRange )
