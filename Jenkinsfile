@@ -127,7 +127,7 @@ node() {
         // upload template to jenkins master node
         sh """
         set +x
-        scp jenkins@${env.peer_os_builder}:/var/lib/subutai/lxc/tmpdir/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
+        scp jenkins@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
         stash includes: "management-*.deb", name: 'deb'
