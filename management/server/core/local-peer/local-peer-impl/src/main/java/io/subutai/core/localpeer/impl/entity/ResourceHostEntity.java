@@ -1198,6 +1198,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
     }
 
+    @Override
+    public String getP2pStatusByP2PHash ( String p2pHash ) throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getP2pStatusByP2PHash(this, p2pHash);
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( "Error obtaining P2P status: {}", e.getMessage() );
+            throw new ResourceHostException( String.format( "Error obtaining P2P status: %s", e.getMessage() ), e );
+        }
+    }
+
 
     public String getOsName() throws ResourceHostException
     {
