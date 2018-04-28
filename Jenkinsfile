@@ -118,7 +118,7 @@ node() {
   			sudo rm /var/lib/subutai/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
             sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/subutai/agent.gcfg
-            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/lib/subutai/lxc/management/agent.gcfg
+            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/lib/subutai/agent.gcfg
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
