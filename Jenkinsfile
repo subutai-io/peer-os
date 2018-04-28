@@ -117,8 +117,8 @@ node() {
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
   			sudo rm /var/lib/subutai/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
-            sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/subutai/current/agent.gcfg
-            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/lib/subutai/lxc/management/current/agent.gcfg
+            sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/subutai/agent.gcfg
+            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/lib/subutai/lxc/management/agent.gcfg
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
