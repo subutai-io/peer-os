@@ -96,7 +96,7 @@ node() {
 			sudo subutai import debian-stretch
 			sudo subutai clone debian-stretch management
 			/bin/sleep 20
-			scp ubuntu@${env.master_node}:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/lib/subutai/lxc/management/rootfs/tmp/
+			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/lib/subutai/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
             sudo cp /opt/key/cdn-pub.key /var/lib/subutai/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
