@@ -45,12 +45,14 @@ node() {
             case ~/master/: hubIp = "masterbazaar.subutai.io"; break;
             case ~/dev/: hubIp = "devbazaar.subutai.io"; break;
             case ~/sysnet/: hubIp = "devbazaar.subutai.io"; break;
+            case ~/no-snap/: hubIp = "devbazaar.subutai.io"; break;
             default: hubIp = "bazaar.subutai.io"
         }
 
         switch (env.BRANCH_NAME) {
             case ~/master/: cdnHost = "mastercdn.subutai.io"; break;
             case ~/dev/: cdnHost = "devcdn.subutai.io"; break;
+            case ~/no-snap/: cdnHost = "devcdn.subutai.io"; break;
             case ~/sysnet/: cdnHost = "sysnetcdn.subutai.io"; break;
             default: cdnHost = "cdn.subutai.io"
         }
