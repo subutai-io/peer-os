@@ -61,6 +61,8 @@ public interface NetworkManager
 
     String getP2pVersion( Host host ) throws NetworkManagerException;
 
+    String getP2pStatusByP2PHash( Host host, String p2pHash ) throws NetworkManagerException;
+
     P2pLogs getP2pLogs( Host host, LogLevel logLevel, Date from, Date till ) throws NetworkManagerException;
 
     Set<String> getUsedP2pIfaceNames( final Host host ) throws NetworkManagerException;

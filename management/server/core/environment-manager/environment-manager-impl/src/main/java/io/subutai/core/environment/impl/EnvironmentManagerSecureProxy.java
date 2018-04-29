@@ -962,11 +962,12 @@ public class EnvironmentManagerSecureProxy extends HostListener
 
     @Override
     public String createTemplate( final String environmentId, final String containerId, final String templateName,
-                                  final boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException
+                                  final String version, final boolean privateTemplate )
+            throws PeerException, EnvironmentNotFoundException
     {
         checkContainerPermission( environmentId, containerId, traitsBuilder( "ownership=All;read=true" ) );
 
-        return environmentManager.createTemplate( environmentId, containerId, templateName, privateTemplate );
+        return environmentManager.createTemplate( environmentId, containerId, templateName, version, privateTemplate );
     }
 
 

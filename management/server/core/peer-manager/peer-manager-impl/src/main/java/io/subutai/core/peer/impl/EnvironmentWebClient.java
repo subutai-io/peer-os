@@ -841,7 +841,7 @@ public class EnvironmentWebClient
     }
 
 
-    public String exportTemplate( final ContainerId containerId, final String templateName,
+    public String exportTemplate( final ContainerId containerId, final String templateName, final String version,
                                   final boolean isPrivateTemplate, final String token ) throws PeerException
     {
         WebClient client = null;
@@ -849,9 +849,8 @@ public class EnvironmentWebClient
         try
         {
             remotePeer.checkRelation();
-            String path =
-                    String.format( "/%s/containers/%s/template/%s/export/%s/token/%s", containerId.getEnvironmentId(),
-                            containerId.getId(), templateName, isPrivateTemplate, token );
+            String path = String.format( "/%s/containers/%s/export/%s/%s/%s/%s", containerId.getEnvironmentId(),
+                    containerId.getId(), templateName, version, isPrivateTemplate, token );
             client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000L,
                     Common.TEMPLATE_EXPORT_TIMEOUT_SEC * 1000L, 1 );
 
