@@ -979,33 +979,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void promoteTemplate( final String containerName, final String templateName ) throws ResourceHostException
+    public String exportTemplate( final String containerName, final String templateName, final String version,
+                                  final boolean isPrivateTemplate, final String token ) throws ResourceHostException
     {
         try
         {
             updateTemplateUploadProgress( templateName, 0 );
 
-            commandUtil.execute( resourceHostCommands.getPromoteTemplateCommand( containerName, templateName ), this );
-        }
-        catch ( CommandException e )
-        {
-            throw new ResourceHostException(
-                    String.format( "Error promoting container to template: %s", e.getMessage() ), e );
-        }
-    }
-
-
-    @Override
-    public String exportTemplate( final String templateName, final boolean isPrivateTemplate, final String token )
-            throws ResourceHostException
-    {
-        try
-        {
-            updateTemplateUploadProgress( templateName, 0 );
-
-            CommandResult result = commandUtil
-                    .execute( resourceHostCommands.getExportTemplateCommand( templateName, isPrivateTemplate, token ),
-                            this, new TemplateUploadTracker( this, templateName ) );
+            CommandResult result = commandUtil.execute( resourceHostCommands
+                            .getExportTemplateCommand( containerName, templateName, version, isPrivateTemplate, token
+                                                     ), this,
+                    new TemplateUploadTracker( this, templateName ) );
 
             Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*\"" );
 
@@ -1211,6 +1195,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 return p2pVersion;
             }
+        }
+    }
+
+    @Override
+    public String getP2pStatusByP2PHash ( String p2pHash ) throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getP2pStatusByP2PHash(this, p2pHash);
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( "Error obtaining P2P status: {}", e.getMessage() );
+            throw new ResourceHostException( String.format( "Error obtaining P2P status: %s", e.getMessage() ), e );
         }
     }
 

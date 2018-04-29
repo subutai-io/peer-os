@@ -421,7 +421,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 
     vm.disabled = false;
-    function createTemplate( container, name, isPublic ) {
+    function createTemplate( container,name, version, isPublic ) {
 
         clearTimeout(timeout);
 
@@ -431,12 +431,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
         ngDialog.closeAll();
 
-
         checkKurjunAuthToken(identitySrv, $rootScope, function(){
 
                 showUploadProgress(name);
 
-                environmentService.createTemplate( container, name, !isPublic )
+                environmentService.createTemplate( container, name,version, !isPublic )
                 .success( function (hash) {
 
                     var signedHashTextArea = document.createElement("textarea");

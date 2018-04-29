@@ -1,42 +1,52 @@
 <div class="b-popup b-popup_min">
-	<div class="b-popup__header">
-		Create template from container
-		<a href ng-click="closeThisDialog()">
-			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-		</a>
-	</div>
+  <div class="b-popup__header">
+    Create template from container
+    <a href ng-click="closeThisDialog()">
+      <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+    </a>
+  </div>
 
-	<form ng-submit="containerViewCtrl.createTemplate(containerViewCtrl.editingContainer, name, isPublic)">
-		<div class="b-popup__body">
+  <form ng-submit="containerViewCtrl.createTemplate(containerViewCtrl.editingContainer, name, version, isPublic)">
+    <div class="b-popup__body">
 
-			<div class="popup-body-box b-popup-checkbox">
-				<label class="b-popup-body-label" for="subt_checkbox__container-private-template">
-					Is public template
-				</label>
-				<input type="checkbox"
-							 id="subt_checkbox__container-private-template"
-							 class="b-popup-checkbox__input"
-							 ng-model="isPublic">
-				<div class="clear"></div>
-			</div>
-			<div class="popup-body-box b-popup-checkbox">
-				<label class="b-popup-body-label" for="subt_inp__container-template-name">
-					Template name
-				</label>
-				<input
-							 id="subt_inp__container-template-name"
-							 ng-model="name"
-							 ng-init="name=containerViewCtrl.editingContainer.hostname">
-				<div class="clear"></div>
-			</div>
+      <div class="popup-body-box b-popup-checkbox">
+        <label class="b-popup-body-label" for="subt_checkbox__container-private-template">
+          Is public template
+        </label>
+        <input type="checkbox"
+               id="subt_checkbox__container-private-template"
+               class="b-popup-checkbox__input"
+               ng-model="isPublic">
+        <div class="clear"></div>
+      </div>
+      <div class="popup-body-box b-popup-checkbox">
+        <label class="b-popup-body-label" for="subt_inp__container-template-name">
+          Template name
+        </label>
+        <input
+            id="subt_inp__container-template-name"
+            ng-model="name"
+            ng-init="name=containerViewCtrl.editingContainer.hostname">
+        <div class="clear"></div>
+      </div>
+      <div class="popup-body-box b-popup-checkbox">
+        <label class="b-popup-body-label" for="subt_inp__container-template-version">
+          Template version
+        </label>
+        <input
+            id="subt_inp__container-template-version"
+            ng-model="version"
+            ng-init="version='1.0.0'">
+        <div class="clear"></div>
+      </div>
 
-		</div>
-		<div class="b-popup__footer">
-			<button class="b-btn b-btn_green g-right" type="submit" ng-disabled="containerViewCtrl.disabled">
-				Create
-			</button>
-			<div class="clear"></div>
-		</div>
-	</form>
+    </div>
+    <div class="b-popup__footer">
+      <button class="b-btn b-btn_green g-right" type="submit" ng-disabled="containerViewCtrl.disabled">
+        Create
+      </button>
+      <div class="clear"></div>
+    </div>
+  </form>
 </div>
 

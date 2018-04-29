@@ -90,8 +90,6 @@ public class CheckNetworkStateHandler extends StateHandler
 
     private void checkP2PConnections( final EnvironmentPeerDto peerDto )
     {
-        CommandResult result = null;
-
         EnvironmentNodesDto nodesDto = null;
 
         try
@@ -115,8 +113,7 @@ public class CheckNetworkStateHandler extends StateHandler
             {
                 host = ctx.localPeer.getResourceHostById( node.getHostId() );
 
-                result = host.execute(
-                        new RequestBuilder( "subutai p2p" ).withCmdArgs( "-s", environmentInfoDto.getP2pHash() ) );
+                String result = host.getP2pStatusByP2PHash(environmentInfoDto.getP2pHash());
 
                 putResults( result, peerDto );
             }
@@ -128,16 +125,11 @@ public class CheckNetworkStateHandler extends StateHandler
     }
 
 
-    private void putResults( CommandResult result, EnvironmentPeerDto peerDto )
+    private void putResults( String result, EnvironmentPeerDto peerDto )
     {
         ObjectMapper mapper = new ObjectMapper();
 
-        if ( !result.hasSucceeded() )
-        {
-            log.error( result.getStdErr() );
-        }
-
-        JSONArray array = new JSONArray( result.getStdOut() );
+        JSONArray array = new JSONArray( result );
 
         for ( int i = 0; i < array.length(); i++ )
         {
