@@ -28,9 +28,9 @@ node() {
         def mvnHome = tool 'M3'
         def workspace = pwd()
 
-        stage("Build management deb/template")
+        stage("Build management deb package")
         // Use maven to to build deb and template files of management
-        notifyBuildDetails = "\nFailed Step - Build management deb/template"
+        notifyBuildDetails = "\nFailed Step - Build management deb package"
 
         checkout scm
         def artifactVersion = getVersion("management/pom.xml")
@@ -84,6 +84,9 @@ node() {
 			set +x
 			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
+        stage("Build management template")
+        // Use maven to to build deb and template files of management
+        notifyBuildDetails = "\nFailed Step - Build management template"
 
         // Start MNG-RH Lock
         lock('peer_os_builder') {
