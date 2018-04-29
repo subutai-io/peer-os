@@ -74,7 +74,7 @@ node() {
         }
 	    """
 
-        // cdn auth creadentials
+        // CDN auth creadentials
         String user = "jenkins"
         def authID = sh(script: """
 			set +x
@@ -84,8 +84,8 @@ node() {
 			set +x
 			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
+        
         stage("Build management template")
-        // Use maven to to build deb and template files of management
         notifyBuildDetails = "\nFailed Step - Build management template"
 
         // Start MNG-RH Lock
@@ -135,29 +135,11 @@ node() {
         scp jenkins@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
-        stash includes: "management-*.deb", name: 'deb'
-        stash includes: "management-subutai-template*", name: 'template'
-
+        
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
-            stage("Deploy artifacts on kurjun")
+            stage("Upload to CDN")
+            notifyBuildDetails = "\nFailed Step - Upload to CDN"
             deleteDir()
-
-            unstash 'deb'
-            unstash 'template'
-
-            // Deploy built and tested artifacts to cdn
-            notifyBuildDetails = "\nFailed on Stage - Deploy artifacts on kurjun"
-
-            // cdn auth creadentials
-//            String user = "jenkins"
-//            def authID = sh(script: """
-//			set +x
-//			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
-//			""", returnStdout: true)
-//            def token = sh(script: """
-//			set +x
-//			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
-//			""", returnStdout: true)
 
             // upload artifacts on cdn
             // upload deb
