@@ -53,4 +53,8 @@ public interface HubManager
     void notifyHubThatPeerIsOffline();
 
     BrokerSettingsDto getBrokers();
+
+    void sendPeersMertics() throws HubManagerException;
+
+    void sendContainerMertics() throws HubManagerException;
 }
