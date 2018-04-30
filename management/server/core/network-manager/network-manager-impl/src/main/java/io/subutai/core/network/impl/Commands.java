@@ -23,7 +23,7 @@ public class Commands
 {
     private static final String TUNNEL_BINDING = "subutai tunnel";
     private static final String VXLAN_BINDING = "subutai vxlan";
-    private static final String P2P_BINDING = "subutai p2p";
+    private static final String P2P_BINDING = "p2p";
     private static final String PROXY_BINDING = "subutai proxy";
     private static final String INFO_BINDING = "subutai info";
     private static final String MAP_BINDING = "subutai map";
@@ -47,7 +47,7 @@ public class Commands
 
     RequestBuilder getP2PConnectionsCommand()
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-p" );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "show" );
     }
 
 
@@ -55,8 +55,13 @@ public class Commands
                                            long secretKeyTtlSec, String portRange )
     {
         return new RequestBuilder( P2P_BINDING )
-                .withCmdArgs( "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ), localIp,
-                        portRange ).withTimeout( 90 );
+                .withCmdArgs( "start", "-dev", interfaceName, "-hash", p2pHash, "-key", secretKey, "-ttl",
+                        String.valueOf( secretKeyTtlSec ), "-ip", localIp, "-ports", portRange ).withTimeout( 90 );
+    }
+
+    RequestBuilder getP2pStatusBySwarm ( String p2pHash )
+    {
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs("status", "-hash", p2pHash);
     }
 
 
@@ -64,33 +69,33 @@ public class Commands
                                                long secretKeyTtlSec, String portRange )
     {
         return new RequestBuilder( P2P_BINDING )
-                .withCmdArgs( "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ), "dhcp",
-                        portRange ).withTimeout( 90 );
+                .withCmdArgs( "start", "-dev", interfaceName, "-hash", p2pHash, "-key", secretKey, "-ttl",
+                        String.valueOf( secretKeyTtlSec ), "-ports", portRange ).withTimeout( 90 );
     }
 
 
     RequestBuilder getRemoveP2PSwarmCommand( String p2pHash )
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-d", p2pHash ).withTimeout( 90 );
-    }
-
-
-    RequestBuilder getRemoveP2PIfaceCommand( String interfaceName )
-    {
-        return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName ).withTimeout( 90 );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "stop", "-hash", p2pHash ).withTimeout( 90 );
     }
 
 
     RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( P2P_BINDING )
-                .withCmdArgs( "-u", p2pHash, newSecretKey, String.valueOf( ttlSeconds ) );
+                .withCmdArgs( "set", "-key", newSecretKey, "-ttl", String.valueOf( ttlSeconds ), "-hash", p2pHash );
     }
 
 
     RequestBuilder getGetUsedP2pIfaceNamesCommand()
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "-i" );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "show", "--interfaces", "--all" );
+    }
+
+
+    RequestBuilder getRemoveP2PIfaceCommand( String interfaceName )
+    {
+        return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName ).withTimeout( 90 );
     }
 
 
