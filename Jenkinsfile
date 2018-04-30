@@ -94,7 +94,7 @@ node() {
             // create management template
             sh """
 			set +x
-			ssh jenkins@${env.peer_os_builder} <<- EOF
+			ssh admin@${env.peer_os_builder} <<- EOF
 			set -e
 			
 			sudo subutai destroy management
@@ -132,7 +132,7 @@ node() {
         // upload template to jenkins master node
         sh """
         set +x
-        scp jenkins@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
+        scp admin@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
         
@@ -160,11 +160,13 @@ node() {
             // upload template
             String responseTemplate = sh(script: """
 			set +x
+            
 			curl -s -k https://${cdnHost}:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
 			""", returnStdout: true)
             def signatureTemplate = sh(script: """
 			set +x
-			curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
+			
+            curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
 			""", returnStdout: true)
 
             sh """
