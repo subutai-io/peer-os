@@ -150,7 +150,7 @@ node() {
             sh """
 			set +x
             echo "${token} and ${cdnHost} and ${debFileName}"
-			curl -s -k -Ffile=@${debFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/apt/upload
+			curl -sk -H "token: ${token}" -Ffile=@${debFileName} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
             """
             sh """
 			set +x
