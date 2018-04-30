@@ -136,7 +136,7 @@ node() {
         """
         /* stash p2p binary to use it in next node() */
         
-        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
+        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet' || env.BRANCH_NAME == 'no-snap') {
             stage("Upload to CDN")
             notifyBuildDetails = "\nFailed Step - Upload to CDN"
             deleteDir()
@@ -184,9 +184,7 @@ node() {
                 def jsonTemplate = jsonParse(responseTemplate)
                 sh """
 				set +x
-				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${
-                    jsonTemplate[0]["id"]
-                }'&'token=${token}
+				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
 			"""
             }
         }
