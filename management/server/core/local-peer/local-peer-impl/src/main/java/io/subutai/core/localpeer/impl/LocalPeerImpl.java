@@ -3657,40 +3657,19 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public void promoteTemplate( final ContainerId containerId, final String templateName ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-
-        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
-
-        ResourceHost resourceHost = containerHost.getParent();
-
-        try
-        {
-            resourceHost.promoteTemplate( containerHost.getContainerName(), templateName );
-        }
-        catch ( ResourceHostException e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error promoting template: %s", e.getMessage() ) );
-        }
-    }
-
-
-    @Override
-    public String exportTemplate( final ContainerId containerId, final String templateName,
+    public String exportTemplate( final ContainerId containerId, final String templateName, final String version,
                                   final boolean isPrivateTemplate, final String token ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
 
         ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
 
         try
         {
-            return resourceHost.exportTemplate( templateName, isPrivateTemplate, token );
+            return resourceHost
+                    .exportTemplate( containerId.getContainerName(), templateName, version, isPrivateTemplate, token );
         }
         catch ( ResourceHostException e )
         {
