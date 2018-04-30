@@ -135,12 +135,16 @@ node() {
         scp admin@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
-        
+        stash includes: "management-*.deb", name: 'deb'
+        stash includes: "management-subutai-template*", name: 'template'
+
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet' || env.BRANCH_NAME == 'no-snap') {
             stage("Upload to CDN")
             notifyBuildDetails = "\nFailed Step - Upload to CDN"
-            //deleteDir()
-
+            deleteDir()
+            
+            unstash 'deb'
+            unstash 'template'
             // upload artifacts on cdn
             // upload deb
             String responseDeb = sh(script: """
