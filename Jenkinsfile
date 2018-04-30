@@ -139,7 +139,7 @@ node() {
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet' || env.BRANCH_NAME == 'no-snap') {
             stage("Upload to CDN")
             notifyBuildDetails = "\nFailed Step - Upload to CDN"
-            deleteDir()
+            //deleteDir()
 
             // upload artifacts on cdn
             // upload deb
