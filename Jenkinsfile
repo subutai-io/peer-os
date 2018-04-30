@@ -94,7 +94,7 @@ node() {
             // create management template
             sh """
 			set +x
-			ssh jenkins@${env.peer_os_builder} <<- EOF
+			ssh admin@${env.peer_os_builder} <<- EOF
 			set -e
 			
 			sudo subutai destroy management
@@ -132,15 +132,19 @@ node() {
         // upload template to jenkins master node
         sh """
         set +x
-        scp jenkins@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
+        scp admin@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
-        
-        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
+        stash includes: "management-*.deb", name: 'deb'
+        stash includes: "management-subutai-template*", name: 'template'
+
+        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet' || env.BRANCH_NAME == 'no-snap') {
             stage("Upload to CDN")
             notifyBuildDetails = "\nFailed Step - Upload to CDN"
             deleteDir()
-
+            
+            unstash 'deb'
+            unstash 'template'
             // upload artifacts on cdn
             // upload deb
             String responseDeb = sh(script: """
@@ -149,7 +153,8 @@ node() {
 			""", returnStdout: true)
             sh """
 			set +x
-			curl -s -k -Ffile=@${debFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/apt/upload
+            echo "${token} and ${cdnHost} and ${debFileName}"
+			curl -sk -H "token: ${token}" -Ffile=@${debFileName} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
             """
             sh """
 			set +x
@@ -159,11 +164,13 @@ node() {
             // upload template
             String responseTemplate = sh(script: """
 			set +x
+            
 			curl -s -k https://${cdnHost}:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
 			""", returnStdout: true)
             def signatureTemplate = sh(script: """
 			set +x
-			curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
+			
+            curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
 			""", returnStdout: true)
 
             sh """
@@ -184,9 +191,7 @@ node() {
                 def jsonTemplate = jsonParse(responseTemplate)
                 sh """
 				set +x
-				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${
-                    jsonTemplate[0]["id"]
-                }'&'token=${token}
+				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
 			"""
             }
         }
