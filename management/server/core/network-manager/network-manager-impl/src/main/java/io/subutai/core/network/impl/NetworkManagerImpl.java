@@ -175,6 +175,25 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public  String getP2pStatusByP2PHash ( Host host, String p2pHash ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkNotNull( p2pHash, "Invalid p2pHash" );
+        Preconditions.checkState( !p2pHash.isEmpty(), "p2pHash can not be empty!" );
+
+        CommandResult result = execute( host, commands.getP2pStatusBySwarm(p2pHash) );
+
+        if ( result.hasSucceeded() )
+        {
+            return result.getStdOut();
+        }else
+        {
+            return  result.getStdErr();
+        }
+    }
+
+
+    @Override
     public P2pLogs getP2pLogs( final Host host, final LogLevel logLevel, final Date from, final Date till )
             throws NetworkManagerException
     {

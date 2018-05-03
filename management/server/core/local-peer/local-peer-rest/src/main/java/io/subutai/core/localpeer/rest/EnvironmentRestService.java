@@ -194,18 +194,11 @@ public interface EnvironmentRestService
 
 
     @POST
-    @Path( "{environmentId}/containers/{containerId}/template/{templateName}/promote" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response promoteTemplate( @PathParam( "containerId" ) ContainerId containerId,
-                              @PathParam( "templateName" ) String templateName );
-
-    @POST
-    @Path( "{environmentId}/containers/{containerId}/template/{templateName}/export/{isPrivateTemplate}/token/{token}" )
+    @Path( "{environmentId}/containers/{containerId}/export/{name}/{version}/{isPrivateTemplate}/{token}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response exportTemplate( @PathParam( "containerId" ) ContainerId containerId,
-                             @PathParam( "templateName" ) String templateName,
+                             @PathParam( "name" ) String templateName, @PathParam( "version" ) String version,
                              @PathParam( "isPrivateTemplate" ) boolean isPrivateTemplate,
                              @PathParam( "token" ) String token );
 }

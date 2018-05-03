@@ -124,6 +124,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     String getP2pVersion() throws ResourceHostException;
 
+    String getP2pStatusByP2PHash ( String p2pHash ) throws ResourceHostException;
+
     String getOsName() throws ResourceHostException;
 
     P2pLogs getP2pLogs( LogLevel logLevel, Date from, Date till ) throws ResourceHostException;
@@ -142,9 +144,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void removeContainerHost( ContainerHost containerHost );
 
-    void promoteTemplate( String containerName, String templateName ) throws ResourceHostException;
-
-    String exportTemplate( String templateName, boolean isPrivateTemplate, String token ) throws ResourceHostException;
+    String exportTemplate( String containerName, String templateName, String version, boolean isPrivateTemplate,
+                           String token ) throws ResourceHostException;
 
     Set<String> listExistingContainerNames() throws ResourceHostException;
 
