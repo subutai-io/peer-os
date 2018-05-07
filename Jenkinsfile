@@ -190,7 +190,7 @@ node() {
             if (responseTemplate != "Not found") {
                 def jsonTemplate = jsonParse(responseTemplate)
                 sh """
-				set +x
+				set +xe
 				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
 			"""
             }
