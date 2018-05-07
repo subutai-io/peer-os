@@ -26,6 +26,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -142,6 +143,10 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
     @Override
     public Set<ContainerInfo> getHostInfos()
     {
+        if ( CollectionUtil.isCollectionEmpty( hostInfos ) )
+        {
+            return Sets.newHashSet();
+        }
         return hostInfos;
     }
 

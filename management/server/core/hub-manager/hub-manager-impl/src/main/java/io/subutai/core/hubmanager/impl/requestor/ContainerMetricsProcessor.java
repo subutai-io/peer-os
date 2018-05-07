@@ -22,8 +22,8 @@ import io.subutai.core.hubmanager.api.model.ContainerMetrics;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.model.ContainerMetricsEntity;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.hub.share.dto.metrics.HostMetricsDto;
 import io.subutai.hub.share.dto.metrics.ContainersMetricsDto;
+import io.subutai.hub.share.dto.metrics.HostMetricsDto;
 
 import static java.lang.String.format;
 
@@ -108,6 +108,7 @@ public class ContainerMetricsProcessor extends HubRequester
                 try
                 {
                     HistoricalMetrics historicalMetrics = monitor.getMetricsSeries( containerHost, startTime, endTime );
+
                     HostMetricsDto hostMetricsDto = historicalMetrics.getHostMetrics();
 
                     //skip "zero" metrics
@@ -119,7 +120,22 @@ public class ContainerMetricsProcessor extends HubRequester
                         hostMetricsDto.setHostName( containerHost.getContainerName() );
                         hostMetricsDto.setStartTime( startTime );
                         hostMetricsDto.setEndTime( endTime );
-
+                        // TODO: 4/26/18 need to set quota after impl of new agent and migrating ZFS
+/*
+                        try
+                        {
+                            // trying to set total
+                            final long quota =
+                                    containerHost.getQuota().get( ContainerResourceType.DISK ).getAsDiskResource()
+                                                 .longValue( ByteUnit.BYTE );
+                            hostMetricsDto.getDisk().get( "total" ).setTotal( quota );
+                        }
+                        catch ( Exception e )
+                        {
+                            log.warn( "Failed to obtain disk quota od the container {}: {}", containerHost.getId(), e
+                            .getMessage() );
+                        }
+*/
                         containersMetricsDto.getContainerHostMetricsDto().add( hostMetricsDto );
                     }
                 }
