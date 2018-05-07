@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -80,7 +81,10 @@ public class RequestedHostJson implements RequestedHost
     public Set<ContainerInfo> getHostInfos()
     {
         Set<ContainerInfo> result = Sets.newHashSet();
-        result.addAll( hostInfos );
+        if ( !CollectionUtil.isCollectionEmpty( hostInfos ) )
+        {
+            result.addAll( hostInfos );
+        }
         return result;
     }
 
