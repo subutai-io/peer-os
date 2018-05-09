@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>peer-manager-parent</artifactId>
-    <version>6.3.13-SNAPSHOT</version>
+    <version>7.0.0</version>
   </parent>
 
   <artifactId>peer-manager-cli</artifactId>
