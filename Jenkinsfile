@@ -45,14 +45,12 @@ node() {
             case ~/master/: hubIp = "masterbazaar.subutai.io"; break;
             case ~/dev/: hubIp = "devbazaar.subutai.io"; break;
             case ~/sysnet/: hubIp = "devbazaar.subutai.io"; break;
-            case ~/no-snap/: hubIp = "devbazaar.subutai.io"; break;
             default: hubIp = "bazaar.subutai.io"
         }
 
         switch (env.BRANCH_NAME) {
             case ~/master/: cdnHost = "mastercdn.subutai.io"; break;
             case ~/dev/: cdnHost = "devcdn.subutai.io"; break;
-            case ~/no-snap/: cdnHost = "devcdn.subutai.io"; break;
             case ~/sysnet/: cdnHost = "sysnetcdn.subutai.io"; break;
             default: cdnHost = "cdn.subutai.io"
         }
@@ -138,7 +136,7 @@ node() {
         stash includes: "management-*.deb", name: 'deb'
         stash includes: "management-subutai-template*", name: 'template'
 
-        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet' || env.BRANCH_NAME == 'no-snap') {
+        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Upload to CDN")
             notifyBuildDetails = "\nFailed Step - Upload to CDN"
             deleteDir()
