@@ -3768,6 +3768,39 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 continue;
             }
 
+            //destroy containers that are registered with Console but don't have environments
+            Set<ContainerHost> containersWithoutEnvironment = Sets.newHashSet();
+            try
+            {
+                ReservedNetworkResources reservedNetworkResources = getReservedNetworkResources();
+
+                for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+                {
+                    if ( reservedNetworkResources.findByEnvironmentId( containerHost.getEnvId() ) == null
+                            && !Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHost.getContainerName() ) )
+                    {
+                        containersWithoutEnvironment.add( containerHost );
+                    }
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage() );
+            }
+
+            //destroy container without environments
+            for ( ContainerHost containerHost : containersWithoutEnvironment )
+            {
+                try
+                {
+                    destroyContainer( containerHost.getContainerId() );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( e.getMessage() );
+                }
+            }
+
             try
             {
                 Set<ContainerInfo> existingContainers = resourceHost.listExistingContainersInfo();
