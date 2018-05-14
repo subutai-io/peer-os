@@ -354,7 +354,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             quotaContainers.push({"key": key, "value": vm.editingEnv.changingContainers[key]});
         }
 
-        var conteiners = {
+        var containers = {
             "topology": vm.containers2Build,
             "removedContainers": vm.containers2Remove,
             "environmentId": vm.editingEnv.id,

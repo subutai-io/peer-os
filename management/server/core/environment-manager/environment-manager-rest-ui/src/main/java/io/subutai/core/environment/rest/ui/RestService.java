@@ -187,14 +187,6 @@ public interface RestService
     Response listContainerTypesInfo();
 
 
-    /** Peers strategy **************************************************** */
-
-    @GET
-    @Path( "strategies" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response listPlacementStrategies();
-
-
     /** Peers **************************************************** */
 
     @GET

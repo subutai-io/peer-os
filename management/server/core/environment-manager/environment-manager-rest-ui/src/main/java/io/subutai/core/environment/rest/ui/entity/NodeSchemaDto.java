@@ -78,4 +78,16 @@ public class NodeSchemaDto
     {
         return hostId;
     }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    public void setHostId( final String hostId )
+    {
+        this.hostId = hostId;
+    }
 }
