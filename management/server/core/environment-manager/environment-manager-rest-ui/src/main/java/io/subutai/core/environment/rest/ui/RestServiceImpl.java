@@ -52,6 +52,7 @@ import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -245,7 +246,7 @@ public class RestServiceImpl implements RestService
     private void distribute( final List<NodeSchemaDto> nodes )
     {
         //fetch online peers with connected resource hosts
-        Map<String, PeerDto> peersNHosts = getOnlinePeers();
+        Map<String, PeerDto> peersNHosts = getPeersNConnectedRHs();
 
         //distribute nodes over resource hosts (round-robin)
         Iterator<NodeSchemaDto> iterator = nodes.iterator();
@@ -254,6 +255,12 @@ public class RestServiceImpl implements RestService
         {
             String peerId = peerEntry.getKey();
             PeerDto peerDto = peerEntry.getValue();
+
+            if ( peerDto.getRhCount() > peerDto.getResourceHosts().size() )
+            {
+                LOG.warn( "Peer {} has disconnected resource hosts, skipping it", peerDto.getName() );
+                continue;
+            }
 
             for ( ResourceHostDto resourceHostDto : peerDto.getResourceHosts() )
             {
@@ -279,7 +286,8 @@ public class RestServiceImpl implements RestService
         //check if all nodes are allocated
         if ( allocated < nodes.size() )
         {
-            throw new IllegalStateException( "Not enough connected resource hosts" );
+            throw new IllegalStateException(
+                    "Not enough connected resource hosts. All resource hosts of selected peers must be connected" );
         }
     }
 
@@ -944,11 +952,11 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getPeers()
     {
-        return Response.ok().entity( JsonUtil.toJson( getOnlinePeers() ) ).build();
+        return Response.ok().entity( JsonUtil.toJson( getPeersNConnectedRHs() ) ).build();
     }
 
 
-    private Map<String, PeerDto> getOnlinePeers()
+    private Map<String, PeerDto> getPeersNConnectedRHs()
     {
         List<Peer> peers = peerManager.getPeers();
 
@@ -964,10 +972,13 @@ public class RestServiceImpl implements RestService
             for ( Peer peer : peers )
             {
                 taskCompletionService.submit( () -> {
-                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(), peer.isLocal() );
-                    if ( peer.isOnline() )
+                    boolean isOnline = peer.isOnline();
+                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), isOnline, peer.isLocal() );
+                    if ( isOnline )
                     {
-                        Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+                        ResourceHostMetrics metrics = peer.getResourceHostMetrics();
+                        Collection<ResourceHostMetric> collection = metrics.getResources();
+                        peerDto.setRhCount( metrics.getResourceHostCount() );
                         for ( ResourceHostMetric metric : collection )
                         {
                             peerDto.addResourceHostDto(

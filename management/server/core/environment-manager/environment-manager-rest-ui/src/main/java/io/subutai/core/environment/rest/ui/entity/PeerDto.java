@@ -12,6 +12,7 @@ public class PeerDto
     private List<ResourceHostDto> resourceHosts;
     private boolean isOnline;
     private boolean isLocal;
+    private int rhCount;
 
 
     public PeerDto( String id, String name, boolean isOnline, boolean isLocal )
@@ -33,5 +34,23 @@ public class PeerDto
     public List<ResourceHostDto> getResourceHosts()
     {
         return resourceHosts;
+    }
+
+
+    public int getRhCount()
+    {
+        return rhCount;
+    }
+
+
+    public void setRhCount( final int rhCount )
+    {
+        this.rhCount = rhCount;
+    }
+
+
+    public String getName()
+    {
+        return name;
     }
 }
