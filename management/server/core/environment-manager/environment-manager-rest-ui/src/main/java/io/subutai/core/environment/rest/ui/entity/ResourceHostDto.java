@@ -44,4 +44,10 @@ public class ResourceHostDto
         this.hddAvailable = hddAvailable;
         this.isManagement = isManagement;
     }
+
+
+    public String getId()
+    {
+        return id;
+    }
 }
