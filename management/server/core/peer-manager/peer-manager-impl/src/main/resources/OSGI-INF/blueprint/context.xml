@@ -24,8 +24,6 @@
 
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
-
   <reference id="monitor" availability="optional"
              interface="io.subutai.core.metric.api.Monitor" />
 

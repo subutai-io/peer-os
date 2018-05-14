@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +48,6 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HubEnvironment;
 import io.subutai.common.environment.Node;
-import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
@@ -76,13 +76,9 @@ import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.RoundRobinStrategy;
-import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerSize;
-import io.subutai.hub.share.resource.PeerGroupResources;
 
 import static io.subutai.common.util.JsonUtil.mapper;
 
@@ -94,25 +90,22 @@ public class RestServiceImpl implements RestService
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
     private final TemplateManager templateManager;
-    private final StrategyManager strategyManager;
     private final SecureEnvironmentManager secureEnvironmentManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
     private IdentityManager identityManager = ServiceLocator.lookup( IdentityManager.class );
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
-                            final TemplateManager templateManager, final StrategyManager strategyManager,
+                            final TemplateManager templateManager,
                             final SecureEnvironmentManager secureEnvironmentManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( templateManager );
-        Preconditions.checkNotNull( strategyManager );
 
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.templateManager = templateManager;
-        this.strategyManager = strategyManager;
         this.secureEnvironmentManager = secureEnvironmentManager;
     }
 
@@ -214,23 +207,18 @@ public class RestServiceImpl implements RestService
 
             checkName( name );
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
+            List<NodeSchemaDto> nodes = parseNodes( topologyJson );
 
-            List<NodeSchemaDto> schemaDto = parseNodes( topologyJson );
+            Topology topology = new Topology( name );
 
-            List<NodeSchema> schema = new ArrayList<>();
-            for ( NodeSchemaDto dto : schemaDto )
+            distribute( nodes );
+
+            for ( NodeSchemaDto dto : nodes )
             {
-                NodeSchema nodeSchema =
-                        new NodeSchema( dto.getName(), dto.getQuota().getContainerQuota(), dto.getTemplateName(),
-                                dto.getTemplateId() );
-                schema.add( nodeSchema );
+                topology.addNodePlacement( dto.getPeerId(),
+                        new Node( dto.getName(), dto.getName(), dto.getQuota().getContainerQuota(), dto.getPeerId(),
+                                dto.getHostId(), dto.getTemplateId() ) );
             }
-
-            final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
-            final Map<ContainerSize, ContainerQuota> quotas = ContainerSize.getDefaultQuotas();
-
-            Topology topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
 
             EnvironmentCreationRef ref = environmentManager.createEnvironment( topology, true );
 
@@ -251,6 +239,48 @@ public class RestServiceImpl implements RestService
         }
 
         return Response.ok( JsonUtil.toJson( envCreationRef ) ).build();
+    }
+
+
+    private void distribute( final List<NodeSchemaDto> nodes )
+    {
+        //fetch online peers with connected resource hosts
+        Map<String, PeerDto> peersNHosts = getOnlinePeers();
+
+        //distribute nodes over resource hosts (round-robin)
+        Iterator<NodeSchemaDto> iterator = nodes.iterator();
+        int allocated = 0;
+        for ( Map.Entry<String, PeerDto> peerEntry : peersNHosts.entrySet() )
+        {
+            String peerId = peerEntry.getKey();
+            PeerDto peerDto = peerEntry.getValue();
+
+            for ( ResourceHostDto resourceHostDto : peerDto.getResourceHosts() )
+            {
+                if ( iterator.hasNext() )
+                {
+                    allocated++;
+                    NodeSchemaDto nodeDto = iterator.next();
+                    nodeDto.setPeerId( peerId );
+                    nodeDto.setHostId( resourceHostDto.getId() );
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if ( !iterator.hasNext() )
+            {
+                break;
+            }
+        }
+
+        //check if all nodes are allocated
+        if ( allocated < nodes.size() )
+        {
+            throw new IllegalStateException( "Not enough connected resource hosts" );
+        }
     }
 
 
@@ -334,18 +364,17 @@ public class RestServiceImpl implements RestService
         {
             String name = environmentManager.loadEnvironment( environmentId ).getName();
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
+            Topology topology = new Topology( name );
 
+            List<NodeSchemaDto> nodes = parseNodes( topologyJson );
 
-            List<NodeSchemaDto> schemaDto = parseNodes( topologyJson );
+            distribute( nodes );
 
-            List<NodeSchema> schema = new ArrayList<>();
-            for ( NodeSchemaDto dto : schemaDto )
+            for ( NodeSchemaDto dto : nodes )
             {
-                NodeSchema nodeSchema =
-                        new NodeSchema( dto.getName(), dto.getQuota().getContainerQuota(), dto.getTemplateName(),
-                                dto.getTemplateId() );
-                schema.add( nodeSchema );
+                topology.addNodePlacement( dto.getPeerId(),
+                        new Node( dto.getName(), dto.getName(), dto.getQuota().getContainerQuota(), dto.getPeerId(),
+                                dto.getHostId(), dto.getTemplateId() ) );
             }
 
 
@@ -356,15 +385,6 @@ public class RestServiceImpl implements RestService
 
             Map<String, ContainerQuota> changedContainersFiltered = getChangedContainers( quotaContainers );
 
-
-            Topology topology = null;
-            if ( !schema.isEmpty() )
-            {
-                final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
-                final Map<ContainerSize, ContainerQuota> quotas = ContainerSize.getDefaultQuotas();
-
-                topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
-            }
 
             EnvironmentCreationRef ref = environmentManager
                     .modifyEnvironment( environmentId, topology, removedContainersList, changedContainersFiltered,
@@ -914,14 +934,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Peers strategy **************************************************** */
-    @Override
-    public Response listPlacementStrategies()
-    {
-        return Response.ok( JsonUtil.toJson( strategyManager.getPlacementStrategyTitles() ) ).build();
-    }
-
-
     private CompletionService<Boolean> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
@@ -931,6 +943,12 @@ public class RestServiceImpl implements RestService
     /** Peers **************************************************** */
     @Override
     public Response getPeers()
+    {
+        return Response.ok().entity( JsonUtil.toJson( getOnlinePeers() ) ).build();
+    }
+
+
+    private Map<String, PeerDto> getOnlinePeers()
     {
         List<Peer> peers = peerManager.getPeers();
 
@@ -986,8 +1004,7 @@ public class RestServiceImpl implements RestService
             LOG.error( "Resource hosts are empty", e );
         }
 
-
-        return Response.ok().entity( JsonUtil.toJson( peerHostMap ) ).build();
+        return peerHostMap;
     }
 
 

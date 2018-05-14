@@ -26,7 +26,6 @@ import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.entity.PeerData;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.strategy.api.StrategyManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -49,8 +48,6 @@ public class PeerManagerImplTest
     CommandExecutor commandExecutor;
     @Mock
     LocalPeerImpl localPeer;
-    @Mock
-    StrategyManager strategyManager;
     @Mock
     PeerInfo peerInfo;
     @Mock

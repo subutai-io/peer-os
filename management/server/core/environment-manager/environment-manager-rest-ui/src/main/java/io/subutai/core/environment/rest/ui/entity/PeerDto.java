@@ -1,7 +1,9 @@
 package io.subutai.core.environment.rest.ui.entity;
 
+
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class PeerDto
 {
@@ -11,7 +13,9 @@ public class PeerDto
     private boolean isOnline;
     private boolean isLocal;
 
-    public PeerDto(String id, String name, boolean isOnline, boolean isLocal) {
+
+    public PeerDto( String id, String name, boolean isOnline, boolean isLocal )
+    {
         this.id = id;
         this.name = name;
         this.isOnline = isOnline;
@@ -19,8 +23,15 @@ public class PeerDto
         resourceHosts = new ArrayList<>();
     }
 
+
     public void addResourceHostDto( ResourceHostDto rh )
     {
         resourceHosts.add( rh );
+    }
+
+
+    public List<ResourceHostDto> getResourceHosts()
+    {
+        return resourceHosts;
     }
 }
