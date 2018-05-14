@@ -67,7 +67,6 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.resource.ByteValueResource;
@@ -127,8 +126,6 @@ public class LocalPeerImplTest
     ResourceHost managementHost;
     @Mock
     CommandExecutor commandExecutor;
-    @Mock
-    StrategyManager strategyManager;
     @Mock
     Monitor monitor;
     @Mock

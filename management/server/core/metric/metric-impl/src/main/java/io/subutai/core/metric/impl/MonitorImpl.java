@@ -285,7 +285,11 @@ public class MonitorImpl extends HostListener implements Monitor
     {
         ResourceHostMetrics result = new ResourceHostMetrics();
 
-        for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
+        Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
+
+        result.setResourceHostCount( resourceHosts.size() );
+
+        for ( ResourceHost resourceHost : resourceHosts )
         {
             final ResourceHostMetric m = getResourceHostMetric( resourceHost );
             if ( m != null )
