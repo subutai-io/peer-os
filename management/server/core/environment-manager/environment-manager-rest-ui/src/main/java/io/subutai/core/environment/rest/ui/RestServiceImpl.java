@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -248,9 +249,7 @@ public class RestServiceImpl implements RestService
         //fetch online peers with connected resource hosts
         Map<String, PeerDto> peersNHosts = getPeersNConnectedRHs();
 
-        //distribute nodes over resource hosts (round-robin)
-        Iterator<NodeSchemaDto> iterator = nodes.iterator();
-        int allocated = 0;
+        //filter peers that have ALL resource hosts connected
         for ( Map.Entry<String, PeerDto> peerEntry : peersNHosts.entrySet() )
         {
             String peerId = peerEntry.getKey();
@@ -259,35 +258,32 @@ public class RestServiceImpl implements RestService
             if ( peerDto.getRhCount() > peerDto.getResourceHosts().size() )
             {
                 LOG.warn( "Peer {} has disconnected resource hosts, skipping it", peerDto.getName() );
-                continue;
-            }
-
-            for ( ResourceHostDto resourceHostDto : peerDto.getResourceHosts() )
-            {
-                if ( iterator.hasNext() )
-                {
-                    allocated++;
-                    NodeSchemaDto nodeDto = iterator.next();
-                    nodeDto.setPeerId( peerId );
-                    nodeDto.setHostId( resourceHostDto.getId() );
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            if ( !iterator.hasNext() )
-            {
-                break;
+                peersNHosts.remove( peerId );
             }
         }
 
-        //check if all nodes are allocated
-        if ( allocated < nodes.size() )
+        //collect all available resource hosts
+        List<ResourceHostDto> resourceHosts = Lists.newArrayList();
+        for ( PeerDto peerDto : peersNHosts.values() )
+        {
+            resourceHosts.addAll( peerDto.getResourceHosts() );
+        }
+
+        //check if we have resource hosts to use
+        if ( resourceHosts.size() == 0 )
         {
             throw new IllegalStateException(
                     "Not enough connected resource hosts. All resource hosts of selected peers must be connected" );
+        }
+
+        //distribute nodes over resource hosts (round-robin)
+        //TODO here we don't check if RH can accommodate the distributed nodes
+        Iterator<ResourceHostDto> rhIterator = Iterables.cycle( resourceHosts ).iterator();
+        for ( NodeSchemaDto node : nodes )
+        {
+            ResourceHostDto rh = rhIterator.next();
+            node.setPeerId( rh.getPeerId() );
+            node.setHostId( rh.getId() );
         }
     }
 
@@ -986,7 +982,7 @@ public class RestServiceImpl implements RestService
                                             metric.getCpuModel(), metric.getUsedCpu().toString(),
                                             metric.getTotalRam().toString(), metric.getAvailableRam().toString(),
                                             metric.getTotalSpace().toString(), metric.getAvailableSpace().toString(),
-                                            metric.isManagement() ) );
+                                            metric.isManagement(), metric.getPeerId() ) );
                         }
                     }
 

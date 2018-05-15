@@ -9,9 +9,11 @@ public class PeerDto
 {
     private String id;
     private String name;
+    //contains metrics of CONNECTED resource hosts
     private List<ResourceHostDto> resourceHosts;
     private boolean isOnline;
     private boolean isLocal;
+    //contains count of ALL resource hosts
     private int rhCount;
 
 
