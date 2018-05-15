@@ -4,7 +4,6 @@ package io.subutai.core.registration.api.service;
 import java.util.Set;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInterface;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 
 

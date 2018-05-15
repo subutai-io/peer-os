@@ -28,7 +28,7 @@
             </div>
           </td>
           <td><span tooltips
-                    tooltip-template='<span class="b-nowrap">ID: {{ rh.id }}</span><br/><span class="b-nowrap">IP: {{ rh.ip }}</span>'
+                    tooltip-template='<span class="b-nowrap">ID: {{ rh.id }}</span><br/><span class="b-nowrap">IP: {{ rh.ip }}</span><br/><span class="b-nowrap">Version: {{ rh.version }}</span>'
                     tooltip-side="right">
             {{ rh.hostname }}
             </span>
@@ -44,7 +44,8 @@
             <span ng-if="rh.isManagement"> [ Management ]</span>
           </td>
           <td>
-            <button ng-if="rh.isConnected" class="b-btn b-btn_blue" ng-click="nodeRegCtrl.update( rh.id )">Update</button>
+            <button ng-if="rh.isConnected" class="b-btn b-btn_blue" ng-click="nodeRegCtrl.update( rh.id )">Update
+            </button>
             <button ng-if="rh.status == 'REQUESTED'" class="b-btn b-btn_green"
                     ng-click="nodeRegCtrl.approve( rh.id )">Approve
             </button>
