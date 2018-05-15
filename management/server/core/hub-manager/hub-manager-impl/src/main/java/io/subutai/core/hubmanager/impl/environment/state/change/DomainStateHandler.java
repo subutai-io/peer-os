@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
@@ -108,10 +109,10 @@ public class DomainStateHandler extends StateHandler
                                         ResourceHost resourceHost =
                                                 ctx.localPeer.getResourceHostByContainerId( nodeDto.getContainerId() );
 
-                                        CommandResult commandResult = TunnelHelper.execute( resourceHost,
-                                                format( TunnelProcessor.CREATE_TUNNEL_COMMAND, ip, port, "" ) );
+                                        CommandResult commandResult = resourceHost.execute( new RequestBuilder(
+                                                format( TunnelProcessor.CREATE_TUNNEL_COMMAND, ip, port, "" ) ) );
                                         TunnelInfoDto tunnelInfoDto = TunnelHelper
-                                                .parseResult(  commandResult.getStdOut(), new TunnelInfoDto() );
+                                                .parseResult( commandResult.getStdOut(), new TunnelInfoDto() );
                                         JSONObject ipPort = new JSONObject();
                                         ipPort.put( "ip", tunnelInfoDto.getOpenedIp() );
                                         ipPort.put( "port", tunnelInfoDto.getOpenedPort().replaceAll( "\n", "" ) );

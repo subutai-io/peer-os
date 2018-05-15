@@ -4,7 +4,6 @@ package io.subutai.core.hubmanager.impl.tunnel;
 import java.util.Map;
 import java.util.TreeMap;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +11,9 @@ import org.apache.http.HttpStatus;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubRequester;
@@ -66,7 +67,7 @@ public class TunnelEventProcessor extends HubRequester
             ResourceHost resourceHost = peerManager.getLocalPeer().getManagementHost();
 
             CommandResult result =
-                    TunnelHelper.execute( resourceHost, format( TUNNEL_LIST_CMD, "10.10.10.1", "8443" ) );
+                    resourceHost.execute( new RequestBuilder( format( TUNNEL_LIST_CMD, "10.10.10.1", "8443" ) ) );
 
             Preconditions.checkNotNull( result );
 
@@ -104,16 +105,16 @@ public class TunnelEventProcessor extends HubRequester
     }
 
 
-    private void checkTunnelStateHub( ResourceHost resourceHost )
+    private void checkTunnelStateHub( ResourceHost resourceHost ) throws CommandException
     {
         TunnelInfoDto tunnelInfoDto = TunnelHelper
                 .getPeerTunnelState( format( REST_GET_TUNNEL_DATA_URL, configManager.getPeerId() ), restClient );
 
         if ( tunnelInfoDto != null && tunnelInfoDto.getTunnelStatus().equals( READY ) )
         {
-            CommandResult resultIpPort = TunnelHelper.execute( resourceHost,
+            CommandResult resultIpPort = resourceHost.execute( new RequestBuilder(
                     format( TunnelProcessor.CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
-                            "" ) );
+                            "" ) ) );
 
             Preconditions.checkNotNull( resultIpPort );
 
