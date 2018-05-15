@@ -18,13 +18,13 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
+import io.subutai.core.hubmanager.impl.util.Utils;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
@@ -135,7 +135,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
     private void fileManipulation( ContainerHost sourceContainer, String cmd )
     {
-        if ( isChConnected( sourceContainer ) )
+        if ( Utils.waitTillConnects( sourceContainer, 5 ) )
         {
             try
             {
@@ -155,7 +155,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
         CommandResult res;
         try
         {
-            if ( isChConnected( sourceContainer ) )
+            if ( Utils.waitTillConnects( sourceContainer, 5 ) )
             {
                 res = sourceContainer.execute( new RequestBuilder( cmd ).withTimeout( timeout ) );
 
@@ -174,28 +174,6 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
         {
             log.error( e.getMessage() );
         }
-    }
-
-
-    private boolean isChConnected( ContainerHost ch )
-    {
-        boolean exec = true;
-        int tryCount = 0;
-
-        while ( exec )
-        {
-            tryCount++;
-            exec = tryCount <= 3;
-
-            if ( !ch.isConnected() )
-            {
-                return true;
-            }
-
-            TaskUtil.sleep( 5000 );
-        }
-
-        return true;
     }
 
 

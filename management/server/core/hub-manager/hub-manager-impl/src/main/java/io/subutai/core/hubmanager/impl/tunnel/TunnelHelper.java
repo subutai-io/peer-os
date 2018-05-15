@@ -3,7 +3,6 @@ package io.subutai.core.hubmanager.impl.tunnel;
 
 import java.util.Set;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.hub.share.common.util.DtoConverter;
@@ -35,37 +33,6 @@ public class TunnelHelper
     private TunnelHelper()
     {
         throw new IllegalAccessError( "Utility class" );
-    }
-
-
-    public static CommandResult execute( ResourceHost resourceHost, String cmd )
-    {
-        boolean exec = true;
-        int tryCount = 0;
-        CommandResult result = null;
-        while ( exec )
-        {
-            tryCount++;
-            exec = tryCount <= 3;
-            try
-            {
-                result = resourceHost.execute( new RequestBuilder( cmd ) );
-
-                if ( result.hasSucceeded() )
-                {
-                    exec = false;
-                    break;
-                }
-            }
-            catch ( CommandException e )
-            {
-                LOG.error( e.getMessage() );
-            }
-
-            TaskUtil.sleep( 5000 );
-        }
-
-        return result;
     }
 
 
@@ -142,17 +109,23 @@ public class TunnelHelper
     public static void deleteAllTunnelsForIp( final Set<ResourceHost> resourceHosts, final String ip )
     {
 
-        ResourceHost resourceHost = resourceHosts.iterator().next();
-
-        CommandResult result = execute( resourceHost, String.format( GET_OPENED_TUNNELS_FOR_IP_COMMAND, ip ) );
-
-        if ( result != null )
+        for ( ResourceHost resourceHost : resourceHosts )
         {
-            String[] data = result.getStdOut().split( "\n" );
-
-            for ( String tunnel : data )
+            try
             {
-                execute( resourceHost, String.format( DELETE_TUNNEL_COMMAND, tunnel ) );
+                CommandResult result = resourceHost
+                        .execute( new RequestBuilder( String.format( GET_OPENED_TUNNELS_FOR_IP_COMMAND, ip ) ) );
+
+                String[] data = result.getStdOut().split( "\n" );
+
+                for ( String tunnel : data )
+                {
+                    resourceHost.execute( new RequestBuilder( String.format( DELETE_TUNNEL_COMMAND, tunnel ) ) );
+                }
+            }
+            catch ( CommandException e )
+            {
+                LOG.error( e.getMessage() );
             }
         }
     }

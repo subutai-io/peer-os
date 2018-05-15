@@ -19,7 +19,7 @@ import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.util.TaskUtil;
+import io.subutai.core.hubmanager.impl.util.Utils;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.AppScaleConfigDto;
 
@@ -163,7 +163,7 @@ public class AppScaleManager
 
     private void execute( ContainerHost ch, String command ) throws CommandException
     {
-        if ( isChConnected( ch ) )
+        if ( Utils.waitTillConnects( ch, 5 ) )
         {
             CommandResult result = ch.execute( new RequestBuilder( command ).withTimeout( 10000 ) );
 
@@ -172,28 +172,6 @@ public class AppScaleManager
                 throw new CommandException( format( "Error to execute command: %s. %s", command, result.getStdErr() ) );
             }
         }
-    }
-
-
-    private boolean isChConnected( final ContainerHost ch )
-    {
-        boolean exec = true;
-        int tryCount = 0;
-
-        while ( exec )
-        {
-            tryCount++;
-            exec = tryCount <= 3;
-
-            if ( !ch.isConnected() )
-            {
-                return true;
-            }
-
-            TaskUtil.sleep( 5000 );
-        }
-
-        return true;
     }
 
 
