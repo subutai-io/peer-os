@@ -37,6 +37,8 @@ public class RequestedHostJson implements RequestedHost
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
     @Expose
     private String ip;
+    @Expose
+    private String version;
 
 
     public RequestedHostJson( RequestedHost requestedHost )
@@ -132,6 +134,12 @@ public class RequestedHostJson implements RequestedHost
     public String getSecret()
     {
         return secret;
+    }
+
+
+    public void setVersion( final String rhVersion )
+    {
+        this.version = rhVersion;
     }
 
 

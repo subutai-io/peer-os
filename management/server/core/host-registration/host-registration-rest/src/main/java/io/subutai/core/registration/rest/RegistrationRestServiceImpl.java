@@ -237,6 +237,8 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
                     requestedHostJson.setConnected( resourceHost.isConnected() );
 
                     requestedHostJson.setIp( resourceHost.getAddress() );
+
+                    requestedHostJson.setVersion( resourceHost.getRhVersion() );
                 }
                 catch ( HostNotFoundException e )
                 {

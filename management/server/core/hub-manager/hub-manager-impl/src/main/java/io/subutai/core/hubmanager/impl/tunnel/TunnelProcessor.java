@@ -12,7 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
@@ -111,29 +111,26 @@ public class TunnelProcessor implements StateLinkProcessor
 
     private void deleteTunnel( final String stateLink, final TunnelInfoDto tunnelInfoDto )
     {
-        ResourceHost resourceHost = null;
         try
         {
-            resourceHost = peerManager.getLocalPeer().getManagementHost();
+            ResourceHost resourceHost = peerManager.getLocalPeer().getManagementHost();
+
+            CommandResult result = resourceHost.execute( new RequestBuilder(
+                    format( DELETE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen() ) ) );
+
+            if ( !result.hasSucceeded() )
+            {
+                String errorLog = "Executed: " + format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(),
+                        tunnelInfoDto.getPortToOpen(), getTunnelLifetime( tunnelInfoDto ) ) + " |  Result: " + result
+                        .getStdErr();
+
+                TunnelHelper.sendError( stateLink, errorLog, restClient );
+            }
         }
-        catch ( HostNotFoundException e )
+        catch ( Exception e )
         {
             TunnelHelper.sendError( stateLink, e.getMessage(), restClient );
             log.error( e.getMessage() );
-        }
-
-        CommandResult result = TunnelHelper.execute( resourceHost,
-                format( DELETE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen() ) );
-
-        Preconditions.checkNotNull( result );
-
-        if ( !result.hasSucceeded() )
-        {
-            String errorLog =
-                    "Executed: " + format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
-                            getTunnelLifetime( tunnelInfoDto ) ) + " |  Result: " + result.getStdErr();
-
-            TunnelHelper.sendError( stateLink, errorLog, restClient );
         }
     }
 
@@ -153,14 +150,15 @@ public class TunnelProcessor implements StateLinkProcessor
 
             String tunnelLifeTime = getTunnelLifetime( tunnelInfoDto );
 
-            CommandResult result =
-                    getOpenedTunnelData( resourceHost, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen() );
+            CommandResult result = resourceHost.execute( new RequestBuilder(
+                    format( TunnelEventProcessor.TUNNEL_LIST_CMD, tunnelInfoDto.getIp(),
+                            tunnelInfoDto.getPortToOpen() ) ) );
 
-            if ( result == null )
+            if ( !result.hasSucceeded() )
             {
-                result = TunnelHelper.execute( resourceHost,
+                result = resourceHost.execute( new RequestBuilder(
                         format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
-                                tunnelLifeTime ) );
+                                tunnelLifeTime ) ) );
             }
 
             parseResult( stateLink, result, tunnelInfoDto, tunnelLifeTime );
@@ -170,22 +168,6 @@ public class TunnelProcessor implements StateLinkProcessor
             log.error( e.getMessage() );
             TunnelHelper.sendError( stateLink, e.getMessage(), restClient );
         }
-    }
-
-
-    private CommandResult getOpenedTunnelData( ResourceHost resourceHost, String ip, String port )
-    {
-        CommandResult result =
-                TunnelHelper.execute( resourceHost, format( TunnelEventProcessor.TUNNEL_LIST_CMD, ip, port ) );
-
-        Preconditions.checkNotNull( result );
-
-        if ( !result.hasSucceeded() )
-        {
-            return null;
-        }
-
-        return result;
     }
 
 

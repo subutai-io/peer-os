@@ -90,6 +90,18 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
                         requestDataService.remove( requestedHost.getId() );
                     }
                 }
+
+                for ( ContainerTokenImpl containerToken : containerTokenDataService.getAll() )
+                {
+                    if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System
+                            .currentTimeMillis() )
+                    {
+                        LOG.warn( "Deleting expired container token {} : {}", containerToken.getToken(),
+                                containerToken.getHostId() );
+
+                        containerTokenDataService.remove( containerToken.getToken() );
+                    }
+                }
             }
         }, 3, 30, TimeUnit.MINUTES );
     }
