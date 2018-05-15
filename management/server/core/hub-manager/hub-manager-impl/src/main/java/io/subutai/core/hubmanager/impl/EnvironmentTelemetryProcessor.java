@@ -135,7 +135,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
     private void fileManipulation( ContainerHost sourceContainer, String cmd )
     {
-        if ( Utils.waitTillConnects( sourceContainer, 5 ) )
+        if ( Utils.waitTillConnects( sourceContainer, 15 ) )
         {
             try
             {
@@ -155,7 +155,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
         CommandResult res;
         try
         {
-            if ( Utils.waitTillConnects( sourceContainer, 5 ) )
+            if ( Utils.waitTillConnects( sourceContainer, 15 ) )
             {
                 res = sourceContainer.execute( new RequestBuilder( cmd ).withTimeout( timeout ) );
 

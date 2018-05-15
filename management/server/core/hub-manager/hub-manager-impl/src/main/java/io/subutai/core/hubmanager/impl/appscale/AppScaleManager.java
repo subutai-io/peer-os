@@ -163,7 +163,7 @@ public class AppScaleManager
 
     private void execute( ContainerHost ch, String command ) throws CommandException
     {
-        if ( Utils.waitTillConnects( ch, 5 ) )
+        if ( Utils.waitTillConnects( ch, 15 ) )
         {
             CommandResult result = ch.execute( new RequestBuilder( command ).withTimeout( 10000 ) );
 
