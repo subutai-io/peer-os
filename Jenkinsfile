@@ -97,6 +97,7 @@ node() {
             sh """
 			set +x
 			echo "${debFileName}"
+            echo "${workspace} ------------------------------------------------------"
             ssh admin@${env.peer_os_builder} <<- EOF
 			set -e
 			
