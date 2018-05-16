@@ -35,7 +35,7 @@ node() {
         checkout scm
         def artifactVersion = getVersion("management/pom.xml")
         //def debversion = getVersion("management/server/server-karaf/pom.xml")
-        String debFileName = "management-${env.BRANCH_NAME}.deb"
+//        String debFileName = "management-${env.BRANCH_NAME}.deb"
         
         String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 
@@ -69,7 +69,6 @@ node() {
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
-		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
         find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}
 	    """
         def debFileName2 = sh(script: """
@@ -104,7 +103,7 @@ node() {
 			sudo subutai import debian-stretch
 			sudo subutai clone debian-stretch management
 			/bin/sleep 20
-			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/lib/subutai/lxc/management/rootfs/tmp/
+			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins/${workspace}/${debFileName2} /var/lib/subutai/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
             sudo cp /opt/key/cdn-pub.key /var/lib/subutai/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
@@ -114,7 +113,7 @@ node() {
 			sudo subutai attach management "sync"
 			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
 			sudo subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
-			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
+			sudo subutai attach management "dpkg -i /tmp/${debFileName2}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
 			sudo subutai attach management "apt-get clean"
@@ -123,7 +122,7 @@ node() {
             sudo subutai attach management "sed -i "/delaycompress/d" /etc/logrotate.d/rsyslog"
             sudo subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
-  			sudo rm /var/lib/subutai/lxc/management/rootfs/tmp/${debFileName}
+  			sudo rm /var/lib/subutai/lxc/management/rootfs/tmp/${debFileName2}
             echo "Using CDN token ${token}"  
             sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/subutai/agent.gcfg
             sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/lib/subutai/agent.gcfg
@@ -152,7 +151,7 @@ node() {
             // upload deb
             String responseDeb = sh(script: """
 			set +x
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/apt/info?name=${debFileName}
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/apt/info?name=${debFileName2}
 			""", returnStdout: true)
             
             sh """
