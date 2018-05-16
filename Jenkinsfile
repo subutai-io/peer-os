@@ -35,7 +35,7 @@ node() {
         checkout scm
         def artifactVersion = getVersion("management/pom.xml")
         //def debversion = getVersion("management/server/server-karaf/pom.xml")
-        //String debFileName = "management-${env.BRANCH_NAME}.deb"
+        String debFileName = "management-${env.BRANCH_NAME}.deb"
         
         String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 
@@ -69,11 +69,11 @@ node() {
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
-		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}
+		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
 	    """
-        def debFileName = sh(script: """
+        def debFileName2 = sh(script: """
             set +x
-            ls -t *.deb | head -1
+            cd ${workspace}/management/server/server-karaf/target/ && ls -t *.deb | head -1
             """, returnStdout: true)
 
         // CDN auth creadentials
@@ -105,7 +105,7 @@ node() {
 			sudo subutai import debian-stretch
 			sudo subutai clone debian-stretch management
 			/bin/sleep 20
-			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/subutai/lxc/management/rootfs/tmp/
+			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins/${workspace}/${debFileName} /var/lib/subutai/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
             sudo cp /opt/key/cdn-pub.key /var/lib/subutai/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
@@ -157,13 +157,13 @@ node() {
 			""", returnStdout: true)
             
             sh """
-            echo "Uploading file ${debFileName}"
+            echo "Uploading file ${debFileName2}"
             """
 
             sh """
 			set +x
-            echo "${token} and ${cdnHost} and ${debFileName}"
-			curl -sk -H "token: ${token}" -Ffile=@${debFileName} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
+            echo "${token} and ${cdnHost} and ${debFileName2}"
+			curl -sk -H "token: ${token}" -Ffile=@${debFileName2} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
             """
             sh """
 			set +x
