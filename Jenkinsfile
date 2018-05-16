@@ -37,7 +37,7 @@ node() {
         //String debFileName = "management-${env.BRANCH_NAME}.deb"
         String debFileName = sh(script: """
 			set +x
-            ls -t ${workspace}/management/server/server-karaf/target/management-*.deb | head -1
+            cd ${workspace}/management/server/server-karaf/target/ && ls -t *.deb | head -1
 			""", returnStdout: true)
             
         String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
