@@ -149,6 +149,11 @@ node() {
 			set +x
 			curl -s -k https://${cdnHost}:8338/kurjun/rest/apt/info?name=${debFileName}
 			""", returnStdout: true)
+            
+            sh """
+            echo "Uploading file ${debFileName}"
+            """
+
             sh """
 			set +x
             echo "${token} and ${cdnHost} and ${debFileName}"
