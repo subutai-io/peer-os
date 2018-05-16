@@ -34,8 +34,9 @@ node() {
 
         checkout scm
         def artifactVersion = getVersion("management/pom.xml")
-        def debversion = getVersion("management/server/server-karaf/pom.xml")
-        String debFileName = "management-${env.BRANCH_NAME}-${debversion}.deb"
+        //def debversion = getVersion("management/server/server-karaf/pom.xml")
+        //String debFileName = "management-${env.BRANCH_NAME}.deb"
+        
         String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 
         commitId = sh(script: "git rev-parse HEAD", returnStdout: true)
@@ -68,9 +69,13 @@ node() {
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
-		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}/${debFileName}
+		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}
 	    """
-
+        String debFileName = sh)script: """
+        set +x
+        ls -t *.deb | head -1
+        """, returnStdout: true)
+        
         // CDN auth creadentials
         String user = "jenkins"
         def authID = sh(script: """
