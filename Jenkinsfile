@@ -36,7 +36,7 @@ node() {
         def artifactVersion = getVersion("management/pom.xml")
         //def debversion = getVersion("management/server/server-karaf/pom.xml")
 //        String debFileName = "management-${env.BRANCH_NAME}.deb"
-        
+
         String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 
         commitId = sh(script: "git rev-parse HEAD", returnStdout: true)
@@ -76,6 +76,11 @@ node() {
             ls -t *all.deb | head -1
             """, returnStdout: true)
 
+        sh """
+        set +x
+        scp ${workspace}/${debFileName2} admin@${env.peer_os_builder}:/tmp
+        """
+
         // CDN auth creadentials
         String user = "jenkins"
         def authID = sh(script: """
@@ -86,7 +91,7 @@ node() {
 			set +x
 			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
-        
+
         stage("Build management template")
         notifyBuildDetails = "\nFailed Step - Build management template"
 
@@ -103,7 +108,7 @@ node() {
 			sudo subutai import debian-stretch
 			sudo subutai clone debian-stretch management
 			/bin/sleep 20
-			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins/${workspace}/${debFileName2} /var/lib/subutai/lxc/management/rootfs/tmp/
+			cp /tmp/${debFileName2} /var/lib/subutai/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
             sudo cp /opt/key/cdn-pub.key /var/lib/subutai/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
@@ -134,7 +139,9 @@ node() {
         // upload template to jenkins master node
         sh """
         set +x
-        scp admin@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
+        scp admin@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${
+            env.BRANCH_NAME
+        }_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
         stash includes: "management-*.deb", name: 'deb'
@@ -144,7 +151,7 @@ node() {
             stage("Upload to CDN")
             notifyBuildDetails = "\nFailed Step - Upload to CDN"
             deleteDir()
-            
+
             unstash 'deb'
             unstash 'template'
             // upload artifacts on cdn
@@ -153,7 +160,7 @@ node() {
 			set +x
 			curl -s -k https://${cdnHost}:8338/kurjun/rest/apt/info?name=${debFileName2}
 			""", returnStdout: true)
-            
+
             sh """
             echo "Uploading file ${debFileName2}"
             """
@@ -198,7 +205,9 @@ node() {
                 def jsonTemplate = jsonParse(responseTemplate)
                 sh """
 				set +xe
-				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
+				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${
+                    jsonTemplate[0]["id"]
+                }'&'token=${token}
 			"""
             }
         }
