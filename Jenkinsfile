@@ -71,8 +71,9 @@ node() {
 		fi		
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}
 	    """
-        String debFileName = sh(script: """
+        def debFileName = sh(script: """
             set +x
+            echo "${workspace}"
             ls -t *.deb | head -1
             """, returnStdout: true)
 
