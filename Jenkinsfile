@@ -24,7 +24,7 @@ node() {
     // Send job started notifications
     try {
         notifyBuild('STARTED')
-
+        deleteDir()
         def mvnHome = tool 'M3'
         def workspace = pwd()
 
@@ -96,8 +96,6 @@ node() {
             // create management template
             sh """
 			set +x
-			echo "${debFileName}"
-            echo "${workspace} ------------------------------------------------------"
             ssh admin@${env.peer_os_builder} <<- EOF
 			set -e
 			
@@ -163,7 +161,8 @@ node() {
             sh """
 			set +x
             echo "${token} and ${cdnHost} and ${debFileName2}"
-			curl -sk -H "token: ${token}" -Ffile=@${debFileName2} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
+			cd ${workspace}/management/server/server-karaf/target/
+            curl -sk -H "token: ${token}" -Ffile=@${debFileName2} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
             """
             sh """
 			set +x
