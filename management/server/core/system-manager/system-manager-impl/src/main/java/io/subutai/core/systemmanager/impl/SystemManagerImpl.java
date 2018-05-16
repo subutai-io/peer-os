@@ -244,7 +244,7 @@ public class SystemManagerImpl implements SystemManager
                             ( int ) TimeUnit.MINUTES.toSeconds(
                                     Common.MH_UPDATE_CHECK_TIMEOUT_MIN + Common.RH_UPDATE_CHECK_TIMEOUT_MIN ) ) );
 
-            if ( result.hasSucceeded() )
+            if ( result.getStdOut().contains( "Update is available" ) )
             {
                 info.setUpdatesAvailable( true );
             }
@@ -297,7 +297,9 @@ public class SystemManagerImpl implements SystemManager
             CommandResult result = host.execute( new RequestBuilder( "subutai update management" )
                     .withTimeout( ( int ) TimeUnit.MINUTES.toSeconds( Common.MH_UPDATE_TIMEOUT_MIN ) ) );
 
-            if ( result.hasSucceeded() || rhUpdated )
+            boolean mhUpdated = !result.getStdOut().contains( "No update is available" ) && result.hasSucceeded();
+
+            if ( mhUpdated || rhUpdated )
             {
                 updateEntity.setCurrentVersion( "No change" );
 
@@ -310,7 +312,7 @@ public class SystemManagerImpl implements SystemManager
                 updateDao.remove( updateEntity.getId() );
             }
 
-            return result.hasSucceeded();
+            return mhUpdated;
         }
         catch ( Exception e )
         {
