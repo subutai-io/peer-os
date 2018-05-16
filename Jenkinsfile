@@ -73,7 +73,6 @@ node() {
 	    """
         def debFileName = sh(script: """
             set +x
-            echo "${workspace}"
             ls -t *.deb | head -1
             """, returnStdout: true)
 
@@ -97,7 +96,8 @@ node() {
             // create management template
             sh """
 			set +x
-			ssh admin@${env.peer_os_builder} <<- EOF
+			echo "${debFileName}"
+            ssh admin@${env.peer_os_builder} <<- EOF
 			set -e
 			
 			sudo subutai destroy management
