@@ -70,10 +70,11 @@ node() {
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
+        find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}
 	    """
         def debFileName2 = sh(script: """
             set +x
-            cd ${workspace}/management/server/server-karaf/target/ && ls -t *.deb | head -1
+            ls -t *all.deb | head -1
             """, returnStdout: true)
 
         // CDN auth creadentials
@@ -161,8 +162,7 @@ node() {
             sh """
 			set +x
             echo "${token} and ${cdnHost} and ${debFileName2}"
-			cd ${workspace}/management/server/server-karaf/target/
-            curl -sk -H "token: ${token}" -Ffile=@${debFileName2} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
+			curl -sk -H "token: ${token}" -Ffile=@${debFileName2} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
             """
             sh """
 			set +x
