@@ -76,8 +76,11 @@ node() {
             ls -t *all.deb | head -1
             """, returnStdout: true)
 
+        echo "${debFileName2}"
+
         sh """
         set +x
+        ls ${workspace}/*.deb
         scp ${workspace}/${debFileName2} admin@${env.peer_os_builder}:/tmp
         """
 
