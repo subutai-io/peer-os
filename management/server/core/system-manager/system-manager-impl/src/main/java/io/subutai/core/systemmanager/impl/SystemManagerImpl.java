@@ -240,7 +240,7 @@ public class SystemManagerImpl implements SystemManager
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
             CommandResult result = host.execute(
-                    new RequestBuilder( "subutai update management -c || subutai update rh -c" ).withTimeout(
+                    new RequestBuilder( "subutai update management -c ; subutai update rh -c" ).withTimeout(
                             ( int ) TimeUnit.MINUTES.toSeconds(
                                     Common.MH_UPDATE_CHECK_TIMEOUT_MIN + Common.RH_UPDATE_CHECK_TIMEOUT_MIN ) ) );
 
