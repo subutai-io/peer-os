@@ -71,11 +71,11 @@ node() {
 		fi		
 		find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} mv {} ${workspace}
 	    """
-        String debFileName = sh)script: """
-        set +x
-        ls -t *.deb | head -1
-        """, returnStdout: true)
-        
+        String debFileName = sh(script: """
+            set +x
+            ls -t *.deb | head -1
+            """, returnStdout: true)
+
         // CDN auth creadentials
         String user = "jenkins"
         def authID = sh(script: """
