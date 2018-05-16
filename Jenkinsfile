@@ -77,6 +77,7 @@ node() {
             """, returnStdout: true)
 
         echo "${debFileName2}"
+        echo "${env.peer_os_builder}"
 
         sh """
         set +x
