@@ -69,7 +69,7 @@ node() {
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
-        find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}
+        find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} /tmp
 	    """
         def debFileName2 = sh(script: """
             set +x
@@ -81,8 +81,7 @@ node() {
 
         sh """
         set +x
-        ls ${workspace}/*.deb
-        scp ${workspace}/${debFileName2} admin@${env.peer_os_builder}:/tmp
+        scp /tmp/${debFileName2} admin@${env.peer_os_builder}:/tmp
         """
 
         // CDN auth creadentials
