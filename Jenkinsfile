@@ -69,20 +69,13 @@ node() {
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
-        find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} /tmp
+        find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} scp {} ${workspace}
+        find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} scp {} admin@${env.peer_os_builder}:/tmp
 	    """
         def debFileName2 = sh(script: """
             set +x
             ls -t *all.deb | head -1
             """, returnStdout: true)
-
-        echo "${debFileName2}"
-        echo "${env.peer_os_builder}"
-
-        sh """
-        set +x
-        scp /tmp/${debFileName2} admin@${env.peer_os_builder}:/tmp
-        """
 
         // CDN auth creadentials
         String user = "jenkins"
