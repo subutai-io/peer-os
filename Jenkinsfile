@@ -34,12 +34,8 @@ node() {
 
         checkout scm
         def artifactVersion = getVersion("management/pom.xml")
-        //String debFileName = "management-${env.BRANCH_NAME}.deb"
-        String debFileName = sh(script: """
-			set +x
-            cd ${workspace}/management/server/server-karaf/target/ && ls -t *.deb | head -1
-			""", returnStdout: true)
-            
+        def debversion = getVersion("management/server/server-karaf/pom.xml")
+        String debFileName = "management-${env.BRANCH_NAME}-${debversion}.deb"
         String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 
         commitId = sh(script: "git rev-parse HEAD", returnStdout: true)
