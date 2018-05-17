@@ -116,11 +116,14 @@ public class TunnelHelper
                 CommandResult result = resourceHost
                         .execute( new RequestBuilder( String.format( GET_OPENED_TUNNELS_FOR_IP_COMMAND, ip ) ) );
 
-                String[] data = result.getStdOut().split( "\n" );
-
-                for ( String tunnel : data )
+                if ( result.hasSucceeded() )
                 {
-                    resourceHost.execute( new RequestBuilder( String.format( DELETE_TUNNEL_COMMAND, tunnel ) ) );
+                    String[] data = result.getStdOut().split( "\n" );
+
+                    for ( String tunnel : data )
+                    {
+                        resourceHost.execute( new RequestBuilder( String.format( DELETE_TUNNEL_COMMAND, tunnel ) ) );
+                    }
                 }
             }
             catch ( CommandException e )
