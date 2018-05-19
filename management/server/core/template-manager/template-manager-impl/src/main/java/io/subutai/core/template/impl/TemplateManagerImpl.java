@@ -247,7 +247,8 @@ public class TemplateManagerImpl implements TemplateManager
 
         for ( Template template : getTemplates() )
         {
-            if ( template.getOwners().contains( owner.toLowerCase() ) )
+            if ( !CollectionUtil.isCollectionEmpty( template.getOwners() ) && template.getOwners()
+                                                                                      .contains( owner.toLowerCase() ) )
             {
                 templates.add( template );
             }
@@ -268,8 +269,7 @@ public class TemplateManagerImpl implements TemplateManager
         }
         catch ( Exception e )
         {
-            LOG.error( "Error getting verified template by name {} from Kurjun: {}", templateName,
-                    e.getMessage() );
+            LOG.error( "Error getting verified template by name {} from Kurjun: {}", templateName, e.getMessage() );
 
             return null;
         }
