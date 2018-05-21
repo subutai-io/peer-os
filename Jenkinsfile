@@ -99,14 +99,18 @@ node() {
 			/bin/sleep 20
 			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/subutai/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
+			if [ \$? -eq 0 ]; then exit 1 ;fi
             sudo cp /opt/key/cdn-pub.key /var/lib/subutai/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
             sudo subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
 			sudo subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
             sudo subutai attach management "apt-get update"
+            if [ \$? -eq 0 ]; then exit 1 ;fi
 			sudo subutai attach management "sync"
 			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
+			if [ \$? -eq 0 ]; then exit 1 ;fi
 			sudo subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+            if [ \$? -eq 0 ]; then exit 1 ;fi
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
