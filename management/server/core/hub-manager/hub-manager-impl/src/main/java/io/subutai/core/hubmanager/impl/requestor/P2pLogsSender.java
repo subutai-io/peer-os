@@ -98,7 +98,6 @@ public class P2pLogsSender extends HubRequester
                 dto.setP2pVersion( info.getP2pVersion() );
                 dto.setP2pStatus( info.getP2pStatus() );
                 dto.setState( info.getState() );
-                dto.setP2pSystemLogs( info.getP2pSystemLogs() );
 
                 p2pList.add( dto );
             }

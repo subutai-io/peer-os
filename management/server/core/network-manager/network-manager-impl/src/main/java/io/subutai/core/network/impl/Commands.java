@@ -1,15 +1,12 @@
 package io.subutai.core.network.impl;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.Protocol;
@@ -27,8 +24,6 @@ public class Commands
     private static final String PROXY_BINDING = "subutai proxy";
     private static final String INFO_BINDING = "subutai info";
     private static final String MAP_BINDING = "subutai map";
-    private static final String LOG_BINDING = "subutai log";
-    private final SimpleDateFormat p2pDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
     private static final String NETWORK_IFACE_REMOVAL = "ip link delete";
 
@@ -59,9 +54,10 @@ public class Commands
                         String.valueOf( secretKeyTtlSec ), "-ip", localIp, "-ports", portRange ).withTimeout( 90 );
     }
 
-    RequestBuilder getP2pStatusBySwarm ( String p2pHash )
+
+    RequestBuilder getP2pStatusBySwarm( String p2pHash )
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs("status", "-hash", p2pHash);
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "status", "-hash", p2pHash );
     }
 
 
@@ -96,21 +92,6 @@ public class Commands
     RequestBuilder getRemoveP2PIfaceCommand( String interfaceName )
     {
         return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName ).withTimeout( 90 );
-    }
-
-
-    RequestBuilder getGetP2pLogsCommand( Date from, Date till, LogLevel logLevel )
-    {
-        List<String> args =
-                Lists.newArrayList( "p2p", "-s", p2pDateFormat.format( from ), "-e", p2pDateFormat.format( till ) );
-
-        if ( logLevel != LogLevel.ALL )
-        {
-            args.add( "-l" );
-            args.add( logLevel.getCliParam() );
-        }
-
-        return new RequestBuilder( LOG_BINDING ).withCmdArgs( args.toArray( new String[args.size()] ) );
     }
 
 
