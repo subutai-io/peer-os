@@ -88,7 +88,7 @@ node() {
         lock('peer_os_builder') {
 
             // create management template
-            sh """
+            def exitCode = sh (script: """
 			set +x
             ssh admin@${env.peer_os_builder} <<- EOF
 			set -e
@@ -123,7 +123,10 @@ node() {
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
-			EOF"""
+			EOF""",returnStatus:true)
+        }
+        if (status != 0) {
+            error "Failed to build management template"
         }
         // upload template to jenkins master node
         sh """
