@@ -88,7 +88,7 @@ node() {
         lock('peer_os_builder') {
 
             // create management template
-            def exitCode = sh (script: """
+            sh """
 			set +x
             ssh admin@${env.peer_os_builder} <<- EOF
 			set -e
@@ -98,19 +98,15 @@ node() {
 			sudo subutai clone debian-stretch management
 			/bin/sleep 20
 			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/subutai/lxc/management/rootfs/tmp/
-            ec=\$(subutai attach management "\$(apt-get update && apt-get install dirmngr -y)  echo \$? ")
-            if [ ec -ne 0 ]; then echo ec; exit 1 ;fi
+			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
             sudo cp /opt/key/cdn-pub.key /var/lib/subutai/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
             sudo subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
 			sudo subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
             sudo subutai attach management "apt-get update"
-            
 			sudo subutai attach management "sync"
 			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
-			
 			sudo subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
-            
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
@@ -127,13 +123,8 @@ node() {
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
-			EOF""",returnStatus:true)
-
-            if (exitCode != 0) {
-                error "Failed to build management template"
-            }
+			EOF"""
         }
-
         // upload template to jenkins master node
         sh """
         set +x
