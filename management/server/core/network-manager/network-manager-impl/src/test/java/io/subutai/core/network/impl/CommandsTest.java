@@ -1,12 +1,10 @@
 package io.subutai.core.network.impl;
 
 
-import java.util.Date;
 import java.util.UUID;
 
 import org.junit.Test;
 
-import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.settings.Common;
 
@@ -59,13 +57,6 @@ public class CommandsTest
     public void testGetResetP2PSecretKey() throws Exception
     {
         assertNotNull( commands.getResetP2PSecretKey( P2P_HASH, SECRET_KEY, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
-    }
-
-
-    @Test
-    public void testGetGetP2pLogsCommand() throws Exception
-    {
-        assertNotNull( commands.getGetP2pLogsCommand( new Date(), new Date(), LogLevel.ERROR ) );
     }
 
 

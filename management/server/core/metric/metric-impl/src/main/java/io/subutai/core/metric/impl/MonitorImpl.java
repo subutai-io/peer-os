@@ -485,8 +485,6 @@ public class MonitorImpl extends HostListener implements Monitor
                 info.setState( statusLines );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
-                info.setP2pSystemLogs( Lists.newArrayList(
-                        resourceHost.getP2pLogs( LogLevel.ERROR, logsStartDate, logsEndData ).getLogs() ) );
 
                 pojos.add( info );
             }

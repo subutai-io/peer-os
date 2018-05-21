@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,9 +52,7 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
-import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.EnvironmentId;
@@ -1233,24 +1230,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 return osName;
             }
-        }
-    }
-
-
-    @Override
-    public P2pLogs getP2pLogs( LogLevel logLevel, Date from, Date till ) throws ResourceHostException
-    {
-        Preconditions.checkNotNull( logLevel, "Invalid log level" );
-        Preconditions.checkNotNull( from, "Invalid from date" );
-        Preconditions.checkNotNull( till, "Invalid till date" );
-
-        try
-        {
-            return getNetworkManager().getP2pLogs( this, logLevel, from, till );
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new ResourceHostException( String.format( "Error obtaining P2P logs: %s", e.getMessage() ), e );
         }
     }
 

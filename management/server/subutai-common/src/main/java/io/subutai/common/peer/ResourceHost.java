@@ -1,7 +1,6 @@
 package io.subutai.common.peer;
 
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -9,9 +8,7 @@ import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.environment.RhTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.network.LogLevel;
 import io.subutai.common.network.NetworkResource;
-import io.subutai.common.network.P2pLogs;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
@@ -124,11 +121,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     String getP2pVersion() throws ResourceHostException;
 
-    String getP2pStatusByP2PHash ( String p2pHash ) throws ResourceHostException;
+    String getP2pStatusByP2PHash( String p2pHash ) throws ResourceHostException;
 
     String getOsName() throws ResourceHostException;
-
-    P2pLogs getP2pLogs( LogLevel logLevel, Date from, Date till ) throws ResourceHostException;
 
     void setContainerHostname( ContainerHost containerHost, String newHostname ) throws ResourceHostException;
 
