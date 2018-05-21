@@ -124,10 +124,12 @@ node() {
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
 			EOF""",returnStatus:true)
+
+            if (exitCode != 0) {
+                error "Failed to build management template"
+            }
         }
-        if (status != 0) {
-            error "Failed to build management template"
-        }
+
         // upload template to jenkins master node
         sh """
         set +x
