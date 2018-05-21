@@ -316,7 +316,7 @@
                 </goals>
                 <configuration>
                   <packageName>management-${git.branch}</packageName>
-                  <packageVersion>${project.version}-${maven.build.timestamp}</packageVersion>
+                  <packageVersion>${project.version}</packageVersion>
                   <maintainerName>Subutai</maintainerName>
                   <packageDependencies>
                     <packageDependencies>openjdk-8-jre-headless</packageDependencies>
