@@ -12,14 +12,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/p2p-logs">
-      <action class="io.subutai.core.network.cli.P2pLogsCommand">
-        <argument ref="localPeer" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/p2p-list">
       <action class="io.subutai.core.network.cli.ListP2PCommand">
         <argument ref="localPeer" />
