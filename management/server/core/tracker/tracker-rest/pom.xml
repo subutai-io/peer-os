@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>tracker-parent</artifactId>
-    <version>7.0.2</version>
+    <version>7.0.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>tracker-rest</artifactId>
