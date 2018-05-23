@@ -85,12 +85,12 @@ node() {
         notifyBuildDetails = "\nFailed Step - Build management template"
 
         // Start MNG-RH Lock
-        lock('peer_os_builder') {
+        lock('deb') {
 
             // create management template
             sh """
 			set +x
-            ssh admin@${env.peer_os_builder} <<- EOF
+            ssh admin@${env.deb} <<- EOF
 			set -e
 			
 			sudo subutai destroy management
@@ -128,9 +128,7 @@ node() {
         // upload template to jenkins master node
         sh """
         set +x
-        scp admin@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${
-            env.BRANCH_NAME
-        }_amd64.tar.gz ${workspace}
+        scp admin@${env.deb}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
         stash includes: "management-*.deb", name: 'deb'
