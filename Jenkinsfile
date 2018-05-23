@@ -99,7 +99,7 @@ node() {
 			/bin/sleep 20
 			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
-            sudo cp /opt/key/cdn-pub.key /var/lib/subutai/lxc/management/rootfs/tmp/
+            sudo cp /opt/key/cdn-pub.key /var/lib/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
             sudo subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
 			sudo subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
@@ -116,7 +116,7 @@ node() {
             sudo subutai attach management "sed -i "/delaycompress/d" /etc/logrotate.d/rsyslog"
             sudo subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
-  			sudo rm /var/lib/subutai/lxc/management/rootfs/tmp/${debFileName}
+  			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
             sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/subutai/agent.gcfg
             sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/lib/subutai/agent.gcfg
