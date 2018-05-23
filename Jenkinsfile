@@ -90,7 +90,7 @@ node() {
             // create management template
             sh """
 			set +x
-            ssh admin@${env.deb} <<- EOF
+            ssh admin@172.31.0.253 <<- EOF
 			set -e
 			
 			sudo subutai destroy management
@@ -128,7 +128,7 @@ node() {
         // upload template to jenkins master node
         sh """
         set +x
-        scp admin@${env.deb}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
+        scp admin@172.31.0.253:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
         stash includes: "management-*.deb", name: 'deb'
