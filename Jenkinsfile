@@ -92,7 +92,8 @@ node() {
 			set +x
             ssh admin@172.31.0.253 <<- EOF
 			set -e
-			
+			sudo apt update && apt upgrade -y
+            
 			sudo subutai destroy management
 			sudo subutai import debian-stretch
 			sudo subutai clone debian-stretch management
@@ -118,8 +119,7 @@ node() {
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
   			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
-            sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/subutai/agent.gcfg
-            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/lib/subutai/agent.gcfg
+            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /etc/subutai/agent.conf
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
