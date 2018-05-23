@@ -92,8 +92,8 @@ node() {
 			set +x
             ssh admin@172.31.0.253 <<- EOF
 			set -e
-			sudo apt update && apt upgrade -y
-            
+			sudo apt update && sudo apt upgrade -y
+
 			sudo subutai destroy management
 			sudo subutai import debian-stretch
 			sudo subutai clone debian-stretch management
