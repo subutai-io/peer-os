@@ -3,7 +3,7 @@
 angular.module('subutai.environment.adv-controller', [])
     .controller('AdvancedEnvironmentCtrl', AdvancedEnvironmentCtrl);
 
-AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', 'identitySrv'];
+AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', 'identitySrv', 'templateSrv'];
 
 var graph = new joint.dia.Graph;
 var paper;
@@ -17,7 +17,7 @@ var PEER_SPACE = 30;
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
 
-function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, identitySrv) {
+function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, identitySrv, templateSrv) {
 
     var vm = this;
 
@@ -84,7 +84,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     }
 
     function loadTemplates(callback) {
-        environmentService.getTemplates()
+        templateSrv.getTemplates()
             .then(function (data) {
                 vm.templates = data;
                 getFilteredTemplates(callback);

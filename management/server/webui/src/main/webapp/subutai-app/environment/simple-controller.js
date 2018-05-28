@@ -3,9 +3,9 @@
 angular.module('subutai.environment.simple-controller', [])
 .controller('EnvironmentSimpleViewCtrl', EnvironmentSimpleViewCtrl);
 
-EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout', 'identitySrv'];
+EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout', 'identitySrv', 'templateSrv'];
 
-function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout, identitySrv) {
+function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout, identitySrv, templateSrv) {
 
 	var vm = this;
 
@@ -68,7 +68,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     }
 
     function loadTemplates(callback){
-        environmentService.getTemplates()
+        templateSrv.getTemplates()
             .then(function (data) {
                 vm.templates = data;
                 getFilteredTemplates(callback);

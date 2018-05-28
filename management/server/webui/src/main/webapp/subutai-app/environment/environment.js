@@ -7,5 +7,6 @@ angular.module('subutai.environment', [
     'subutai.environment.service',
     'subutai.peer-registration.service',
     'subutai.tracker.service',
-    'subutai.identity.service'
+    'subutai.identity.service',
+    'subutai.template.service'
 ]);

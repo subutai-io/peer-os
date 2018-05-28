@@ -21,6 +21,7 @@ var app = angular.module('subutai-app', [
 
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
+    .factory('templateSrv', templateSrv)
 
     .factory('trackerSrv', trackerSrv)
 
