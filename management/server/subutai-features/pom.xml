@@ -402,7 +402,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>template-manager-impl</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>template-manager-rest</artifactId>
+    </dependency>
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- tracker -->
     <dependency>

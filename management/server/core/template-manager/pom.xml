@@ -17,6 +17,7 @@
   <modules>
     <module>template-manager-api</module>
     <module>template-manager-impl</module>
+    <module>template-manager-rest</module>
   </modules>
 
 </project>

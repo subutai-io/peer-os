@@ -196,6 +196,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
         localStorage.removeItem('kurjunToken');
 
+        //TODO use templateManagerSrv
         identitySrv.getKurjunAuthId().success(function (authId) {
 
             var signedAuthIdTextArea = document.createElement("textarea");

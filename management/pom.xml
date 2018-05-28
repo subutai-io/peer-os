@@ -623,7 +623,11 @@
         <artifactId>template-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>template-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- tracker -->
       <dependency>
