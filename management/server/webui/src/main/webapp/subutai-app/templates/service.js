@@ -31,7 +31,7 @@ function templateSrv($http) {
    }
 
    function obtainCdnToken(signedFingerprint){
-       var postData = "signedFingerprint=" + signedFingerprint
+       var postData = "signedFingerprint=" + encodeURIComponent(signedFingerprint)
 
        return $http.post(
            BASE_URL + "token",

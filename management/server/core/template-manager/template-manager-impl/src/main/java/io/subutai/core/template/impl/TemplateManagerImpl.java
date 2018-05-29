@@ -14,18 +14,20 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
@@ -43,7 +45,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -461,17 +462,17 @@ public class TemplateManagerImpl implements TemplateManager
 
     public String obtainCdnToken( final String signedFingerprint )
     {
+        Preconditions.checkNotNull( signedFingerprint );
 
         CloseableHttpClient client = getHttpsClient();
         try
         {
             HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/token", Common.HUB_IP ) );
 
-            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-            entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
-            entityBuilder.addTextBody( "signedFingerprint", signedFingerprint );
-            HttpEntity httpEntity = entityBuilder.build();
-            post.setEntity( httpEntity );
+            List<NameValuePair> form = Lists.newArrayList();
+            form.add( new BasicNameValuePair( "signedFingerprint", signedFingerprint ) );
+            UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity( form, Consts.UTF_8 );
+            post.setEntity( urlEncodedFormEntity );
             CloseableHttpResponse response = client.execute( post );
 
             try
@@ -483,12 +484,6 @@ public class TemplateManagerImpl implements TemplateManager
                 if ( response.getStatusLine().getStatusCode() == 200 )
                 {
                     identityManager.getActiveSession().setCdnToken( content );
-
-//                    TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
-//                    if ( templateManager != null )
-//                    {
-//                        templateManager.resetTemplateCache();
-//                    }
 
                     return content;
                 }

@@ -1144,8 +1144,8 @@ public class EnvironmentManagerImpl extends HostListener
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
-        String kurjunToken = identityManager.getActiveSession().getCdnToken();
-        Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing or expired" );
+        String cdnToken = identityManager.getActiveSession().getCdnToken();
+        Preconditions.checkNotNull( cdnToken, "Cdn token is missing or expired" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
@@ -1169,7 +1169,7 @@ public class EnvironmentManagerImpl extends HostListener
         Peer targetPeer = containerHost.getPeer();
 
         return targetPeer
-                .exportTemplate( containerHost.getContainerId(), templateName, version, privateTemplate, kurjunToken );
+                .exportTemplate( containerHost.getContainerId(), templateName, version, privateTemplate, cdnToken );
     }
 
 
