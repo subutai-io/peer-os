@@ -8,8 +8,7 @@ import io.subutai.common.protocol.Template;
 
 
 /**
- * Exposes API to work with templates.
- * All methods use caching except those that explicitly mention otherwise
+ * Exposes API to work with templates. All methods use caching except those that explicitly mention otherwise
  */
 public interface TemplateManager
 {
@@ -56,8 +55,7 @@ public interface TemplateManager
     List<Template> getTemplatesByOwner( final String owner );
 
     /**
-     * Returns active user's templates.
-     * Does NOT use caching!
+     * Returns active user's templates. Does NOT use caching!
      */
     List<Template> getUserPrivateTemplates();
 
@@ -65,4 +63,12 @@ public interface TemplateManager
      * Resets template cache
      */
     void resetTemplateCache();
+
+    String getFingerprint();
+
+    String getObtainedCdnToken();
+
+    String obtainCdnToken( String signedFingerprint );
+
+    boolean isRegisteredWithCdn();
 }

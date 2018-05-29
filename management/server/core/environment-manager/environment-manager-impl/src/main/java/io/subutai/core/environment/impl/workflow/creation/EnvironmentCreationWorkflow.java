@@ -151,7 +151,7 @@ public class EnvironmentCreationWorkflow
         try
         {
             new PrepareTemplatesStep( environment, peerManager, topology,
-                    identityManager.getActiveSession().getKurjunToken(), operationTracker ).execute();
+                    identityManager.getActiveSession().getCdnToken(), operationTracker ).execute();
 
             saveEnvironment();
 

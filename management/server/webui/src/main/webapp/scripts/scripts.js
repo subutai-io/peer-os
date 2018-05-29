@@ -242,3 +242,97 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
     }
 
 
+//Bazaar CDN
+    var cdnCheckInProgress = false;
+
+    function checkCDNToken(templateSrv, $scope, callback){
+
+        if(!cdnCheckInProgress){
+
+            cdnCheckInProgress = true;
+
+            templateSrv.getObtainedCdnToken().success(function(data){
+                if (!$.trim(data)){
+
+                    obtainCDNToken(templateSrv, $scope, callback);
+
+                }else{
+
+                    if(data != localStorage.getItem('cdnToken')){
+
+                        localStorage.setItem('cdnToken', data);
+
+                        notifyCDNTokenListeners($scope);
+                    }
+
+                    cdnCheckInProgress = false;
+
+                    if(callback) callback();
+                }
+            }).error(function(){
+
+                cdnCheckInProgress = false;
+
+                if(callback) callback();
+            });
+        }else{
+            if(callback) callback();
+        }
+    }
+
+    function obtainCDNToken(templateSrv, $scope, callback){
+
+        localStorage.removeItem('cdnToken');
+
+        templateSrv.getFingerprint().success(function (fingerprint) {
+
+            var signedFingerprintTextArea = document.createElement("textarea");
+            signedFingerprintTextArea.setAttribute('class', 'bp-sign-target');
+            signedFingerprintTextArea.style.width = '1px';
+            signedFingerprintTextArea.style.position = 'absolute';
+            signedFingerprintTextArea.style.left = '-100px';
+            signedFingerprintTextArea.value = fingerprint;
+            document.body.appendChild(signedFingerprintTextArea);
+
+            $(signedFingerprintTextArea).on('change', function() {
+
+               var signedFingerprint = $(this).val();
+
+               templateSrv.obtainCdnToken(signedFingerprint).success(function (token) {
+
+                   localStorage.setItem('cdnToken', token);
+
+                   notifyCDNTokenListeners($scope);
+
+                   if(callback) callback();
+
+               }).error(function(error) {
+
+                 if(callback) callback();
+
+                 console.log(error);
+               });
+
+               $(this).remove();
+            });
+
+            cdnCheckInProgress = false;
+
+        }).error(function(error) {
+
+            cdnCheckInProgress = false;
+
+            if(callback) callback();
+
+            console.log(error);
+        });
+    }
+
+    function notifyCDNTokenListeners($scope){
+
+        if($scope){
+
+            $scope.$broadcast('cdnTokenSet', {});
+        }
+    }
+

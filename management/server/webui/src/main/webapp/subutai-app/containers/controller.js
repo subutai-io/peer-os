@@ -20,6 +20,8 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
     checkKurjunAuthToken(identitySrv, $rootScope);
 
+	checkCDNToken(templateSrv, $rootScope)
+
 	var vm = this;
 
 	cfpLoadingBar.start();

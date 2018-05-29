@@ -659,7 +659,7 @@ public class RestServiceImpl implements RestService
         CloseableHttpClient client = getHttpsClient();
         try
         {
-            if ( isRegisteredWithGorjun() )
+            if ( isRegisteredWithCDN() )
             {
                 HttpGet httpGet = new HttpGet(
                         String.format( "%s/auth/token?user=%s", Common.KURJUN_BASE_URL, getFingerprint() ) );
@@ -704,7 +704,7 @@ public class RestServiceImpl implements RestService
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
             entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
             entityBuilder.addTextBody( "signature", signedTemplateHash );
-            entityBuilder.addTextBody( "token", identityManager.getActiveSession().getKurjunToken() );
+            entityBuilder.addTextBody( "token", identityManager.getActiveSession().getCdnToken() );
             HttpEntity httpEntity = entityBuilder.build();
             post.setEntity( httpEntity );
             CloseableHttpResponse response = client.execute( post );
@@ -769,7 +769,7 @@ public class RestServiceImpl implements RestService
 
                 if ( response.getStatusLine().getStatusCode() == 200 )
                 {
-                    identityManager.getActiveSession().setKurjunToken( content );
+                    identityManager.getActiveSession().setCdnToken( content );
 
                     TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
                     if ( templateManager != null )
@@ -810,7 +810,7 @@ public class RestServiceImpl implements RestService
 
         if ( identityManager.getActiveSession() != null )
         {
-            token = identityManager.getActiveSession().getKurjunToken();
+            token = identityManager.getActiveSession().getCdnToken();
         }
 
         return Response.status( Response.Status.OK ).entity( token ).build();
@@ -822,7 +822,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( isRegisteredWithGorjun() ).build();
+            return Response.ok( isRegisteredWithCDN() ).build();
         }
         catch ( Exception e )
         {
@@ -831,7 +831,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private boolean isRegisteredWithGorjun() throws IOException
+    private boolean isRegisteredWithCDN() throws IOException
     {
         CloseableHttpClient client = getHttpsClient();
         try

@@ -33,4 +33,32 @@ public class RestServiceImpl implements RestService
     {
         return Response.ok().entity( gson.toJson( templateManager.getTemplates() ) ).build();
     }
+
+
+    @Override
+    public Response getFingerprint()
+    {
+        return Response.ok().entity( templateManager.getFingerprint() ).build();
+    }
+
+
+    @Override
+    public Response getObtainedCdnToken()
+    {
+        return Response.ok().entity( templateManager.getObtainedCdnToken() ).build();
+    }
+
+
+    @Override
+    public Response obtainCdnToken( final String signedFingerprint )
+    {
+        return Response.ok().entity( templateManager.obtainCdnToken( signedFingerprint ) ).build();
+    }
+
+
+    @Override
+    public Response isRegisteredWithCdn()
+    {
+        return Response.ok().entity( templateManager.isRegisteredWithCdn() ).build();
+    }
 }

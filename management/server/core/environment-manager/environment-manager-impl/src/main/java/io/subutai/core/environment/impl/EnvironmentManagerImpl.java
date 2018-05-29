@@ -1144,7 +1144,7 @@ public class EnvironmentManagerImpl extends HostListener
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
-        String kurjunToken = identityManager.getActiveSession().getKurjunToken();
+        String kurjunToken = identityManager.getActiveSession().getCdnToken();
         Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing or expired" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );

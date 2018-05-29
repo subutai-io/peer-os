@@ -11,8 +11,23 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.util.EntityUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -28,8 +43,10 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.template.api.TemplateManager;
 
 
@@ -41,6 +58,7 @@ public class TemplateManagerImpl implements TemplateManager
             Common.KURJUN_BASE_URL + "/template/list?owner=%s&token=%s";
     private static final String GORJUN_GET_VERIFIED_TEMPLATE_URL =
             Common.KURJUN_BASE_URL + "/template/info?name=%s&verified=true";
+
     private static final int TEMPLATE_CACHE_TTL_SEC = 60;
     private static final int HIT_CACHE_IF_ERROR_INTERVAL_SEC = 30;
     private Set<Template> templatesCache = Sets.newConcurrentHashSet();
@@ -81,7 +99,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         if ( session != null )
         {
-            kurjunToken = session.getKurjunToken();
+            kurjunToken = session.getCdnToken();
         }
 
         return getTemplates( kurjunToken );
@@ -285,7 +303,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         if ( session != null )
         {
-            String kurjunToken = session.getKurjunToken();
+            String kurjunToken = session.getCdnToken();
 
             if ( kurjunToken != null )
             {
@@ -393,5 +411,136 @@ public class TemplateManagerImpl implements TemplateManager
     LoadingCache<String, Template> getVerifiedTemplatesCache()
     {
         return verifiedTemplatesCache;
+    }
+
+    //Bazaar CDN
+
+
+    private CloseableHttpClient getHttpsClient()
+    {
+        try
+        {
+            RequestConfig config = RequestConfig.custom().setSocketTimeout( 5000 ).setConnectTimeout( 5000 ).build();
+
+            SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+            sslContextBuilder.loadTrustMaterial( null, ( TrustStrategy ) ( x509Certificates, s ) -> true );
+            SSLConnectionSocketFactory sslSocketFactory =
+                    new SSLConnectionSocketFactory( sslContextBuilder.build(), NoopHostnameVerifier.INSTANCE );
+
+            return HttpClients.custom().setDefaultRequestConfig( config ).setSSLSocketFactory( sslSocketFactory )
+                              .build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+
+        return HttpClients.createDefault();
+    }
+
+
+    public String getFingerprint()
+    {
+        User user = identityManager.getActiveUser();
+        return user.getFingerprint().toLowerCase();
+    }
+
+
+    public String getObtainedCdnToken()
+    {
+        String token = null;
+
+        if ( identityManager.getActiveSession() != null )
+        {
+            token = identityManager.getActiveSession().getCdnToken();
+        }
+
+        return token;
+    }
+
+
+    public String obtainCdnToken( final String signedFingerprint )
+    {
+
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+            HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/token", Common.HUB_IP ) );
+
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+            entityBuilder.setMode( HttpMultipartMode.BROWSER_COMPATIBLE );
+            entityBuilder.addTextBody( "signedFingerprint", signedFingerprint );
+            HttpEntity httpEntity = entityBuilder.build();
+            post.setEntity( httpEntity );
+            CloseableHttpResponse response = client.execute( post );
+
+            try
+            {
+                HttpEntity entity = response.getEntity();
+                String content = IOUtils.toString( entity.getContent() );
+                EntityUtils.consume( entity );
+
+                if ( response.getStatusLine().getStatusCode() == 200 )
+                {
+                    identityManager.getActiveSession().setCdnToken( content );
+
+//                    TemplateManager templateManager = ServiceLocator.getServiceOrNull( TemplateManager.class );
+//                    if ( templateManager != null )
+//                    {
+//                        templateManager.resetTemplateCache();
+//                    }
+
+                    return content;
+                }
+                else
+                {
+                    LOG.error( "Http code: " + response.getStatusLine().getStatusCode() + " Msg: " + content );
+                }
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+
+        return null;
+    }
+
+
+    public boolean isRegisteredWithCdn()
+    {
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+            HttpGet httpGet =
+                    new HttpGet( String.format( "https://%s/rest/v1/cdn/users/%s", Common.HUB_IP, getFingerprint() ) );
+            CloseableHttpResponse response = client.execute( httpGet );
+            try
+            {
+                return response.getStatusLine().getStatusCode() == 200;
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+
+        return false;
     }
 }
