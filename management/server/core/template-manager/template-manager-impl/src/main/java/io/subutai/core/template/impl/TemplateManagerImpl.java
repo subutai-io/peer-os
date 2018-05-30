@@ -613,8 +613,11 @@ public class TemplateManagerImpl implements TemplateManager
         {
             HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/templates", Common.HUB_IP ) );
 
+            String templateJson = JsonUtil.toJson( templat );
+            LOG.debug( "Registering template with CDN\n{}", templateJson );
+
             List<NameValuePair> form = Lists.newArrayList();
-            form.add( new BasicNameValuePair( "template", templat.toString() ) );
+            form.add( new BasicNameValuePair( "template", templateJson ) );
             form.add( new BasicNameValuePair( "token", cdnToken ) );
             UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity( form, Consts.UTF_8 );
             post.setEntity( urlEncodedFormEntity );
