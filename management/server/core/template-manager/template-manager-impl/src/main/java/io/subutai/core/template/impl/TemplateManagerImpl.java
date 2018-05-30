@@ -15,7 +15,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -40,6 +39,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.common.exception.ActionFailedException;
+import io.subutai.common.protocol.Templat;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
@@ -445,6 +446,29 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
+    private String readContent( CloseableHttpResponse response )
+    {
+        try
+        {
+            return EntityUtils.toString( response.getEntity() );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error reading entity content", e );
+
+            return null;
+        }
+    }
+
+
+    private void close( CloseableHttpResponse response )
+    {
+        EntityUtils.consumeQuietly( response.getEntity() );
+
+        IOUtils.closeQuietly( response );
+    }
+
+
     public String getFingerprint()
     {
         User user = identityManager.getActiveUser();
@@ -467,7 +491,7 @@ public class TemplateManagerImpl implements TemplateManager
 
     public String obtainCdnToken( final String signedFingerprint )
     {
-        Preconditions.checkNotNull( signedFingerprint );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( signedFingerprint ) );
 
         CloseableHttpClient client = getHttpsClient();
         try
@@ -482,9 +506,7 @@ public class TemplateManagerImpl implements TemplateManager
 
             try
             {
-                HttpEntity entity = response.getEntity();
-                String content = IOUtils.toString( entity.getContent() );
-                EntityUtils.consume( entity );
+                String content = readContent( response );
 
                 if ( response.getStatusLine().getStatusCode() == 200 )
                 {
@@ -494,12 +516,12 @@ public class TemplateManagerImpl implements TemplateManager
                 }
                 else
                 {
-                    LOG.error( "Http code: " + response.getStatusLine().getStatusCode() + " Msg: " + content );
+                    LOG.error( "Failed to obtain token: " + response.getStatusLine() + ", " + content );
                 }
             }
             finally
             {
-                IOUtils.closeQuietly( response );
+                close( response );
             }
         }
         catch ( Exception e )
@@ -529,7 +551,7 @@ public class TemplateManagerImpl implements TemplateManager
             }
             finally
             {
-                IOUtils.closeQuietly( response );
+                close( response );
             }
         }
         catch ( Exception e )
@@ -547,6 +569,8 @@ public class TemplateManagerImpl implements TemplateManager
 
     public String getOwner( String token )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ) );
+
         CloseableHttpClient client = getHttpsClient();
         try
         {
@@ -557,15 +581,12 @@ public class TemplateManagerImpl implements TemplateManager
             {
                 if ( response.getStatusLine().getStatusCode() == 200 )
                 {
-                    HttpEntity entity = response.getEntity();
-                    String content = IOUtils.toString( entity.getContent() );
-                    EntityUtils.consume( entity );
-                    return content;
+                    return readContent( response );
                 }
             }
             finally
             {
-                IOUtils.closeQuietly( response );
+                close( response );
             }
         }
         catch ( Exception e )
@@ -578,5 +599,48 @@ public class TemplateManagerImpl implements TemplateManager
         }
 
         return null;
+    }
+
+
+    @Override
+    public void registerTemplate( final Templat templat, final String cdnToken )
+    {
+        Preconditions.checkNotNull( templat );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( cdnToken ) );
+
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+            HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/templates", Common.HUB_IP ) );
+
+            List<NameValuePair> form = Lists.newArrayList();
+            form.add( new BasicNameValuePair( "template", templat.toString() ) );
+            form.add( new BasicNameValuePair( "token", cdnToken ) );
+            UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity( form, Consts.UTF_8 );
+            post.setEntity( urlEncodedFormEntity );
+            CloseableHttpResponse response = client.execute( post );
+
+            try
+            {
+                if ( response.getStatusLine().getStatusCode() != 200 )
+                {
+                    throw new ActionFailedException(
+                            "Failed to register template with CDN: " + response.getStatusLine() + ", " + readContent(
+                                    response ) );
+                }
+            }
+            finally
+            {
+                close( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new ActionFailedException( e.getMessage() );
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
     }
 }

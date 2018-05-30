@@ -4,6 +4,7 @@ package io.subutai.core.template.api;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.common.protocol.Templat;
 import io.subutai.common.protocol.Template;
 
 
@@ -73,4 +74,6 @@ public interface TemplateManager
     boolean isRegisteredWithCdn();
 
     String getOwner( String token );
+
+    void registerTemplate( Templat templat, String cdnToken );
 }
