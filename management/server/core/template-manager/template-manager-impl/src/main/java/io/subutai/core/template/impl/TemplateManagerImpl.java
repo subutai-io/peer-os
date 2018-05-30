@@ -258,14 +258,19 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public List<Template> getTemplatesByOwner( final String owner )
+    public List<Template> getTemplatesByOwner( final String token )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( owner ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
+
+        String owner = getOwner( token );
+
+        Preconditions.checkNotNull( owner, "Owner not found" );
 
         List<Template> templates = Lists.newArrayList();
 
         for ( Template template : getTemplates() )
         {
+            //TODO template must have one owner
             if ( !CollectionUtil.isCollectionEmpty( template.getOwners() ) && template.getOwners()
                                                                                       .contains( owner.toLowerCase() ) )
             {
@@ -537,5 +542,41 @@ public class TemplateManagerImpl implements TemplateManager
         }
 
         return false;
+    }
+
+
+    public String getOwner( String token )
+    {
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+            HttpGet httpGet = new HttpGet(
+                    String.format( "https://%s/rest/v1/cdn/users/username?token=%s", Common.HUB_IP, token ) );
+            CloseableHttpResponse response = client.execute( httpGet );
+            try
+            {
+                if ( response.getStatusLine().getStatusCode() == 200 )
+                {
+                    HttpEntity entity = response.getEntity();
+                    String content = IOUtils.toString( entity.getContent() );
+                    EntityUtils.consume( entity );
+                    return content;
+                }
+            }
+            finally
+            {
+                IOUtils.closeQuietly( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+
+        return null;
     }
 }

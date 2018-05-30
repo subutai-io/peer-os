@@ -294,10 +294,10 @@ public interface EnvironmentManager
      * @param containerId container id
      * @param version name of template
      * @param privateTemplate true indicates that template is accessible to owner only, otherwise it will be public
-     * template(not used, kept for future)
+     * template ( not used, kept for future )
      */
-    String createTemplate( String environmentId, String containerId, String templateName, String version,
-                           boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException;
+    void createTemplate( String environmentId, String containerId, String templateName, String version,
+                         boolean privateTemplate ) throws PeerException, EnvironmentNotFoundException;
 
     /**
      * Returns true, if resource host has environment containers, false otherwise

@@ -50,9 +50,9 @@ public interface TemplateManager
     Template getVerifiedTemplateByName( final String name );
 
     /**
-     * Returns template by owner. Owner is user PGP public key fingerprint
+     * Returns templates belonging to token holder
      */
-    List<Template> getTemplatesByOwner( final String owner );
+    List<Template> getTemplatesByOwner( final String token );
 
     /**
      * Returns active user's templates. Does NOT use caching!
@@ -71,4 +71,6 @@ public interface TemplateManager
     String obtainCdnToken( String signedFingerprint );
 
     boolean isRegisteredWithCdn();
+
+    String getOwner( String token );
 }

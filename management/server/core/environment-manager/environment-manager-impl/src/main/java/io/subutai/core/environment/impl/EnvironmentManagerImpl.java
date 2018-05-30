@@ -63,12 +63,14 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.ExportedTemplate;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeerEventListener;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Templat;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -1136,14 +1138,15 @@ public class EnvironmentManagerImpl extends HostListener
 
 
     @Override
-    public String createTemplate( final String environmentId, final String containerId, final String templateName,
-                                  final String version, final boolean privateTemplate )
+    public void createTemplate( final String environmentId, final String containerId, final String templateName,
+                                final String version, final boolean privateTemplate )
             throws PeerException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
+        Preconditions.checkArgument( version.matches( "^\\d+\\.\\d+\\.\\d+$" ), "Version must be in X.X.X format" );
         String cdnToken = identityManager.getActiveSession().getCdnToken();
         Preconditions.checkNotNull( cdnToken, "Cdn token is missing or expired" );
 
@@ -1152,8 +1155,9 @@ public class EnvironmentManagerImpl extends HostListener
         //check that container exists in the environment
         EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
-        List<Template> ownerTemplates =
-                templateManager.getTemplatesByOwner( identityManager.getActiveUser().getFingerprint() );
+        Preconditions.checkArgument( containerHost.isLocal(), "Container must be local" );
+
+        List<Template> ownerTemplates = templateManager.getTemplatesByOwner( cdnToken );
 
         for ( Template template : ownerTemplates )
         {
@@ -1166,10 +1170,16 @@ public class EnvironmentManagerImpl extends HostListener
             }
         }
 
-        Peer targetPeer = containerHost.getPeer();
+        ExportedTemplate template = peerManager.getLocalPeer()
+                                               .exportTemplate( containerHost.getContainerId(), templateName, version,
+                                                       privateTemplate, cdnToken );
 
-        return targetPeer
-                .exportTemplate( containerHost.getContainerId(), templateName, version, privateTemplate, cdnToken );
+
+        //TODO register template with CDN
+        Templat templat =
+                new Templat( template.getHash(), template.getMd5sum(), template.getSize(), templateName, version );
+
+        LOG.info( "Template {} exported", templat );
     }
 
 

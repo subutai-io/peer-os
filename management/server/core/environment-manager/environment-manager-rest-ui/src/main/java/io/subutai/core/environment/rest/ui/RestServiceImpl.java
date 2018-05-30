@@ -170,8 +170,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            return Response.ok( environmentManager
-                    .createTemplate( environmentId, containerId, templateName, version, privateTemplate ) ).build();
+            environmentManager.createTemplate( environmentId, containerId, templateName, version, privateTemplate );
+
+            return Response.ok().build();
         }
         catch ( Exception e )
         {

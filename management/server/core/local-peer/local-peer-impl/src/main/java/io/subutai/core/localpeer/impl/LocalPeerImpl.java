@@ -88,6 +88,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.ExportedTemplate;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -3657,8 +3658,9 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public String exportTemplate( final ContainerId containerId, final String templateName, final String version,
-                                  final boolean isPrivateTemplate, final String token ) throws PeerException
+    public ExportedTemplate exportTemplate( final ContainerId containerId, final String templateName,
+                                            final String version, final boolean isPrivateTemplate, final String token )
+            throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
