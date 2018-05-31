@@ -16,7 +16,7 @@ import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Templat;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.util.HostUtil;
@@ -29,14 +29,14 @@ public class CloneContainerTask extends HostUtil.Task<String>
     private static final int DEFAULT_PARALLEL_CLONE_TASK_AMOUNT = 2;
 
     private final CloneRequest request;
-    private final Template template;
+    private final Templat template;
     private final ResourceHost resourceHost;
     private final NetworkResource networkResource;
     private final LocalPeer localPeer;
     private final Set<String> namesToExclude;
 
 
-    public CloneContainerTask( final CloneRequest request, final Template template, final ResourceHost resourceHost,
+    public CloneContainerTask( final CloneRequest request, final Templat template, final ResourceHost resourceHost,
                                final NetworkResource networkResource, final LocalPeer localPeer,
                                final Set<String> namesToExclude )
     {

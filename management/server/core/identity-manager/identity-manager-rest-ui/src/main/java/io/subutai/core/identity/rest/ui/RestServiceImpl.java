@@ -643,7 +643,7 @@ public class RestServiceImpl implements RestService
     }
 
     //****** Kurjun ***********/
-    //TODO extract Kurjun related functionality into separate KurjunClient
+    //TODO REMOVE ALL KURJUN endpoints after IPFS migration
 
 
     private String getFingerprint()

@@ -43,7 +43,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Templat;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
@@ -100,6 +100,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "create_time", nullable = false )
     @JsonProperty( "created" )
     private long creationTimestamp = System.currentTimeMillis();
+
 
     protected ContainerHostEntity()
     {
@@ -274,7 +275,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public Template getTemplate() throws PeerException
+    public Templat getTemplate() throws PeerException
     {
         return getLocalPeer().getTemplateById( templateId );
     }

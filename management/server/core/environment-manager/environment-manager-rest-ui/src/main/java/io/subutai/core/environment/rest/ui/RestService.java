@@ -27,9 +27,9 @@ public interface RestService
     Response listTemplates();
 
     @GET
-    @Path( "templates/private" )
+    @Path( "templates/own" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response listPrivateTemplates();
+    Response listOwnTemplates();
 
     @GET
     @Path( "templates/verified/{templateName}" )

@@ -22,7 +22,7 @@ function environmentService($http, $q) {
 
 	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
 
-	var PRIVATE_TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/private';
+	var OWN_TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/own';
 
 	var VERIFIED_TEMPLATE_URL = ENVIRONMENTS_URL + 'templates/verified/';
 
@@ -35,7 +35,7 @@ function environmentService($http, $q) {
 
 	var environmentService = {
 		getTemplates: getTemplates,
-		getPrivateTemplates: getPrivateTemplates,
+		getOwnTemplates: getOwnTemplates,
 		getVerifiedTemplate: getVerifiedTemplate,
 
 		getStrategies : getStrategies,
@@ -136,10 +136,10 @@ function environmentService($http, $q) {
 		return callF.promise;
 	}
 
-    function getPrivateTemplates() {
+    function getOwnTemplates() {
 		var callF = $q.defer();
 
-		$http.get(PRIVATE_TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
+		$http.get(OWN_TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
 			.success(function(data) {
 				callF.resolve(data);
 			});

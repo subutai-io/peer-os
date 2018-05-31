@@ -10,39 +10,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-
-import io.subutai.common.command.CommandCallback;
-import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.EnvironmentPeer;
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.Quota;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerId;
-import io.subutai.common.protocol.Template;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 

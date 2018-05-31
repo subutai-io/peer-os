@@ -36,6 +36,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response listOwnTemplates()
+    {
+        return Response.ok().entity( gson.toJson( templateManager.getOwnTemplates() ) ).build();
+    }
+
+
+    @Override
     public Response getFingerprint()
     {
         return Response.ok().entity( templateManager.getFingerprint() ).build();

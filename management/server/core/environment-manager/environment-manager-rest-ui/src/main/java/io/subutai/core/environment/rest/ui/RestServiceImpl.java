@@ -62,7 +62,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Templat;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -117,25 +117,19 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
-        Set<Template> templates = templateManager.getTemplates().stream().filter(
+        Set<Templat> templates = templateManager.getTemplates().stream().filter(
                 n -> !Strings.isNullOrEmpty( n.getName() ) && !n.getName()
                                                                 .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                 .filter( n -> !n.getName().matches(
-                                                         "(?i)cassandra14|" + "cassandra16|" + "elasticsearch14|"
-                                                                 + "elasticsearch16|" + "hadoop14|" + "hadoop16|"
-                                                                 + "mongo14|" + "mongo16|" + "openjre714|"
-                                                                 + "openjre716|" + "solr14|" + "solr16|" + "storm14|"
-                                                                 + "storm16|" + "zookeeper14|" + "zookeeper16" ) )
-                                                 .collect( Collectors.toSet() );
+                                                .collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
 
 
     @Override
-    public Response listPrivateTemplates()
+    public Response listOwnTemplates()
     {
-        return Response.ok().entity( gson.toJson( templateManager.getUserPrivateTemplates() ) ).build();
+        return Response.ok().entity( gson.toJson( templateManager.getOwnTemplates() ) ).build();
     }
 
 
@@ -144,7 +138,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Template template = templateManager.getVerifiedTemplateByName( templateName );
+            Templat template = templateManager.getVerifiedTemplateByName( templateName );
 
             if ( template != null )
             {

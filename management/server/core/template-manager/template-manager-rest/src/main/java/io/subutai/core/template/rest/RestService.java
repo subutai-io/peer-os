@@ -17,6 +17,11 @@ public interface RestService
     Response listTemplates();
 
     @GET
+    @Produces( { MediaType.APPLICATION_JSON } )
+    @Path( "own" )
+    Response listOwnTemplates();
+
+    @GET
     @Produces( { MediaType.TEXT_PLAIN } )
     @Path( "fingerprint" )
     Response getFingerprint();

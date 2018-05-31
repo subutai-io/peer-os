@@ -20,7 +20,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Templat;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.hub.share.quota.ContainerQuota;
 
@@ -70,7 +70,7 @@ public class ContainerHostEntityTest
     HostRegistry hostRegistry;
 
     @Mock
-    Template template;
+    Templat template;
 
     private ContainerHostEntity containerHostEntity;
 

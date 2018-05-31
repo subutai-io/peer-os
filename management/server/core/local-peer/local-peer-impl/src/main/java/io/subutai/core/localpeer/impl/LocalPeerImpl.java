@@ -107,7 +107,7 @@ import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Templat;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -812,7 +812,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
             for ( final String templateId : request.getTemplates().get( resourceHostId ) )
             {
-                Template template = templateManager.getTemplate( templateId, request.getKurjunToken() );
+                //                Templat template = templateManager.getTemplate( templateId, request.getCdnToken() );
+                Templat template = templateManager.getTemplate( templateId );
 
                 if ( template == null )
                 {
@@ -821,7 +822,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
                 HostUtil.Task<Object> importTask =
                         new ImportTemplateTask( template, resourceHost, request.getEnvironmentId(),
-                                request.getKurjunToken() );
+                                request.getCdnToken() );
 
                 tasks.addTask( resourceHost, importTask );
             }
@@ -2936,14 +2937,14 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public Set<Template> getTemplates()
+    public Set<Templat> getTemplates()
     {
         return templateManager.getTemplates();
     }
 
 
     @Override
-    public Template getTemplateByName( final String templateName )
+    public Templat getTemplateByName( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
@@ -2952,7 +2953,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public Template getTemplateById( final String templateId ) throws PeerException
+    public Templat getTemplateById( final String templateId ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateId ), "Invalid template id" );
 

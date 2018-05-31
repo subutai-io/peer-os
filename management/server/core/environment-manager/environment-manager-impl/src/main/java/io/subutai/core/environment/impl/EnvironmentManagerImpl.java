@@ -71,7 +71,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Templat;
-import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -1157,9 +1156,13 @@ public class EnvironmentManagerImpl extends HostListener
 
         Preconditions.checkArgument( containerHost.isLocal(), "Container must be local" );
 
-        List<Template> ownerTemplates = templateManager.getTemplatesByOwner( cdnToken );
+        String owner = templateManager.getOwner( cdnToken );
 
-        for ( Template template : ownerTemplates )
+        Preconditions.checkNotNull( owner, "Owner not found" );
+
+        List<Templat> ownerTemplates = templateManager.getTemplatesByOwner( owner );
+
+        for ( Templat template : ownerTemplates )
         {
             if ( templateName.equalsIgnoreCase( template.getName() ) && version
                     .equalsIgnoreCase( template.getVersion() ) )
@@ -1176,7 +1179,8 @@ public class EnvironmentManagerImpl extends HostListener
 
 
         Templat templat =
-                new Templat( template.getHash(), template.getMd5sum(), template.getSize(), templateName, version );
+                new Templat( template.getHash(), template.getMd5sum(), template.getSize(), templateName, version,
+                        template.getParent() );
 
         templateManager.registerTemplate( templat, cdnToken );
 

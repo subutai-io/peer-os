@@ -14,7 +14,7 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Templat;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.hub.share.dto.domain.ReservedPortMapping;
@@ -105,14 +105,14 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 
-    void importTemplate( Template template, String environmentId, String kurjunToken ) throws ResourceHostException;
+    void importTemplate( Templat template, String environmentId, String cdnToken ) throws ResourceHostException;
 
     /**
      * Clones container based on the specified arguments
      *
      * @return ID of container
      */
-    String cloneContainer( Template template, String containerName, String hostname, String ip, int vlan,
+    String cloneContainer( Templat template, String containerName, String hostname, String ip, int vlan,
                            String environmentId ) throws ResourceHostException;
 
     void setContainerQuota( ContainerHost containerHost, ContainerQuota containerQuota ) throws ResourceHostException;
@@ -139,8 +139,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void removeContainerHost( ContainerHost containerHost );
 
-    ExportedTemplate exportTemplate( String containerName, String templateName, String version, boolean isPrivateTemplate,
-                           String token ) throws ResourceHostException;
+    ExportedTemplate exportTemplate( String containerName, String templateName, String version,
+                                     boolean isPrivateTemplate, String token ) throws ResourceHostException;
 
     Set<String> listExistingContainerNames() throws ResourceHostException;
 
