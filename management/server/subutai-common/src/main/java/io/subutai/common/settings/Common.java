@@ -3,7 +3,7 @@ package io.subutai.common.settings;
 
 import java.util.regex.Pattern;
 
-
+//TODO remove unused variables/constants
 public class Common
 {
     public static final String E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME = "su_fingerprint";
@@ -14,8 +14,12 @@ public class Common
     public static final long RH_UPDATE_CHECK_TIMEOUT_MIN = 10;
     public static final long MH_UPDATE_TIMEOUT_MIN = 60;
     public static final long MH_UPDATE_CHECK_TIMEOUT_MIN = 15;
+    //TODO remove
     public static String KURJUN_BASE_URL =
             String.format( "https://%s:8338/kurjun/rest", System.getProperty( "cdnIp" ) );
+
+    //TODO take from system property
+    public static String IPFS_PATH = "/root/.ipfs";
     public static final int DEFAULT_PUBLIC_PORT = 8443;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
     public static final int DEFAULT_AGENT_PORT = 7070;
