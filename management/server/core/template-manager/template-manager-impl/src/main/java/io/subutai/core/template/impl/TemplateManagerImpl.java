@@ -104,7 +104,8 @@ public class TemplateManagerImpl implements TemplateManager
             CloseableHttpClient client = getHttpsClient();
             try
             {
-                HttpGet httpGet = new HttpGet( String.format( "https://%s/rest/v1/cdn/templates", Common.HUB_IP ) );
+                HttpGet httpGet = new HttpGet(
+                        String.format( "https://%s/rest/v1/cdn/templates?version=latest", Common.HUB_IP ) );
                 CloseableHttpResponse response = client.execute( httpGet );
 
                 try
