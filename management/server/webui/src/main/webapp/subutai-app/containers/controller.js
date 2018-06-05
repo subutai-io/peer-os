@@ -145,7 +145,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		}
 		environmentService.setTags(vm.tags2Container.environmentId, vm.tags2Container.id, tags).success(function (data) {
 			vm.tags2Container.tags = tags;
-			console.log(data);
 		});
 		vm.tags2Container.tags = tags;
 		ngDialog.closeAll();
@@ -153,14 +152,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function removeTag(container, tag, key) {
 		environmentService.removeTag(container.environmentId, container.id, tag).success(function (data) {
-			console.log(data);
 		});
 		container.tags.splice(key, 1);
 	}
 
 	function getNotRegisteredContainers() {
 		environmentService.getNotRegisteredContainers().success(function (data) {
-			console.log(data);
 			vm.notRegisteredContainers = data;
 		});
 	}

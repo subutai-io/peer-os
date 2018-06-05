@@ -44,7 +44,7 @@ public class PrepareTemplatesStepTest
     @Before
     public void setUp() throws Exception
     {
-        step = new PrepareTemplatesStep( environment, peerManager, topology, TestHelper.KURJUN_TOKEN,
+        step = new PrepareTemplatesStep( environment, peerManager, topology, TestHelper.CDN_TOKEN,
                 TestHelper.TRACKER_OPERATION() );
         step.templateUtil = peerUtil;
         doReturn( response ).when( peerTaskResult ).getResult();

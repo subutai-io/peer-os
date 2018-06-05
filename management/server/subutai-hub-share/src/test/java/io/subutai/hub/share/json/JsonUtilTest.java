@@ -12,8 +12,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.subutai.hub.share.dto.RegistrationDto;
-import io.subutai.hub.share.dto.TrustDataDto;
-import io.subutai.hub.share.dto.TrustDataDto.TrustLevel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,19 +33,6 @@ public class JsonUtilTest
         RegistrationDto reg2 = JsonUtil.fromCbor( data, RegistrationDto.class );
 
         assertEquals( reg.getOwnerFingerprint(), reg2.getOwnerFingerprint() );
-    }
-
-
-    @Test
-    public void testJson() throws Exception
-    {
-        TrustDataDto dto = new TrustDataDto( "keyId", "principalKeyId", TrustLevel.FULL );
-
-        String json = JsonUtil.toJson( dto );
-
-        TrustDataDto dto2 = JsonUtil.fromJson( json , TrustDataDto.class );
-
-        assertEquals( dto, dto2 );
     }
 
 

@@ -57,11 +57,11 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getImportTemplateCommand( final String templateId, final String kurjunToken )
+    public RequestBuilder getImportTemplateCommand( final String templateId, final String cdnToken )
     {
         return new RequestBuilder(
                 String.format( "export IPFS_PATH=\"%s\" && subutai import id:%s %s", Common.IPFS_PATH, templateId,
-                        Strings.isNullOrEmpty( kurjunToken ) ? "" : "-t " + kurjunToken ) )
+                        Strings.isNullOrEmpty( cdnToken ) ? "" : "-t " + cdnToken ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 

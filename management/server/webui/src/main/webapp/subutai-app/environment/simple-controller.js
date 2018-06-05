@@ -78,8 +78,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     loadTemplates();
     loadOwnTemplates();
 
-    console.log(vm.templates)
-
     $rootScope.$on('cdnTokenSet', function(event, data){
         loadOwnTemplates();
     });

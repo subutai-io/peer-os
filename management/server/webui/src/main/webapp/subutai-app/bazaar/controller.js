@@ -97,7 +97,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
         LOADING_SCREEN();
         BazaarSrv.getHubPlugins().success(function (data) {
             vm.plugins = data.productsDto;
-            console.log(vm.plugins);
             if (vm.plugins === undefined || vm.plugins === "") {
                 vm.plugins = [];
             }
