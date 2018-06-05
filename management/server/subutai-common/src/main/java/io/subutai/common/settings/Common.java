@@ -12,9 +12,7 @@ public class Common
     public static final long MH_UPDATE_TIMEOUT_MIN = 60;
     public static final long MH_UPDATE_CHECK_TIMEOUT_MIN = 15;
 
-    //TODO take from system property
-    public static String IPFS_PATH = "/root/.ipfs";
-    public static final String KARAF_DATA = System.getProperty( "karaf.data" );
+    public static String IPFS_PATH = System.getProperty( "ipfsPath" );
 
     public static final int DEFAULT_PUBLIC_PORT = 8443;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
