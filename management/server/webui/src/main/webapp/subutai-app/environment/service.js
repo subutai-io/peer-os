@@ -18,12 +18,6 @@ function environmentService($http, $q) {
 	var CONTAINER_TYPES_URL = CONTAINERS_URL + 'types/';
 	var DOMAINS_URL = ENVIRONMENTS_URL + 'domains/';
 
-	var STRATEGIES_URL = ENVIRONMENTS_URL + 'strategies/';
-
-	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
-
-	var OWN_TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/own';
-
 	var VERIFIED_TEMPLATE_URL = ENVIRONMENTS_URL + 'templates/verified/';
 
 	var PEERS_URL = ENVIRONMENTS_URL + 'peers/';
@@ -34,12 +28,7 @@ function environmentService($http, $q) {
 
 
 	var environmentService = {
-		getTemplates: getTemplates,
-		getOwnTemplates: getOwnTemplates,
 		getVerifiedTemplate: getVerifiedTemplate,
-
-		getStrategies : getStrategies,
-
 
 		getEnvironments : getEnvironments,
 		getTenants: getTenants,
@@ -107,44 +96,6 @@ function environmentService($http, $q) {
 
 	function getVerifiedTemplate(name){
         return $http.get(VERIFIED_TEMPLATE_URL + name, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
-
-	function getTemplates() {
-		var callF = $q.defer();
-
-		$http.get(TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
-			.success(function(data) {
-				var res = {};
-                res['other'] = [];
-
-                for( var i = 0; i < data.length; i++ ){
-                    if(data[i].tags){
-                        for( var j = 0; j < data[i].tags.length; j++ ){
-                            if ( res[data[i].tags[j]] == undefined ) {
-                                res[data[i].tags[j]] = [];
-                            }
-                            res[data[i].tags[j]].push(data[i]);
-                        }
-                    }else{
-                       res['other'].push(data[i]);
-                    }
-                }
-
-				callF.resolve(res);
-			});
-
-		return callF.promise;
-	}
-
-    function getOwnTemplates() {
-		var callF = $q.defer();
-
-		$http.get(OWN_TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
-			.success(function(data) {
-				callF.resolve(data);
-			});
-
-		return callF.promise;
 	}
 
 	function getUploadProgress(templateName) {
@@ -321,12 +272,6 @@ function environmentService($http, $q) {
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
-
-
-	function getStrategies() {
-		return $http.get(STRATEGIES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
-
 
 	function getPeers() {
 		return $http.get(PEERS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});

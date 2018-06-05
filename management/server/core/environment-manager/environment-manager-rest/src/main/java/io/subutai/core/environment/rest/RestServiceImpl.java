@@ -30,7 +30,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
@@ -88,7 +88,7 @@ public class RestServiceImpl implements RestService
 
             if ( Strings.isNullOrEmpty( templateId ) )
             {
-                Templat template = templateManager.getVerifiedTemplateByName( node.getTemplateName() );
+                Template template = templateManager.getVerifiedTemplateByName( node.getTemplateName() );
 
                 Preconditions.checkNotNull( template,
                         String.format( "Verified template not found by name %s", node.getTemplateName() ) );

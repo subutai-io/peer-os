@@ -67,7 +67,7 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.security.objects.PermissionObject;
@@ -881,7 +881,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( final Templat template, final String environmentId, final String cdnToken )
+    public void importTemplate( final Template template, final String environmentId, final String cdnToken )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
@@ -1012,7 +1012,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public String cloneContainer( final Templat template, final String containerName, final String hostname,
+    public String cloneContainer( final Template template, final String containerName, final String hostname,
                                   final String ip, final int vlan, final String environmentId )
             throws ResourceHostException
     {

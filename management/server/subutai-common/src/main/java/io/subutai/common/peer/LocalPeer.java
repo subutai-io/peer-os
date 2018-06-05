@@ -11,7 +11,7 @@ import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.util.HostUtil;
 import io.subutai.hub.share.quota.Quota;
 import io.subutai.hub.share.resource.ContainerResourceType;
@@ -172,7 +172,7 @@ public interface LocalPeer extends Peer
 
     PeerResources getResources();
 
-    Set<Templat> getTemplates();
+    Set<Template> getTemplates();
 
     SshTunnel setupSshTunnelForContainer( String containerIp, int sshIdleTimeout ) throws PeerException;
 
@@ -203,9 +203,9 @@ public interface LocalPeer extends Peer
 
     void removeOrphanContainers();
 
-    Templat getTemplateByName( String templateName ) throws PeerException;
+    Template getTemplateByName( String templateName ) throws PeerException;
 
-    Templat getTemplateById( String templateId ) throws PeerException;
+    Template getTemplateById( String templateId ) throws PeerException;
 
     boolean destroyNotRegisteredContainer( String containerId ) throws PeerException;
 

@@ -5,19 +5,19 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.util.HostUtil;
 
 
 public class ImportTemplateTask extends HostUtil.Task<Object>
 {
-    private final Templat template;
+    private final Template template;
     private final ResourceHost resourceHost;
     private final String environmentId;
     private final String token;
 
 
-    public ImportTemplateTask( final Templat template, final ResourceHost resourceHost, final String environmentId,
+    public ImportTemplateTask( final Template template, final ResourceHost resourceHost, final String environmentId,
                                final String kurjunToken )
     {
         Preconditions.checkNotNull( template );

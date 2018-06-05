@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.exception.ActionFailedException;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
@@ -48,8 +48,8 @@ public class TemplateManagerImpl implements TemplateManager
 
     private static final int TEMPLATE_CACHE_TTL_SEC = 60;
     private static final int HIT_CACHE_IF_ERROR_INTERVAL_SEC = 30;
-    private static final String VERIFIED_OWNER = "subutai";
-    private Set<Templat> templatesCache = Sets.newConcurrentHashSet();
+    private static final String[] VERIFIED_OWNERS = { "subutai", "jenkins" };
+    private Set<Template> templatesCache = Sets.newConcurrentHashSet();
     private volatile long lastTemplatesFetchTime = 0L;
     private volatile long lastTemplatesFetchErrorTime = 0L;
     private final ReentrantLock lock = new ReentrantLock( true );
@@ -82,7 +82,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public Set<Templat> getTemplates()
+    public Set<Template> getTemplates()
     {
 
         if ( !needToUpdateCache() )
@@ -109,13 +109,13 @@ public class TemplateManagerImpl implements TemplateManager
 
                 try
                 {
-                    Set<Templat> freshTemplateList = Sets.newHashSet();
+                    Set<Template> freshTemplateList = Sets.newHashSet();
 
                     String json = readContent( response );
 
                     if ( !Strings.isNullOrEmpty( json ) )
                     {
-                        Set<Templat> templates = JsonUtil.fromJson( json, new TypeToken<Set<Templat>>()
+                        Set<Template> templates = JsonUtil.fromJson( json, new TypeToken<Set<Template>>()
                         {
                         }.getType() );
 
@@ -129,7 +129,7 @@ public class TemplateManagerImpl implements TemplateManager
 
                         templatesCache.clear();
 
-                        for ( Templat template : freshTemplateList )
+                        for ( Template template : freshTemplateList )
                         {
                             if ( template != null && !Strings.isNullOrEmpty( template.getId() ) )
                             {
@@ -164,11 +164,11 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public Templat getTemplate( final String id )
+    public Template getTemplate( final String id )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
 
-        for ( Templat template : getTemplates() )
+        for ( Template template : getTemplates() )
         {
             if ( template.getId().equalsIgnoreCase( id ) )
             {
@@ -180,20 +180,19 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    //TODO return latest version
     @Override
-    public Templat getTemplateByName( final String name )
+    public Template getTemplateByName( final String name )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
 
-        Templat verifiedTemplate = getVerifiedTemplateByName( name );
+        Template verifiedTemplate = getVerifiedTemplateByName( name );
 
         if ( verifiedTemplate != null )
         {
             return verifiedTemplate;
         }
 
-        for ( Templat template : getTemplates() )
+        for ( Template template : getTemplates() )
         {
             if ( name.equalsIgnoreCase( template.getName() ) )
             {
@@ -206,13 +205,13 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public List<Templat> getTemplatesByOwner( final String owner )
+    public List<Template> getTemplatesByOwner( final String owner )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( owner ), "Invalid owner" );
 
-        List<Templat> templates = Lists.newArrayList();
+        List<Template> templates = Lists.newArrayList();
 
-        for ( Templat template : getTemplates() )
+        for ( Template template : getTemplates() )
         {
             if ( template.getOwner().equalsIgnoreCase( owner ) )
             {
@@ -223,18 +222,24 @@ public class TemplateManagerImpl implements TemplateManager
         return templates;
     }
 
-    //TODO return latest version
+
     @Override
-    public Templat getVerifiedTemplateByName( final String templateName )
+    public Template getVerifiedTemplateByName( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
 
-        List<Templat> verifiedTemplates = getTemplatesByOwner( VERIFIED_OWNER );
-        for ( Templat templat : verifiedTemplates )
+        List<Template> verifiedTemplates = Lists.newArrayList();
+
+        for ( String owner : VERIFIED_OWNERS )
         {
-            if ( templat.getName().equalsIgnoreCase( templateName ) )
+            verifiedTemplates.addAll( getTemplatesByOwner( owner ) );
+        }
+
+        for ( Template template : verifiedTemplates )
+        {
+            if ( template.getName().equalsIgnoreCase( templateName ) )
             {
-                return templat;
+                return template;
             }
         }
 
@@ -243,7 +248,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public List<Templat> getOwnTemplates()
+    public List<Template> getOwnTemplates()
     {
         String cdnToken = null;
 
@@ -451,9 +456,9 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public void registerTemplate( final Templat templat, final String cdnToken )
+    public void registerTemplate( final Template template, final String cdnToken )
     {
-        Preconditions.checkNotNull( templat );
+        Preconditions.checkNotNull( template );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( cdnToken ) );
 
         CloseableHttpClient client = getHttpsClient();
@@ -461,7 +466,7 @@ public class TemplateManagerImpl implements TemplateManager
         {
             HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/templates", Common.HUB_IP ) );
 
-            String templateJson = JsonUtil.toJson( templat );
+            String templateJson = JsonUtil.toJson( template );
             LOG.debug( "Registering template with CDN\n{}", templateJson );
 
             List<NameValuePair> form = Lists.newArrayList();

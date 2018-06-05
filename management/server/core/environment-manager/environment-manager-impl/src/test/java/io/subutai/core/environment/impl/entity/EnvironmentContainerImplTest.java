@@ -22,7 +22,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
@@ -68,7 +68,7 @@ public class EnvironmentContainerImplTest
     @Mock
     LocalPeer peer;
     @Mock
-    Templat template;
+    Template template;
     @Mock
     CommandCallback CALLBACK;
     @Mock

@@ -62,7 +62,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -115,30 +115,11 @@ public class RestServiceImpl implements RestService
     /** Templates *************************************************** */
 
     @Override
-    public Response listTemplates()
-    {
-        Set<Templat> templates = templateManager.getTemplates().stream().filter(
-                n -> !Strings.isNullOrEmpty( n.getName() ) && !n.getName()
-                                                                .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                .collect( Collectors.toSet() );
-
-        return Response.ok().entity( gson.toJson( templates ) ).build();
-    }
-
-
-    @Override
-    public Response listOwnTemplates()
-    {
-        return Response.ok().entity( gson.toJson( templateManager.getOwnTemplates() ) ).build();
-    }
-
-
-    @Override
     public Response getVerifiedTemplate( final String templateName )
     {
         try
         {
-            Templat template = templateManager.getVerifiedTemplateByName( templateName );
+            Template template = templateManager.getVerifiedTemplateByName( templateName );
 
             if ( template != null )
             {
@@ -272,7 +253,6 @@ public class RestServiceImpl implements RestService
         }
 
         //distribute nodes over resource hosts (round-robin)
-        //TODO here we don't check if RH can accommodate the distributed nodes
         Iterator<ResourceHostDto> rhIterator = Iterables.cycle( resourceHosts ).iterator();
         for ( NodeSchemaDto node : nodes )
         {

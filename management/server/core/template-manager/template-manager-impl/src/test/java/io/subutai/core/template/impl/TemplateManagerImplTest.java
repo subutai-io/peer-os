@@ -14,7 +14,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.cache.LoadingCache;
 
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.core.identity.api.IdentityManager;
 
 import static junit.framework.TestCase.assertFalse;
@@ -42,9 +42,9 @@ public class TemplateManagerImplTest
     @Mock
     CloseableHttpResponse response;
     @Mock
-    LoadingCache<String, Templat> cache;
+    LoadingCache<String, Template> cache;
     @Mock
-    Templat template;
+    Template template;
     @Mock
     IdentityManager identityManager;
 
@@ -65,7 +65,7 @@ public class TemplateManagerImplTest
     @Test
     public void testGetTemplates() throws Exception
     {
-        Set<Templat> templates = templateManager.getTemplates();
+        Set<Template> templates = templateManager.getTemplates();
 
         assertFalse( templates.isEmpty() );
     }
@@ -74,7 +74,7 @@ public class TemplateManagerImplTest
     @Test
     public void testGetTemplate() throws Exception
     {
-        Templat template = templateManager.getTemplate( TEMPLATE_ID );
+        Template template = templateManager.getTemplate( TEMPLATE_ID );
 
         assertNotNull( template );
     }
@@ -83,7 +83,7 @@ public class TemplateManagerImplTest
     @Test
     public void testGetTemplateByName() throws Exception
     {
-        Templat template = templateManager.getTemplateByName( TEMPLATE_NAME );
+        Template template = templateManager.getTemplateByName( TEMPLATE_NAME );
 
         assertNotNull( template );
     }

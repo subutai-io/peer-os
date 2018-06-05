@@ -54,7 +54,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
@@ -394,7 +394,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
 
     @Override
-    public Templat getTemplate() throws PeerException
+    public Template getTemplate() throws PeerException
     {
         return getLocalPeer().getTemplateById( templateId );
     }

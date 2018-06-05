@@ -46,7 +46,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
@@ -160,7 +160,7 @@ public class LocalPeerImplTest
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
-    Templat template;
+    Template template;
     @Mock
     ContainerHostInfoModel containerHostInfoModel;
 

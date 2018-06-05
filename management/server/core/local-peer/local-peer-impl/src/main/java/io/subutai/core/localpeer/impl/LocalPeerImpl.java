@@ -107,7 +107,7 @@ import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -812,8 +812,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
             for ( final String templateId : request.getTemplates().get( resourceHostId ) )
             {
-                //                Templat template = templateManager.getTemplate( templateId, request.getCdnToken() );
-                Templat template = templateManager.getTemplate( templateId );
+                //                Template template = templateManager.getTemplate( templateId, request.getCdnToken() );
+                Template template = templateManager.getTemplate( templateId );
 
                 if ( template == null )
                 {
@@ -2937,14 +2937,14 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public Set<Templat> getTemplates()
+    public Set<Template> getTemplates()
     {
         return templateManager.getTemplates();
     }
 
 
     @Override
-    public Templat getTemplateByName( final String templateName )
+    public Template getTemplateByName( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
@@ -2953,7 +2953,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public Templat getTemplateById( final String templateId ) throws PeerException
+    public Template getTemplateById( final String templateId ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateId ), "Invalid template id" );
 

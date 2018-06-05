@@ -4,7 +4,7 @@ package io.subutai.core.template.api;
 import java.util.List;
 import java.util.Set;
 
-import io.subutai.common.protocol.Templat;
+import io.subutai.common.protocol.Template;
 
 
 /**
@@ -15,30 +15,30 @@ public interface TemplateManager
     /**
      * Returns all templates visible to current user
      */
-    Set<Templat> getTemplates();
+    Set<Template> getTemplates();
 
     /**
      * Returns template by its id
      */
-    Templat getTemplate( String id );
+    Template getTemplate( String id );
 
     /**
      * Returns template by name. First looks in verified templates, if not found looks in the rest templates.
      *
      * @param name name of template
      */
-    Templat getTemplateByName( String name );
+    Template getTemplateByName( String name );
 
     /**
      * Returns template by name from the verified repository. Verified repo contains official templates, not user
      * templates.
      */
-    Templat getVerifiedTemplateByName( final String name );
+    Template getVerifiedTemplateByName( final String name );
 
     /**
      * Returns templates belonging to owner
      */
-    List<Templat> getTemplatesByOwner( final String owner );
+    List<Template> getTemplatesByOwner( final String owner );
 
     /**
      * Resets template cache
@@ -55,7 +55,7 @@ public interface TemplateManager
 
     String getOwner( String token );
 
-    void registerTemplate( Templat templat, String cdnToken );
+    void registerTemplate( Template template, String cdnToken );
 
-    List<Templat> getOwnTemplates();
+    List<Template> getOwnTemplates();
 }

@@ -17,14 +17,10 @@
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <reference id="identityManagerRef" availability="mandatory"
-             interface="io.subutai.core.identity.api.IdentityManager" />
-
   <reference id="templateManagerRef" availability="mandatory"
              interface="io.subutai.core.template.api.TemplateManager" />
 
   <bean id="templateManagerRestImpl" class="io.subutai.core.template.rest.RestServiceImpl">
-    <argument ref="identityManagerRef" />
     <argument ref="templateManagerRef" />
   </bean>
 
