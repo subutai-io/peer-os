@@ -82,7 +82,7 @@ node() {
 			""", returnStdout: true)
         def ID = sh(script: """
             set +x
-            curl -s https://${cdnHost}:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"`\K`(.*?)"'| tr -d '"'
+            curl -s https://${cdnHost}:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"/K(.*?)"'| tr -d '"'
             """, returnStdout: true)
 
         stage("Build management template")
