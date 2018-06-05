@@ -80,9 +80,9 @@ node() {
 			set +x
 			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
-        def ID = sh(script: """
+        String ID = sh(script: """
             set +x
-            curl -s https://${cdnHost}:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
+            curl -s https://${cdnHost}:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\\K(.*?)"'| tr -d '"'
             """, returnStdout: true)
 
         stage("Build management template")
