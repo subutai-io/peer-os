@@ -99,7 +99,7 @@ node() {
 			
 			sudo subutai destroy management
 			echo "This is ${ID}"
-            sudo subutai clone id:${ID} management
+            sudo subutai clone id:$ID management
 			/bin/sleep 20
 			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
