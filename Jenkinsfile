@@ -80,6 +80,10 @@ node() {
 			set +x
 			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
+        String ID = sh(script: """
+            set +x
+            curl -s https://cdn.subutai.io:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
+            """, returnStdout: true)
 
         stage("Build management template")
         notifyBuildDetails = "\nFailed Step - Build management template"
@@ -87,6 +91,7 @@ node() {
         // Start MNG-RH Lock
         lock('deb') {
 
+            ID = ID.trim()
             // create management template
             sh """
 			set +x
@@ -94,8 +99,8 @@ node() {
 			set -e
 			
 			sudo subutai destroy management
-			sudo subutai import debian-stretch
-			sudo subutai clone debian-stretch management
+			echo "This is ${ID}"
+            sudo subutai clone id:${ID} management
 			/bin/sleep 20
 			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"

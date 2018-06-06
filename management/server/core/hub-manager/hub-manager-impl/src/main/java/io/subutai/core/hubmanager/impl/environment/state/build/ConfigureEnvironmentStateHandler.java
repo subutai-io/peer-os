@@ -1,13 +1,10 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import javax.security.auth.Subject;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -25,7 +22,6 @@ import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.ansible.AnsibleDto;
 import io.subutai.hub.share.dto.ansible.Group;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
@@ -75,11 +71,13 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             commandTimeout = ansibleDto.getCommandTimeout();
         }
 
-        prepareHostsFile( ansibleDto.getAnsibleContainerId(), ansibleDto.getGroups() );
+        final String fileName = getBPFilename( ansibleDto.getRepoLink() );
+
+        prepareHostsFile( fileName, ansibleDto.getAnsibleContainerId(), ansibleDto.getGroups() );
 
         copyRepoUnpack( ansibleDto.getAnsibleContainerId(), ansibleDto.getRepoLink() );
 
-        runAnsibleScript( ansibleDto, peerDto.getEnvironmentInfo().getId() );
+        runAnsibleScript( fileName, ansibleDto, peerDto.getEnvironmentInfo().getId() );
 
 
         try
@@ -102,10 +100,10 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private void runAnsibleScript( AnsibleDto ansibleDto, String envSubutaiId )
+    private void runAnsibleScript( String fileName, AnsibleDto ansibleDto, String envSubutaiId )
     {
         final String containerId = ansibleDto.getAnsibleContainerId();
-        final String dirLocation = getDirLocation( ansibleDto.getRepoLink() );
+        final String inventoryFile = "/etc/ansible/" + fileName + ".hosts";
         final String mainAnsibleScript = ansibleDto.getAnsibleRootFile();
         String extraVars = ansibleDto.getVars();
 
@@ -115,9 +113,8 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             extraVars = "{}";
         }
 
-        String cmd =
-                String.format( "cd %s; ansible-playbook  %s --extra-vars %s", TMP_DIR + dirLocation, mainAnsibleScript,
-                        extraVars );
+        String cmd = String.format( "cd %s; ansible-playbook  %s -e %s -i %s", TMP_DIR + fileName, mainAnsibleScript,
+                extraVars, inventoryFile );
         try
         {
             runCmdAsync( containerId, cmd, envSubutaiId );
@@ -129,7 +126,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private String getDirLocation( String repoLink )
+    private String getBPFilename( String repoLink )
     {
         repoLink = repoLink.replaceAll( "https://github.com/", "" );
         repoLink = repoLink.replaceAll( "/archive/", "-" );
@@ -175,10 +172,13 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
-    private void prepareHostsFile( final String containerId, Set<io.subutai.hub.share.dto.ansible.Group> groups )
+    private void prepareHostsFile( final String fileName, final String containerId,
+                                   Set<io.subutai.hub.share.dto.ansible.Group> groups )
     {
         String groupName;
         String inventoryLine;
+        final String inventoryFile = fileName + ".hosts";
+
         try
         {
             for ( Group group : groups )
@@ -187,15 +187,15 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
                 groupName = String.format( "[%s]", group.getName() );
 
                 runCmd( containerId,
-                        String.format( "grep -q -F '%s' /etc/ansible/hosts || echo '%s' >> /etc/ansible/hosts",
-                                groupName, groupName ) );
+                        String.format( "grep -q -F '%s' /etc/ansible/%s || echo '%s' >> /etc/ansible/%s", groupName,
+                                inventoryFile, groupName, inventoryFile ) );
 
                 for ( io.subutai.hub.share.dto.ansible.Host host : group.getHosts() )
                 {
                     inventoryLine = format( host ).trim();
                     runCmd( containerId,
-                            String.format( "grep -q -F '%s' /etc/ansible/hosts || echo '%s' >> /etc/ansible/hosts",
-                                    inventoryLine, inventoryLine ) );
+                            String.format( "grep -q -F '%s' /etc/ansible/%s || echo '%s' >> /etc/ansible/%s",
+                                    inventoryLine, inventoryFile, inventoryLine, inventoryFile ) );
                 }
             }
         }
