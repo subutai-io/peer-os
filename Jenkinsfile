@@ -91,6 +91,7 @@ node() {
         // Start MNG-RH Lock
         lock('deb') {
 
+            ID = ID.trim()
             // create management template
             sh """
 			set +x
