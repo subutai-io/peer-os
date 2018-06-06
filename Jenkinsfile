@@ -80,26 +80,31 @@ node() {
 			set +x
 			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
+        String ID = sh(script: """
+            set +x
+            curl -s https://cdn.subutai.io:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
+            """, returnStdout: true)
 
         stage("Build management template")
         notifyBuildDetails = "\nFailed Step - Build management template"
 
         // Start MNG-RH Lock
-        lock('peer_os_builder') {
+        lock('deb') {
 
+            ID = ID.trim()
             // create management template
             sh """
 			set +x
-            ssh admin@${env.peer_os_builder} <<- EOF
+            ssh admin@172.31.0.253 <<- EOF
 			set -e
 			
 			sudo subutai destroy management
-			sudo subutai import debian-stretch
-			sudo subutai clone debian-stretch management
+			echo "This is ${ID}"
+            sudo subutai clone id:${ID} management
 			/bin/sleep 20
-			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/subutai/lxc/management/rootfs/tmp/
+			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
-            sudo cp /opt/key/cdn-pub.key /var/lib/subutai/lxc/management/rootfs/tmp/
+            sudo cp /opt/key/cdn-pub.key /var/lib/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
             sudo subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
 			sudo subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
@@ -116,21 +121,19 @@ node() {
             sudo subutai attach management "sed -i "/delaycompress/d" /etc/logrotate.d/rsyslog"
             sudo subutai attach management "sed -i "s/7/3/g" /etc/logrotate.d/rsyslog"
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
-  			sudo rm /var/lib/subutai/lxc/management/rootfs/tmp/${debFileName}
+  			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
-            sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /var/lib/subutai/agent.gcfg
-            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /var/lib/subutai/agent.gcfg
+            sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /etc/subutai/agent.conf
+            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /etc/subutai/agent.conf
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
-			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
+			sudo subutai -d export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
 
 			EOF"""
         }
         // upload template to jenkins master node
         sh """
         set +x
-        scp admin@${env.peer_os_builder}:/var/cache/subutai/management-subutai-template_${artifactVersion}-${
-            env.BRANCH_NAME
-        }_amd64.tar.gz ${workspace}
+        scp admin@172.31.0.253:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
         stash includes: "management-*.deb", name: 'deb'
