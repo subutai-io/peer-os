@@ -31,10 +31,15 @@ public interface RestService
     @Path( "token" )
     Response getObtainedCdnToken();
 
+    @GET
+    @Produces( { MediaType.TEXT_PLAIN } )
+    @Path( "request" )
+    Response getCdnTokenRequest();
+
     @POST
     @Produces( { MediaType.TEXT_PLAIN } )
     @Path( "token" )
-    Response obtainCdnToken( @FormParam( "signedFingerprint" ) String signedFingerprint );
+    Response obtainCdnToken( @FormParam( "signedRequest" ) String signRequest );
 
     @GET
     @Produces( { MediaType.TEXT_PLAIN } )

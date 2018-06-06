@@ -341,9 +341,48 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    public String obtainCdnToken( final String signedFingerprint )
+    public String getTokenRequest()
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( signedFingerprint ) );
+        CloseableHttpClient client = getHttpsClient();
+        try
+        {
+            HttpGet httpGet = new HttpGet(
+                    String.format( "https://%s/rest/v1/cdn/token?fingerprint=%s", Common.HUB_IP, getFingerprint() ) );
+            CloseableHttpResponse response = client.execute( httpGet );
+            try
+            {
+                String content = readContent( response );
+
+                if ( response.getStatusLine().getStatusCode() == 201 )
+                {
+                    return content;
+                }
+                else
+                {
+                    LOG.error( "Failed to obtain token request: " + response.getStatusLine() + ", " + content );
+                }
+            }
+            finally
+            {
+                close( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+        finally
+        {
+            IOUtils.closeQuietly( client );
+        }
+
+        return null;
+    }
+
+
+    public String obtainCdnToken( final String signedRequest )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( signedRequest ) );
 
         CloseableHttpClient client = getHttpsClient();
         try
@@ -351,7 +390,7 @@ public class TemplateManagerImpl implements TemplateManager
             HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/token", Common.HUB_IP ) );
 
             List<NameValuePair> form = Lists.newArrayList();
-            form.add( new BasicNameValuePair( "signedFingerprint", signedFingerprint ) );
+            form.add( new BasicNameValuePair( "request", signedRequest ) );
             UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity( form, Consts.UTF_8 );
             post.setEntity( urlEncodedFormEntity );
             CloseableHttpResponse response = client.execute( post );

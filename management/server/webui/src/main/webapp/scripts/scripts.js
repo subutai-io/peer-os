@@ -189,21 +189,21 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 
         localStorage.removeItem('cdnToken');
 
-        templateSrv.getFingerprint().success(function (fingerprint) {
+        templateSrv.getTokenRequest().success(function (request) {
 
-            var signedFingerprintTextArea = document.createElement("textarea");
-            signedFingerprintTextArea.setAttribute('class', 'bp-sign-target');
-            signedFingerprintTextArea.style.width = '1px';
-            signedFingerprintTextArea.style.position = 'absolute';
-            signedFingerprintTextArea.style.left = '-100px';
-            signedFingerprintTextArea.value = fingerprint;
-            document.body.appendChild(signedFingerprintTextArea);
+            var signedRequestTextArea = document.createElement("textarea");
+            signedRequestTextArea.setAttribute('class', 'bp-sign-target');
+            signedRequestTextArea.style.width = '1px';
+            signedRequestTextArea.style.position = 'absolute';
+            signedRequestTextArea.style.left = '-100px';
+            signedRequestTextArea.value = request;
+            document.body.appendChild(signedRequestTextArea);
 
-            $(signedFingerprintTextArea).on('change', function() {
+            $(signedRequestTextArea).on('change', function() {
 
-               var signedFingerprint = $(this).val();
+               var signedRequest = $(this).val();
 
-               templateSrv.obtainCdnToken(signedFingerprint).success(function (token) {
+               templateSrv.obtainCdnToken(signedRequest).success(function (token) {
 
                    localStorage.setItem('cdnToken', token);
 

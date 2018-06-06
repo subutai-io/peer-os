@@ -69,9 +69,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response obtainCdnToken( final String signedFingerprint )
+    public Response obtainCdnToken( final String signedRequest )
     {
-        return Response.ok().entity( templateManager.obtainCdnToken( signedFingerprint ) ).build();
+        return Response.ok().entity( templateManager.obtainCdnToken( signedRequest ) ).build();
+    }
+
+
+    @Override
+    public Response getCdnTokenRequest()
+    {
+        return Response.ok().entity( templateManager.getTokenRequest() ).build();
     }
 
 

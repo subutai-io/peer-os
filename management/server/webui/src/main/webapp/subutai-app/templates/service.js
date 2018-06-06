@@ -11,10 +11,11 @@ function templateSrv($http, $q) {
 
    var templateSrv = {
         getTemplates: getTemplates,
-        getOwnTemplates:getOwnTemplates,
+        getOwnTemplates: getOwnTemplates,
         getFingerprint: getFingerprint,
         getObtainedCdnToken: getObtainedCdnToken,
-        obtainCdnToken: obtainCdnToken
+        obtainCdnToken: obtainCdnToken,
+        getTokenRequest: getTokenRequest
    };
 
    return templateSrv;
@@ -51,8 +52,12 @@ function templateSrv($http, $q) {
        return $http.get(BASE_URL + "/token", {withCredentials: true});
    }
 
-   function obtainCdnToken(signedFingerprint){
-       var postData = "signedFingerprint=" + encodeURIComponent(signedFingerprint)
+   function getTokenRequest(){
+       return $http.get(BASE_URL + "/request", {withCredentials: true});
+   }
+
+   function obtainCdnToken(signedRequest){
+       var postData = "signedRequest=" + encodeURIComponent(signedRequest)
 
        return $http.post(
            BASE_URL + "/token",

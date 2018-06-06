@@ -47,9 +47,11 @@ public interface TemplateManager
 
     String getFingerprint();
 
+    String getTokenRequest();
+
     String getObtainedCdnToken();
 
-    String obtainCdnToken( String signedFingerprint );
+    String obtainCdnToken( String signedRequest );
 
     boolean isRegisteredWithCdn();
 
