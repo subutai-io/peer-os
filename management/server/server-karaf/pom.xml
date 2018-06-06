@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>7.0.0</version>
+    <version>7.0.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>subutai</artifactId>
@@ -17,6 +17,7 @@
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
     <hubEnv>hub</hubEnv>
+    <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
   </properties>
 
   <dependencies>

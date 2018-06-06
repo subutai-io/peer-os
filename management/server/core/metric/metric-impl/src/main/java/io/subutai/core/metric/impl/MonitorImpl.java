@@ -285,7 +285,11 @@ public class MonitorImpl extends HostListener implements Monitor
     {
         ResourceHostMetrics result = new ResourceHostMetrics();
 
-        for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
+        Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
+
+        result.setResourceHostCount( resourceHosts.size() );
+
+        for ( ResourceHost resourceHost : resourceHosts )
         {
             final ResourceHostMetric m = getResourceHostMetric( resourceHost );
             if ( m != null )
@@ -481,8 +485,6 @@ public class MonitorImpl extends HostListener implements Monitor
                 info.setState( statusLines );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
-                info.setP2pSystemLogs( Lists.newArrayList(
-                        resourceHost.getP2pLogs( LogLevel.ERROR, logsStartDate, logsEndData ).getLogs() ) );
 
                 pojos.add( info );
             }

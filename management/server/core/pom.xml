@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>7.0.0</version>
+    <version>7.0.3-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -20,7 +20,6 @@
     <module>network-manager</module>
     <module>local-peer</module>
     <module>peer-manager</module>
-    <module>strategy-manager</module>
     <module>tracker</module>
     <module>metric</module>
     <module>messenger</module>

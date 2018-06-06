@@ -6,7 +6,7 @@
   <parent>
     <artifactId>peer-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>7.0.0</version>
+    <version>7.0.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>peer-manager-api</artifactId>
@@ -19,11 +19,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>strategy-manager-api</artifactId>
     </dependency>
 
     <dependency>

@@ -18,6 +18,7 @@ public class ResourceHostDto
     private String hostname;
     private InstanceType instanceType;
     private HostArchitecture hostArchitecture;
+    private String peerId;
 
 
     public ResourceHostDto( final String id, final String hostname, final InstanceType instanceType,
@@ -32,7 +33,8 @@ public class ResourceHostDto
 
 
     public ResourceHostDto( String id, String hostname, String cpu, String cpuAvailable, String memory,
-                            String memoryAvailable, String hdd, String hddAvailable, boolean isManagement )
+                            String memoryAvailable, String hdd, String hddAvailable, boolean isManagement,
+                            String peerId )
     {
         this.id = id;
         this.hostname = hostname;
@@ -43,5 +45,18 @@ public class ResourceHostDto
         this.hdd = hdd;
         this.hddAvailable = hddAvailable;
         this.isManagement = isManagement;
+        this.peerId = peerId;
+    }
+
+
+    public String getId()
+    {
+        return id;
+    }
+
+
+    public String getPeerId()
+    {
+        return peerId;
     }
 }

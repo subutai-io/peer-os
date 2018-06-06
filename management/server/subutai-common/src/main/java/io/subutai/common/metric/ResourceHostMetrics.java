@@ -1,9 +1,8 @@
 package io.subutai.common.metric;
 
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.cxf.common.util.CollectionUtils;
 
@@ -19,10 +18,13 @@ public class ResourceHostMetrics
 {
     @Expose
     @JsonProperty( "resources" )
-    Collection<ResourceHostMetric> resources = new HashSet();
+    Set<ResourceHostMetric> resources = new HashSet();
+    @Expose
+    @JsonProperty( "count" )
+    int resourceHostCount;
 
 
-    public Collection<ResourceHostMetric> getResources()
+    public Set<ResourceHostMetric> getResources()
     {
         return resources;
     }
@@ -36,17 +38,27 @@ public class ResourceHostMetrics
 
     public ResourceHostMetric get( String hostId )
     {
-        ResourceHostMetric result = null;
-
-        for ( Iterator<ResourceHostMetric> i = resources.iterator(); result == null && i.hasNext(); )
+        for ( ResourceHostMetric metric : resources )
         {
-            ResourceHostMetric r = i.next();
-            if ( r.getHostInfo().getId().equals( hostId ) )
+            if ( metric.getHostInfo().getId().equals( hostId ) )
             {
-                result = r;
+                return metric;
             }
         }
-        return result;
+
+        return null;
+    }
+
+
+    public void setResourceHostCount( final int resourceHostCount )
+    {
+        this.resourceHostCount = resourceHostCount;
+    }
+
+
+    public int getResourceHostCount()
+    {
+        return resourceHostCount;
     }
 
 

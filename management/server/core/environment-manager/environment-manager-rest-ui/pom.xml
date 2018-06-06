@@ -5,7 +5,7 @@
   <parent>
     <artifactId>environment-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>7.0.0</version>
+    <version>7.0.3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -38,10 +38,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>strategy-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

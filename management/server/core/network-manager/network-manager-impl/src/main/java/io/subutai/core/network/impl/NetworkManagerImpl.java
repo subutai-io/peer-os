@@ -2,7 +2,6 @@ package io.subutai.core.network.impl;
 
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -17,8 +16,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.LogLevel;
-import io.subutai.common.network.P2pLogs;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.ContainerHost;
@@ -175,57 +172,22 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public  String getP2pStatusByP2PHash ( Host host, String p2pHash ) throws NetworkManagerException
+    public String getP2pStatusByP2PHash( Host host, String p2pHash ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkNotNull( p2pHash, "Invalid p2pHash" );
         Preconditions.checkState( !p2pHash.isEmpty(), "p2pHash can not be empty!" );
 
-        CommandResult result = execute( host, commands.getP2pStatusBySwarm(p2pHash) );
+        CommandResult result = execute( host, commands.getP2pStatusBySwarm( p2pHash ) );
 
         if ( result.hasSucceeded() )
         {
             return result.getStdOut();
-        }else
-        {
-            return  result.getStdErr();
         }
-    }
-
-
-    @Override
-    public P2pLogs getP2pLogs( final Host host, final LogLevel logLevel, final Date from, final Date till )
-            throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkNotNull( logLevel, "Invalid log level" );
-        Preconditions.checkNotNull( from, "Invalid from date" );
-        Preconditions.checkNotNull( till, "Invalid till date" );
-
-        P2pLogs p2pLogs = new P2pLogs();
-
-        try
+        else
         {
-            CommandResult result = host.execute( commands.getGetP2pLogsCommand( from, till, logLevel ) );
-
-            StringTokenizer st = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
-
-            while ( st.hasMoreTokens() )
-            {
-                String logLine = st.nextToken();
-
-                if ( !Strings.isNullOrEmpty( logLine ) )
-                {
-                    p2pLogs.addLog( logLine );
-                }
-            }
+            return result.getStdErr();
         }
-        catch ( CommandException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-
-        return p2pLogs;
     }
 
 
