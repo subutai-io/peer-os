@@ -126,15 +126,6 @@
 				</span>
       </a>
     </li>
-    <li class="b-nav-menu" ng-class="subutaiController.activeState == 'bazaar' ? 'b-nav-menu_active' : ''">
-      <a ui-sref="bazaar" class="b-nav-menu-link" id="subt-link__bazaar">
-				<span class="b-nav-menu__icon b-nav-menu-link__item">
-					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets/elements/icons.svg#nav-bazaar"></use>
-					</svg>
-				</span>
-      </a>
-    </li>
     <li class="b-nav-menu" ng-if="subutaiController.adminMenus"
         ng-class="subutaiController.activeState == 'about' || subutaiController.activeState == 'settings-peer' || subutaiController.activeState == 'settings-network' || subutaiController.activeState == 'settings-advanced' || subutaiController.activeState == 'settings-updates' ? 'b-nav-menu_active' : ''">
       <a class="b-nav-menu-link" href id="subt-link__settings">
