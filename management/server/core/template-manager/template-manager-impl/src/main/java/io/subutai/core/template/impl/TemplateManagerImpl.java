@@ -399,7 +399,7 @@ public class TemplateManagerImpl implements TemplateManager
             {
                 String content = readContent( response );
 
-                if ( response.getStatusLine().getStatusCode() == 200 )
+                if ( response.getStatusLine().getStatusCode() == 201 )
                 {
                     identityManager.getActiveSession().setCdnToken( content );
 
