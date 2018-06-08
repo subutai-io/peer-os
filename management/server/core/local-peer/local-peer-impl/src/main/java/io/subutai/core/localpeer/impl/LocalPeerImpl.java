@@ -199,7 +199,7 @@ import io.subutai.hub.share.resource.ResourceValue;
 @PermitAll
 public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 {
-    private static final int BUNDLE_COUNT = 278;
+    private static final int BUNDLE_COUNT = 281;
 
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
     private static final BigDecimal ONE_HUNDRED = new BigDecimal( "100.00" );
