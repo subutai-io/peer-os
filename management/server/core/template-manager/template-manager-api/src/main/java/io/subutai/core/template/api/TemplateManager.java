@@ -57,7 +57,5 @@ public interface TemplateManager
 
     String getOwner( String token );
 
-    void registerTemplate( Template template, String cdnToken );
-
     List<Template> getOwnTemplates();
 }

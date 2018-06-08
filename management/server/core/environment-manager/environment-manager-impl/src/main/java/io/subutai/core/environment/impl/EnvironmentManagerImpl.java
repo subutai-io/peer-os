@@ -1178,13 +1178,7 @@ public class EnvironmentManagerImpl extends HostListener
                                                        privateTemplate, cdnToken );
 
 
-        Template templat =
-                new Template( template.getHash(), template.getMd5sum(), template.getSize(), templateName, version,
-                        template.getParent() );
-
-        templateManager.registerTemplate( templat, cdnToken );
-
-        LOG.info( "Template {} exported", templat );
+        LOG.info( "Template {} exported", template );
     }
 
 

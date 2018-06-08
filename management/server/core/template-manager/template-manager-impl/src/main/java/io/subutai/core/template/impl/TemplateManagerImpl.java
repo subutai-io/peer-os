@@ -32,7 +32,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 
-import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
@@ -492,51 +491,5 @@ public class TemplateManagerImpl implements TemplateManager
         }
 
         return null;
-    }
-
-
-    @Override
-    public void registerTemplate( final Template template, final String cdnToken )
-    {
-        Preconditions.checkNotNull( template );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( cdnToken ) );
-
-        CloseableHttpClient client = getHttpsClient();
-        try
-        {
-            HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/templates", Common.HUB_IP ) );
-
-            String templateJson = JsonUtil.toJson( template );
-            LOG.debug( "Registering template with CDN\n{}", templateJson );
-
-            List<NameValuePair> form = Lists.newArrayList();
-            form.add( new BasicNameValuePair( "template", templateJson ) );
-            form.add( new BasicNameValuePair( "token", cdnToken ) );
-            UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity( form, Consts.UTF_8 );
-            post.setEntity( urlEncodedFormEntity );
-            CloseableHttpResponse response = client.execute( post );
-
-            try
-            {
-                if ( response.getStatusLine().getStatusCode() != 200 )
-                {
-                    throw new ActionFailedException(
-                            "Failed to register template with CDN: " + response.getStatusLine() + ", " + readContent(
-                                    response ) );
-                }
-            }
-            finally
-            {
-                close( response );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new ActionFailedException( e.getMessage() );
-        }
-        finally
-        {
-            IOUtils.closeQuietly( client );
-        }
     }
 }
