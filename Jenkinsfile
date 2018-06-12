@@ -75,10 +75,10 @@ node() {
 			set +x
 			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
 			""", returnStdout: true)
-        def token = sh(script: """
-			set +x
-			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
-			""", returnStdout: true)
+        //def token = sh(script: """
+		//	set +x
+		//	curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
+		//	""", returnStdout: true)
         String ID = sh(script: """
             set +x
             curl -s https://cdn.subutai.io:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
@@ -96,7 +96,12 @@ node() {
 			set +x
             ssh admin@172.31.0.253 <<- EOF
 			set -e
-			
+		    export fingerprint=877B586E74F170BC4CF6ECABB971E2AC63D23DC9
+            export user=jenkins
+            authId=$(curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint})
+            sign=$(echo ${authId} | gpg --clearsign -u ${user})
+            token=$(curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token)
+            echo ${token}
 			sudo subutai destroy management
 			echo "This is ${ID}"
             sudo subutai clone id:${ID} management
@@ -125,9 +130,22 @@ node() {
             sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /etc/subutai/agent.conf
             sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /etc/subutai/agent.conf
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
-			sudo subutai -d export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
-
+			sudo subutai -d export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\' > template.json
+            scp /var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ipfs-kg:/tmp
 			EOF"""
+            sh """
+            ssh ipfs-kg <<-EOF
+            ipfs pin add /tmp/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz | awk '{print ${3}}' > abc
+            export IDS=$(cat abc)
+            EOF"""
+            sh """
+            ssh admin@172.31.0.253 <<- EOF 
+            sudo sed -i 's/"id":""/"id":"${IDS}"/g' /var/cache/subutai/template.json
+            cd /var/cache/subutai/
+            export templ=$(cat template.json)
+            curl -d "token={token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
+            EOF"""
+            
         }
         // upload template to jenkins master node
         sh """
@@ -167,37 +185,37 @@ node() {
 		    """
 
             // upload template
-            String responseTemplate = sh(script: """
-			set +x
+            //String responseTemplate = sh(script: """
+			//set +x
             
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
-			""", returnStdout: true)
-            def signatureTemplate = sh(script: """
-			set +x
+			//curl -s -k https://${cdnHost}:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
+			//""", returnStdout: true)
+            //def signatureTemplate = sh(script: """
+			//set +x
 			
-            curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
-			""", returnStdout: true)
+            //curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
+			//""", returnStdout: true)
 
-            sh """
-            echo "Uploading file ${templateFileName}"
-            """
+            //sh """
+            //echo "Uploading file ${templateFileName}"
+            //"""
 
-            sh """
-			set +x
-			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" https://${cdnHost}:8338/kurjun/rest/auth/sign
-		    """
-            sh """
-            set +x
-            echo "https://${cdnHost}:8338/kurjun/rest/template/list"
-            """
+            //sh """
+			//set +x
+			//curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" https://${cdnHost}:8338/kurjun/rest/auth/sign
+		    //"""
+            //sh """
+            //set +x
+            //echo "https://${cdnHost}:8338/kurjun/rest/template/list"
+            //"""
 
             // delete old template
-            if (responseTemplate != "404 Not found") {
-                def jsonTemplate = jsonParse(responseTemplate)
-                sh """
-				set +xe
-				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
-			"""
+            //if (responseTemplate != "404 Not found") {
+            //    def jsonTemplate = jsonParse(responseTemplate)
+             //   sh """
+		//		set +xe
+		//		curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
+		//	"""
             }
         }
     } catch (e) {
