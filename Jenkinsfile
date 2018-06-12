@@ -69,20 +69,8 @@ node() {
         find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
 	    """
         
-        // CDN auth creadentials
+        // CDN auth credentials
         String user = "jenkins"
-        def authID = sh(script: """
-			set +x
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
-			""", returnStdout: true)
-        //def token = sh(script: """
-		//	set +x
-		//	curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
-		//	""", returnStdout: true)
-        String ID = sh(script: """
-            set +x
-            curl -s https://${cdnHost}:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
-            """, returnStdout: true)
         String fingerprint = "877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
         def authId = sh(script: """
             curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint}
@@ -100,7 +88,6 @@ node() {
         // Start MNG-RH Lock
         lock('deb') {
 
-            ID = ID.trim()
             // create management template
             sh """
 			set +x
@@ -108,8 +95,7 @@ node() {
 			set -e
 		    echo ${token}
 			sudo subutai destroy management
-			echo "This is ${ID}"
-            sudo subutai clone id:${ID} management
+            sudo subutai clone debian-stretch management
 			/bin/sleep 20
 			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
@@ -133,7 +119,7 @@ node() {
   			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
             sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /etc/subutai/agent.conf
-            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /etc/subutai/agent.conf
+            sudo sed 's/URL =.*/URL = ${hubIp}/g' -i /etc/subutai/agent.conf
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\' > template.json
             scp /var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ipfs-kg:/tmp
