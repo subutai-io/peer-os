@@ -98,9 +98,9 @@ node() {
 			set -e
 		    export fingerprint=877B586E74F170BC4CF6ECABB971E2AC63D23DC9
             export user=jenkins
-            export authId=$(curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint})
-            export sign=$(echo ${authId} | gpg --clearsign -u ${user})
-            export token=$(curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token)
+            export authId=\$(curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint})
+            export sign=\$(echo ${authId} | gpg --clearsign -u ${user})
+            export token=\$(curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token)
             echo ${token}
 			sudo subutai destroy management
 			echo "This is ${ID}"
@@ -143,7 +143,7 @@ node() {
             export IDS=(cat abc)
             sudo sed -i 's/"id":""/"id":"${IDS}"/g' /var/cache/subutai/template.json
             cd /var/cache/subutai/
-            export templ=$(cat template.json)
+            export templ=\$(cat template.json)
             curl -d "token=${token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
             EOF"""
             
