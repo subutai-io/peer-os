@@ -96,8 +96,7 @@ node() {
 			set +x
             ssh admin@172.31.0.253 <<- EOF
 			set -e
-		    export fingerprint=877B586E74F170BC4CF6ECABB971E2AC63D23DC9
-            export user=jenkins
+		    export fingerprint="877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
             export authId=\$(curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint})
             export sign=\$(echo ${authId} | gpg --clearsign -u ${user})
             export token=\$(curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token)
