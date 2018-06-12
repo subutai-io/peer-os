@@ -21,6 +21,7 @@ var app = angular.module('subutai-app', [
 
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
+    .factory('templateSrv', templateSrv)
 
     .factory('trackerSrv', trackerSrv)
 
@@ -239,9 +240,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     function logout() {
     	//TODO here we can clear cache
-//        localStorage.removeItem('bazaarProducts');
         removeCookie('sptoken');
-        localStorage.removeItem('kurjunToken');
+        localStorage.removeItem('cdnToken');
         localStorage.removeItem('currentUserToken');
         sessionStorage.removeItem('notifications');
         $location.path('login');
@@ -409,16 +409,6 @@ function SubutaiController($rootScope, $http, $state) {
                 }
             });
 
-            /*$http.get(SERVER_URL + "rest/v1/hub/registration_state", {
-                withCredentials: true,
-                headers: {'Content-Type': 'application/json'}
-            }).success(function (data) {
-                if (data.isRegisteredToHub == true) {
-                    vm.peerName = data.peerName + " | Subutai";
-                }else{
-                    vm.peerName = "Subutai";
-                }
-            });*/
             return;
         }
 
@@ -488,33 +478,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 							files: [
 								'subutai-app/identityUser/identityUser.js',
 								'subutai-app/identityUser/controller.js',
-								'subutai-app/identity/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		})
-		.state('identity-role', {
-			url: '/identity-role',
-			templateUrl: 'subutai-app/identityRole/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				security: ['$q', function($q){
-					if(!localStorage.getItem('isAdmin')){
-						return $q.reject("notAdmin");
-					}
-				}],
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.identity-role',
-							files: [
-								'subutai-app/identityRole/identityRole.js',
-								'subutai-app/identityRole/controller.js',
 								'subutai-app/identity/service.js'
 							]
 						}
@@ -636,33 +599,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-		.state('settings-security', {
-			url: '/settings-security',
-			templateUrl: 'subutai-app/settingsSecurity/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				security: ['$q', function($q){
-					if(!localStorage.getItem('isAdmin')){
-						return $q.reject("notAdmin");
-					}
-				}],
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.settings-security',
-							files: [
-								'subutai-app/settingsSecurity/settingsSecurity.js',
-								'subutai-app/settingsSecurity/controller.js',
-								'subutai-app/settingsSecurity/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		})
 		.state('about', {
 			url: '/about',
 			templateUrl: 'subutai-app/about/partials/view.html',
@@ -686,60 +622,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 							]
 						}
 					])
-				}]
-			}
-		})
-		.state('settings-peer', {
-			url: '/settings-peer',
-			templateUrl: 'subutai-app/settingsPeer/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				security: ['$q', function($q){
-					if(!localStorage.getItem('isAdmin')){
-						return $q.reject("notAdmin");
-					}
-				}],
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.settings-peer',
-							files: [
-								'subutai-app/settingsPeer/settingsPeer.js',
-								'subutai-app/settingsPeer/controller.js',
-								'subutai-app/settingsPeer/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		})
-		.state('settings-kurjun', {
-			url: '/settings-kurjun',
-			templateUrl: 'subutai-app/settingsKurjun/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				security: ['$q', function($q){
-					if(!localStorage.getItem('isAdmin')){
-						return $q.reject("notAdmin");
-					}
-				}],
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.settings-kurjun',
-							files: [
-								'subutai-app/settingsKurjun/settingsKurjun.js',
-								'subutai-app/settingsKurjun/controller.js',
-								'subutai-app/settingsKurjun/service.js'
-							]
-						}
-					]);
 				}]
 			}
 		})
@@ -887,30 +769,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
-        .state('kurjun', {
-            url: '/kurjun',
-            templateUrl: 'subutai-app/kurjun/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.kurjun',
-                            files: [
-                                'subutai-app/kurjun/kurjun.js',
-                                'subutai-app/kurjun/controller.js',
-                                'subutai-app/kurjun/service.js',
-                                'subutai-app/identity/service.js',
-                                'subutai-app/settingsKurjun/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
         .state('tracker', {
             url: '/tracker',
             templateUrl: 'subutai-app/tracker/partials/view.html',
@@ -927,28 +785,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/tracker/trckr.js',
                                 'subutai-app/tracker/controller.js',
                                 'subutai-app/tracker/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('tokens', {
-            url: '/tokens',
-            templateUrl: 'subutai-app/tokens/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.tokens',
-                            files: [
-                                'subutai-app/tokens/tokens.js',
-                                'subutai-app/tokens/controller.js',
-                                'subutai-app/identity/service.js'
                             ]
                         }
                     ]);
@@ -998,30 +834,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/console/service.js',
                                 'subutai-app/environment/service.js',
                                 'subutai-app/peerRegistration/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('bazaar', {
-            url: '/bazaar',
-            templateUrl: 'subutai-app/bazaar/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.bazaar',
-                            files: [
-                                'subutai-app/bazaar/bazaar.js',
-                                'subutai-app/bazaar/controller.js',
-                                'subutai-app/bazaar/service.js',
-                                'subutai-app/identity/service.js',
-                                'subutai-app/bazaar/partials/css/component.css'
                             ]
                         }
                     ]);
@@ -1155,7 +967,6 @@ var bazaarUpdate = false;
 var hubRegisterStatus = false;
 
 var SERVER_URL = '/';
-var GLOBAL_KURJUN_URL = '';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
 var VARS_TOOLTIP_TIMEOUT = 1600;

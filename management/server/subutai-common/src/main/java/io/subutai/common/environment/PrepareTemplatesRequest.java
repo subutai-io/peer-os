@@ -12,20 +12,20 @@ public class PrepareTemplatesRequest
     @JsonProperty( value = "environmentId" )
     private final String environmentId;
 
-    @JsonProperty( value = "kurjunToken" )
-    private final String kurjunToken;
+    @JsonProperty( value = "cdnToken" )
+    private final String cdnToken;
 
     @JsonProperty( value = "templates" )
     private Map<String, Set<String>> templates;
 
 
     public PrepareTemplatesRequest( @JsonProperty( value = "environmentId" ) final String environmentId,
-                                    @JsonProperty( value = "kurjunToken" ) final String kurjunToken,
+                                    @JsonProperty( value = "cdnToken" ) final String cdnToken,
                                     @JsonProperty( value = "templates" ) final Map<String, Set<String>> templates )
     {
         this.environmentId = environmentId;
         this.templates = templates;
-        this.kurjunToken = kurjunToken;
+        this.cdnToken = cdnToken;
     }
 
 
@@ -35,9 +35,9 @@ public class PrepareTemplatesRequest
     }
 
 
-    public String getKurjunToken()
+    public String getCdnToken()
     {
-        return kurjunToken;
+        return cdnToken;
     }
 
 
@@ -52,7 +52,7 @@ public class PrepareTemplatesRequest
     {
         final StringBuffer sb = new StringBuffer( "PrepareTemplatesRequest{" );
         sb.append( "environmentId='" ).append( environmentId ).append( '\'' );
-        sb.append( ", kurjunToken='" ).append( kurjunToken ).append( '\'' );
+        sb.append( ", cdnToken='" ).append( cdnToken ).append( '\'' );
         sb.append( ", templates=" ).append( templates );
         sb.append( '}' );
         return sb.toString();

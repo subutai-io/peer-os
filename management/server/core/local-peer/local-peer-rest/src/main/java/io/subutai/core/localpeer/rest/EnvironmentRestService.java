@@ -191,14 +191,4 @@ public interface EnvironmentRestService
     @Produces( MediaType.APPLICATION_JSON )
     Response placeEnvironmentInfoByContainerId( @PathParam( "environmentId" ) String environmentId,
                                                 @PathParam( "containerId" ) String containerId );
-
-
-    @POST
-    @Path( "{environmentId}/containers/{containerId}/export/{name}/{version}/{isPrivateTemplate}/{token}" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response exportTemplate( @PathParam( "containerId" ) ContainerId containerId,
-                             @PathParam( "name" ) String templateName, @PathParam( "version" ) String version,
-                             @PathParam( "isPrivateTemplate" ) boolean isPrivateTemplate,
-                             @PathParam( "token" ) String token );
 }

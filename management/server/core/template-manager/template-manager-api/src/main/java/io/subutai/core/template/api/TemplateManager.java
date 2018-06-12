@@ -8,8 +8,7 @@ import io.subutai.common.protocol.Template;
 
 
 /**
- * Exposes API to work with templates.
- * All methods use caching except those that explicitly mention otherwise
+ * Exposes API to work with templates. All methods use caching except those that explicitly mention otherwise
  */
 public interface TemplateManager
 {
@@ -19,23 +18,9 @@ public interface TemplateManager
     Set<Template> getTemplates();
 
     /**
-     * Returns all templates visible to current user
-     *
-     * @param kurjunToken - kurjun token
-     */
-    Set<Template> getTemplates( String kurjunToken );
-
-    /**
      * Returns template by its id
      */
     Template getTemplate( String id );
-
-    /**
-     * Returns template by its id
-     *
-     * @param kurjunToken - kurjun token
-     */
-    Template getTemplate( String id, String kurjunToken );
 
     /**
      * Returns template by name. First looks in verified templates, if not found looks in the rest templates.
@@ -51,18 +36,26 @@ public interface TemplateManager
     Template getVerifiedTemplateByName( final String name );
 
     /**
-     * Returns template by owner. Owner is user PGP public key fingerprint
+     * Returns templates belonging to owner
      */
     List<Template> getTemplatesByOwner( final String owner );
-
-    /**
-     * Returns active user's templates.
-     * Does NOT use caching!
-     */
-    List<Template> getUserPrivateTemplates();
 
     /**
      * Resets template cache
      */
     void resetTemplateCache();
+
+    String getFingerprint();
+
+    String getTokenRequest();
+
+    String getObtainedCdnToken();
+
+    String obtainCdnToken( String signedRequest );
+
+    boolean isRegisteredWithCdn();
+
+    String getOwner( String token );
+
+    List<Template> getOwnTemplates();
 }

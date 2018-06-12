@@ -170,7 +170,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
         try
         {
             new PrepareTemplatesStep( environment, peerManager, topology,
-                    identityManager.getActiveSession().getKurjunToken(), operationTracker ).execute();
+                    identityManager.getActiveSession().getCdnToken(), operationTracker ).execute();
 
             saveEnvironment();
 

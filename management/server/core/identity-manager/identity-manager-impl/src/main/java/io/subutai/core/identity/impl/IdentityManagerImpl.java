@@ -953,7 +953,7 @@ public class IdentityManagerImpl implements IdentityManager
                 templateManager.resetTemplateCache();
             }
 
-            session.setKurjunToken( null );
+            session.setCdnToken( null );
         }
 
         User user = identityDataService.getUser( userId );

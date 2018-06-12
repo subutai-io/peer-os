@@ -36,6 +36,7 @@ import io.subutai.hub.share.quota.ContainerQuota;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -341,11 +342,9 @@ public class ResourceHostEntityTest
     {
         doReturn( "time=\"2017-04-11 10:01:36\" level=info msg=\"tag-test-template exported to "
                 + "/var/snap/subutai-dev/common/lxc/tmpdir/tag-test-template-subutai-template_4.0.0_amd64.tar"
-                + ".gz\" \n" + "time=\"2017-04-11 10:01:38\" level=info msg=\"Template uploaded, hash: "
-                + "7d42f1d084c405b482938bb2620cce77\"" ).when( commandResult ).getStdOut();
+                + ".gz\" \n" + "time=\"2017-04-11 10:01:38\" level=info msg=\"Template uploaded, hash:7d42f1d084c405b482938bb2620cce77 md5:asdfadfadsf size:123 parent:'foo:dilshat:1.0.0'\"" ).when( commandResult ).getStdOut();
 
-        assertEquals( "7d42f1d084c405b482938bb2620cce77",
-                resourceHostEntity.exportTemplate( "foo", "foo-template", "1.0.0", false, "token" ) );
+        assertNotNull( resourceHostEntity.exportTemplate( "foo", "foo-template", "1.0.0", false, "token" ) );
     }
 
 
