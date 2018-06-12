@@ -130,16 +130,17 @@ node() {
             sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /etc/subutai/agent.conf
             sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /etc/subutai/agent.conf
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
-			sudo subutai -d export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\' > template.json
+			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\' > template.json
             scp /var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ipfs-kg:/tmp
 			EOF"""
             sh """
             ssh ipfs-kg <<-EOF
-            ipfs pin add /tmp/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz | awk '{print ${3}}' > abc
-            export IDS=$(cat abc)
+            ipfs -Q add /tmp/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz > abc
             EOF"""
             sh """
             ssh admin@172.31.0.253 <<- EOF 
+            scp ipfs-kg:~/abc ~
+            export IDS=(cat abc)
             sudo sed -i 's/"id":""/"id":"${IDS}"/g' /var/cache/subutai/template.json
             cd /var/cache/subutai/
             export templ=$(cat template.json)
