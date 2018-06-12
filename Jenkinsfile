@@ -81,16 +81,16 @@ node() {
 		//	""", returnStdout: true)
         String ID = sh(script: """
             set +x
-            curl -s https://cdn.subutai.io:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
+            curl -s https://${cdnHost}:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
             """, returnStdout: true)
         String fingerprint = "877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
-        String authId = sh(script: """
+        def authId = sh(script: """
             curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint}
             """, returnStdout: true)
-        String sign = sh(script: """
+        def sign = sh(script: """
             echo ${authId} | gpg --clearsign -u ${user}
             """, returnStdout: true)
-        String token = sh(script:"""
+        def token = sh(script:"""
             curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token
             """, returnStdout: true)
 
