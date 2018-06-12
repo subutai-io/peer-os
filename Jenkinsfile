@@ -84,6 +84,16 @@ node() {
             curl -s https://cdn.subutai.io:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
             """, returnStdout: true)
         String fingerprint = "877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
+        String authId = sh(script: """
+            curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint}
+            """, returnStdout: true)
+        String sign = sh(script: """
+            echo ${authId} | gpg --clearsign -u ${user}
+            """, returnStdout: true)
+        String token = sh(script:"""
+            curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token
+            """, returnStdout: true)
+
         stage("Build management template")
         notifyBuildDetails = "\nFailed Step - Build management template"
 
@@ -96,10 +106,7 @@ node() {
 			set +x
             ssh admin@172.31.0.253 <<- EOF
 			set -e
-		    export authId=\$(curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint})
-            export sign=\$(echo ${authId} | gpg --clearsign -u ${user})
-            export token=\$(curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token)
-            echo ${token}
+		    echo ${token}
 			sudo subutai destroy management
 			echo "This is ${ID}"
             sudo subutai clone id:${ID} management
