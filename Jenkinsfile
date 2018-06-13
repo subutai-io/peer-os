@@ -124,21 +124,24 @@ node() {
             echo "Using CDN token ${token}"  
             echo "Template version is ${artifactVersion}"
 			sudo subutai export management -v ${artifactVersion} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\\\' > ~/template.json
+            scp ~/template.json ipfs-kg:/tmp
             scp /var/cache/subutai/management-subutai-template_${artifactVersion}_amd64.tar.gz ipfs-kg:/tmp
 			EOF"""
+
             sh """
-            ssh ipfs-kg "ipfs add -Q /tmp/management-subutai-template_${artifactVersion}_amd64.tar.gz > abc"
+            ssh ipfs-kg "ipfs add -Q /tmp/management-subutai-template_${artifactVersion}_amd64.tar.gz > /tmp/ipfs.hash"
             """
+
             sh """
-            ssh admin@172.31.0.253 <<- EOF 
-            scp ipfs-kg:~/abc ~
-            export IDS=\$(cat ~/abc)
+            scp ipfs-kg:/tmp/ipfs.hash ~
+            scp ipfs-kg:/tmp/template.json ~
+            export IDS=\$(cat ~/ipfs.hash)
             echo "ID: \$IDS"
             sudo sed -i 's/"id":""/"id":"\${IDS}"/g' ~/template.json
             export templ=\$(cat ~/template.json)
             echo "Template: \$templ"
             curl -d "token=${token}&template=\${templ}" https://${hubIp}/rest/v1/cdn/templates
-            EOF"""
+            """
         }
         // upload template to jenkins master node
         sh """
