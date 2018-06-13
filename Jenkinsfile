@@ -117,14 +117,25 @@ node() {
             scp ipfs-kg:/tmp/template.json /tmp/
             """
 
-            String IDS = sh(script: """
+            String NEW_ID = sh(script: """
             cat /tmp/ipfs.hash
             """, returnStdout: true)
-            IDS = IDS.trim()
+            NEW_ID = NEW_ID.trim()
+
+            //remove existing template metadata
+            String OLD_ID = sh(script: """
+            var=\$(curl -s https://${hubIp}/rest/v1/cdn/template?name=management&verified=true) && echo \$var | grep -Po '"id":"\\K([a-zA-Z0-9]+)'
+            """, returnStdout: true)
+            OLD_ID = OLD_ID.trim()
 
             sh """
-            echo "ID: ${IDS}"
-            sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
+            echo "OLD ID: ${OLD_ID}"
+            curl -X DELETE "https://${hubIp}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
+            """
+
+            sh """
+            echo "NEW ID: ${NEW_ID}"
+            sed -i 's/"id":""/"id":"${NEW_ID}"/g' /tmp/template.json
             template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${hubIp}/rest/v1/cdn/templates
             """
         }
