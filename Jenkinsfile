@@ -123,7 +123,7 @@ node() {
   			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
             echo "Template version is ${artifactVersion}"
-			sudo subutai export management -v ${artifactVersion} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\\\' > /var/cache/subutai/template.json
+			sudo subutai export management -v ${artifactVersion} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
             scp /var/cache/subutai/management-subutai-template_${artifactVersion}_amd64.tar.gz ipfs-kg:/tmp
 			EOF"""
             sh """
@@ -134,9 +134,9 @@ node() {
             ssh admin@172.31.0.253 <<- EOF 
             scp ipfs-kg:~/abc ~
             export IDS=(cat abc)
-            sudo sed -i 's/"id":""/"id":"${IDS}"/g' /var/cache/subutai/template.json
+            sudo sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
             cd /var/cache/subutai/
-            export templ=\$(cat template.json)
+            export templ=\$(cat /tmp/template.json)
             curl -d "token=${token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
             EOF"""
         }
