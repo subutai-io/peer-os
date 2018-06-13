@@ -122,13 +122,13 @@ node() {
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
   			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
-            echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
-			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\' > template.json
-            scp /var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ipfs-kg:/tmp
+            echo "Template version is ${artifactVersion}"
+			sudo subutai export management -v ${artifactVersion} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\' > template.json
+            scp /var/cache/subutai/management-subutai-template_${artifactVersion}_amd64.tar.gz ipfs-kg:/tmp
 			EOF"""
             sh """
             ssh ipfs-kg <<-EOF
-            ipfs -Q add /tmp/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz > abc
+            ipfs -Q add /tmp/management-subutai-template_${artifactVersion}_amd64.tar.gz > abc
             EOF"""
             sh """
             ssh admin@172.31.0.253 <<- EOF 
@@ -143,7 +143,7 @@ node() {
         // upload template to jenkins master node
         sh """
         set +x
-        scp admin@172.31.0.253:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
+        scp admin@172.31.0.253:/var/cache/subutai/management-subutai-template_${artifactVersion}_amd64.tar.gz ${workspace}
         """
         /* stash p2p binary to use it in next node() */
         stash includes: "management-*.deb", name: 'deb'
@@ -177,39 +177,6 @@ node() {
             curl -k -H "token: ${token}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
 		    """
 
-            // upload template
-            //String responseTemplate = sh(script: """
-			//set +x
-            
-			//curl -s -k https://${cdnHost}:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
-			//""", returnStdout: true)
-            //def signatureTemplate = sh(script: """
-			//set +x
-			
-            //curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
-			//""", returnStdout: true)
-
-            //sh """
-            //echo "Uploading file ${templateFileName}"
-            //"""
-
-            //sh """
-			//set +x
-			//curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" https://${cdnHost}:8338/kurjun/rest/auth/sign
-		    //"""
-            //sh """
-            //set +x
-            //echo "https://${cdnHost}:8338/kurjun/rest/template/list"
-            //"""
-
-            // delete old template
-            //if (responseTemplate != "404 Not found") {
-            //    def jsonTemplate = jsonParse(responseTemplate)
-             //   sh """
-		//		set +xe
-		//		curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
-		//	"""
-            //}
         }
     } catch (e) {
         currentBuild.result = "FAILED"
