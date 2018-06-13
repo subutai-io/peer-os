@@ -133,7 +133,7 @@ node() {
             ssh admin@172.31.0.253 <<- EOF 
             scp ipfs-kg:~/abc ~
             export IDS=(cat abc)
-            sudo sed -i 's/"id":""/"id":"${IDS}"/g' template.json
+            sudo sed -i 's/"id":""/"id":"\${IDS}"/g' template.json
             export templ=\$(cat template.json)
             curl -d "token=${token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
             EOF"""
