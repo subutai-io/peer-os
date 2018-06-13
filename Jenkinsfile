@@ -75,12 +75,15 @@ node() {
         def authId = sh(script: """
             curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint}
             """, returnStdout: true)
+        authId = authId.trim()
         def sign = sh(script: """
             echo ${authId} | gpg --clearsign -u ${user}
             """, returnStdout: true)
+        sign = sign.trim()
         def token = sh(script:"""
             curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token
             """, returnStdout: true)
+        token = token.trim()
 
         stage("Build management template")
         notifyBuildDetails = "\nFailed Step - Build management template"
