@@ -94,6 +94,7 @@ node() {
             ssh admin@172.31.0.253 <<- EOF
 			set -e
 		    echo ${token}
+            sudo sed 's/URL =.*/URL = ${hubIp}/g' -i /etc/subutai/agent.conf
 			sudo subutai destroy management
             sudo subutai clone debian-stretch management
 			/bin/sleep 20
@@ -118,7 +119,6 @@ node() {
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
   			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
-            sudo sed 's/URL =.*/URL = ${hubIp}/g' -i /etc/subutai/agent.conf
             echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
 			sudo subutai export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\' > template.json
             scp /var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ipfs-kg:/tmp
