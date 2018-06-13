@@ -135,7 +135,7 @@ node() {
             export IDS=(cat abc)
             sudo sed -i 's/"id":""/"id":"\${IDS}"/g' template.json
             export templ=\$(cat template.json)
-            curl -d "token=${token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
+            curl -d "token=${token}&template=\${templ}" https://${hubIp}/rest/v1/cdn/templates
             EOF"""
         }
         // upload template to jenkins master node
