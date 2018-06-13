@@ -147,44 +147,6 @@ node() {
             template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${hubIp}/rest/v1/cdn/templates
             """
         }
-        // upload template to jenkins master node
-        sh """
-        set +x
-        scp admin@172.31.0.253:/var/cache/subutai/management-subutai-template_${artifactVersion}_amd64.tar.gz ${workspace}
-        """
-        /* stash p2p binary to use it in next node() */
-        stash includes: "management-*.deb", name: 'deb'
-        stash includes: "management-subutai-template*", name: 'template'
-
-        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
-            stage("Upload to CDN")
-            notifyBuildDetails = "\nFailed Step - Upload to CDN"
-            deleteDir()
-
-            unstash 'deb'
-            unstash 'template'
-            // upload artifacts on cdn
-            // upload deb
-            String responseDeb = sh(script: """
-			set +x
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/apt/info?name=${debFileName}
-			""", returnStdout: true)
-
-            sh """
-            echo "Uploading file ${debFileName}"
-            """
-
-            sh """
-			set +x
-            echo "${token} and ${cdnHost} and ${debFileName}"
-			curl -sk -H "token: ${token}" -Ffile=@${debFileName} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
-            """
-            sh """
-			set +x
-            curl -k -H "token: ${token}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
-		    """
-
-        }
     } catch (e) {
         currentBuild.result = "FAILED"
         throw e
