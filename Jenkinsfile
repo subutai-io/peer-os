@@ -132,11 +132,11 @@ node() {
             sh """
             ssh admin@172.31.0.253 <<- EOF 
             scp ipfs-kg:~/abc ~
-            export IDS=(cat ~/abc)
-            echo "- \$IDS -"
+            export IDS=\$(cat ~/abc)
+            echo "ID: \$IDS"
             sudo sed -i 's/"id":""/"id":"\${IDS}"/g' ~/template.json
             export templ=\$(cat ~/template.json)
-            echo "\$templ"
+            echo "Template: \$templ"
             curl -d "token=${token}&template=\${templ}" https://${hubIp}/rest/v1/cdn/templates
             EOF"""
         }
