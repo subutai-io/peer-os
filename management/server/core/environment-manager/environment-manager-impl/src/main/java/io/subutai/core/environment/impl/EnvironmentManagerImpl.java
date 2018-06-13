@@ -63,7 +63,6 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.ExportedTemplate;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeerEventListener;
 import io.subutai.common.peer.Peer;
@@ -1173,12 +1172,11 @@ public class EnvironmentManagerImpl extends HostListener
             }
         }
 
-        ExportedTemplate template = peerManager.getLocalPeer()
-                                               .exportTemplate( containerHost.getContainerId(), templateName, version,
-                                                       privateTemplate, cdnToken );
+        peerManager.getLocalPeer()
+                   .exportTemplate( containerHost.getContainerId(), templateName, version, privateTemplate, cdnToken );
 
 
-        LOG.info( "Template {} exported", template );
+        LOG.info( "Template exported" );
     }
 
 

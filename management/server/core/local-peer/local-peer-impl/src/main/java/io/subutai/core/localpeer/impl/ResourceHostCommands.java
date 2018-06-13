@@ -59,9 +59,8 @@ public class ResourceHostCommands
 
     public RequestBuilder getImportTemplateCommand( final String templateId, final String cdnToken )
     {
-        return new RequestBuilder(
-                String.format( "export IPFS_PATH=\"%s\" && subutai import id:%s %s", Common.IPFS_PATH, templateId,
-                        Strings.isNullOrEmpty( cdnToken ) ? "" : "-t " + cdnToken ) )
+        return new RequestBuilder( String.format( "subutai import id:%s %s", templateId,
+                Strings.isNullOrEmpty( cdnToken ) ? "" : "-t " + cdnToken ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 
@@ -69,10 +68,10 @@ public class ResourceHostCommands
     public RequestBuilder getCloneContainerCommand( final String templateId, String containerName, String hostname,
                                                     String ip, int vlan, String environmentId, String containerToken )
     {
-        return new RequestBuilder( String.format(
-                "export IPFS_PATH=\"%s\" && subutai clone id:%s %s -i \"%s %d\" -e %s -s %s && subutai hostname %s %s",
-                Common.IPFS_PATH, templateId, containerName, ip, vlan, environmentId, containerToken, containerName,
-                hostname ) ).withTimeout( Common.CLONE_TIMEOUT_SEC );
+        return new RequestBuilder(
+                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -s %s && subutai hostname %s %s", templateId,
+                        containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
+                .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
 
@@ -81,9 +80,8 @@ public class ResourceHostCommands
                                                     final String token )
     {
         return new RequestBuilder(
-                String.format( "export IPFS_PATH=\"%s\" && subutai export %s -n %s -v %s -t %s %s", Common.IPFS_PATH,
-                        containerName, templateName, version, token, isPrivateTemplate ? "-p" : "" ) )
-                .withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
+                String.format( "subutai export %s -n %s -v %s -t %s %s", containerName, templateName, version, token,
+                        isPrivateTemplate ? "-p" : "" ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
 
 

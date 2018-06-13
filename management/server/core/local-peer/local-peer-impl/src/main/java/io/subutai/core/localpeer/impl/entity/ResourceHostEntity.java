@@ -56,7 +56,6 @@ import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.ExportedTemplate;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
@@ -976,33 +975,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ExportedTemplate exportTemplate( final String containerName, final String templateName, final String version,
-                                            final boolean isPrivateTemplate, final String token )
-            throws ResourceHostException
+    public void exportTemplate( final String containerName, final String templateName, final String version,
+                                final boolean isPrivateTemplate, final String token ) throws ResourceHostException
     {
         try
         {
             updateTemplateUploadProgress( templateName, 0 );
 
-            CommandResult result = commandUtil.execute( resourceHostCommands
+            commandUtil.execute( resourceHostCommands
                             .getExportTemplateCommand( containerName, templateName, version, isPrivateTemplate, token
                                                      ), this,
                     new TemplateUploadTracker( this, templateName ) );
-
-            //hash:QmdwYCXDtoiZHfanuurmGXCYGgyJF35o9XJBNsKcuePDNk md5:a5d4d338ea7d70fad92821052b2fd1bf size:618223 parent:'foo:dilshat:0.4.1'
-            Pattern p = Pattern.compile( "hash:(\\S+)\\s+md5:(\\S+)\\s+size:(\\d+)\\s+parent:'(\\S+)'" );
-
-            Matcher m = p.matcher( result.getStdOut() );
-
-            if ( m.find() && m.groupCount() == 4 )
-            {
-                return new ExportedTemplate( m.group( 1 ), m.group( 2 ), Long.parseLong( m.group( 3 ) ), m.group( 4 ) );
-            }
-            else
-            {
-                throw new ResourceHostException(
-                        "Template attributes are not found in the output of subutai export command" );
-            }
         }
         catch ( CommandException e )
         {

@@ -227,7 +227,7 @@ public interface LocalPeer extends Peer
 
     PeerTemplatesUploadProgress getTemplateUploadProgress( final String templateName ) throws PeerException;
 
-    ExportedTemplate exportTemplate( ContainerId containerId, String templateName, String version,
+    void exportTemplate( ContainerId containerId, String templateName, String version,
                                      boolean isPrivateTemplate, String token ) throws PeerException;
 }
 

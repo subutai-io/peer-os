@@ -12,8 +12,6 @@ public class Common
     public static final long MH_UPDATE_TIMEOUT_MIN = 60;
     public static final long MH_UPDATE_CHECK_TIMEOUT_MIN = 15;
 
-    public static String IPFS_PATH = System.getProperty( "ipfsPath" );
-
     public static final int DEFAULT_PUBLIC_PORT = 8443;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
     public static final int DEFAULT_AGENT_PORT = 7070;

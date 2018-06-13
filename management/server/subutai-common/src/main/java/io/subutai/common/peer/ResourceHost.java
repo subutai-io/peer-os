@@ -139,7 +139,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void removeContainerHost( ContainerHost containerHost );
 
-    ExportedTemplate exportTemplate( String containerName, String templateName, String version,
+    void exportTemplate( String containerName, String templateName, String version,
                                      boolean isPrivateTemplate, String token ) throws ResourceHostException;
 
     Set<String> listExistingContainerNames() throws ResourceHostException;
