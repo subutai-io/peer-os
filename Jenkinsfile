@@ -84,11 +84,11 @@ node() {
             curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token
             """, returnStdout: true)
         token = token.trim()
-        def IDS = sh(script:"""
+        String IDS = sh(script:"""
             cat /tmp/ipfs.hash
             """, returnStdout: true)
         IDS = IDS.trim()
-        def templ = sh(script:"""
+        String templ = sh(script:"""
             cat /tmp/template.json
             """, returnStdout: true)
         templ = templ.trim()
