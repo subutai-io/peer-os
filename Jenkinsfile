@@ -85,11 +85,11 @@ node() {
             """, returnStdout: true)
         token = token.trim()
         def IDS = sh(script:"""
-            cat ~/ipfs.hash
+            cat /tmp/ipfs.hash
             """, returnStdout: true)
         IDS = IDS.trim()
         def templ = sh(script:"""
-            cat ~/template.json
+            cat /tmp/template.json
             """, returnStdout: true)
         templ = templ.trim()
         stage("Build management template")
@@ -130,8 +130,8 @@ node() {
   			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
             echo "Template version is ${artifactVersion}"
-			sudo subutai export management -v ${artifactVersion} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\\\' > ~/template.json
-            scp ~/template.json ipfs-kg:/tmp
+			sudo subutai export management -v ${artifactVersion} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
+            scp /tmp/template.json ipfs-kg:/tmp
             scp /var/cache/subutai/management-subutai-template_${artifactVersion}_amd64.tar.gz ipfs-kg:/tmp
 			EOF"""
 
@@ -140,13 +140,13 @@ node() {
             """
 
             sh """
-            scp ipfs-kg:/tmp/ipfs.hash ~
-            scp ipfs-kg:/tmp/template.json ~
+            ssh admin@172.31.0.253 <<-EOF
+            scp ipfs-kg:/tmp/ipfs.hash /tmp/
             echo "ID: ${IDS}"
-            sudo sed -i 's/"id":""/"id":"${IDS}"/g' ~/template.json
+            sudo sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
             echo "Template: ${templ}"
             curl -d "token=${token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
-            """
+            EOF"""
         }
         // upload template to jenkins master node
         sh """
