@@ -140,16 +140,11 @@ node() {
             cat /tmp/ipfs.hash
             """, returnStdout: true)
             IDS = IDS.trim()
-            String templ = sh(script:"""
-            cat /tmp/template.json
-            """, returnStdout: true)
-            templ = templ.trim()
 
             sh """
             echo "ID: ${IDS}"
-            echo "Template: ${templ}"
             sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
-            curl -d "token=${token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
+            template=`cat /tmp/template.json` && curl -d "token=${token}&template=$template" https://${hubIp}/rest/v1/cdn/templates
             """
         }
         // upload template to jenkins master node
