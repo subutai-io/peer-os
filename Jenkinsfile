@@ -148,7 +148,7 @@ node() {
             sh """
             echo "ID: ${IDS}"
             echo "Template: ${templ}"
-            sudo sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
+            sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
             curl -d "token=${token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
             """
         }
