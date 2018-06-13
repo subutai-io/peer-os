@@ -1,21 +1,5 @@
 #!groovy
 
-// Configuring builder:
-// Manage Jenkins -> Global Tool Configuration -> Maven installations -> Add Maven:
-// Name - M3
-// MAVEN_HOME - path to Maven3 home dir
-//
-// Manage Jenkins -> Configure System -> Environment variables
-// SS_TEST_NODE_CORE16 - ip of SS node for smoke tests 
-//
-// Approve methods:
-// in build job log you will see 
-// Scripts not permitted to use new <method>
-// Goto http://jenkins.domain/scriptApproval/
-// and approve methods denied methods
-//
-// TODO:
-// https://jenkins.io/doc/pipeline/steps/ssh-agent/#sshagent-ssh-agent
 notifyBuildDetails = ""
 hubIp = ""
 cdnHost = ""
@@ -35,10 +19,8 @@ node() {
         checkout scm
         def artifactVersion = getVersion("management/pom.xml")
         String debFileName = "management-${env.BRANCH_NAME}.deb"
-        String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 
         commitId = sh(script: "git rev-parse HEAD", returnStdout: true)
-        String serenityReportDir = "/var/lib/jenkins/www/serenity/${commitId}"
 
         // declare hub address
         switch (env.BRANCH_NAME) {
@@ -58,7 +40,6 @@ node() {
         // build deb
         sh """
 		cd management
-		export GIT_BRANCH=${env.BRANCH_NAME}
 		sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 
 		if [[ "${env.BRANCH_NAME}" == "dev" ]] || [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
@@ -66,9 +47,11 @@ node() {
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
-        find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
+        find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${
+            debFileName
+        }
 	    """
-        
+
         // CDN auth credentials
         String user = "jenkins@optimal-dynamics.com"
         String fingerprint = "877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
@@ -80,7 +63,7 @@ node() {
             echo ${authId} | gpg --clearsign -u ${user}
             """, returnStdout: true)
         sign = sign.trim()
-        def token = sh(script:"""
+        def token = sh(script: """
             curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token
             """, returnStdout: true)
         token = token.trim()
@@ -136,7 +119,7 @@ node() {
             scp ipfs-kg:/tmp/template.json /tmp/
             """
 
-            String IDS = sh(script:"""
+            String IDS = sh(script: """
             cat /tmp/ipfs.hash
             """, returnStdout: true)
             IDS = IDS.trim()
@@ -146,6 +129,30 @@ node() {
             sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
             template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${hubIp}/rest/v1/cdn/templates
             """
+        }
+
+        stash includes: "management-*.deb", name: 'deb'
+
+        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
+            stage("Upload to CDN")
+            notifyBuildDetails = "\nFailed Step - Upload to CDN"
+            deleteDir()
+
+            unstash 'deb'
+
+            sh """
+            echo "Uploading file ${debFileName}"
+            """
+
+            sh """
+			set +x
+            echo "${token} and ${cdnHost} and ${debFileName}"
+			curl -sk -H "token: ${token}" -Ffile=@${debFileName} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
+            """
+            sh """
+			set +x
+            curl -k -H "token: ${token}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
+		    """
         }
     } catch (e) {
         currentBuild.result = "FAILED"
