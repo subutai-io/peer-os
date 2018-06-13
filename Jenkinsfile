@@ -84,14 +84,6 @@ node() {
             curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token
             """, returnStdout: true)
         token = token.trim()
-        String IDS = sh(script:"""
-            cat /tmp/ipfs.hash
-            """, returnStdout: true)
-        IDS = IDS.trim()
-        String templ = sh(script:"""
-            cat /tmp/template.json
-            """, returnStdout: true)
-        templ = templ.trim()
         stage("Build management template")
         notifyBuildDetails = "\nFailed Step - Build management template"
 
@@ -140,13 +132,25 @@ node() {
             """
 
             sh """
-            ssh admin@172.31.0.253 <<-EOF
             scp ipfs-kg:/tmp/ipfs.hash /tmp/
+            scp ipfs-kg:/tmp/template.json /tmp/
+            """
+
+            String IDS = sh(script:"""
+            cat /tmp/ipfs.hash
+            """, returnStdout: true)
+            IDS = IDS.trim()
+            String templ = sh(script:"""
+            cat /tmp/template.json
+            """, returnStdout: true)
+            templ = templ.trim()
+
+            sh """
             echo "ID: ${IDS}"
-            sudo sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
             echo "Template: ${templ}"
+            sudo sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
             curl -d "token=${token}&template=${templ}" https://${hubIp}/rest/v1/cdn/templates
-            EOF"""
+            """
         }
         // upload template to jenkins master node
         sh """
