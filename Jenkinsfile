@@ -144,7 +144,7 @@ node() {
             sh """
             echo "ID: ${IDS}"
             sed -i 's/"id":""/"id":"${IDS}"/g' /tmp/template.json
-            template=`cat /tmp/template.json` && curl -d "token=${token}&template=$template" https://${hubIp}/rest/v1/cdn/templates
+            template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${hubIp}/rest/v1/cdn/templates
             """
         }
         // upload template to jenkins master node
