@@ -70,7 +70,7 @@ node() {
 	    """
         
         // CDN auth credentials
-        String user = "jenkins"
+        String user = "jenkins@optimal-dynamics.com"
         String fingerprint = "877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
         def authId = sh(script: """
             curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint}
