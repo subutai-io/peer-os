@@ -149,6 +149,18 @@ node() {
 
             unstash 'deb'
 
+            // CDN auth creadentials
+            String kurjunUser = "jenkins"
+            String kurjunUserEmail = "jenkins@subut.ai"
+            def kurjunID = sh(script: """
+			set +x
+			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${kurjunUser} | gpg --clearsign --no-tty -u ${kurjunUserEmail}
+			""", returnStdout: true)
+            def kurjunToken = sh(script: """
+			set +x
+			curl -s -k -Fmessage=\"${kurjunID}\" -Fuser=${kurjunUser} https://${cdnHost}:8338/kurjun/rest/auth/token
+			""", returnStdout: true)
+
             sh """
             echo "Uploading file ${debFileName}"
             """
@@ -156,11 +168,11 @@ node() {
             sh """
 			set +x
             echo "${token} and ${cdnHost} and ${debFileName}"
-			curl -sk -H "token: ${token}" -Ffile=@${debFileName} -Ftoken=${token} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
+			curl -sk -H "token: ${kurjunToken}" -Ffile=@${debFileName} -Ftoken=${kurjunToken} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
             """
             sh """
 			set +x
-            curl -k -H "token: ${token}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
+            curl -k -H "token: ${kurjunToken}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
 		    """
         }
     } catch (e) {
