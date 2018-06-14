@@ -130,7 +130,9 @@ node() {
 
             sh """
             echo "OLD ID: ${OLD_ID}"
-            curl -X DELETE "https://${hubIp}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
+            if [[ "${OLD_ID}" != "Template not found" ]]; then
+                curl -X DELETE "https://${hubIp}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
+            fi
             """
 
             sh """
