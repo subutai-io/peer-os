@@ -1136,24 +1136,30 @@ public class EnvironmentManagerImpl extends HostListener
 
 
     @Override
-    public String createTemplate( final String environmentId, final String containerId, final String templateName,
-                                  final String version, final boolean privateTemplate )
+    public void createTemplate( final String environmentId, final String containerId, final String templateName,
+                                final String version, final boolean privateTemplate )
             throws PeerException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
-        String kurjunToken = identityManager.getActiveSession().getKurjunToken();
-        Preconditions.checkNotNull( kurjunToken, "Kurjun token is missing or expired" );
+        Preconditions.checkArgument( version.matches( "^\\d+\\.\\d+\\.\\d+$" ), "Version must be in X.X.X format" );
+        String cdnToken = identityManager.getActiveSession().getCdnToken();
+        Preconditions.checkNotNull( cdnToken, "Cdn token is missing or expired" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
         //check that container exists in the environment
         EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
-        List<Template> ownerTemplates =
-                templateManager.getTemplatesByOwner( identityManager.getActiveUser().getFingerprint() );
+        Preconditions.checkArgument( containerHost.isLocal(), "Container must be local" );
+
+        String owner = templateManager.getOwner( cdnToken );
+
+        Preconditions.checkNotNull( owner, "Owner not found" );
+
+        List<Template> ownerTemplates = templateManager.getTemplatesByOwner( owner );
 
         for ( Template template : ownerTemplates )
         {
@@ -1166,10 +1172,11 @@ public class EnvironmentManagerImpl extends HostListener
             }
         }
 
-        Peer targetPeer = containerHost.getPeer();
+        peerManager.getLocalPeer()
+                   .exportTemplate( containerHost.getContainerId(), templateName, version, privateTemplate, cdnToken );
 
-        return targetPeer
-                .exportTemplate( containerHost.getContainerId(), templateName, version, privateTemplate, kurjunToken );
+
+        LOG.info( "Template exported" );
     }
 
 

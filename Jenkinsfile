@@ -1,21 +1,5 @@
 #!groovy
 
-// Configuring builder:
-// Manage Jenkins -> Global Tool Configuration -> Maven installations -> Add Maven:
-// Name - M3
-// MAVEN_HOME - path to Maven3 home dir
-//
-// Manage Jenkins -> Configure System -> Environment variables
-// SS_TEST_NODE_CORE16 - ip of SS node for smoke tests 
-//
-// Approve methods:
-// in build job log you will see 
-// Scripts not permitted to use new <method>
-// Goto http://jenkins.domain/scriptApproval/
-// and approve methods denied methods
-//
-// TODO:
-// https://jenkins.io/doc/pipeline/steps/ssh-agent/#sshagent-ssh-agent
 notifyBuildDetails = ""
 hubIp = ""
 cdnHost = ""
@@ -35,10 +19,8 @@ node() {
         checkout scm
         def artifactVersion = getVersion("management/pom.xml")
         String debFileName = "management-${env.BRANCH_NAME}.deb"
-        String templateFileName = "management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz"
 
         commitId = sh(script: "git rev-parse HEAD", returnStdout: true)
-        String serenityReportDir = "/var/lib/jenkins/www/serenity/${commitId}"
 
         // declare hub address
         switch (env.BRANCH_NAME) {
@@ -58,9 +40,7 @@ node() {
         // build deb
         sh """
 		cd management
-		export GIT_BRANCH=${env.BRANCH_NAME}
 		sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i server/server-karaf/src/main/assembly/bin/setenv
-		sed 's/export CDN_IP=.*/export CDN_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 
 		if [[ "${env.BRANCH_NAME}" == "dev" ]] || [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
 			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
@@ -69,38 +49,37 @@ node() {
 		fi		
         find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
 	    """
-        
-        // CDN auth creadentials
-        String user = "jenkins"
-        def authID = sh(script: """
-			set +x
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${user} | gpg --clearsign --no-tty
-			""", returnStdout: true)
-        def token = sh(script: """
-			set +x
-			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} https://${cdnHost}:8338/kurjun/rest/auth/token
-			""", returnStdout: true)
-        String ID = sh(script: """
-            set +x
-            curl -s https://cdn.subutai.io:8338/kurjun/rest/template/info?name=debian-stretch | grep -oP 'id":"\\K(.*?)"'| tr -d '"'
-            """, returnStdout: true)
 
+        // CDN auth credentials
+        String user = "jenkins@optimal-dynamics.com"
+        String fingerprint = "877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
+        def authId = sh(script: """
+            curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint}
+            """, returnStdout: true)
+        authId = authId.trim()
+        def sign = sh(script: """
+            echo ${authId} | gpg --clearsign -u ${user}
+            """, returnStdout: true)
+        sign = sign.trim()
+        def token = sh(script: """
+            curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token
+            """, returnStdout: true)
+        token = token.trim()
         stage("Build management template")
         notifyBuildDetails = "\nFailed Step - Build management template"
 
         // Start MNG-RH Lock
         lock('deb') {
 
-            ID = ID.trim()
             // create management template
             sh """
 			set +x
             ssh admin@172.31.0.253 <<- EOF
 			set -e
-			
+		    echo ${token}
+            sudo sed 's/URL =.*/URL = ${hubIp}/g' -i /etc/subutai/agent.conf
 			sudo subutai destroy management
-			echo "This is ${ID}"
-            sudo subutai clone id:${ID} management
+            sudo subutai clone debian-stretch management
 			/bin/sleep 20
 			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
@@ -123,21 +102,45 @@ node() {
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
   			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
-            sudo sed 's/branch = .*/branch = ${env.BRANCH_NAME}/g' -i /etc/subutai/agent.conf
-            sudo sed 's/URL =.*/URL = ${cdnHost}/g' -i /etc/subutai/agent.conf
-            echo "Template version is ${artifactVersion}-${env.BRANCH_NAME}"
-			sudo subutai -d export management -v ${artifactVersion}-${env.BRANCH_NAME} --local -t ${token}
-
+            echo "Template version is ${artifactVersion}"
+			sudo subutai export management -v ${artifactVersion} --local -t ${token} |  grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
+            scp /tmp/template.json ipfs-kg:/tmp
+            scp /var/cache/subutai/management-subutai-template_${artifactVersion}_amd64.tar.gz ipfs-kg:/tmp
 			EOF"""
+
+            sh """
+            ssh ipfs-kg "ipfs add -Q /tmp/management-subutai-template_${artifactVersion}_amd64.tar.gz > /tmp/ipfs.hash"
+            """
+
+            sh """
+            scp ipfs-kg:/tmp/ipfs.hash /tmp/
+            scp ipfs-kg:/tmp/template.json /tmp/
+            """
+
+            String NEW_ID = sh(script: """
+            cat /tmp/ipfs.hash
+            """, returnStdout: true)
+            NEW_ID = NEW_ID.trim()
+
+            //remove existing template metadata
+            String OLD_ID = sh(script: """
+            var=\$(curl -s https://${hubIp}/rest/v1/cdn/template?name=management&verified=true) && echo \$var | grep -Po '"id":"\\K([a-zA-Z0-9]+)'
+            """, returnStdout: true)
+            OLD_ID = OLD_ID.trim()
+
+            sh """
+            echo "OLD ID: ${OLD_ID}"
+            curl -X DELETE "https://${hubIp}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
+            """
+
+            sh """
+            echo "NEW ID: ${NEW_ID}"
+            sed -i 's/"id":""/"id":"${NEW_ID}"/g' /tmp/template.json
+            template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${hubIp}/rest/v1/cdn/templates
+            """
         }
-        // upload template to jenkins master node
-        sh """
-        set +x
-        scp admin@172.31.0.253:/var/cache/subutai/management-subutai-template_${artifactVersion}-${env.BRANCH_NAME}_amd64.tar.gz ${workspace}
-        """
-        /* stash p2p binary to use it in next node() */
+
         stash includes: "management-*.deb", name: 'deb'
-        stash includes: "management-subutai-template*", name: 'template'
 
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Upload to CDN")
@@ -145,13 +148,6 @@ node() {
             deleteDir()
 
             unstash 'deb'
-            unstash 'template'
-            // upload artifacts on cdn
-            // upload deb
-            String responseDeb = sh(script: """
-			set +x
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/apt/info?name=${debFileName}
-			""", returnStdout: true)
 
             sh """
             echo "Uploading file ${debFileName}"
@@ -166,40 +162,6 @@ node() {
 			set +x
             curl -k -H "token: ${token}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
 		    """
-
-            // upload template
-            String responseTemplate = sh(script: """
-			set +x
-            
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/template/info?name=management'&'version=${env.BRANCH_NAME}
-			""", returnStdout: true)
-            def signatureTemplate = sh(script: """
-			set +x
-			
-            curl -s -k -Ffile=@${templateFileName} -Ftoken=${token} -H "token: ${token}" https://${cdnHost}:8338/kurjun/rest/template/upload | gpg --clearsign --no-tty
-			""", returnStdout: true)
-
-            sh """
-            echo "Uploading file ${templateFileName}"
-            """
-
-            sh """
-			set +x
-			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureTemplate}\" https://${cdnHost}:8338/kurjun/rest/auth/sign
-		    """
-            sh """
-            set +x
-            echo "https://${cdnHost}:8338/kurjun/rest/template/list"
-            """
-
-            // delete old template
-            if (responseTemplate != "404 Not found") {
-                def jsonTemplate = jsonParse(responseTemplate)
-                sh """
-				set +xe
-				curl -s -k -X DELETE https://${cdnHost}:8338/kurjun/rest/template/delete?id=${jsonTemplate[0]["id"]}'&'token=${token}
-			"""
-            }
         }
     } catch (e) {
         currentBuild.result = "FAILED"

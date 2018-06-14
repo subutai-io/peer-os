@@ -115,31 +115,6 @@ public class RestServiceImpl implements RestService
     /** Templates *************************************************** */
 
     @Override
-    public Response listTemplates()
-    {
-        Set<Template> templates = templateManager.getTemplates().stream().filter(
-                n -> !Strings.isNullOrEmpty( n.getName() ) && !n.getName()
-                                                                .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                 .filter( n -> !n.getName().matches(
-                                                         "(?i)cassandra14|" + "cassandra16|" + "elasticsearch14|"
-                                                                 + "elasticsearch16|" + "hadoop14|" + "hadoop16|"
-                                                                 + "mongo14|" + "mongo16|" + "openjre714|"
-                                                                 + "openjre716|" + "solr14|" + "solr16|" + "storm14|"
-                                                                 + "storm16|" + "zookeeper14|" + "zookeeper16" ) )
-                                                 .collect( Collectors.toSet() );
-
-        return Response.ok().entity( gson.toJson( templates ) ).build();
-    }
-
-
-    @Override
-    public Response listPrivateTemplates()
-    {
-        return Response.ok().entity( gson.toJson( templateManager.getUserPrivateTemplates() ) ).build();
-    }
-
-
-    @Override
     public Response getVerifiedTemplate( final String templateName )
     {
         try
@@ -170,8 +145,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            return Response.ok( environmentManager
-                    .createTemplate( environmentId, containerId, templateName, version, privateTemplate ) ).build();
+            environmentManager.createTemplate( environmentId, containerId, templateName, version, privateTemplate );
+
+            return Response.ok().build();
         }
         catch ( Exception e )
         {
@@ -277,7 +253,6 @@ public class RestServiceImpl implements RestService
         }
 
         //distribute nodes over resource hosts (round-robin)
-        //TODO here we don't check if RH can accommodate the distributed nodes
         Iterator<ResourceHostDto> rhIterator = Iterables.cycle( resourceHosts ).iterator();
         for ( NodeSchemaDto node : nodes )
         {

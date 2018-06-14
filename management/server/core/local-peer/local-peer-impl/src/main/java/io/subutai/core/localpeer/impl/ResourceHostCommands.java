@@ -57,10 +57,10 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getImportTemplateCommand( final String templateId, final String kurjunToken )
+    public RequestBuilder getImportTemplateCommand( final String templateId, final String cdnToken )
     {
         return new RequestBuilder( String.format( "subutai import id:%s %s", templateId,
-                Strings.isNullOrEmpty( kurjunToken ) ? "" : "-t " + kurjunToken ) )
+                Strings.isNullOrEmpty( cdnToken ) ? "" : "-t " + cdnToken ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 
@@ -72,6 +72,16 @@ public class ResourceHostCommands
                 String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -s %s && subutai hostname %s %s", templateId,
                         containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getExportTemplateCommand( final String containerName, final String templateName,
+                                                    final String version, final boolean isPrivateTemplate,
+                                                    final String token )
+    {
+        return new RequestBuilder(
+                String.format( "subutai export %s -n %s -v %s -t %s %s", containerName, templateName, version, token,
+                        isPrivateTemplate ? "-p" : "" ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
 
 
@@ -102,15 +112,5 @@ public class ResourceHostCommands
     public RequestBuilder getGetSetRhHostnameCommand( final String newHostname )
     {
         return new RequestBuilder( String.format( "subutai hostname %s", newHostname ) );
-    }
-
-
-    public RequestBuilder getExportTemplateCommand( final String containerName, final String templateName,
-                                                    final String version, final boolean isPrivateTemplate,
-                                                    final String token )
-    {
-        return new RequestBuilder(
-                String.format( "subutai export %s -n %s -v %s -t %s %s", containerName, templateName, version, token,
-                        isPrivateTemplate ? "-p" : "" ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
 }

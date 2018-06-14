@@ -147,35 +147,36 @@ function accordionInit() {
 var UPDATE_NIGHTLY_BUILD_STATUS;
 
 
-    var kurjunCheckInProgress = false;
+//Bazaar CDN
+    var cdnCheckInProgress = false;
 
-    function checkKurjunAuthToken(identitySrv, $scope, callback){
+    function checkCDNToken(templateSrv, $scope, callback){
 
-        if(!kurjunCheckInProgress){
+        if(!cdnCheckInProgress){
 
-            kurjunCheckInProgress = true;
+            cdnCheckInProgress = true;
 
-            identitySrv.getObtainedKurjunToken().success(function(data){
+            templateSrv.getObtainedCdnToken().success(function(data){
                 if (!$.trim(data)){
 
-                    obtainKurjunAuthToken(identitySrv, $scope, callback);
+                    obtainCDNToken(templateSrv, $scope, callback);
 
                 }else{
 
-                    if(data != localStorage.getItem('kurjunToken')){
+                    if(data != localStorage.getItem('cdnToken')){
 
-                        localStorage.setItem('kurjunToken', data);
+                        localStorage.setItem('cdnToken', data);
 
-                        notifyKurjunTokenListeners($scope);
+                        notifyCDNTokenListeners($scope);
                     }
 
-                    kurjunCheckInProgress = false;
+                    cdnCheckInProgress = false;
 
                     if(callback) callback();
                 }
             }).error(function(){
 
-                kurjunCheckInProgress = false;
+                cdnCheckInProgress = false;
 
                 if(callback) callback();
             });
@@ -184,37 +185,29 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
         }
     }
 
-    function notifyKurjunTokenListeners($scope){
+    function obtainCDNToken(templateSrv, $scope, callback){
 
-        if($scope){
+        localStorage.removeItem('cdnToken');
 
-            $scope.$broadcast('kurjunTokenSet', {});
-        }
-    }
+        templateSrv.getTokenRequest().success(function (request) {
 
-    function obtainKurjunAuthToken(identitySrv, $scope, callback){
+            var signedRequestTextArea = document.createElement("textarea");
+            signedRequestTextArea.setAttribute('class', 'bp-sign-target');
+            signedRequestTextArea.style.width = '1px';
+            signedRequestTextArea.style.position = 'absolute';
+            signedRequestTextArea.style.left = '-100px';
+            signedRequestTextArea.value = request;
+            document.body.appendChild(signedRequestTextArea);
 
-        localStorage.removeItem('kurjunToken');
+            $(signedRequestTextArea).on('change', function() {
 
-        identitySrv.getKurjunAuthId().success(function (authId) {
+               var signedRequest = $(this).val();
 
-            var signedAuthIdTextArea = document.createElement("textarea");
-            signedAuthIdTextArea.setAttribute('class', 'bp-sign-target');
-            signedAuthIdTextArea.style.width = '1px';
-            signedAuthIdTextArea.style.position = 'absolute';
-            signedAuthIdTextArea.style.left = '-100px';
-            signedAuthIdTextArea.value = authId;
-            document.body.appendChild(signedAuthIdTextArea);
+               templateSrv.obtainCdnToken(signedRequest).success(function (token) {
 
-            $(signedAuthIdTextArea).on('change', function() {
+                   localStorage.setItem('cdnToken', token);
 
-               var signedAuthId = $(this).val();
-
-               identitySrv.obtainKurjunToken(signedAuthId).success(function (kurjunToken) {
-
-                   localStorage.setItem('kurjunToken', kurjunToken);
-
-                   notifyKurjunTokenListeners($scope);
+                   notifyCDNTokenListeners($scope);
 
                    if(callback) callback();
 
@@ -228,11 +221,11 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
                $(this).remove();
             });
 
-            kurjunCheckInProgress = false;
+            cdnCheckInProgress = false;
 
         }).error(function(error) {
 
-            kurjunCheckInProgress = false;
+            cdnCheckInProgress = false;
 
             if(callback) callback();
 
@@ -240,4 +233,11 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
         });
     }
 
+    function notifyCDNTokenListeners($scope){
+
+        if($scope){
+
+            $scope.$broadcast('cdnTokenSet', {});
+        }
+    }
 

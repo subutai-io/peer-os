@@ -101,6 +101,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @JsonProperty( "created" )
     private long creationTimestamp = System.currentTimeMillis();
 
+
     protected ContainerHostEntity()
     {
     }

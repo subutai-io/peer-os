@@ -52,7 +52,6 @@ export SUBUTAI_APP_DATA_PATH="/opt/subutai-mng/"
 export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"
 export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"
 export HUB_IP=bazaar.subutai.io
-export CDN_IP=cdn.subutai.io
 export P2P_PORT_RANGE_START=1
 export P2P_PORT_RANGE_END=65535
 

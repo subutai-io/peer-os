@@ -62,7 +62,6 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	reloadTableData();
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
-		console.log('cancel');
 		$timeout.cancel(refreshTable);
 	});
 

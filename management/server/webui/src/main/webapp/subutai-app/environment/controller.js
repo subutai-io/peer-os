@@ -216,10 +216,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		loadEnvironments();
 	});
 
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
-	});
-
 	environmentService.getDomainStrategies().success(function (data) {
 		vm.domainStrategies = data;
 	});

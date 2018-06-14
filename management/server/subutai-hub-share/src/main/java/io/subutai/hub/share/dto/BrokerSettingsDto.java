@@ -3,7 +3,7 @@ package io.subutai.hub.share.dto;
 
 import java.util.List;
 
-
+@Deprecated
 public class BrokerSettingsDto
 {
     private List<String> brokers;

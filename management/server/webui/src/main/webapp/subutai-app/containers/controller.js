@@ -14,11 +14,11 @@ angular.module('subutai.containers.controller', ['ngTagsInput'])
 		}
 	});
 
-ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout', 'cfpLoadingBar', 'identitySrv'];
+ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout', 'cfpLoadingBar', 'identitySrv', 'templateSrv'];
 
-function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar, identitySrv) {
+function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar, identitySrv, templateSrv) {
 
-    checkKurjunAuthToken(identitySrv, $rootScope);
+	checkCDNToken(templateSrv, $rootScope)
 
 	var vm = this;
 
@@ -61,7 +61,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.changeNamePopup = changeNamePopup;
 	vm.createTemplatePopup=createTemplatePopup;
 	vm.createTemplate=createTemplate;
-	vm.hasKurjunToken=hasKurjunToken;
+	vm.hasCdnToken=hasCdnToken;
     vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
@@ -145,7 +145,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		}
 		environmentService.setTags(vm.tags2Container.environmentId, vm.tags2Container.id, tags).success(function (data) {
 			vm.tags2Container.tags = tags;
-			console.log(data);
 		});
 		vm.tags2Container.tags = tags;
 		ngDialog.closeAll();
@@ -153,14 +152,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function removeTag(container, tag, key) {
 		environmentService.removeTag(container.environmentId, container.id, tag).success(function (data) {
-			console.log(data);
 		});
 		container.tags.splice(key, 1);
 	}
 
 	function getNotRegisteredContainers() {
 		environmentService.getNotRegisteredContainers().success(function (data) {
-			console.log(data);
 			vm.notRegisteredContainers = data;
 		});
 	}
@@ -368,7 +365,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function createTemplatePopup(container){
 
-        if( hasKurjunToken() ){
+        if( hasCdnToken() ){
             vm.editingContainer = container;
 
             ngDialog.open({
@@ -378,7 +375,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
             });
 		} else {
 		    SweetAlert.swal(
-		    "Your key is not registered with Kurjun",
+		    "Your key is not registered with Bazaar",
 		    "Please, register your key on Bazaar",
 		    "success");
 		}
@@ -421,7 +418,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 
     vm.disabled = false;
-    function createTemplate( container,name, version, isPublic ) {
+    function createTemplate( container, name, version ) {
 
         clearTimeout(timeout);
 
@@ -431,43 +428,17 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
         ngDialog.closeAll();
 
-        checkKurjunAuthToken(identitySrv, $rootScope, function(){
+        checkCDNToken(templateSrv, $rootScope, function(){
 
                 showUploadProgress(name);
 
-                environmentService.createTemplate( container, name,version, !isPublic )
-                .success( function (hash) {
-
-                    var signedHashTextArea = document.createElement("textarea");
-                    signedHashTextArea.setAttribute('class', 'bp-sign-target');
-                    signedHashTextArea.style.width = '1px';
-                    signedHashTextArea.style.position = 'absolute';
-                    signedHashTextArea.style.left = '-100px';
-                    signedHashTextArea.value = hash;
-                    document.body.appendChild(signedHashTextArea);
-
-                    $(signedHashTextArea).on('change', function() {
-
-                       var signedHash = $(this).val();
-                       console.log(signedHash);
-
-                       // submit signed hash
-                       identitySrv.submitSignedHash(signedHash).success(function(){
-                           vm.disabled = false;
-                           ngDialog.closeAll();
-                           clearTimeout(timeout);
-                           SweetAlert.swal ("Success!", "Template has been created", "success");
-                       }).error(function(error){
-                           vm.disabled = false;
-                           ngDialog.closeAll();
-                           clearTimeout(timeout);
-                           SweetAlert.swal ("ERROR!", error, "error");
-                       });
-
-                      $(this).remove();
-                   });
-
-                } )
+                environmentService.createTemplate( container, name, version, false )
+                .success(function(){
+                    vm.disabled = false;
+                    ngDialog.closeAll();
+                    clearTimeout(timeout);
+                    SweetAlert.swal ("Success!", "Template has been created", "success");
+                 })
                 .error( function (error) {
                     vm.disabled = false;
                     ngDialog.closeAll();
@@ -479,8 +450,8 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
     }
 
-    function hasKurjunToken(){
-        return !(localStorage.getItem('kurjunToken') == undefined || localStorage.getItem('kurjunToken') == null);
+    function hasCdnToken(){
+        return !(localStorage.getItem('cdnToken') == undefined || localStorage.getItem('cdnToken') == null);
     }
 
 }

@@ -3,13 +3,13 @@
 angular.module('subutai.environment.simple-controller', [])
 .controller('EnvironmentSimpleViewCtrl', EnvironmentSimpleViewCtrl);
 
-EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout', 'identitySrv'];
+EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout', 'identitySrv', 'templateSrv'];
 
-function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout, identitySrv) {
+function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout, identitySrv, templateSrv) {
 
 	var vm = this;
 
-	checkKurjunAuthToken(identitySrv, $rootScope);
+	checkCDNToken(templateSrv, $rootScope)
 
 	var GRID_CELL_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
@@ -31,7 +31,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.environments = [];
 
 	vm.colors = quotaColors;
-	vm.templates = [];
+	vm.templates = {};
 	vm.templatesList = [];
 
 	vm.activeCloudTab = 'templates';
@@ -57,10 +57,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	//plugins actions
 	vm.selectPlugin = selectPlugin;
 	vm.setTemplatesByPlugin = setTemplatesByPlugin;
-    vm.loadPrivateTemplates = loadPrivateTemplates;
+    vm.loadOwnTemplates = loadOwnTemplates;
 
-    function loadPrivateTemplates(){
-        environmentService.getPrivateTemplates()
+    function loadOwnTemplates(){
+        templateSrv.getOwnTemplates()
             .then(function (data) {
                 vm.templates['own'] = data;
                 getFilteredTemplates();
@@ -68,17 +68,18 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     }
 
     function loadTemplates(callback){
-        environmentService.getTemplates()
+        templateSrv.getTemplates()
             .then(function (data) {
-                vm.templates = data;
+                vm.templates['all'] = data;
                 getFilteredTemplates(callback);
             });
     }
 
     loadTemplates();
+    loadOwnTemplates();
 
-    $rootScope.$on('kurjunTokenSet', function(event, data){
-        loadPrivateTemplates();
+    $rootScope.$on('cdnTokenSet', function(event, data){
+        loadOwnTemplates();
     });
 
     function addUniqueTemplates(filteredTemplates, groupedTemplates){
@@ -101,7 +102,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         var templatesLst = [];
 
         for (var i in vm.templates) {
-            if (vm.templatesType == 'all' || i == vm.templatesType) {
+            if (i == vm.templatesType) {
                 templatesLst = addUniqueTemplates(templatesLst, vm.templates[i]);
             }
         }

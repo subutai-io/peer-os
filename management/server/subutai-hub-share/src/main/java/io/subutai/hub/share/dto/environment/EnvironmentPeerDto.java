@@ -61,6 +61,7 @@ public class EnvironmentPeerDto
 
     private String playbook;
 
+    //TODO rename to cdnToken
     private String kurjunToken;
 
     private AnsibleDto ansibleDto;

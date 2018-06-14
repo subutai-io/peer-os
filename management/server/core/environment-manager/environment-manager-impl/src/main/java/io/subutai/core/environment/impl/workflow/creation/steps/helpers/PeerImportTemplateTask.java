@@ -22,17 +22,17 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
     private final String environmentId;
     private final Peer peer;
     private final Set<Node> nodes;
-    private final String kurjunToken;
+    private final String cdnToken;
     private final TrackerOperation trackerOperation;
 
 
     public PeerImportTemplateTask( final String environmentId, final Peer peer, final Set<Node> nodes,
-                                   final String kurjunToken, final TrackerOperation trackerOperation )
+                                   final String cdnToken, final TrackerOperation trackerOperation )
     {
         this.environmentId = environmentId;
         this.peer = peer;
         this.nodes = nodes;
-        this.kurjunToken = kurjunToken;
+        this.cdnToken = cdnToken;
         this.trackerOperation = trackerOperation;
     }
 
@@ -57,7 +57,7 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
 
 
         PrepareTemplatesResponse response =
-                peer.prepareTemplates( new PrepareTemplatesRequest( environmentId, kurjunToken, rhTemplates ) );
+                peer.prepareTemplates( new PrepareTemplatesRequest( environmentId, cdnToken, rhTemplates ) );
 
 
         for ( String message : response.getMessages() )

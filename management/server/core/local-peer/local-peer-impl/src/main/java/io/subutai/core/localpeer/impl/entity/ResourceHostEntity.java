@@ -58,7 +58,6 @@ import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
@@ -881,7 +880,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( final Template template, final String environmentId, final String kurjunToken )
+    public void importTemplate( final Template template, final String environmentId, final String cdnToken )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
@@ -891,7 +890,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             updateTemplateDownloadProgress( environmentId, template.getName(), 0 );
 
-            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId(), kurjunToken ), this,
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId(), cdnToken ), this,
                     new TemplateDownloadTracker( this, environmentId ) );
         }
         catch ( Exception e )
@@ -976,30 +975,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public String exportTemplate( final String containerName, final String templateName, final String version,
-                                  final boolean isPrivateTemplate, final String token ) throws ResourceHostException
+    public void exportTemplate( final String containerName, final String templateName, final String version,
+                                final boolean isPrivateTemplate, final String token ) throws ResourceHostException
     {
         try
         {
             updateTemplateUploadProgress( templateName, 0 );
 
-            CommandResult result = commandUtil.execute( resourceHostCommands
+            commandUtil.execute( resourceHostCommands
                             .getExportTemplateCommand( containerName, templateName, version, isPrivateTemplate, token
                                                      ), this,
                     new TemplateUploadTracker( this, templateName ) );
-
-            Pattern p = Pattern.compile( "hash:\\s+(\\S+)\\s*\"" );
-
-            Matcher m = p.matcher( result.getStdOut() );
-
-            if ( m.find() && m.groupCount() == 1 )
-            {
-                return m.group( 1 );
-            }
-            else
-            {
-                throw new ResourceHostException( "Template hash is not found in the output of subutai export command" );
-            }
         }
         catch ( CommandException e )
         {
@@ -1121,14 +1107,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     {
                         containerHost =
                                 new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                                        info.getHostInterfaces(), info.getContainerName(),
-                                        getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
+                                        info.getHostInterfaces(), info.getContainerName(), Common.MANAGEMENT_HOSTNAME,
+                                        //                                        getLocalPeer().getTemplateByName(
+                                        // Common.MANAGEMENT_HOSTNAME ).getId(),
                                         Common.MANAGEMENT_HOSTNAME, null, null,
                                         new ContainerQuota( ContainerSize.SMALL ), info.getVlan() );
 
                         addContainerHost( containerHost );
                     }
-                    catch ( PeerException e1 )
+                    catch ( Exception e1 )
                     {
                         LOG.warn( "Could not register management host, error obtaining management template info", e );
                     }

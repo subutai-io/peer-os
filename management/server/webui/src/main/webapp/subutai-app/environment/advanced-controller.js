@@ -3,7 +3,7 @@
 angular.module('subutai.environment.adv-controller', [])
     .controller('AdvancedEnvironmentCtrl', AdvancedEnvironmentCtrl);
 
-AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', 'identitySrv'];
+AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', 'identitySrv', 'templateSrv'];
 
 var graph = new joint.dia.Graph;
 var paper;
@@ -17,11 +17,11 @@ var PEER_SPACE = 30;
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
 
-function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, identitySrv) {
+function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, identitySrv, templateSrv) {
 
     var vm = this;
 
-    checkKurjunAuthToken(identitySrv, $rootScope);
+	checkCDNToken(templateSrv, $rootScope)
 
     vm.buildEnvironment = buildEnvironment;
     vm.buildEditedEnvironment = buildEditedEnvironment;
@@ -41,7 +41,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.nodeStatus = 'Add to';
     vm.nodeList = [];
     vm.colors = quotaColors;
-    vm.templates = [];
+    vm.templates = {};
     vm.templatesList = [];
 
 
@@ -73,10 +73,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     //plugins actions
     vm.selectPlugin = selectPlugin;
     vm.setTemplatesByPlugin = setTemplatesByPlugin;
-    vm.loadPrivateTemplates = loadPrivateTemplates;
+    vm.loadOwnTemplates = loadOwnTemplates;
 
-    function loadPrivateTemplates() {
-        environmentService.getPrivateTemplates()
+    function loadOwnTemplates() {
+        templateSrv.getOwnTemplates()
             .then(function (data) {
                 vm.templates['own'] = data;
                 getFilteredTemplates();
@@ -84,17 +84,18 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     }
 
     function loadTemplates(callback) {
-        environmentService.getTemplates()
+        templateSrv.getTemplates()
             .then(function (data) {
-                vm.templates = data;
+                vm.templates['all'] = data;
                 getFilteredTemplates(callback);
             });
     }
 
     loadTemplates();
+    loadOwnTemplates();
 
-    $rootScope.$on('kurjunTokenSet', function (event, data) {
-        loadPrivateTemplates();
+    $rootScope.$on('cdnTokenSet', function (event, data) {
+        loadOwnTemplates();
     });
 
     function addUniqueTemplates(filteredTemplates, groupedTemplates){
@@ -117,7 +118,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         var templatesLst = [];
 
         for (var i in vm.templates) {
-            if (vm.templatesType == 'all' || i == vm.templatesType) {
+            if (i == vm.templatesType) {
                 templatesLst = addUniqueTemplates(templatesLst, vm.templates[i]);
             }
         }
@@ -360,6 +361,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             "environmentId": vm.editingEnv.id,
             "changingContainers": quotaContainers
         };
+
         environmentService.modifyEnvironment(containers, 'advanced')
             .success(function (data) {
                 vm.newEnvID = data;
