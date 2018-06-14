@@ -124,7 +124,7 @@ node() {
 
             //remove existing template metadata
             String OLD_ID = sh(script: """
-            var=\$(curl -s https://${hubIp}/rest/v1/cdn/template?name=management&verified=true) && echo \$var | grep -Po '"id":"\\K([a-zA-Z0-9]+)'
+            var=\$(curl -s https://${hubIp}/rest/v1/cdn/template?name=management&verified=true) ; if [[ \$var != "Template not found" ]]; then echo \$var | grep -Po '"id":"\\K([a-zA-Z0-9]+)' ; else echo \$var; fi
             """, returnStdout: true)
             OLD_ID = OLD_ID.trim()
 
