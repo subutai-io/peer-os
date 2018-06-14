@@ -492,49 +492,6 @@
       </dependency>
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-      <!--plugin-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>plugin-common-core</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-      <!--plugin-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>plugin-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>plugin-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>plugin-manager-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-      <!--bazaar -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>bazaar-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>bazaar-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>bazaar-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>test-cli</artifactId>
@@ -623,7 +580,11 @@
         <artifactId>template-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>template-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- tracker -->
       <dependency>

@@ -291,7 +291,4 @@ public interface Peer extends RelationLink
     RegistrationStatus getStatus();
 
     PeerTemplatesDownloadProgress getTemplateDownloadProgress( EnvironmentId environmentId ) throws PeerException;
-
-    String exportTemplate( ContainerId containerId, String templateName, String version, boolean isPrivateTemplate,
-                           String token ) throws PeerException;
 }

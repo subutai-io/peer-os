@@ -11,7 +11,6 @@ function SettingsNetworkCtrl($rootScope, $scope, SettingsNetworkSrv, SweetAlert)
 
     function getConfig() {
         SettingsNetworkSrv.getConfig().success(function (data) {
-            console.log(data);
             vm.config = data;
         });
     }

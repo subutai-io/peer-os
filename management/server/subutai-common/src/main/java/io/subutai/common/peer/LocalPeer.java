@@ -226,5 +226,8 @@ public interface LocalPeer extends Peer
     void registerResourceHost( ResourceHostInfo resourceHostInfo );
 
     PeerTemplatesUploadProgress getTemplateUploadProgress( final String templateName ) throws PeerException;
+
+    void exportTemplate( ContainerId containerId, String templateName, String version,
+                                     boolean isPrivateTemplate, String token ) throws PeerException;
 }
 

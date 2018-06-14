@@ -18,7 +18,7 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
 
 
     public ImportTemplateTask( final Template template, final ResourceHost resourceHost, final String environmentId,
-                               final String kurjunToken )
+                               final String cdnToken )
     {
         Preconditions.checkNotNull( template );
         Preconditions.checkNotNull( resourceHost );
@@ -27,7 +27,7 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
         this.template = template;
         this.resourceHost = resourceHost;
         this.environmentId = environmentId;
-        this.token = kurjunToken;
+        this.token = cdnToken;
     }
 
 

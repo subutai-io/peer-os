@@ -6,19 +6,9 @@
     </a>
   </div>
 
-  <form ng-submit="containerViewCtrl.createTemplate(containerViewCtrl.editingContainer, name, version, isPublic)">
+  <form ng-submit="containerViewCtrl.createTemplate(containerViewCtrl.editingContainer, name, version)">
     <div class="b-popup__body">
 
-      <div class="popup-body-box b-popup-checkbox">
-        <label class="b-popup-body-label" for="subt_checkbox__container-private-template">
-          Is public template
-        </label>
-        <input type="checkbox"
-               id="subt_checkbox__container-private-template"
-               class="b-popup-checkbox__input"
-               ng-model="isPublic">
-        <div class="clear"></div>
-      </div>
       <div class="popup-body-box b-popup-checkbox">
         <label class="b-popup-body-label" for="subt_inp__container-template-name">
           Template name

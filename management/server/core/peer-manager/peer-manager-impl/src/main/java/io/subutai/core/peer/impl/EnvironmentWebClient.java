@@ -841,37 +841,6 @@ public class EnvironmentWebClient
     }
 
 
-    public String exportTemplate( final ContainerId containerId, final String templateName, final String version,
-                                  final boolean isPrivateTemplate, final String token ) throws PeerException
-    {
-        WebClient client = null;
-        Response response;
-        try
-        {
-            remotePeer.checkRelation();
-            String path = String.format( "/%s/containers/%s/export/%s/%s/%s/%s", containerId.getEnvironmentId(),
-                    containerId.getId(), templateName, version, isPrivateTemplate, token );
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000L,
-                    Common.TEMPLATE_EXPORT_TIMEOUT_SEC * 1000L, 1 );
-
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            response = client.post( null );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error exporting template: " + e.getMessage() );
-        }
-        finally
-        {
-            WebClientBuilder.close( client );
-        }
-
-        return WebClientBuilder.checkResponse( response, String.class );
-    }
-
-
     public Quota getRawQuota( final ContainerId containerId ) throws PeerException
     {
         WebClient client = null;

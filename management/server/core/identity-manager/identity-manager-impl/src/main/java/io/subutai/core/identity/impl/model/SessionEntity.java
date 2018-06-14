@@ -51,8 +51,8 @@ public class SessionEntity implements Session
     @Transient
     private Subject subject;
     //************************************
-    private long kurjunTokenSetTime;
-    private String kurjunToken;
+    private long cdnTokenSetTime;
+    private String cdnToken;
 
 
     @Override
@@ -140,22 +140,22 @@ public class SessionEntity implements Session
 
 
     @Override
-    public synchronized void setKurjunToken( final String token )
+    public synchronized void setCdnToken( final String token )
     {
-        kurjunToken = token;
-        kurjunTokenSetTime = System.currentTimeMillis();
+        cdnToken = token;
+        cdnTokenSetTime = System.currentTimeMillis();
     }
 
 
     @Override
-    public synchronized String getKurjunToken()
+    public synchronized String getCdnToken()
     {
         //invalidate token after 30 min
-        if ( System.currentTimeMillis() - kurjunTokenSetTime > TimeUnit.MINUTES.toMillis( 30 ) )
+        if ( System.currentTimeMillis() - cdnTokenSetTime > TimeUnit.MINUTES.toMillis( 30 ) )
         {
-            kurjunToken = null;
+            cdnToken = null;
         }
 
-        return kurjunToken;
+        return cdnToken;
     }
 }

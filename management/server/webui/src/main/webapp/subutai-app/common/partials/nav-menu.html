@@ -82,10 +82,6 @@
             ng-class="subutaiController.activeState == 'identity-user' ? 'b-nav-menu-sub_active' : ''">
           <a ui-sref="identity-user" id="subt-link__user-management">User management</a>
         </li>
-        <!--<li class="b-nav-menu-sub b-nav-menu-sub_disabled" ng-if="subutaiController.adminMenus"-->
-            <!--ng-class="subutaiController.activeState == 'identity-role' ? 'b-nav-menu-sub_active' : ''">-->
-          <!--<a ui-sref="identity-role" id="subt-link__role-management">Role management</a>-->
-        <!--</li>-->
         <li class="b-nav-menu-sub b-nav-menu-sub_disabled"
             ng-class="subutaiController.activeState == 'account-settings' || subutaiController.activeState == 'change-pass' ? 'b-nav-menu-sub_active' : ''">
           <a ui-sref="account-settings" id="subt-link__account-settings">Account Settings</a>
@@ -130,20 +126,8 @@
 				</span>
       </a>
     </li>
-    <li class="b-nav-menu" ng-class="subutaiController.activeState == 'bazaar' ? 'b-nav-menu_active' : ''">
-      <a ui-sref="bazaar" class="b-nav-menu-link" id="subt-link__bazaar">
-				<span class="b-nav-menu__icon b-nav-menu-link__item">
-					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets/elements/icons.svg#nav-bazaar"></use>
-					</svg>
-				</span><!--
-					--><span class="b-nav-menu__title b-nav-menu-link__item">
-					Plugins
-				</span>
-      </a>
-    </li>
     <li class="b-nav-menu" ng-if="subutaiController.adminMenus"
-        ng-class="subutaiController.activeState == 'about' || subutaiController.activeState == 'settings-peer' || subutaiController.activeState == 'settings-kurjun' || subutaiController.activeState == 'settings-network' || subutaiController.activeState == 'settings-advanced' || subutaiController.activeState == 'settings-updates' ? 'b-nav-menu_active' : ''">
+        ng-class="subutaiController.activeState == 'about' || subutaiController.activeState == 'settings-peer' || subutaiController.activeState == 'settings-network' || subutaiController.activeState == 'settings-advanced' || subutaiController.activeState == 'settings-updates' ? 'b-nav-menu_active' : ''">
       <a class="b-nav-menu-link" href id="subt-link__settings">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -158,10 +142,6 @@
 				</span>
       </a>
       <ul class="b-nav-menu__sub">
-        <!--<li class="b-nav-menu-sub b-nav-menu-sub_disabled"
-            ng-class="subutaiController.activeState == 'settings-peer' ? 'b-nav-menu-sub_active' : ''">
-          <a ui-sref="settings-peer" id="subt-link__settings-peer">Peer settings</a>
-		  </li>-->
         <li class="b-nav-menu-sub b-nav-menu-sub_disabled"
             ng-class="subutaiController.activeState == 'settings-network' ? 'b-nav-menu-sub_active' : ''">
           <a ui-sref="settings-network" id="subt-link__settings-network">Network</a>

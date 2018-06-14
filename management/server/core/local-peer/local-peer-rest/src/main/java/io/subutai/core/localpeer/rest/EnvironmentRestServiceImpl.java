@@ -574,26 +574,4 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
-
-
-    @Override
-    public Response exportTemplate( final ContainerId containerId, final String templateName, final String version,
-                                    final boolean isPrivateTemplate, final String token )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( version ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( token ) );
-
-            return Response
-                    .ok( localPeer.exportTemplate( containerId, templateName, version, isPrivateTemplate, token ) )
-                    .build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
 }
