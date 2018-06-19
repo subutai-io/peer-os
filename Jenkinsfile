@@ -1,8 +1,8 @@
 #!groovy
 
 notifyBuildDetails = ""
-hubIp = ""
 cdnHost = ""
+aptHost = ""
 
 node() {
     // Send job started notifications
@@ -24,23 +24,23 @@ node() {
 
         // declare hub address
         switch (env.BRANCH_NAME) {
-            case ~/master/: hubIp = "masterbazaar.subutai.io"; break;
-            case ~/dev/: hubIp = "devbazaar.subutai.io"; break;
-            case ~/sysnet/: hubIp = "devbazaar.subutai.io"; break;
-            default: hubIp = "bazaar.subutai.io"
+            case ~/master/: cdnHost = "masterbazaar.subutai.io"; break;
+            case ~/dev/: cdnHost = "devbazaar.subutai.io"; break;
+            case ~/sysnet/: cdnHost = "devbazaar.subutai.io"; break;
+            default: cdnHost = "bazaar.subutai.io"
         }
 
         switch (env.BRANCH_NAME) {
-            case ~/master/: cdnHost = "mastercdn.subutai.io"; break;
-            case ~/dev/: cdnHost = "devcdn.subutai.io"; break;
-            case ~/sysnet/: cdnHost = "sysnetcdn.subutai.io"; break;
-            default: cdnHost = "cdn.subutai.io"
+            case ~/master/: aptHost = "mastercdn.subutai.io"; break;
+            case ~/dev/: aptHost = "devcdn.subutai.io"; break;
+            case ~/sysnet/: aptHost = "sysnetcdn.subutai.io"; break;
+            default: aptHost = "cdn.subutai.io"
         }
 
         // build deb
         sh """
 		cd management
-		sed 's/export HUB_IP=.*/export HUB_IP=${hubIp}/g' -i server/server-karaf/src/main/assembly/bin/setenv
+		sed 's/export HUB_IP=.*/export HUB_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 
 		if [[ "${env.BRANCH_NAME}" == "dev" ]] || [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
 			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
@@ -54,7 +54,7 @@ node() {
         String user = "jenkins@optimal-dynamics.com"
         String fingerprint = "877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
         def authId = sh(script: """
-            curl -s https://${hubIp}/rest/v1/cdn/token?fingerprint=${fingerprint}
+            curl -s https://${cdnHost}/rest/v1/cdn/token?fingerprint=${fingerprint}
             """, returnStdout: true)
         authId = authId.trim()
         def sign = sh(script: """
@@ -62,7 +62,7 @@ node() {
             """, returnStdout: true)
         sign = sign.trim()
         def token = sh(script: """
-            curl -s --data-urlencode "request=${sign}"  https://${hubIp}/rest/v1/cdn/token
+            curl -s --data-urlencode "request=${sign}"  https://${cdnHost}/rest/v1/cdn/token
             """, returnStdout: true)
         token = token.trim()
         stage("Build management template")
@@ -77,9 +77,9 @@ node() {
             ssh admin@172.31.0.253 <<- EOF
 			set -e
 		    echo ${token}
-            sudo sed 's/APT =.*/APT = ${hubIp}/gI' -i /etc/subutai/agent.conf
+            sudo sed 's/APT =.*/APT = ${aptHost}/gI' -i /etc/subutai/agent.conf
             sudo sed 's/URL =.*/URL = ${cdnHost}/gI' -i /etc/subutai/agent.conf
-            sudo sed 's/SshJumpServer =.*/SshJumpServer = ${cdnHost}/gI' -i /etc/subutai/agent.conf
+            sudo sed 's/SshJumpServer =.*/SshJumpServer = ${aptHost}/gI' -i /etc/subutai/agent.conf
 			sudo subutai destroy management
             sudo subutai clone debian-stretch management
 			/bin/sleep 20
@@ -88,11 +88,11 @@ node() {
             sudo cp /opt/key/cdn-pub.key /var/lib/lxc/management/rootfs/tmp/
             sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
             sudo subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
-			sudo subutai attach management "echo 'deb http://${cdnHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
+			sudo subutai attach management "echo 'deb http://${aptHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
             sudo subutai attach management "apt-get update"
 			sudo subutai attach management "sync"
 			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
-			sudo subutai attach management "wget -q 'https://${cdnHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+			sudo subutai attach management "wget -q 'https://${aptHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
@@ -126,21 +126,21 @@ node() {
 
             //remove existing template metadata
             String OLD_ID = sh(script: """
-            var=\$(curl -s https://${hubIp}/rest/v1/cdn/template?name=management&verified=true) ; if [[ \$var != "Template not found" ]]; then echo \$var | grep -Po '"id":"\\K([a-zA-Z0-9]+)' ; else echo \$var; fi
+            var=\$(curl -s https://${cdnHost}/rest/v1/cdn/template?name=management&verified=true) ; if [[ \$var != "Template not found" ]]; then echo \$var | grep -Po '"id":"\\K([a-zA-Z0-9]+)' ; else echo \$var; fi
             """, returnStdout: true)
             OLD_ID = OLD_ID.trim()
 
             sh """
             echo "OLD ID: ${OLD_ID}"
             if [[ "${OLD_ID}" != "Template not found" ]]; then
-                curl -X DELETE "https://${hubIp}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
+                curl -X DELETE "https://${cdnHost}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
             fi
             """
 
             sh """
             echo "NEW ID: ${NEW_ID}"
             sed -i 's/"id":""/"id":"${NEW_ID}"/g' /tmp/template.json
-            template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${hubIp}/rest/v1/cdn/templates
+            template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${cdnHost}/rest/v1/cdn/templates
             """
         }
 
@@ -158,11 +158,11 @@ node() {
             String kurjunUserEmail = "jenkins@subut.ai"
             def kurjunID = sh(script: """
 			set +x
-			curl -s -k https://${cdnHost}:8338/kurjun/rest/auth/token?user=${kurjunUser} | gpg --clearsign --no-tty -u ${kurjunUserEmail}
+			curl -s -k https://${aptHost}:8338/kurjun/rest/auth/token?user=${kurjunUser} | gpg --clearsign --no-tty -u ${kurjunUserEmail}
 			""", returnStdout: true)
             def kurjunToken = sh(script: """
 			set +x
-			curl -s -k -Fmessage=\"${kurjunID}\" -Fuser=${kurjunUser} https://${cdnHost}:8338/kurjun/rest/auth/token
+			curl -s -k -Fmessage=\"${kurjunID}\" -Fuser=${kurjunUser} https://${aptHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
 
             sh """
@@ -171,12 +171,12 @@ node() {
 
             sh """
 			set +x
-            echo "${token} and ${cdnHost} and ${debFileName}"
-			curl -sk -H "token: ${kurjunToken}" -Ffile=@${debFileName} -Ftoken=${kurjunToken} "https://${cdnHost}:8338/kurjun/rest/apt/upload"
+            echo "${token} and ${aptHost} and ${debFileName}"
+			curl -sk -H "token: ${kurjunToken}" -Ffile=@${debFileName} -Ftoken=${kurjunToken} "https://${aptHost}:8338/kurjun/rest/apt/upload"
             """
             sh """
 			set +x
-            curl -k -H "token: ${kurjunToken}" "https://${cdnHost}:8338/kurjun/rest/apt/generate" 
+            curl -k -H "token: ${kurjunToken}" "https://${aptHost}:8338/kurjun/rest/apt/generate" 
 		    """
         }
     } catch (e) {
