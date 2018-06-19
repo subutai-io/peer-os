@@ -174,7 +174,7 @@ node() {
                 def jsonDeb = jsonParse(responseDeb)
                 sh """
 			    set +x
-			    curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${kurjunToken}
+			    curl -s -k -X DELETE https://${aptHost}:8338/kurjun/rest/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${kurjunToken}
 		        """
             }
 
