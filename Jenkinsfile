@@ -77,7 +77,9 @@ node() {
             ssh admin@172.31.0.253 <<- EOF
 			set -e
 		    echo ${token}
-            sudo sed 's/URL =.*/URL = ${hubIp}/g' -i /etc/subutai/agent.conf
+            sudo sed 's/APT =.*/APT = ${hubIp}/gI' -i /etc/subutai/agent.conf
+            sudo sed 's/URL =.*/URL = ${cdnHost}/gI' -i /etc/subutai/agent.conf
+            sudo sed 's/SshJumpServer =.*/SshJumpServer = ${cdnHost}/gI' -i /etc/subutai/agent.conf
 			sudo subutai destroy management
             sudo subutai clone debian-stretch management
 			/bin/sleep 20
