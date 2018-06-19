@@ -20,8 +20,6 @@ node() {
         def artifactVersion = getVersion("management/pom.xml")
         String debFileName = "management-${env.BRANCH_NAME}.deb"
 
-        commitId = sh(script: "git rev-parse HEAD", returnStdout: true)
-
         // declare hub address
         switch (env.BRANCH_NAME) {
             case ~/master/: cdnHost = "masterbazaar.subutai.io"; break;
@@ -153,7 +151,7 @@ node() {
 
             unstash 'deb'
 
-            // CDN auth creadentials
+            // CDN auth credentials
             String kurjunUser = "jenkins"
             String kurjunUserEmail = "jenkins@subut.ai"
             def kurjunID = sh(script: """
@@ -164,6 +162,22 @@ node() {
 			set +x
 			curl -s -k -Fmessage=\"${kurjunID}\" -Fuser=${kurjunUser} https://${aptHost}:8338/kurjun/rest/auth/token
 			""", returnStdout: true)
+
+
+            String responseDeb = sh(script: """
+		    set +x
+		    curl -s -k https://${aptHost}:8338/kurjun/rest/apt/info?name=${debFileName}
+		    """, returnStdout: true)
+
+            // delete old deb
+            if (responseDeb != "Not found") {
+                def jsonDeb = jsonParse(responseDeb)
+                sh """
+			    set +x
+			    curl -s -k -X DELETE ${url}/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${kurjunToken}
+		        """
+            }
+
 
             sh """
             echo "Uploading file ${debFileName}"
