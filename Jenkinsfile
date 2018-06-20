@@ -45,6 +45,7 @@ node() {
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
+        branch=`git symbolic-ref --short HEAD` && echo "Branch is \$branch"
         find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
 	    """
 
