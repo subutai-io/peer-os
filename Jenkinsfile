@@ -2,7 +2,8 @@
 
 notifyBuildDetails = ""
 cdnHost = ""
-aptHost = ""
+jumpServer = ""
+aptRepo = ""
 
 node() {
     // Send job started notifications
@@ -20,7 +21,6 @@ node() {
         def artifactVersion = getVersion("management/pom.xml")
         String debFileName = "management-${env.BRANCH_NAME}.deb"
 
-        // declare hub address
         switch (env.BRANCH_NAME) {
             case ~/master/: cdnHost = "masterbazaar.subutai.io"; break;
             case ~/dev/: cdnHost = "devbazaar.subutai.io"; break;
@@ -29,18 +29,24 @@ node() {
         }
 
         switch (env.BRANCH_NAME) {
-            case ~/master/: aptHost = "mastercdn.subutai.io"; break;
-            case ~/dev/: aptHost = "devcdn.subutai.io"; break;
-            case ~/sysnet/: aptHost = "sysnetcdn.subutai.io"; break;
-            default: aptHost = "cdn.subutai.io"
+            case ~/master/: jumpServer = "mastercdn.subutai.io"; break;
+            case ~/dev/: jumpServer = "devcdn.subutai.io"; break;
+            case ~/sysnet/: jumpServer = "sysnetcdn.subutai.io"; break;
+            default: jumpServer = "cdn.subutai.io"
         }
 
+        switch (env.BRANCH_NAME) {
+            case ~/master/: aptRepo = "master"; break;
+            case ~/dev/: aptRepo = "dev"; break;
+            case ~/sysnet/: aptRepo = "sysnet"; break;
+            default: aptRepo = "prod"
+        }
         // build deb
         sh """
 		cd management
-		sed 's/export HUB_IP=.*/export HUB_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
         git checkout ${env.BRANCH_NAME}
-		if [[ "${env.BRANCH_NAME}" == "dev" ]] || [[ "${env.BRANCH_NAME}" == "hotfix-"* ]]; then
+		sed 's/export HUB_IP=.*/export HUB_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
+		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
 			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
@@ -67,7 +73,7 @@ node() {
         stage("Build management template")
         notifyBuildDetails = "\nFailed Step - Build management template"
 
-        // Start MNG-RH Lock
+
         lock('deb') {
 
             // create management template
@@ -76,22 +82,19 @@ node() {
             ssh admin@172.31.0.253 <<- EOF
 			set -e
 		    echo ${token}
-            sudo sed 's/APT =.*/APT = ${aptHost}/gI' -i /etc/subutai/agent.conf
             sudo sed 's/URL =.*/URL = ${cdnHost}/gI' -i /etc/subutai/agent.conf
-            sudo sed 's/SshJumpServer =.*/SshJumpServer = ${aptHost}/gI' -i /etc/subutai/agent.conf
+            sudo sed 's/SshJumpServer =.*/SshJumpServer = ${jumpServer}/gI' -i /etc/subutai/agent.conf
 			sudo subutai destroy management
             sudo subutai clone debian-stretch management
 			/bin/sleep 20
 			scp ubuntu@${env.master_rh}:/mnt/lib/lxc/jenkins${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
-            sudo cp /opt/key/cdn-pub.key /var/lib/lxc/management/rootfs/tmp/
-            sudo subutai attach management "gpg --import /tmp/cdn-pub.key"
-            sudo subutai attach management "gpg --export --armor 80260C65A4D79BC8 | apt-key add"
-			sudo subutai attach management "echo 'deb http://${aptHost}:8080/kurjun/rest/apt /' > /etc/apt/sources.list.d/subutai-repo.list"
+			sudo subutai attach management "apt-key adv --recv-keys --keyserver keyserver.ubuntu.com C6B2AC7FBEB649F1"
+			sudo subutai attach management "echo 'deb http://deb.subutai.io/subutai ${aptRepo} main' > /etc/apt/sources.list.d/subutai-repo.list"
             sudo subutai attach management "apt-get update"
 			sudo subutai attach management "sync"
 			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
-			sudo subutai attach management "wget -q 'https://${aptHost}:8338/kurjun/rest/raw/get?owner=subutai&name=influxdb.conf' -O /etc/influxdb/influxdb.conf"
+			sudo cp /home/admin/influxdb.conf /var/lib/lxc/management/rootfs/etc/influxdb/influxdb.conf
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
@@ -136,6 +139,7 @@ node() {
             fi
             """
 
+            //register template with CDN
             sh """
             echo "NEW ID: ${NEW_ID}"
             sed -i 's/"id":""/"id":"${NEW_ID}"/g' /tmp/template.json
@@ -152,47 +156,12 @@ node() {
 
             unstash 'deb'
 
-            // CDN auth credentials
-            String kurjunUser = "jenkins"
-            String kurjunUserEmail = "jenkins@subut.ai"
-            def kurjunID = sh(script: """
-			set +x
-			curl -s -k https://${aptHost}:8338/kurjun/rest/auth/token?user=${kurjunUser} | gpg --clearsign --no-tty -u ${kurjunUserEmail}
-			""", returnStdout: true)
-            def kurjunToken = sh(script: """
-			set +x
-			curl -s -k -Fmessage=\"${kurjunID}\" -Fuser=${kurjunUser} https://${aptHost}:8338/kurjun/rest/auth/token
-			""", returnStdout: true)
-
-
-            String responseDeb = sh(script: """
-		    set +x
-		    curl -s -k https://${aptHost}:8338/kurjun/rest/apt/info?name=${debFileName}
-		    """, returnStdout: true)
-
-            // delete old deb
-            if (responseDeb != "Not found") {
-                def jsonDeb = jsonParse(responseDeb)
-                sh """
-			    set +x
-			    curl -s -k -X DELETE https://${aptHost}:8338/kurjun/rest/apt/delete?id=${jsonDeb[0]["id"]}'&'token=${kurjunToken}
-		        """
-            }
-
-
+            //copy deb to repo
             sh """
-            echo "Uploading file ${debFileName}"
+            touch uploading_management
+            scp uploading_management ${debFileName} dak@deb.subutai.io:incoming/${env.BRANCH_NAME}/
+            ssh dak@deb.subutai.io sh /var/reprepro/scripts/scan-incoming.sh ${env.BRANCH_NAME} management
             """
-
-            sh """
-			set +x
-            echo "${token} and ${aptHost} and ${debFileName}"
-			curl -sk -H "token: ${kurjunToken}" -Ffile=@${debFileName} -Ftoken=${kurjunToken} "https://${aptHost}:8338/kurjun/rest/apt/upload"
-            """
-            sh """
-			set +x
-            curl -k -H "token: ${kurjunToken}" "https://${aptHost}:8338/kurjun/rest/apt/generate" 
-		    """
         }
     } catch (e) {
         currentBuild.result = "FAILED"
