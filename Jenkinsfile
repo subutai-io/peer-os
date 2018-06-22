@@ -94,7 +94,7 @@ node() {
             sudo subutai attach management "apt-get update"
 			sudo subutai attach management "sync"
 			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
-			sudo scp /home/admin/influxdb.conf /var/lib/lxc/management/rootfs/etc/influxdb/influxdb.conf
+			sudo cp /home/admin/influxdb.conf /var/lib/lxc/management/rootfs/etc/influxdb/influxdb.conf
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
