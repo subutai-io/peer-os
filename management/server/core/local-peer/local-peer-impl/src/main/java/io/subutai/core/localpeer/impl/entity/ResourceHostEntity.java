@@ -1010,7 +1010,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             //generate registration token for container for 30 min
-            String containerToken = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
+            String containerToken = getRegistrationManager().generateContainerToken( 30 * 60 * 1000L );
 
 
             CommandResult result = execute( resourceHostCommands

@@ -1810,7 +1810,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         try
         {
-            String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
+            String token = registrationManager.generateContainerToken( 30 * 1000L );
 
             commandUtil.execute( localPeerCommands.getRegisterManagementContainerCommand( token ), resourceHost );
         }
