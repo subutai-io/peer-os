@@ -5,7 +5,6 @@ import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.registration.api.HostRegistrationManager;
-import io.subutai.core.registration.api.service.ContainerToken;
 
 
 @Command( scope = "host", name = "generate-token", description = "Generates container token" )
@@ -23,8 +22,8 @@ public class GenerateContainerToken extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        ContainerToken containerToken = registrationManager.generateContainerTTLToken( 30 * 1000000L );
-        System.out.println( containerToken.getToken() );
+        String containerToken = registrationManager.generateContainerToken( 30 * 1000000L );
+        System.out.println( containerToken );
         return null;
     }
 }

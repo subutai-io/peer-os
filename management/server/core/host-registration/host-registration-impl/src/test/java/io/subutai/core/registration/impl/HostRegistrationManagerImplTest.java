@@ -1,7 +1,6 @@
 package io.subutai.core.registration.impl;
 
 
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -14,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -21,13 +21,10 @@ import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
 import io.subutai.core.registration.impl.dao.RequestDataService;
-import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -37,10 +34,14 @@ import io.subutai.core.security.api.jetty.HttpContextManager;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -61,15 +62,10 @@ public class HostRegistrationManagerImplTest
     RequestDataService requestDataService;
 
     @Mock
-    ContainerTokenDataService containerTokenDataService;
-
-    @Mock
     DaoManager daoManager;
 
     @Mock
     SecurityManager securityManager;
-    @Mock
-    NetworkManager networkManager;
     @Mock
     ServiceLocator serviceLocator;
     @Mock
@@ -77,7 +73,7 @@ public class HostRegistrationManagerImplTest
 
     HostRegistrationManagerImpl registrationManager;
     @Mock
-    ContainerTokenImpl containerToken;
+    ExpiringCache<String, Boolean> tokenCache;
     @Mock
     KeyManager keyManager;
     @Mock
@@ -97,8 +93,8 @@ public class HostRegistrationManagerImplTest
     {
         registrationManager = spy( new HostRegistrationManagerImpl( securityManager, daoManager ) );
         registrationManager.requestDataService = requestDataService;
-        registrationManager.containerTokenDataService = containerTokenDataService;
         registrationManager.serviceLocator = serviceLocator;
+        registrationManager.tokenCache = tokenCache;
 
         RequestedHostImpl host1 = mock( RequestedHostImpl.class );
         RequestedHostImpl host2 = mock( RequestedHostImpl.class );
@@ -126,7 +122,6 @@ public class HostRegistrationManagerImplTest
     {
         registrationManager.init();
 
-        assertNotNull( registrationManager.containerTokenDataService );
         assertNotNull( registrationManager.requestDataService );
     }
 
@@ -195,29 +190,23 @@ public class HostRegistrationManagerImplTest
     }
 
 
-    @Test( expected = HostRegistrationException.class )
+    @Test
     public void testGenerateContainerTTLToken() throws Exception
     {
-        registrationManager.generateContainerTTLToken( 123L );
+        registrationManager.generateContainerToken( 123L );
 
-        verify( containerTokenDataService ).persist( isA( ContainerTokenImpl.class ) );
-
-        //-----
-
-        doThrow( new RuntimeException() ).when( containerTokenDataService ).persist( isA( ContainerTokenImpl.class ) );
-
-        registrationManager.generateContainerTTLToken( 123L );
+        verify( tokenCache ).put( anyString(), anyBoolean(), eq( 123L ) );
     }
 
 
     @Test
     public void testVerifyToken() throws Exception
     {
-        doReturn( containerToken ).when( containerTokenDataService ).find( "token" );
-        doReturn( new Timestamp( System.currentTimeMillis() ) ).when( containerToken ).getDateCreated();
-        doReturn( 1000000L ).when( containerToken ).getTtl();
+        String containerToken = UUID.randomUUID().toString();
+        doReturn( containerToken ).when( registrationManager ).generateContainerToken( anyLong() );
+        doReturn( true ).when( tokenCache ).keyExists( containerToken );
 
-        registrationManager.verifyToken( "token", "id", TestHelper.PGP_PUBLIC_KEY );
+        registrationManager.verifyTokenAndRegisterKey( containerToken, "id", TestHelper.PGP_PUBLIC_KEY );
 
         verify( keyManager )
                 .savePublicKeyRing( "id", SecurityKeyType.CONTAINER_HOST_KEY.getId(), TestHelper.PGP_PUBLIC_KEY );
@@ -230,41 +219,23 @@ public class HostRegistrationManagerImplTest
 
         try
         {
-            registrationManager.verifyToken( "token", "id", TestHelper.PGP_PUBLIC_KEY );
+            registrationManager.verifyTokenAndRegisterKey( containerToken, "id", TestHelper.PGP_PUBLIC_KEY );
 
             fail( "Expected HostRegistrationException" );
         }
         catch ( HostRegistrationException e )
         {
         }
+
 
         //-----
 
-        doReturn( -1000000L ).when( containerToken ).getTtl();
+        doReturn( false ).when( tokenCache ).keyExists( containerToken );
 
-        try
-        {
-            registrationManager.verifyToken( "token", "id", TestHelper.PGP_PUBLIC_KEY );
+        boolean result =
+                registrationManager.verifyTokenAndRegisterKey( containerToken, "id", TestHelper.PGP_PUBLIC_KEY );
 
-            fail( "Expected HostRegistrationException" );
-        }
-        catch ( HostRegistrationException e )
-        {
-        }
-
-        //-----
-
-        doReturn( null ).when( containerTokenDataService ).find( "token" );
-
-        try
-        {
-            registrationManager.verifyToken( "token", "id", TestHelper.PGP_PUBLIC_KEY );
-
-            fail( "Expected HostRegistrationException" );
-        }
-        catch ( HostRegistrationException e )
-        {
-        }
+        assertFalse( result );
     }
 
 
