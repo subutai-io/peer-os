@@ -186,9 +186,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 
             String publicKey = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 
-            registrationManager.verifyToken( token, containerId, publicKey );
+            boolean valid = registrationManager.verifyTokenAndRegisterKey( token, containerId, publicKey );
 
-            return Response.accepted().build();
+            return valid ? Response.accepted().build() :
+                   Response.status( Response.Status.UNAUTHORIZED ).entity( "Invalid token" ).build();
         }
         catch ( Exception e )
         {

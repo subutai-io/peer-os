@@ -1,7 +1,6 @@
 package io.subutai.core.registration.impl;
 
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -20,6 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
@@ -36,11 +36,8 @@ import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.ContainerInfo;
-import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
 import io.subutai.core.registration.impl.dao.RequestDataService;
-import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -52,10 +49,10 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
     private static final Logger LOG = LoggerFactory.getLogger( HostRegistrationManagerImpl.class );
     private SecurityManager securityManager;
     RequestDataService requestDataService;
-    ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
     ServiceLocator serviceLocator = new ServiceLocator();
     private ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
+    ExpiringCache<String, Boolean> tokenCache = new ExpiringCache<>();
 
 
     public HostRegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
@@ -70,7 +67,6 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
 
     public void init()
     {
-        containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
         cleaner.scheduleWithFixedDelay( new Runnable()
         {
@@ -90,20 +86,47 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
                         requestDataService.remove( requestedHost.getId() );
                     }
                 }
-
-                for ( ContainerTokenImpl containerToken : containerTokenDataService.getAll() )
-                {
-                    if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System
-                            .currentTimeMillis() )
-                    {
-                        LOG.warn( "Deleting expired container token {} : {}", containerToken.getToken(),
-                                containerToken.getHostId() );
-
-                        containerTokenDataService.remove( containerToken.getToken() );
-                    }
-                }
             }
         }, 3, 30, TimeUnit.MINUTES );
+    }
+
+
+    @Override
+    public String generateContainerToken( final long ttlInMs )
+    {
+        Preconditions.checkArgument( ttlInMs > 0, "Invalid ttl" );
+
+        String token = UUID.randomUUID().toString();
+
+        tokenCache.put( token, true, ttlInMs );
+
+        return token;
+    }
+
+
+    @Override
+    public Boolean verifyTokenAndRegisterKey( final String token, String containerHostId, String publicKey )
+            throws HostRegistrationException
+    {
+
+        if ( !tokenCache.keyExists( token ) )
+        {
+            return false;
+        }
+
+        try
+        {
+            securityManager.getKeyManager()
+                           .savePublicKeyRing( containerHostId, SecurityKeyType.CONTAINER_HOST_KEY.getId(), publicKey );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error verifying token", e );
+
+            throw new HostRegistrationException( "Failed to store container pubkey", e );
+        }
+
+        return true;
     }
 
 
@@ -327,64 +350,6 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
 
             throw new HostRegistrationException( e );
         }
-    }
-
-
-    @Override
-    public ContainerToken generateContainerTTLToken( final long ttlInMs ) throws HostRegistrationException
-    {
-        Preconditions.checkArgument( ttlInMs > 0, "Invalid ttl" );
-
-        ContainerTokenImpl token =
-                new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
-                        ttlInMs );
-        try
-        {
-            containerTokenDataService.persist( token );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error persisting container token", e );
-
-            throw new HostRegistrationException( e );
-        }
-
-        return token;
-    }
-
-
-    @Override
-    public ContainerToken verifyToken( final String token, String containerHostId, String publicKey )
-            throws HostRegistrationException
-    {
-
-        ContainerTokenImpl containerToken = containerTokenDataService.find( token );
-
-        if ( containerToken == null )
-        {
-            LOG.error( "Failed to verify container token " + token + " for host " + containerHostId );
-
-            throw new HostRegistrationException( "Couldn't verify container token" );
-        }
-
-        if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
-        {
-            throw new HostRegistrationException( "Container token expired" );
-        }
-
-        try
-        {
-            securityManager.getKeyManager()
-                           .savePublicKeyRing( containerHostId, SecurityKeyType.CONTAINER_HOST_KEY.getId(), publicKey );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error verifying token", e );
-
-            throw new HostRegistrationException( "Failed to store container pubkey", e );
-        }
-
-        return containerToken;
     }
 
 
