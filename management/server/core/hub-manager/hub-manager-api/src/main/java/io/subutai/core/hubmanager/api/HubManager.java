@@ -24,17 +24,9 @@ public interface HubManager
 
     String getHubDns() throws HubManagerException;
 
-    String getProducts() throws HubManagerException;
-
-    void installPlugin( String url, String filename, String uid ) throws HubManagerException;
-
-    void uninstallPlugin( String name, String uid );
-
     Map<String, String> getPeerInfo() throws HubManagerException;
 
     Config getHubConfiguration();
-
-    String getChecksum();
 
     String getCurrentUserEmail();
 

@@ -131,7 +131,9 @@ try {
             set -e
 		    sudo sed 's/URL =.*/URL = ${cdnHost}/gI' -i /etc/subutai/agent.conf
             sudo sed 's/SshJumpServer =.*/SshJumpServer = ${jumpServer}/gI' -i /etc/subutai/agent.conf
+            set +e
 			sudo subutai destroy management
+			set -e
             sudo subutai clone debian-stretch management
 			/bin/sleep 20
 			scp jenkins-master:/tmp/${debFileName} /var/lib/lxc/management/rootfs/tmp/
