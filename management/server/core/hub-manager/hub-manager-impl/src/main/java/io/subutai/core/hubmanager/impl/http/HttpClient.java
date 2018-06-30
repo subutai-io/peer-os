@@ -18,16 +18,16 @@ import io.subutai.core.hubmanager.impl.FingerprintTrustManager;
 
 public class HttpClient
 {
-    private static final long SECONDS_15 = 15 * 1000L;
-
     private static final long SECONDS_30 = 30 * 1000L;
+
+    private static final long SECONDS_60 = 60 * 1000L;
 
     private static final int DEFAULT_MAX_RETRANSMITS = 3;
 
 
     private HttpClient()
     {
-        throw new IllegalAccessError("Utility class");
+        throw new IllegalAccessError( "Utility class" );
     }
 
 
@@ -47,9 +47,9 @@ public class HttpClient
 
             HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
 
-            httpClientPolicy.setConnectionTimeout( SECONDS_15 );
+            httpClientPolicy.setConnectionTimeout( SECONDS_30 );
 
-            httpClientPolicy.setReceiveTimeout( SECONDS_30 );
+            httpClientPolicy.setReceiveTimeout( SECONDS_60 );
 
             httpClientPolicy.setMaxRetransmits( DEFAULT_MAX_RETRANSMITS );
 

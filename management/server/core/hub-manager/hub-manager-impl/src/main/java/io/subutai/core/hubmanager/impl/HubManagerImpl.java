@@ -1,9 +1,6 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -17,9 +14,7 @@ import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import com.google.common.base.Preconditions;
@@ -30,9 +25,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.security.utils.SafeCloseUtil;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.desktop.api.DesktopManager;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -56,7 +49,6 @@ import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
-import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProxyProcessor;
 import io.subutai.core.hubmanager.impl.processor.UserTokenProcessor;
 import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProcessor;
@@ -78,10 +70,7 @@ import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.BrokerSettingsDto;
 import io.subutai.hub.share.dto.PeerDto;
-import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.UserDto;
-import io.subutai.hub.share.dto.product.ProductsDto;
-import io.subutai.hub.share.json.JsonUtil;
 
 
 public class HubManagerImpl extends HostListener implements HubManager
@@ -135,8 +124,6 @@ public class HubManagerImpl extends HostListener implements HubManager
     private PeerMetricsProcessor peerMetricsProcessor;
 
     private ContainerMetricsService containerMetricsService;
-
-    private ProductProcessor productProcessor;
 
     private DesktopManager desktopManager;
 
@@ -248,8 +235,6 @@ public class HubManagerImpl extends HostListener implements HubManager
 
         StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
-        productProcessor = new ProductProcessor( configManager, this.hubEventListeners, restClient );
-
         AppScaleProcessor appScaleProcessor = new AppScaleProcessor( new AppScaleManager( peerManager ), restClient );
 
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
@@ -266,7 +251,6 @@ public class HubManagerImpl extends HostListener implements HubManager
                                                                              .addProcessor( tunnelProcessor )
                                                                              .addProcessor(
                                                                                      environmentTelemetryProcessor )
-                                                                             .addProcessor( productProcessor )
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor( proxyProcessor )
                                                                              .addProcessor( containerPortMapProcessor )
@@ -436,112 +420,6 @@ public class HubManagerImpl extends HostListener implements HubManager
 
 
     @Override
-    public String getProducts() throws HubManagerException
-    {
-        try
-        {
-            RestResult<String> restResult = restClient.getPlain( "/rest/v1/marketplace/products/public", String.class );
-
-            if ( restResult.getStatus() == HttpStatus.SC_NO_CONTENT )
-            {
-                return null;
-            }
-
-            if ( restResult.getStatus() != HttpStatus.SC_OK )
-            {
-                log.error( restResult.getError() );
-                return null;
-            }
-
-            ProductsDto productsDto = new ProductsDto( restResult.getEntity() );
-
-            return JsonUtil.toJson( productsDto );
-        }
-        catch ( Exception e )
-        {
-            throw new HubManagerException( "Could not retrieve product data", e );
-        }
-    }
-
-
-    @Override
-    public void installPlugin( String url, String name, String uid ) throws HubManagerException
-    {
-        //Using WebClient directly here b/c we need to close it only after response is processed
-        WebClient client = null;
-        InputStream initialStream = null;
-        try
-        {
-            client = RestUtil.createTrustedWebClient( url );
-            File product = client.get( File.class );
-            initialStream = FileUtils.openInputStream( product );
-            File targetFile =
-                    new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-            FileUtils.copyInputStreamToFile( initialStream, targetFile );
-            initialStream.close();
-
-            if ( isRegisteredWithHub() )
-            {
-                PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
-                peerProductDataDto.setProductId( uid );
-                peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
-                peerProductDataDto.setInstallDate( new Date() );
-
-                try
-                {
-                    productProcessor.updatePeerProductData( peerProductDataDto );
-                }
-                catch ( Exception e )
-                {
-                    log.error( "Failed to send plugin install command to Hub: {}", e.getMessage() );
-                }
-            }
-
-            log.debug( "Product installed successfully..." );
-        }
-        catch ( Exception e )
-        {
-            throw new HubManagerException( e );
-        }
-        finally
-        {
-            RestUtil.close( client );
-            SafeCloseUtil.close( initialStream );
-        }
-    }
-
-
-    @Override
-    public void uninstallPlugin( final String name, final String uid )
-    {
-        File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-
-        if ( file.delete() )
-        {
-            log.debug( file.getName() + " is removed." );
-        }
-
-        if ( isRegisteredWithHub() )
-        {
-            PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
-            peerProductDataDto.setProductId( uid );
-            peerProductDataDto.setState( PeerProductDataDto.State.REMOVE );
-
-            try
-            {
-                productProcessor.deletePeerProductData( peerProductDataDto );
-            }
-            catch ( Exception e )
-            {
-                log.error( "Failed to send plugin remove command to Hub: {}", e.getMessage() );
-            }
-        }
-
-        log.debug( "Product uninstalled successfully..." );
-    }
-
-
-    @Override
     public boolean isRegisteredWithHub()
     {
         return getHubConfiguration() != null;
@@ -629,32 +507,6 @@ public class HubManagerImpl extends HostListener implements HubManager
     public Config getHubConfiguration()
     {
         return configDataService.getHubConfig( configManager.getPeerId() );
-    }
-
-
-    @Override
-    public String getChecksum()
-    {
-        try
-        {
-            RestResult<String> restResult =
-                    restClient.getPlain( "/rest/v1/marketplace/products/checksum", String.class );
-
-            if ( restResult.getStatus() != HttpStatus.SC_OK )
-            {
-                log.error( restResult.getError() );
-            }
-            else
-            {
-                return restResult.getEntity();
-            }
-        }
-        catch ( Exception e )
-        {
-            log.error( "Could not retrieve checksum", e );
-        }
-
-        return null;
     }
 
 
