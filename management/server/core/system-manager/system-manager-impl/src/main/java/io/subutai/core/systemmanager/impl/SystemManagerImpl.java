@@ -288,7 +288,8 @@ public class SystemManagerImpl implements SystemManager
         {
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
-            UpdateEntity updateEntity = new UpdateEntity( SubutaiInfo.getVersion(), SubutaiInfo.getCommitId() );
+            UpdateEntity updateEntity =
+                    new UpdateEntity( SubutaiInfo.getVersion(), SubutaiInfo.getCommitId(), SubutaiInfo.getBuildTime() );
 
             updateDao.persist( updateEntity );
 
@@ -369,7 +370,14 @@ public class SystemManagerImpl implements SystemManager
             {
                 updateEntity.setCurrentVersion( "No change" );
 
-                updateEntity.setCurrentCommitId( "Probably update was interrupted" );
+                if ( Objects.equals( updateEntity.getBuildTime(), SubutaiInfo.getBuildTime() ) )
+                {
+                    updateEntity.setCurrentCommitId( "Probably update was interrupted" );
+                }
+                else
+                {
+                    updateEntity.setCurrentCommitId( "Console was rebuilt" );
+                }
             }
             else
             {
