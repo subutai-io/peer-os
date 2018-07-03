@@ -75,6 +75,12 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.setTemplatesByPlugin = setTemplatesByPlugin;
     vm.loadOwnTemplates = loadOwnTemplates;
 
+    vm.getCdnToken = getCdnToken;
+
+    function getCdnToken(){
+        return localStorage.getItem('cdnToken');
+    }
+
     function loadOwnTemplates() {
         templateSrv.getOwnTemplates()
             .then(function (data) {
