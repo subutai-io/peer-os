@@ -1,4 +1,5 @@
-<div class="b-cloud" ng-controller="EnvironmentSimpleViewCtrl as environmentSimpleViewCtrl" ng-init="environmentSimpleViewCtrl.loadPrivateTemplates()">
+<div class="b-cloud" ng-controller="EnvironmentSimpleViewCtrl as environmentSimpleViewCtrl"
+     ng-init="environmentSimpleViewCtrl.loadPrivateTemplates()">
   <div class="b-cloud__tools g-right">
     <div class="b-cloud-tools">
       <div class="b-tabs-menu b-tabs-menu_cloud-env">
@@ -56,55 +57,18 @@
 						<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup"
                   tooltips
                   tooltip-side="right"
-                  tooltip-template='Plugins'>
+                  tooltip-template='CDN token'>
 						</span>
             <div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">
-              <div class="header">Choose plugin</div>
-              <div class="b-template-settings__body">
-                <div class="b-environments-plugin__list js-scrollbar js-pluginspopup-scroll">
-                  <ul class="b-environments-plugin-list">
-                    <li class="b-environments-plugin-list__item"
-                        ng-repeat="plugin in environmentSimpleViewCtrl.filteredPlugins">
-                      <a ui-sref="{{ plugin.name.toLowerCase() }}" class="b-cloud-item-link b-btn b-btn_white">goto</a>
-                      <span class="b-tools-menu__item"
-                            ng-click="environmentSimpleViewCtrl.selectPlugin(plugin)">
-
-												<i class="fa b-cloud-item-checkbox"
-                           aria-hidden="true"
-                           ng-class="plugin.selected ? 'fa-check-square-o' : 'fa-square-o'">
-												</i>
-
-												<span class="b-cloud-item">
-													<img
-                              ng-src="/{{ plugin.img }}"
-                              alt="{{ plugin.name }}"
-                              onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
-												</span>
-
-												<span class="b-cloud-item-text">{{ plugin.name }}</span>
-
-											</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="footer">
-
-                <button type="button"
-                        class="b-btn b-btn_green"
-                        ng-click="environmentSimpleViewCtrl.setTemplatesByPlugin()"
-                        ng-disabled="environmentSimpleViewCtrl.filteredPlugins | isEmpty:environmentSimpleViewCtrl.isEditing ">
-                  Use
-                </button>
-
-              </div>
+              <div class="header">{{ environmentSimpleViewCtrl.getCdnToken() }}</div>
             </div>
           </div>
 
           <div class="b-template-settings js-dropen-menu js-no-close">
             <div class="header"></div>
             <div class="b-template-settings__coll">
-              <form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings, environmentViewCtrl.containersTypeInfo[templateSettings.quotaSize])">
+              <form
+                  ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings, environmentViewCtrl.containersTypeInfo[templateSettings.quotaSize])">
                 <div class="body">
                   <div class="b-form-group">
                     <div class="b-form-group__label">Container hostname</div>
@@ -142,15 +106,16 @@
               </p>
             </div>
             <!--CUSTOM-->
-            <div class="b-template-settings__coll b-template-settings__coll_quota" ng-if="templateSettings.quotaSize == 'CUSTOM'">
+            <div class="b-template-settings__coll b-template-settings__coll_quota"
+                 ng-if="templateSettings.quotaSize == 'CUSTOM'">
               <p class="b-template-settings__text">CUSTOM:</p>
               <div class="b-template-settings__text b-template-settings__text_input">
                 <label for="js-quotasize-custom-cpu" class="b-form-label b-form-label_margin_r">cpu (%):</label>
                 <input type="number"
-                        id="js-quotasize-custom-cpu"
-                        class="b-form-input b-form-input_custom-quota"
-                        ng-model="templateSettings.cpuQuota" required>
-              <div class="clear"></div>
+                       id="js-quotasize-custom-cpu"
+                       class="b-form-input b-form-input_custom-quota"
+                       ng-model="templateSettings.cpuQuota" required>
+                <div class="clear"></div>
               </div>
               <div class="b-template-settings__text b-template-settings__text_input">
                 <label for="js-quotasize-custom-ram" class="b-form-label b-form-label_margin_r">ram (MB):</label>

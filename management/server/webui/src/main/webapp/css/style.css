@@ -3966,6 +3966,7 @@ span.ssh-info-button
 .b-template-settings_plugins {
 	top: 50px;
 	right: 1px;
+	width: 300px;
 }
 
 .b-template-settings_plugins:before {

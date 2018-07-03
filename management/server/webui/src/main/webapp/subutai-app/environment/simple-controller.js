@@ -59,6 +59,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.setTemplatesByPlugin = setTemplatesByPlugin;
     vm.loadOwnTemplates = loadOwnTemplates;
 
+    vm.getCdnToken = getCdnToken;
+
+    function getCdnToken(){
+        return localStorage.getItem('cdnToken');
+    }
+
+
     function loadOwnTemplates(){
         templateSrv.getOwnTemplates()
             .then(function (data) {
