@@ -19,7 +19,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>7.0.4-SNAPSHOT</version>
+    <version>7.0.4</version>
   </parent>
 
   <artifactId>subutai-hub-share</artifactId>
