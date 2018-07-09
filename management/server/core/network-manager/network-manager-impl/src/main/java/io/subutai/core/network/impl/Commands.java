@@ -98,20 +98,20 @@ public class Commands
     RequestBuilder getCreateTunnelCommand( String tunnelName, String tunnelIp, int vlan, long vni )
     {
         return new RequestBuilder( VXLAN_BINDING )
-                .withCmdArgs( "-create", tunnelName, "-remoteip", tunnelIp, "-vlan", String.valueOf( vlan ), "-vni",
+                .withCmdArgs( "--create", tunnelName, "--remoteip", tunnelIp, "--vlan", String.valueOf( vlan ), "--vni",
                         String.valueOf( vni ) );
     }
 
 
     RequestBuilder getDeleteTunnelCommand( final String tunnelName )
     {
-        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( "-delete", tunnelName );
+        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( "--delete", tunnelName );
     }
 
 
     RequestBuilder getGetTunnelsCommand()
     {
-        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( "-list" );
+        return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( "--list" );
     }
 
 

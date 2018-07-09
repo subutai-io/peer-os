@@ -160,7 +160,7 @@ try {
             // Exporting template
             sh """
             set -e
-			sudo subutai export management -v "${version}" --local --token "${token}" | grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
+			sudo subutai export management --ver "${version}" --local --token "${token}" | grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
             """
                         
         stage("Upload management template to IPFS node")

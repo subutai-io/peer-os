@@ -69,7 +69,7 @@ public class ResourceHostCommands
                                                     String ip, int vlan, String environmentId, String containerToken )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -s %s && subutai hostname %s %s", templateId,
+                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s && subutai hostname %s %s", templateId,
                         containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
@@ -80,8 +80,8 @@ public class ResourceHostCommands
                                                     final String token )
     {
         return new RequestBuilder(
-                String.format( "subutai export %s -n %s -v %s -t %s %s", containerName, templateName, version, token,
-                        isPrivateTemplate ? "-p" : "" ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
+                String.format( "subutai export %s --name %s --ver %s --token %s", containerName, templateName,
+                        version, token ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
 
 

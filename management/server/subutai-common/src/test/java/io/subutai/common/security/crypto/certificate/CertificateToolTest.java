@@ -3,6 +3,7 @@ package io.subutai.common.security.crypto.certificate;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.cert.X509Certificate;
 
 import org.junit.Before;
 import org.junit.Test;
