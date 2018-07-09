@@ -40,7 +40,6 @@ import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.LogLevel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
@@ -141,8 +140,7 @@ public class MonitorImpl extends HostListener implements Monitor
         try
         {
 
-            CommandResult commandResult =
-                    resourceHost.execute( commands.getRhMetricCommand( resourceHost.getHostname() ) );
+            CommandResult commandResult = resourceHost.execute( commands.getRhMetricCommand() );
             if ( commandResult.hasSucceeded() )
             {
                 result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );

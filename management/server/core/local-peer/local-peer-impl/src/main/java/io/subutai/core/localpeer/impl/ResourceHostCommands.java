@@ -69,7 +69,7 @@ public class ResourceHostCommands
                                                     String ip, int vlan, String environmentId, String containerToken )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s && subutai hostname %s %s", templateId,
+                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s && subutai hostname con %s %s", templateId,
                         containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
@@ -105,12 +105,12 @@ public class ResourceHostCommands
 
     public RequestBuilder getSetContainerHostnameCommand( final String containerName, final String newHostname )
     {
-        return new RequestBuilder( String.format( "subutai hostname %s %s", containerName, newHostname ) );
+        return new RequestBuilder( String.format( "subutai hostname con %s %s", containerName, newHostname ) );
     }
 
 
     public RequestBuilder getGetSetRhHostnameCommand( final String newHostname )
     {
-        return new RequestBuilder( String.format( "subutai hostname %s", newHostname ) );
+        return new RequestBuilder( String.format( "subutai hostname rh %s", newHostname ) );
     }
 }
