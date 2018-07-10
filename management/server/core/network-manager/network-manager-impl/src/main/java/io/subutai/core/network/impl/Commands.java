@@ -117,13 +117,13 @@ public class Commands
 
     RequestBuilder getGetVlanDomainCommand( int vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "check", String.valueOf( vLanId ), "-d" );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "domain", "check", String.valueOf( vLanId ) );
     }
 
 
     RequestBuilder getRemoveVlanDomainCommand( final String vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "del", vLanId, "-d" );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "domain", "del", vLanId );
     }
 
 
@@ -131,7 +131,7 @@ public class Commands
                                             final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                             final String sslCertPath )
     {
-        List<String> args = Lists.newArrayList( "add", vLanId, "-d", domain );
+        List<String> args = Lists.newArrayList( "domain", "add", vLanId, domain );
 
         if ( proxyLoadBalanceStrategy != ProxyLoadBalanceStrategy.NONE )
         {
@@ -151,19 +151,19 @@ public class Commands
 
     RequestBuilder getCheckIpInVlanDomainCommand( final String hostIp, final int vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "check", String.valueOf( vLanId ), "-h", hostIp );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "check", String.valueOf( vLanId ), hostIp );
     }
 
 
     RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final String vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "add", vLanId, "-h", hostIp );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "add", vLanId, hostIp );
     }
 
 
     RequestBuilder getRemoveIpFromVlanDomainCommand( final String hostIp, final int vLanId )
     {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "del", String.valueOf( vLanId ), "-h", hostIp );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "del", String.valueOf( vLanId ), hostIp );
     }
 
 
