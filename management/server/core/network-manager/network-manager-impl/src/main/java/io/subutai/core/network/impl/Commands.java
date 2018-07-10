@@ -176,7 +176,7 @@ public class Commands
     RequestBuilder getMapContainerPortToRandomPortCommand( final Protocol protocol, final String containerIp,
                                                            final int containerPort )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( protocol.name().toLowerCase(), "-i",
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ) );
     }
 
@@ -184,18 +184,16 @@ public class Commands
     RequestBuilder getMapContainerPortToSpecificPortCommand( final Protocol protocol, final String containerIp,
                                                              final int containerPort, final int rhPort )
     {
-        return new RequestBuilder( MAP_BINDING )
-                .withCmdArgs( protocol.name().toLowerCase(), "-i", String.format( "%s:%s", containerIp, containerPort ),
-                        "-e", String.valueOf( rhPort ) );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", protocol.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ) );
     }
 
 
     RequestBuilder getRemoveContainerPortMappingCommand( final Protocol protocol, final String containerIp,
                                                          final int containerPort, final int rhPort )
     {
-        return new RequestBuilder( MAP_BINDING )
-                .withCmdArgs( protocol.name().toLowerCase(), "-i", String.format( "%s:%s", containerIp, containerPort ),
-                        "-e", String.valueOf( rhPort ), "-r" );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "rm", protocol.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ) );
     }
 
 
@@ -204,7 +202,7 @@ public class Commands
                                                        final String sslCertPath, final LoadBalancing loadBalancing,
                                                        final boolean sslBackend )
     {
-        List<String> args = Lists.newArrayList( protocol.name().toLowerCase(), "-i",
+        List<String> args = Lists.newArrayList( "add", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain );
 
         if ( !Strings.isNullOrEmpty( sslCertPath ) )
@@ -232,21 +230,20 @@ public class Commands
                                                                final int containerPort, final int rhPort,
                                                                final String domain )
     {
-        return new RequestBuilder( MAP_BINDING )
-                .withCmdArgs( protocol.name().toLowerCase(), "-i", String.format( "%s:%s", containerIp, containerPort ),
-                        "-e", String.valueOf( rhPort ), "-d", domain, "-r" );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "rm", protocol.name().toLowerCase(), "-i",
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain );
     }
 
 
     RequestBuilder getListOfReservedPortMappingCommand()
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "-l" );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "ls" );
     }
 
 
     RequestBuilder getListPortMappingsCommand( final Protocol protocol )
     {
-        List<String> args = Lists.newArrayList( "-l" );
+        List<String> args = Lists.newArrayList( "ls" );
 
         if ( protocol != null )
         {

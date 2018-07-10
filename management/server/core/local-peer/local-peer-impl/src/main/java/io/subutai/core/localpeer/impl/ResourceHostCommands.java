@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.impl;
 
 
-import com.google.common.base.Strings;
-
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 
@@ -57,10 +55,9 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getImportTemplateCommand( final String templateId, final String cdnToken )
+    public RequestBuilder getImportTemplateCommand( final String templateId )
     {
-        return new RequestBuilder( String.format( "subutai import id:%s %s", templateId,
-                Strings.isNullOrEmpty( cdnToken ) ? "" : "-t " + cdnToken ) )
+        return new RequestBuilder( String.format( "subutai import id:%s", templateId ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 
@@ -69,8 +66,8 @@ public class ResourceHostCommands
                                                     String ip, int vlan, String environmentId, String containerToken )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s && subutai hostname con %s %s", templateId,
-                        containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
+                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s && subutai hostname con %s %s",
+                        templateId, containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
@@ -80,8 +77,8 @@ public class ResourceHostCommands
                                                     final String token )
     {
         return new RequestBuilder(
-                String.format( "subutai export %s --name %s --ver %s --token %s", containerName, templateName,
-                        version, token ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
+                String.format( "subutai export %s --name %s --ver %s --token %s", containerName, templateName, version,
+                        token ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
 
 

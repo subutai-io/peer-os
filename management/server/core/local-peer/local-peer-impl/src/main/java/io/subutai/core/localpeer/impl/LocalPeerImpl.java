@@ -811,7 +811,6 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
             for ( final String templateId : request.getTemplates().get( resourceHostId ) )
             {
-                //                Template template = templateManager.getTemplate( templateId, request.getCdnToken() );
                 Template template = templateManager.getTemplate( templateId );
 
                 if ( template == null )
