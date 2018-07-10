@@ -34,8 +34,8 @@ public abstract class Commands
         {
 
             Command quotaCommand = new Command( "quota" );
-            quotaCommand.addArgument( containerName );
             quotaCommand.addArgument( resourceType.getKey() );
+            quotaCommand.addArgument( containerName );
             result.addCommand( quotaCommand );
         }
 
@@ -52,8 +52,8 @@ public abstract class Commands
         {
 
             Command quotaCommand = new Command( "quota" );
-            quotaCommand.addArgument( containerName );
             quotaCommand.addArgument( r.getResource().getContainerResourceType().getKey() );
+            quotaCommand.addArgument( containerName );
             quotaCommand.addArgument( "-s" );
 
             if ( r.getResource().getContainerResourceType() == ContainerResourceType.DISK )
