@@ -1139,7 +1139,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            rhVersion = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+            CommandResult result = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this );
+            //workaround for agent returning version in stderr
+            rhVersion = result.getStdOut() + result.getStdErr();
             return rhVersion;
         }
         catch ( CommandException e )
