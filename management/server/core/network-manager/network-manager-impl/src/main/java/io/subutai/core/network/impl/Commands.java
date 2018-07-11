@@ -203,7 +203,7 @@ public class Commands
                                                        final boolean sslBackend )
     {
         List<String> args = Lists.newArrayList( "add", protocol.name().toLowerCase(), "-i",
-                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain );
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-n", domain );
 
         if ( !Strings.isNullOrEmpty( sslCertPath ) )
         {
@@ -231,7 +231,7 @@ public class Commands
                                                                final String domain )
     {
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( "rm", protocol.name().toLowerCase(), "-i",
-                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-d", domain );
+                String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-n", domain );
     }
 
 

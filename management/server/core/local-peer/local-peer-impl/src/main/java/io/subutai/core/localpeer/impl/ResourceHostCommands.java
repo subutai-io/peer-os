@@ -9,19 +9,19 @@ public class ResourceHostCommands
 {
     public RequestBuilder getListContainerInfoCommand( String containerName )
     {
-        return new RequestBuilder( String.format( "subutai list -i %s", containerName ) );
+        return new RequestBuilder( String.format( "subutai list info -n %s", containerName ) );
     }
 
 
     public RequestBuilder getListContainersInfoCommand()
     {
-        return new RequestBuilder( "subutai list -i" );
+        return new RequestBuilder( "subutai list info" );
     }
 
 
     public RequestBuilder getListContainersCommand()
     {
-        return new RequestBuilder( "subutai list -c" );
+        return new RequestBuilder( "subutai list containers" );
     }
 
 
