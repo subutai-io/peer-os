@@ -40,7 +40,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
     private static final String GET_ENV_CONTAINERS_URL = "/rest/v1/environments/%s";
     private static final String PUT_ENV_TELEMETRY_URL = "/rest/v1/environments/%s/telemetry";
 
-    private static final String PING_COMMAND = "ping -c 5 -i 0.2 -w 5 %s";
+    private static final String PING_COMMAND = "ping -c 5 %s";
     private static final String SSH_COMMAND = "ssh root@%s date";
     private static final String PREPARE_FILE = "MD5=`dd bs=1024 count=2 </dev/urandom | tee /tmp/tmpfile`";
     private static final String SCP_FILE_COMMAND = "scp /tmp/tmpfile root@%s:/tmp";
@@ -110,7 +110,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
                     {
                         if ( tools.contains( "ping" ) )
                         {
-                            executeCheckCommand( "ping", sourceContainer, format( PING_COMMAND, ip ), result, 10 );
+                            executeCheckCommand( "ping", sourceContainer, format( PING_COMMAND, ip ), result, 20 );
                         }
                         if ( tools.contains( "ssh" ) )
                         {
