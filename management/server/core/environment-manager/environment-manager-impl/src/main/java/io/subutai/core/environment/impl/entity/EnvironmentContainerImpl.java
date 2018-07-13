@@ -409,7 +409,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
         }
         catch ( Exception e )
         {
-            logger.error( "Failed to get template by id: {}", e.getMessage() );
+            logger.error( "Failed to get template by id {}: {}", templateId, e.getMessage() );
         }
 
         return null;
