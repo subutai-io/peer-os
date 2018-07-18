@@ -135,6 +135,9 @@ function ConsoleViewCtrl($scope, consoleService, $stateParams, ngDialog, cfpLoad
 				if(data.stdOut.length > 0) {
 					output = data.stdOut.split('\r');
 				}
+				for(var i = 0; i < output.length; i++){
+				    output[i] = escapeHTML(output[i])
+				}
 				if(data.stdErr.length > 0) {
 					var errors = data.stdErr.split('\r');
 					for(var i = 0; i < errors.length; i++) {
@@ -180,6 +183,10 @@ function ConsoleViewCtrl($scope, consoleService, $stateParams, ngDialog, cfpLoad
 			$scope.session.output.push({ output: true, breakLine: true, text: [err.message] });
 		}
 	});
+
+	function escapeHTML(html) {
+        return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+    }
 	//END Console UI
 
 	//functions
