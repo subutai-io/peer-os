@@ -208,16 +208,37 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
 
     function hubUnregister() {
-        hubPopupLoadScreen(true);
-        $http.delete(SERVER_URL + 'rest/v1/hub/unregister')
-            .success(function () {
-                hubPopupLoadScreen();
-                vm.hubStatus = false;
-				vm.peerNameValue = false;
-                //SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
-            }).error(function (error) {
-            hubPopupLoadScreen();
-            SweetAlert.swal("ERROR!", error, "error");
+
+        var previousWindowKeyDown = window.onkeydown;
+        SweetAlert.swal({
+            title: "Are you sure?",
+            text: "Do you want to remove your peer from Bazaar?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ff3f3c",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true,
+            showLoaderOnConfirm: true
+        },
+        function (isConfirm) {
+            window.onkeydown = previousWindowKeyDown;
+            if (isConfirm) {
+
+                hubPopupLoadScreen(true);
+                $http.delete(SERVER_URL + 'rest/v1/hub/unregister')
+                    .success(function () {
+                        hubPopupLoadScreen();
+                        vm.hubStatus = false;
+                        vm.peerNameValue = false;
+                        SweetAlert.swal ("Success!", "Your peer was unregistered from Bazaar", "success");
+                    }).error(function (error) {
+                    hubPopupLoadScreen();
+                    SweetAlert.swal("ERROR!", error, "error");
+                });
+
+            }
         });
     }
 
