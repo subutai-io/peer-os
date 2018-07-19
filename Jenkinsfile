@@ -56,30 +56,7 @@ try {
         find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
 
         """        
-        
-        sh """
-            cp ${debFileName} /tmp
-            echo "${artifactVersion}" > versionfile
-            cp versionfile /tmp
-        """
-        
         stash includes: "management-*.deb", name: 'deb'
-        
-        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
-            stage("Upload to REPO") {
-            notifyBuildDetails = "\nFailed Step - Upload to Repo"
-            deleteDir()
-
-            unstash 'deb'
-
-            //copy deb to repo
-            sh """
-            touch uploading_management
-            scp uploading_management ${debFileName} dak@deb.subutai.io:incoming/${env.BRANCH_NAME}/
-            ssh dak@deb.subutai.io sh /var/reprepro/scripts/scan-incoming.sh ${env.BRANCH_NAME} management
-            """
-            }
-        }
 
         // CDN auth credentials
         String user = "jenkins@optimal-dynamics.com"
@@ -180,6 +157,23 @@ try {
             ssh ipfs-eu1 "ipfs pin add ${NEW_ID}"
             ssh ipfs-us1 "ipfs pin add ${NEW_ID}"
             """
+        
+        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
+            stage("Upload to REPO") {
+            notifyBuildDetails = "\nFailed Step - Upload to Repo"
+            deleteDir()
+
+            unstash 'deb'
+
+            //copy deb to repo
+            sh """
+            touch uploading_management
+            scp uploading_management ${debFileName} dak@deb.subutai.io:incoming/${env.BRANCH_NAME}/
+            ssh dak@deb.subutai.io sh /var/reprepro/scripts/scan-incoming.sh ${env.BRANCH_NAME} management
+            """
+            }
+        }
+
     }
 } catch (e) {
         currentBuild.result = "FAILED"
