@@ -12,25 +12,22 @@ try {
     switch (env.BRANCH_NAME) {
         case ~/master/: cdnHost = "masterbazaar.subutai.io"; break;
         case ~/dev/: cdnHost = "devbazaar.subutai.io"; break;
-        case ~/sysnet/: cdnHost = "devbazaar.subutai.io"; break;
         default: cdnHost = "bazaar.subutai.io"
     }
 
     switch (env.BRANCH_NAME) {
         case ~/master/: jumpServer = "mastercdn.subutai.io"; break;
         case ~/dev/: jumpServer = "devcdn.subutai.io"; break;
-        case ~/sysnet/: jumpServer = "sysnetcdn.subutai.io"; break;
         default: jumpServer = "cdn.subutai.io"
     }
 
     switch (env.BRANCH_NAME) {
         case ~/master/: aptRepo = "master"; break;
         case ~/dev/: aptRepo = "dev"; break;
-        case ~/sysnet/: aptRepo = "sysnet"; break;
         default: aptRepo = "prod"
     }
 
-    node("console") {
+    node("management") {
         deleteDir()
         def mvnHome = tool 'M3'
         def workspace = pwd()
@@ -65,20 +62,6 @@ try {
         
         stash includes: "management-*.deb", name: 'deb'
         
-        if (env.BRANCH_NAME =='jenkins') {
-            stage("Upload to REPO")
-            notifyBuildDetails = "\nFailed Step - Upload to Repo"
-            deleteDir()
-
-            unstash 'deb'
-
-            //copy deb to repo
-            sh """
-            touch uploading_management
-            scp uploading_management ${debFileName} dak@deb.subutai.io:incoming/sysnet/
-            ssh dak@deb.subutai.io sh /var/reprepro/scripts/scan-incoming.sh sysnet management
-            """
-        }
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Upload to REPO") {
             notifyBuildDetails = "\nFailed Step - Upload to Repo"
@@ -94,9 +77,7 @@ try {
             """
             }
         }
-    }
 
-    node("template-builder") {
         // CDN auth credentials
         String user = "jenkins@optimal-dynamics.com"
         String fingerprint = "877B586E74F170BC4CF6ECABB971E2AC63D23DC9"
@@ -118,14 +99,7 @@ try {
         notifyBuildDetails = "\nFailed Step - Build management template"
                 
         // create management template
-            sh """
-            scp jenkins-master:/tmp/versionfile ~
-            """
-            def version = sh(script: """
-                cat ~/versionfile
-            """, returnStdout: true)
-            version = version.trim()
-        
+                             
             sh """
 		   	set +x
             set -e
@@ -136,7 +110,7 @@ try {
 			set -e
             sudo subutai clone debian-stretch management
 			/bin/sleep 20
-			scp jenkins-master:/tmp/${debFileName} /var/lib/lxc/management/rootfs/tmp/
+			cp ${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
 			sudo subutai attach management "apt-key adv --recv-keys --keyserver keyserver.ubuntu.com C6B2AC7FBEB649F1"
 			sudo subutai attach management "echo 'deb http://deb.subutai.io/subutai ${aptRepo} main' > /etc/apt/sources.list.d/subutai-repo.list"
@@ -155,12 +129,12 @@ try {
             sudo subutai attach management "sed -i "s/4/3/g" /etc/logrotate.d/rsyslog"
   			sudo rm /var/lib/lxc/management/rootfs/tmp/${debFileName}
             echo "Using CDN token ${token}"  
-            echo "Template version is ${version}"
+            echo "Template version is ${artifactVersion}"
             """
             // Exporting template
             sh """
             set -e
-			sudo subutai export management -v "${version}" --local --token "${token}" | grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
+			sudo subutai export management -v "${artifactVersion}" --local --token "${token}" | grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
             """
                         
         stage("Upload management template to IPFS node")
@@ -169,7 +143,7 @@ try {
             // Pinning template
             sh """
             cd /var/cache/subutai/
-            IPFS_PATH=/var/lib/ipfs/node ipfs add -Q management-subutai-template_${version}_amd64.tar.gz > /tmp/ipfs.hash
+            IPFS_PATH=/var/lib/ipfs/node ipfs add -Q management-subutai-template_${artifactVersion}_amd64.tar.gz > /tmp/ipfs.hash
             """
 
             String NEW_ID = sh(script: """
