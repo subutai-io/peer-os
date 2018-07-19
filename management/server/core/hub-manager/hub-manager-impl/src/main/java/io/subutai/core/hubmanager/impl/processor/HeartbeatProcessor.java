@@ -218,7 +218,10 @@ public class HeartbeatProcessor implements Runnable
             {
                 if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN && !isRegisteredWithHub() )
                 {
-                    log.warn( "Local peer {} is not registered with Hub", peerId );
+                    log.warn( "Local peer {} is not registered with Bazaar, deleting registration record from db",
+                            peerId );
+
+                    hubManager.getConfigDataService().deleteConfig( peerId );
                 }
                 else
                 {

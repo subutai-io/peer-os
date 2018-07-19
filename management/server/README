@@ -2,3 +2,23 @@ Contains the code for the server system which is to be installed on Management h
 
 After the build, a custom tar.gz karaf distribution for the Server can be found in:
 ./server-karaf/target/ directory.
+
+
+
+Pre-requisites for Debian
+-------------------------
+
+    sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" >/etc/apt/sources.list.d/launchpad.list
+    sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" >>/etc/apt/sources.list.d/launchpad.list
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C2518248EEA14886 \
+            && sudo apt update \
+            && sudo apt install oracle-java8-unlimited-jce-policy \
+            && sudo apt install oracle-java8-set-default
+
+Build Instructions
+------------------
+
+    mvn clean     # Removes build artifacts
+    mvn test      # Compiles and tests the artifacts
+    mvn install   # Compile, tests and installs artifacts to local Maven repository ($HOME/.m2/repository)
+

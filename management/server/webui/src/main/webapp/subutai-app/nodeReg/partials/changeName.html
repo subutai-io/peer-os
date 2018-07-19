@@ -1,25 +1,26 @@
 <div class="b-popup b-popup_min">
-	<div class="b-popup__header">
-		Change RH hostname
-		<a href ng-click="closeThisDialog()">
-			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-		</a>
-	</div>
+  <div class="b-popup__header">
+    Change RH hostname
+    <a href ng-click="closeThisDialog()">
+      <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+    </a>
+  </div>
 
-	<form ng-submit="nodeRegCtrl.setHostName(nodeRegCtrl.editingRh, hostname)">
-		<div class="b-popup__body">
+  <form name="rhHostnameForm" ng-submit="nodeRegCtrl.setHostName(nodeRegCtrl.editingRh, hostname)">
+    <div class="b-popup__body">
 
-			<div class="popup-body-box">
-				<input ng-model="hostname" ng-init="hostname=nodeRegCtrl.editingRh.hostname" />
-			</div>
+      <div class="popup-body-box">
+        <input ng-model="hostname" ng-init="hostname=nodeRegCtrl.editingRh.hostname" required/>
+      </div>
 
-		</div>
-		<div class="b-popup__footer">
-			<button class="b-btn b-btn_green g-right" type="submit" >
-				Save
-			</button>
-			<div class="clear"></div>
-		</div>
-	</form>
+    </div>
+    <div class="b-popup__footer">
+      <button class="b-btn b-btn_green g-right" type="submit"
+              ng-disabled="nodeRegCtrl.editingRh.hostname == hostname || rhHostnameForm.$invalid">
+        Save
+      </button>
+      <div class="clear"></div>
+    </div>
+  </form>
 </div>
 

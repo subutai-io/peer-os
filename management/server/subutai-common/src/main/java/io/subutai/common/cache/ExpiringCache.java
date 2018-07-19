@@ -137,6 +137,34 @@ public class ExpiringCache<K, V>
     }
 
 
+    public boolean keyExists( K key )
+    {
+        if ( key != null )
+        {
+            CacheEntry<V> entry = entries.get( key );
+
+            if ( entry != null )
+            {
+                entry.lock();
+
+                try
+                {
+                    if ( !entry.isExpired() )
+                    {
+                        return true;
+                    }
+                }
+                finally
+                {
+                    entry.unlock();
+                }
+            }
+        }
+
+        return false;
+    }
+
+
     /**
      * adds entry to the cache.
      *

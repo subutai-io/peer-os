@@ -66,39 +66,6 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	}, 3000);
 
 
-	identitySrv.isAdminCheck().success(function (data) {
-		if (data == true || data == 'true') {
-			identitySrv.isUpdateInProgress().success(function (data){
-
-				 if (data == true || data == 'true') {
-					removeUpdateMessage();
-				 }else{
-					checkUpdate();
-				 }
-			});
-		}
-	});
-
-	function checkUpdate() {
-		identitySrv.getConfig().success(function (data) {
-			if (data.isUpdatesAvailable) {
-				$rootScope.notifications = {
-					"message": "Updates available",
-					"updateMessage": true,
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-					"links": [
-					{
-						"text": "Update",
-						"href": "/#/settings-updates"
-					}
-					]
-				};
-			} else {
-				removeUpdateMessage();
-			}
-		});
-	}
-
 	function removeUpdateMessage() {
 		var notifications = sessionStorage.getItem('notifications');
 		if (

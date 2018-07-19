@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -186,9 +187,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 
             String publicKey = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 
-            registrationManager.verifyToken( token, containerId, publicKey );
+            boolean valid = registrationManager.verifyTokenAndRegisterKey( token, containerId, publicKey );
 
-            return Response.accepted().build();
+            return valid ? Response.accepted().build() :
+                   Response.status( Response.Status.UNAUTHORIZED ).entity( "Invalid token" ).build();
         }
         catch ( Exception e )
         {
@@ -240,7 +242,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 
                     requestedHostJson.setVersion( resourceHost.getRhVersion() );
                 }
-                catch ( HostNotFoundException e )
+                catch ( HostNotFoundException | ResourceHostException e )
                 {
                     //ignore
                 }
