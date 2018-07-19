@@ -88,7 +88,13 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
 
     private RestClient getRestClient()
     {
-        return ServiceLocator.lookup( HubManager.class ).getRestClient();
+        return getHubManager().getRestClient();
+    }
+
+
+    private HubManager getHubManager()
+    {
+        return ServiceLocator.lookup( HubManager.class );
     }
 
 
@@ -406,14 +412,14 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
     @Override
     public void onEnvironmentCreated( final Environment environment )
     {
-        //not used
+        getHubManager().schedulePeerMetrics();
     }
 
 
     @Override
     public void onEnvironmentGrown( final Environment environment, final Set<EnvironmentContainerHost> newContainers )
     {
-        //not used
+        getHubManager().schedulePeerMetrics();
     }
 
 
@@ -421,13 +427,15 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
     public void onContainerDestroyed( final Environment environment, final String containerId )
     {
         destroyContainer( environment.getId(), containerId );
+
+        getHubManager().schedulePeerMetrics();
     }
 
 
     @Override
     public void onEnvironmentDestroyed( final String environmentId )
     {
-        //not used
+        getHubManager().schedulePeerMetrics();
     }
 
 
@@ -435,6 +443,9 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
     public void onContainerStarted( final Environment environment, final String containerId )
     {
         onContainerStateChange( environment.getId(), containerId, "start" );
+
+        getHubManager().schedulePeerMetrics();
+
     }
 
 
@@ -442,6 +453,9 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
     public void onContainerStopped( final Environment environment, final String containerId )
     {
         onContainerStateChange( environment.getId(), containerId, "stop" );
+
+        getHubManager().schedulePeerMetrics();
+
     }
 
 
