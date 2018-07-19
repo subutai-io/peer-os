@@ -22,6 +22,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
@@ -61,6 +62,7 @@ import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.hubmanager.impl.util.EnvironmentUserHelper;
+import io.subutai.core.hubmanager.impl.util.ReschedulableTimer;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.Monitor;
@@ -131,6 +133,8 @@ public class HubManagerImpl extends HostListener implements HubManager
 
     private ContainerMetricsProcessor containerMetricsProcessor;
 
+    private ReschedulableTimer peerMetricsTimer;
+
 
     public HubManagerImpl( DaoManager daoManager )
     {
@@ -156,6 +160,22 @@ public class HubManagerImpl extends HostListener implements HubManager
 
             initHubRequesters();
             initHeartbeatProcessors();
+
+            peerMetricsTimer = new ReschedulableTimer( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        sendPeersMertics();
+                    }
+                    catch ( HubManagerException e )
+                    {
+                        log.error( "Error sending peer metrics: {}", e.getMessage() );
+                    }
+                }
+            } );
         }
         catch ( Exception e )
         {
@@ -265,23 +285,32 @@ public class HubManagerImpl extends HostListener implements HubManager
     @Override
     public void sendHeartbeat() throws HubManagerException
     {
-        p2pLogsSender.process();
-        heartbeatProcessor.sendHeartbeat( true );
-        containerEventProcessor.process();
+        if ( isRegisteredWithHub() )
+        {
+            p2pLogsSender.process();
+            heartbeatProcessor.sendHeartbeat( true );
+            containerEventProcessor.process();
+        }
     }
 
 
     @Override
     public void sendPeersMertics() throws HubManagerException
     {
-        peerMetricsProcessor.request();
+        if ( isRegisteredWithHub() )
+        {
+            peerMetricsProcessor.request();
+        }
     }
 
 
     @Override
     public void sendContainerMertics() throws HubManagerException
     {
-        containerMetricsProcessor.request();
+        if ( isRegisteredWithHub() )
+        {
+            containerMetricsProcessor.request();
+        }
     }
 
 
@@ -689,5 +718,27 @@ public class HubManagerImpl extends HostListener implements HubManager
                 client.get( "/rest/v1/brokers/" + localPeer.getId(), BrokerSettingsDto.class );
 
         return response.getEntity();
+    }
+
+
+    @Override
+    public void onContainerCreated( final ContainerHostInfo containerInfo )
+    {
+        schedulePeerMetrics();
+    }
+
+
+    /**
+     * This method schedules sending of peer metrics to Bazaar. If a pending round is still there it gets rescheduled.
+     * This is done to not overwhelm Bazaar with frequent requests that can happen for example when environment is
+     * destroyed and its containers get destroyed one by one very quickly.
+     */
+    @Override
+    public void schedulePeerMetrics()
+    {
+        if ( isRegisteredWithHub() )
+        {
+            peerMetricsTimer.schedule( 15L );
+        }
     }
 }
