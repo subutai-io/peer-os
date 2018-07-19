@@ -12,18 +12,21 @@ try {
     switch (env.BRANCH_NAME) {
         case ~/master/: cdnHost = "masterbazaar.subutai.io"; break;
         case ~/dev/: cdnHost = "devbazaar.subutai.io"; break;
+        case ~/sysnet/: cdnHost = "devbazaar.subutai.io"; break;
         default: cdnHost = "bazaar.subutai.io"
     }
 
     switch (env.BRANCH_NAME) {
         case ~/master/: jumpServer = "mastercdn.subutai.io"; break;
         case ~/dev/: jumpServer = "devcdn.subutai.io"; break;
+        case ~/sysnet/: jumpServer = "devcdn.subutai.io"; break;
         default: jumpServer = "cdn.subutai.io"
     }
 
     switch (env.BRANCH_NAME) {
         case ~/master/: aptRepo = "master"; break;
         case ~/dev/: aptRepo = "dev"; break;
+        case ~/sysnet/: aptRepo = "dev"; break;
         default: aptRepo = "prod"
     }
 
