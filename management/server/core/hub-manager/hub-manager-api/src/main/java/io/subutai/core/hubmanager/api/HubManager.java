@@ -49,4 +49,6 @@ public interface HubManager
     void sendPeersMertics() throws HubManagerException;
 
     void sendContainerMertics() throws HubManagerException;
+
+    void schedulePeerMetrics();
 }

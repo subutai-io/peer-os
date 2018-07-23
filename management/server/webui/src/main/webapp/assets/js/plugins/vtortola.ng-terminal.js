@@ -323,8 +323,15 @@
                         });
 
                         consoleView.on('click', function () {
+                            var range = window.getSelection().getRangeAt(0);
+
                             target[0].focus();
+
                             terminal.toggleClass('terminal-focused', true);
+
+                            window.getSelection().removeAllRanges();
+                            window.getSelection().addRange(range);
+
                         });
 
                         target.on("blur", function (e) {
