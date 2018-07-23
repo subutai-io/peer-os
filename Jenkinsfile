@@ -146,6 +146,7 @@ try {
 
             //register template with CDN
             sh """
+            /bin/sleep 20
             echo "NEW ID: ${NEW_ID}"
             sed -i 's/"id":""/"id":"${NEW_ID}"/g' /tmp/template.json
             template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${cdnHost}/rest/v1/cdn/templates
