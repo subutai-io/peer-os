@@ -163,7 +163,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             if ( !protocol.isHttpOrHttps() )
             {
                 if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
-                        portMapDto.getInternalPort() ) )
+                        portMapDto.getInternalPort(), portMapDto.getDomain() ) )
                 {
                     resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
                             portMapDto.getExternalPort() );
@@ -176,7 +176,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             else
             {
                 if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
-                        portMapDto.getInternalPort() ) )
+                        portMapDto.getInternalPort(), portMapDto.getDomain() ) )
                 {
                     String sslCertPath =
                             protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, resourceHost ) :
@@ -199,7 +199,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 String rhIpAddr = resourceHost.getAddress();
 
                 if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
-                        portMapDto.getExternalPort() ) )
+                        portMapDto.getExternalPort(), portMapDto.getDomain() ) )
                 {
                     if ( !protocol.isHttpOrHttps() )
                     {
