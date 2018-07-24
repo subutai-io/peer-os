@@ -156,7 +156,6 @@ try {
 
             sh """
             ssh ipfs-eu1 "ipfs pin add ${NEW_ID}"
-            ssh ipfs-us1 "ipfs pin add ${NEW_ID}"
             """
         
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
