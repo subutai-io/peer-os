@@ -1530,11 +1530,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public boolean isPortMappingReserved( final Protocol protocol, final int externalPort, final String ipAddress,
-                                          final int internalPort ) throws ResourceHostException
+                                          final int internalPort, final String domain ) throws ResourceHostException
     {
         try
         {
-            return getNetworkManager().isPortMappingReserved( this, protocol, externalPort, ipAddress, internalPort );
+            return getNetworkManager().isPortMappingReserved( this, protocol, externalPort, ipAddress, internalPort, domain );
         }
         catch ( NetworkManagerException e )
         {

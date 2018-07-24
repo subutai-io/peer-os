@@ -229,7 +229,7 @@ public class ProxyProcessor implements StateLinkProcessor
                                 PortMapDto.State.USED ) )
                         {
                             if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
-                                    portMapDto.getIpAddr(), portMapDto.getExternalPort() ) )
+                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
                             {
                                 String sslCertPath = protocol == Protocol.HTTPS ?
                                                      saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
@@ -258,7 +258,7 @@ public class ProxyProcessor implements StateLinkProcessor
                                 PortMapDto.State.USED ) )
                         {
                             if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
-                                    portMapDto.getIpAddr(), portMapDto.getExternalPort() ) )
+                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
                             {
                                 resourceHost.mapContainerPort( protocol, portMapDto.getIpAddr(),
                                         portMapDto.getExternalPort(), portMapDto.getExternalPort() );
