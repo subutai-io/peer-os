@@ -146,6 +146,7 @@ try {
 
             //register template with CDN
             sh """
+            /bin/sleep 20
             echo "NEW ID: ${NEW_ID}"
             sed -i 's/"id":""/"id":"${NEW_ID}"/g' /tmp/template.json
             template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${cdnHost}/rest/v1/cdn/templates
@@ -155,7 +156,6 @@ try {
 
             sh """
             ssh ipfs-eu1 "ipfs pin add ${NEW_ID}"
-            ssh ipfs-us1 "ipfs pin add ${NEW_ID}"
             """
         
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {

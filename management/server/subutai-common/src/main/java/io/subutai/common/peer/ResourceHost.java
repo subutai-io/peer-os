@@ -211,7 +211,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
                                            String domain ) throws ResourceHostException;
 
     boolean isPortMappingReserved( final Protocol protocol, final int externalPort, final String ipAddress,
-                                   final int internalPort ) throws ResourceHostException;
+                                   final int internalPort, final String domain ) throws ResourceHostException;
 
     List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException;
 
