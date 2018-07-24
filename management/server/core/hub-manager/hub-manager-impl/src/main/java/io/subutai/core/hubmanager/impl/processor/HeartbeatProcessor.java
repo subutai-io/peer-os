@@ -14,12 +14,14 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
 
 
@@ -39,6 +41,8 @@ public class HeartbeatProcessor implements Runnable
 
     private final HubManagerImpl hubManager;
 
+    private final PeerManager peerManager;
+
     private final RestClient restClient;
 
     private final String path;
@@ -56,9 +60,11 @@ public class HeartbeatProcessor implements Runnable
     private volatile boolean isHubReachable = true;
 
 
-    public HeartbeatProcessor( HubManagerImpl hubManager, RestClient restClient, String peerId )
+    public HeartbeatProcessor( HubManagerImpl hubManager, PeerManager peerManager, RestClient restClient,
+                               String peerId )
     {
         this.hubManager = hubManager;
+        this.peerManager = peerManager;
         this.restClient = restClient;
         this.peerId = peerId;
 
@@ -149,6 +155,12 @@ public class HeartbeatProcessor implements Runnable
     public void sendHeartbeat( boolean force ) throws HubManagerException
     {
         if ( !hubManager.isRegisteredWithHub() || hubManager.isPeerUpdating() )
+        {
+            return;
+        }
+
+        if ( !( peerManager.getLocalPeer().getState() == LocalPeer.State.READY && peerManager.getLocalPeer()
+                                                                                             .isMHPresent() ) )
         {
             return;
         }
