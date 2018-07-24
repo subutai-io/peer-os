@@ -266,15 +266,11 @@ public class HubManagerImpl extends HostListener implements HubManager
 
         UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx );
 
-        heartbeatProcessor =
-                new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( hubEnvironmentProcessor )
-                                                                             .addProcessor( tunnelProcessor )
-                                                                             .addProcessor(
-                                                                                     environmentTelemetryProcessor )
-                                                                             .addProcessor( appScaleProcessor )
-                                                                             .addProcessor( proxyProcessor )
-                                                                             .addProcessor( containerPortMapProcessor )
-                                                                             .addProcessor( userTokenProcessor );
+        heartbeatProcessor = new HeartbeatProcessor( this, peerManager, restClient, localPeer.getId() )
+                .addProcessor( hubEnvironmentProcessor ).addProcessor( tunnelProcessor )
+                .addProcessor( environmentTelemetryProcessor ).addProcessor( appScaleProcessor )
+                .addProcessor( proxyProcessor ).addProcessor( containerPortMapProcessor )
+                .addProcessor( userTokenProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
