@@ -1686,6 +1686,11 @@ public class IdentityManagerImpl implements IdentityManager
         //******Cannot remove Internal User *************
         User user = identityDataService.getUser( userId );
 
+        if (user == null)
+        {
+            return;
+        }
+
         if ( user.getType() == UserType.SYSTEM.getId() )
         {
             throw new AccessControlException( "Internal User cannot be removed" );
