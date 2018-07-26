@@ -2,7 +2,6 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.security.objects.TokenType;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
@@ -32,12 +31,18 @@ public class ExchangeInfoStateHandler extends StateHandler
 
             EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
 
-            User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
-            UserToken token = ctx.identityManager.getUserToken( user.getId() );
-            if ( token == null )
-            {
-                token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
-            }
+            UserToken token =
+                    ctx.hubManager.getUserToken( peerDto.getEnvironmentInfo().getOwnerId(), peerDto.getPeerId() );
+
+            final User user = ctx.identityManager.getUser( token.getUserId() );
+
+            //            User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
+            //            UserToken token = ctx.identityManager.getUserToken( user.getId() );
+            //            if ( token == null )
+            //            {
+            //                token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.SESSION
+            // .getId(), null );
+            //            }
 
             UserTokenDto userTokenDto = new UserTokenDto();
             userTokenDto.setSsUserId( user.getId() );
@@ -53,10 +58,6 @@ public class ExchangeInfoStateHandler extends StateHandler
             logEnd();
 
             return resultDto;
-        }
-        catch ( HubManagerException e )
-        {
-            throw e;
         }
         catch ( Exception e )
         {

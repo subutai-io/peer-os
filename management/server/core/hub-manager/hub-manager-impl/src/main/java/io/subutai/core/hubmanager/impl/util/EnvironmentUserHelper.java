@@ -110,11 +110,9 @@ public class EnvironmentUserHelper
     }
 
 
-    public User handleEnvironmentOwnerCreation( EnvironmentPeerDto peerDto )
+    public User handleEnvironmentOwnerCreation( final String envOwnerId, final String peerId )
     {
-        String envOwnerId = peerDto.getEnvironmentInfo().getOwnerId();
-
-        Config config = configDataService.getHubConfig( peerDto.getPeerId() );
+        Config config = configDataService.getHubConfig( peerId );
 
         User user = getUserByHubId( envOwnerId );
 
@@ -175,8 +173,9 @@ public class EnvironmentUserHelper
 
         try
         {
-            User user = identityManager.createUser( userDto.getFingerprint(), null, "[Bazaar] " + userDto.getName(), email,
-                    UserType.HUB.getId(), KeyTrustLevel.MARGINAL.getId(), false, true );
+            User user = identityManager
+                    .createUser( userDto.getFingerprint(), null, "[Bazaar] " + userDto.getName(), email,
+                            UserType.HUB.getId(), KeyTrustLevel.MARGINAL.getId(), false, true );
 
             identityManager.setUserPublicKey( user.getId(), userDto.getPublicKey() );
             identityManager.assignUserRole( user, getRole( IdentityManager.ENV_MANAGER_ROLE ) );
