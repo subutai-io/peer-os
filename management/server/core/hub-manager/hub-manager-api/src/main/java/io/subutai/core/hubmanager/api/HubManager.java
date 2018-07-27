@@ -5,8 +5,8 @@ import java.util.Map;
 
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.api.model.Config;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.BrokerSettingsDto;
-
 
 public interface HubManager
 {
@@ -51,4 +51,6 @@ public interface HubManager
     void sendContainerMertics() throws HubManagerException;
 
     void schedulePeerMetrics();
+
+    UserToken getUserToken( String envOwnerId, String peerId );
 }
