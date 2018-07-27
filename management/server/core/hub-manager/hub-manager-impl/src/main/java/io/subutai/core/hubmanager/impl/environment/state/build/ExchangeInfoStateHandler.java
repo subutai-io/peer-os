@@ -13,9 +13,6 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 public class ExchangeInfoStateHandler extends StateHandler
 {
-    private static final String PATH = "/rest/v1/environments/%s/containers";
-
-
     public ExchangeInfoStateHandler( Context ctx )
     {
         super( ctx, "Preparing initial data" );
@@ -35,14 +32,6 @@ public class ExchangeInfoStateHandler extends StateHandler
                     ctx.hubManager.getUserToken( peerDto.getEnvironmentInfo().getOwnerId(), peerDto.getPeerId() );
 
             final User user = ctx.identityManager.getUser( token.getUserId() );
-
-            //            User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
-            //            UserToken token = ctx.identityManager.getUserToken( user.getId() );
-            //            if ( token == null )
-            //            {
-            //                token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.SESSION
-            // .getId(), null );
-            //            }
 
             UserTokenDto userTokenDto = new UserTokenDto();
             userTokenDto.setSsUserId( user.getId() );
