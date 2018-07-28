@@ -10,6 +10,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.Protocol;
+import io.subutai.common.settings.Common;
 
 
 /**
@@ -51,7 +52,7 @@ public class Commands
     {
         return new RequestBuilder( P2P_BINDING )
                 .withCmdArgs( "start", "-dev", interfaceName, "-hash", p2pHash, "-key", secretKey, "-ttl",
-                        String.valueOf( secretKeyTtlSec ), "-ip", localIp, "-ports", portRange ).withTimeout( 90 );
+                        String.valueOf( secretKeyTtlSec ), "-ip", localIp, "-ports", portRange ).withTimeout( Common.JOIN_P2P_TIMEOUT_SEC );
     }
 
 
@@ -66,13 +67,13 @@ public class Commands
     {
         return new RequestBuilder( P2P_BINDING )
                 .withCmdArgs( "start", "-dev", interfaceName, "-hash", p2pHash, "-key", secretKey, "-ttl",
-                        String.valueOf( secretKeyTtlSec ), "-ports", portRange ).withTimeout( 90 );
+                        String.valueOf( secretKeyTtlSec ), "-ports", portRange ).withTimeout( Common.JOIN_P2P_TIMEOUT_SEC );
     }
 
 
     RequestBuilder getRemoveP2PSwarmCommand( String p2pHash )
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "stop", "-hash", p2pHash ).withTimeout( 90 );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "stop", "-hash", p2pHash ).withTimeout( Common.LEAVE_P2P_TIMEOUT_SEC );
     }
 
 
@@ -91,7 +92,7 @@ public class Commands
 
     RequestBuilder getRemoveP2PIfaceCommand( String interfaceName )
     {
-        return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName ).withTimeout( 90 );
+        return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName ).withTimeout( Common.IP_LINK_REMOVE_TIMEOUT_SEC );
     }
 
 
