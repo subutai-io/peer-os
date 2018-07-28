@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.impl.binding;
 
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.settings.Common;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
 import io.subutai.hub.share.quota.ContainerQuota;
@@ -39,7 +40,7 @@ public abstract class Commands
             result.addCommand( quotaCommand );
         }
 
-        return new RequestBuilder( result.toString() ).withTimeout( 60 );
+        return new RequestBuilder( result.toString() ).withTimeout( Common.GET_QUOTA_TIMEOUT_SEC );
     }
 
 
@@ -77,6 +78,6 @@ public abstract class Commands
             result.addCommand( quotaCommand );
         }
 
-        return new RequestBuilder( result.toString() ).withTimeout( 120 );
+        return new RequestBuilder( result.toString() ).withTimeout( Common.SET_QUOTA_TIMEOUT_SEC );
     }
 }
