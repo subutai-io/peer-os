@@ -22,7 +22,7 @@ public class EventMessageTest extends ObjectMapperTest
 
     public static final String FIRST_PLACE = "container";
     public static final String SECOND_PLACE = "peer";
-    public static final String THIRD_PLACE = "hub";
+    public static final String THIRD_PLACE = "bazaar";
     private ProgressPayload progressPayload;
     private OriginMeta origin;
     private SourceMeta source;

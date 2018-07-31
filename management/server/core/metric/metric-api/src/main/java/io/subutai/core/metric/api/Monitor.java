@@ -52,7 +52,7 @@ public interface Monitor
 
     void putAlert( Alert alert );
 
-    List<P2Pinfo> getP2PStatus( Date logsStartDate, Date logsEndData );
+    List<P2Pinfo> getP2PStatus(  );
 
     HistoricalMetrics getMetricsSeries( final Host host, Date startTime, Date endTime );
 }
