@@ -874,7 +874,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( String.format( "Failed to create tunnel: %s", e.getMessage() ), e );
+            throw new ResourceHostException( String.format( "Failed to remove tunnel: %s", e.getMessage() ), e );
         }
     }
 

@@ -111,7 +111,7 @@ public class HubManagerImpl extends HostListener implements HubManager
 
     private HeartbeatProcessor heartbeatProcessor;
 
-    private P2pLogsSender p2pLogsSender;
+    private P2pLogsSender p2pStatusSender;
 
     private ContainerEventProcessor containerEventProcessor;
 
@@ -194,9 +194,9 @@ public class HubManagerImpl extends HostListener implements HubManager
 
     private void initHubRequesters()
     {
-        p2pLogsSender = new P2pLogsSender( this, localPeer, monitor, restClient );
+        p2pStatusSender = new P2pLogsSender( this, localPeer, monitor, restClient );
 
-        requestorsRunner.scheduleWithFixedDelay( p2pLogsSender, 20, 3600, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( p2pStatusSender, 30, 600, TimeUnit.SECONDS );
 
         //***********
 
@@ -286,9 +286,9 @@ public class HubManagerImpl extends HostListener implements HubManager
     {
         if ( isRegisteredWithHub() )
         {
-            p2pLogsSender.process();
+            p2pStatusSender.request();
             heartbeatProcessor.sendHeartbeat( true );
-            containerEventProcessor.process();
+            containerEventProcessor.request();
         }
     }
 
@@ -384,7 +384,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                         }
                         catch ( Exception e )
                         {
-                            log.error( "Error notifying hub event listener", e );
+                            log.error( "Error notifying event listener", e );
                         }
                     }
                 } );
@@ -420,7 +420,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                         }
                         catch ( Exception e )
                         {
-                            log.error( "Error notifying hub event listener", e );
+                            log.error( "Error notifying event listener", e );
                         }
                     }
                 } );
@@ -674,7 +674,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                 //delay to let peer register the RH
                 TaskUtil.sleep( 1000 );
 
-                log.debug( "Notifying Hub about RH connection" );
+                log.debug( "Notifying Bazaar about RH connection" );
 
                 peerMetricsProcessor.request();
             }
@@ -696,7 +696,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                 //delay to let peer unregister the RH
                 TaskUtil.sleep( 1000 );
 
-                log.debug( "Notifying Hub about RH disconnection" );
+                log.debug( "Notifying Bazaar about RH disconnection" );
 
                 peerMetricsProcessor.request();
             }

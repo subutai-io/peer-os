@@ -86,7 +86,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
             if ( !restResult.isSuccess() )
             {
-                log.error( "Could not get port map data from HUB" );
+                log.error( "Could not get port map data from Bazaar" );
             }
 
             ContainerPortMapDto containerPortMapDto = restResult.getEntity();
@@ -100,7 +100,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     .post( format( "/rest/v1/environments/%s/ports/map", containerPortMapDto.getEnvironmentSSId() ),
                             containerPortMapDto );
 
-            log.info( !restRes.isSuccess() ? "Could not send port map data to HUB" : "Sent port map data to HUB" );
+            log.info( !restRes.isSuccess() ? "Could not send port map data to Bazaar" : "Sent port map data to Bazaar" );
         }
         catch ( Exception e )
         {

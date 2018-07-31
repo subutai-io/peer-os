@@ -116,14 +116,14 @@ public class AppScaleProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            log.error( "Error to update AppScale data to Hub: ", e );
+            log.error( "Error to update AppScale data to Bazaar: ", e );
         }
     }
 
 
     private AppScaleConfigDto getData( String link )
     {
-        log.debug( "Getting AppScale data from Hub: {}", link );
+        log.debug( "Getting AppScale data from Bazaar: {}", link );
 
         try
         {
@@ -133,7 +133,7 @@ public class AppScaleProcessor implements StateLinkProcessor
 
             if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( "Error to get AppScale data from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get AppScale data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return null;
@@ -143,7 +143,7 @@ public class AppScaleProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            log.error( "Error to get AppScale data from Hub: ", e );
+            log.error( "Error to get AppScale data from Bazaar: ", e );
 
             return null;
         }
