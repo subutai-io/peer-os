@@ -102,7 +102,7 @@ public class HeartbeatProcessor implements Runnable
                 return;
             }
 
-            log.warn( "Notifying Hub that peer is offline" );
+            log.warn( "Notifying Bazaar that peer is offline" );
 
             String url = path + "shutdown-hook";
 
@@ -110,7 +110,7 @@ public class HeartbeatProcessor implements Runnable
 
             if ( restResult.isSuccess() )
             {
-                log.info( "'Peer offline' notification successfully sent to Hub" );
+                log.info( "'Peer offline' notification successfully sent to Bazaar" );
             }
         }
         catch ( Exception e )
@@ -171,7 +171,7 @@ public class HeartbeatProcessor implements Runnable
 
         if ( canSend )
         {
-            log.info( "Sending heartbeat to HUB: interval={}, force={}, fastModeLeft={}", interval, force,
+            log.info( "Sending heartbeat to Bazaar: interval={}, force={}, fastModeLeft={}", interval, force,
                     fastModeLeft );
 
             try

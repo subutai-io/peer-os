@@ -188,11 +188,11 @@ public class TunnelProcessor implements StateLinkProcessor
 
                 if ( response.getStatus() == HttpStatus.SC_OK || response.getStatus() == 204 )
                 {
-                    log.info( "Tunnel peer data successfully sent to hub" );
+                    log.info( "Tunnel peer data successfully sent to Bazaar" );
                 }
                 else
                 {
-                    log.error( "Tunnel peer data was not successfully sent to hub" );
+                    log.error( "Tunnel peer data was not successfully sent to Bazaar" );
                 }
             }
         }
@@ -223,7 +223,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
             if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( "Error to get tunnel  data from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get tunnel  data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return null;

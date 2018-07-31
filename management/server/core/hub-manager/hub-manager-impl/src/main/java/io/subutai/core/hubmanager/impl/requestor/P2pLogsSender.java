@@ -105,7 +105,7 @@ public class P2pLogsSender extends HubRequester
             SystemLogsDto logsDto = new SystemLogsDto();
             logsDto.setP2PInfo( p2pList );
 
-            log.info( "Sending p2p logs and status to Hub..." );
+            log.info( "Sending p2p logs and status to Bazaar..." );
 
             String path = format( "/rest/v1/peers/%s/resource-hosts/system-logs", localPeer.getId() );
 

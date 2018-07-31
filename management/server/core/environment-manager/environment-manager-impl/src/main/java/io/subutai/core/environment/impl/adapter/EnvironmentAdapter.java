@@ -99,7 +99,7 @@ public class EnvironmentAdapter
     {
         if ( !canWorkWithHub() )
         {
-            throw new ActionFailedException( "Peer is not registered with Hub or connection to Hub failed" );
+            throw new ActionFailedException( "Peer is not registered with Bazaar or connection to Bazaar failed" );
         }
 
         String json = all ? hubAdapter.getAllEnvironmentsForPeer() : hubAdapter.getUserEnvironmentsForPeer();

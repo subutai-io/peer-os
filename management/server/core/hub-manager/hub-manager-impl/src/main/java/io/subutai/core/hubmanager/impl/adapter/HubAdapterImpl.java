@@ -133,7 +133,7 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
             return StringUtils.substringBefore( user.getEmail(), "@" );
         }
 
-        log.debug( "Can't get proper user id for Hub" );
+        log.debug( "Can't get proper user id for Bazaar" );
 
         return null;
     }
@@ -143,7 +143,7 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
     {
         if ( !isRegistered() )
         {
-            log.debug( "Peer not registered to Hub." );
+            log.debug( "Peer not registered to Bazaar" );
 
             return null;
         }
@@ -223,7 +223,7 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
 
         if ( userId != null )
         {
-            log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", userId, peerId );
+            log.debug( "Peer registered to Bazaar. Getting environments for: user={}, peer={}", userId, peerId );
 
             return getRestClient().get( format( USER_ENVIRONMENTS_URL, userId ), String.class ).getEntity();
         }
@@ -374,7 +374,7 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
 
         if ( !result.isSuccess() )
         {
-            log.error( "Error notifying Hub about container disk usage excess: HTTP {} - {}", result.getStatus(),
+            log.error( "Error notifying Bazaar about container disk usage excess: HTTP {} - {}", result.getStatus(),
                     result.getReasonPhrase() );
         }
     }

@@ -78,7 +78,7 @@ class RegistrationManager
 
     private void registerPeerPubKey() throws HubManagerException
     {
-        log.info( "Registering peer public key with Hub..." );
+        log.info( "Registering peer public key with Bazaar..." );
 
         Form form = new Form( "keytext", readKeyText( configManager.getPeerPublicKey() ) );
 
@@ -86,7 +86,7 @@ class RegistrationManager
 
         if ( !restResult.isSuccess() )
         {
-            throw new HubManagerException( "Error registering peer public key with Hub: " + restResult.getError() );
+            throw new HubManagerException( "Error registering peer public key with Bazaar: " + restResult.getError() );
         }
 
         log.info( "Public key successfully registered" );
@@ -122,7 +122,7 @@ class RegistrationManager
 
     private void register( String email, String password, String peerName, String peerScope ) throws HubManagerException
     {
-        log.info( "Registering peer with Hub..." );
+        log.info( "Registering peer with Bazaar..." );
 
         String path = format( "/rest/v1/peers/%s", peerId );
 
@@ -163,7 +163,7 @@ class RegistrationManager
 
         if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
         {
-            log.info( "Peer or its pubic key not found on Hub. Unregistered anyway." );
+            log.info( "Peer or its pubic key not found on Bazaar. Unregistered anyway." );
         }
         else if ( !restResult.isSuccess() )
         {

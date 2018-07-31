@@ -674,7 +674,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                 //delay to let peer register the RH
                 TaskUtil.sleep( 1000 );
 
-                log.debug( "Notifying Hub about RH connection" );
+                log.debug( "Notifying Bazaar about RH connection" );
 
                 peerMetricsProcessor.request();
             }
@@ -696,7 +696,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                 //delay to let peer unregister the RH
                 TaskUtil.sleep( 1000 );
 
-                log.debug( "Notifying Hub about RH disconnection" );
+                log.debug( "Notifying Bazaar about RH disconnection" );
 
                 peerMetricsProcessor.request();
             }

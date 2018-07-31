@@ -189,13 +189,13 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
             if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get environment ids data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
             }
         }
         catch ( Exception e )
         {
-            log.error( "Could not sent  telemetry data to hub.", e.getMessage() );
+            log.error( "Could not sent  telemetry data to Bazaar", e.getMessage() );
         }
     }
 
@@ -210,7 +210,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
             if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( "Error to get telemetry  data from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get telemetry data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return null;
@@ -237,7 +237,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
             if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get environment ids data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return Collections.emptySet();
@@ -264,7 +264,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
             if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get environmentPeerDto from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get environmentPeerDto from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return null;

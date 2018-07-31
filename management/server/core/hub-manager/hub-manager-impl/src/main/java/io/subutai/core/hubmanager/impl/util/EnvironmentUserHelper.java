@@ -81,7 +81,7 @@ public class EnvironmentUserHelper
 
         if ( hasUserEnvironmentsForPeerOnHub( envOwnerId ) )
         {
-            log.debug( "Can't delete user b/c user has Hub environment on this peer" );
+            log.debug( "Can't delete user b/c user has Bazaar environment on this peer" );
 
             return;
         }
@@ -101,7 +101,7 @@ public class EnvironmentUserHelper
 
         if ( !restResult.isSuccess() )
         {
-            log.error( "Error to get user environments from Hub: " + restResult.getError() );
+            log.error( "Error to get user environments from Bazaar: " + restResult.getError() );
         }
 
         String json = restResult.getEntity();
@@ -206,7 +206,7 @@ public class EnvironmentUserHelper
 
         if ( !restResult.isSuccess() )
         {
-            log.error( "Error to get user data from Hub: " + restResult.getError() );
+            log.error( "Error to get user data from Bazaar: " + restResult.getError() );
         }
 
         return restResult.getEntity();
@@ -220,7 +220,7 @@ public class EnvironmentUserHelper
 
         if ( res.getStatus() != HttpStatus.SC_OK && res.getStatus() != 204 )
         {
-            throw new HubManagerException( "Error to get user token form Hub: HTTP " + res.getStatus() );
+            throw new HubManagerException( "Error to get user token from Bazaar: HTTP " + res.getStatus() );
         }
 
         UserTokenDto userTokenDto = res.getEntity();

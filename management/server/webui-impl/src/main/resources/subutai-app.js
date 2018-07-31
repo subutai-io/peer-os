@@ -193,14 +193,14 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
                 })
                     .success(function () {
                     }).error(function (error) {
-                    console.log('hub/register error: ', error);
+                    console.log('bazaar/register error: ', error);
                     vm.hubRegisterError = error;
                 });
 
 				vm.peerNameValue = vm.hub.peerName;
 
             }).error(function (error) {
-            console.log('hub/register error: ', error);
+            console.log('bazaar/register error: ', error);
             vm.hubRegisterError = error;
             hubPopupLoadScreen();
         });

@@ -84,7 +84,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.BAD_REQUEST ).
-                    entity( "Could not get Hub IP" ).build();
+                    entity( "Could not get Bazaar IP" ).build();
         }
     }
 
