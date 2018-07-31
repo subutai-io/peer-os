@@ -1,10 +1,6 @@
 package io.subutai.core.hubmanager.impl.adapter;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -36,7 +32,6 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.common.HubAdapter;
-import io.subutai.hub.share.json.JsonUtil;
 
 import static java.lang.String.format;
 
@@ -254,117 +249,6 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
 
 
     @Override
-    public boolean uploadPluginData( String pluginKey, String key, Object data )
-    {
-        String userId = getUserIdWithCheck();
-
-        if ( userId == null )
-        {
-            return false;
-        }
-
-        String json = gson.toJson( data );
-
-        log.debug( "json: {}", json );
-
-        String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
-
-        String response = getRestClient().post( url, json, String.class ).getEntity();
-
-        // The data is for environment created on Hub. We save the plugin data there only,
-        // i.e. no need to store in the local DB too.
-        return "HUB_ENVIRONMENT".equals( response );
-    }
-
-
-    @Override
-    public <T> List<T> getPluginData( String pluginKey, Class<T> clazz )
-    {
-        String userId = getUserIdWithCheck();
-
-        if ( userId == null )
-        {
-            return Collections.emptyList();
-        }
-
-        log.debug( "userId={}, pluginKey={}, class={}", userId, pluginKey, clazz );
-
-        String response =
-                getRestClient().get( format( PLUGIN_DATA_URL, userId, peerId, pluginKey ), String.class ).getEntity();
-
-        log.debug( "response: {}", response );
-
-        if ( response == null )
-        {
-            return Collections.emptyList();
-        }
-
-        List<T> resultList = new ArrayList<>();
-
-        try
-        {
-            ArrayList<String> dataList = JsonUtil.fromJson( response, ArrayList.class );
-
-            for ( String data : dataList )
-            {
-                if ( StringUtils.isNotBlank( data ) )
-                {
-                    resultList.add( gson.fromJson( data, clazz ) );
-                }
-            }
-        }
-        catch ( IOException e )
-        {
-            log.error( "Error to parse json: ", e );
-        }
-
-        return resultList;
-    }
-
-
-    @Override
-    public <T> T getPluginDataByKey( String pluginKey, String key, Class<T> clazz )
-    {
-        String userId = getUserIdWithCheck();
-
-        if ( userId == null )
-        {
-            return null;
-        }
-
-        log.debug( "userId={}, pluginKey={}, key={}, class={}", userId, pluginKey, key, clazz );
-
-        String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
-
-        String response = getRestClient().get( url, String.class ).getEntity();
-
-        log.debug( "response: {}", response );
-
-        return response != null ? gson.fromJson( response, clazz ) : null;
-    }
-
-
-    @Override
-    public boolean deletePluginData( String pluginKey, String key )
-    {
-        String userId = getUserIdWithCheck();
-
-        if ( userId == null )
-        {
-            return false;
-        }
-
-        log.debug( "userId={}, pluginKey={}, key={}", userId, pluginKey, key );
-
-        String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
-
-        getRestClient().delete( url );
-
-        return true;
-    }
-
-
-    @Override
     public void notifyContainerDiskUsageExcess( String peerId, String envId, String contId, long diskUsage,
                                                 boolean containerWasStopped )
     {
@@ -445,7 +329,6 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
         onContainerStateChange( environment.getId(), containerId, "start" );
 
         getHubManager().schedulePeerMetrics();
-
     }
 
 
@@ -455,7 +338,6 @@ public class HubAdapterImpl extends HostListener implements HubAdapter, Environm
         onContainerStateChange( environment.getId(), containerId, "stop" );
 
         getHubManager().schedulePeerMetrics();
-
     }
 
 

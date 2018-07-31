@@ -384,7 +384,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                         }
                         catch ( Exception e )
                         {
-                            log.error( "Error notifying hub event listener", e );
+                            log.error( "Error notifying event listener", e );
                         }
                     }
                 } );
@@ -420,7 +420,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                         }
                         catch ( Exception e )
                         {
-                            log.error( "Error notifying hub event listener", e );
+                            log.error( "Error notifying event listener", e );
                         }
                     }
                 } );

@@ -82,6 +82,10 @@ public class EnvironmentAdapter
         }
         catch ( ActionFailedException e )
         {
+            //ignore
+        }
+        catch ( Exception e )
+        {
             log.warn( e.getMessage() );
         }
 
@@ -106,7 +110,7 @@ public class EnvironmentAdapter
 
         if ( json == null )
         {
-            throw new ActionFailedException( "Failed to obtain environments from Hub" );
+            throw new ActionFailedException( "Failed to obtain environments from Bazaar" );
         }
 
         log.debug( "Json with environments: {}", json );
@@ -124,9 +128,9 @@ public class EnvironmentAdapter
         }
         catch ( Exception e )
         {
-            log.error( "Failed to parse environments from Hub", e );
+            log.error( "Failed to parse environments from Bazaar", e );
 
-            throw new ActionFailedException( "Failed to parse environments from Hub: " + e.getMessage() );
+            throw new ActionFailedException( "Failed to parse environments from Bazaar: " + e.getMessage() );
         }
 
         return envs;
@@ -138,14 +142,14 @@ public class EnvironmentAdapter
 
         if ( !canWorkWithHub() )
         {
-            throw new ActionFailedException( "Peer is not registered with Hub or connection to Hub failed" );
+            throw new ActionFailedException( "Peer is not registered with Bazaar or connection to Bazaar failed" );
         }
 
         String json = hubAdapter.getDeletedEnvironmentsForPeer();
 
         if ( json == null )
         {
-            throw new ActionFailedException( "Failed to obtain deleted environments from Hub" );
+            throw new ActionFailedException( "Failed to obtain deleted environments from Bazaar" );
         }
 
         log.debug( "Json with deleted environments: {}", json );
@@ -160,7 +164,7 @@ public class EnvironmentAdapter
         {
             log.error( "Error to parse json: ", e );
 
-            throw new ActionFailedException( "Failed to parse deleted environments from Hub: " + e.getMessage() );
+            throw new ActionFailedException( "Failed to parse deleted environments from Bazaar: " + e.getMessage() );
         }
     }
 
@@ -269,7 +273,7 @@ public class EnvironmentAdapter
         }
         catch ( Exception e )
         {
-            log.debug( "Error to post local environment to Hub: ", e );
+            log.debug( "Error to post local environment to Bazaar: ", e );
 
             return false;
         }
@@ -300,7 +304,7 @@ public class EnvironmentAdapter
         }
         catch ( Exception e )
         {
-            log.debug( "Error to post local environment to Hub: ", e );
+            log.debug( "Error to post local environment to Bazaar: ", e );
         }
 
         return false;
