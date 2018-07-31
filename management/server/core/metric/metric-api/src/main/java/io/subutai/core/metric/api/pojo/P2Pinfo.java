@@ -18,16 +18,5 @@ public interface P2Pinfo
     List<String> getState();
 
 
-    List<String> getP2pSystemLogs();
-
-
     String getP2pVersion();
-
-
-    int getRhVersionCheck();
-
-
-    int getP2pVersionCheck();
-
-    String getRhName();
 }

@@ -40,7 +40,6 @@ import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.LogLevel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
@@ -456,7 +455,7 @@ public class MonitorImpl extends HostListener implements Monitor
 
 
     @Override
-    public List<P2Pinfo> getP2PStatus( Date logsStartDate, Date logsEndData )
+    public List<P2Pinfo> getP2PStatus()
     {
         List<P2Pinfo> pojos = Lists.newArrayList();
 
@@ -468,7 +467,8 @@ public class MonitorImpl extends HostListener implements Monitor
             {
                 List<String> statusLines = Lists.newArrayList();
 
-                String status = resourceHost.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+                CommandResult result = resourceHost.execute( new RequestBuilder( "p2p status" ) );
+                String status = result.getStdOut();
 
                 String lines[] = status.split( "\\r?\\n" );
 
@@ -481,8 +481,8 @@ public class MonitorImpl extends HostListener implements Monitor
                 }
 
                 info.setRhId( resourceHost.getId() );
-                info.setRhName( resourceHost.getHostname() );
                 info.setState( statusLines );
+                info.setP2pStatus( result.getExitCode() );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
 
