@@ -21,7 +21,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.rest.ui.pojo.P2PInfoPojo;
+import io.subutai.core.metric.api.pojo.P2PInfo;
 
 
 public class RestServiceImpl implements RestService
@@ -98,7 +98,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e ) ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e ) ).build();
         }
     }
 
@@ -118,14 +118,30 @@ public class RestServiceImpl implements RestService
         return getMetrics( null, null, interval );
     }
 
-//
-//    @RolesAllowed( "System-Management|Read" )
-//    @Override
-//    public Response getP2PStatus()
-//    {
-//        P2PInfoPojo pojo = new P2PInfoPojo();
-//        pojo.setP2pList( monitor.getP2PStatus() );
-//        String info = JsonUtil.GSON.toJson( pojo );
-//        return Response.status( Response.Status.OK ).entity( info ).build();
-//    }
+    //
+    //    @RolesAllowed( "System-Management|Read" )
+    //    @Override
+    //    public Response getP2PStatuses()
+    //    {
+    //        P2PInfoPojo pojo = new P2PInfoPojo();
+    //        pojo.setP2pList( monitor.getP2PStatuses() );
+    //        String info = JsonUtil.GSON.toJson( pojo );
+    //        return Response.status( Response.Status.OK ).entity( info ).build();
+    //    }
+
+
+    @Override
+    public Response getP2PStatus( final String hostId )
+    {
+        try
+        {
+            P2PInfo p2PInfo = monitor.getP2pStatus( hostId );
+
+            return Response.ok( p2PInfo.getP2pStatus() == 0 ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e ) ).build();
+        }
+    }
 }
