@@ -53,7 +53,7 @@ public class P2pLogsSender extends HubRequester
         }
         catch ( Exception e )
         {
-            log.error( "Error sending p2p status: {} ", e.getMessage() );
+            log.error( "Error sending P2P status: {} ", e.getMessage() );
         }
     }
 
@@ -62,7 +62,7 @@ public class P2pLogsSender extends HubRequester
     {
         try
         {
-            log.info( "Getting p2p logs" );
+            log.info( "Getting P2P status" );
 
             List<P2Pinfo> p2Pinfos = monitor.getP2PStatus();
 
@@ -96,7 +96,7 @@ public class P2pLogsSender extends HubRequester
             SystemLogsDto logsDto = new SystemLogsDto();
             logsDto.setP2PInfo( p2pList );
 
-            log.info( "Sending p2p status to Bazaar..." );
+            log.info( "Sending P2P status to Bazaar..." );
 
             String path = format( "/rest/v1/peers/%s/resource-hosts/system-logs", localPeer.getId() );
 
@@ -104,7 +104,7 @@ public class P2pLogsSender extends HubRequester
 
             if ( restResult.isSuccess() )
             {
-                log.info( "Processing p2p logs completed successfully" );
+                log.info( "P2P status was sent to Bazaar successfully" );
 
                 lastSendDate = new Date();
             }
