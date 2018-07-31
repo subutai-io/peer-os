@@ -14,6 +14,7 @@ function monitoringSrv($http, environmentService, peerRegistrationService) {
 		getResourceHosts: getResourceHosts,
 		getInfo: getInfo,
 		isAdminCheck: isAdminCheck,
+		isP2pRunning: isP2pRunning,
 	};
 
 	return monitoringSrv;
@@ -45,6 +46,13 @@ function monitoringSrv($http, environmentService, peerRegistrationService) {
 			url + period,
 			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
 		);
+	}
+
+	function isP2pRunning(hostId){
+        return $http.get(
+            BASE_URL + 'p2p/' + hostId + '/',
+            {withCredentials: true, headers: {'Content-Type': 'application/json'}}
+        );
 	}
 
 }

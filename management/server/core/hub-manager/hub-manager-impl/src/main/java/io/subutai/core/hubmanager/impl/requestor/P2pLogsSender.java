@@ -17,7 +17,7 @@ import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.core.metric.api.pojo.P2PInfo;
 import io.subutai.hub.share.dto.P2PDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 
@@ -45,7 +45,7 @@ public class P2pLogsSender extends HubRequester
 
 
     @Override
-    public void request() throws HubManagerException
+    public void request()
     {
         try
         {
@@ -64,17 +64,15 @@ public class P2pLogsSender extends HubRequester
         {
             log.info( "Getting P2P status" );
 
-            List<P2Pinfo> p2Pinfos = monitor.getP2PStatus();
+            List<P2PInfo> p2PInfos = monitor.getP2PStatuses();
 
             List<P2PDto> p2pList = Lists.newArrayList();
 
             boolean hasProblems = false;
-            for ( final P2Pinfo info : p2Pinfos )
+            for ( final P2PInfo info : p2PInfos )
             {
                 P2PDto dto = new P2PDto();
                 dto.setRhId( info.getRhId() );
-                dto.setRhVersion( info.getRhVersion() );
-                dto.setP2pVersion( info.getP2pVersion() );
                 dto.setP2pStatus( info.getP2pStatus() );
                 dto.setState( info.getState() );
 

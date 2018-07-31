@@ -7,10 +7,13 @@ import java.util.List;
 public class P2PDto
 {
     private String rhId;
+    @Deprecated
     private String rhVersion;
+    @Deprecated
     private String p2pVersion;
     private int p2pStatus;
     private List<String> state;
+    @Deprecated
     private List<String> p2pSystemLogs;
 
 
