@@ -14,7 +14,7 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.core.metric.api.pojo.P2PInfo;
 
 
 /**
@@ -52,7 +52,9 @@ public interface Monitor
 
     void putAlert( Alert alert );
 
-    List<P2Pinfo> getP2PStatus(  );
+    List<P2PInfo> getP2PStatuses();
+
+    P2PInfo getP2pStatus( String rhId ) throws Exception;
 
     HistoricalMetrics getMetricsSeries( final Host host, Date startTime, Date endTime );
 }
