@@ -57,7 +57,7 @@ import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProces
 import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.requestor.P2pLogsSender;
+import io.subutai.core.hubmanager.impl.requestor.P2pStatusSender;
 import io.subutai.core.hubmanager.impl.requestor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
@@ -111,7 +111,7 @@ public class HubManagerImpl extends HostListener implements HubManager
 
     private HeartbeatProcessor heartbeatProcessor;
 
-    private P2pLogsSender p2pStatusSender;
+    private P2pStatusSender p2pStatusSender;
 
     private ContainerEventProcessor containerEventProcessor;
 
@@ -194,7 +194,7 @@ public class HubManagerImpl extends HostListener implements HubManager
 
     private void initHubRequesters()
     {
-        p2pStatusSender = new P2pLogsSender( this, localPeer, monitor, restClient );
+        p2pStatusSender = new P2pStatusSender( this, localPeer, monitor, restClient );
 
         requestorsRunner.scheduleWithFixedDelay( p2pStatusSender, 30, 600, TimeUnit.SECONDS );
 

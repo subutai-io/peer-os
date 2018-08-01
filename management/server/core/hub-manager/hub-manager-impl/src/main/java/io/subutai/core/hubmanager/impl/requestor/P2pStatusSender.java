@@ -24,7 +24,7 @@ import io.subutai.hub.share.dto.SystemLogsDto;
 import static java.lang.String.format;
 
 
-public class P2pLogsSender extends HubRequester
+public class P2pStatusSender extends HubRequester
 {
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -34,7 +34,7 @@ public class P2pLogsSender extends HubRequester
     private Date lastSendDate;
 
 
-    public P2pLogsSender( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor, RestClient restClient )
+    public P2pStatusSender( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor, RestClient restClient )
     {
         super( hubManager, restClient );
 

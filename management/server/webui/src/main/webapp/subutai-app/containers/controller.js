@@ -337,6 +337,13 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function setContainerName( container, name ) {
+
+        if (! /^[a-zA-Z][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]$/.test(name)){
+                    SweetAlert.swal("Invalid hostname", "The container hostname must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen", "error");
+
+                    return;
+        }
+
 		LOADING_SCREEN();
 		environmentService.setContainerName( container, name ).success( function (data) {
 			location.reload();
