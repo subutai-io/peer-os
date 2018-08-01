@@ -764,7 +764,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		}
 
-		var containerName = 'Container ' + (containerCounter++).toString();
+		var containerName = 'Container' + (containerCounter++).toString();
 		var devElement = new joint.shapes.tm.devElement({
 			position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 			edited: false,

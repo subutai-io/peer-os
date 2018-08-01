@@ -1439,7 +1439,7 @@ function addContainerToHost(model, template, img, size, quota, containerId, name
 
     var containerName = '';
     if (name == undefined || name == null) {
-        containerName = 'Container ' + (containerCounter++).toString();
+        containerName = 'Container' + (containerCounter++).toString();
     } else {
         containerName = name;
     }
