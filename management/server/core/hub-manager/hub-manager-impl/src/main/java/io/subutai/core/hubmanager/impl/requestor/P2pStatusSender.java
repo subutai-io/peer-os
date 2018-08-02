@@ -3,11 +3,10 @@ package io.subutai.core.hubmanager.impl.requestor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.lang3.time.DateUtils;
 
 import com.google.common.collect.Lists;
 
@@ -18,27 +17,24 @@ import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.core.metric.api.pojo.P2PInfo;
 import io.subutai.hub.share.dto.P2PDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 
 import static java.lang.String.format;
 
 
-public class P2pLogsSender extends HubRequester
+public class P2pStatusSender extends HubRequester
 {
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private LocalPeer localPeer;
-
     private Monitor monitor;
+    private Date lastSendDate;
 
-    private Date p2pLogsEndDate;
 
-
-    public P2pLogsSender( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
-                          RestClient restClient )
+    public P2pStatusSender( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor, RestClient restClient )
     {
         super( hubManager, restClient );
 
@@ -49,63 +45,56 @@ public class P2pLogsSender extends HubRequester
 
 
     @Override
-    public void request() throws HubManagerException
+    public void request()
     {
-        process();
-    }
-
-
-    public void process() throws HubManagerException
-    {
-        processP2PLogs();
-    }
-
-
-    private void processP2PLogs()
-    {
-        Date currentDate = new Date();
-
-        Date startDate = p2pLogsEndDate != null ? p2pLogsEndDate : DateUtils.addMinutes( currentDate, -15 );
-
-        p2pLogsEndDate = currentDate;
-
         try
         {
-            processP2PLogs( startDate, currentDate );
+            sendP2PStatus();
         }
         catch ( Exception e )
         {
-            log.error( "Error to process p2p logs: {} ", e.getMessage() );
+            log.error( "Error sending P2P status: {} ", e.getMessage() );
         }
     }
 
 
-    private void processP2PLogs( Date startDate, Date endDate ) throws HubManagerException
+    private void sendP2PStatus() throws HubManagerException
     {
         try
         {
-            log.info( "Getting p2p logs: {} - {}", startDate, endDate );
+            log.info( "Getting P2P status" );
 
-            List<P2Pinfo> p2Pinfos = monitor.getP2PStatus( startDate, endDate );
+            List<P2PInfo> p2PInfos = monitor.getP2PStatuses();
 
             List<P2PDto> p2pList = Lists.newArrayList();
 
-            for ( final P2Pinfo info : p2Pinfos )
+            boolean hasProblems = false;
+            for ( final P2PInfo info : p2PInfos )
             {
                 P2PDto dto = new P2PDto();
                 dto.setRhId( info.getRhId() );
-                dto.setRhVersion( info.getRhVersion() );
-                dto.setP2pVersion( info.getP2pVersion() );
                 dto.setP2pStatus( info.getP2pStatus() );
                 dto.setState( info.getState() );
+
+                if ( info.getP2pStatus() != 0 )
+                {
+                    hasProblems = true;
+                }
 
                 p2pList.add( dto );
             }
 
+            if ( !hasProblems && lastSendDate != null
+                    && System.currentTimeMillis() - lastSendDate.getTime() < TimeUnit.MINUTES.toMillis( 60 ) )
+            {
+                return;
+            }
+
+
             SystemLogsDto logsDto = new SystemLogsDto();
             logsDto.setP2PInfo( p2pList );
 
-            log.info( "Sending p2p logs and status to Hub..." );
+            log.info( "Sending P2P status to Bazaar..." );
 
             String path = format( "/rest/v1/peers/%s/resource-hosts/system-logs", localPeer.getId() );
 
@@ -113,7 +102,9 @@ public class P2pLogsSender extends HubRequester
 
             if ( restResult.isSuccess() )
             {
-                log.info( "Processing p2p logs completed successfully" );
+                log.info( "P2P status was sent to Bazaar successfully" );
+
+                lastSendDate = new Date();
             }
         }
         catch ( Exception e )

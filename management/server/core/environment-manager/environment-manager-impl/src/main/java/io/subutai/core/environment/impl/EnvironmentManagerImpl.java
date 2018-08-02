@@ -2264,7 +2264,7 @@ public class EnvironmentManagerImpl extends HostListener
         }
         catch ( PeerException e )
         {
-            LOG.error( "Error removing stale Hub environments: {}", e.getMessage() );
+            LOG.error( "Error removing stale Bazaar environments: {}", e.getMessage() );
         }
     }
 
@@ -2326,7 +2326,7 @@ public class EnvironmentManagerImpl extends HostListener
         }
         catch ( PeerException e )
         {
-            LOG.error( "Error getting locally registered Hub environments: {}", e.getMessage() );
+            LOG.error( "Error getting locally registered Bazaar environments: {}", e.getMessage() );
         }
 
         return hubEnvironments;

@@ -9,7 +9,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-@Command( scope = "environment", name = "list-deleted-on-hub", description = "Command to view deleted Hub "
+@Command( scope = "environment", name = "list-deleted-on-bazaar", description = "Command to view deleted Bazaar"
         + "environments" )
 public class ListDeletedHubEnvironmentsCommand extends SubutaiShellCommandSupport
 {

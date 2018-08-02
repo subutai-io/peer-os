@@ -104,7 +104,7 @@ public class VersionInfoProcessor extends HubRequester
             }
             else
             {
-                throw new HubManagerException( "Error on sending version info to hub: " + restResult.getError() );
+                throw new HubManagerException( "Error on sending version info to Bazaar: " + restResult.getError() );
             }
         }
     }

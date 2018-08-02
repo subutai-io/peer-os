@@ -17,6 +17,8 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 	vm.currentType = 'environments';
 	vm.isAdmin = false;
 
+	vm.p2pRunning = false;
+
 	vm.charts = [{}, {}, {}, {}];
 	vm.environments = [];
 	vm.containers = [];
@@ -58,6 +60,7 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 	vm.showContainers = showContainers;
 	vm.setCurrentType = setCurrentType;
 	vm.getServerData = getServerData;
+	vm.getP2PStatus = getP2PStatus;
 	vm.initAccordeon = initAccordeon;
 	vm.viewError = viewError;
 
@@ -66,12 +69,12 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 
 		monitoringSrv.isAdminCheck().success(function (data) {
 			if(data == true || data == 'true') {
-//				getP2Pstatus();
 				monitoringSrv.getResourceHosts().success(function (data) {
 					vm.hosts = data;
 					vm.isAdmin = true;
 					vm.currentType = 'peer';
 					vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : '';
+                    getP2PStatus();
 					getServerData();
 				});
 			} else {
@@ -88,47 +91,6 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 		});
 	}
 	
-//	function getP2Pstatus() {
-//		monitoringSrv.getP2Pstatus().success (function (data) {
-//			vm.info = data.p2pList;
-//			for(var i = 0; i < vm.info.length; i++) {
-//
-//				switch(vm.info[i].p2pStatus) {
-//					case 0:
-//						vm.statusTable.p2pStatuses.healthy++;
-//						break;
-//					case 1:
-//						vm.statusTable.p2pStatuses.problems++;
-//						vm.p2pColor = '#efc94c';
-//						break;
-//					case 2:
-//						vm.statusTable.p2pStatuses.notWork++;
-//						if(!vm.p2pColor || vm.p2pColor == '#efc94c') {
-//							vm.p2pColor = '#c1272d';
-//						}
-//						break;
-//					default:
-//						break;
-//				}
-//
-//				switch(vm.info[i].p2pVersionCheck) {
-//					case 0:
-//						vm.statusTable.p2pUpdates.updated++;
-//						break;
-//					case 1:
-//						vm.statusTable.p2pUpdates.normal++;
-//						break;
-//					case 2:
-//						vm.statusTable.p2pUpdates.needUpdate++;
-//						break;
-//					default:
-//						break;
-//				}
-//
-//			}
-//		});
-//
-//	}
 
 	function setFirstEnvByDefault() {
 		if(vm.environments.length > 0) {
@@ -164,6 +126,22 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 				break;
 			}
 		}
+	}
+
+	function getServerDataAndP2PStatus(){
+	    getServerData()
+
+	    getP2PStatus()
+	}
+
+	function getP2PStatus(){
+	    if (vm.currentHost) {
+            monitoringSrv.isP2pRunning(vm.currentHost).success(function (data){
+                vm.p2pRunning = data;
+            }).error(function (error) {
+                console.log(error);
+            });
+        }
 	}
 
 	function getServerData() {

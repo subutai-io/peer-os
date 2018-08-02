@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>7.0.5-SNAPSHOT</version>
+    <version>7.0.6-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -39,7 +39,6 @@
     <module>hub-manager</module>
     <module>karaf-manager</module>
     <module>template-manager</module>
-    <module>environment-metadata-manager</module>
   </modules>
 
 </project>

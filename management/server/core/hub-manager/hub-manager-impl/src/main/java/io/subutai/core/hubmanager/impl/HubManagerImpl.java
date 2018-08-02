@@ -26,6 +26,7 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.desktop.api.DesktopManager;
@@ -56,7 +57,7 @@ import io.subutai.core.hubmanager.impl.processor.port_map.ContainerPortMapProces
 import io.subutai.core.hubmanager.impl.requestor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.requestor.ContainerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.requestor.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.requestor.P2pLogsSender;
+import io.subutai.core.hubmanager.impl.requestor.P2pStatusSender;
 import io.subutai.core.hubmanager.impl.requestor.PeerMetricsProcessor;
 import io.subutai.core.hubmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
@@ -65,6 +66,7 @@ import io.subutai.core.hubmanager.impl.util.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.util.ReschedulableTimer;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -109,7 +111,7 @@ public class HubManagerImpl extends HostListener implements HubManager
 
     private HeartbeatProcessor heartbeatProcessor;
 
-    private P2pLogsSender p2pLogsSender;
+    private P2pStatusSender p2pStatusSender;
 
     private ContainerEventProcessor containerEventProcessor;
 
@@ -192,9 +194,9 @@ public class HubManagerImpl extends HostListener implements HubManager
 
     private void initHubRequesters()
     {
-        p2pLogsSender = new P2pLogsSender( this, localPeer, monitor, restClient );
+        p2pStatusSender = new P2pStatusSender( this, localPeer, monitor, restClient );
 
-        requestorsRunner.scheduleWithFixedDelay( p2pLogsSender, 20, 3600, TimeUnit.SECONDS );
+        requestorsRunner.scheduleWithFixedDelay( p2pStatusSender, 30, 600, TimeUnit.SECONDS );
 
         //***********
 
@@ -251,7 +253,8 @@ public class HubManagerImpl extends HostListener implements HubManager
     {
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, restClient );
 
-        Context ctx = new Context( identityManager, envManager, envUserHelper, localPeer, restClient, desktopManager );
+        Context ctx =
+                new Context( this, identityManager, envManager, envUserHelper, localPeer, restClient, desktopManager );
 
         StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
@@ -283,9 +286,9 @@ public class HubManagerImpl extends HostListener implements HubManager
     {
         if ( isRegisteredWithHub() )
         {
-            p2pLogsSender.process();
+            p2pStatusSender.request();
             heartbeatProcessor.sendHeartbeat( true );
-            containerEventProcessor.process();
+            containerEventProcessor.request();
         }
     }
 
@@ -381,7 +384,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                         }
                         catch ( Exception e )
                         {
-                            log.error( "Error notifying hub event listener", e );
+                            log.error( "Error notifying event listener", e );
                         }
                     }
                 } );
@@ -417,7 +420,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                         }
                         catch ( Exception e )
                         {
-                            log.error( "Error notifying hub event listener", e );
+                            log.error( "Error notifying event listener", e );
                         }
                     }
                 } );
@@ -671,7 +674,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                 //delay to let peer register the RH
                 TaskUtil.sleep( 1000 );
 
-                log.debug( "Notifying Hub about RH connection" );
+                log.debug( "Notifying Bazaar about RH connection" );
 
                 peerMetricsProcessor.request();
             }
@@ -693,7 +696,7 @@ public class HubManagerImpl extends HostListener implements HubManager
                 //delay to let peer unregister the RH
                 TaskUtil.sleep( 1000 );
 
-                log.debug( "Notifying Hub about RH disconnection" );
+                log.debug( "Notifying Bazaar about RH disconnection" );
 
                 peerMetricsProcessor.request();
             }
@@ -736,5 +739,18 @@ public class HubManagerImpl extends HostListener implements HubManager
         {
             peerMetricsTimer.schedule( 15L );
         }
+    }
+
+
+    @Override
+    synchronized public UserToken getUserToken( final String envOwnerId, final String peerId )
+    {
+        final User user = envUserHelper.handleEnvironmentOwnerCreation( envOwnerId, peerId );
+        UserToken token = identityManager.getUserToken( user.getId() );
+        if ( token == null )
+        {
+            token = identityManager.createUserToken( user, null, null, null, TokenType.SESSION.getId(), null );
+        }
+        return token;
     }
 }

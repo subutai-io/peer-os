@@ -57,7 +57,7 @@ public class TunnelHelper
         }
         catch ( Exception e )
         {
-            String mgs = "Could not sent tunnel peer data to hub.";
+            String mgs = "Could not sent tunnel peer data to Bazaar.";
             LOG.error( mgs, e.getMessage() );
             return null;
         }
@@ -75,7 +75,7 @@ public class TunnelHelper
 
             if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                LOG.error( "Error to get tunnel  data from Hub: HTTP {} - {}", restResult.getStatus(),
+                LOG.error( "Error to get tunnel  data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return null;

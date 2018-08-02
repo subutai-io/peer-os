@@ -156,7 +156,8 @@ public interface NetworkManager
      * @param ipAddress IP address of container of Resource Host
      */
     boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
-                                   final String ipAddress, final int internalPort ) throws NetworkManagerException;
+                                   final String ipAddress, final int internalPort, final String domain )
+            throws NetworkManagerException;
 
 
     /**

@@ -7,10 +7,6 @@ public class Common
     public static final String HUB_ID = "bazaar";
     public static final String SUBUTAI_ID = "subutai";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
-    public static final long RH_UPDATE_TIMEOUT_MIN = 60;
-    public static final long RH_UPDATE_CHECK_TIMEOUT_MIN = 10;
-    public static final long MH_UPDATE_TIMEOUT_MIN = 60;
-    public static final long MH_UPDATE_CHECK_TIMEOUT_MIN = 15;
 
     public static final int DEFAULT_PUBLIC_PORT = 8443;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
@@ -32,17 +28,44 @@ public class Common
 
     public static final String PEER_CERT_ALIAS = "peer_cert";
 
-    public static final int WAIT_CONTAINER_CONNECTION_SEC = 60;
-    public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 30;
+    //Command related timeouts
+
+    public static final long RH_UPDATE_TIMEOUT_MIN = 60;
+    public static final long RH_UPDATE_CHECK_TIMEOUT_MIN = 10;
+    public static final long MH_UPDATE_TIMEOUT_MIN = 60;
+    public static final long MH_UPDATE_CHECK_TIMEOUT_MIN = 15;
+
+    public static final int WAIT_CONTAINER_CONNECTION_SEC = 120;
+    public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 60;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
 
     public static final int CLONE_TIMEOUT_SEC = 60 * 5; // 5 min
 
     public static final int TEMPLATE_DOWNLOAD_TIMEOUT_SEC = 60 * 60 * 5; // 5 hour
     public static final int TEMPLATE_EXPORT_TIMEOUT_SEC = 60 * 60 * 5; // 5 hour
-    public static final int TEMPLATE_PROMOTE_TIMEOUT_SEC = 60 * 10; // 10 min
 
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
+
+    public static final int DESTROY_CONTAINER_TIMEOUT_SEC = 600;
+
+    public static final int CREATE_SSH_KEY_TIMEOUT_SEC = 60;
+
+    public static final int CLEANUP_ENV_TIMEOUT_SEC = 3600;
+
+    public static final int STOP_CONTAINER_TIMEOUT_SEC = 120;
+
+    public static final int GET_QUOTA_TIMEOUT_SEC = 60;
+
+    public static final int SET_QUOTA_TIMEOUT_SEC = 120;
+
+    public static final int JOIN_P2P_TIMEOUT_SEC = 180;
+
+    public static final int LEAVE_P2P_TIMEOUT_SEC = 90;
+
+    public static final int IP_LINK_REMOVE_TIMEOUT_SEC = 90;
+
+    // <<< timeouts
+
     public static final String IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}"
             + "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
     public static final String CIDR_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}"
@@ -67,8 +90,8 @@ public class Common
     public static final String DEFAULT_DOMAIN_NAME = "intra.lan";
 
     //http/rest client settings
-    public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 10L;
-    public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15L;
+    public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 10L; // 10 min
+    public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15L; // 15sec
     public static final int DEFAULT_MAX_RETRANSMITS = 3;
 
     public static final String ETC_HOSTS_FILE = "/etc/hosts";
