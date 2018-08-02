@@ -1,0 +1,6 @@
+
+Private-Package: \
+     io.subutai.core.object.relation.rest
+
+
+Import-Package: *

@@ -1,0 +1,17 @@
+assert rootProject == project
+
+allprojects {
+    apply plugin: 'idea'
+
+}
+
+/**
+ This makes IntelliJ load Gradle API Sources properly.
+ **/
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+idea.project.vcs = 'Git'

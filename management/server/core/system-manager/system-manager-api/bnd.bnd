@@ -1,0 +1,7 @@
+
+Export-Package: \
+     io.subutai.core.systemmanager.api, \
+     io.subutai.core.systemmanager.api.pojo
+
+
+Import-Package: *

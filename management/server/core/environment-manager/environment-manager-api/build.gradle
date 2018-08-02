@@ -1,0 +1,9 @@
+dependencies {
+    compile project(":server:subutai-common")
+    compile project(":server:subutai-hub-share")
+    compile libraries.slf4j
+    compile libraries.servicemix_beanflow
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

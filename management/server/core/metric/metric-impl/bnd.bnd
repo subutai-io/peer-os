@@ -1,0 +1,9 @@
+
+Private-Package: \
+     io.subutai.core.metric.impl, \
+     io.subutai.core.metric.impl.dao, \
+     io.subutai.core.metric.impl.model, \
+     io.subutai.core.metric.impl.pojo
+
+
+Import-Package: *

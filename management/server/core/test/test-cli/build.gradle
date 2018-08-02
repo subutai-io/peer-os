@@ -1,0 +1,9 @@
+dependencies {
+    compile project(":server:core:cli-controller")
+    compile project(":server:subutai-common")
+    compile libraries.karaf_shell
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

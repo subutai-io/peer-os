@@ -1,0 +1,9 @@
+
+Export-Package: \
+     io.subutai.core.blueprint.api, \
+     io.subutai.core.blueprint.api.dao, \
+     io.subutai.core.blueprint.api.exception, \
+     io.subutai.core.blueprint.api.model
+
+
+Import-Package: *

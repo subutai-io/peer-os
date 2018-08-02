@@ -1,0 +1,7 @@
+
+Private-Package: \
+     io.subutai.core.security.rest, \
+     io.subutai.core.security.rest.model
+
+
+Import-Package: *

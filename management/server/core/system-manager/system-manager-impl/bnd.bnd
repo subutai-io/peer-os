@@ -1,0 +1,9 @@
+
+Private-Package: \
+     io.subutai.core.systemmanager.impl, \
+     io.subutai.core.systemmanager.impl.dao, \
+     io.subutai.core.systemmanager.impl.entity, \
+     io.subutai.core.systemmanager.impl.pojo
+
+
+Import-Package: *

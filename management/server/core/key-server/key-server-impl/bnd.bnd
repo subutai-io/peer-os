@@ -1,0 +1,9 @@
+
+Private-Package: \
+     io.subutai.core.keyserver.impl, \
+     io.subutai.core.keyserver.impl.dao, \
+     io.subutai.core.keyserver.impl.model, \
+     io.subutai.core.keyserver.impl.utils
+
+
+Import-Package: *

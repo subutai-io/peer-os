@@ -1,0 +1,6 @@
+dependencies {
+    feature libraries.jackson
+    feature libraries.guava
+    feature libraries.commons_lang3
+    feature libraries.commons_io
+}

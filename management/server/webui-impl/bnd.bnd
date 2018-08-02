@@ -1,0 +1,6 @@
+
+Private-Package: \
+     io.subutai.webui.impl
+
+
+Import-Package: *

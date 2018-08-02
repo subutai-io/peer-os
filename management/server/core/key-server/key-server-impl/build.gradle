@@ -1,0 +1,9 @@
+dependencies {
+    compile project(":server:core:key-server:key-server-api")
+    compile project(":server:subutai-common")
+    compile libraries.bouncycastle
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

@@ -1,0 +1,10 @@
+dependencies {
+    compile project(":server:core:host-registry:host-registry-api")
+    compile project(":server:core:metric:metric-api")
+    compile project(":server:core:peer-manager:peer-manager-api")
+    compile project(":server:subutai-common")
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

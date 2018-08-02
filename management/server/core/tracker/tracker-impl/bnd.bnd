@@ -1,0 +1,8 @@
+
+Export-Package: \
+     io.subutai.core.template.impl, \
+     io.subutai.core.template.dao, \
+     io.subutai.core.template.entity
+
+
+Import-Package: *

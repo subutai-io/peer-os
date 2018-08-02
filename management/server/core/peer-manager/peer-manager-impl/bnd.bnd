@@ -1,0 +1,10 @@
+
+Private-Package: \
+     io.subutai.core.peer.impl, \
+     io.subutai.core.peer.impl.command, \
+     io.subutai.core.peer.impl.dao, \
+     io.subutai.core.peer.impl.entity, \
+     io.subutai.core.peer.impl.request
+
+
+Import-Package: *

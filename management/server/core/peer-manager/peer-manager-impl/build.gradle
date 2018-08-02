@@ -1,0 +1,14 @@
+dependencies {
+    compile project(":server:core:host-registry:host-registry-api")
+    compile project(":server:core:identity-manager:identity-manager-api")
+    compile project(":server:core:messenger:messenger-api")
+    compile project(":server:core:peer-manager:peer-manager-api")
+    compile project(":server:core:security-manager:security-manager-api")
+    compile project(":server:subutai-common")
+    compile libraries.javax_annotation
+    compile libraries.open_jpa
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

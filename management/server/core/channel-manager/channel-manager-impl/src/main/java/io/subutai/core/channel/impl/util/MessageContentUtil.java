@@ -16,7 +16,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -88,6 +88,11 @@ public class MessageContentUtil
     {
 
         InputStream is = message.getContent( InputStream.class );
+        if( is == null )
+        {
+            LOG.error( "Error decrypting content: No content: " + message.getExchange() );
+            return;
+        }
 
         CachedOutputStream os = new CachedOutputStream();
 

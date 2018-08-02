@@ -1,0 +1,10 @@
+dependencies {
+
+    compile libraries.commons_io
+    compile libraries.javax_servlet
+    compile libraries.jetty
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

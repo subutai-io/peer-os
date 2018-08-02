@@ -1,0 +1,8 @@
+
+Export-Package: \
+     io.subutai.core.environment.api, \
+     io.subutai.core.environment.api.exception, \
+     io.subutai.core.environment.api.ShareDto
+
+
+Import-Package: *

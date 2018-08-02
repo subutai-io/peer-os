@@ -1,0 +1,24 @@
+dependencies {
+    compile project(":server:subutai-hub-share")
+    compile libraries.cxf
+    compile libraries.commons_codec
+    compile libraries.commons_configuration
+    compile libraries.commons_lang3
+    compile libraries.commons_net
+    compile libraries.commons_validator
+    compile libraries.gson
+    compile libraries.guava
+    compile libraries.jackson
+    compile libraries.javax_ws_rs
+    compile libraries.jsoup
+    compile libraries.nimbus_jwt
+    compile libraries.open_jpa
+    compile libraries.osgi_core
+    compile libraries.slf4j
+    compile libraries.uuid_generator
+
+    testCompile libraries.hamcrest
+
+    // BAD!!
+    compile libraries.junit
+}

@@ -1,0 +1,7 @@
+dependencies {
+    compile libraries.karaf_shell
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}
