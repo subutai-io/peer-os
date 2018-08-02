@@ -338,8 +338,8 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function setContainerName( container, name ) {
 
-        if (! /^[a-zA-Z][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]$/.test(name)){
-                    SweetAlert.swal("Invalid hostname", "The container hostname must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen", "error");
+        if (! /^[a-zA-Z][a-zA-Z0-9\-]{0,49}$/.test(name)){
+                    SweetAlert.swal("Invalid hostname", "The container hostname must start with a letter and have as interior characters only letters, digits, and hyphen", "error");
 
                     return;
         }
@@ -426,6 +426,18 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
     vm.disabled = false;
     function createTemplate( container, name, version ) {
+
+        if (! /^[a-zA-Z][a-zA-Z0-9\-]{0,49}$/.test(name)){
+                    SweetAlert.swal("Invalid name", "The template name must start with a letter and have as interior characters only letters, digits, and hyphen", "error");
+
+                    return;
+        }
+
+        if (! /^\d\.\d\.\d$/.test(version)){
+                    SweetAlert.swal("Invalid version", "The template version must be in form d.d.d where d is a digit. E.g. 1.2.3", "error");
+
+                    return;
+        }
 
         clearTimeout(timeout);
 
