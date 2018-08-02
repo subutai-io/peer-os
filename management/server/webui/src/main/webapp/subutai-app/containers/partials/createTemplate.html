@@ -16,6 +16,8 @@
         <input
             id="subt_inp__container-template-name"
             ng-model="name"
+            required
+            maxlength="50"
             ng-init="name=containerViewCtrl.editingContainer.hostname">
         <div class="clear"></div>
       </div>
@@ -26,6 +28,7 @@
         <input
             id="subt_inp__container-template-version"
             ng-model="version"
+            required
             ng-init="version='1.0.0'">
         <div class="clear"></div>
       </div>

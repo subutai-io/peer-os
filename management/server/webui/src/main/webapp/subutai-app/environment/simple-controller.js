@@ -1014,11 +1014,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function addSettingsToTemplate(templateSettings, sizeDetails) {
 
-	    if (! /^[a-zA-Z][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]$/.test(templateSettings.containerName)){
-	    			SweetAlert.swal("Invalid hostname", "The container hostname must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen", "error");
+        if (! /^[a-zA-Z][a-zA-Z0-9\-]{0,49}$/.test(templateSettings.containerName)){
+                    SweetAlert.swal("Invalid hostname", "The container hostname must start with a letter and have as interior characters only letters, digits, and hyphen", "error");
 
-        			return;
-	    }
+                    return;
+        }
 
         var isCustom = templateSettings.quotaSize == 'CUSTOM';
 
