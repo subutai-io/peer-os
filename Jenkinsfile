@@ -114,16 +114,12 @@ try {
             // Exporting template
             sh """
             set -e
-			sudo subutai export management -v "${artifactVersion}" --local --token "${token}" | grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
+			sudo subutai export management -v "${artifactVersion}" --local --token "${token}"
             """
                         
         stage("Upload management template to IPFS node")
         notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
         
-            String NEW_ID = sh(script: """
-            cat /tmp/ipfs.hash
-            """, returnStdout: true)
-            NEW_ID = NEW_ID.trim()
 
             //remove existing template metadata
             String OLD_ID = sh(script: """
@@ -138,14 +134,13 @@ try {
             fi
             """
 
-            //register template with CDN
+            //TODO upload to CDN
+            
             sh """
-            /bin/sleep 20
-            echo "NEW ID: ${NEW_ID}"
-            sed -i 's/"id":""/"id":"${NEW_ID}"/g' /tmp/template.json
-            template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${cdnHost}/rest/v1/cdn/templates
-            """
+            
+            curl -sk -H "token: ${token}" -Ffile=@management-subutai-template_${artifactVersion}_amd64.tar.gz -Ftoken=${token} -X POST "https://${cdnHost}/rest/v1/cdn/uploadTemplate"
 
+            """
        
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Upload to REPO") {
