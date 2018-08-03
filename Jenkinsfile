@@ -135,6 +135,12 @@ try {
             """
 
             //TODO upload to CDN
+            
+            sh """
+            
+            curl -sk -H "token: ${token}" -Ffile=@management-subutai-template_${artifactVersion}_amd64.tar.gz -Ftoken=${token} -X POST "https://${cdnHost}/rest/v1/cdn/uploadTemplate"
+
+            """
        
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Upload to REPO") {
