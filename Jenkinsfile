@@ -120,12 +120,6 @@ try {
         stage("Upload management template to IPFS node")
         notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
         
-            // Pinning template
-            sh """
-            cd /var/cache/subutai/
-            IPFS_PATH=/var/lib/ipfs/node ipfs add -Q management-subutai-template_${artifactVersion}_amd64.tar.gz > /tmp/ipfs.hash
-            """
-
             String NEW_ID = sh(script: """
             cat /tmp/ipfs.hash
             """, returnStdout: true)
@@ -152,12 +146,7 @@ try {
             template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${cdnHost}/rest/v1/cdn/templates
             """
 
-            // Pinning templates to EU1 and US1
-
-            sh """
-            ssh ipfs-eu1 "ipfs pin add ${NEW_ID}"
-            """
-        
+       
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Upload to REPO") {
             notifyBuildDetails = "\nFailed Step - Upload to Repo"
