@@ -9,6 +9,10 @@ dependencies {
     compile libraries.open_jpa
     compile libraries.slf4j
 
+    testCompile project(":server:core:command-executor:command-executor-api")
+    testCompile project(":server:core:metric:metric-api")
+    testCompile project(":server:core:local-peer:local-peer-impl")
     testCompile libraries.hamcrest
     testCompile libraries.junit
+    testCompile libraries.mockito
 }

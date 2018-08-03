@@ -9,7 +9,7 @@
 .classpath
 .settings
 .metadata
-target
+target/
 git.properties
 .gitignore
 # Package Files #

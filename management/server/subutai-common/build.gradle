@@ -18,7 +18,8 @@ dependencies {
     compile libraries.uuid_generator
 
     testCompile libraries.hamcrest
+    testCompile libraries.mockito
 
-    // BAD!!
+    // BAD!! - compile!!
     compile libraries.junit
 }

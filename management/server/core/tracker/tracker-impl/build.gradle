@@ -7,4 +7,5 @@ dependencies {
 
     testCompile libraries.hamcrest
     testCompile libraries.junit
+    testCompile libraries.mockito
 }

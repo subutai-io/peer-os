@@ -5,6 +5,8 @@ dependencies {
     compile project(":server:subutai-common")
     compile libraries.slf4j
 
+    testCompile project(":server:core:identity-manager:identity-manager-api")
     testCompile libraries.hamcrest
     testCompile libraries.junit
+    testCompile libraries.mockito
 }

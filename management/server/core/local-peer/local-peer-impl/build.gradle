@@ -18,4 +18,6 @@ dependencies {
 
     testCompile libraries.hamcrest
     testCompile libraries.junit
+    testCompile libraries.mockito
+    testCompile libraries.slf4j_testlogger
 }

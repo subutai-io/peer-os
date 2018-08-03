@@ -109,21 +109,21 @@ allprojects {
         }
     }
 
-    if (releaseBuild == "true") {
-        println "Project: " + project.name + " in Releasebuild: " + releaseBuild
+    apply plugin: 'nebula.nebula-release'
 
-        apply plugin: 'nebula.nebula-release'
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    repository(url: "$nexusDeployTarget") {
-                        authentication(userName: "$nexusUsername", password: "$nexusPassword")
-                    }
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "$nexusDeployTarget") {
+                    authentication(userName: "$nexusUsername", password: "$nexusPassword")
                 }
             }
         }
-        project.rootProject.tasks.release.dependsOn(uploadArchives)
+    }
+    project.rootProject.tasks.release.dependsOn(uploadArchives)
+
+    test {
+        workingDir = file(project.projectDir)
     }
 
     if (ciBuild.toBoolean()) {
