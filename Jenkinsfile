@@ -138,6 +138,7 @@ try {
             
             sh """
             set +e
+            cd /var/cache/subutai/
             curl -sk -H "token: ${token}" -Ffile=@management-subutai-template_${artifactVersion}_amd64.tar.gz -Ftoken=${token} -X POST "https://${cdnHost}/rest/v1/cdn/uploadTemplate"
 
             """
