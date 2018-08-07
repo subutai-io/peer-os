@@ -17,10 +17,10 @@ try {
     }
 
     switch (env.BRANCH_NAME) {
-        case ~/master/: jumpServer = "mastercdn.subutai.io"; break;
-        case ~/dev/: jumpServer = "devcdn.subutai.io"; break;
-        case ~/sysnet/: jumpServer = "devcdn.subutai.io"; break;
-        default: jumpServer = "cdn.subutai.io"
+        case ~/master/: jumpServer = "mastertun.subutai.io"; break;
+        case ~/dev/: jumpServer = "devtun.subutai.io"; break;
+        case ~/sysnet/: jumpServer = "devtun.subutai.io"; break;
+        default: jumpServer = "tun.subutai.io"
     }
 
     switch (env.BRANCH_NAME) {
