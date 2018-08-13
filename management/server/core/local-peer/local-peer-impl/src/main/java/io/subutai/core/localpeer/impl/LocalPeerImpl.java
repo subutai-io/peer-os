@@ -1053,8 +1053,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             if ( requestedCapacity.getDisk() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getDisk() )
             {
                 LOG.warn( "Requested DISK volume {}GB can not be accommodated on RH {}: available DISK volume is "
-                                + "{}GB", UnitUtil.convert( requestedCapacity.getDisk(), UnitUtil.Unit.B, UnitUtil
-                                .Unit.GB ),
+                                + "{}GB", UnitUtil.convert( requestedCapacity.getDisk(), UnitUtil.Unit.B,
+                        UnitUtil.Unit.GB ),
                         resourceHost.getHostname(),
                         UnitUtil.convert( availableCapacity.getDisk(), UnitUtil.Unit.B, UnitUtil.Unit.GB ) );
 
@@ -1441,7 +1441,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         {
             String errMsg = String.format( "Could not start container %s: %s", containerHost.getContainerName(),
                     e.getMessage() );
-            LOG.error( errMsg );
+            LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }
     }
@@ -1463,7 +1463,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         {
             String errMsg = String.format( "Could not stop container %s: %s", containerHost.getContainerName(),
                     e.getMessage() );
-            LOG.error( errMsg );
+            LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }
     }
@@ -1698,7 +1698,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( e.getMessage() );
+                    LOG.error( e.getMessage(), e );
                     throw new PeerException( e );
                 }
             }
@@ -1840,7 +1840,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 String errMsg =
                         String.format( "Error obtaining domain by vlan %d: %s", reservedNetworkResource.getVlan(),
                                 e.getMessage() );
-                LOG.error( errMsg );
+                LOG.error( errMsg, e );
                 throw new PeerException( errMsg, e );
             }
         }
@@ -1868,7 +1868,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 String errMsg =
                         String.format( "Error removing domain by vlan %d: %s", reservedNetworkResource.getVlan(),
                                 e.getMessage() );
-                LOG.error( errMsg );
+                LOG.error( errMsg, e );
                 throw new PeerException( errMsg, e );
             }
         }
@@ -1901,7 +1901,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             {
                 String errMsg = String.format( "Error setting domain by vlan %d: %s", reservedNetworkResource.getVlan(),
                         e.getMessage() );
-                LOG.error( errMsg );
+                LOG.error( errMsg, e );
                 throw new PeerException( errMsg, e );
             }
         }
@@ -1929,7 +1929,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             {
                 String errMsg = String.format( "Error checking domain by ip %s and vlan %d: %s", hostIp,
                         reservedNetworkResource.getVlan(), e.getMessage() );
-                LOG.error( errMsg );
+                LOG.error( errMsg, e );
                 throw new PeerException( errMsg, e );
             }
         }
@@ -1958,7 +1958,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             {
                 String errMsg = String.format( "Error adding ip %s to domain by vlan %d: %s", hostIp,
                         reservedNetworkResource.getVlan(), e.getMessage() );
-                LOG.error( errMsg );
+                LOG.error( errMsg, e );
                 throw new PeerException( errMsg, e );
             }
         }
@@ -1987,7 +1987,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             {
                 String errMsg = String.format( "Error removing ip %s from domain by vlan %d: %s", hostIp,
                         reservedNetworkResource.getVlan(), e.getMessage() );
-                LOG.error( errMsg );
+                LOG.error( errMsg, e );
                 throw new PeerException( errMsg, e );
             }
         }
@@ -2017,7 +2017,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         {
             String errMsg =
                     String.format( "Error setting up ssh tunnel for container ip %s: %s", containerIp, e.getMessage() );
-            LOG.error( errMsg );
+            LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }
     }
@@ -2108,7 +2108,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         catch ( Exception e )
         {
             String errMsg = String.format( "Error creating PEK: %s", e.getMessage() );
-            LOG.error( errMsg );
+            LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }
     }
@@ -2410,7 +2410,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         catch ( Exception e )
         {
             String errMsg = String.format( "Error reserving network resources: %s", e.getMessage() );
-            LOG.error( errMsg );
+            LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }
     }
@@ -2431,7 +2431,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         catch ( Exception e )
         {
             String errMsg = String.format( "Error getting reserved network resources: %s", e.getMessage() );
-            LOG.error( errMsg );
+            LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }
 
@@ -2999,12 +2999,17 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
             io.subutai.common.host.Quota quota = containerHostInfo.getRawQuota();
 
+            if ( quota == null )
+            {
+                return new io.subutai.common.host.Quota( 0D, 0D, 0D );
+            }
+
             //temp workaround for btrfs quota issue https://github.com/subutai-io/agent/wiki/Switch-to-Soft-Quota
             return new io.subutai.common.host.Quota( quota.getCpu(), quota.getRam(), quota.getDisk() / 2 );
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Error getting container quota: %s", e.getMessage() ), e );
         }
     }
@@ -3128,7 +3133,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
             throw new PeerException(
                     String.format( "Could not set container quota for %s: %s", containerId.getId(), e.getMessage() ) );
         }
@@ -3159,7 +3164,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         }
         catch ( HostNotFoundException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
             throw new PeerException( e.getMessage(), e );
         }
     }
@@ -3180,7 +3185,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         }
         catch ( HostNotFoundException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
             throw new PeerException( e.getMessage(), e );
         }
     }
@@ -3786,7 +3791,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             }
             catch ( Exception e )
             {
-                LOG.error( e.getMessage() );
+                LOG.error( e.getMessage(), e );
             }
 
             //destroy container without environments
@@ -3798,7 +3803,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 }
                 catch ( PeerException e )
                 {
-                    LOG.error( e.getMessage() );
+                    LOG.error( e.getMessage(), e );
                 }
             }
 
@@ -3877,14 +3882,14 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                         }
                         catch ( CommandException e1 )
                         {
-                            LOG.error( e1.getMessage() );
+                            LOG.error( e1.getMessage(), e1 );
                         }
                     }
                 }
             }
             catch ( ResourceHostException e )
             {
-                LOG.error( e.getMessage() );
+                LOG.error( e.getMessage(), e );
             }
 
 
@@ -3908,7 +3913,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             }
             catch ( Exception e )
             {
-                LOG.error( e.getMessage() );
+                LOG.error( e.getMessage(), e );
             }
 
             for ( Integer vlan : lostEnvironmentsVlans )
@@ -3921,7 +3926,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 }
                 catch ( ResourceHostException e )
                 {
-                    LOG.error( e.getMessage() );
+                    LOG.error( e.getMessage(), e );
                 }
             }
 
@@ -3957,7 +3962,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             }
             catch ( Exception e )
             {
-                LOG.error( e.getMessage() );
+                LOG.error( e.getMessage(), e );
             }
 
             //b) ignore manually created containers
@@ -3977,7 +3982,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 catch ( Exception e )
                 {
                     iterator.remove();
-                    LOG.error( e.getMessage() );
+                    LOG.error( e.getMessage(), e );
                 }
             }
 
@@ -4006,7 +4011,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 }
                 catch ( CommandException e )
                 {
-                    LOG.error( e.getMessage() );
+                    LOG.error( e.getMessage(), e );
                 }
             }
 
@@ -4045,7 +4050,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             }
             catch ( PeerException e )
             {
-                LOG.error( e.getMessage() );
+                LOG.error( e.getMessage(), e );
             }
 
 
@@ -4069,7 +4074,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                     }
                     catch ( ResourceHostException e )
                     {
-                        LOG.error( e.getMessage() );
+                        LOG.error( e.getMessage(), e );
                     }
                 }
             }
