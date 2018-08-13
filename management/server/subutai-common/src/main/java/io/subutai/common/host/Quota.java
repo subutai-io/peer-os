@@ -30,19 +30,19 @@ public class Quota implements Serializable
 
     public Double getCpu()
     {
-        return cpu;
+        return cpu == null ? 0 : cpu;
     }
 
 
     public Double getRam()
     {
-        return ram;
+        return ram == null ? 0 : ram;
     }
 
 
     public Double getDisk()
     {
-        return disk;
+        return disk == null ? 0 : disk;
     }
 
 
