@@ -138,6 +138,7 @@ public class CloneContainerTask extends HostUtil.Task<String>
         //append 3 random letters
         //append VLAN, it will make it unique on this peer
         //append additional suffix (last IP octet) that will make it unique inside host environment
+        //13 symbols are appended
 
         return String
                 .format( "%s-%s-%d-%s", request.getHostname(), RandomStringUtils.randomAlphanumeric( 3 ).toLowerCase(),

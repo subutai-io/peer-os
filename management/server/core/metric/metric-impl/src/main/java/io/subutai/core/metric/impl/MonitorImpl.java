@@ -53,7 +53,7 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.core.metric.api.pojo.P2PInfo;
 import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -454,45 +454,56 @@ public class MonitorImpl extends HostListener implements Monitor
 
 
     @Override
-    public List<P2Pinfo> getP2PStatus( Date logsStartDate, Date logsEndData )
+    public List<P2PInfo> getP2PStatuses()
     {
-        List<P2Pinfo> pojos = Lists.newArrayList();
+        List<P2PInfo> pojos = Lists.newArrayList();
 
         for ( final ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
         {
-            P2PInfoPojo info = new P2PInfoPojo();
 
             try
             {
-                List<String> statusLines = Lists.newArrayList();
-
-                String status = resourceHost.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
-
-                String lines[] = status.split( "\\r?\\n" );
-
-                for ( String line : lines )
-                {
-                    if ( StringUtils.isNotBlank( line.trim() ) )
-                    {
-                        statusLines.add( line );
-                    }
-                }
-
-                info.setRhId( resourceHost.getId() );
-                info.setRhName( resourceHost.getHostname() );
-                info.setState( statusLines );
-                info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
-                info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+                P2PInfo info = getP2pStatus( resourceHost.getId() );
 
                 pojos.add( info );
             }
             catch ( Exception e )
             {
-                LOG.error( "Error getting RH/P2P versions: {}", e.getMessage() );
+                LOG.error( "Error getting P2P status: {}", e.getMessage() );
             }
         }
 
         return pojos;
+    }
+
+
+    @Override
+    public P2PInfo getP2pStatus( String rhId ) throws Exception
+    {
+        P2PInfoPojo info = new P2PInfoPojo();
+
+        List<String> statusLines = Lists.newArrayList();
+
+        ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( rhId );
+
+        CommandResult result = resourceHost.execute( new RequestBuilder( "p2p status" ) );
+        String status = result.getStdOut();
+
+        String lines[] = status.split( "\\r?\\n" );
+
+        for ( String line : lines )
+        {
+            if ( StringUtils.isNotBlank( line.trim() ) )
+            {
+                statusLines.add( line );
+            }
+        }
+
+        info.setRhId( resourceHost.getId() );
+        info.setState( statusLines );
+        info.setP2pStatus( result.getExitCode() );
+
+        return info;
     }
 
 

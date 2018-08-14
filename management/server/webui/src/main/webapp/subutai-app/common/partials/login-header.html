@@ -132,7 +132,7 @@
               <div class="g-text g-margin-bottom-half">Login</div>
               <input type="email"
                      class="b-form-input b-form-input_full"
-                     focus-input="currentUserCtrl.getRegistrationFormVisibilityStatus()"
+                     autofocus
                      tabindex=1
                      ng-model="currentUserCtrl.hub.login" placeholder="Your Email address">
             </div>
@@ -160,8 +160,8 @@
             </div>
           </div>
           <div class="footer">
-            <a href="https://{{ currentUserCtrl.hubIp }}" target="_blank" tabindex=3 class="b-form-label">Sign Up</a>
-            <button type="submit" class="b-btn b-btn_green g-right" tabindex=5
+            <a href="https://{{ currentUserCtrl.hubIp }}" target="_blank" tabindex=5 class="b-form-label">Sign Up</a>
+            <button type="submit" class="b-btn b-btn_green g-right" tabindex=6
                     ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
               Register
             </button>

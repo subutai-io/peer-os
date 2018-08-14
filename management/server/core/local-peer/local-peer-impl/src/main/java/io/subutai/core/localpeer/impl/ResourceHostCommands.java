@@ -33,19 +33,22 @@ public class ResourceHostCommands
 
     public RequestBuilder getStopContainerCommand( String containerName )
     {
-        return new RequestBuilder( String.format( "subutai stop %s", containerName ) ).withTimeout( 120 );
+        return new RequestBuilder( String.format( "subutai stop %s", containerName ) )
+                .withTimeout( Common.STOP_CONTAINER_TIMEOUT_SEC );
     }
 
 
     public RequestBuilder getDestroyContainerCommand( String containerId )
     {
-        return new RequestBuilder( String.format( "subutai destroy id:%s", containerId ) ).withTimeout( 600 );
+        return new RequestBuilder( String.format( "subutai destroy id:%s", containerId ) )
+                .withTimeout( Common.DESTROY_CONTAINER_TIMEOUT_SEC );
     }
 
 
     public RequestBuilder getCleanupEnvironmentCommand( int vlan )
     {
-        return new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ).withTimeout( 3600 );
+        return new RequestBuilder( String.format( "subutai cleanup %d", vlan ) )
+                .withTimeout( Common.CLEANUP_ENV_TIMEOUT_SEC );
     }
 
 

@@ -1,9 +1,6 @@
 package io.subutai.hub.share.common;
 
 
-import java.util.List;
-
-
 public interface HubAdapter
 {
     //
@@ -27,18 +24,6 @@ public interface HubAdapter
     void removeSshKey( String envId, String sshKey );
 
     void addSshKey( String envId, String sshKey );
-
-    //
-    // Plugins
-    //
-
-    <T> List<T> getPluginData( String pluginKey, Class<T> clazz );
-
-    <T> T getPluginDataByKey( String pluginKey, String key, Class<T> clazz );
-
-    boolean uploadPluginData( String pluginKey, String key, Object data );
-
-    boolean deletePluginData( String pluginKey, String key );
 
     void notifyContainerDiskUsageExcess( String peerId, String envId, String contId, long diskUsage,
                                          boolean containerWasStopped );

@@ -1167,6 +1167,13 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     }
 
     function addSettingsToTemplate(templateSettings, sizeDetails) {
+
+        if (! /^[a-zA-Z][a-zA-Z0-9\-]{0,49}$/.test(templateSettings.containerName)){
+                    SweetAlert.swal("Invalid hostname", "The container hostname must start with a letter and have as interior characters only letters, digits, and hyphen", "error");
+
+                    return;
+        }
+
         var isCustom = templateSettings.quotaSize == 'CUSTOM';
 
         currentTemplate.set('quotaSize', templateSettings.quotaSize);
@@ -1432,7 +1439,7 @@ function addContainerToHost(model, template, img, size, quota, containerId, name
 
     var containerName = '';
     if (name == undefined || name == null) {
-        containerName = 'Container ' + (containerCounter++).toString();
+        containerName = 'Container' + (containerCounter++).toString();
     } else {
         containerName = name;
     }

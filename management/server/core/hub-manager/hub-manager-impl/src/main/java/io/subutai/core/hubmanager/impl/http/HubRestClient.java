@@ -36,7 +36,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 public class HubRestClient implements RestClient
 {
-    private static final String ERROR = "Error executing request to Hub: ";
+    private static final String ERROR = "Error executing request to Bazaar: ";
     private static final int MAX_ATTEMPTS = 3;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );

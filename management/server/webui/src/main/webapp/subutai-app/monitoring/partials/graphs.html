@@ -35,7 +35,7 @@
          ng-show="monitoringCtrl.currentType == 'peer'">
       <select class="b-popup-body-input"
               ng-model="monitoringCtrl.currentHost"
-              ng-change="monitoringCtrl.getServerData()">
+              ng-change="monitoringCtrl.getServerDataAndP2PStatus()">
         <option value="" disabled>Select Host</option>
         <option ng-repeat="host in monitoringCtrl.hosts" value="{{ host.id }}"
                 ng-selected="host.id == monitoringCtrl.currentHost">
@@ -62,7 +62,10 @@
       <div class="clear"></div>
     </div>
 
+  <label style="line-height: 29px; margin-left:3px; font-size:14px;">P2P running: {{ monitoringCtrl.p2pRunning }}</label>
+
   </div>
+
 
   <div class="clear"></div>
 </div>

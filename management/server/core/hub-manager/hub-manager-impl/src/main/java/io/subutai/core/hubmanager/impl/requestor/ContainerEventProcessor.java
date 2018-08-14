@@ -4,7 +4,6 @@ package io.subutai.core.hubmanager.impl.requestor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
@@ -40,12 +39,6 @@ public class ContainerEventProcessor extends HubRequester
 
     @Override
     public void request() throws HubManagerException
-    {
-        process();
-    }
-
-
-    public void process() throws HubManagerException
     {
         try
         {

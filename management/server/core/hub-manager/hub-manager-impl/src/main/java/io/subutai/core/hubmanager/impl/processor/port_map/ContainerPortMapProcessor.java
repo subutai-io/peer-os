@@ -86,7 +86,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
             if ( !restResult.isSuccess() )
             {
-                log.error( "Could not get port map data from HUB" );
+                log.error( "Could not get port map data from Bazaar" );
             }
 
             ContainerPortMapDto containerPortMapDto = restResult.getEntity();
@@ -100,7 +100,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     .post( format( "/rest/v1/environments/%s/ports/map", containerPortMapDto.getEnvironmentSSId() ),
                             containerPortMapDto );
 
-            log.info( !restRes.isSuccess() ? "Could not send port map data to HUB" : "Sent port map data to HUB" );
+            log.info( !restRes.isSuccess() ? "Could not send port map data to Bazaar" : "Sent port map data to Bazaar" );
         }
         catch ( Exception e )
         {
@@ -163,7 +163,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             if ( !protocol.isHttpOrHttps() )
             {
                 if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
-                        portMapDto.getInternalPort() ) )
+                        portMapDto.getInternalPort(), portMapDto.getDomain() ) )
                 {
                     resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
                             portMapDto.getExternalPort() );
@@ -176,7 +176,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             else
             {
                 if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
-                        portMapDto.getInternalPort() ) )
+                        portMapDto.getInternalPort(), portMapDto.getDomain() ) )
                 {
                     String sslCertPath =
                             protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, resourceHost ) :
@@ -199,7 +199,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 String rhIpAddr = resourceHost.getAddress();
 
                 if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
-                        portMapDto.getExternalPort() ) )
+                        portMapDto.getExternalPort(), portMapDto.getDomain() ) )
                 {
                     if ( !protocol.isHttpOrHttps() )
                     {

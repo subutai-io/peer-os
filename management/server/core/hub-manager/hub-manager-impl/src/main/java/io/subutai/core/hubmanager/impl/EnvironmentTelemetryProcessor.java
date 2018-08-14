@@ -18,6 +18,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubRequester;
 import io.subutai.core.hubmanager.api.RestClient;
@@ -40,7 +41,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
     private static final String GET_ENV_CONTAINERS_URL = "/rest/v1/environments/%s";
     private static final String PUT_ENV_TELEMETRY_URL = "/rest/v1/environments/%s/telemetry";
 
-    private static final String PING_COMMAND = "ping -c 5 -i 0.2 -w 5 %s";
+    private static final String PING_COMMAND = "ping -c 5 %s";
     private static final String SSH_COMMAND = "ssh root@%s date";
     private static final String PREPARE_FILE = "MD5=`dd bs=1024 count=2 </dev/urandom | tee /tmp/tmpfile`";
     private static final String SCP_FILE_COMMAND = "scp /tmp/tmpfile root@%s:/tmp";
@@ -110,16 +111,19 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
                     {
                         if ( tools.contains( "ping" ) )
                         {
-                            executeCheckCommand( "ping", sourceContainer, format( PING_COMMAND, ip ), result, 10 );
+                            executeCheckCommand( "ping", sourceContainer, format( PING_COMMAND, ip ), result,
+                                    Common.DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC * 2 );
                         }
                         if ( tools.contains( "ssh" ) )
                         {
-                            executeCheckCommand( "ssh", sourceContainer, format( SSH_COMMAND, ip ), result, 10 );
+                            executeCheckCommand( "ssh", sourceContainer, format( SSH_COMMAND, ip ), result,
+                                    Common.DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC );
                         }
                         if ( tools.contains( "scp" ) )
                         {
                             fileManipulation( sourceContainer, PREPARE_FILE );
-                            executeCheckCommand( "scp", sourceContainer, format( SCP_FILE_COMMAND, ip ), result, 60 );
+                            executeCheckCommand( "scp", sourceContainer, format( SCP_FILE_COMMAND, ip ), result,
+                                    Common.DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC * 6 );
                             fileManipulation( sourceContainer, DELETE_PREPARED_FILE );
                         }
                     }
@@ -139,7 +143,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
         {
             try
             {
-                sourceContainer.execute( new RequestBuilder( cmd ).withTimeout( 10 ) );
+                sourceContainer.execute( new RequestBuilder( cmd ) );
             }
             catch ( CommandException e )
             {
@@ -185,13 +189,13 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
             if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get environment ids data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
             }
         }
         catch ( Exception e )
         {
-            log.error( "Could not sent  telemetry data to hub.", e.getMessage() );
+            log.error( "Could not sent  telemetry data to Bazaar", e.getMessage() );
         }
     }
 
@@ -206,7 +210,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
             if ( restResult.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( "Error to get telemetry  data from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get telemetry data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return null;
@@ -233,7 +237,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
             if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get environment ids data from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return Collections.emptySet();
@@ -260,7 +264,7 @@ public class EnvironmentTelemetryProcessor extends HubRequester implements State
 
             if ( restResult.getStatus() != HttpStatus.SC_OK && restResult.getStatus() != 204 )
             {
-                log.error( "Error to get environmentPeerDto from Hub: HTTP {} - {}", restResult.getStatus(),
+                log.error( "Error to get environmentPeerDto from Bazaar: HTTP {} - {}", restResult.getStatus(),
                         restResult.getError() );
 
                 return null;

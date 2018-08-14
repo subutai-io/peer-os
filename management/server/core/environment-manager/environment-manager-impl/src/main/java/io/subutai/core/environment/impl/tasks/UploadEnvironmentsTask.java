@@ -96,7 +96,7 @@ public class UploadEnvironmentsTask implements Runnable
             }
             catch ( Exception e )
             {
-                LOG.error( "Error uploading environment {} to Hub: {}", environment.getName(), e.getMessage() );
+                LOG.error( "Error uploading environment {} to Bazaar: {}", environment.getName(), e.getMessage() );
             }
         }
     }

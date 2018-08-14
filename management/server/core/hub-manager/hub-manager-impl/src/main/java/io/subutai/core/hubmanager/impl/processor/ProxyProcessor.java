@@ -99,7 +99,7 @@ public class ProxyProcessor implements StateLinkProcessor
                     deleteP2pNetworkInterface( proxyDto );
                     break;
                 default:
-                    log.error( "Wrong state come from HUB: {}", proxyDto );
+                    log.error( "Wrong state from Bazaar: {}", proxyDto );
                     break;
             }
 
@@ -229,7 +229,7 @@ public class ProxyProcessor implements StateLinkProcessor
                                 PortMapDto.State.USED ) )
                         {
                             if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
-                                    portMapDto.getIpAddr(), portMapDto.getExternalPort() ) )
+                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
                             {
                                 String sslCertPath = protocol == Protocol.HTTPS ?
                                                      saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
@@ -258,7 +258,7 @@ public class ProxyProcessor implements StateLinkProcessor
                                 PortMapDto.State.USED ) )
                         {
                             if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
-                                    portMapDto.getIpAddr(), portMapDto.getExternalPort() ) )
+                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
                             {
                                 resourceHost.mapContainerPort( protocol, portMapDto.getIpAddr(),
                                         portMapDto.getExternalPort(), portMapDto.getExternalPort() );
@@ -345,11 +345,11 @@ public class ProxyProcessor implements StateLinkProcessor
 
         if ( !result.isSuccess() )
         {
-            log.error( "Error to send  data to Hub: " + result.getError() );
+            log.error( "Error to send  data to Bazaar: " + result.getError() );
         }
         else
         {
-            log.info( "Sent Data to HUB Success" );
+            log.info( "Sent Data to Bazaar Success" );
         }
     }
 }

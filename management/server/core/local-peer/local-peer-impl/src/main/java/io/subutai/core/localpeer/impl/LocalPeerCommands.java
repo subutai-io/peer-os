@@ -85,7 +85,7 @@ public class LocalPeerCommands
                 "if [ -f %1$s/id_%2$s.pub ]; " + "then cat %1$s/id_%2$s.pub ;" + "else rm -rf %1$s ; "
                         + "mkdir -p %1$s && " + "chmod 700 %1$s && " + "ssh-keygen -t %2$s -P '' -f %1$s/id_%2$s -q && "
                         + "cat %1$s/id_%2$s.pub; fi", Common.CONTAINER_SSH_FOLDER,
-                encryptionType.name().toLowerCase() ) ).withTimeout( 60 );
+                encryptionType.name().toLowerCase() ) ).withTimeout( Common.CREATE_SSH_KEY_TIMEOUT_SEC );
     }
 
 
@@ -128,6 +128,7 @@ public class LocalPeerCommands
 
     public RequestBuilder getDestroyContainerCommand( String containerName )
     {
-        return new RequestBuilder( String.format( "subutai destroy %s", containerName ) ).withTimeout( 60 );
+        return new RequestBuilder( String.format( "subutai destroy %s", containerName ) )
+                .withTimeout( Common.DESTROY_CONTAINER_TIMEOUT_SEC );
     }
 }

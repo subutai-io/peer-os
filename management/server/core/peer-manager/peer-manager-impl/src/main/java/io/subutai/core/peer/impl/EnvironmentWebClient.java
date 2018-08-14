@@ -26,7 +26,6 @@ import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.WebClientBuilder;
-import io.subutai.common.settings.Common;
 import io.subutai.hub.share.quota.ContainerQuota;
 
 
@@ -800,37 +799,6 @@ public class EnvironmentWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error requesting environment info: " + e.getMessage() );
-        }
-        finally
-        {
-            WebClientBuilder.close( client );
-        }
-
-        WebClientBuilder.checkResponse( response );
-    }
-
-
-    public void promoteTemplate( final ContainerId containerId, final String templateName ) throws PeerException
-    {
-        WebClient client = null;
-        Response response;
-        try
-        {
-            remotePeer.checkRelation();
-            String path = String.format( "/%s/containers/%s/template/%s/promote", containerId.getEnvironmentId(),
-                    containerId.getId(), templateName );
-            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 5000L,
-                    // 1 min for promote
-                    Common.TEMPLATE_PROMOTE_TIMEOUT_SEC * 1000L, 1 );
-
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            response = client.post( null );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error promoting container to template: " + e.getMessage() );
         }
         finally
         {

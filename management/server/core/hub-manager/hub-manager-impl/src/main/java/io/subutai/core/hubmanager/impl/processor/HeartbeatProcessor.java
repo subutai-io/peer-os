@@ -14,12 +14,14 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.RestClient;
 import io.subutai.core.hubmanager.api.RestResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
 
 
@@ -39,6 +41,8 @@ public class HeartbeatProcessor implements Runnable
 
     private final HubManagerImpl hubManager;
 
+    private final PeerManager peerManager;
+
     private final RestClient restClient;
 
     private final String path;
@@ -56,9 +60,11 @@ public class HeartbeatProcessor implements Runnable
     private volatile boolean isHubReachable = true;
 
 
-    public HeartbeatProcessor( HubManagerImpl hubManager, RestClient restClient, String peerId )
+    public HeartbeatProcessor( HubManagerImpl hubManager, PeerManager peerManager, RestClient restClient,
+                               String peerId )
     {
         this.hubManager = hubManager;
+        this.peerManager = peerManager;
         this.restClient = restClient;
         this.peerId = peerId;
 
@@ -96,7 +102,7 @@ public class HeartbeatProcessor implements Runnable
                 return;
             }
 
-            log.warn( "Notifying Hub that peer is offline" );
+            log.warn( "Notifying Bazaar that peer is offline" );
 
             String url = path + "shutdown-hook";
 
@@ -104,7 +110,7 @@ public class HeartbeatProcessor implements Runnable
 
             if ( restResult.isSuccess() )
             {
-                log.info( "'Peer offline' notification successfully sent to Hub" );
+                log.info( "'Peer offline' notification successfully sent to Bazaar" );
             }
         }
         catch ( Exception e )
@@ -153,13 +159,19 @@ public class HeartbeatProcessor implements Runnable
             return;
         }
 
+        if ( !( peerManager.getLocalPeer().getState() == LocalPeer.State.READY && peerManager.getLocalPeer()
+                                                                                             .isMHPresent() ) )
+        {
+            return;
+        }
+
         long interval = ( System.currentTimeMillis() - lastSentMillis ) / 1000;
 
         boolean canSend = ( interval >= BIG_INTERVAL_SECONDS || force || fastModeLeft > 0 ) && !inProgress;
 
         if ( canSend )
         {
-            log.info( "Sending heartbeat to HUB: interval={}, force={}, fastModeLeft={}", interval, force,
+            log.info( "Sending heartbeat to Bazaar: interval={}, force={}, fastModeLeft={}", interval, force,
                     fastModeLeft );
 
             try

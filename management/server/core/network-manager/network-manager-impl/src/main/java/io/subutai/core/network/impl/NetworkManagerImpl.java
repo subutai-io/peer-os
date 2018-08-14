@@ -568,14 +568,15 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
-                                          final String ipAddress, final int internalPort )
+                                          final String ipAddress, final int internalPort, final String domain )
             throws NetworkManagerException
     {
         for ( final ReservedPortMapping mapping : getReservedPortMappings( host ) )
         {
             if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() )
                     && mapping.getExternalPort() == externalPort && mapping.getInternalPort() == internalPort && mapping
-                    .getIpAddress().equalsIgnoreCase( ipAddress ) )
+                    .getIpAddress().equalsIgnoreCase( ipAddress ) && ( domain == null || domain
+                    .equals( mapping.getDomain() ) ) )
             {
                 return true;
             }
