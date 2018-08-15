@@ -153,8 +153,8 @@ try {
             //copy deb to repo
             sh """
             touch uploading_management
-            scp uploading_management ${debFileName} dak@deb.subutai.io:incoming/${env.BRANCH_NAME}/
-            ssh dak@deb.subutai.io sh /var/reprepro/scripts/scan-incoming.sh ${env.BRANCH_NAME} management
+            scp uploading_management ${debFileName} dak@debup.subutai.io:incoming/${env.BRANCH_NAME}/
+            ssh dak@debup.subutai.io sh /var/reprepro/scripts/scan-incoming.sh ${env.BRANCH_NAME} management
             """
             }
         }
