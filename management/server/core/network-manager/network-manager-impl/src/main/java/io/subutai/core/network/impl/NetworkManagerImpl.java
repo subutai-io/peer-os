@@ -532,7 +532,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         Preconditions.checkNotNull( host );
 
-        CommandResult result = execute( host, commands.getListOfReservedPortMappingCommand() );
+        CommandResult result = execute( host, commands.getListPortMappingsCommand( null ) );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 

@@ -35,7 +35,10 @@ public abstract class Commands
         {
 
             Command quotaCommand = new Command( "quota" );
+            quotaCommand.addArgument( "get" );
+            quotaCommand.addArgument( "-r" );
             quotaCommand.addArgument( resourceType.getKey() );
+            quotaCommand.addArgument( "-c" );
             quotaCommand.addArgument( containerName );
             result.addCommand( quotaCommand );
         }
@@ -53,9 +56,11 @@ public abstract class Commands
         {
 
             Command quotaCommand = new Command( "quota" );
+            quotaCommand.addArgument( "set" );
+            quotaCommand.addArgument( "-r" );
             quotaCommand.addArgument( r.getResource().getContainerResourceType().getKey() );
+            quotaCommand.addArgument( "-c" );
             quotaCommand.addArgument( containerName );
-            quotaCommand.addArgument( "-s" );
 
             if ( r.getResource().getContainerResourceType() == ContainerResourceType.DISK )
             {
@@ -65,14 +70,6 @@ public abstract class Commands
             else
             {
                 quotaCommand.addArgument( r.getResource().getWriteValue() );
-            }
-
-            if ( r.getThreshold() != null && r.getThreshold() != 0 && !(
-                    r.getResource().getContainerResourceType() == ContainerResourceType.CPUSET
-                            || r.getResource().getContainerResourceType() == ContainerResourceType.DISK ) )
-            {
-                quotaCommand.addArgument( "-t" );
-                quotaCommand.addArgument( r.getThreshold().toString() );
             }
 
             result.addCommand( quotaCommand );

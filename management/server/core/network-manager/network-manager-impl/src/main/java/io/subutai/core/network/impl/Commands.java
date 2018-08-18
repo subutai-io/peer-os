@@ -52,7 +52,8 @@ public class Commands
     {
         return new RequestBuilder( P2P_BINDING )
                 .withCmdArgs( "start", "-dev", interfaceName, "-hash", p2pHash, "-key", secretKey, "-ttl",
-                        String.valueOf( secretKeyTtlSec ), "-ip", localIp, "-ports", portRange ).withTimeout( Common.JOIN_P2P_TIMEOUT_SEC );
+                        String.valueOf( secretKeyTtlSec ), "-ip", localIp, "-ports", portRange )
+                .withTimeout( Common.JOIN_P2P_TIMEOUT_SEC );
     }
 
 
@@ -67,13 +68,15 @@ public class Commands
     {
         return new RequestBuilder( P2P_BINDING )
                 .withCmdArgs( "start", "-dev", interfaceName, "-hash", p2pHash, "-key", secretKey, "-ttl",
-                        String.valueOf( secretKeyTtlSec ), "-ports", portRange ).withTimeout( Common.JOIN_P2P_TIMEOUT_SEC );
+                        String.valueOf( secretKeyTtlSec ), "-ports", portRange )
+                .withTimeout( Common.JOIN_P2P_TIMEOUT_SEC );
     }
 
 
     RequestBuilder getRemoveP2PSwarmCommand( String p2pHash )
     {
-        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "stop", "-hash", p2pHash ).withTimeout( Common.LEAVE_P2P_TIMEOUT_SEC );
+        return new RequestBuilder( P2P_BINDING ).withCmdArgs( "stop", "-hash", p2pHash )
+                                                .withTimeout( Common.LEAVE_P2P_TIMEOUT_SEC );
     }
 
 
@@ -92,7 +95,8 @@ public class Commands
 
     RequestBuilder getRemoveP2PIfaceCommand( String interfaceName )
     {
-        return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName ).withTimeout( Common.IP_LINK_REMOVE_TIMEOUT_SEC );
+        return new RequestBuilder( NETWORK_IFACE_REMOVAL ).withCmdArgs( interfaceName )
+                                                          .withTimeout( Common.IP_LINK_REMOVE_TIMEOUT_SEC );
     }
 
 
@@ -146,7 +150,7 @@ public class Commands
             args.add( sslCertPath );
         }
 
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( args.toArray( new String[args.size()] ) );
+        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( args.toArray( new String[0] ) );
     }
 
 
@@ -177,7 +181,7 @@ public class Commands
     RequestBuilder getMapContainerPortToRandomPortCommand( final Protocol protocol, final String containerIp,
                                                            final int containerPort )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", protocol.name().toLowerCase(), "-i",
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ) );
     }
 
@@ -185,7 +189,7 @@ public class Commands
     RequestBuilder getMapContainerPortToSpecificPortCommand( final Protocol protocol, final String containerIp,
                                                              final int containerPort, final int rhPort )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", protocol.name().toLowerCase(), "-i",
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ) );
     }
 
@@ -193,7 +197,7 @@ public class Commands
     RequestBuilder getRemoveContainerPortMappingCommand( final Protocol protocol, final String containerIp,
                                                          final int containerPort, final int rhPort )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "rm", protocol.name().toLowerCase(), "-i",
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "rm", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ) );
     }
 
@@ -203,7 +207,7 @@ public class Commands
                                                        final String sslCertPath, final LoadBalancing loadBalancing,
                                                        final boolean sslBackend )
     {
-        List<String> args = Lists.newArrayList( "add", protocol.name().toLowerCase(), "-i",
+        List<String> args = Lists.newArrayList( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-n", domain );
 
         if ( !Strings.isNullOrEmpty( sslCertPath ) )
@@ -223,7 +227,7 @@ public class Commands
             args.add( loadBalancing.name().toLowerCase() );
         }
 
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[args.size()] ) );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[0] ) );
     }
 
 
@@ -231,14 +235,8 @@ public class Commands
                                                                final int containerPort, final int rhPort,
                                                                final String domain )
     {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "rm", protocol.name().toLowerCase(), "-i",
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "rm", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-n", domain );
-    }
-
-
-    RequestBuilder getListOfReservedPortMappingCommand()
-    {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "ls" );
     }
 
 
@@ -248,10 +246,11 @@ public class Commands
 
         if ( protocol != null )
         {
+            args.add( "-p" );
             args.add( protocol.name().toLowerCase() );
         }
 
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[args.size()] ) );
+        return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[0] ) );
     }
 
 
