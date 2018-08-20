@@ -105,7 +105,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 
-    void importTemplate( Template template, String environmentId, String cdnToken ) throws ResourceHostException;
+    void importTemplate( Template template, String environmentId ) throws ResourceHostException;
 
     /**
      * Clones container based on the specified arguments

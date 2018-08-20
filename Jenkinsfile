@@ -55,7 +55,7 @@ try {
         branch=`git symbolic-ref --short HEAD` && echo "Branch is \$branch"
         find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
 
-        """        
+        """
         stash includes: "management-*.deb", name: 'deb'
 
         // CDN auth credentials
@@ -79,7 +79,7 @@ try {
         notifyBuildDetails = "\nFailed Step - Build management template"
                 
         // create management template
-                             
+
             sh """
 		   	set +x
             set -e
@@ -119,7 +119,7 @@ try {
                         
         stage("Upload management template to IPFS node")
         notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
-        
+
 
             //remove existing template metadata
             String OLD_ID = sh(script: """
@@ -135,14 +135,14 @@ try {
             """
 
             //TODO upload to CDN
-            
+
             sh """
             set +e
             cd /var/cache/subutai/
             curl -sk -H "token: ${token}" -Ffile=@management-subutai-template_${artifactVersion}_amd64.tar.gz -Ftoken=${token} -X POST "https://${cdnHost}/rest/v1/cdn/uploadTemplate"
 
             """
-       
+
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Upload to REPO") {
             notifyBuildDetails = "\nFailed Step - Upload to Repo"
