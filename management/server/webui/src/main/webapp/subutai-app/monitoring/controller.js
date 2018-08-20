@@ -141,6 +141,7 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
                 vm.p2pRunning = (data == "true");
             }).error(function (error) {
                 console.log(error);
+                vm.p2pRunning = false;
             });
         }
 	}
