@@ -31,6 +31,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -212,10 +213,11 @@ public class NetworkManagerImplTest
     @Test( expected = NetworkManagerException.class )
     public void testGetVlanDomain() throws Exception
     {
+        doReturn( DOMAIN ).when( commandResult ).getStdOut();
+
         networkManager.getVlanDomain( VLAN_ID );
 
-        verify( commandResult ).getStdOut();
-
+        verify( commandResult, atLeastOnce() ).getStdOut();
 
         doReturn( false ).when( commandResult ).hasSucceeded();
 
@@ -248,6 +250,7 @@ public class NetworkManagerImplTest
     @Test( expected = NetworkManagerException.class )
     public void testIsIpInVlanDomain() throws Exception
     {
+        doReturn( "Host is in domain" ).when( commandResult ).getStdOut();
         assertTrue( networkManager.isIpInVlanDomain( LOCAL_IP, VLAN_ID ) );
 
         doReturn( false ).when( commandResult ).hasSucceeded();

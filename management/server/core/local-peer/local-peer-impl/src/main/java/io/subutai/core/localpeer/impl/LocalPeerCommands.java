@@ -12,7 +12,7 @@ public class LocalPeerCommands
 {
     public RequestBuilder getRegisterManagementContainerCommand( String token )
     {
-        return new RequestBuilder( String.format( "subutai import %s -t %s", Common.MANAGEMENT_HOSTNAME, token ) );
+        return new RequestBuilder( String.format( "subutai import %s -s %s", Common.MANAGEMENT_HOSTNAME, token ) );
     }
 
 
