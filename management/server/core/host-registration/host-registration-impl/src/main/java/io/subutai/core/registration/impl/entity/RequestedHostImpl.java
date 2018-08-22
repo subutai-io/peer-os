@@ -104,6 +104,7 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
         this.publicKey = requestedHost.getPublicKey();
         this.status = requestedHost.getStatus();
         this.cert = requestedHost.getCert();
+        this.address = requestedHost.getAddress();
 
         if ( this.arch == null )
         {

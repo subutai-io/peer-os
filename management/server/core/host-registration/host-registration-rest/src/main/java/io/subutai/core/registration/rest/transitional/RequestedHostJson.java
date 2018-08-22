@@ -37,7 +37,7 @@ public class RequestedHostJson implements RequestedHost
     @Expose
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
     @Expose
-    @SerializedName(value="ip", alternate={ "address"})
+    @SerializedName( value = "ip", alternate = { "address" } )
     private String ip;
     @Expose
     private String version;
@@ -142,6 +142,13 @@ public class RequestedHostJson implements RequestedHost
     public void setVersion( final String rhVersion )
     {
         this.version = rhVersion;
+    }
+
+
+    @Override
+    public String getAddress()
+    {
+        return ip;
     }
 
 
