@@ -140,7 +140,7 @@ public class Commands
 
         if ( proxyLoadBalanceStrategy != ProxyLoadBalanceStrategy.NONE )
         {
-            args.add( "-l" );
+            args.add( "-b" );
             args.add( proxyLoadBalanceStrategy.getValue() );
         }
 
