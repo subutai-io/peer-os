@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.util.CollectionUtil;
@@ -36,6 +37,7 @@ public class RequestedHostJson implements RequestedHost
     @Expose
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
     @Expose
+    @SerializedName( value = "ip", alternate = { "address" } )
     private String ip;
     @Expose
     private String version;
@@ -140,6 +142,13 @@ public class RequestedHostJson implements RequestedHost
     public void setVersion( final String rhVersion )
     {
         this.version = rhVersion;
+    }
+
+
+    @Override
+    public String getAddress()
+    {
+        return ip;
     }
 
 
