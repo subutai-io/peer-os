@@ -28,7 +28,7 @@ import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.READY;
 
 public class TunnelProcessor implements StateLinkProcessor
 {
-    public static final String CREATE_TUNNEL_COMMAND = "subutai tunnel add %s:%s %s -g";
+    public static final String CREATE_TUNNEL_COMMAND = "subutai tunnel add %s:%s %s";
 
     private static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s:%s";
 
