@@ -24,4 +24,6 @@ public interface RequestedHost
     String getSecret();
 
     String getCert();
+
+    String getAddress();
 }
