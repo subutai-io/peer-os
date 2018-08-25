@@ -1,0 +1,184 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.10.0'
+        classpath 'com.netflix.nebula:nebula-release-plugin:6.3.5'
+    }
+}
+
+plugins {
+//    id 'maven'
+//    id 'java'
+    id 'com.github.lburgazzoli.karaf' version '0.0.49'
+}
+//
+//if (version == "unspecified") {
+//    version "999-SNAPSHOT"
+//}
+//
+//group "io.subutai.peeros"
+//apply from: 'dependencies.gradle'
+//apply from: "gradle/ide.gradle"
+//
+//defaultTasks 'clean', 'install'
+//
+//
+//repositories {
+//    // add the enterprise repositories
+//    mavenLocal()
+//    mavenCentral()
+//}
+//
+//configurations {
+//    feature
+//    feature.transitive = false
+//    archives.extendsFrom feature
+//    compileOnly.extendsFrom feature
+//    testCompile.extendsFrom feature
+//}
+
+//subprojects {
+//    group "io.subutai.peeros"
+//    version rootProject.version
+//    apply plugin: "java"
+//    compileJava.options.encoding = 'UTF-8'
+//
+//    configurations {
+//        feature
+//        feature.transitive = false
+//        archives.extendsFrom feature
+//        compileOnly.extendsFrom feature
+//        testCompile.extendsFrom feature
+//    }
+////    rootProject.dependencies {
+////        feature project(":$project.name")
+////    }
+//
+//    if (new File("$project.projectDir/bnd.bnd").exists()) {
+//        apply plugin: 'org.dm.bundle'
+//        bundle {
+//            instruction '-include', 'bnd.bnd'
+//            failOnError = true
+//        }
+//    }
+//    apply plugin: "maven"
+//
+//    sourceCompatibility = JavaVersion.VERSION_1_8
+//    targetCompatibility = JavaVersion.VERSION_1_8
+//
+//    repositories {
+//        // add the enterprise repositories
+//        mavenLocal()
+//        mavenCentral()
+//    }
+//
+//    tasks.withType(Test) {
+//        systemProperty 'subutai.test.integration', System.getProperty('subutai.test.integration', 'false')
+//        systemProperty 'subutai.test.mariadb.host', System.getProperty('subutai.test.mariadb.host', 'localhost')
+//        systemProperty 'subutai.test.mariadb.user', System.getProperty('subutai.test.mariadb.user', 'root')
+//        systemProperty 'subutai.test.mariadb.password', System.getProperty('subutai.test.mariadb.password', 'evasion')
+//    }
+//
+//    jar.finalizedBy(install)
+//
+//    task sourcesJar(type: Jar, dependsOn: classes) {
+//        classifier = "sources"
+//        from sourceSets.main.allSource
+//    }
+//
+//    artifacts {
+//        archives sourcesJar
+//    }
+//}
+
+
+apply from: 'dependencies.gradle'
+
+allprojects {
+    // enable if you want ..
+
+    configurations {
+        all {
+            resolutionStrategy {
+                failOnVersionConflict()
+            }
+        }
+        feature
+        feature.transitive = false
+        archives.extendsFrom feature
+        compileOnly.extendsFrom feature
+        testCompile.extendsFrom feature
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'nebula.nebula-release'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "$nexusUrlMavenSnapshots") {
+                    authentication(userName: "$nexusUsername", password: "$nexusPassword")
+                }
+            }
+        }
+    }
+//    project.rootProject.tasks.release.dependsOn(uploadArchives)
+
+    test {
+        workingDir = file(project.projectDir)
+    }
+
+    if (ciBuild.toBoolean()) {
+        // Enable Integration Tests?
+        // Enable Performance Tests?
+        // Enable Test Coverage measurement and report?
+        // Enable Sonar Output?
+    }
+}
+
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+
+    // Include the results from the `test` task in all subprojects
+    reportOn subprojects*.test
+}
+
+test.finalizedBy(testReport)
+
+karaf {
+
+    features {
+        xsdVersion = '1.4.0'
+        description = 'Subutai Feature Repository'
+        repository "mvn:org.ops4j.pax.jdbc/pax-jdbc-features/1.1.0/xml/features"
+        repository "mvn:org.ops4j.pax.useradmin/pax-useradmin/2.0.0-SNAPSHOT/xml/features"
+        repository "mvn:org.hibernate/hibernate-osgi/5.2.10.Final/xml/karaf"
+        repository "mvn:org.apache.cxf.karaf/apache-cxf/3.1.12/xml/features"
+        repository "mvn:org.apache.karaf.features/enterprise/4.1.2/xml/features"
+        repository "mvn:org.apache.activemq/activemq-karaf/5.15.0/xml/features-core"
+        repository "mvn:org.apache.karaf.features/spring/4.1.2/xml/features"
+
+        feature {
+            name = 'io.subutai.peeros'
+            description = 'Subutai PeerOS feature'
+            // Don't eagerly start the publisher until our
+            // custom ResourceFilter is installed.
+            bundle('com.eclipsesource.jaxrs:publisher:5.3.1') {
+                attribute 'start', 'false'
+            }
+
+            feature 'pax-useradmin-service'
+        }
+    }
+}
