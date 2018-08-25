@@ -30,7 +30,6 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
@@ -138,7 +137,7 @@ public class ContainerInfoImpl implements ContainerInfo
         {
             return getLocalPeer().getRawQuota( new ContainerId( id ) );
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             return null;
         }

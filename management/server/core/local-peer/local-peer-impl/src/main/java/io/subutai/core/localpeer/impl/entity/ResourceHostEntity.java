@@ -880,8 +880,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( final Template template, final String environmentId, final String cdnToken )
-            throws ResourceHostException
+    public void importTemplate( final Template template, final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -890,7 +889,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             updateTemplateDownloadProgress( environmentId, template.getName(), 0 );
 
-            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId(), cdnToken ), this,
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId() ), this,
                     new TemplateDownloadTracker( this, environmentId ) );
         }
         catch ( Exception e )
@@ -1139,7 +1138,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            rhVersion = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+            CommandResult result = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this );
+            //workaround for agent returning version in stderr
+            rhVersion = result.getStdOut() + result.getStdErr();
             return rhVersion;
         }
         catch ( CommandException e )

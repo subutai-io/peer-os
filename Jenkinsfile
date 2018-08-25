@@ -17,10 +17,10 @@ try {
     }
 
     switch (env.BRANCH_NAME) {
-        case ~/master/: jumpServer = "mastercdn.subutai.io"; break;
-        case ~/dev/: jumpServer = "devcdn.subutai.io"; break;
-        case ~/sysnet/: jumpServer = "devcdn.subutai.io"; break;
-        default: jumpServer = "cdn.subutai.io"
+        case ~/master/: jumpServer = "mastertun.subutai.io"; break;
+        case ~/dev/: jumpServer = "devtun.subutai.io"; break;
+        case ~/sysnet/: jumpServer = "devtun.subutai.io"; break;
+        default: jumpServer = "tun.subutai.io"
     }
 
     switch (env.BRANCH_NAME) {
@@ -55,7 +55,7 @@ try {
         branch=`git symbolic-ref --short HEAD` && echo "Branch is \$branch"
         find ${workspace}/management/server/server-karaf/target/ -name *.deb | xargs -I {} cp {} ${workspace}/${debFileName}
 
-        """        
+        """
         stash includes: "management-*.deb", name: 'deb'
 
         // CDN auth credentials
@@ -79,7 +79,7 @@ try {
         notifyBuildDetails = "\nFailed Step - Build management template"
                 
         // create management template
-                             
+
             sh """
 		   	set +x
             set -e
@@ -114,26 +114,16 @@ try {
             // Exporting template
             sh """
             set -e
-			sudo subutai export management -v "${artifactVersion}" --local --token "${token}" | grep -Po "{.*}" | tr -d '\\\\' > /tmp/template.json
+			sudo subutai export management -v "${artifactVersion}" --local --token "${token}"
             """
                         
         stage("Upload management template to IPFS node")
         notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
-        
-            // Pinning template
-            sh """
-            cd /var/cache/subutai/
-            IPFS_PATH=/var/lib/ipfs/node ipfs add -Q management-subutai-template_${artifactVersion}_amd64.tar.gz > /tmp/ipfs.hash
-            """
 
-            String NEW_ID = sh(script: """
-            cat /tmp/ipfs.hash
-            """, returnStdout: true)
-            NEW_ID = NEW_ID.trim()
 
             //remove existing template metadata
             String OLD_ID = sh(script: """
-            var=\$(curl -s https://${cdnHost}/rest/v1/cdn/template?name=management&verified=true) ; if [[ \$var != "Template not found" ]]; then echo \$var | grep -Po '"id":"\\K([a-zA-Z0-9]+)' ; else echo \$var; fi
+            var=\$(curl -s https://${cdnHost}/rest/v1/cdn/template?name=management) ; if [[ \$var != "Template not found" ]]; then echo \$var | grep -Po '"id"\\s*:\\s*"\\K([a-zA-Z0-9]+)' ; else echo \$var; fi
             """, returnStdout: true)
             OLD_ID = OLD_ID.trim()
 
@@ -144,20 +134,15 @@ try {
             fi
             """
 
-            //register template with CDN
-            sh """
-            /bin/sleep 20
-            echo "NEW ID: ${NEW_ID}"
-            sed -i 's/"id":""/"id":"${NEW_ID}"/g' /tmp/template.json
-            template=`cat /tmp/template.json` && curl -d "token=${token}&template=\$template" https://${cdnHost}/rest/v1/cdn/templates
-            """
-
-            // Pinning templates to EU1 and US1
+            //TODO upload to CDN
 
             sh """
-            ssh ipfs-eu1 "ipfs pin add ${NEW_ID}"
+            set +e
+            cd /var/cache/subutai/
+            curl -sk -H "token: ${token}" -Ffile=@management-subutai-template_${artifactVersion}_amd64.tar.gz -Ftoken=${token} -X POST "https://${cdnHost}/rest/v1/cdn/uploadTemplate"
+
             """
-        
+
         if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'sysnet') {
             stage("Upload to REPO") {
             notifyBuildDetails = "\nFailed Step - Upload to Repo"
@@ -168,8 +153,8 @@ try {
             //copy deb to repo
             sh """
             touch uploading_management
-            scp uploading_management ${debFileName} dak@deb.subutai.io:incoming/${env.BRANCH_NAME}/
-            ssh dak@deb.subutai.io sh /var/reprepro/scripts/scan-incoming.sh ${env.BRANCH_NAME} management
+            scp uploading_management ${debFileName} dak@debup.subutai.io:incoming/${env.BRANCH_NAME}/
+            ssh dak@debup.subutai.io sh /var/reprepro/scripts/scan-incoming.sh ${env.BRANCH_NAME} management
             """
             }
         }

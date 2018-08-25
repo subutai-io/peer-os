@@ -48,7 +48,7 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
     @Override
     public Object call() throws Exception
     {
-        resourceHost.importTemplate( template, environmentId, token );
+        resourceHost.importTemplate( template, environmentId );
 
         return null;
     }

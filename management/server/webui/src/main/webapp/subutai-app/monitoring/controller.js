@@ -61,6 +61,7 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 	vm.setCurrentType = setCurrentType;
 	vm.getServerData = getServerData;
 	vm.getP2PStatus = getP2PStatus;
+	vm.getServerDataAndP2PStatus = getServerDataAndP2PStatus;
 	vm.initAccordeon = initAccordeon;
 	vm.viewError = viewError;
 
@@ -137,9 +138,10 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 	function getP2PStatus(){
 	    if (vm.currentHost) {
             monitoringSrv.isP2pRunning(vm.currentHost).success(function (data){
-                vm.p2pRunning = data;
+                vm.p2pRunning = (data == "true");
             }).error(function (error) {
                 console.log(error);
+                vm.p2pRunning = false;
             });
         }
 	}

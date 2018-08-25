@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.impl;
 
 
-import com.google.common.base.Strings;
-
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 
@@ -11,19 +9,19 @@ public class ResourceHostCommands
 {
     public RequestBuilder getListContainerInfoCommand( String containerName )
     {
-        return new RequestBuilder( String.format( "subutai list -i %s", containerName ) );
+        return new RequestBuilder( String.format( "subutai list info -n %s", containerName ) );
     }
 
 
     public RequestBuilder getListContainersInfoCommand()
     {
-        return new RequestBuilder( "subutai list -i" );
+        return new RequestBuilder( "subutai list info" );
     }
 
 
     public RequestBuilder getListContainersCommand()
     {
-        return new RequestBuilder( "subutai list -c" );
+        return new RequestBuilder( "subutai list containers" );
     }
 
 
@@ -60,10 +58,9 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getImportTemplateCommand( final String templateId, final String cdnToken )
+    public RequestBuilder getImportTemplateCommand( final String templateId )
     {
-        return new RequestBuilder( String.format( "subutai import id:%s %s", templateId,
-                Strings.isNullOrEmpty( cdnToken ) ? "" : "-t " + cdnToken ) )
+        return new RequestBuilder( String.format( "subutai import id:%s", templateId ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 
@@ -72,8 +69,8 @@ public class ResourceHostCommands
                                                     String ip, int vlan, String environmentId, String containerToken )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -i \"%s %d\" -e %s -s %s && subutai hostname %s %s", templateId,
-                        containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
+                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s && subutai hostname con %s %s",
+                        templateId, containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
@@ -83,8 +80,8 @@ public class ResourceHostCommands
                                                     final String token )
     {
         return new RequestBuilder(
-                String.format( "subutai export %s -n %s -v %s -t %s %s", containerName, templateName, version, token,
-                        isPrivateTemplate ? "-p" : "" ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
+                String.format( "subutai export %s --name %s --ver %s --token %s", containerName, templateName, version,
+                        token ) ).withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
 
 
@@ -108,12 +105,12 @@ public class ResourceHostCommands
 
     public RequestBuilder getSetContainerHostnameCommand( final String containerName, final String newHostname )
     {
-        return new RequestBuilder( String.format( "subutai hostname %s %s", containerName, newHostname ) );
+        return new RequestBuilder( String.format( "subutai hostname con %s %s", containerName, newHostname ) );
     }
 
 
     public RequestBuilder getGetSetRhHostnameCommand( final String newHostname )
     {
-        return new RequestBuilder( String.format( "subutai hostname %s", newHostname ) );
+        return new RequestBuilder( String.format( "subutai hostname rh %s", newHostname ) );
     }
 }
