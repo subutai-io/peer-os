@@ -157,49 +157,8 @@ karaf {
         repository "mvn:org.apache.karaf.features/spring/4.1.2/xml/features"
 
         feature {
-            name = 'io.subutai.peeros.jdbc'
-            description = 'Subutai PeerOS jdbc feature'
-
-            feature ('pax-jdbc-h2') {
-                version = "1.1.0"
-            }
-            feature ('pax-jdbc-mariadb') {
-                version = "1.1.0"
-            }
-            feature ('pax-jdbc-config') {
-                version = "1.1.0"
-            }
-            feature ('pax-jdbc-pool-dbcp2') {
-                version = "1.1.0"
-            }
-
-        }
-
-        feature {
-            name = 'io.subutai.peeros.jpa'
-            description = 'Subutai PeerOS JPA features'
-
-            feature('transaction') {
-                version = '2.0.0'
-            }
-            feature ('jpa') {
-                version = '2.6.1'
-            }
-
-            feature('hibernate-orm') {
-                version = '5.2.10.Final'
-            }
-            feature 'hibernate-validator'
-        }
-
-        feature {
             name = 'io.subutai.peeros'
-            description = 'Subutai PeerOS Feature'
-            configuration 'feature'
-
-            feature 'com.spicter.core.jdbc'
-            feature 'com.spicter.core.jpa'
-
+            description = 'Subutai PeerOS feature'
             // Don't eagerly start the publisher until our
             // custom ResourceFilter is installed.
             bundle('com.eclipsesource.jaxrs:publisher:5.3.1') {

@@ -15,7 +15,6 @@ def commonsValidatorVersion = '1.4.0'
 def groovyVersion = '2.4.4'
 def cxfVersion = '3.1.0'
 def derbyVersion = '10.12.1.1'
-def gitCommitPluginVersion = '2.2.0'
 def gogoCommandVersion = "0.16.0"
 def gogoRuntimeVersion = "0.16.2"
 def gsonVersion = '2.3.1'
@@ -91,8 +90,6 @@ rootProject.ext {
             ],
 
             derby                : "org.apache.derby:derby:$derbyVersion",
-
-            git_commit_plugin    : "pl.project13.maven:git-commit-id-plugin:$gitCommitPluginVersion",
 
             gogo                 : [
                     [group: "org.apache.felix", name: "org.apache.felix.gogo.runtime", version: gogoRuntimeVersion, transitive: false],

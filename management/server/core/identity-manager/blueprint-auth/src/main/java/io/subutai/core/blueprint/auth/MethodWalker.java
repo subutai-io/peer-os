@@ -159,6 +159,7 @@ public class MethodWalker
         }
         catch ( NoSuchMethodException e )
         {
+            // SWALLOW
             logger.warn( "Error while checking relation" );
         }
     }
@@ -206,6 +207,7 @@ public class MethodWalker
         }
         catch ( Exception ex )
         {
+            // SWALLOW
             logger.error( "Error getting link: {}", ex.getMessage() );
             return null;
         }
@@ -237,6 +239,7 @@ public class MethodWalker
         }
         catch ( NoSuchFieldException | IllegalAccessException e )
         {
+            // SWALLOW ?
             logger.error( "Failed to get field with name {}: {}", varName, e.getMessage() );
         }
         return null;
