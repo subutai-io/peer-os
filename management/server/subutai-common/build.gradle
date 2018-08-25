@@ -1,5 +1,5 @@
 dependencies {
-    compile project(":server:subutai-hub-share")
+    compile project( ":management:server:subutai-hub-share")
     compile libraries.cxf
     compile libraries.commons_codec
     compile libraries.commons_configuration

@@ -1,7 +1,7 @@
 dependencies {
-    compile project(":server:subutai-common")
-    compile project(":server:core:environment-manager:environment-manager-api")
-    compile project(":server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile project( ":management:server:core:environment-manager:environment-manager-api")
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
     compile libraries.javax_annotation
     compile libraries.slf4j
 

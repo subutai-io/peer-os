@@ -1,6 +1,6 @@
 dependencies {
-    compile project(":server:core:host-registration:host-registration-api")
-    compile project(":server:core:cli-controller")
+    compile project( ":management:server:core:host-registration:host-registration-api")
+    compile project( ":management:server:core:cli-controller")
     compile libraries.karaf_shell
     compile libraries.slf4j
 

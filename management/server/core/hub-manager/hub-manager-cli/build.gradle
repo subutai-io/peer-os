@@ -1,6 +1,6 @@
 dependencies {
-    compile project(":server:core:cli-controller")
-    compile project(":server:core:hub-manager:hub-manager-api")
+    compile project( ":management:server:core:cli-controller")
+    compile project( ":management:server:core:hub-manager:hub-manager-api")
     compile libraries.guava
     compile libraries.karaf_shell
     compile libraries.slf4j

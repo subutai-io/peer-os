@@ -1,7 +1,7 @@
 dependencies {
-    compile project(":server:core:network-manager:network-manager-api")
-    compile project(":server:core:peer-manager:peer-manager-api")
-    compile project(":server:subutai-common")
+    compile project( ":management:server:core:network-manager:network-manager-api")
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
+    compile project( ":management:server:subutai-common")
     compile libraries.slf4j
 
     testCompile libraries.hamcrest

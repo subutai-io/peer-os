@@ -1,7 +1,7 @@
 dependencies {
-    compile project(":server:core:command-executor:command-executor-api")
-    compile project(":server:core:security-manager:security-manager-api")
-    compile project(":server:subutai-common")
+    compile project( ":management:server:core:command-executor:command-executor-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:subutai-common")
     compile libraries.guava
     compile libraries.javax_annotation
     compile libraries.slf4j

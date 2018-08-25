@@ -1,7 +1,7 @@
 dependencies {
-    compile project(":server:core:cli-controller")
-    compile project(":server:core:command-executor:command-executor-api")
-    compile project(":server:subutai-common")
+    compile project( ":management:server:core:cli-controller")
+    compile project( ":management:server:core:command-executor:command-executor-api")
+    compile project( ":management:server:subutai-common")
     compile libraries.guava
     compile libraries.karaf_shell
     compile libraries.slf4j

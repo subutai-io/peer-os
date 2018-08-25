@@ -1,5 +1,5 @@
 dependencies {
-    compile project(":server:webui")
+    compile project( ":management:server:webui")
     compile libraries.osgi_core
     compile libraries.slf4j
 

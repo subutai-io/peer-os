@@ -1,5 +1,5 @@
 dependencies {
-    compile project(":server:core:karaf-manager:karaf-manager-api")
+    compile project( ":management:server:core:karaf-manager:karaf-manager-api")
     compile libraries.javax_ws_rs
     compile libraries.slf4j
 

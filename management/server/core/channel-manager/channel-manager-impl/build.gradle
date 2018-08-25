@@ -1,10 +1,10 @@
 dependencies {
 
-    compile project( ":server:subutai-common" )
-    compile project( ":server:core:channel-manager:channel-manager-api" )
-    compile project( ":server:core:identity-manager:identity-manager-api" )
-    compile project( ":server:core:peer-manager:peer-manager-api" )
-    compile project( ":server:core:security-manager:security-manager-api" )
+    compile project( ":management:server:subutai-common" )
+    compile project( ":management:server:core:channel-manager:channel-manager-api" )
+    compile project( ":management:server:core:identity-manager:identity-manager-api" )
+    compile project( ":management:server:core:peer-manager:peer-manager-api" )
+    compile project( ":management:server:core:security-manager:security-manager-api" )
 
     compile libraries.slf4j
 

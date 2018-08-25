@@ -1,6 +1,6 @@
 dependencies {
-    compile project(":server:core:template-manager:template-manager-api")
-    compile project(":server:subutai-common")
+    compile project( ":management:server:core:template-manager:template-manager-api")
+    compile project( ":management:server:subutai-common")
     compile libraries.javax_ws_rs
     compile libraries.gson
     compile libraries.guava
