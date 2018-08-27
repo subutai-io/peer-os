@@ -1,4 +1,5 @@
-rootProject.name = "subutai.peeros"
+
+rootProject.name = "peeros"
 
 include 'management:server:core:channel-manager:channel-manager-api'
 include 'management:server:core:channel-manager:channel-manager-impl'
