@@ -16,7 +16,7 @@ git.properties
 #.jar
 *.war
 *.ear
-/server/server-karaf/nb-configuration.xml
+nb-configuration.xml
 *.uml
 /out/
 .DS_Store
