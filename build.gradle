@@ -59,21 +59,19 @@ allprojects {
     artifacts {
         archives sourcesJar
     }
-    def repositoryUrl;
-
-    if (version =~ /^[0-9]+(\.[0-9]+(\.[0-9]+)?)?$/) {                      // official releases
-        repositoryUrl = nexusUrlMavenReleases
-    } else if (version =~ /^[0-9]+(\.[0-9]+(\.[0-9]+)?)?\\-SNAPSHOT$/) {    // Maven-styled SNAPSHOTs
-        repositoryUrl = nexusUrlMavenSnapshots
-    } else {
-        repositoryUrl = nexusUrlMavenDevSnapshots                           // devSnapshots of different types
-    }
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: repositoryUrl) {
-                    authentication(userName: "$nexusUsername", password: "$nexusPassword")
-                }
+    uploadArchives.repositories.mavenDeployer {
+        if (version =~ /^[0-9]+(\.[0-9]+(\.[0-9]+)?)?$/) {                      // official releases
+            repository(url: nexusUrlMavenReleases) {
+                authentication(userName: "$nexusUsername", password: "$nexusPassword")
+            }
+        } else if (version =~ /^[0-9]+(\.[0-9]+(\.[0-9]+)?)?-SNAPSHOT$/) {    // Maven-styled SNAPSHOTs
+            snapshotRepository(url: nexusUrlMavenSnapshots) {
+                authentication(userName: "$nexusUsername", password: "$nexusPassword")
+            }
+        } else {
+            // devSnapshots of different types
+            repository(url: nexusUrlMavenDevSnapshots) {
+                authentication(userName: "$nexusUsername", password: "$nexusPassword")
             }
         }
     }
