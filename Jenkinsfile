@@ -111,16 +111,6 @@ try {
             echo "Using CDN token ${token}"  
             echo "Template version is ${artifactVersion}"
             """
-            // Exporting template
-            sh """
-            set -e
-			sudo subutai export management -r "${artifactVersion}" --local --token "${token}"
-            """
-                        
-        stage("Upload management template to IPFS node")
-        notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
-
-
             //remove existing template metadata
             String OLD_ID = sh(script: """
             var=\$(curl -s https://${cdnHost}/rest/v1/cdn/template?name=management) ; if [[ \$var != "Template not found" ]]; then echo \$var | grep -Po '"id"\\s*:\\s*"\\K([a-zA-Z0-9]+)' ; else echo \$var; fi
@@ -133,6 +123,15 @@ try {
                 curl -X DELETE "https://${cdnHost}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
             fi
             """
+            
+            // Exporting template
+            sh """
+            set -e
+			sudo subutai export management -r "${artifactVersion}" --local --token "${token}"
+            """
+                        
+        stage("Upload management template to IPFS node")
+        notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
 
             //TODO upload to CDN
 
