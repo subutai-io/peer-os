@@ -101,6 +101,7 @@ try {
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
+            sudo subutai attach management "rm -rf /opt/subutai-mng/db"
 			sudo subutai attach management "apt-get clean"
 			sudo subutai attach management "sync"
             sudo subutai attach management "sed -i "s/weekly/dayly/g" /etc/logrotate.d/rsyslog"
@@ -123,7 +124,7 @@ try {
                 curl -X DELETE "https://${cdnHost}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
             fi
             """
-            
+
             // Exporting template
             sh """
             set -e
