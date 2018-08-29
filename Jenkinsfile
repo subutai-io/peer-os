@@ -114,7 +114,7 @@ try {
             // Exporting template
             sh """
             set -e
-			sudo subutai export management -v "${artifactVersion}" --local --token "${token}"
+			sudo subutai export management -r "${artifactVersion}" --local --token "${token}"
             """
                         
         stage("Upload management template to IPFS node")
