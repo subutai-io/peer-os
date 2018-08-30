@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalCause;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.Sets;
@@ -287,10 +288,13 @@ public class HostRegistryImpl implements HostRegistry
                                         public void onRemoval(
                                                 final RemovalNotification<String, ResourceHostInfo> notification )
                                         {
-                                            for ( HostListener listener : hostListeners )
+                                            if ( notification.getCause() == RemovalCause.EXPIRED )
                                             {
-                                                threadPool.execute(
-                                                        new HostNotifier( listener, notification.getValue() ) );
+                                                for ( HostListener listener : hostListeners )
+                                                {
+                                                    threadPool.execute(
+                                                            new HostNotifier( listener, notification.getValue() ) );
+                                                }
                                             }
                                         }
                                     } ).
