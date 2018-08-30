@@ -1,0 +1,9 @@
+dependencies {
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.javax_servlet
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

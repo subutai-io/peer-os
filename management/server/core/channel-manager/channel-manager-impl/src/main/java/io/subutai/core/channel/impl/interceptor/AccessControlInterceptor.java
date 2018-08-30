@@ -69,6 +69,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                             }
                             catch ( Exception ex )
                             {
+                                // SWALLOW ?
                                 Throwable t = ExceptionUtils.getRootCause( ex );
                                 MessageContentUtil.abortChain( message, t );
                             }

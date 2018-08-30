@@ -1,0 +1,8 @@
+dependencies {
+    compile libraries.log4j
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

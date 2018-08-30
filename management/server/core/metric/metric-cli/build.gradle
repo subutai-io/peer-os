@@ -1,0 +1,10 @@
+dependencies {
+    compile project( ":management:server:core:metric:metric-api")
+    compile project( ":management:server:core:cli-controller")
+    compile project( ":management:server:subutai-common")
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

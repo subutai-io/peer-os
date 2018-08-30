@@ -1,0 +1,8 @@
+dependencies {
+    compile project( ":management:server:webui")
+    compile libraries.osgi_core
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

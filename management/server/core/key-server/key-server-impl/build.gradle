@@ -1,0 +1,10 @@
+dependencies {
+    compile project( ":management:server:core:key-server:key-server-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.bouncycastle
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

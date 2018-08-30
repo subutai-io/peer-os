@@ -9,7 +9,7 @@
 .classpath
 .settings
 .metadata
-target
+target/
 git.properties
 .gitignore
 # Package Files #
@@ -20,5 +20,6 @@ git.properties
 *.uml
 out
 .DS_Store
-
+build/
+.gradle/
 server/webui/src/main/webapp/subutai-app/subutai-app.js

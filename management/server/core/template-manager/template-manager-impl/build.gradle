@@ -1,0 +1,11 @@
+dependencies {
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:core:template-manager:template-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.http_client
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

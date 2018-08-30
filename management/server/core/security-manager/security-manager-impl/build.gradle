@@ -1,0 +1,11 @@
+dependencies {
+    compile project( ":management:server:core:key-server:key-server-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:core:security-manager:http-context-factory")
+    compile project( ":management:server:subutai-common")
+    compile libraries.bouncycastle
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

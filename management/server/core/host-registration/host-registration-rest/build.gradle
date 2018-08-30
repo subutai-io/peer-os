@@ -1,0 +1,10 @@
+dependencies {
+    compile project( ":management:server:core:host-registration:host-registration-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.javax_annotation
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

@@ -1,0 +1,7 @@
+dependencies {
+    compile libraries.javax_annotation
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

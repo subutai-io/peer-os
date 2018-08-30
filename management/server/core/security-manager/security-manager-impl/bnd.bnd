@@ -1,0 +1,10 @@
+
+Private-Package: \
+     io.subutai.core.security.impl, \
+     io.subutai.core.security.impl.crypto, \
+     io.subutai.core.security.impl.dao, \
+     io.subutai.core.security.impl.jetty, \
+     io.subutai.core.security.impl.model
+
+
+Import-Package: *

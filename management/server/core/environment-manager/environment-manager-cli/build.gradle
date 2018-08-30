@@ -1,0 +1,10 @@
+dependencies {
+    compile project( ":management:server:core:environment-manager:environment-manager-api")
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
+    compile project( ":management:server:core:cli-controller")
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

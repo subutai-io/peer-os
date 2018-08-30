@@ -1,0 +1,7 @@
+dependencies {
+    compile libraries.commons_configuration
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

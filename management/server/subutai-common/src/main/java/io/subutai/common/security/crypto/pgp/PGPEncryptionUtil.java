@@ -82,7 +82,7 @@ import org.bouncycastle.util.io.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import com.google.common.base.Preconditions;
 

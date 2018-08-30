@@ -1,0 +1,23 @@
+dependencies {
+    compile project( ":management:server:core:command-executor:command-executor-api")
+    compile project( ":management:server:core:host-registration:host-registration-api")
+    compile project( ":management:server:core:host-registry:host-registry-api")
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:core:metric:metric-api")
+    compile project( ":management:server:core:messenger:messenger-api")
+    compile project( ":management:server:core:network-manager:network-manager-api")
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:subutai-common")
+
+    // This slf4j is placed earlier, due to multiple versions being on compile classpath. Must resolve later.
+    compile libraries.slf4j
+    compile libraries.javax_annotation
+    compile libraries.karaf_client
+    compile libraries.open_jpa
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+    testCompile libraries.slf4j_testlogger
+}

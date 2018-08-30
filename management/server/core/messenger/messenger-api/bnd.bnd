@@ -1,0 +1,6 @@
+
+Export-Package: \
+     io.subutai.core.messenger.api
+
+
+Import-Package: *

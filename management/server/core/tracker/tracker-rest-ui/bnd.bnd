@@ -1,0 +1,6 @@
+
+Private-Package: \
+     io.subutai.core.tracker.rest.ui
+
+
+Import-Package: *

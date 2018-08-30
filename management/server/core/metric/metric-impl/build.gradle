@@ -1,0 +1,12 @@
+dependencies {
+    compile project( ":management:server:core:host-registry:host-registry-api")
+    compile project( ":management:server:core:metric:metric-api")
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.slf4j
+
+    testCompile project( ":management:server:core:identity-manager:identity-manager-api")
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

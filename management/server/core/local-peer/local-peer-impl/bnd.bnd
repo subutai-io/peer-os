@@ -1,0 +1,13 @@
+
+Private-Package: \
+     io.subutai.core.localpeer.impl, \
+     io.subutai.core.localpeer.impl.binding, \
+     io.subutai.core.localpeer.impl.command, \
+     io.subutai.core.localpeer.impl.container, \
+     io.subutai.core.localpeer.impl.dao, \
+     io.subutai.core.localpeer.impl.entity, \
+     io.subutai.core.localpeer.impl.request, \
+     io.subutai.core.localpeer.impl.tasks
+
+
+Import-Package: *

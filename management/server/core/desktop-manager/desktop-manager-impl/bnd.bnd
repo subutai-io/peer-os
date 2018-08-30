@@ -1,0 +1,6 @@
+
+Private-Package: \
+     io.subutai.core.desktop.impl
+
+
+Import-Package: *

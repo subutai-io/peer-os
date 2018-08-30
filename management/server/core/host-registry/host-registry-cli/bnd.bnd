@@ -1,0 +1,6 @@
+
+Export-Package: \
+     io.subutai.core.hostregistry.cli
+
+
+Import-Package: *

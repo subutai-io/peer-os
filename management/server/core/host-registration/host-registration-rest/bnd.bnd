@@ -1,0 +1,7 @@
+
+Private-Package: \
+     io.subutai.core.registration.rest, \
+     io.subutai.core.registration.rest.transitional
+
+
+Import-Package: *

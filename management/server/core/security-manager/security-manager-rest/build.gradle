@@ -1,0 +1,12 @@
+dependencies {
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.bouncycastle
+    compile libraries.guava
+    compile libraries.javax_ws_rs
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

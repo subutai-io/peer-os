@@ -1,0 +1,7 @@
+
+Private-Package: \
+     io.subutai.core.identity.rest, \
+     io.subutai.core.identity.rest.model
+
+
+Import-Package: *

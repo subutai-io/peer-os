@@ -1,0 +1,14 @@
+dependencies {
+
+    compile project( ":management:server:subutai-common" )
+    compile project( ":management:server:core:channel-manager:channel-manager-api" )
+    compile project( ":management:server:core:identity-manager:identity-manager-api" )
+    compile project( ":management:server:core:peer-manager:peer-manager-api" )
+    compile project( ":management:server:core:security-manager:security-manager-api" )
+
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

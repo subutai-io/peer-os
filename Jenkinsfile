@@ -101,6 +101,7 @@ try {
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
+            sudo subutai attach management "rm -rf /opt/subutai-mng/db"
 			sudo subutai attach management "apt-get clean"
 			sudo subutai attach management "sync"
             sudo subutai attach management "sed -i "s/weekly/dayly/g" /etc/logrotate.d/rsyslog"
@@ -111,16 +112,6 @@ try {
             echo "Using CDN token ${token}"  
             echo "Template version is ${artifactVersion}"
             """
-            // Exporting template
-            sh """
-            set -e
-			sudo subutai export management -v "${artifactVersion}" --local --token "${token}"
-            """
-                        
-        stage("Upload management template to IPFS node")
-        notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
-
-
             //remove existing template metadata
             String OLD_ID = sh(script: """
             var=\$(curl -s https://${cdnHost}/rest/v1/cdn/template?name=management) ; if [[ \$var != "Template not found" ]]; then echo \$var | grep -Po '"id"\\s*:\\s*"\\K([a-zA-Z0-9]+)' ; else echo \$var; fi
@@ -133,6 +124,15 @@ try {
                 curl -X DELETE "https://${cdnHost}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
             fi
             """
+
+            // Exporting template
+            sh """
+            set -e
+			sudo subutai export management -r "${artifactVersion}" --local --token "${token}"
+            """
+                        
+        stage("Upload management template to IPFS node")
+        notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
 
             //TODO upload to CDN
 

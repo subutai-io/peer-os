@@ -1,13 +1,24 @@
-target
-*.swp
-*.iml
-*.log
+*.class
+
+# IDE and Maven files and directories #
 .idea
-*.idea
-*.classes
-*.o
-*.mk
-*.a
-*.deb
-*~
+*.iml
+*.ipr
+*.MF
+.project
+.classpath
+.settings
+.metadata
+target/
+git.properties
+
+# Package Files #
+#.jar
+*.war
+*.ear
+nb-configuration.xml
+*.uml
+/out/
 .DS_Store
+/build/
+.gradle/

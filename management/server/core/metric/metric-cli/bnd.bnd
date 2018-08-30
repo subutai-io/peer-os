@@ -1,0 +1,6 @@
+
+Private-Package: \
+     io.subutai.core.metric.cli
+
+
+Import-Package: *
