@@ -128,4 +128,5 @@ public interface HostRegistry
 
     void removeResourceHost( String id );
 
+    boolean pingHost( String hostIp );
 }

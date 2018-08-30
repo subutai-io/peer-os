@@ -339,7 +339,7 @@ public class HostRegistryImplTest
     public void testUpdateHost() throws Exception
     {
         WebClient webClient = mock( WebClient.class );
-        doReturn( webClient ).when( registry ).getWebClient( any( ResourceHostInfo.class ), anyString() );
+        doReturn( webClient ).when( registry ).getWebClient( anyString(), anyString() );
         Response response = mock( Response.class );
         doReturn( response ).when( webClient ).get();
         doReturn( Response.Status.OK.getStatusCode() ).when( response ).getStatus();

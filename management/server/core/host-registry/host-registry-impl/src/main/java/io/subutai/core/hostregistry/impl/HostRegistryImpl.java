@@ -427,7 +427,7 @@ public class HostRegistryImpl implements HostRegistry
 
         try
         {
-            webClient = getWebClient( resourceHostInfo, "ping" );
+            webClient = getWebClient( resourceHostInfo.getAddress(), "ping" );
 
             response = webClient.get();
 
@@ -468,7 +468,7 @@ public class HostRegistryImpl implements HostRegistry
 
         try
         {
-            webClient = getWebClient( resourceHostInfo, "heartbeat" );
+            webClient = getWebClient( resourceHostInfo.getAddress(), "heartbeat" );
             response = webClient.get();
         }
         catch ( Exception e )
@@ -482,11 +482,41 @@ public class HostRegistryImpl implements HostRegistry
     }
 
 
-    WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action )
+    WebClient getWebClient( String hostIp, String action )
     {
-        return RestUtil.createWebClient(
-                String.format( "http://%s:%d/%s", resourceHostInfo.getAddress(), Common.DEFAULT_AGENT_PORT, action ),
-                3000, 5000, 1 );
+        return RestUtil
+                .createWebClient( String.format( "http://%s:%d/%s", hostIp, Common.DEFAULT_AGENT_PORT, action ), 3000,
+                        5000, 1 );
+    }
+
+
+    @Override
+    public boolean pingHost( String hostIp )
+    {
+        WebClient webClient = null;
+        Response response = null;
+
+        try
+        {
+            webClient = getWebClient( hostIp, "ping" );
+
+            response = webClient.get();
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                return true;
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error pinging host at ip {}: {}", hostIp, e.getMessage() );
+        }
+        finally
+        {
+            RestUtil.close( response, webClient );
+        }
+
+        return false;
     }
 
 

@@ -13,7 +13,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -28,10 +27,10 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -88,7 +87,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
 
         tracker.init();
 
-        verify( entityManager ).close();
+        verify( entityManager, atLeastOnce() ).close();
     }
 
 
@@ -124,14 +123,14 @@ public class TrackerImplTest extends SystemOutRedirectTest
     {
         tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
 
-        verify( dataService ).getRecentUserOperations( eq( SOURCE ), isA( Date.class ), isA( Date.class ), anyInt(), anyInt() );
+        verify( dataService )
+                .getRecentUserOperations( eq( SOURCE ), isA( Date.class ), isA( Date.class ), anyInt(), anyInt() );
 
         doReturn( true ).when( identityManager ).isAdmin();
 
         tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
 
         verify( dataService ).getTrackerOperations( eq( SOURCE ), isA( Date.class ), isA( Date.class ), anyInt() );
-
     }
 
 
