@@ -225,4 +225,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @return - true if update was available, false otherwise
      */
     boolean update();
+
+    boolean ping();
 }

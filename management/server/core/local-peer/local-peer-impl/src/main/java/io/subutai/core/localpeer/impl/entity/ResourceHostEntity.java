@@ -982,8 +982,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             updateTemplateUploadProgress( templateName, 0 );
 
             commandUtil.execute( resourceHostCommands
-                            .getExportTemplateCommand( containerName, templateName, version, isPrivateTemplate, token
-                                                     ), this,
+                            .getExportTemplateCommand( containerName, templateName, version, isPrivateTemplate,
+                                    token ), this,
                     new TemplateUploadTracker( this, templateName ) );
         }
         catch ( CommandException e )
@@ -1138,12 +1138,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
+            Preconditions.checkState( isConnected(), "Host is not connected" );
+
             CommandResult result = commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this );
             //workaround for agent returning version in stderr
             rhVersion = result.getStdOut() + result.getStdErr();
             return rhVersion;
         }
-        catch ( CommandException e )
+        catch ( Exception e )
         {
             LOG.error( "Error obtaining RH version: {}", e.getMessage() );
 
@@ -1164,10 +1166,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
+            Preconditions.checkState( isConnected(), "Host is not connected" );
+
             p2pVersion = getNetworkManager().getP2pVersion( this );
             return p2pVersion;
         }
-        catch ( NetworkManagerException e )
+        catch ( Exception e )
         {
             LOG.error( "Error obtaining P2P version: {}", e.getMessage() );
 
@@ -1203,10 +1207,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
+            Preconditions.checkState( isConnected(), "Host is not connected" );
+
             osName = commandUtil.execute( resourceHostCommands.getGetRhOsNameCommand(), this ).getStdOut();
             return osName;
         }
-        catch ( CommandException e )
+        catch ( Exception e )
         {
             LOG.error( "Error obtaining RH OS name: {}", e.getMessage() );
 
@@ -1535,7 +1541,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            return getNetworkManager().isPortMappingReserved( this, protocol, externalPort, ipAddress, internalPort, domain );
+            return getNetworkManager()
+                    .isPortMappingReserved( this, protocol, externalPort, ipAddress, internalPort, domain );
         }
         catch ( NetworkManagerException e )
         {
@@ -1665,5 +1672,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         return false;
+    }
+
+
+    @Override
+    public boolean ping()
+    {
+        return getHostRegistry().pingHost( getAddress() );
     }
 }
