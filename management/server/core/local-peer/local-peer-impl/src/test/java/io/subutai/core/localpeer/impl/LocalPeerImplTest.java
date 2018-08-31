@@ -465,6 +465,8 @@ public class LocalPeerImplTest
     @Test
     public void testIsConnected() throws Exception
     {
+        doReturn( resourceHostInfo ).when( hostRegistry ).getResourceHostByContainerHost( containerHostInfo );
+        doReturn( true ).when( hostRegistry ).pingHost( anyString() );
         assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );

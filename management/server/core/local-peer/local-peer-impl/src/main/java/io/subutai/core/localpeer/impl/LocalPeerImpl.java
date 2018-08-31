@@ -1520,8 +1520,18 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
             if ( hostInfo.getId().equals( hostId.getId() ) )
             {
-                return hostInfo instanceof ResourceHostInfo || ContainerHostState.RUNNING
-                        .equals( ( ( ContainerHostInfo ) hostInfo ).getState() );
+                if ( hostInfo instanceof ResourceHostInfo )
+                {
+                    return hostRegistry.pingHost( ( ( ResourceHostInfo ) hostInfo ).getAddress() );
+                }
+                else
+                {
+                    ResourceHostInfo resourceHostInfo =
+                            hostRegistry.getResourceHostByContainerHost( ( ContainerHostInfo ) hostInfo );
+
+                    return hostRegistry.pingHost( resourceHostInfo.getAddress() ) && ContainerHostState.RUNNING
+                            .equals( ( ( ContainerHostInfo ) hostInfo ).getState() );
+                }
             }
         }
         catch ( HostDisconnectedException ignore )

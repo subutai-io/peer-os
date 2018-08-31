@@ -28,7 +28,3 @@ if [ -d /run/systemd/system ]; then
     systemctl --system daemon-reload >/dev/null || true
     deb-systemd-invoke start management.service >/dev/null || true
 fi
-
-echo "deb http://deb.subutai.io/subutai prod main" > /etc/apt/sources.list.d/subutai-repo.list
-
-apt-key adv --recv-keys --keyserver pool.sks-keyservers.net C6B2AC7FBEB649F1
