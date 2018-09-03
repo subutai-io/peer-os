@@ -2,6 +2,7 @@ package io.subutai.core.object.relation.impl;
 
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +70,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             byte[] extractedText = encryptionTool.extractClearSignContent( signedMessage.getBytes() );
             byte[] decrypted = encryptionTool.decrypt( extractedText, secretKeyRing, "" );
 
-            String decryptedMessage = new String( decrypted, "UTF-8" );
+            String decryptedMessage = new String( decrypted, StandardCharsets.UTF_8 );
             RelationChallengeImpl relationChallengeImpl = JsonUtil.fromJson( decryptedMessage, RelationChallengeImpl
                     .class );
 
@@ -111,10 +112,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             throw new RelationVerificationException( "Relation verification failed (possible cause of error: clear "
                     + "sign document extraction failed, " + "failed to decrypt message or failed to verify message)"
                     + ".", ex );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            throw new RelationVerificationException( e );
         }
     }
 

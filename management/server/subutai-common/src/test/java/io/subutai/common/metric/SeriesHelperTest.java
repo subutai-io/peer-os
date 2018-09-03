@@ -2,6 +2,7 @@ package io.subutai.common.metric;
 
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +30,11 @@ public class SeriesHelperTest
 
         final String rhJson = IOUtils.toString(
                 SeriesHelperTest.class.getClassLoader().getResourceAsStream( "metrics/resource_host_metrics.json" ),
-                "UTF-8" );
+                StandardCharsets.UTF_8 );
         rhMetrics = objectMapper.readValue( rhJson, HistoricalMetrics.class );
         final String chJson = IOUtils.toString(
                 SeriesHelperTest.class.getClassLoader().getResourceAsStream( "metrics/container_host_metrics.json" ),
-                "UTF-8" );
+                StandardCharsets.UTF_8 );
         chMetrics = objectMapper.readValue( chJson, HistoricalMetrics.class );
     }
 

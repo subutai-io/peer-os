@@ -1784,7 +1784,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( "Error exchanging keys with MH" );
+                    LOG.error( "Error exchanging keys with MH", e );
                 }
 
                 //setup security
