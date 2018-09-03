@@ -2,6 +2,7 @@ package io.subutai.core.object.relation.impl;
 
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -160,9 +161,9 @@ public class RelationManagerImpl implements RelationManager
         {
             KeyManager keyManager = securityManager.getKeyManager();
             byte[] encBytes = PGPEncryptionUtil.encrypt( content.getBytes(), keyManager.getPublicKey( null ), true );
-            return "\n" + new String( encBytes, "UTF-8" );
+            return "\n" + new String( encBytes, StandardCharsets.UTF_8 );
         }
-        catch ( UnsupportedEncodingException | PGPException e )
+        catch ( PGPException e )
         {
             logger.error( "Error encrypting message for relation challenge", e );
             throw new RelationVerificationException( "Error encrypting message for relation challenge", e );
