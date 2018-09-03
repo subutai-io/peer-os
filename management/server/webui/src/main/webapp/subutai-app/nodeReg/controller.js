@@ -110,34 +110,53 @@ function NodeRegCtrl($scope, nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnD
 	function remove(nodeId, status) {
 		if(nodeId === undefined) return;
 
-		LOADING_SCREEN();
-        if(status == 'REJECTED'){
-            nodeRegSrv.unblockReq( nodeId ).success(function (data) {
-                SweetAlert.swal(
-                    "Success!",
-                    "Host has been unblocked",
-                    "success"
-                );
-                LOADING_SCREEN('none');
-                getNodes();
-            }).error(function(error){
-                LOADING_SCREEN('none');
-                SweetAlert.swal("ERROR!", error.ERROR, "error");
-            });
-		} else {
-             nodeRegSrv.removeReq( nodeId ).success(function (data) {
-                 SweetAlert.swal(
-                     "Success!",
-                     "Host has been removed",
-                     "success"
-                 );
-                 LOADING_SCREEN('none');
-                 getNodes();
-             }).error(function(error){
-                 LOADING_SCREEN('none');
-                 SweetAlert.swal("ERROR!", error.ERROR, "error");
-             });
-        }
+		var previousWindowKeyDown = window.onkeydown;
+		SweetAlert.swal({
+			title: "Are you sure?",
+			text: "Do you want to remove this resource host?",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Remove",
+			cancelButtonText: "Cancel",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
+
+            if(isConfirm){
+		        LOADING_SCREEN();
+                if(status == 'REJECTED'){
+                    nodeRegSrv.unblockReq( nodeId ).success(function (data) {
+                        SweetAlert.swal(
+                            "Success!",
+                            "Host has been unblocked",
+                            "success"
+                        );
+                        LOADING_SCREEN('none');
+                        getNodes();
+                    }).error(function(error){
+                        LOADING_SCREEN('none');
+                        SweetAlert.swal("ERROR!", error.ERROR, "error");
+                    });
+                } else {
+                     nodeRegSrv.removeReq( nodeId ).success(function (data) {
+                         SweetAlert.swal(
+                             "Success!",
+                             "Host has been removed",
+                             "success"
+                         );
+                         LOADING_SCREEN('none');
+                         getNodes();
+                     }).error(function(error){
+                         LOADING_SCREEN('none');
+                         SweetAlert.swal("ERROR!", error.ERROR, "error");
+                     });
+                }
+            }
+		});
 	}
 
     function changeNamePopup( rh ) {
