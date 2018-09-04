@@ -68,6 +68,21 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 	monitoringSrv.getEnvironments().success(function (data) {
 		vm.environments = data;
 
+		//todo remove remote container in BZR environments
+		for (var i = 0; i < data.length; i++){
+		    var env = data[i];
+
+		    for (var j = 0; j < env.containers.length; j++){
+		        var cont = env.containers[j];
+
+		        if (cont.local == "true"){
+		          console.log("LOCAL CONT")
+		        }else{
+		            console.log("REMOTE CONT")
+		        }
+		    }
+		}
+
 		monitoringSrv.isAdminCheck().success(function (data) {
 			if(data == true || data == 'true') {
 				monitoringSrv.getResourceHosts().success(function (data) {
