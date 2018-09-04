@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessControlException;
 
 import javax.security.auth.login.LoginException;
@@ -16,7 +17,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -66,7 +67,7 @@ public class MessageContentUtil
         try
         {
             response.setStatus( errorStatus );
-            response.getOutputStream().write( errorMessage.getBytes( Charset.forName( "UTF-8" ) ) );
+            response.getOutputStream().write( errorMessage.getBytes(  StandardCharsets.UTF_8 ) );
             response.getOutputStream().flush();
 
             LOG.error( "****** Error !!! Error in AccessInterceptor:" + " "+ errorMessage
@@ -88,6 +89,11 @@ public class MessageContentUtil
     {
 
         InputStream is = message.getContent( InputStream.class );
+        if( is == null )
+        {
+            LOG.error( "Error decrypting content: No content: " + message.getExchange() );
+            return;
+        }
 
         CachedOutputStream os = new CachedOutputStream();
 

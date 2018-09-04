@@ -1,0 +1,18 @@
+dependencies {
+    compile project( ":management:server:core:host-registry:host-registry-api")
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:core:messenger:messenger-api")
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.javax_annotation
+    compile libraries.open_jpa
+    compile libraries.slf4j
+
+    testCompile project( ":management:server:core:command-executor:command-executor-api")
+    testCompile project( ":management:server:core:metric:metric-api")
+    testCompile project( ":management:server:core:local-peer:local-peer-impl")
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

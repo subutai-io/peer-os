@@ -1,0 +1,6 @@
+
+Export-Package: \
+     io.subutai.core.tracker.rest
+
+
+Import-Package: *

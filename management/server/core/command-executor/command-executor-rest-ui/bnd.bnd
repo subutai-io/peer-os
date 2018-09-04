@@ -1,0 +1,6 @@
+
+Private-Package: \
+     io.subutai.core.executor.rest.ui
+
+
+Import-Package: *

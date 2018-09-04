@@ -58,7 +58,7 @@ public class CommandBatch
 
         if ( type == Type.JSON )
         {
-            return String.format( "subutai batch -json '%s'", asJson() );
+            return String.format( "subutai batch '%s'", asJson() );
         }
         else
         {

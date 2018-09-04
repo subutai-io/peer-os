@@ -1,0 +1,8 @@
+
+Private-Package: \
+     io.subutai.core.object.relation.impl, \
+     io.subutai.core.object.relation.impl.dao, \
+     io.subutai.core.object.relation.impl.model
+
+
+Import-Package: *

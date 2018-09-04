@@ -1,6 +1,7 @@
 package io.subutai.core.registration.rest;
 
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -55,7 +56,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
             byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
-            String decryptedMessage = new String( decrypted, "UTF-8" );
+            String decryptedMessage = new String( decrypted, StandardCharsets.UTF_8 );
             RequestedHost requestedHost = JsonUtil.fromJson( decryptedMessage, RequestedHostJson.class );
 
             registrationManager.queueRequest( requestedHost );
@@ -177,7 +178,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
             byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
-            String decryptedMessage = new String( decrypted, "UTF-8" );
+            String decryptedMessage = new String( decrypted, StandardCharsets.UTF_8 );
             String lineSeparator = System.getProperty( "line.separator" );
 
             String token = decryptedMessage.substring( 0, decryptedMessage.indexOf( lineSeparator ) );
@@ -236,11 +237,16 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
                 {
                     ResourceHost resourceHost = localPeer.getResourceHostById( requestedHost.getId() );
 
-                    requestedHostJson.setConnected( resourceHost.isConnected() );
+                    boolean connected = resourceHost.isConnected();
+
+                    requestedHostJson.setConnected( connected );
 
                     requestedHostJson.setIp( resourceHost.getAddress() );
 
-                    requestedHostJson.setVersion( resourceHost.getRhVersion() );
+                    if ( resourceHost.ping() )
+                    {
+                        requestedHostJson.setVersion( resourceHost.getRhVersion() );
+                    }
                 }
                 catch ( HostNotFoundException | ResourceHostException e )
                 {

@@ -1,0 +1,13 @@
+dependencies {
+    compile project( ":management:server:core:cli-controller")
+    compile project( ":management:server:core:host-registry:host-registry-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.karaf_shell
+    compile libraries.guava
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+    testCompile libraries.slf4j_testlogger
+}

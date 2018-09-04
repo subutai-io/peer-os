@@ -2,7 +2,7 @@ package io.subutai.core.identity.impl;
 
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
 import java.security.AccessController;
@@ -37,7 +37,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.cxf.message.Message;
 
 import com.google.common.base.Preconditions;
@@ -360,7 +360,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
-    public String issueJWTToken(String origin ) throws TokenCreateException
+    public String issueJWTToken( String origin ) throws TokenCreateException
 
     {
         final String secret = UUID.randomUUID().toString();
@@ -435,8 +435,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Authenticates user and returns Session
+     * *********************************************************************************** Authenticates user and
+     * returns Session
      *
      * @param login Login name  or "token" keyword
      * @param password Password or JWT
@@ -481,8 +481,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Create JSON Web Token and save in DB
+     * *********************************************************************************** Create JSON Web Token and
+     * save in DB
      *
      * @param user input String
      *
@@ -545,8 +545,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Checks username and password (authenticates), on success returns full token
+     * *********************************************************************************** Checks username and password
+     * (authenticates), on success returns full token
      *
      * @param userName Login name
      * @param password Password
@@ -618,8 +618,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Update (renew) Authorization ID of the User (Which is used by RSA keys to authenticate)
+     * *********************************************************************************** Update (renew) Authorization
+     * ID of the User (Which is used by RSA keys to authenticate)
      *
      * @param user User
      * @param authId Authorization ID
@@ -660,8 +660,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Encrypt with user's PGP private key and return encrypted Authorization id
+     * *********************************************************************************** Encrypt with user's PGP
+     * private key and return encrypted Authorization id
      *
      * @param user User
      *
@@ -704,8 +704,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Authenticate user by Authorization id
+     * *********************************************************************************** Authenticate user by
+     * Authorization id
      *
      * @param fingerprint fingerprint of the key
      * @param signedAuth Signed Authorization id (signedMessage)
@@ -755,8 +755,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Authenticate user by JWT
+     * *********************************************************************************** Authenticate user by JWT
      *
      * @param token Token to be checked
      *
@@ -782,8 +781,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Authenticate user with Username and password
+     * *********************************************************************************** Authenticate user with
+     * Username and password
      *
      * @param userName Username
      * @param password Password
@@ -835,8 +834,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Sets the Owner of the Peer
+     * *********************************************************************************** Sets the Owner of the Peer
      *
      * @param user User that will be set as an owner
      */
@@ -849,8 +847,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * ***********************************************************************************
-     * Sets the Owner of the Peer
+     * *********************************************************************************** Sets the Owner of the Peer
      *
      * @return Id of the PeerOwner
      */
@@ -1323,15 +1320,15 @@ public class IdentityManagerImpl implements IdentityManager
             PGPPublicKey publicKey = keyManager.getPublicKey( delegatedUser.getId() );
             byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
 
-            String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
+            String encryptedMessage = "\n" + new String( relationEncrypted, StandardCharsets.UTF_8 );
             delegatedUser.setRelationDocument( encryptedMessage );
             identityDataService.updateUserDelegate( delegatedUser );
             LOGGER.debug( encryptedMessage );
             LOGGER.debug( delegatedUser.getId() );
         }
-        catch ( UnsupportedEncodingException e )
+        catch ( Exception e )
         {
-            LOGGER.error( "Error decoding byte array", e );
+            LOGGER.error( "Error in #createIdentityDelegationDocument", e );
         }
     }
 
@@ -1686,7 +1683,7 @@ public class IdentityManagerImpl implements IdentityManager
         //******Cannot remove Internal User *************
         User user = identityDataService.getUser( userId );
 
-        if (user == null)
+        if ( user == null )
         {
             return;
         }

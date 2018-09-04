@@ -4,12 +4,18 @@ package io.subutai.core.metric.rest.ui;
 import java.security.AccessControlException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.environment.ContainerDto;
+import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.EnvironmentDto;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
@@ -22,6 +28,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.pojo.P2PInfo;
+import io.subutai.core.peer.api.PeerManager;
 
 
 public class RestServiceImpl implements RestService
@@ -31,20 +38,24 @@ public class RestServiceImpl implements RestService
     private EnvironmentManager environmentManager;
     private LocalPeer localPeer;
     private IdentityManager identityManager;
+    private PeerManager peerManager;
 
 
     public RestServiceImpl( final Monitor monitor, final EnvironmentManager environmentManager,
-                            final LocalPeer localPeer, final IdentityManager identityManager )
+                            final LocalPeer localPeer, final IdentityManager identityManager,
+                            final PeerManager peerManager )
     {
         Preconditions.checkNotNull( monitor );
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( localPeer );
         Preconditions.checkNotNull( identityManager );
+        Preconditions.checkNotNull( peerManager );
 
         this.monitor = monitor;
         this.environmentManager = environmentManager;
         this.localPeer = localPeer;
         this.identityManager = identityManager;
+        this.peerManager = peerManager;
     }
 
 
@@ -62,7 +73,36 @@ public class RestServiceImpl implements RestService
             Host host;
             if ( environmentId != null && hostId != null )
             {
-                host = environmentManager.loadEnvironment( environmentId ).getContainerHostById( hostId );
+                try
+                {
+                    host = environmentManager.loadEnvironment( environmentId ).getContainerHostById( hostId );
+                }
+                catch ( EnvironmentNotFoundException e )
+                {
+                    Optional<EnvironmentDto> envDto = environmentManager.getTenantEnvironments().stream().filter(
+                            env -> environmentId.equalsIgnoreCase( env.getId() ) ).findFirst();
+
+                    if ( envDto.isPresent() && !Common.HUB_ID.equalsIgnoreCase( envDto.get().getDataSource() ) )
+                    {
+                        Optional<ContainerDto> containerDto = envDto.get().getContainers().stream().filter(
+                                cont -> hostId.equalsIgnoreCase( cont.getId() ) ).findFirst();
+                        if ( containerDto.isPresent() )
+                        {
+                            return Response.ok( peerManager.getPeer( containerDto.get().getPeerId() )
+                                                           .getHistoricalMetrics(
+                                                                   new ContainerId( containerDto.get().getHostId() ),
+                                                                   start, current ) ).build();
+                        }
+                        else
+                        {
+                            throw new ContainerHostNotFoundException( "Container " + hostId + " not found" );
+                        }
+                    }
+                    else
+                    {
+                        throw e;
+                    }
+                }
             }
             else if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( hostId ) )
             {
@@ -117,17 +157,6 @@ public class RestServiceImpl implements RestService
     {
         return getMetrics( null, null, interval );
     }
-
-    //
-    //    @RolesAllowed( "System-Management|Read" )
-    //    @Override
-    //    public Response getP2PStatuses()
-    //    {
-    //        P2PInfoPojo pojo = new P2PInfoPojo();
-    //        pojo.setP2pList( monitor.getP2PStatuses() );
-    //        String info = JsonUtil.GSON.toJson( pojo );
-    //        return Response.status( Response.Status.OK ).entity( info ).build();
-    //    }
 
 
     @Override

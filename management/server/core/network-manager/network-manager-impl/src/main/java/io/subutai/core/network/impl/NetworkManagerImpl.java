@@ -282,7 +282,7 @@ public class NetworkManagerImpl implements NetworkManager
         try
         {
             CommandResult result = getManagementHost().execute( commands.getGetVlanDomainCommand( vLanId ) );
-            if ( result.hasSucceeded() )
+            if ( result.hasSucceeded() && !result.getStdOut().toLowerCase().contains( "no domain" ) )
             {
                 return result.getStdOut();
             }
@@ -334,7 +334,7 @@ public class NetworkManagerImpl implements NetworkManager
         {
             CommandResult result =
                     getManagementHost().execute( commands.getCheckIpInVlanDomainCommand( hostIp, vLanId ) );
-            if ( result.hasSucceeded() )
+            if ( result.hasSucceeded() && result.getStdOut().toLowerCase().contains( "is in domain" ) )
             {
                 return true;
             }
@@ -532,7 +532,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         Preconditions.checkNotNull( host );
 
-        CommandResult result = execute( host, commands.getListOfReservedPortMappingCommand() );
+        CommandResult result = execute( host, commands.getListPortMappingsCommand( null ) );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 

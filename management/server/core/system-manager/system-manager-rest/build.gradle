@@ -1,0 +1,10 @@
+dependencies {
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
+    compile project( ":management:server:core:system-manager:system-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.javax_ws_rs
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

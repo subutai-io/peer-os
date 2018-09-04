@@ -1,0 +1,6 @@
+
+Export-Package: \
+     io.subutai.core.peer.api
+
+
+Import-Package: *

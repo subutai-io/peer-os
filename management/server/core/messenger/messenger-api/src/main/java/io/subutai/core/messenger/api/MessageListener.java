@@ -1,7 +1,7 @@
 package io.subutai.core.messenger.api;
 
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

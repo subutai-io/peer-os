@@ -1,0 +1,7 @@
+
+Export-Package: \
+     io.subutai.core.hubmanager.rest, \
+     io.subutai.core.hubmanager.rest.pojo
+
+
+Import-Package: *

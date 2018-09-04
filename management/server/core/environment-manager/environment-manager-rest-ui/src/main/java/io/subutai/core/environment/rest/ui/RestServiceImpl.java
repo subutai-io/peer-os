@@ -1193,13 +1193,6 @@ public class RestServiceImpl implements RestService
     {
         Set<EnvironmentDto> tenantEnvs = environmentManager.getTenantEnvironments();
 
-        //remove remote containers
-        for ( EnvironmentDto environmentDto : tenantEnvs )
-        {
-            Set<ContainerDto> containerDtos = environmentDto.getContainers();
-            containerDtos.removeIf( containerDto -> !containerDto.isLocal() );
-        }
-
         return Response.ok( JsonUtil.toJson( removeXss( tenantEnvs ) ) ).build();
     }
 

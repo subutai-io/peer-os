@@ -1,0 +1,6 @@
+
+Private-Package: \
+     io.subutai.core.localpeer.rest
+
+
+Import-Package: *

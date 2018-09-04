@@ -1,0 +1,10 @@
+dependencies {
+    compile project( ":management:server:core:environment-manager:environment-manager-api")
+    compile project( ":management:server:core:template-manager:template-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.javax_ws_rs
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

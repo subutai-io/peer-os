@@ -1,0 +1,16 @@
+dependencies {
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:subutai-common")
+
+    compile libraries.joda_time
+
+    compile libraries.commons_lang3
+    compile libraries.karaf_client
+    compile libraries.open_jpa
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

@@ -60,6 +60,7 @@ public class HostRegistryImplTest
     private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_HOSTNAME = "container";
     private static final String DUMMY_HOSTNAME = "dummy";
+    private static final String HOST_IP = "127.0.0.1";
 
     @Mock
     Set<HostListener> hostListeners;
@@ -92,6 +93,11 @@ public class HostRegistryImplTest
     @Mock
     IPUtil ipUtil;
 
+    @Mock
+    WebClient webClient;
+    @Mock
+    Response response;
+
     HostRegistryImpl registry;
     Set<QuotaAlertValue> alerts;
 
@@ -112,11 +118,14 @@ public class HostRegistryImplTest
         when( resourceHostInfo.getHostname() ).thenReturn( HOST_HOSTNAME );
         when( containerHostInfo.getId() ).thenReturn( CONTAINER_ID );
         when( containerHostInfo.getHostname() ).thenReturn( CONTAINER_HOSTNAME );
+        when( containerHostInfo.getContainerName() ).thenReturn( CONTAINER_HOSTNAME );
         Iterator<HostListener> hostListenerIterator = mock( Iterator.class );
         when( hostListeners.iterator() ).thenReturn( hostListenerIterator );
         when( hostListenerIterator.hasNext() ).thenReturn( true ).thenReturn( false );
         when( hostListenerIterator.next() ).thenReturn( hostListener );
         alerts = Sets.newHashSet( quotaAlertValue );
+        doReturn( webClient ).when( registry ).getWebClient( anyString(), anyString() );
+        doReturn( response ).when( webClient ).get();
     }
 
 
@@ -339,7 +348,7 @@ public class HostRegistryImplTest
     public void testUpdateHost() throws Exception
     {
         WebClient webClient = mock( WebClient.class );
-        doReturn( webClient ).when( registry ).getWebClient( any( ResourceHostInfo.class ), anyString() );
+        doReturn( webClient ).when( registry ).getWebClient( anyString(), anyString() );
         Response response = mock( Response.class );
         doReturn( response ).when( webClient ).get();
         doReturn( Response.Status.OK.getStatusCode() ).when( response ).getStatus();
@@ -360,5 +369,37 @@ public class HostRegistryImplTest
         registry.updateHost( resourceHost );
 
         verify( registry ).requestHeartbeat( resourceHost );
+    }
+
+
+    @Test
+    public void testPingHost()
+    {
+        registry.pingHost( HOST_IP );
+
+        verify( webClient ).get();
+
+        doReturn( Response.Status.OK.getStatusCode() ).when( response ).getStatus();
+
+        assertTrue( registry.pingHost( HOST_IP ) );
+
+        doReturn( Response.Status.SERVICE_UNAVAILABLE.getStatusCode() ).when( response ).getStatus();
+
+        assertFalse( registry.pingHost( HOST_IP ) );
+
+        doThrow( new RuntimeException() ).when( webClient ).get();
+
+        assertFalse( registry.pingHost( HOST_IP ) );
+    }
+
+
+    @Test(expected = HostDisconnectedException.class)
+    public void testGetContainerHostInfoByContainerName() throws Exception
+    {
+        assertNotNull( registry.getContainerHostInfoByContainerName( CONTAINER_HOSTNAME ) );
+
+        doReturn( "" ).when( containerHostInfo ).getContainerName();
+
+        registry.getContainerHostInfoByContainerName( CONTAINER_HOSTNAME );
     }
 }

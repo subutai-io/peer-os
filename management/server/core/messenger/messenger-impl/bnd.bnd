@@ -1,0 +1,8 @@
+
+Private-Package: \
+     io.subutai.core.messenger.impl, \
+     io.subutai.core.messenger.impl.dao, \
+     io.subutai.core.messenger.impl.entity
+
+
+Import-Package: *

@@ -62,7 +62,12 @@
       <div class="clear"></div>
     </div>
 
-  <label style="line-height: 29px; margin-left:3px; font-size:14px;">P2P running: {{ monitoringCtrl.p2pRunning }}</label>
+    <label
+        ng-show="monitoringCtrl.currentType == 'peer'"
+        style="line-height: 29px; margin-left:3px; font-size:14px;"
+        ng-class="[monitoringCtrl.p2pRunning ? 'g-text-green' : 'g-text-red']">
+      P2P status: {{ monitoringCtrl.p2pRunning ? "RUNNING" : "NOT RUNNING"}}
+    </label>
 
   </div>
 

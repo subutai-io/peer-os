@@ -4,6 +4,7 @@ package io.subutai.core.peer.impl;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,7 +40,6 @@ import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
@@ -75,8 +75,6 @@ import io.subutai.core.peer.impl.entity.PeerData;
 import io.subutai.core.peer.impl.entity.PeerRegistrationData;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.hub.share.resource.PeerGroupResources;
-import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -254,7 +252,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
         {
             SocketUtil.check( registrationData.getPeerInfo().getIp(), 3,
                     registrationData.getPeerInfo().getPublicSecurePort() );
-            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( StandardCharsets.UTF_8 ) );
             String decryptedSslCert = encryptedSslCert.decrypt( key, String.class );
             securityManager.getKeyStoreManager().importCertAsTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT,
                     registrationData.getPeerInfo().getId(), decryptedSslCert );
@@ -353,7 +351,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     }
 
 
-    private void updatePeerData( final PeerData peerData ) throws PeerException
+    private void updatePeerData( final PeerData peerData )
     {
         Preconditions.checkNotNull( peerData, "Peer data could not be null." );
 
@@ -589,7 +587,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     {
         Peer peer = peers.get( peerId );
 
-        if ( peer != null && peer instanceof RemotePeer )
+        if ( peer instanceof RemotePeer )
         {
             return ( RemotePeer ) peer;
         }
@@ -675,9 +673,9 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
         try
         {
             final String keyPhrase = loadPeerData( registrationData.getPeerInfo().getId() ).getKeyPhrase();
-            byte[] decrypted =
-                    encryptedSslCert.decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) ) );
-            if ( !keyPhrase.equals( new String( decrypted, "UTF-8" ) ) )
+            byte[] decrypted = encryptedSslCert
+                    .decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( StandardCharsets.UTF_8 ) ) );
+            if ( !keyPhrase.equals( new String( decrypted, StandardCharsets.UTF_8 ) ) )
             {
                 throw new PeerException( "Could not unregister peer." );
             }
@@ -707,7 +705,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
             final Encrypted encryptedSslCert = registrationData.getSslCert();
             try
             {
-                byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+                byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( StandardCharsets.UTF_8 ) );
                 encryptedSslCert.decrypt( key, String.class );
                 removeRequest( id );
             }
@@ -735,7 +733,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
             final Encrypted encryptedData = request.getSslCert();
             try
             {
-                byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+                byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( StandardCharsets.UTF_8 ) );
                 encryptedData.decrypt( key, String.class );
                 removeRequest( id );
             }
@@ -790,7 +788,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     {
         try
         {
-            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( StandardCharsets.UTF_8 ) );
             Encrypted encryptedData = new Encrypted( keyPhrase, key );
             result.setSslCert( encryptedData );
         }
@@ -809,7 +807,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
         PGPPublicKey pkey = securityManager.getKeyManager().getPublicKey( localPeerId );
         try
         {
-            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( StandardCharsets.UTF_8 ) );
             Encrypted encryptedSslCert = new Encrypted( sslCert, key );
             result.setSslCert( encryptedSslCert );
             String publicKey = PGPKeyUtil.exportAscii( pkey );
@@ -1238,27 +1236,6 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
         }
 
         return result;
-    }
-
-
-    @Override
-    public PeerGroupResources getPeerGroupResources() throws PeerException
-    {
-        final List<PeerResources> resources = new ArrayList<>();
-        for ( final Peer peer : getPeers() )
-        {
-            try
-            {
-                PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( new PeerId( localPeerId ) );
-                resources.add( peerResources );
-            }
-            catch ( Exception ignore )
-            {
-                //ignore
-            }
-        }
-
-        return new PeerGroupResources( resources );
     }
 
 

@@ -52,7 +52,8 @@ public class RestServiceImplTest
 
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
+        throws Exception
     {
 
         restService = new RestServiceImpl( tracker );

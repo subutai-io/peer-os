@@ -1,0 +1,10 @@
+dependencies {
+    compile project( ":management:server:subutai-common")
+    compile libraries.aries_blueprint
+    compile libraries.javax_annotation
+    compile libraries.osgi_core
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

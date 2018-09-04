@@ -1,0 +1,18 @@
+dependencies {
+    compile project( ":management:server:core:environment-manager:environment-manager-api")
+    compile project( ":management:server:core:hub-manager:hub-manager-api")
+    compile project( ":management:server:core:host-registry:host-registry-api")
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:core:system-manager:system-manager-api")
+    compile project( ":management:server:core:tracker:tracker-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.commons_lang3
+    compile libraries.guava
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

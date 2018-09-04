@@ -3,8 +3,7 @@ package io.subutai.common.security.token;
 import java.util.Date;
 
 import org.junit.Test;
-import org.apache.commons.lang.time.DateUtils;
-import static junit.framework.Assert.assertFalse;
+import org.apache.commons.lang3.time.DateUtils;
 import static junit.framework.Assert.assertTrue;
 
 

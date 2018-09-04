@@ -1,0 +1,7 @@
+
+Export-Package: \
+     io.subutai.core.metric.rest.ui, \
+     io.subutai.core.metric.rest.ui.pojo
+
+
+Import-Package: *

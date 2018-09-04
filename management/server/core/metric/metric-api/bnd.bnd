@@ -1,0 +1,7 @@
+
+Export-Package: \
+     io.subutai.core.metric.api, \
+     io.subutai.core.metric.api.pojo
+
+
+Import-Package: *

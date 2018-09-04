@@ -1,0 +1,6 @@
+
+Export-Package: \
+     io.subutai.core.channel.api
+
+
+Import-Package: *

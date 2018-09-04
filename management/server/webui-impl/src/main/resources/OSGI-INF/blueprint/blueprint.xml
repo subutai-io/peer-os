@@ -15,7 +15,7 @@
         init-method="init"
         scope="singleton" activation="eager"
         class="io.subutai.webui.impl.WebuiModuleServiceImpl">
-    <property name="bcontext" ref="blueprintBundleContext"></property>
+    <property name="bcontext" ref="blueprintBundleContext"/>
   </bean>
 
   <service ref="webuiModuleService"

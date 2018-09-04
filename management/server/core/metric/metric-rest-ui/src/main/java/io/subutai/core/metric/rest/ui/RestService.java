@@ -27,10 +27,6 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getMetrics( @PathParam( "interval" ) int interval );
 
-    //    @GET
-    //    @Path( "p2p/status" )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
-    //    Response getP2PStatuses();
 
     @GET
     @Path( "p2p/{host_id}" )

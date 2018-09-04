@@ -1,0 +1,6 @@
+
+Private-Package: \
+     io.subutai.core.karaf.manager.rest
+
+
+Import-Package: *

@@ -1,0 +1,11 @@
+dependencies {
+    compile project( ":management:server:core:identity-manager:identity-manager-api")
+    compile project( ":management:server:core:tracker:tracker-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.guava
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

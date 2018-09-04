@@ -1,0 +1,5 @@
+
+Private-Package: \
+     io.subutai.core.executor.impl
+
+Import-Package: *

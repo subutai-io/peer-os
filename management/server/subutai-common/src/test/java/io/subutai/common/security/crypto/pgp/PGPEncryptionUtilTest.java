@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -333,7 +334,7 @@ public class PGPEncryptionUtilTest
         byte[] signedMessageArmor =
                 PGPEncryptionUtil.clearSign( encryptedMessage, secondSecretKey, "123".toCharArray(), "" );
 
-        String signedMessage = new String( signedMessageArmor, "UTF-8" );
+        String signedMessage = new String( signedMessageArmor, StandardCharsets.UTF_8 );
 
         logger.info( "\n" + signedMessage );
         logger.info( "\n======================" );
@@ -350,7 +351,7 @@ public class PGPEncryptionUtilTest
 
         byte[] extracted = PGPEncryptionUtil.extractContentFromClearSign( signedMessage.getBytes() );
         byte[] decrypted = PGPEncryptionUtil.decrypt( extracted, secretKeyRing, "123" );
-        logger.info( "Decrypted message \n" + new String( decrypted, "UTF-8" ) );
+        logger.info( "Decrypted message \n" + new String( decrypted, StandardCharsets.UTF_8 ) );
 
         assertEquals( true, result );
     }
@@ -383,7 +384,7 @@ public class PGPEncryptionUtilTest
                 .clearSign( IOUtils.toString( findFile( "message.txt" ) ).getBytes(), secondSecretKey,
                         "123".toCharArray(), "" );
 
-        String signedMessage = new String( signedMessageArmor, "UTF-8" );
+        String signedMessage = new String( signedMessageArmor, StandardCharsets.UTF_8 );
 
         logger.info( "\n" + signedMessage );
 

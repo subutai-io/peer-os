@@ -1,0 +1,8 @@
+
+Export-Package: \
+     io.subutai.core.registration.api, \
+     io.subutai.core.registration.api.exception, \
+     io.subutai.core.registration.api.service
+
+
+Import-Package: *

@@ -1,0 +1,170 @@
+def awaitilityVersion = '1.6.1'
+def ariesBlueprintVersion = '1.1.0'
+def ariesProxyVersion = '1.0.1'
+def ariesUtilVersion = '1.1.0'
+def bouncycastleVersion = '1.52'
+def codehaleVersion = '3.0.2'
+def commonsCodecVersion = '1.9'
+def commonsConfigurationVersion = '1.10'
+def commonsIoVersion = '2.4'
+def commonsLang3Version = '3.4'
+def commonsLoggingVersion = '1.1.3'
+def commonsNetVersion = '3.3'
+def commonsPoolVersion = '1.6'
+def commonsValidatorVersion = '1.4.0'
+def groovyVersion = '2.4.4'
+def cxfVersion = '3.1.0'
+def derbyVersion = '10.12.1.1'
+def gogoCommandVersion = "0.16.0"
+def gogoRuntimeVersion = "0.16.2"
+def gsonVersion = '2.8.5'
+def guavaVersion = '18.0'
+def hamcrestVersion = '1.3'
+def httpClientVersion = '4.5.2'
+def httpCoreVersion = '4.4.5'
+def jacksonVersion = '2.6.3'
+def javaxAnnotationVersion = '1.2'
+def javaxElVersion = '2.2'
+def javaxWsRsVersion = '2.0.1'
+def jaxbVersion = '2.2.11'
+def jettisonVersion = '1.3.5'
+def jodaTimeVersion = '2.9.9'
+def jpountzVersion = '1.2.0'
+def jsoupVersion = '1.10.1'
+def junitVersion = '4.11'
+def karafVersion = '3.0.9'
+def log4jVersion = '1.2.17'
+def mockitoVersion = '1.9.5'
+def nettyVersion = '3.9.4.Final'
+def nimbusJwtVersion = '5.9'
+def openjpaVersion = '2.3.0'
+def osgiCoreVersion = '5.0.0'
+def servicemixBeanflowVersion = '3.2.3'
+def servletVersion = '3.0.1'
+def slf4jVersion = '1.7.12'
+def uuidGeneratorVersion = '3.1.3'
+def xerialSnappyVersion = '1.1.1.3'
+
+
+rootProject.ext {
+    libraries = [
+            aries_blueprint      : [
+                    group: "org.apache.aries.blueprint", name: "org.apache.aries.blueprint", version: ariesBlueprintVersion
+            ],
+            aries_proxy          : [
+                    group: "org.apache.aries.proxy", name: "org.apache.aries.proxy", version: ariesProxyVersion
+            ],
+            aries_util           : [
+                    group: "org.apache.aries", name: "org.apache.aries.util", version: ariesUtilVersion
+            ],
+
+            awaitility           : "com.jayway.awaitility:awaitility:$awaitilityVersion",
+
+            bouncycastle         : [
+                    [group: "org.bouncycastle", name: "bcmail-jdk15on", version: bouncycastleVersion, transitive: false],
+                    [group: "org.bouncycastle", name: "bcpg-jdk15on", version: bouncycastleVersion, transitive: false],
+                    [group: "org.bouncycastle", name: "bcprov-jdk15on", version: bouncycastleVersion, transitive: false],
+                    [group: "org.bouncycastle", name: "bcprov-ext-jdk15on", version: bouncycastleVersion, transitive: false],
+                    [group: "org.bouncycastle", name: "bcpkix-jdk15on", version: bouncycastleVersion, transitive: false]
+            ],
+            codehale             : "com.codahale.metrics:metrics-core:$codehaleVersion",
+
+            commons_codec        : [group: "commons-codec", name: "commons-codec", version: commonsCodecVersion, transitive: false],
+            commons_configuration: [group: "commons-configuration", name: "commons-configuration", version: commonsConfigurationVersion, transitive: true],
+            commons_io           : [group: "commons-io", name: "commons-io", version: commonsIoVersion, transitive: false],
+
+            commons_lang3        : [group: "org.apache.commons", name: "commons-lang3", version: commonsLang3Version, transitive: false],
+            commons_logging      : [group: "org.apache.commons", name: "commons-logging", version: commonsLoggingVersion, transitive: false],
+            commons_net          : [group: "commons-net", name: "commons-net", version: commonsNetVersion, transitive: false],
+            commons_pool         : [group: "commons-pool", name: "commons-pool", version: commonsPoolVersion, transitive: false],
+            commons_validator    : [group: "commons-validator", name: "commons-validator", version: commonsValidatorVersion, transitive: false],
+
+            cxf                  : [
+                    [group: "org.apache.cxf", name: "cxf-core", version: cxfVersion, transitive: false],
+                    [group: "org.apache.cxf", name: "cxf-rt-frontend-jaxrs", version: cxfVersion, transitive: false],
+                    [group: "org.apache.cxf", name: "cxf-rt-rs-client", version: cxfVersion, transitive: false],
+                    [group: "org.apache.cxf", name: "cxf-rt-transports-http", version: cxfVersion, transitive: false],
+                    [group: "org.apache.cxf", name: "cxf-rt-transports-http-hc", version: cxfVersion, transitive: false],
+                    [group: "org.apache.cxf", name: "cxf-rt-rs-extension-providers", version: cxfVersion, transitive: false],
+                    [group: "org.apache.cxf", name: "cxf-rt-wsdl", version: cxfVersion, transitive: false]
+            ],
+
+            derby                : "org.apache.derby:derby:$derbyVersion",
+
+            gogo                 : [
+                    [group: "org.apache.felix", name: "org.apache.felix.gogo.runtime", version: gogoRuntimeVersion, transitive: false],
+                    [group: "org.apache.felix", name: "org.apache.felix.gogo.command", version: gogoCommandVersion, transitive: false]
+            ],
+
+            groovy               : [group: "org.codehaus.groovy", name: "groovy-all", version: groovyVersion, transitive: false],
+            gson                 : "com.google.code.gson:gson:$gsonVersion",
+            guava                : [group: "com.google.guava", name: "guava", version: guavaVersion, transitive: false],
+
+            hamcrest             : [
+                    [group: "org.hamcrest", name: "hamcrest-core", version: hamcrestVersion, transitive: false],
+                    [group: "org.hamcrest", name: "hamcrest-library", version: hamcrestVersion, transitive: false]
+            ],
+
+            http_client          : [
+                    [group: "org.apache.httpcomponents", name: "httpclient", version: httpClientVersion, transitive: false],
+                    [group: "org.apache.httpcomponents", name: "httpmime", version: httpClientVersion, transitive: false],
+                    [group: "org.apache.httpcomponents", name: "httpcore", version: httpCoreVersion, transitive: false]
+
+            ],
+
+            jackson              : [
+                    [group: "com.fasterxml.jackson.core", name: "jackson-core", version: jacksonVersion, transitive: false],
+                    [group: "com.fasterxml.jackson.core", name: "jackson-annotations", version: jacksonVersion, transitive: false],
+                    [group: "com.fasterxml.jackson.core", name: "jackson-databind", version: jacksonVersion, transitive: false],
+                    [group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-cbor", version: jacksonVersion, transitive: false],
+                    [group: "com.fasterxml.jackson.jaxrs", name: "jackson-jaxrs-base", version: jacksonVersion, transitive: false],
+                    [group: "com.fasterxml.jackson.jaxrs", name: "jackson-jaxrs-json-provider", version: jacksonVersion, transitive: false]
+            ],
+            javax_annotation     : "javax.annotation:javax.annotation-api:$javaxAnnotationVersion",
+            javax_el             : "javax.el:el-api:$javaxElVersion",
+            javax_servlet        : [group: "javax.servlet", name: "javax.servlet-api", version: servletVersion, transitive: false],
+            javax_ws_rs          : [group: "javax.ws.rs", name: "javax.ws.rs-api", version: javaxWsRsVersion],
+            jaxb                 : "javax.xml.bind:jaxb-api:$jaxbVersion",
+            jettison             : "org.codehaus.jettison:jettison:$jettisonVersion",
+
+            //TODO: Why is this dependency needed. I suspect a much smaller artifact is what should be used.
+            jetty                : 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411',
+
+
+            joda_time            : "joda-time:joda-time:$jodaTimeVersion",
+            jpountz              : "net.jpountz.lz4:lz4:$jpountzVersion",
+            jsoup                : "org.jsoup:jsoup:$jsoupVersion",
+
+            junit                : [group: "junit", name: "junit", version: junitVersion, transitive: false],
+
+            karaf_client         : [
+                    [group: "org.apache.karaf.bundle", name: "org.apache.karaf.bundle.core", version: karafVersion, transitive: false],
+                    [group: "org.apache.karaf.jaas", name: "org.apache.karaf.jaas.boot", version: karafVersion, transitive: false],
+                    [group: "org.apache.karaf.jaas", name: "org.apache.karaf.jaas.config", version: karafVersion, transitive: false],
+                    [group: "org.apache.karaf.jaas", name: "org.apache.karaf.jaas.modules", version: karafVersion, transitive: false],
+                    [group: "org.apache.karaf.jaas", name: "org.apache.karaf.jaas.jasypt", version: karafVersion, transitive: false],
+                    [group: "org.apache.karaf.jaas", name: "org.apache.karaf.jaas.command", version: karafVersion, transitive: false]
+            ],
+
+            karaf_shell          : [group: "org.apache.karaf.shell", name: "org.apache.karaf.shell.console", version: karafVersion, transitive: false],
+            log4j                : "log4j:log4j:$log4jVersion",
+            mockito              : [group: "org.mockito", name: "mockito-all", version: mockitoVersion, transitive: true],
+            netty                : "io.netty:netty:$nettyVersion",
+            nimbus_jwt           : "com.nimbusds:nimbus-jose-jwt:$nimbusJwtVersion",
+
+            open_jpa             : [
+                    [group: "org.apache.openjpa", name: "openjpa-all", version: openjpaVersion, transitive: false],
+                    [group: "org.apache.openjpa", name: "openjpa", version: openjpaVersion, transitive: false],
+                    [group: "net.sourceforge.serp", name: "serp", version: "1.14.1", transitive: false]
+
+            ],
+            org_json             : [group: "org.json", name: "json", version: "20150729"],
+            osgi_core            : [group: "org.osgi", name: "org.osgi.core", version: osgiCoreVersion],
+            servicemix_beanflow  : [group: "org.apache.servicemix", name: "servicemix-beanflow", version: servicemixBeanflowVersion, transitive: false],
+            slf4j                : [group: "org.slf4j", name: "slf4j-api", version: slf4jVersion, transitive: false],
+            slf4j_testlogger     : [group: "org.slf4j", name: "slf4j-simple", version: slf4jVersion, transitive: false],
+            uuid_generator       : [group: "com.fasterxml.uuid", name: "java-uuid-generator", version: uuidGeneratorVersion, transitive: false],
+            xerial_snappy        : "org.xerial.snappy:snappy-java:$xerialSnappyVersion"
+
+    ]
+}
