@@ -25,11 +25,15 @@
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
   <bean id="metricsRestUIServiceImpl" class="io.subutai.core.metric.rest.ui.RestServiceImpl">
     <argument ref="monitor" />
     <argument ref="environmentManager" />
     <argument ref="localPeer" />
     <argument ref="identityManager" />
+    <argument ref="peerManager" />
   </bean>
 
   <jaxrs:server address="/ui/metrics" id="metricsRestUIService">
