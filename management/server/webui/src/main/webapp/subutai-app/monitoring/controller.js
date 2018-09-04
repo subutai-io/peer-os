@@ -68,7 +68,6 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 	monitoringSrv.getEnvironments().success(function (data) {
 		vm.environments = data;
 
-		//todo remove remote container in BZR environments
 		for (var i = 0; i < data.length; i++){
 		    var env = data[i];
 
