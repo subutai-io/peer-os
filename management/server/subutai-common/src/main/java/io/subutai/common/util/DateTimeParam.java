@@ -3,6 +3,7 @@ package io.subutai.common.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,7 +33,7 @@ public class DateTimeParam
         Preconditions.checkNotNull( str );
         Preconditions.checkArgument( str.length() >= 10 );
 
-        String decoded = URLDecoder.decode( str, "UTF-8" );
+        String decoded = URLDecoder.decode( str, StandardCharsets.UTF_8.name() );
         this.date = dateTimeFormat.parse( decoded );
     }
 

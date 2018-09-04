@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessControlException;
 
 import javax.security.auth.login.LoginException;
@@ -66,7 +67,7 @@ public class MessageContentUtil
         try
         {
             response.setStatus( errorStatus );
-            response.getOutputStream().write( errorMessage.getBytes( Charset.forName( "UTF-8" ) ) );
+            response.getOutputStream().write( errorMessage.getBytes(  StandardCharsets.UTF_8 ) );
             response.getOutputStream().flush();
 
             LOG.error( "****** Error !!! Error in AccessInterceptor:" + " "+ errorMessage

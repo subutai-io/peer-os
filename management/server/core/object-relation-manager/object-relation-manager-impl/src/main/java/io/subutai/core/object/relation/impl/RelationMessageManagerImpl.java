@@ -2,6 +2,7 @@ package io.subutai.core.object.relation.impl;
 
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -41,7 +42,7 @@ public class RelationMessageManagerImpl implements RelationMessageManager
             byte[] extractedText = encryptionTool.extractClearSignContent( signedMessage.getBytes() );
             byte[] decrypted = encryptionTool.decrypt( extractedText, secretKeyRing, "" );
 
-            String decryptedMessage = new String( decrypted, "UTF-8" );
+            String decryptedMessage = new String( decrypted, StandardCharsets.UTF_8 );
             RelationImpl relation = JsonUtil.fromJson( decryptedMessage, RelationImpl.class );
 
             PGPPublicKeyRing publicKey = keyManager.getPublicKeyRing( relation.getKeyId() );
