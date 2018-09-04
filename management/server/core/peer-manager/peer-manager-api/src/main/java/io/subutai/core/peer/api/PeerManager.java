@@ -12,7 +12,6 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
-import io.subutai.hub.share.resource.PeerGroupResources;
 
 
 public interface PeerManager
@@ -65,8 +64,6 @@ public interface PeerManager
     void processRejectRequest( RegistrationData registrationData ) throws PeerException;
 
     String getRemotePeerIdByIp( String ip ) throws PeerNotRegisteredException;
-
-    PeerGroupResources getPeerGroupResources() throws PeerException;
 
     PeerPolicy getAvailablePolicy();
 
