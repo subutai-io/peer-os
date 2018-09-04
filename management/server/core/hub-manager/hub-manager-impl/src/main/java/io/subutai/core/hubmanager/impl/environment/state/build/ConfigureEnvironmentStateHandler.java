@@ -32,6 +32,9 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     private static final String ENV_APPS_URL = "/rest/v1/environments/%s/apps";
 
     private static final String TMP_DIR = "/root/";
+    private static final String EXTRA_VARS_FILE_NAME = "extra-vars.json";
+    private static final String CREATE_EXTRA_VARS_FILE_CMD = "cd %s; cat > %s <<EOL\n" + "%s" + "\n" + "EOL\n";
+    private static final String RUN_PLAYBOOK_CMD = "cd %s; ansible-playbook  %s -e \"@%s\" -i %s";
 
     private long commandTimeout = 5L;
 
@@ -113,10 +116,16 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             extraVars = "{}";
         }
 
-        String cmd = String.format( "cd %s; ansible-playbook  %s -e %s -i %s", TMP_DIR + fileName, mainAnsibleScript,
-                extraVars, inventoryFile );
+        String extraVarsCmd =
+                String.format( CREATE_EXTRA_VARS_FILE_CMD, TMP_DIR + fileName, EXTRA_VARS_FILE_NAME, extraVars );
+
+        String cmd = String.format( RUN_PLAYBOOK_CMD, TMP_DIR + fileName, mainAnsibleScript, EXTRA_VARS_FILE_NAME,
+                inventoryFile );
+
         try
         {
+            runCmd( containerId, extraVarsCmd );
+
             runCmdAsync( containerId, cmd, envSubutaiId );
         }
         catch ( Exception e )

@@ -40,7 +40,6 @@ import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
@@ -76,8 +75,6 @@ import io.subutai.core.peer.impl.entity.PeerData;
 import io.subutai.core.peer.impl.entity.PeerRegistrationData;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.hub.share.resource.PeerGroupResources;
-import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -354,7 +351,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     }
 
 
-    private void updatePeerData( final PeerData peerData ) throws PeerException
+    private void updatePeerData( final PeerData peerData )
     {
         Preconditions.checkNotNull( peerData, "Peer data could not be null." );
 
@@ -590,7 +587,7 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     {
         Peer peer = peers.get( peerId );
 
-        if ( peer != null && peer instanceof RemotePeer )
+        if ( peer instanceof RemotePeer )
         {
             return ( RemotePeer ) peer;
         }
@@ -676,9 +673,8 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
         try
         {
             final String keyPhrase = loadPeerData( registrationData.getPeerInfo().getId() ).getKeyPhrase();
-            byte[] decrypted =
-                    encryptedSslCert.decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes(
-                            StandardCharsets.UTF_8 ) ) );
+            byte[] decrypted = encryptedSslCert
+                    .decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( StandardCharsets.UTF_8 ) ) );
             if ( !keyPhrase.equals( new String( decrypted, StandardCharsets.UTF_8 ) ) )
             {
                 throw new PeerException( "Could not unregister peer." );
@@ -1240,27 +1236,6 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
         }
 
         return result;
-    }
-
-
-    @Override
-    public PeerGroupResources getPeerGroupResources() throws PeerException
-    {
-        final List<PeerResources> resources = new ArrayList<>();
-        for ( final Peer peer : getPeers() )
-        {
-            try
-            {
-                PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( new PeerId( localPeerId ) );
-                resources.add( peerResources );
-            }
-            catch ( Exception ignore )
-            {
-                //ignore
-            }
-        }
-
-        return new PeerGroupResources( resources );
     }
 
 
