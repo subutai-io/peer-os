@@ -68,11 +68,11 @@ public class EnvironmentAdapter
     }
 
 
-    public HubEnvironment get( String id )
+    public BazaarEnvironment get( String id )
     {
         try
         {
-            for ( HubEnvironment e : getEnvironments( identityManager.isTenantManager() ) )
+            for ( BazaarEnvironment e : getEnvironments( identityManager.isTenantManager() ) )
             {
                 if ( e.getId().equals( id ) )
                 {
@@ -99,9 +99,9 @@ public class EnvironmentAdapter
      *
      * @param all true: returns all environments, false: returns current user environments
      */
-    public Set<HubEnvironment> getEnvironments( boolean all )
+    public Set<BazaarEnvironment> getEnvironments( boolean all )
     {
-        if ( !canWorkWithHub() )
+        if ( !canWorkWithBazaar() )
         {
             throw new ActionFailedException( "Peer is not registered with Bazaar or connection to Bazaar failed" );
         }
@@ -115,7 +115,7 @@ public class EnvironmentAdapter
 
         log.debug( "Json with environments: {}", json );
 
-        Set<HubEnvironment> envs = new HashSet<>();
+        Set<BazaarEnvironment> envs = new HashSet<>();
 
         try
         {
@@ -123,7 +123,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new HubEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
+                envs.add( new BazaarEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
@@ -140,7 +140,7 @@ public class EnvironmentAdapter
     public Set<String> getDeletedEnvironmentsIds()
     {
 
-        if ( !canWorkWithHub() )
+        if ( !canWorkWithBazaar() )
         {
             throw new ActionFailedException( "Peer is not registered with Bazaar or connection to Bazaar failed" );
         }
@@ -169,9 +169,9 @@ public class EnvironmentAdapter
     }
 
 
-    public void destroyContainer( HubEnvironment env, String containerId )
+    public void destroyContainer( BazaarEnvironment env, String containerId )
     {
-        if ( !canWorkWithHub() )
+        if ( !canWorkWithBazaar() )
         {
             return;
         }
@@ -199,7 +199,7 @@ public class EnvironmentAdapter
 
     public boolean removeEnvironment( String envId )
     {
-        if ( !canWorkWithHub() )
+        if ( !canWorkWithBazaar() )
         {
             return false;
         }
@@ -225,13 +225,13 @@ public class EnvironmentAdapter
     }
 
 
-    public boolean canWorkWithHub()
+    public boolean canWorkWithBazaar()
     {
-        return isHubReachable() && isRegisteredWithHub();
+        return isBazaarReachable() && isRegisteredWithBazaar();
     }
 
 
-    public boolean isHubReachable()
+    public boolean isBazaarReachable()
     {
         BazaarManager bazaarManager = ServiceLocator.getServiceOrNull( BazaarManager.class );
 
@@ -239,7 +239,7 @@ public class EnvironmentAdapter
     }
 
 
-    public boolean isRegisteredWithHub()
+    public boolean isRegisteredWithBazaar()
     {
         BazaarManager bazaarManager = ServiceLocator.getServiceOrNull( BazaarManager.class );
 
@@ -249,7 +249,7 @@ public class EnvironmentAdapter
 
     public boolean uploadEnvironment( LocalEnvironment env )
     {
-        if ( !canWorkWithHub() )
+        if ( !canWorkWithBazaar() )
         {
             return false;
         }
@@ -282,7 +282,7 @@ public class EnvironmentAdapter
 
     public boolean uploadPeerOwnerEnvironment( LocalEnvironment env )
     {
-        if ( !canWorkWithHub() )
+        if ( !canWorkWithBazaar() )
         {
             return false;
         }
@@ -313,7 +313,7 @@ public class EnvironmentAdapter
 
     public void removeSshKey( String envId, String sshKey )
     {
-        if ( !canWorkWithHub() )
+        if ( !canWorkWithBazaar() )
         {
             return;
         }
@@ -324,7 +324,7 @@ public class EnvironmentAdapter
 
     public void addSshKey( String envId, String sshKey )
     {
-        if ( !canWorkWithHub() )
+        if ( !canWorkWithBazaar() )
         {
             return;
         }
@@ -431,14 +431,14 @@ public class EnvironmentAdapter
     public void handleHostnameChange( final ContainerHostInfo containerInfo, final String previousHostname,
                                       final String currentHostname )
     {
-        HubEnvironment environment = null;
+        BazaarEnvironment environment = null;
 
-        for ( HubEnvironment hubEnvironment : getEnvironments( true ) )
+        for ( BazaarEnvironment bazaarEnvironment : getEnvironments( true ) )
         {
             try
             {
-                hubEnvironment.getContainerHostById( containerInfo.getId() );
-                environment = hubEnvironment;
+                bazaarEnvironment.getContainerHostById( containerInfo.getId() );
+                environment = bazaarEnvironment;
 
                 break;
             }

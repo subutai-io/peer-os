@@ -30,7 +30,7 @@ import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
 
 public class EnvironmentUserHelper
 {
-    private final String baseHubTokenUrl = "/rest/v1/users/%s/token";
+    private final String baseBazaarTokenUrl = "/rest/v1/users/%s/token";
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -60,7 +60,7 @@ public class EnvironmentUserHelper
     {
         String envOwnerId = peerDto.getEnvironmentInfo().getOwnerId();
 
-        User user = getUserByHubId( envOwnerId );
+        User user = getUserBybazaarId( envOwnerId );
 
         if ( user == null )
         {
@@ -79,7 +79,7 @@ public class EnvironmentUserHelper
             return;
         }
 
-        if ( hasUserEnvironmentsForPeerOnHub( envOwnerId ) )
+        if ( hasUserEnvironmentsForPeerOnBazaar( envOwnerId ) )
         {
             log.debug( "Can't delete user b/c user has Bazaar environment on this peer" );
 
@@ -93,7 +93,7 @@ public class EnvironmentUserHelper
     }
 
 
-    private boolean hasUserEnvironmentsForPeerOnHub( String userId )
+    private boolean hasUserEnvironmentsForPeerOnBazaar( String userId )
     {
         String path = String.format( "/rest/v1/adapter/users/%s/environments", userId );
 
@@ -114,7 +114,7 @@ public class EnvironmentUserHelper
     {
         Config config = configDataService.getBazaarConfig( peerId );
 
-        User user = getUserByHubId( envOwnerId );
+        User user = getUserBybazaarId( envOwnerId );
 
         if ( user != null )
         {
@@ -135,12 +135,12 @@ public class EnvironmentUserHelper
     }
 
 
-    private User getUserByHubId( String userId )
+    private User getUserBybazaarId( String userId )
     {
         for ( User user : identityManager.getAllUsers() )
         {
             String email = userId + BazaarManager.BAZAAR_EMAIL_SUFFIX;
-            if ( user.getEmail().equals( email ) && user.isHubUser() )
+            if ( user.getEmail().equals( email ) && user.isBazaarUser() )
             {
                 return user;
             }
@@ -175,7 +175,7 @@ public class EnvironmentUserHelper
         {
             User user = identityManager
                     .createUser( userDto.getFingerprint(), null, "[Bazaar] " + userDto.getName(), email,
-                            UserType.HUB.getId(), KeyTrustLevel.MARGINAL.getId(), false, true );
+                            UserType.BAZAAR.getId(), KeyTrustLevel.MARGINAL.getId(), false, true );
 
             identityManager.setUserPublicKey( user.getId(), userDto.getPublicKey() );
             identityManager.assignUserRole( user, getRole( IdentityManager.ENV_MANAGER_ROLE ) );
@@ -213,9 +213,9 @@ public class EnvironmentUserHelper
     }
 
 
-    public UserToken getUserTokenFromHub( Long ssUserId ) throws BazaarManagerException, PGPException, IOException
+    public UserToken getUserTokenFromBazaar( Long ssUserId ) throws BazaarManagerException, PGPException, IOException
     {
-        String url = String.format( baseHubTokenUrl, ssUserId );
+        String url = String.format( baseBazaarTokenUrl, ssUserId );
         RestResult<UserTokenDto> res = restClient.get( url, UserTokenDto.class );
 
         if ( res.getStatus() != HttpStatus.SC_OK && res.getStatus() != 204 )
@@ -237,14 +237,14 @@ public class EnvironmentUserHelper
         }
         catch ( Exception exception )
         {
-            return updateUserTokenInHub( userTokenDto );
+            return updateUserTokenInBazaar( userTokenDto );
         }
     }
 
 
-    private UserToken updateUserTokenInHub( UserTokenDto userTokenDto )
+    private UserToken updateUserTokenInBazaar( UserTokenDto userTokenDto )
     {
-        String url = String.format( baseHubTokenUrl, userTokenDto.getOwnerId() );
+        String url = String.format( baseBazaarTokenUrl, userTokenDto.getOwnerId() );
 
         User user = identityManager.getUser( userTokenDto.getSsUserId() );
 

@@ -45,11 +45,11 @@ public class ContainerMetricsProcessor extends BazaarRequester
     private int scanIntervalMinutes;
 
 
-    public ContainerMetricsProcessor( BazaarManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
+    public ContainerMetricsProcessor( BazaarManagerImpl bazaarManager, LocalPeer localPeer, Monitor monitor,
                                       RestClient restClient, ContainerMetricsService containerMetricsService,
                                       int scanIntervalMinutes )
     {
-        super( hubManager, restClient );
+        super( bazaarManager, restClient );
 
         this.localPeer = localPeer;
 

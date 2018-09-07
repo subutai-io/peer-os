@@ -129,7 +129,7 @@ public class BazaarRestClient implements RestClient
 
         try
         {
-            webClient = configManager.getTrustedWebClientWithAuth( url, configManager.getHubIp() );
+            webClient = configManager.getTrustedWebClientWithAuth( url, configManager.getbazaarIp() );
 
             Object requestBody = encrypt ? encryptBody( body ) : body;
 

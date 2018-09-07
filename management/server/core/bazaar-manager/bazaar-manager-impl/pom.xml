@@ -11,13 +11,13 @@
 
   <artifactId>bazaar-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Hub Manager Impl</name>
-  <description>Subutai Hub Manager Impl</description>
+  <name>Subutai bazaarManager Impl</name>
+  <description>Subutai bazaarManager Impl</description>
 
   <dependencies>
     <dependency>
       <groupId>io.subutai</groupId>
-      <artifactId>subutai-hub-share</artifactId>
+      <artifactId>subutai-bazaar-share</artifactId>
     </dependency>
 
     <dependency>
@@ -115,7 +115,7 @@
         <configuration>
           <instructions>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
-            <Bundle-SymbolicName>${project.groupId}.core.hubmanager.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.bazaarmanager.impl</Bundle-SymbolicName>
             <Export-Package>
               com.fasterxml.jackson.dataformat.cbor,
               {local-packages};version=${project.version};-noimport:=true

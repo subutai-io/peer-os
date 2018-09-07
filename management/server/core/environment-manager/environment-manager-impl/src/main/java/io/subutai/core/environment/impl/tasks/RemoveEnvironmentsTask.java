@@ -12,7 +12,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Environment;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
-import io.subutai.core.environment.impl.adapter.HubEnvironment;
+import io.subutai.core.environment.impl.adapter.BazaarEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
@@ -40,30 +40,30 @@ public class RemoveEnvironmentsTask implements Runnable
     @Override
     public void run()
     {
-        if ( !environmentAdapter.canWorkWithHub() )
+        if ( !environmentAdapter.canWorkWithBazaar() )
         {
             return;
         }
 
         try
         {
-            Set<HubEnvironment> environmentsObtainedFromHub = environmentAdapter.getEnvironments( true );
+            Set<BazaarEnvironment> environmentsObtainedFromBazaar = environmentAdapter.getEnvironments( true );
 
-            Set<RemoteEnvironment> locallyRegisteredHubEnvironments =
-                    environmentManager.getLocallyRegisteredHubEnvironments();
+            Set<RemoteEnvironment> locallyRegisteredBazaarEnvironments =
+                    environmentManager.getLocallyRegisteredBazaarEnvironments();
 
 
             // 1. remove environments onbazaar that are missing locally
 
             Set<Environment> environmentsMissingLocally = Sets.newHashSet();
 
-            for ( Environment hubEnvironment : environmentsObtainedFromHub )
+            for ( Environment bzrEnvironment : environmentsObtainedFromBazaar )
             {
                 boolean isMissingLocally = true;
 
-                for ( Environment localEnvironment : locallyRegisteredHubEnvironments )
+                for ( Environment localEnvironment : locallyRegisteredBazaarEnvironments )
                 {
-                    if ( hubEnvironment.getId().equalsIgnoreCase( localEnvironment.getId() ) )
+                    if ( bzrEnvironment.getId().equalsIgnoreCase( localEnvironment.getId() ) )
                     {
                         isMissingLocally = false;
 
@@ -73,7 +73,7 @@ public class RemoveEnvironmentsTask implements Runnable
 
                 if ( isMissingLocally )
                 {
-                    environmentsMissingLocally.add( hubEnvironment );
+                    environmentsMissingLocally.add( bzrEnvironment );
                 }
             }
 
@@ -87,32 +87,32 @@ public class RemoveEnvironmentsTask implements Runnable
 
             // 2. remove local environments that are missing onbazaar
 
-            Set<String> deletedEnvironmentsIdsOnHub = environmentAdapter.getDeletedEnvironmentsIds();
-            Set<Environment> environmentsMissingOnHub = Sets.newHashSet();
+            Set<String> deletedEnvironmentsIdsOnBazaar = environmentAdapter.getDeletedEnvironmentsIds();
+            Set<Environment> environmentsMissingOnBazaar = Sets.newHashSet();
 
-            for ( Environment localEnvironment : locallyRegisteredHubEnvironments )
+            for ( Environment localEnvironment : locallyRegisteredBazaarEnvironments )
             {
-                boolean isMissingOnHub = false;
+                boolean isMissingOnBazaar = false;
 
-                for ( String hubEnvironmentId : deletedEnvironmentsIdsOnHub )
+                for ( String bzrEnvironmentId : deletedEnvironmentsIdsOnBazaar )
                 {
-                    if ( localEnvironment.getId().equalsIgnoreCase( hubEnvironmentId ) )
+                    if ( localEnvironment.getId().equalsIgnoreCase( bzrEnvironmentId ) )
                     {
-                        isMissingOnHub = true;
+                        isMissingOnBazaar = true;
 
                         break;
                     }
                 }
 
-                if ( isMissingOnHub )
+                if ( isMissingOnBazaar )
                 {
-                    environmentsMissingOnHub.add( localEnvironment );
+                    environmentsMissingOnBazaar.add( localEnvironment );
                 }
             }
 
             // destroy local env-s missing onbazaar
 
-            for ( Environment environment : environmentsMissingOnHub )
+            for ( Environment environment : environmentsMissingOnBazaar )
             {
                 environmentManager.cleanupEnvironment( environment.getEnvironmentId() );
 
@@ -121,9 +121,9 @@ public class RemoveEnvironmentsTask implements Runnable
 
             // notifybazaar about environment deletion
 
-            for ( String hubEnvironmentId : deletedEnvironmentsIdsOnHub )
+            for ( String bzrEnvironmentId : deletedEnvironmentsIdsOnBazaar )
             {
-                environmentAdapter.removeEnvironment( hubEnvironmentId );
+                environmentAdapter.removeEnvironment( bzrEnvironmentId );
             }
 
             // 3. Remove deleted local env-s frombazaar

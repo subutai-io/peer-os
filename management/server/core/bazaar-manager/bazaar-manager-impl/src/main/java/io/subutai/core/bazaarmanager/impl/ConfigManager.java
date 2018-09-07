@@ -28,11 +28,11 @@ import io.subutai.bazaar.share.pgp.message.PGPMessenger;
 public class ConfigManager
 {
 
-    private static final int HUB_PORT = 444;
+    private static final int BAZAAR_PORT = 444;
 
     private IdentityManager identityManager;
     private PeerManager peerManager;
-    private PGPPublicKey hPublicKey;
+    private PGPPublicKey bzrPublicKey;
     private PGPPublicKey ownerPublicKey;
     private PGPPublicKey peerPublicKey;
     private KeyStore keyStore;
@@ -60,7 +60,7 @@ public class ConfigManager
 
             this.peerId = peerManager.getLocalPeer().getId();
 
-            this.hPublicKey = PGPKeyHelper.readPublicKey( Common.BAZAAR_PUB_KEY );
+            this.bzrPublicKey = PGPKeyHelper.readPublicKey( Common.BAZAAR_PUB_KEY );
 
             this.ownerPublicKey =
                     securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
@@ -68,7 +68,7 @@ public class ConfigManager
 
             this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
-            this.messenger = new PGPMessenger( sender, hPublicKey );
+            this.messenger = new PGPMessenger( sender, bzrPublicKey );
 
             final KeyStoreTool keyStoreTool = new KeyStoreTool();
 
@@ -106,16 +106,16 @@ public class ConfigManager
     }
 
 
-    public WebClient getTrustedWebClientWithAuth( String path, final String hubIp ) throws BazaarManagerException
+    public WebClient getTrustedWebClientWithAuth( String path, final String bazaarIp ) throws BazaarManagerException
     {
-        String baseUrl = String.format( "https://%s:%d", hubIp, HUB_PORT );
+        String baseUrl = String.format( "https://%s:%d", bazaarIp, BAZAAR_PORT );
 
         return HttpClient.createTrustedWebClientWithAuth( baseUrl + path, keyStore,
-                SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(), hPublicKey.getFingerprint() );
+                SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(), bzrPublicKey.getFingerprint() );
     }
 
 
-    public String getHubIp()
+    public String getbazaarIp()
     {
         return Common.BAZAAR_IP;
     }

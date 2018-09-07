@@ -78,7 +78,7 @@ public abstract class StateHandler
     {
         try
         {
-            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getEnvironmentInfo().getSsOwnerId() );
+            UserToken userToken = ctx.envUserHelper.getUserTokenFromBazaar( peerDto.getEnvironmentInfo().getSsOwnerId() );
             return userToken.getFullToken();
         }
         catch ( Exception e )

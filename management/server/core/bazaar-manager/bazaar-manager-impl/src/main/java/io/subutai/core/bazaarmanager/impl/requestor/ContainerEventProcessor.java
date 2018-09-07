@@ -28,10 +28,10 @@ public class ContainerEventProcessor extends BazaarRequester
     private DesktopManager desktopManager;
 
 
-    public ContainerEventProcessor( final BazaarManagerImpl hubManager, final PeerManager peerManager,
+    public ContainerEventProcessor( final BazaarManagerImpl bazaarManager, final PeerManager peerManager,
                                     final RestClient restClient, final DesktopManager desktopManager )
     {
-        super( hubManager, restClient );
+        super( bazaarManager, restClient );
         this.peerManager = peerManager;
         this.desktopManager = desktopManager;
     }

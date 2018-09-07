@@ -17,7 +17,7 @@
     <module>core</module>
     <module>subutai-common</module>
     <module>subutai-features</module>
-    <module>subutai-hub-share</module>
+    <module>subutai-bazaar-share</module>
     <module>server-karaf</module>
     <module>webui</module>
     <module>webui-impl</module>

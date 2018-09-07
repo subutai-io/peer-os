@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>bazaar-manager</artifactId>
-  <name>Subutai Hub Manager Parent</name>
-  <description>Subutai Hub Manager Parent</description>
+  <name>Subutai bazaarManager Parent</name>
+  <description>Subutai bazaarManager Parent</description>
   <packaging>pom</packaging>
   <modules>
     <module>bazaar-manager-api</module>

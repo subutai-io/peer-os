@@ -34,9 +34,9 @@ public class P2pStatusSender extends BazaarRequester
     private Date lastSendDate;
 
 
-    public P2pStatusSender( BazaarManagerImpl hubManager, LocalPeer localPeer, Monitor monitor, RestClient restClient )
+    public P2pStatusSender( BazaarManagerImpl bazaarmanager, LocalPeer localPeer, Monitor monitor, RestClient restClient )
     {
-        super( hubManager, restClient );
+        super( bazaarmanager, restClient );
 
         this.localPeer = localPeer;
 

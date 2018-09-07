@@ -6,7 +6,7 @@ package io.subutai.common.security.objects;
  */
 public enum UserType
 {
-    SYSTEM( 1, "System" ), REGULAR( 2, "Regular" ), HUB( 3, "Bazaar" );
+    SYSTEM( 1, "System" ), REGULAR( 2, "Regular" ), BAZAAR( 3, "Bazaar" );
 
     private String name;
     private int id;

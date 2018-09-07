@@ -45,11 +45,11 @@ public class DeletePeerStateHandler extends StateHandler
 
             log.info( "env: {}", env );
 
-            boolean isHubEnvironment = env == null || Common.BAZAAR_ID.equals( env.getPeerId() );
+            boolean isBazaarEnvironment = env == null || Common.BAZAAR_ID.equals( env.getPeerId() );
 
-            if ( isHubEnvironment )
+            if ( isBazaarEnvironment )
             {
-                deleteHubEnvironment( peerDto );
+                deleteBazaarEnvironment( peerDto );
             }
             else
             {
@@ -92,7 +92,7 @@ public class DeletePeerStateHandler extends StateHandler
     }
 
 
-    private void deleteHubEnvironment( EnvironmentPeerDto peerDto ) throws PeerException
+    private void deleteBazaarEnvironment( EnvironmentPeerDto peerDto ) throws PeerException
     {
         EnvironmentId envId = new EnvironmentId( peerDto.getEnvironmentInfo().getId() );
 
@@ -158,7 +158,7 @@ public class DeletePeerStateHandler extends StateHandler
     {
         try
         {
-            UserToken userToken = ctx.envUserHelper.getUserTokenFromHub( peerDto.getSsUserId() );
+            UserToken userToken = ctx.envUserHelper.getUserTokenFromBazaar( peerDto.getSsUserId() );
             return userToken.getFullToken();
         }
         catch ( Exception e )

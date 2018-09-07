@@ -20,18 +20,18 @@ import io.subutai.core.environment.impl.entity.LocalEnvironment;
 /**
  * NOTE: Using environmentManager from parent LocalEnvironment gives side effects. For example, empty container list.
  */
-public class HubEnvironment extends LocalEnvironment implements io.subutai.common.environment.HubEnvironment
+public class BazaarEnvironment extends LocalEnvironment implements io.subutai.common.environment.BazaarEnvironment
 {
-    private final static Logger log = LoggerFactory.getLogger( HubEnvironment.class );
+    private final static Logger log = LoggerFactory.getLogger( BazaarEnvironment.class );
 
     private transient final EnvironmentAdapter environmentAdapter;
 
     private String owner;
-    private String ownerHubId;
+    private String ownerbazaarId;
 
 
-    HubEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
-                    ProxyContainerHelper proxyContainerHelper )
+    BazaarEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
+                       ProxyContainerHelper proxyContainerHelper )
     {
         super( json.get( "name" ).asText(), null, 0L, Common.BAZAAR_ID );
 
@@ -56,7 +56,7 @@ public class HubEnvironment extends LocalEnvironment implements io.subutai.commo
         setStatus( EnvironmentStatus.HEALTHY );
 
         this.owner = json.get( "owner" ).asText();
-        this.ownerHubId = json.get( "ownerHubId" ).asText();
+        this.ownerbazaarId = json.get( "ownerbazaarId" ).asText();
     }
 
 
@@ -102,9 +102,9 @@ public class HubEnvironment extends LocalEnvironment implements io.subutai.commo
     }
 
 
-    public String getOwnerHubId()
+    public String getOwnerbazaarId()
     {
-        return ownerHubId;
+        return ownerbazaarId;
     }
 
 

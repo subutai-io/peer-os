@@ -63,7 +63,7 @@ public class UserTokenProcessor implements StateLinkProcessor
             if ( userTokenDto != null )
             {
                 //This process will get token, updates if expired
-                ctx.envUserHelper.getUserTokenFromHub( userTokenDto.getSsUserId() );
+                ctx.envUserHelper.getUserTokenFromBazaar( userTokenDto.getSsUserId() );
             }
         }
         catch ( Exception e )

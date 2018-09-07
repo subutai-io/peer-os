@@ -133,7 +133,7 @@ public class EnvironmentTelemetryProcessor extends BazaarRequester implements St
 
         JSONObject healthData = new JSONObject();
         healthData.put( configManager.getPeerId(), result.toString() );
-        sendToHUB( healthData, envId );
+        sendToBazaar( healthData, envId );
     }
 
 
@@ -181,7 +181,7 @@ public class EnvironmentTelemetryProcessor extends BazaarRequester implements St
     }
 
 
-    private void sendToHUB( JSONObject healthData, String envId )
+    private void sendToBazaar( JSONObject healthData, String envId )
     {
         try
         {

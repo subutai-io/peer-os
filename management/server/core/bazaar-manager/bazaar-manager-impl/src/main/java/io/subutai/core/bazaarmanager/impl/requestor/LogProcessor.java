@@ -30,10 +30,10 @@ public class LogProcessor extends BazaarRequester
     private LogListenerImpl logListener;
 
 
-    public LogProcessor( final ConfigManager configManager, final BazaarManagerImpl hubManager,
+    public LogProcessor( final ConfigManager configManager, final BazaarManagerImpl bazaarManager,
                          final LogListenerImpl logListener, final RestClient restClient )
     {
-        super( hubManager, restClient );
+        super( bazaarManager, restClient );
         this.configManager = configManager;
         this.logListener = logListener;
     }

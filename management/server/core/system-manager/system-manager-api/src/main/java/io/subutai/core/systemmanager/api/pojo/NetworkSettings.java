@@ -15,7 +15,7 @@ public interface NetworkSettings
     int getEndRange();
 
 
-    String getHubIp();
+    String getBazaarIp();
 
     boolean getUseRhIp();
 }

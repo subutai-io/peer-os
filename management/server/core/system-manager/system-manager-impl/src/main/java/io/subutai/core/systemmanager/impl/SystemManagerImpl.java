@@ -149,7 +149,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setUseRhIp( !localPeerInfo.isManualSetting() );
         pojo.setStartRange( Integer.parseInt( Common.P2P_PORT_RANGE_START ) );
         pojo.setEndRange( Integer.parseInt( Common.P2P_PORT_RANGE_END ) );
-        pojo.setHubIp( Common.BAZAAR_IP );
+        pojo.setBazaarIp( Common.BAZAAR_IP );
 
         return pojo;
     }
@@ -280,7 +280,7 @@ public class SystemManagerImpl implements SystemManager
             return false;
         }
 
-        notifyHubThatPeerIsOffline();
+        notifyBazaarThatPeerIsOffline();
 
         isUpdateInProgress = true;
 
@@ -344,7 +344,7 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public void notifyHubThatPeerIsOffline()
+    public void notifyBazaarThatPeerIsOffline()
     {
         BazaarManager bazaarManager = ServiceLocator.lookup( BazaarManager.class );
         bazaarManager.notifyBazaarThatPeerIsOffline();
@@ -352,7 +352,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public String getHubIp()
+    public String getBazaarIp()
     {
         return Common.BAZAAR_IP;
     }

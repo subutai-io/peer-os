@@ -354,8 +354,8 @@ public class UserEntity implements User
 
 
     @Override
-    public boolean isHubUser()
+    public boolean isBazaarUser()
     {
-        return type == UserType.HUB.getId();
+        return type == UserType.BAZAAR.getId();
     }
 }

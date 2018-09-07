@@ -93,5 +93,5 @@ public interface RestService
     @GET
     @Path( "bazaar_ip" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response getHubIp();
+    Response getBazaarIp();
 }

@@ -9,7 +9,7 @@ public class EnvironmentInfoDto
 {
     private String id;
 
-    private Long hubId;
+    private Long bazaarId;
 
     private String ownerId;
 
@@ -65,15 +65,15 @@ public class EnvironmentInfoDto
     }
 
 
-    public Long getHubId()
+    public Long getbazaarId()
     {
-        return hubId;
+        return bazaarId;
     }
 
 
-    public void setHubId( Long hubId )
+    public void setbazaarId( Long bazaarId )
     {
-        this.hubId = hubId;
+        this.bazaarId = bazaarId;
     }
 
 

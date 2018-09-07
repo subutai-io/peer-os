@@ -3,34 +3,34 @@ package io.subutai.core.bazaarmanager.rest.pojo;
 
 public class RegistrationPojo
 {
-    private boolean isRegisteredToHub;
-    private boolean isHubReachable;
+    private boolean isRegisteredToBazaar;
+    private boolean isBazaarReachable;
     private String ownerId;
     private String currentUserEmail;
     private String peerName;
 
 
-    public boolean isRegisteredToHub()
+    public boolean isRegisteredToBazaar()
     {
-        return isRegisteredToHub;
+        return isRegisteredToBazaar;
     }
 
 
-    public void setRegisteredToHub( boolean isRegisteredToHub )
+    public void setRegisteredToBazaar( boolean isRegisteredToBazaar )
     {
-        this.isRegisteredToHub = isRegisteredToHub;
+        this.isRegisteredToBazaar = isRegisteredToBazaar;
     }
 
 
-    public boolean isHubReachable()
+    public boolean isBazaarReachable()
     {
-        return isHubReachable;
+        return isBazaarReachable;
     }
 
 
-    public void setHubReachable( final boolean hubReachable )
+    public void setBazaarReachable( final boolean bazaarReachable )
     {
-        isHubReachable = hubReachable;
+        isBazaarReachable = bazaarReachable;
     }
 
 

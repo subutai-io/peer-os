@@ -45,7 +45,7 @@ public class UploadEnvironmentsTask implements Runnable
     public void run()
     {
         //0. check if peer is registered withbazaar andbazaar is reachable
-        if ( !environmentAdapter.canWorkWithHub() )
+        if ( !environmentAdapter.canWorkWithBazaar() )
         {
             return;
         }

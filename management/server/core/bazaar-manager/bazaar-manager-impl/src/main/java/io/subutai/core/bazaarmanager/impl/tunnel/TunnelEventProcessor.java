@@ -77,7 +77,7 @@ public class TunnelEventProcessor extends BazaarRequester
             }
             else
             {
-                checkTunnelStateHub( resourceHost );
+                checkTunnelStateBazaar( resourceHost );
             }
         }
         catch ( Exception e )
@@ -99,13 +99,13 @@ public class TunnelEventProcessor extends BazaarRequester
 
             if ( OPENED_IP_PORT == null || !map.containsValue( OPENED_IP_PORT ) )
             {
-                sendDataToHub( map );
+                sendDataToBazaar( map );
             }
         }
     }
 
 
-    private void checkTunnelStateHub( ResourceHost resourceHost ) throws CommandException
+    private void checkTunnelStateBazaar( ResourceHost resourceHost ) throws CommandException
     {
         TunnelInfoDto tunnelInfoDto = TunnelHelper
                 .getPeerTunnelState( format( REST_GET_TUNNEL_DATA_URL, configManager.getPeerId() ), restClient );
@@ -136,7 +136,7 @@ public class TunnelEventProcessor extends BazaarRequester
     }
 
 
-    private void sendDataToHub( Map<Long, String> map )
+    private void sendDataToBazaar( Map<Long, String> map )
     {
         setOpenPort( getOptimalIpPort( map ) );
 

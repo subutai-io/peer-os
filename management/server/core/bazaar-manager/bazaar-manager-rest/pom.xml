@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>bazaar-manager-rest</artifactId>
-  <name>Subutai Hub Manager REST</name>
-  <description>Subutai Hub Manager REST</description>
+  <name>Subutai bazaarManager REST</name>
+  <description>Subutai bazaarManager REST</description>
   <packaging>bundle</packaging>
 
   <dependencies>
@@ -93,7 +93,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.hubmanager.rest</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.bazaarmanager.rest</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

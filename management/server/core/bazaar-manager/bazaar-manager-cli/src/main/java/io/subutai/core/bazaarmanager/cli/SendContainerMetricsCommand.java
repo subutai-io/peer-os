@@ -21,7 +21,7 @@ public class SendContainerMetricsCommand extends SubutaiShellCommandSupport
 
     public SendContainerMetricsCommand( final BazaarManager bazaarManager )
     {
-        Preconditions.checkNotNull( bazaarManager, "Hub manager is null" );
+        Preconditions.checkNotNull( bazaarManager, "Bazaar manager is null" );
 
         this.bazaarManager = bazaarManager;
     }

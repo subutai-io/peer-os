@@ -64,7 +64,7 @@ import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.adapter.HubEnvironment;
+import io.subutai.core.environment.impl.adapter.BazaarEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
@@ -211,19 +211,19 @@ public class EnvironmentManagerSecureProxy extends HostListener
 
         // Environments created onbazaar doesn't have relation data on SS side. We have to add this in future.
         // Meantime, we just bypass the relation check.
-        Set<Environment> hubEnvs = new HashSet<>();
+        Set<Environment> bazaarEnvs = new HashSet<>();
 
         for ( Environment env : result )
         {
-            if ( env instanceof HubEnvironment )
+            if ( env instanceof BazaarEnvironment )
             {
-                hubEnvs.add( env );
+                bazaarEnvs.add( env );
             }
         }
 
         check( null, result, traitsBuilder( "ownership=All;read=true" ) );
 
-        result.addAll( hubEnvs );
+        result.addAll( bazaarEnvs );
 
         return result;
     }
@@ -361,7 +361,7 @@ public class EnvironmentManagerSecureProxy extends HostListener
 
             // Environments created onbazaar doesn't have relation data on SS side. We have to add this in future.
             // Meantime, we just bypass the relation check.
-            if ( !identityManager.isTenantManager() && !( environment instanceof HubEnvironment ) )
+            if ( !identityManager.isTenantManager() && !( environment instanceof BazaarEnvironment ) )
             {
                 check( null, environment, traitsBuilder( "ownership=All;delete=true" ) );
             }
@@ -394,7 +394,7 @@ public class EnvironmentManagerSecureProxy extends HostListener
 
         // Environments created onbazaar doesn't have relation data on SS side. We have to add this in future.
         // Meantime, we just bypass the relation check.
-        if ( environment instanceof HubEnvironment )
+        if ( environment instanceof BazaarEnvironment )
         {
             environmentManager.destroyContainer( environmentId, containerId, async );
 
@@ -436,7 +436,7 @@ public class EnvironmentManagerSecureProxy extends HostListener
         Environment environment = environmentManager.loadEnvironment( environmentId );
 
         // Environment is frombazaar
-        if ( environment instanceof HubEnvironment )
+        if ( environment instanceof BazaarEnvironment )
         {
             return environment;
         }

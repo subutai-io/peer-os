@@ -77,11 +77,11 @@ public class BazaaarAdapterImpl extends HostListener implements BazaaarAdapter, 
 
     private RestClient getRestClient()
     {
-        return getHubManager().getRestClient();
+        return getbazaarmanager().getRestClient();
     }
 
 
-    private BazaarManager getHubManager()
+    private BazaarManager getbazaarmanager()
     {
         return ServiceLocator.lookup( BazaarManager.class );
     }
@@ -290,14 +290,14 @@ public class BazaaarAdapterImpl extends HostListener implements BazaaarAdapter, 
     @Override
     public void onEnvironmentCreated( final Environment environment )
     {
-        getHubManager().schedulePeerMetrics();
+        getbazaarmanager().schedulePeerMetrics();
     }
 
 
     @Override
     public void onEnvironmentGrown( final Environment environment, final Set<EnvironmentContainerHost> newContainers )
     {
-        getHubManager().schedulePeerMetrics();
+        getbazaarmanager().schedulePeerMetrics();
     }
 
 
@@ -306,14 +306,14 @@ public class BazaaarAdapterImpl extends HostListener implements BazaaarAdapter, 
     {
         destroyContainer( environment.getId(), containerId );
 
-        getHubManager().schedulePeerMetrics();
+        getbazaarmanager().schedulePeerMetrics();
     }
 
 
     @Override
     public void onEnvironmentDestroyed( final String environmentId )
     {
-        getHubManager().schedulePeerMetrics();
+        getbazaarmanager().schedulePeerMetrics();
     }
 
 
@@ -322,7 +322,7 @@ public class BazaaarAdapterImpl extends HostListener implements BazaaarAdapter, 
     {
         onContainerStateChange( environment.getId(), containerId, "start" );
 
-        getHubManager().schedulePeerMetrics();
+        getbazaarmanager().schedulePeerMetrics();
     }
 
 
@@ -331,7 +331,7 @@ public class BazaaarAdapterImpl extends HostListener implements BazaaarAdapter, 
     {
         onContainerStateChange( environment.getId(), containerId, "stop" );
 
-        getHubManager().schedulePeerMetrics();
+        getbazaarmanager().schedulePeerMetrics();
     }
 
 

@@ -42,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-hub-share</artifactId>
+      <artifactId>subutai-bazaar-share</artifactId>
     </dependency>
 
     <dependency>

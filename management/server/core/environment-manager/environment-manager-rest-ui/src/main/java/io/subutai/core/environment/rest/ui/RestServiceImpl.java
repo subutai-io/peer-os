@@ -47,7 +47,7 @@ import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.HubEnvironment;
+import io.subutai.common.environment.BazaarEnvironment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.Topology;
@@ -168,7 +168,7 @@ public class RestServiceImpl implements RestService
         try
         {
             //disallow bazaar users to use this operation
-            filterHubUser();
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -278,7 +278,7 @@ public class RestServiceImpl implements RestService
         try
         {
             //disallow bazaar users to use this operation
-            filterHubUser();
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -329,7 +329,7 @@ public class RestServiceImpl implements RestService
         try
         {
             //disallow bazaar users to use this operation
-            filterHubUser();
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -396,7 +396,7 @@ public class RestServiceImpl implements RestService
         try
         {
             //disallow bazaar users to use this operation
-            filterHubUser();
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -818,7 +818,7 @@ public class RestServiceImpl implements RestService
         try
         {
             //disallow bazaar users to use this operation
-            filterHubUser();
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -1166,8 +1166,9 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                String dataSource = ( environment instanceof HubEnvironment || String.format( "Of %s", Common.BAZAAR_ID )
-                                                                                     .equals(
+                String dataSource = ( environment instanceof BazaarEnvironment
+                        || String.format( "Of %s", Common.BAZAAR_ID )
+                                 .equals(
                                                                                              environment.getName() ) ) ?
                                     Common.BAZAAR_ID : Common.SUBUTAI_ID;
 
@@ -1271,10 +1272,10 @@ public class RestServiceImpl implements RestService
     /**
      * Filter if active user isbazaar user.
      */
-    private void filterHubUser() throws AccessControlException
+    private void filterBazaarUser() throws AccessControlException
     {
         User user = identityManager.getActiveUser();
-        if ( user.isHubUser() )
+        if ( user.isBazaarUser() )
         {
             throw new AccessControlException( "You don't have permission to perform this operation" );
         }

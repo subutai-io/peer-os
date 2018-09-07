@@ -11,8 +11,8 @@
 
   <artifactId>bazaar-manager-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Hub Manager Api</name>
-  <description>Subutai Hub Manager Api</description>
+  <name>Subutai bazaarManager Api</name>
+  <description>Subutai bazaarManager Api</description>
 
   <dependencies>
     <dependency>
@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-hub-share</artifactId>
+      <artifactId>subutai-bazaar-share</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -40,7 +40,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.hubmanager.api</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.bazaarmanager.api</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

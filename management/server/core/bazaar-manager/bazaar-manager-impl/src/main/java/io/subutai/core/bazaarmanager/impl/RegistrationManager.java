@@ -35,7 +35,7 @@ class RegistrationManager
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private final BazaarManagerImpl hubManager;
+    private final BazaarManagerImpl bazaarManager;
 
     private final ConfigManager configManager;
 
@@ -44,13 +44,13 @@ class RegistrationManager
     private final RestClient restClient;
 
 
-    RegistrationManager( BazaarManagerImpl hubManager, ConfigManager configManager )
+    RegistrationManager( BazaarManagerImpl bazaarManager, ConfigManager configManager )
     {
-        this.hubManager = hubManager;
+        this.bazaarManager = bazaarManager;
         this.configManager = configManager;
         this.peerId = configManager.getPeerId();
 
-        restClient = hubManager.getRestClient();
+        restClient = bazaarManager.getRestClient();
     }
 
 
@@ -141,14 +141,14 @@ class RegistrationManager
         try
         {
             config = new ConfigEntity( regDto.getPeerInfo().getId(), Common.BAZAAR_IP,
-                    hubManager.getPeerInfo().get( "OwnerId" ), email, peerName );
+                    bazaarManager.getPeerInfo().get( "OwnerId" ), email, peerName );
         }
         catch ( Exception e )
         {
             throw new BazaarManagerException( e );
         }
 
-        hubManager.getConfigDataService().saveBazaarConfig( config );
+        bazaarManager.getConfigDataService().saveBazaarConfig( config );
 
         log.info( "Peer registered successfully" );
     }
@@ -171,7 +171,7 @@ class RegistrationManager
             throw new BazaarManagerException( "Error to unregister peer: " + restResult.getError() );
         }
 
-        hubManager.getConfigDataService().deleteConfig( configManager.getPeerId() );
+        bazaarManager.getConfigDataService().deleteConfig( configManager.getPeerId() );
 
         log.info( "Unregistered successfully" );
     }

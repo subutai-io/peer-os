@@ -176,7 +176,7 @@
       <!-- subutai-bazaar-share -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>subutai-hub-share</artifactId>
+        <artifactId>subutai-bazaar-share</artifactId>
         <version>${project.version}</version>
       </dependency>
 

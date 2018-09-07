@@ -127,13 +127,13 @@ public class RestServiceImpl implements RestService
             pojo.setPeerName( bazaarManager.getPeerName() );
         }
 
-        pojo.setRegisteredToHub( bazaarManager.isRegisteredWithBazaar() );
+        pojo.setRegisteredToBazaar( bazaarManager.isRegisteredWithBazaar() );
 
-        pojo.setHubReachable( bazaarManager.isBazaarReachable() );
+        pojo.setBazaarReachable( bazaarManager.isBazaarReachable() );
 
-        String hubRegistrationInfo = JsonUtil.GSON.toJson( pojo );
+        String registrationInfo = JsonUtil.GSON.toJson( pojo );
 
-        return Response.status( Response.Status.OK ).entity( hubRegistrationInfo ).build();
+        return Response.status( Response.Status.OK ).entity( registrationInfo ).build();
     }
 
 

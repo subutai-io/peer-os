@@ -42,10 +42,10 @@ public class VersionInfoProcessor extends BazaarRequester
     private PeerManager peerManager;
 
 
-    public VersionInfoProcessor( final BazaarManagerImpl hubManager, final PeerManager peerManager,
+    public VersionInfoProcessor( final BazaarManagerImpl bazaarManager, final PeerManager peerManager,
                                  final ConfigManager configManager, final RestClient restClient )
     {
-        super( hubManager, restClient );
+        super( bazaarManager, restClient );
 
         this.peerManager = peerManager;
         this.configManager = configManager;

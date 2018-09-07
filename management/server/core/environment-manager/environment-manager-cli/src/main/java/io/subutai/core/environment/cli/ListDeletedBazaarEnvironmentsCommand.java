@@ -11,13 +11,13 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 @Command( scope = "environment", name = "list-deleted-on-bazaar", description = "Command to view deleted Bazaar"
         + "environments" )
-public class ListDeletedHubEnvironmentsCommand extends SubutaiShellCommandSupport
+public class ListDeletedBazaarEnvironmentsCommand extends SubutaiShellCommandSupport
 {
 
     private final EnvironmentManager environmentManager;
 
 
-    public ListDeletedHubEnvironmentsCommand( final EnvironmentManager environmentManager )
+    public ListDeletedBazaarEnvironmentsCommand( final EnvironmentManager environmentManager )
     {
         Preconditions.checkNotNull( environmentManager );
 

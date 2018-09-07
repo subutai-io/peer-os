@@ -22,8 +22,8 @@
     <version>7.0.8-SNAPSHOT</version>
   </parent>
 
-  <artifactId>subutai-hub-share</artifactId>
-  <name>Subutai Hub Share</name>
+  <artifactId>subutai-bazaar-share</artifactId>
+  <name>Subutai bazaarShare</name>
   <packaging>jar</packaging>
 
   <dependencies>

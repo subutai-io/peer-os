@@ -491,7 +491,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function showSSHKeyForm(environmentId) {
 
-		if ( alertForHubEnvironment( environmentId ) )
+		if ( alertForBazaarEnvironment( environmentId ) )
 		{
 			return;
 		}
@@ -505,7 +505,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 
-	function alertForHubEnvironment( envId )
+	function alertForBazaarEnvironment( envId )
 	{
 		var env = getEnvironment( envId );
 
@@ -536,7 +536,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function showSSHKeysPopup(environmentId) {
 
-		if ( alertForHubEnvironment( environmentId ) )
+		if ( alertForBazaarEnvironment( environmentId ) )
 		{
 			return;
 		}
@@ -577,7 +577,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function showDomainForm(environmentId) {
 
-		if ( alertForHubEnvironment( environmentId ) )
+		if ( alertForBazaarEnvironment( environmentId ) )
 		{
 			return;
 		}
