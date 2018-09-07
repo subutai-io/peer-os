@@ -1,0 +1,9 @@
+
+Export-Package: \
+     io.subutai.core.bazaarmanager.api, \
+     io.subutai.core.bazaarmanager.api.dao, \
+     io.subutai.core.bazaarmanager.api.exception, \
+     io.subutai.core.bazaarmanager.api.model
+
+
+Import-Package: *

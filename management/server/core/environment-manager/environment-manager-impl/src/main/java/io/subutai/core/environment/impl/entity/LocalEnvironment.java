@@ -579,7 +579,7 @@ public class LocalEnvironment implements Environment, Serializable
                     new ContainerDto( host.getId(), getId(), host.getHostname(), host.getIp(), host.getTemplateName(),
                             host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
                             host.getResourceHostId().getId(), isLocalContainer,
-                            this instanceof HubEnvironment ? Common.HUB_ID : Common.SUBUTAI_ID, containerHostState,
+                            this instanceof HubEnvironment ? Common.BAZAAR_ID : Common.SUBUTAI_ID, containerHostState,
                             host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() );
             containerDto.setQuota( quota );
             containerDtos.add( containerDto );

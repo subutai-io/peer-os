@@ -249,7 +249,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 							vm.containerState.length > 0
 						) {continue;}
 
-						// We don't show on UI containers created by Hub, located on other peers.
+						// We don't show on UI containers created bybazaar, located on other peers.
 						// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
 						// @todo remove when implement on backend
 						var container = vm.environments[i].containers[j];

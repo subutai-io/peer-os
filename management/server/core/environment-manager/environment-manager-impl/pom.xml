@@ -27,7 +27,7 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>hub-manager-api</artifactId>
+      <artifactId>bazaar-manager-api</artifactId>
     </dependency>
     <dependency>
 

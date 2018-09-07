@@ -2,7 +2,7 @@ package io.subutai.common.environment;
 
 
 /**
- * Marker interface for Hub side environments
+ * Marker interface forbazaar side environments
  */
 public interface HubEnvironment
 {

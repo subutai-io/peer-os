@@ -11,9 +11,9 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.hub.share.resource.ByteUnit;
-import io.subutai.hub.share.resource.ByteValueResource;
-import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.resource.ByteUnit;
+import io.subutai.bazaar.share.resource.ByteValueResource;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
 
 
 @Command( scope = "alert", name = "put" )

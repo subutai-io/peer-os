@@ -38,7 +38,7 @@
   <reference id="systemManager"
              interface="io.subutai.core.systemmanager.api.SystemManager" />
 
-  <reference id="hubAdapter" availability="optional" interface="io.subutai.hub.share.common.HubAdapter" />
+  <reference id="bazaaarAdapter" availability="optional" interface="io.subutai.bazaar.share.common.BazaaarAdapter" />
 
   <!-- JTA -->
 
@@ -88,7 +88,7 @@
     <argument ref="identityManager" />
     <argument ref="tracker" />
     <argument ref="relationManager" />
-    <argument ref="hubAdapter" />
+    <argument ref="bazaaarAdapter" />
     <argument ref="envMgrService" />
     <argument ref="systemManager" />
   </bean>
@@ -97,7 +97,7 @@
   <service ref="environmentManager" interface="io.subutai.core.environment.api.SecureEnvironmentManager" />
   <service ref="environmentManager" interface="io.subutai.common.peer.AlertListener" />
   <service ref="environmentManager" interface="io.subutai.core.peer.api.PeerActionListener" />
-  <service ref="environmentManager" interface="io.subutai.hub.share.common.HubEventListener" />
+  <service ref="environmentManager" interface="io.subutai.bazaar.share.common.BazaarEventListener" />
   <service ref="environmentManager" interface="io.subutai.core.hostregistry.api.HostListener" />
   <service ref="environmentManager" interface="io.subutai.common.peer.LocalPeerEventListener" />
 

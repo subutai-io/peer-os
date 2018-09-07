@@ -9,7 +9,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 public class ChangeQuotaStep

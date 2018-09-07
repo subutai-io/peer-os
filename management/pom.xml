@@ -173,7 +173,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- subutai-hub-share -->
+      <!-- subutai-bazaar-share -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>subutai-hub-share</artifactId>
@@ -485,25 +485,25 @@
       </dependency>
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-      <!--hub-manager -->
+      <!--bazaar-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hub-manager-api</artifactId>
+        <artifactId>bazaar-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hub-manager-impl</artifactId>
+        <artifactId>bazaar-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hub-manager-rest</artifactId>
+        <artifactId>bazaar-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hub-manager-cli</artifactId>
+        <artifactId>bazaar-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 

@@ -33,7 +33,7 @@ public class HubEnvironment extends LocalEnvironment implements io.subutai.commo
     HubEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
                     ProxyContainerHelper proxyContainerHelper )
     {
-        super( json.get( "name" ).asText(), null, 0L, Common.HUB_ID );
+        super( json.get( "name" ).asText(), null, 0L, Common.BAZAAR_ID );
 
         init( json );
 

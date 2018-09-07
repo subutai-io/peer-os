@@ -89,8 +89,8 @@ import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.resource.PeerResources;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.resource.PeerResources;
 
 
 /**

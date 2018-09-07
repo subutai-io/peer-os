@@ -7,8 +7,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.gson.required.GsonRequired;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 /**

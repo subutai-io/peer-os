@@ -10,13 +10,13 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.util.JsonUtil;
-import io.subutai.hub.share.quota.ContainerCpuResource;
-import io.subutai.hub.share.quota.ContainerDiskResource;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerRamResource;
-import io.subutai.hub.share.quota.ContainerSize;
-import io.subutai.hub.share.quota.Quota;
-import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.quota.ContainerCpuResource;
+import io.subutai.bazaar.share.quota.ContainerDiskResource;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerRamResource;
+import io.subutai.bazaar.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.Quota;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
 
 import static junit.framework.TestCase.assertEquals;
 

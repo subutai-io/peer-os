@@ -46,7 +46,7 @@ try {
         sh """
 		cd management
         git checkout ${env.BRANCH_NAME}
-		sed 's/export HUB_IP=.*/export HUB_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
+		sed 's/export BAZAAR_IP=.*/export BAZAAR_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
 			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
 		else 

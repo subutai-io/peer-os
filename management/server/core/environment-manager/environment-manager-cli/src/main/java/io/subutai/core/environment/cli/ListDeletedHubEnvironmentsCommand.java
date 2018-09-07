@@ -29,7 +29,7 @@ public class ListDeletedHubEnvironmentsCommand extends SubutaiShellCommandSuppor
     protected Object doExecute() throws Exception
     {
 
-        for ( String environmentId : environmentManager.getDeletedEnvironmentsFromHub() )
+        for ( String environmentId : environmentManager.getDeletedEnvironmentsFromBazaar() )
         {
             System.out.println( String.format( "Environment id %s", environmentId ) );
         }

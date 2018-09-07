@@ -87,9 +87,9 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.hub.share.common.HubAdapter;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -133,7 +133,7 @@ public class EnvironmentManagerImplTest
     @Mock
     RelationManager relationManager;
     @Mock
-    HubAdapter hubAdapter;
+    BazaaarAdapter bazaaarAdapter;
     @Mock
     EnvironmentService environmentService;
     @Mock
@@ -191,15 +191,16 @@ public class EnvironmentManagerImplTest
         public EnvironmentManagerImplSUT( final TemplateManager templateManager, final PeerManager peerManager,
                                           final SecurityManager securityManager, final IdentityManager identityManager,
                                           final Tracker tracker, final RelationManager relationManager,
-                                          final HubAdapter hubAdapter, final EnvironmentService environmentService,
+                                          final BazaaarAdapter bazaaarAdapter, final EnvironmentService environmentService,
                                           final SystemManager systemManager )
         {
-            super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
+            super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager,
+                    bazaaarAdapter,
                     environmentService, systemManager );
         }
 
 
-        protected EnvironmentAdapter getEnvironmentAdapter( HubAdapter hubAdapter )
+        protected EnvironmentAdapter getEnvironmentAdapter( BazaaarAdapter bazaaarAdapter )
         {
             return environmentAdapter;
         }
@@ -226,7 +227,7 @@ public class EnvironmentManagerImplTest
 
         environmentManager =
                 spy( new EnvironmentManagerImplSUT( templateManager, peerManager, securityManager, identityManager,
-                        tracker, relationManager, hubAdapter, environmentService, systemManager ) );
+                        tracker, relationManager, bazaaarAdapter, environmentService, systemManager ) );
         environmentManager.jsonUtil = jsonUtil;
         environmentManager.pgpKeyUtil = pgpKeyUtil;
         environmentManager.activeWorkflows = activeWorkflows;

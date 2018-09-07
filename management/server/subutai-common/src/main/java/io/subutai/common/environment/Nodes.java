@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 public class Nodes

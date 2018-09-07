@@ -36,7 +36,7 @@
     <module>object-relation-manager</module>
     <module>system-manager</module>
     <module>desktop-manager</module>
-    <module>hub-manager</module>
+    <module>bazaar-manager</module>
     <module>karaf-manager</module>
     <module>template-manager</module>
   </modules>

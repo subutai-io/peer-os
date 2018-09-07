@@ -25,8 +25,8 @@ import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;

@@ -82,7 +82,7 @@ public class RestServiceImpl implements RestService
                     Optional<EnvironmentDto> envDto = environmentManager.getTenantEnvironments().stream().filter(
                             env -> environmentId.equalsIgnoreCase( env.getId() ) ).findFirst();
 
-                    if ( envDto.isPresent() && !Common.HUB_ID.equalsIgnoreCase( envDto.get().getDataSource() ) )
+                    if ( envDto.isPresent() && !Common.BAZAAR_ID.equalsIgnoreCase( envDto.get().getDataSource() ) )
                     {
                         Optional<ContainerDto> containerDto = envDto.get().getContainers().stream().filter(
                                 cont -> hostId.equalsIgnoreCase( cont.getId() ) ).findFirst();

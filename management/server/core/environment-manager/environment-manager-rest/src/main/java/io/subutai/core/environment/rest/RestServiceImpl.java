@@ -39,8 +39,8 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.template.api.TemplateManager;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 public class RestServiceImpl implements RestService
@@ -172,10 +172,10 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                String dataSource = ( environment instanceof HubEnvironment || String.format( "Of %s", Common.HUB_ID )
+                String dataSource = ( environment instanceof HubEnvironment || String.format( "Of %s", Common.BAZAAR_ID )
                                                                                      .equals(
                                                                                              environment.getName() ) ) ?
-                                    Common.HUB_ID : Common.SUBUTAI_ID;
+                                    Common.BAZAAR_ID : Common.SUBUTAI_ID;
 
                 EnvironmentDto environmentDto =
                         new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),

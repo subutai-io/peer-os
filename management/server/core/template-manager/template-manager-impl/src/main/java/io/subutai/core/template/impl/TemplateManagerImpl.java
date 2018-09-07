@@ -104,7 +104,7 @@ public class TemplateManagerImpl implements TemplateManager
             try
             {
                 HttpGet httpGet = new HttpGet(
-                        String.format( "https://%s/rest/v1/cdn/templates?version=latest", Common.HUB_IP ) );
+                        String.format( "https://%s/rest/v1/cdn/templates?version=latest", Common.BAZAAR_IP ) );
                 CloseableHttpResponse response = client.execute( httpGet );
 
                 try
@@ -346,7 +346,7 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             HttpGet httpGet = new HttpGet(
-                    String.format( "https://%s/rest/v1/cdn/token?fingerprint=%s", Common.HUB_IP, getFingerprint() ) );
+                    String.format( "https://%s/rest/v1/cdn/token?fingerprint=%s", Common.BAZAAR_IP, getFingerprint() ) );
             CloseableHttpResponse response = client.execute( httpGet );
             try
             {
@@ -386,7 +386,7 @@ public class TemplateManagerImpl implements TemplateManager
         CloseableHttpClient client = getHttpsClient();
         try
         {
-            HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/token", Common.HUB_IP ) );
+            HttpPost post = new HttpPost( String.format( "https://%s/rest/v1/cdn/token", Common.BAZAAR_IP ) );
 
             List<NameValuePair> form = Lists.newArrayList();
             form.add( new BasicNameValuePair( "request", signedRequest ) );
@@ -435,7 +435,7 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             HttpGet httpGet =
-                    new HttpGet( String.format( "https://%s/rest/v1/cdn/users/%s", Common.HUB_IP, getFingerprint() ) );
+                    new HttpGet( String.format( "https://%s/rest/v1/cdn/users/%s", Common.BAZAAR_IP, getFingerprint() ) );
             CloseableHttpResponse response = client.execute( httpGet );
             try
             {
@@ -467,7 +467,7 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             HttpGet httpGet = new HttpGet(
-                    String.format( "https://%s/rest/v1/cdn/users/username?token=%s", Common.HUB_IP, token ) );
+                    String.format( "https://%s/rest/v1/cdn/users/username?token=%s", Common.BAZAAR_IP, token ) );
             CloseableHttpResponse response = client.execute( httpGet );
             try
             {

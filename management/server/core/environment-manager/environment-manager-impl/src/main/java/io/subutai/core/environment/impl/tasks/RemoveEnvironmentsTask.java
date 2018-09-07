@@ -53,7 +53,7 @@ public class RemoveEnvironmentsTask implements Runnable
                     environmentManager.getLocallyRegisteredHubEnvironments();
 
 
-            // 1. remove environments on Hub that are missing locally
+            // 1. remove environments onbazaar that are missing locally
 
             Set<Environment> environmentsMissingLocally = Sets.newHashSet();
 
@@ -77,7 +77,7 @@ public class RemoveEnvironmentsTask implements Runnable
                 }
             }
 
-            // remove all missing env-s from Hub
+            // remove all missing env-s frombazaar
 
             for ( Environment environment : environmentsMissingLocally )
             {
@@ -85,7 +85,7 @@ public class RemoveEnvironmentsTask implements Runnable
             }
 
 
-            // 2. remove local environments that are missing on Hub
+            // 2. remove local environments that are missing onbazaar
 
             Set<String> deletedEnvironmentsIdsOnHub = environmentAdapter.getDeletedEnvironmentsIds();
             Set<Environment> environmentsMissingOnHub = Sets.newHashSet();
@@ -110,7 +110,7 @@ public class RemoveEnvironmentsTask implements Runnable
                 }
             }
 
-            // destroy local env-s missing on Hub
+            // destroy local env-s missing onbazaar
 
             for ( Environment environment : environmentsMissingOnHub )
             {
@@ -119,14 +119,14 @@ public class RemoveEnvironmentsTask implements Runnable
                 environmentManager.notifyOnEnvironmentDestroyed( environment.getId() );
             }
 
-            // notify Hub about environment deletion
+            // notifybazaar about environment deletion
 
             for ( String hubEnvironmentId : deletedEnvironmentsIdsOnHub )
             {
                 environmentAdapter.removeEnvironment( hubEnvironmentId );
             }
 
-            // 3. Remove deleted local env-s from Hub
+            // 3. Remove deleted local env-s frombazaar
 
             Collection<LocalEnvironment> deletedEnvs = environmentService.getDeleted();
 

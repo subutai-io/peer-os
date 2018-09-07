@@ -279,22 +279,22 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!--hub-manager-->
+    <!--bazaar-manager-->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>hub-manager-api</artifactId>
+      <artifactId>bazaar-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>hub-manager-impl</artifactId>
+      <artifactId>bazaar-manager-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>hub-manager-rest</artifactId>
+      <artifactId>bazaar-manager-rest</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>hub-manager-cli</artifactId>
+      <artifactId>bazaar-manager-cli</artifactId>
     </dependency>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->

@@ -71,7 +71,7 @@ public class RemoteEnvironment extends LocalEnvironment
                     new ContainerDto( host.getId(), getId(), host.getHostname(), host.getIp(), host.getTemplateName(),
                             host.getContainerSize(), host.getArch().name(), Sets.<String>newHashSet(), host.getPeerId(),
                             host.getResourceHostId().getId(), true,
-                            Common.HUB_ID.equals( initiatorPeerId ) ? Common.HUB_ID : Common.SUBUTAI_ID,
+                            Common.BAZAAR_ID.equals( initiatorPeerId ) ? Common.BAZAAR_ID : Common.SUBUTAI_ID,
                             host.getState(), host.getTemplateId(), host.getContainerName(),
                             host.getResourceHostId().getId() );
             try

@@ -4,7 +4,7 @@ package io.subutai.common.settings;
 public class Common
 {
     public static final String E2E_PLUGIN_USER_KEY_FINGERPRINT_NAME = "su_fingerprint";
-    public static final String HUB_ID = "bazaar";
+    public static final String BAZAAR_ID = "bazaar";
     public static final String SUBUTAI_ID = "subutai";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
 
@@ -18,13 +18,13 @@ public class Common
     public static final String SUBUTAI_HTTP_HEADER = "sbt-hdr";
     public static final String KARAF_ETC = System.getProperty( "karaf.etc" );
     public static final String SUBUTAI_APP_DATA_PATH = System.getProperty( "subutaiAppDataPath" );
-    public static final String HUB_IP = System.getProperty( "hubIp" );
+    public static final String BAZAAR_IP = System.getProperty( "bazaarIp" );
     public static final String P2P_PORT_RANGE_START = System.getProperty( "p2pPortRangeStart" );
     public static final String P2P_PORT_RANGE_END = System.getProperty( "p2pPortRangeEnd" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
     public static final String LOCAL_HOST_IP = "127.0.0.1";
     public static final String LOCAL_HOST_NAME = "localhost";
-    public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keys/h.public.gpg";
+    public static final String BAZAAR_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keys/h.public.gpg";
 
     public static final String PEER_CERT_ALIAS = "peer_cert";
 

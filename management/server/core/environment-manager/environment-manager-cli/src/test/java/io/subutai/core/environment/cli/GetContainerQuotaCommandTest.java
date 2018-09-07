@@ -17,7 +17,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;

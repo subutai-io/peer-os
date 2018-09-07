@@ -13,9 +13,9 @@ import io.subutai.common.network.SshTunnel;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.util.HostUtil;
-import io.subutai.hub.share.quota.Quota;
-import io.subutai.hub.share.resource.ContainerResourceType;
-import io.subutai.hub.share.resource.PeerResources;
+import io.subutai.bazaar.share.quota.Quota;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.resource.PeerResources;
 
 
 /**

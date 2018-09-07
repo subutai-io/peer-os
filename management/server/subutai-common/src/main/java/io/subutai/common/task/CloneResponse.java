@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 public class CloneResponse implements TaskResponse

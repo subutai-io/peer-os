@@ -466,7 +466,7 @@ run() {
     fi
     cd "$KARAF_BASE"
 
-    exec "$JAVA" $JAVA_OPTS -Djavax.ws.rs.ext.RuntimeDelegate=org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl -Djava.endorsed.dirs="${JAVA_ENDORSED_DIRS}" -DsubutaiAppDataPath="${SUBUTAI_APP_DATA_PATH}" -DhubIp="${HUB_IP}" -Dp2pPortRangeStart="${P2P_PORT_RANGE_START}" -Dp2pPortRangeEnd="${P2P_PORT_RANGE_END}" -DsubutaiKeystorePath="${SUBUTAI_APP_KEYSTORE_PATH}" -DsubutaiCertsPath="${SUBUTAI_APP_CERTS_PATH}" -Djava.ext.dirs="${JAVA_EXT_DIRS}" -Dkaraf.instances="${KARAF_HOME}/instances" -Dkaraf.home="$KARAF_HOME" -Dkaraf.base="$KARAF_BASE" -Dkaraf.data="$KARAF_DATA" -Dkaraf.etc="$KARAF_ETC" -Djava.io.tmpdir="$KARAF_DATA/tmp" -Djava.util.logging.config.file="$KARAF_BASE/etc/java.util.logging.properties" $KARAF_OPTS $OPTS -classpath "$CLASSPATH" $MAIN "$@"
+    exec "$JAVA" $JAVA_OPTS -Djavax.ws.rs.ext.RuntimeDelegate=org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl -Djava.endorsed.dirs="${JAVA_ENDORSED_DIRS}" -DsubutaiAppDataPath="${SUBUTAI_APP_DATA_PATH}" -DbazaarIp="${BAZAAR_IP}" -Dp2pPortRangeStart="${P2P_PORT_RANGE_START}" -Dp2pPortRangeEnd="${P2P_PORT_RANGE_END}" -DsubutaiKeystorePath="${SUBUTAI_APP_KEYSTORE_PATH}" -DsubutaiCertsPath="${SUBUTAI_APP_CERTS_PATH}" -Djava.ext.dirs="${JAVA_EXT_DIRS}" -Dkaraf.instances="${KARAF_HOME}/instances" -Dkaraf.home="$KARAF_HOME" -Dkaraf.base="$KARAF_BASE" -Dkaraf.data="$KARAF_DATA" -Dkaraf.etc="$KARAF_ETC" -Djava.io.tmpdir="$KARAF_DATA/tmp" -Djava.util.logging.config.file="$KARAF_BASE/etc/java.util.logging.properties" $KARAF_OPTS $OPTS -classpath "$CLASSPATH" $MAIN "$@"
 }
 
 main() {

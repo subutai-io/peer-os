@@ -30,11 +30,11 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
-import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.bazaarmanager.api.BazaarManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.common.HubAdapter;
-import io.subutai.hub.share.json.JsonUtil;
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.json.JsonUtil;
 
 
 public class EnvironmentAdapter
@@ -45,26 +45,26 @@ public class EnvironmentAdapter
 
     private final ProxyContainerHelper proxyContainerHelper;
 
-    private final HubAdapter hubAdapter;
+    private final BazaaarAdapter bazaaarAdapter;
     private final IdentityManager identityManager;
 
 
     public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager,
-                               HubAdapter hubAdapter, IdentityManager identityManager )
+                               BazaaarAdapter bazaaarAdapter, IdentityManager identityManager )
     {
         this.environmentManager = environmentManager;
 
         proxyContainerHelper = new ProxyContainerHelper( peerManager );
 
-        this.hubAdapter = hubAdapter;
+        this.bazaaarAdapter = bazaaarAdapter;
 
         this.identityManager = identityManager;
     }
 
 
-    public HubAdapter getHubAdapter()
+    public BazaaarAdapter getBazaaarAdapter()
     {
-        return hubAdapter;
+        return bazaaarAdapter;
     }
 
 
@@ -94,7 +94,7 @@ public class EnvironmentAdapter
 
 
     /**
-     * Returns hub environments for this peer. Throws {@code ActionFailedException} if requests to Hub failed for some
+     * Returns bazaar environments for this peer. Throws {@code ActionFailedException} if requests tobazaar failed for some
      * reason
      *
      * @param all true: returns all environments, false: returns current user environments
@@ -106,7 +106,7 @@ public class EnvironmentAdapter
             throw new ActionFailedException( "Peer is not registered with Bazaar or connection to Bazaar failed" );
         }
 
-        String json = all ? hubAdapter.getAllEnvironmentsForPeer() : hubAdapter.getUserEnvironmentsForPeer();
+        String json = all ? bazaaarAdapter.getAllEnvironmentsForPeer() : bazaaarAdapter.getUserEnvironmentsForPeer();
 
         if ( json == null )
         {
@@ -145,7 +145,7 @@ public class EnvironmentAdapter
             throw new ActionFailedException( "Peer is not registered with Bazaar or connection to Bazaar failed" );
         }
 
-        String json = hubAdapter.getDeletedEnvironmentsForPeer();
+        String json = bazaaarAdapter.getDeletedEnvironmentsForPeer();
 
         if ( json == null )
         {
@@ -188,7 +188,7 @@ public class EnvironmentAdapter
 
             ( ( EnvironmentContainerImpl ) ch ).destroy( false );
 
-            hubAdapter.destroyContainer( env.getId(), containerId );
+            bazaaarAdapter.destroyContainer( env.getId(), containerId );
         }
         catch ( Exception e )
         {
@@ -206,7 +206,7 @@ public class EnvironmentAdapter
 
         try
         {
-            hubAdapter.removeEnvironment( envId );
+            bazaaarAdapter.removeEnvironment( envId );
 
             return true;
         }
@@ -233,17 +233,17 @@ public class EnvironmentAdapter
 
     public boolean isHubReachable()
     {
-        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
+        BazaarManager bazaarManager = ServiceLocator.getServiceOrNull( BazaarManager.class );
 
-        return hubManager != null && hubManager.isHubReachable();
+        return bazaarManager != null && bazaarManager.isBazaarReachable();
     }
 
 
     public boolean isRegisteredWithHub()
     {
-        HubManager hubManager = ServiceLocator.getServiceOrNull( HubManager.class );
+        BazaarManager bazaarManager = ServiceLocator.getServiceOrNull( BazaarManager.class );
 
-        return hubManager != null && hubManager.isRegisteredWithHub();
+        return bazaarManager != null && bazaarManager.isRegisteredWithBazaar();
     }
 
 
@@ -267,7 +267,7 @@ public class EnvironmentAdapter
 
             environmentContainersToJson( env, envJson );
 
-            hubAdapter.uploadEnvironment( envJson.toString() );
+            bazaaarAdapter.uploadEnvironment( envJson.toString() );
 
             return true;
         }
@@ -300,7 +300,7 @@ public class EnvironmentAdapter
 
             environmentContainersToJson( env, envJson );
 
-            return hubAdapter.uploadPeerOwnerEnvironment( envJson.toString() );
+            return bazaaarAdapter.uploadPeerOwnerEnvironment( envJson.toString() );
         }
         catch ( Exception e )
         {
@@ -318,7 +318,7 @@ public class EnvironmentAdapter
             return;
         }
 
-        hubAdapter.removeSshKey( envId, sshKey );
+        bazaaarAdapter.removeSshKey( envId, sshKey );
     }
 
 
@@ -329,7 +329,7 @@ public class EnvironmentAdapter
             return;
         }
 
-        hubAdapter.addSshKey( envId, sshKey );
+        bazaaarAdapter.addSshKey( envId, sshKey );
     }
 
 

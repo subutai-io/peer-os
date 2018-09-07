@@ -5,9 +5,9 @@ import java.util.Set;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.hub.share.quota.ContainerCpuResource;
-import io.subutai.hub.share.quota.ContainerDiskResource;
-import io.subutai.hub.share.quota.ContainerRamResource;
+import io.subutai.bazaar.share.quota.ContainerCpuResource;
+import io.subutai.bazaar.share.quota.ContainerDiskResource;
+import io.subutai.bazaar.share.quota.ContainerRamResource;
 
 
 /**

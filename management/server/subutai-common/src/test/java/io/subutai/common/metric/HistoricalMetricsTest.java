@@ -14,10 +14,10 @@ import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.subutai.hub.share.dto.metrics.CpuDto;
-import io.subutai.hub.share.dto.metrics.DiskDto;
-import io.subutai.hub.share.dto.metrics.HostMetricsDto;
-import io.subutai.hub.share.dto.metrics.MemoryDto;
+import io.subutai.bazaar.share.dto.metrics.CpuDto;
+import io.subutai.bazaar.share.dto.metrics.DiskDto;
+import io.subutai.bazaar.share.dto.metrics.HostMetricsDto;
+import io.subutai.bazaar.share.dto.metrics.MemoryDto;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

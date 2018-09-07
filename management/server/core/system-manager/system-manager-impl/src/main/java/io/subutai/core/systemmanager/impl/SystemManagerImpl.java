@@ -38,7 +38,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.hubmanager.api.HubManager;
+import io.subutai.core.bazaarmanager.api.BazaarManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
@@ -149,7 +149,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setUseRhIp( !localPeerInfo.isManualSetting() );
         pojo.setStartRange( Integer.parseInt( Common.P2P_PORT_RANGE_START ) );
         pojo.setEndRange( Integer.parseInt( Common.P2P_PORT_RANGE_END ) );
-        pojo.setHubIp( Common.HUB_IP );
+        pojo.setHubIp( Common.BAZAAR_IP );
 
         return pojo;
     }
@@ -346,15 +346,15 @@ public class SystemManagerImpl implements SystemManager
 
     public void notifyHubThatPeerIsOffline()
     {
-        HubManager hubManager = ServiceLocator.lookup( HubManager.class );
-        hubManager.notifyHubThatPeerIsOffline();
+        BazaarManager bazaarManager = ServiceLocator.lookup( BazaarManager.class );
+        bazaarManager.notifyBazaarThatPeerIsOffline();
     }
 
 
     @Override
     public String getHubIp()
     {
-        return Common.HUB_IP;
+        return Common.BAZAAR_IP;
     }
 
 

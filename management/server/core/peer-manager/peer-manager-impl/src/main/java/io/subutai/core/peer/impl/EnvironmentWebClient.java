@@ -26,7 +26,7 @@ import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.WebClientBuilder;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 /**
