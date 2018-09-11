@@ -1,8 +1,8 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,8 +10,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
@@ -46,7 +46,7 @@ public class EnvironmentModifyWorkflowTest
         public EnvironmentModifyWorkflowSUT( final String defaultDomain, final IdentityManager identityManager,
                                              final PeerManager peerManager, final SecurityManager securityManager,
                                              final LocalEnvironment environment, final Topology topology,
-                                             final List<String> removedContainers,
+                                             final Set<String> removedContainers,
                                              final Map<String, ContainerQuota> changedContainers,
                                              final TrackerOperation operationTracker,
                                              final EnvironmentManagerImpl environmentManager )
@@ -94,8 +94,8 @@ public class EnvironmentModifyWorkflowTest
         changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
 
         workflow = new EnvironmentModifyWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, identityManager, peerManager,
-                securityManager, environment, topology, Lists.newArrayList( TestHelper.CONTAINER_ID ),
-                changedContainers, trackerOperation, environmentManager );
+                securityManager, environment, topology, Sets.newHashSet( TestHelper.CONTAINER_ID ), changedContainers,
+                trackerOperation, environmentManager );
 
         doReturn( environment ).when( environmentManager ).update( environment );
         doReturn( environmentContainer ).when( environment ).getContainerHostById( TestHelper.CONTAINER_ID );

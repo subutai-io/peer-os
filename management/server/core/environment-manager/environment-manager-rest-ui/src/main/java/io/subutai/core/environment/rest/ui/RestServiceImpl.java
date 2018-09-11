@@ -357,7 +357,7 @@ public class RestServiceImpl implements RestService
             }
 
 
-            List<String> removedContainersList = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
+            Set<String> removedContainersList = JsonUtil.fromJson( removedContainers, new TypeToken<Set<String>>()
             {
             }.getType() );
 
@@ -418,7 +418,7 @@ public class RestServiceImpl implements RestService
 
             topology.addAllNodePlacement( nodes );
 
-            List<String> containersToRemove = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
+            Set<String> containersToRemove = JsonUtil.fromJson( removedContainers, new TypeToken<Set<String>>()
             {
             }.getType() );
 
