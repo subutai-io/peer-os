@@ -21,6 +21,8 @@ public class Common
     public static final String HUB_IP = System.getProperty( "hubIp" );
     public static final String P2P_PORT_RANGE_START = System.getProperty( "p2pPortRangeStart" );
     public static final String P2P_PORT_RANGE_END = System.getProperty( "p2pPortRangeEnd" );
+    public static final boolean CHECK_RH_LIMITS =
+            Boolean.TRUE.toString().equalsIgnoreCase( System.getProperty( "checkRhLimits" ) );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
     public static final String LOCAL_HOST_IP = "127.0.0.1";
     public static final String LOCAL_HOST_NAME = "localhost";

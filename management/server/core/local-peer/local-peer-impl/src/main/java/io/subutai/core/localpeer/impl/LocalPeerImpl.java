@@ -883,6 +883,11 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public boolean canAccommodate( final Nodes nodes ) throws PeerException
     {
+        if ( !Common.CHECK_RH_LIMITS )
+        {
+            return true;
+        }
+
         Preconditions.checkArgument(
                 nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
                         .isCollectionEmpty( nodes.getNewNodes() ) ), "Invalid nodes" );
