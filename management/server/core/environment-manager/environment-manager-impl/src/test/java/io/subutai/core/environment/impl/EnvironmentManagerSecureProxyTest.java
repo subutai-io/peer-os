@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -245,11 +244,11 @@ public class EnvironmentManagerSecureProxyTest
         Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
         changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
 
-        proxy.modifyEnvironment( TestHelper.ENV_ID, topology, Lists.newArrayList( TestHelper.CONTAINER_ID ),
+        proxy.modifyEnvironment( TestHelper.ENV_ID, topology, Sets.newHashSet( TestHelper.CONTAINER_ID ),
                 changedContainers, true );
 
         verify( environmentManager )
-                .modifyEnvironment( TestHelper.ENV_ID, topology, Lists.newArrayList( TestHelper.CONTAINER_ID ),
+                .modifyEnvironment( TestHelper.ENV_ID, topology, Sets.newHashSet( TestHelper.CONTAINER_ID ),
                         changedContainers, true );
     }
 

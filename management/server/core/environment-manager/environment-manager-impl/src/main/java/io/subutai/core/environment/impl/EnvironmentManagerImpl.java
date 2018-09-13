@@ -45,6 +45,8 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.ContainerHostInfo;
@@ -440,6 +442,24 @@ public class EnvironmentManagerImpl extends HostListener
 
                 throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getName() ) );
             }
+
+
+            try
+            {
+                if ( !peer.canAccommodate( new Nodes( topology.getPeerNodes( peer.getId() ) ) ) )
+                {
+                    operationTracker.addLogFailed(
+                            String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
+
+                    throw new EnvironmentCreationException(
+                            String.format( "Peer %s can not accommodate the requested containers", peer.getName() ) );
+                }
+            }
+            catch ( PeerException e )
+            {
+                operationTracker.addLogFailed( e.getMessage() );
+                throw new EnvironmentCreationException( e.getMessage() );
+            }
         }
 
 
@@ -557,7 +577,7 @@ public class EnvironmentManagerImpl extends HostListener
 
     @Override
     public EnvironmentCreationRef modifyEnvironment( final String environmentId, final Topology topology,
-                                                     final List<String> removedContainers,
+                                                     final Set<String> removedContainers,
                                                      final Map<String, ContainerQuota> changedContainers,
                                                      final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
@@ -601,6 +621,35 @@ public class EnvironmentManagerImpl extends HostListener
                 operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getName() ) );
 
                 throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getName() ) );
+            }
+
+            Set<Node> newNodes = topology == null ? Sets.<Node>newHashSet() : topology.getPeerNodes( peer.getId() );
+            Map<String, ContainerQuota> changedQuotas =
+                    getPeerChangedContainers( peer.getId(), changedContainers, environment );
+
+            //check if peer can accommodate the requested nodes
+            if ( ( hasContainerCreation && !newNodes.isEmpty() ) || ( hasQuotaModification && !changedQuotas
+                    .isEmpty() ) )
+            {
+                try
+                {
+                    if ( !peer.canAccommodate( new Nodes( newNodes, removedContainers, changedQuotas ) ) )
+                    {
+                        operationTracker.addLogFailed(
+                                String.format( "Peer %s can not accommodate the requested containers",
+                                        peer.getName() ) );
+
+                        throw new EnvironmentModificationException(
+                                String.format( "Peer %s can not accommodate the requested containers",
+                                        peer.getName() ) );
+                    }
+                }
+                catch ( PeerException e )
+                {
+                    operationTracker.addLogFailed( e.getMessage() );
+
+                    throw new EnvironmentModificationException( e.getMessage() );
+                }
             }
         }
 
@@ -667,34 +716,64 @@ public class EnvironmentManagerImpl extends HostListener
     }
 
 
+    private Map<String, ContainerQuota> getPeerRemovedQuotas( final String peerId, final List<String> removedNodes,
+                                                              final LocalEnvironment environment )
+            throws EnvironmentModificationException
+    {
+
+        if ( CollectionUtil.isCollectionEmpty( removedNodes ) )
+        {
+            return Maps.newHashMap();
+        }
+
+        try
+        {
+            Map<String, ContainerQuota> peerRemovedNodes = Maps.newHashMap();
+
+            for ( String containerId : removedNodes )
+            {
+                final ContainerHost containerHost = environment.getContainerHostById( containerId );
+
+                if ( Objects.equals( containerHost.getPeerId(), peerId ) )
+                {
+                    peerRemovedNodes.put( containerHost.getResourceHostId().getId(), containerHost.getQuota() );
+                }
+            }
+
+            return peerRemovedNodes;
+        }
+        catch ( Exception e )
+        {
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
     private Map<String, ContainerQuota> getPeerChangedContainers( final String peerId,
-                                                                  final Map<String, ContainerQuota>
-                                                                          allChangedContainers,
+                                                                  final Map<String, ContainerQuota> allChangedContainers,
                                                                   final LocalEnvironment environment )
             throws EnvironmentModificationException
     {
+        if ( allChangedContainers == null )
+        {
+            return Maps.newHashMap();
+        }
+
         try
         {
-            if ( allChangedContainers == null )
-            {
-                return Maps.newHashMap();
-            }
-            else
-            {
-                Map<String, ContainerQuota> peerChangedContainers = Maps.newHashMap();
+            Map<String, ContainerQuota> peerChangedContainers = Maps.newHashMap();
 
-                for ( Map.Entry<String, ContainerQuota> entry : allChangedContainers.entrySet() )
+            for ( Map.Entry<String, ContainerQuota> entry : allChangedContainers.entrySet() )
+            {
+                String containerId = entry.getKey();
+                EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
+                if ( Objects.equals( containerHost.getPeerId(), peerId ) )
                 {
-                    String containerId = entry.getKey();
-                    EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
-                    if ( Objects.equals( containerHost.getPeerId(), peerId ) )
-                    {
-                        peerChangedContainers.put( containerId, entry.getValue() );
-                    }
+                    peerChangedContainers.put( containerId, entry.getValue() );
                 }
-
-                return peerChangedContainers;
             }
+
+            return peerChangedContainers;
         }
         catch ( Exception e )
         {
@@ -1552,8 +1631,7 @@ public class EnvironmentManagerImpl extends HostListener
     protected P2PSecretKeyModificationWorkflow getP2PSecretKeyModificationWorkflow( final LocalEnvironment environment,
                                                                                     final String p2pSecretKey,
                                                                                     final long p2pSecretKeyTtlSec,
-                                                                                    final TrackerOperation
-                                                                                            operationTracker )
+                                                                                    final TrackerOperation operationTracker )
     {
         return new P2PSecretKeyModificationWorkflow( environment, p2pSecretKey, p2pSecretKeyTtlSec, operationTracker,
                 this );
@@ -1595,9 +1673,8 @@ public class EnvironmentManagerImpl extends HostListener
     protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final LocalEnvironment environment,
                                                                          final Topology topology,
                                                                          final TrackerOperation operationTracker,
-                                                                         final List<String> removedContainers,
-                                                                         final Map<String, ContainerQuota>
-                                                                                 changedContainers )
+                                                                         final Set<String> removedContainers,
+                                                                         final Map<String, ContainerQuota> changedContainers )
 
     {
         return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, identityManager, peerManager, securityManager,
@@ -1606,8 +1683,7 @@ public class EnvironmentManagerImpl extends HostListener
 
 
     protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final LocalEnvironment environment,
-                                                                                final TrackerOperation
-                                                                                        operationTracker )
+                                                                                final TrackerOperation operationTracker )
     {
         return new EnvironmentDestructionWorkflow( this, environment, operationTracker );
     }

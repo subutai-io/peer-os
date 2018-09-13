@@ -245,11 +245,12 @@ public class RestServiceImpl implements RestService
     @Override
     public Boolean canAccommodate( final Nodes nodes )
     {
+        //TODO
         try
         {
             Preconditions.checkArgument(
                     nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
-                            .isCollectionEmpty( nodes.getNodes() ) ), "Invalid nodes" );
+                            .isCollectionEmpty( nodes.getNewNodes() ) ), "Invalid nodes" );
 
             return localPeer.canAccommodate( nodes );
         }
