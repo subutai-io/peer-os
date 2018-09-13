@@ -2,8 +2,8 @@ package io.subutai.core.environment.impl.workflow.modification;
 
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
@@ -34,7 +34,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     private final PeerManager peerManager;
     private LocalEnvironment environment;
     private final Topology topology;
-    private List<String> removedContainers;
+    private Set<String> removedContainers;
     private Map<String, ContainerQuota> changedContainers;
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
@@ -59,7 +59,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
     public EnvironmentModifyWorkflow( String defaultDomain, IdentityManager identityManager, PeerManager peerManager,
                                       SecurityManager securityManager, LocalEnvironment environment, Topology topology,
-                                      List<String> removedContainers, Map<String, ContainerQuota> changedContainers,
+                                      Set<String> removedContainers, Map<String, ContainerQuota> changedContainers,
                                       TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
 

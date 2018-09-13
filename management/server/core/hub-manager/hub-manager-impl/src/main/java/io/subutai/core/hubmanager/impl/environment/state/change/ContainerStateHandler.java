@@ -1,7 +1,7 @@
 package io.subutai.core.hubmanager.impl.environment.state.change;
 
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerId;
@@ -76,7 +76,7 @@ public class ContainerStateHandler extends StateHandler
                             if ( envDto.isCreatedOnSS() )
                             {
                                 ctx.envManager.modifyEnvironment( nodeDto.getEnvironmentId(), null,
-                                        Lists.newArrayList( nodeDto.getContainerId() ), null, false );
+                                        Sets.newHashSet( nodeDto.getContainerId() ), null, false );
                             }
                             else
                             {
@@ -117,7 +117,7 @@ public class ContainerStateHandler extends StateHandler
                                 if ( envDto.isCreatedOnSS() )
                                 {
                                     ctx.envManager.modifyEnvironment( nodeDto.getEnvironmentId(), null,
-                                            Lists.newArrayList( nodeDto.getContainerId() ), null, false );
+                                            Sets.newHashSet( nodeDto.getContainerId() ), null, false );
                                 }
 
                                 nodeDto.setState( ContainerStateDto.FROZEN );

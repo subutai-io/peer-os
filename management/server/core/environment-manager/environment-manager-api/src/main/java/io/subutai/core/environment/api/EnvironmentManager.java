@@ -2,7 +2,6 @@ package io.subutai.core.environment.api;
 
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,7 +74,7 @@ public interface EnvironmentManager
      * new quota
      * @param async true - env will be created in background, false - caller will block
      */
-    EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology, List<String> removedContainers,
+    EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology, Set<String> removedContainers,
                                               Map<String, ContainerQuota> changedContainers, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 

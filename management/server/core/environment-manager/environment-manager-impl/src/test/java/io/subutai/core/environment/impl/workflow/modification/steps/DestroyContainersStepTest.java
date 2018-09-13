@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.tracker.TrackerOperation;
@@ -49,8 +49,8 @@ public class DestroyContainersStepTest
     @Before
     public void setUp() throws Exception
     {
-        step = new DestroyContainersStep( environment, environmentManager,
-                Lists.newArrayList( TestHelper.CONTAINER_ID ), trackerOperation );
+        step = new DestroyContainersStep( environment, environmentManager, Sets.newHashSet( TestHelper.CONTAINER_ID ),
+                trackerOperation );
         step.destroyUtil = taskUtil;
         TestHelper.bind( taskUtil, taskResults, taskResult );
         doReturn( task ).when( taskResult ).getTask();
