@@ -2,6 +2,7 @@ dependencies {
     compile project( ":management:server:core:identity-manager:identity-manager-api")
     compile project( ":management:server:core:metric:metric-api")
     compile project( ":management:server:subutai-common")
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
     compile libraries.javax_ws_rs
     compile libraries.slf4j
 
