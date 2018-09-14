@@ -40,10 +40,6 @@
       <id>akarasulu</id>
       <name>Alex Karasulu</name>
     </developer>
-    <developer>
-      <id>aasanaliev</id>
-      <name>Askhat Asanaliev</name>
-    </developer>
   </developers>
 
   <scm>
@@ -59,12 +55,12 @@
 
   <distributionManagement>
     <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>optdyn-nexus</id>
+      <url>https://repo.optdyn.com/repository/maven-snapshots/</url>
     </snapshotRepository>
     <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      <id>optdyn-nexus</id>
+      <url>https://repo.optdyn.com/repository/maven-releases/</url>
     </repository>
   </distributionManagement>
 
@@ -1148,12 +1144,6 @@
   <profiles>
     <profile>
       <id>release</id>
-      <activation>
-        <property>
-          <name>subutaiRelease</name>
-          <value>true</value>
-        </property>
-      </activation>
       <build>
         <plugins>
           <plugin>
@@ -1161,8 +1151,8 @@
             <artifactId>nexus-staging-maven-plugin</artifactId>
             <extensions>true</extensions>
             <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <serverId>optdyn-nexus</serverId>
+              <nexusUrl>https://repo.optdyn.com</nexusUrl>
               <autoReleaseAfterClose>true</autoReleaseAfterClose>
             </configuration>
           </plugin>
