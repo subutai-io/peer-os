@@ -1081,7 +1081,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             if ( requestedCapacity.getCpu() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getCpu() )
             {
                 LOG.warn( "Requested CPU {} can not be accommodated on RH {}: available CPU is {}",
-                        resourceHost.getHostname(), requestedCapacity.getCpu(), availableCapacity.getCpu() );
+                        requestedCapacity.getCpu(), resourceHost.getHostname(), availableCapacity.getCpu() );
 
                 canAccommodate = false;
             }
