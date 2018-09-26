@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>7.1.1</version>
+  <version>7.1.2-SNAPSHOT</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -51,7 +51,7 @@
     <developerConnection>
       scm:git:git@github.com:subutai-io/peer-os.git
     </developerConnection>
-    <tag>7.1.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
