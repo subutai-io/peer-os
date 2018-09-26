@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -11,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>7.0.8-SNAPSHOT</version>
+  <version>7.1.1-SNAPSHOT</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -40,31 +39,29 @@
       <id>akarasulu</id>
       <name>Alex Karasulu</name>
     </developer>
-    <developer>
-      <id>aasanaliev</id>
-      <name>Askhat Asanaliev</name>
-    </developer>
   </developers>
 
   <scm>
-    <url>https://github.com/subutai-io/base</url>
+    <url>
+      scm:git:git@github.com:subutai-io/peer-os.git
+    </url>
     <connection>
-      scm:git:git://github.com/subutai-io/base.git
+      scm:git:git@github.com:subutai-io/peer-os.git
     </connection>
     <developerConnection>
-      scm:git:git@github.com:subutai-io/base.git
+      scm:git:git@github.com:subutai-io/peer-os.git
     </developerConnection>
     <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
     <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>optdyn-nexus</id>
+      <url>https://repo.optdyn.com/repository/maven-snapshots/</url>
     </snapshotRepository>
     <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      <id>optdyn-nexus</id>
+      <url>https://repo.optdyn.com/repository/maven-releases/</url>
     </repository>
   </distributionManagement>
 
@@ -150,15 +147,6 @@
 
   <dependencyManagement>
     <dependencies>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- blueprint-authz -->
-
-      <!--<dependency>-->
-      <!--<groupId>org.apache.aries.blueprint</groupId>-->
-      <!--<artifactId>org.apache.aries.blueprint.authz</artifactId>-->
-      <!--<version>1.0.1-CUSTOM</version>-->
-      <!--</dependency>-->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -966,6 +954,15 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8.2</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <source>1.7</source>
@@ -996,6 +993,47 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <releaseProfiles>releases</releaseProfiles>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-api</artifactId>
+            <version>RELEASE</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-gitexe</artifactId>
+            <version>RELEASE</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-deploy</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>deploy</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <serverId>optdyn-nexus</serverId>
+          <nexusUrl>https://repo.optdyn.com/</nexusUrl>
+          <skipStaging>true</skipStaging>
+        </configuration>
       </plugin>
     </plugins>
 
@@ -1098,8 +1136,7 @@
                 <stylesheet>default.xsl</stylesheet>
                 <fileMappers>
                   <!-- Configures the file extension of the output files. -->
-                  <fileMapper
-                      implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                  <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
                     <targetExtension>.html</targetExtension>
                   </fileMapper>
                 </fileMappers>
@@ -1147,100 +1184,26 @@
 
   <profiles>
     <profile>
-      <id>release</id>
-      <activation>
-        <property>
-          <name>subutaiRelease</name>
-          <value>true</value>
-        </property>
-      </activation>
+      <id>releases</id>
       <build>
         <plugins>
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <extensions>true</extensions>
+            <executions>
+              <execution>
+                <id>default-deploy</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy</goal>
+                </goals>
+              </execution>
+            </executions>
             <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+              <serverId>optdyn-nexus</serverId>
+              <nexusUrl>https://repo.optdyn.com/</nexusUrl>
+              <skipStaging>true</skipStaging>
             </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-release-plugin</artifactId>
-            <configuration>
-              <localCheckout>true</localCheckout>
-              <pushChanges>false</pushChanges>
-              <!--
-              <tagNameFormat>v@${pom.version}</tagNameFormat>
-              -->
-              <arguments>-Psubutai.release -Psonatype-oss-release</arguments>
-              <autoVersionSubmodules>true</autoVersionSubmodules>
-              <releaseProfiles>release</releaseProfiles>
-              <!--
-              <useReleaseProfile>false</useReleaseProfile>
-              -->
-              <goals>deploy</goals>
-            </configuration>
-            <dependencies>
-              <dependency>
-                <groupId>org.apache.maven.scm</groupId>
-                <artifactId>maven-scm-provider-gitexe</artifactId>
-                <version>1.8.1</version>
-              </dependency>
-            </dependencies>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-                <configuration>
-                  <additionalparam>-Xdoclint:none</additionalparam>
-                  <additionalDependencies>
-                    <dependency>
-                      <groupId>org.osgi</groupId>
-                      <artifactId>org.osgi.compendium</artifactId>
-                      <version>${osgi.framework.version}</version>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.osgi</groupId>
-                      <artifactId>org.osgi.core</artifactId>
-                      <version>${osgi.framework.version}</version>
-                    </dependency>
-                  </additionalDependencies>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>

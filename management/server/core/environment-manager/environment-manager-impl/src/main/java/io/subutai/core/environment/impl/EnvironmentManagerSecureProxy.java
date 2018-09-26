@@ -258,7 +258,7 @@ public class EnvironmentManagerSecureProxy extends HostListener
     @Override
     @RolesAllowed( "Environment-Management|Write" )
     public EnvironmentCreationRef modifyEnvironment( final String environmentId, final Topology topology,
-                                                     final List<String> removedContainers,
+                                                     final Set<String> removedContainers,
                                                      final Map<String, ContainerQuota> changedContainers,
                                                      final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException

@@ -633,9 +633,10 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean canAccommodate( final Nodes nodes ) throws PeerException
     {
+        //TODO
         Preconditions.checkArgument(
                 nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
-                        .isCollectionEmpty( nodes.getNodes() ) ), "Invalid nodes" );
+                        .isCollectionEmpty( nodes.getNewNodes() ) ), "Invalid nodes" );
 
         return peerWebClient.canAccommodate( nodes );
     }

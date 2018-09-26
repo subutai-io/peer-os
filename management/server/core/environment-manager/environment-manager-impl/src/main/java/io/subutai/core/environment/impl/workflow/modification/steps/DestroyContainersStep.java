@@ -1,7 +1,7 @@
 package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
-import java.util.List;
+import java.util.Set;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
@@ -22,13 +22,13 @@ public class DestroyContainersStep
 {
     private final LocalEnvironment environment;
     private final EnvironmentManagerImpl environmentManager;
-    private final List<String> removedContainers;
+    private final Set<String> removedContainers;
     private final TrackerOperation trackerOperation;
     protected TaskUtil<Object> destroyUtil = new TaskUtil<>();
 
 
     public DestroyContainersStep( final LocalEnvironment environment, final EnvironmentManagerImpl environmentManager,
-                                  final List<String> removedContainers, TrackerOperation trackerOperation )
+                                  final Set<String> removedContainers, TrackerOperation trackerOperation )
     {
         this.environment = environment;
         this.environmentManager = environmentManager;

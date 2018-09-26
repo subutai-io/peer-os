@@ -54,6 +54,7 @@ export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"
 export BAZAAR_IP=bazaar.subutai.io
 export P2P_PORT_RANGE_START=1
 export P2P_PORT_RANGE_END=65535
+export CHECK_RH_LIMITS=false
 
 #memory optimization
 export MALLOC_ARENA_MAX=4

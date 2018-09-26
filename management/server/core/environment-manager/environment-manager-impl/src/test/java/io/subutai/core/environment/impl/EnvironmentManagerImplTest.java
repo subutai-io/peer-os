@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -98,9 +97,9 @@ import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -450,20 +449,20 @@ public class EnvironmentManagerImplTest
     {
 
         doReturn( environmentCreationRef ).when( environmentManager )
-                                          .modifyEnvironment( eq( TestHelper.ENV_ID ), eq( topology ), anyList(),
+                                          .modifyEnvironment( eq( TestHelper.ENV_ID ), eq( topology ), anySet(),
                                                   anyMap(), anyBoolean() );
 
         environmentManager.growEnvironment( TestHelper.ENV_ID, topology, false );
 
         verify( environmentManager )
-                .modifyEnvironment( eq( TestHelper.ENV_ID ), eq( topology ), anyList(), anyMap(), anyBoolean() );
+                .modifyEnvironment( eq( TestHelper.ENV_ID ), eq( topology ), anySet(), anyMap(), anyBoolean() );
     }
 
 
     @Test
     public void testModifyEnvironment() throws Exception
     {
-        List<String> removedContainers = Lists.newArrayList( TestHelper.CONTAINER_ID );
+        Set<String> removedContainers = Sets.newHashSet( TestHelper.CONTAINER_ID );
         Map<String, ContainerQuota> changedContainers = Maps.newHashMap();
         changedContainers.put( TestHelper.CONTAINER_ID, new ContainerQuota( ContainerSize.LARGE ) );
         EnvironmentModifyWorkflow environmentModifyWorkflow = mock( EnvironmentModifyWorkflow.class );

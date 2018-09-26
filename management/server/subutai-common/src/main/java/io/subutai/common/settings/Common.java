@@ -21,6 +21,8 @@ public class Common
     public static final String BAZAAR_IP = System.getProperty( "bazaarIp" );
     public static final String P2P_PORT_RANGE_START = System.getProperty( "p2pPortRangeStart" );
     public static final String P2P_PORT_RANGE_END = System.getProperty( "p2pPortRangeEnd" );
+    public static final boolean CHECK_RH_LIMITS =
+            Boolean.TRUE.toString().equalsIgnoreCase( System.getProperty( "checkRhLimits" ) );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
     public static final String LOCAL_HOST_IP = "127.0.0.1";
     public static final String LOCAL_HOST_NAME = "localhost";
@@ -35,7 +37,7 @@ public class Common
     public static final long MH_UPDATE_TIMEOUT_MIN = 60;
     public static final long MH_UPDATE_CHECK_TIMEOUT_MIN = 15;
 
-    public static final int WAIT_CONTAINER_CONNECTION_SEC = 120;
+    public static final int WAIT_CONTAINER_CONNECTION_SEC = 180;
     public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 60;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
 

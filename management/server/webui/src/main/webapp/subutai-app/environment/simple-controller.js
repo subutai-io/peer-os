@@ -305,6 +305,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 				$rootScope.notificationsUpdate = 'buildEnvironment';
 			}).error(function (error) {
+			    ngDialog.closeAll();
 				if (error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR(SweetAlert, 'Error: ' + error);
 				} else {
@@ -441,6 +442,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			initScrollbar();
 			$rootScope.notificationsUpdate = 'modifyEnvironment';
 		}).error(function (error) {
+		    ngDialog.closeAll();
             if (error && error.ERROR === undefined) {
                 VARS_MODAL_ERROR(SweetAlert, 'Error: ' + error);
             } else {

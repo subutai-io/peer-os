@@ -883,39 +883,57 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public boolean canAccommodate( final Nodes nodes ) throws PeerException
     {
+        if ( !Common.CHECK_RH_LIMITS )
+        {
+            return true;
+        }
+
         Preconditions.checkArgument(
                 nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
-                        .isCollectionEmpty( nodes.getNodes() ) ), "Invalid nodes" );
+                        .isCollectionEmpty( nodes.getNewNodes() ) ), "Invalid nodes" );
 
         Map<ResourceHost, ResourceHostCapacity> requestedResources = Maps.newHashMap();
 
         for ( ContainerHostInfo containerHostInfo : hostRegistry.getContainerHostsInfo() )
         {
-            //use new quota instead of current if present
-            ContainerQuota newQuota = null;
-            if ( nodes.getQuotas() != null )
+            double requestedRam = 0, requestedCpu = 0, requestedDisk = 0;
+
+            //exclude container from calculations if it is included into removed containers
+            if ( nodes.getRemovedContainers() != null && nodes.getRemovedContainers()
+                                                              .contains( containerHostInfo.getId() ) )
             {
-                newQuota = nodes.getQuotas().get( containerHostInfo.getId() );
+                LOG.debug( "Skipping removed container {}", containerHostInfo.getContainerName() );
             }
+            else
+            {
+                //use container quotas as amount of used resources in calculations
 
-            //use current quota as requested amount unless the container has a change of quota
-            //note: we use 0 for containers that have unset quota since we don't know what the effective limit is
-            double requestedRam = newQuota != null ? newQuota.getContainerSize().getRamQuota() :
-                                  containerHostInfo.getRawQuota() == null
-                                          || containerHostInfo.getRawQuota().getRam() == null ? 0 :
-                                  UnitUtil.convert( containerHostInfo.getRawQuota().getRam(), UnitUtil.Unit.MB,
-                                          UnitUtil.Unit.B );
+                //use new quota instead of current if present
+                ContainerQuota newQuota = null;
+                if ( nodes.getQuotas() != null )
+                {
+                    newQuota = nodes.getQuotas().get( containerHostInfo.getId() );
+                }
 
-            double requestedCpu = newQuota != null ? newQuota.getContainerSize().getCpuQuota() :
-                                  containerHostInfo.getRawQuota() == null
-                                          || containerHostInfo.getRawQuota().getCpu() == null ? 0 :
-                                  containerHostInfo.getRawQuota().getCpu();
+                //use current quota as requested amount unless the container has a change of quota
+                //note: we use 0 for containers that have unset quota since we don't know what the effective limit is
+                requestedRam = newQuota != null ? newQuota.getContainerSize().getRamQuota() :
+                               containerHostInfo.getRawQuota() == null
+                                       || containerHostInfo.getRawQuota().getRam() == null ? 0 :
+                               UnitUtil.convert( containerHostInfo.getRawQuota().getRam(), UnitUtil.Unit.MB,
+                                       UnitUtil.Unit.B );
 
-            double requestedDisk = newQuota != null ? newQuota.getContainerSize().getDiskQuota() :
-                                   containerHostInfo.getRawQuota() == null
-                                           || containerHostInfo.getRawQuota().getDisk() == null ? 0 :
-                                   UnitUtil.convert( containerHostInfo.getRawQuota().getDisk(), UnitUtil.Unit.GB,
-                                           UnitUtil.Unit.B );
+                requestedCpu = newQuota != null ? newQuota.getContainerSize().getCpuQuota() :
+                               containerHostInfo.getRawQuota() == null
+                                       || containerHostInfo.getRawQuota().getCpu() == null ? 0 :
+                               containerHostInfo.getRawQuota().getCpu();
+
+                requestedDisk = newQuota != null ? newQuota.getContainerSize().getDiskQuota() :
+                                containerHostInfo.getRawQuota() == null
+                                        || containerHostInfo.getRawQuota().getDisk() == null ? 0 :
+                                UnitUtil.convert( containerHostInfo.getRawQuota().getDisk(), UnitUtil.Unit.GB,
+                                        UnitUtil.Unit.B );
+            }
 
             //figure out current container resource consumption based on historical metrics
             Calendar cal = Calendar.getInstance();
@@ -988,9 +1006,9 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         }
 
         //new nodes
-        if ( nodes.getNodes() != null )
+        if ( nodes.getNewNodes() != null )
         {
-            for ( Node node : nodes.getNodes() )
+            for ( Node node : nodes.getNewNodes() )
             {
                 double requestedRam = node.getQuota().getContainerSize().getRamQuota();
                 double requestedDisk = node.getQuota().getContainerSize().getDiskQuota();
@@ -1063,7 +1081,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             if ( requestedCapacity.getCpu() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getCpu() )
             {
                 LOG.warn( "Requested CPU {} can not be accommodated on RH {}: available CPU is {}",
-                        resourceHost.getHostname(), requestedCapacity.getCpu(), availableCapacity.getCpu() );
+                        requestedCapacity.getCpu(), resourceHost.getHostname(), availableCapacity.getCpu() );
 
                 canAccommodate = false;
             }
@@ -3024,6 +3042,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     }
 
 
+    //TODO review this method
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
@@ -3062,6 +3081,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
                     containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
                 }
+
+                //todo here adjust disk quota by dividing by 2
             }
         }
         catch ( Exception e )
