@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.UnitUtil;
 
@@ -49,6 +50,11 @@ public class FitCheckResult
 
     public boolean canFit()
     {
+        if ( !Common.CHECK_RH_LIMITS )
+        {
+            return true;
+        }
+
         return canFit;
     }
 
@@ -74,7 +80,8 @@ public class FitCheckResult
                     .getRam() )
             {
                 humanResult.append( String.format(
-                        "Requested RAM volume %.2fMB can not be accommodated on RH %s: available RAM volume is %.2fMB%n",
+                        "Requested RAM volume %.2fMB can not be accommodated on RH %s: available RAM volume is %"
+                                + ".2fMB%n",
                         UnitUtil.convert( requestedCapacity.getRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ),
                         resourceHost.getHostname(),
                         UnitUtil.convert( availableCapacity.getRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ) ) );
