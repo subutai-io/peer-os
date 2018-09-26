@@ -88,6 +88,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.FitCheckResult;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -100,6 +101,7 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostCapacity;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.Disposable;
@@ -202,7 +204,6 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
     private static final BigDecimal ONE_HUNDRED = new BigDecimal( "100.00" );
-    private static final double ACCOMMODATION_OVERHEAD_FACTOR = 1.01;
 
     private transient DaoManager daoManager;
     private transient TemplateManager templateManager;
@@ -875,19 +876,9 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     }
 
 
-    //TODO add dateCreated to ContainerHostEntity
-    //when quota change is requested, check for the time passed since the dateCreated
-    //or since the last quota change
-    //must be at least 30 seconds otherwise throw an exception
-    @RolesAllowed( "Environment-Management|Read" )
     @Override
-    public boolean canAccommodate( final Nodes nodes ) throws PeerException
+    public FitCheckResult checkResources( final Nodes nodes ) throws PeerException
     {
-        if ( !Common.CHECK_RH_LIMITS )
-        {
-            return true;
-        }
-
         Preconditions.checkArgument(
                 nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
                         .isCollectionEmpty( nodes.getNewNodes() ) ), "Invalid nodes" );
@@ -1048,47 +1039,22 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         }
 
 
-        boolean canAccommodate = true;
+        return new FitCheckResult( availableResources, requestedResources );
+    }
 
-        for ( Map.Entry<ResourceHost, ResourceHostCapacity> resourceEntry : requestedResources.entrySet() )
+
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public boolean canAccommodate( final Nodes nodes ) throws PeerException
+    {
+        if ( !Common.CHECK_RH_LIMITS )
         {
-            ResourceHost resourceHost = resourceEntry.getKey();
-            ResourceHostCapacity requestedCapacity = resourceEntry.getValue();
-
-            ResourceHostCapacity availableCapacity = availableResources.get( resourceHost );
-
-            if ( requestedCapacity.getRam() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getRam() )
-            {
-                LOG.warn( "Requested RAM volume {}MB can not be accommodated on RH {}: available RAM volume is {}MB",
-                        UnitUtil.convert( requestedCapacity.getRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ),
-                        resourceHost.getHostname(),
-                        UnitUtil.convert( availableCapacity.getRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ) );
-
-                canAccommodate = false;
-            }
-
-            if ( requestedCapacity.getDisk() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getDisk() )
-            {
-                LOG.warn( "Requested DISK volume {}GB can not be accommodated on RH {}: available DISK volume is "
-                                + "{}GB", UnitUtil.convert( requestedCapacity.getDisk(), UnitUtil.Unit.B,
-                        UnitUtil.Unit.GB ),
-                        resourceHost.getHostname(),
-                        UnitUtil.convert( availableCapacity.getDisk(), UnitUtil.Unit.B, UnitUtil.Unit.GB ) );
-
-                canAccommodate = false;
-            }
-
-            if ( requestedCapacity.getCpu() * ACCOMMODATION_OVERHEAD_FACTOR > availableCapacity.getCpu() )
-            {
-                LOG.warn( "Requested CPU {} can not be accommodated on RH {}: available CPU is {}",
-                        requestedCapacity.getCpu(), resourceHost.getHostname(), availableCapacity.getCpu() );
-
-                canAccommodate = false;
-            }
+            return true;
         }
 
+        FitCheckResult fitCheckResult = checkResources( nodes );
 
-        return canAccommodate;
+        return fitCheckResult.canFit();
     }
 
 
