@@ -5,7 +5,7 @@ Private-Package: \
      io.subutai.core.bazaarmanager.impl.appscale, \
      io.subutai.core.bazaarmanager.impl.dao, \
      io.subutai.core.bazaarmanager.impl.environment.state, \
-     io.subutai.core.bazaarmanager.impl.environment.state.build, \
+     io.subutai.core.bazaarmanager.impl.environment.state.create, \
      io.subutai.core.bazaarmanager.impl.environment.state.change, \
      io.subutai.core.bazaarmanager.impl.environment.state.destroy, \
      io.subutai.core.bazaarmanager.impl.http, \
