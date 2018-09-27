@@ -23,4 +23,10 @@
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
+  <jaxrs:server address="/v1/hub" id="hubRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="bazaarRestServiceImpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
 </blueprint>
