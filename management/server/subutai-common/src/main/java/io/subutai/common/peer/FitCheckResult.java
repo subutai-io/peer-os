@@ -80,7 +80,7 @@ public class FitCheckResult
                     .getRam() )
             {
                 humanResult.append( String.format(
-                        "Requested RAM volume %.2fMB can not be accommodated on RH %s: available RAM volume is %"
+                        "Requested RAM volume %.2fMB can not be provided on RH %s: available RAM volume is %"
                                 + ".2fMB%n",
                         UnitUtil.convert( requestedCapacity.getRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ),
                         resourceHost.getHostname(),
@@ -93,7 +93,7 @@ public class FitCheckResult
                     .getDisk() )
             {
                 humanResult.append( String.format(
-                        "Requested DISK volume %.2fGB can not be accommodated on RH %s: available DISK volume is "
+                        "Requested DISK volume %.2fGB can not be provided on RH %s: available DISK volume is "
                                 + "%.2fGB%n",
                         UnitUtil.convert( requestedCapacity.getDisk(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
                         resourceHost.getHostname(),
@@ -106,7 +106,7 @@ public class FitCheckResult
                     .getCpu() )
             {
                 humanResult.append(
-                        String.format( "Requested CPU %.2f can not be accommodated on RH %s: available CPU is %.2f%n",
+                        String.format( "Requested CPU %.2f can not be provided on RH %s: available CPU is %.2f%n",
                                 requestedCapacity.getCpu(), resourceHost.getHostname(), availableCapacity.getCpu() ) );
 
                 canFit = false;
