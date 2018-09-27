@@ -8,15 +8,15 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.http.HttpStatus;
 
+import io.subutai.bazaar.share.common.util.DtoConverter;
+import io.subutai.bazaar.share.dto.CommonDto;
+import io.subutai.bazaar.share.dto.TunnelInfoDto;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.bazaarmanager.api.RestClient;
 import io.subutai.core.bazaarmanager.api.RestResult;
-import io.subutai.bazaar.share.common.util.DtoConverter;
-import io.subutai.bazaar.share.dto.CommonDto;
-import io.subutai.bazaar.share.dto.TunnelInfoDto;
 
 import static io.subutai.bazaar.share.dto.TunnelInfoDto.TunnelStatus.ERROR;
 
@@ -122,7 +122,11 @@ public class TunnelHelper
 
                     for ( String tunnel : data )
                     {
-                        resourceHost.execute( new RequestBuilder( String.format( DELETE_TUNNEL_COMMAND, tunnel ) ) );
+                        if ( !tunnel.isEmpty() )
+                        {
+                            resourceHost
+                                    .execute( new RequestBuilder( String.format( DELETE_TUNNEL_COMMAND, tunnel ) ) );
+                        }
                     }
                 }
             }
