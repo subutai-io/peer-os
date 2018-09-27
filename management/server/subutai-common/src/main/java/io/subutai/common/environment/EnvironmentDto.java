@@ -20,7 +20,7 @@ public class EnvironmentDto
     @JsonProperty( "containers" )
     private Set<ContainerDto> containers;
 
-    // Where environment created: subutai, hub
+    // Where environment created: subutai, bazaar
     @JsonProperty( "dataSource" )
     private String dataSource;
     @JsonProperty( "username" )

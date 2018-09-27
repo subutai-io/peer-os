@@ -74,5 +74,5 @@ public interface User extends RelationLink
 
     boolean isIdentityValid();
 
-    boolean isHubUser();
+    boolean isBazaarUser();
 }

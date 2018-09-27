@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
+           default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+            http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
+            http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
+>
+
+  <!-- ***************************************************************** -->
+  <authz:enable />
+  <!-- ***************************************************************** -->
+
+  <bean id="logListener" scope="singleton" class="io.subutai.core.bazaarmanager.impl.LogListenerImpl" />
+  <service ref="logListener" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
+
+  <reference id="securityManager"
+             interface="io.subutai.core.security.api.SecurityManager" />
+
+  <reference id="peerManager"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
+  <reference id="monitor"
+             interface="io.subutai.core.metric.api.Monitor" />
+
+  <reference id="environmentManager"
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
+
+  <reference id="identityManager"
+             interface="io.subutai.core.identity.api.IdentityManager" />
+
+  <reference id="commandExecutor" availability="mandatory"
+             interface="io.subutai.core.executor.api.CommandExecutor" />
+
+  <reference id="desktopManager"
+             interface="io.subutai.core.desktop.api.DesktopManager" />
+
+  <reference id="systemManager"
+             interface="io.subutai.core.systemmanager.api.SystemManager" />
+
+  <!-- ***************************************************************** -->
+  <bean id="daoManagerBazaar" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
+    <jpa:unit unitname="bzrConfigPUnit" property="entityManagerFactory" />
+  </bean>
+  <!-- ***************************************************************** -->
+
+  <bean id="bazaarImpl" scope="singleton" init-method="init" destroy-method="destroy" activation="eager"
+        class="io.subutai.core.bazaarmanager.impl.BazaarManagerImpl">
+    <property name="securityManager" ref="securityManager" />
+    <property name="peerManager" ref="peerManager" />
+    <property name="environmentManager" ref="environmentManager" />
+    <property name="identityManager" ref="identityManager" />
+    <property name="monitor" ref="monitor" />
+    <property name="commandExecutor" ref="commandExecutor" />
+    <property name="logListener" ref="logListener" />
+    <property name="desktopManager" ref="desktopManager" />
+    <property name="systemManager" ref="systemManager" />
+    <argument ref="daoManagerBazaar" />
+  </bean>
+
+  <service ref="bazaarImpl" interface="io.subutai.core.hostregistry.api.HostListener" />
+
+  <service ref="bazaarImpl" interface="io.subutai.core.bazaarmanager.api.BazaarManager" />
+
+  <reference-list id="bazaarEventLstnr"
+                  interface="io.subutai.bazaar.share.common.BazaarEventListener"
+                  availability="optional">
+    <reference-listener ref="bazaarImpl" bind-method="addListener" unbind-method="removeListener" />
+  </reference-list>
+
+  <bean id="bazaaarAdapter" class="io.subutai.core.bazaarmanager.impl.adapter.BazaaarAdapterImpl" activation="eager"
+        scope="singleton">
+    <argument ref="daoManagerBazaar" />
+    <argument ref="peerManager" />
+    <argument ref="identityManager" />
+  </bean>
+
+  <service ref="bazaaarAdapter" interface="io.subutai.bazaar.share.common.BazaaarAdapter" />
+
+  <service ref="bazaaarAdapter" interface="io.subutai.core.environment.api.EnvironmentEventListener" />
+
+  <service ref="bazaaarAdapter" interface="io.subutai.core.hostregistry.api.HostListener" />
+
+</blueprint>

@@ -7,7 +7,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 public class CloneRequest

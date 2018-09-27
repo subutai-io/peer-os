@@ -1,0 +1,22 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <reference id="bazaarmanager" availability="mandatory"
+             interface="io.subutai.core.bazaarmanager.api.BazaarManager" />
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="bazaar/send-peer-metrics">
+      <action class="io.subutai.core.bazaarmanager.cli.SendPeerMetricsCommand">
+        <argument ref="bazaarmanager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="bazaar/send-container-metrics">
+      <action class="io.subutai.core.bazaarmanager.cli.SendContainerMetricsCommand">
+        <argument ref="bazaarmanager" />
+      </action>
+    </command>
+  </command-bundle>
+
+</blueprint>

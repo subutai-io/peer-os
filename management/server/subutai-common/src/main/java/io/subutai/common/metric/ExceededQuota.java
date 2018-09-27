@@ -10,14 +10,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.HostId;
-import io.subutai.hub.share.quota.ContainerCpuResource;
-import io.subutai.hub.share.quota.ContainerDiskResource;
-import io.subutai.hub.share.quota.ContainerRamResource;
-import io.subutai.hub.share.quota.ContainerResource;
-import io.subutai.hub.share.resource.ByteValueResource;
-import io.subutai.hub.share.resource.ContainerResourceType;
-import io.subutai.hub.share.resource.NumericValueResource;
-import io.subutai.hub.share.resource.ResourceValue;
+import io.subutai.bazaar.share.quota.ContainerCpuResource;
+import io.subutai.bazaar.share.quota.ContainerDiskResource;
+import io.subutai.bazaar.share.quota.ContainerRamResource;
+import io.subutai.bazaar.share.quota.ContainerResource;
+import io.subutai.bazaar.share.resource.ByteValueResource;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.resource.NumericValueResource;
+import io.subutai.bazaar.share.resource.ResourceValue;
 
 
 /**

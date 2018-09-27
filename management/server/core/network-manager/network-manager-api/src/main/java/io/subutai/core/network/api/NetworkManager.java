@@ -14,7 +14,7 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.hub.share.dto.domain.ReservedPortMapping;
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 
 
 public interface NetworkManager

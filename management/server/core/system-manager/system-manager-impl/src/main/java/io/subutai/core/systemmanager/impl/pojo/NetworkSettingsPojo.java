@@ -10,7 +10,7 @@ public class NetworkSettingsPojo implements NetworkSettings
     private int publicSecurePort;
     private int startRange;
     private int endRange;
-    private String hubIp;
+    private String bazaarIp;
     private boolean useRhIp;
 
 
@@ -28,15 +28,15 @@ public class NetworkSettingsPojo implements NetworkSettings
 
 
     @Override
-    public String getHubIp()
+    public String getBazaarIp()
     {
-        return hubIp;
+        return bazaarIp;
     }
 
 
-    public void setHubIp( final String hubIp )
+    public void setBazaarIp( final String bazaarIp )
     {
-        this.hubIp = hubIp;
+        this.bazaarIp = bazaarIp;
     }
 
 

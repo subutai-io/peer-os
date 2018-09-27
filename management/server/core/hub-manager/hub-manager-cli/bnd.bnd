@@ -1,6 +1,0 @@
-
-Export-Package: \
-     io.subutai.core.hubmanager.cli
-
-
-Import-Package: *

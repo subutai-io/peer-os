@@ -47,7 +47,7 @@ import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.HubEnvironment;
+import io.subutai.common.environment.BazaarEnvironment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.Topology;
@@ -79,8 +79,8 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.template.api.TemplateManager;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 import static io.subutai.common.util.JsonUtil.mapper;
 
@@ -167,8 +167,8 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            //disallow hub users to use this operation
-            filterHubUser();
+            //disallow bazaar users to use this operation
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -277,8 +277,8 @@ public class RestServiceImpl implements RestService
         Map<String, String> envCreationRef = Maps.newHashMap();
         try
         {
-            //disallow hub users to use this operation
-            filterHubUser();
+            //disallow bazaar users to use this operation
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -328,8 +328,8 @@ public class RestServiceImpl implements RestService
         String trackerId;
         try
         {
-            //disallow hub users to use this operation
-            filterHubUser();
+            //disallow bazaar users to use this operation
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -395,8 +395,8 @@ public class RestServiceImpl implements RestService
         String trackerId;
         try
         {
-            //disallow hub users to use this operation
-            filterHubUser();
+            //disallow bazaar users to use this operation
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -817,8 +817,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //disallow hub users to use this operation
-            filterHubUser();
+            //disallow bazaar users to use this operation
+            filterBazaarUser();
         }
         catch ( AccessControlException e )
         {
@@ -1166,10 +1166,11 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                String dataSource = ( environment instanceof HubEnvironment || String.format( "Of %s", Common.HUB_ID )
-                                                                                     .equals(
+                String dataSource = ( environment instanceof BazaarEnvironment
+                        || String.format( "Of %s", Common.BAZAAR_ID )
+                                 .equals(
                                                                                              environment.getName() ) ) ?
-                                    Common.HUB_ID : Common.SUBUTAI_ID;
+                                    Common.BAZAAR_ID : Common.SUBUTAI_ID;
 
                 EnvironmentDto environmentDto =
                         new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
@@ -1269,12 +1270,12 @@ public class RestServiceImpl implements RestService
 
 
     /**
-     * Filter if active user is Hub user.
+     * Filter if active user isbazaar user.
      */
-    private void filterHubUser() throws AccessControlException
+    private void filterBazaarUser() throws AccessControlException
     {
         User user = identityManager.getActiveUser();
-        if ( user.isHubUser() )
+        if ( user.isBazaarUser() )
         {
             throw new AccessControlException( "You don't have permission to perform this operation" );
         }

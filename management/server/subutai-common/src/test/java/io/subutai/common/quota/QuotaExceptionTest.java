@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.hub.share.quota.QuotaException;
+import io.subutai.bazaar.share.quota.QuotaException;
 
 
 @RunWith( MockitoJUnitRunner.class )

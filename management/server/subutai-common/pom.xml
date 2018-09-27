@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>io.subutai</groupId>
-      <artifactId>subutai-hub-share</artifactId>
+      <artifactId>subutai-bazaar-share</artifactId>
     </dependency>
 
     <dependency>

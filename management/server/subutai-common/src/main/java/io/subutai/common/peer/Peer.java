@@ -35,8 +35,8 @@ import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.resource.PeerResources;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.resource.PeerResources;
 
 
 /**

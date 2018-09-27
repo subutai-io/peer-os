@@ -28,8 +28,8 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 class ProxyEnvironmentContainer extends EnvironmentContainerImpl
@@ -45,8 +45,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
     ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager, Set<String> localContainerIds )
     {
-        //TODO pass env id and vlan from Hub
-        super( Common.HUB_ID, json.get( "peerId" ).asText(),
+        //TODO pass env id and vlan frombazaar
+        super( Common.BAZAAR_ID, json.get( "peerId" ).asText(),
                 new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
                         json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
                         ContainerHostState.RUNNING, null, null ), json.get( "templateId" ).asText(),
@@ -179,7 +179,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         }
         else
         {
-            //TODO for remote containers obtain from Hub metadata
+            //TODO for remote containers obtain frombazaar metadata
             return ContainerHostState.UNKNOWN;
         }
     }
@@ -194,7 +194,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         }
         else
         {
-            //TODO for remote containers obtain from Hub metadata
+            //TODO for remote containers obtain frombazaar metadata
             return null;
         }
     }
@@ -209,7 +209,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         }
         else
         {
-            //TODO for remote containers obtain from Hub metadata
+            //TODO for remote containers obtain frombazaar metadata
             return new SshKeys();
         }
     }
@@ -224,7 +224,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         }
         else
         {
-            //TODO for remote containers obtain from Hub metadata
+            //TODO for remote containers obtain frombazaar metadata
             return null;
         }
     }

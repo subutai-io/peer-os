@@ -91,7 +91,7 @@ public interface RestService
     Response isEnvironmentWorkflowInProgress();
 
     @GET
-    @Path( "hub_ip" )
+    @Path( "bazaar_ip" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response getHubIp();
+    Response getBazaarIp();
 }

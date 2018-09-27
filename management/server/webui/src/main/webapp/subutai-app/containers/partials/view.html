@@ -175,7 +175,7 @@
                 </div>
                 <div class="ssh-key-button_title">SSH</div>
               </button>
-              <span class="ssh-info-button" ng-if="!containerViewCtrl.hubStatus || !containerViewCtrl.hasPGPplugin">
+              <span class="ssh-info-button" ng-if="!containerViewCtrl.bazaarStatus || !containerViewCtrl.hasPGPplugin">
 								?
 								<div class="ssh-plugin-info-tooltip tooltip" ng-if="!containerViewCtrl.hasPGPplugin">
 									<div
@@ -183,7 +183,7 @@
 									<a href="https://github.com/subutai-io/browser-plugins/releases/latest" target="_blank">Download</a>
 								</div>
 								<div class="ssh-plugin-info-tooltip tooltip" style="height: auto;"
-                     ng-if="!containerViewCtrl.hubStatus && containerViewCtrl.hasPGPplugin">
+                     ng-if="!containerViewCtrl.bazaarStatus && containerViewCtrl.hasPGPplugin">
 									Please register your peer with Bazaar to access you environment.
 								</div>
 							</span>

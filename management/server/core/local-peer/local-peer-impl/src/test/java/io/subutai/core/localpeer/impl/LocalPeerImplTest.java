@@ -68,8 +68,8 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.resource.ByteValueResource;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.resource.ByteValueResource;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;

@@ -64,7 +64,7 @@ import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.adapter.HubEnvironment;
+import io.subutai.core.environment.impl.adapter.BazaarEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
@@ -78,15 +78,14 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.hub.share.common.HubAdapter;
-import io.subutai.hub.share.common.HubEventListener;
-import io.subutai.hub.share.dto.PeerProductDataDto;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.common.BazaarEventListener;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 @PermitAll
 public class EnvironmentManagerSecureProxy extends HostListener
-        implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, HubEventListener,
+        implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, BazaarEventListener,
         LocalPeerEventListener
 {
     private final EnvironmentManagerImpl environmentManager;
@@ -98,7 +97,7 @@ public class EnvironmentManagerSecureProxy extends HostListener
     public EnvironmentManagerSecureProxy( final TemplateManager templateManager, final PeerManager peerManager,
                                           SecurityManager securityManager, final IdentityManager identityManager,
                                           final Tracker tracker, final RelationManager relationManager,
-                                          final HubAdapter hubAdapter, final EnvironmentService environmentService,
+                                          final BazaaarAdapter bazaaarAdapter, final EnvironmentService environmentService,
                                           final SystemManager systemManager )
     {
         Preconditions.checkNotNull( templateManager );
@@ -114,18 +113,18 @@ public class EnvironmentManagerSecureProxy extends HostListener
         this.tracker = tracker;
         this.identityManager = identityManager;
         this.environmentManager =
-                getEnvironmentManager( templateManager, peerManager, securityManager, hubAdapter, environmentService,
+                getEnvironmentManager( templateManager, peerManager, securityManager, bazaaarAdapter, environmentService,
                         systemManager );
     }
 
 
     protected EnvironmentManagerImpl getEnvironmentManager( TemplateManager templateManager, PeerManager peerManager,
-                                                            SecurityManager securityManager, HubAdapter hubAdapter,
+                                                            SecurityManager securityManager, BazaaarAdapter bazaaarAdapter,
                                                             EnvironmentService environmentService,
                                                             SystemManager systemManager )
     {
         return new EnvironmentManagerImpl( templateManager, peerManager, securityManager, identityManager, tracker,
-                relationManager, hubAdapter, environmentService, systemManager );
+                relationManager, bazaaarAdapter, environmentService, systemManager );
     }
 
 
@@ -210,21 +209,21 @@ public class EnvironmentManagerSecureProxy extends HostListener
     {
         Set<Environment> result = environmentManager.getEnvironments();
 
-        // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
+        // Environments created onbazaar doesn't have relation data on SS side. We have to add this in future.
         // Meantime, we just bypass the relation check.
-        Set<Environment> hubEnvs = new HashSet<>();
+        Set<Environment> bazaarEnvs = new HashSet<>();
 
         for ( Environment env : result )
         {
-            if ( env instanceof HubEnvironment )
+            if ( env instanceof BazaarEnvironment )
             {
-                hubEnvs.add( env );
+                bazaarEnvs.add( env );
             }
         }
 
         check( null, result, traitsBuilder( "ownership=All;read=true" ) );
 
-        result.addAll( hubEnvs );
+        result.addAll( bazaarEnvs );
 
         return result;
     }
@@ -360,9 +359,9 @@ public class EnvironmentManagerSecureProxy extends HostListener
         {
             environment = loadEnvironment( environmentId );
 
-            // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
+            // Environments created onbazaar doesn't have relation data on SS side. We have to add this in future.
             // Meantime, we just bypass the relation check.
-            if ( !identityManager.isTenantManager() && !( environment instanceof HubEnvironment ) )
+            if ( !identityManager.isTenantManager() && !( environment instanceof BazaarEnvironment ) )
             {
                 check( null, environment, traitsBuilder( "ownership=All;delete=true" ) );
             }
@@ -393,9 +392,9 @@ public class EnvironmentManagerSecureProxy extends HostListener
     {
         Environment environment = loadEnvironment( environmentId );
 
-        // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
+        // Environments created onbazaar doesn't have relation data on SS side. We have to add this in future.
         // Meantime, we just bypass the relation check.
-        if ( environment instanceof HubEnvironment )
+        if ( environment instanceof BazaarEnvironment )
         {
             environmentManager.destroyContainer( environmentId, containerId, async );
 
@@ -436,8 +435,8 @@ public class EnvironmentManagerSecureProxy extends HostListener
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
 
-        // Environment is from Hub
-        if ( environment instanceof HubEnvironment )
+        // Environment is frombazaar
+        if ( environment instanceof BazaarEnvironment )
         {
             return environment;
         }
@@ -787,13 +786,6 @@ public class EnvironmentManagerSecureProxy extends HostListener
     }
 
 
-    @Override
-    public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
-    {
-        environmentManager.onPluginEvent( pluginUid, state );
-    }
-
-
     @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
@@ -939,9 +931,9 @@ public class EnvironmentManagerSecureProxy extends HostListener
 
 
     @Override
-    public Set<String> getDeletedEnvironmentsFromHub()
+    public Set<String> getDeletedEnvironmentsFromBazaar()
     {
-        return environmentManager.getDeletedEnvironmentsFromHub();
+        return environmentManager.getDeletedEnvironmentsFromBazaar();
     }
 
 

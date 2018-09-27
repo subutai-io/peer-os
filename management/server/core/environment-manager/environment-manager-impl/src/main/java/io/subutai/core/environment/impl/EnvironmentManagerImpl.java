@@ -95,7 +95,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
-import io.subutai.core.environment.impl.adapter.HubEnvironment;
+import io.subutai.core.environment.impl.adapter.BazaarEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -127,10 +127,9 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.hub.share.common.HubAdapter;
-import io.subutai.hub.share.common.HubEventListener;
-import io.subutai.hub.share.dto.PeerProductDataDto;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.common.BazaarEventListener;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 /**
@@ -139,13 +138,13 @@ import io.subutai.hub.share.quota.ContainerQuota;
  * to EM API), update background task to consider this TTL (make background task run frequently with short intervals)
  **/
 public class EnvironmentManagerImpl extends HostListener
-        implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener, LocalPeerEventListener
+        implements EnvironmentManager, PeerActionListener, AlertListener, BazaarEventListener, LocalPeerEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
     protected static final String MODULE_NAME = "Environment Manager";
     private static final long RESET_ENVS_P2P_KEYS_INTERVAL_MIN = 60;
-    private static final long SYNC_ENVS_WITH_HUB_INTERVAL_MIN = 10;
+    private static final long SYNC_ENVS_WITH_BAZAAR_INTERVAL_MIN = 10;
     private static final String REMOTE_OWNER_NAME = "remote";
     private static final String UKNOWN_OWNER_NAME = "unknown";
     private static final long CONTAINER_DISK_USAGE_CHECK_INTERVAL_MIN = 6 * 60; // 6 hrs
@@ -175,7 +174,7 @@ public class EnvironmentManagerImpl extends HostListener
 
     public EnvironmentManagerImpl( final TemplateManager templateManager, final PeerManager peerManager,
                                    SecurityManager securityManager, final IdentityManager identityManager,
-                                   final Tracker tracker, final RelationManager relationManager, HubAdapter hubAdapter,
+                                   final Tracker tracker, final RelationManager relationManager, BazaaarAdapter bazaaarAdapter,
                                    final EnvironmentService environmentService, final SystemManager systemManager )
     {
         Preconditions.checkNotNull( templateManager );
@@ -208,7 +207,7 @@ public class EnvironmentManagerImpl extends HostListener
 
         executor = getCachedExecutor();
 
-        environmentAdapter = getEnvironmentAdapter( hubAdapter );
+        environmentAdapter = getEnvironmentAdapter( bazaaarAdapter );
 
         this.environmentService = environmentService;
     }
@@ -226,9 +225,9 @@ public class EnvironmentManagerImpl extends HostListener
     }
 
 
-    protected EnvironmentAdapter getEnvironmentAdapter( HubAdapter hubAdapter )
+    protected EnvironmentAdapter getEnvironmentAdapter( BazaaarAdapter bazaaarAdapter )
     {
-        return new EnvironmentAdapter( this, peerManager, hubAdapter, identityManager );
+        return new EnvironmentAdapter( this, peerManager, bazaaarAdapter, identityManager );
     }
 
 
@@ -341,13 +340,13 @@ public class EnvironmentManagerImpl extends HostListener
 
         try
         {
-            Set<HubEnvironment> hubEnvironments = environmentAdapter.getEnvironments( false );
+            Set<BazaarEnvironment> bzrEnvironments = environmentAdapter.getEnvironments( false );
 
-            // remove environments that exist on Hub but don't exist on peer
+            // remove environments that exist onbazaar but don't exist on peer
             // workaround for https://github.com/subutai-io/base/issues/1464
-            removeStaleHubEnvironments( hubEnvironments );
+            removeStaleBazaarEnvironments( bzrEnvironments );
 
-            envs.addAll( hubEnvironments );
+            envs.addAll( bzrEnvironments );
         }
         catch ( ActionFailedException e )
         {
@@ -374,7 +373,7 @@ public class EnvironmentManagerImpl extends HostListener
     void setEnvironmentTransientFields( final Environment environment )
     {
         // Using environmentManager for ProxyEnvironment may give side effects. For example, empty container list.
-        if ( !( environment instanceof HubEnvironment ) )
+        if ( !( environment instanceof BazaarEnvironment ) )
         {
             ( ( LocalEnvironment ) environment ).setEnvironmentManager( this );
         }
@@ -1008,8 +1007,8 @@ public class EnvironmentManagerImpl extends HostListener
             }
         }
 
-        // If environment from Hub, send destroy request to Hub
-        if ( environment instanceof HubEnvironment )
+        // If environment frombazaar, send destroy request tobazaar
+        if ( environment instanceof BazaarEnvironment )
         {
             environmentAdapter.removeEnvironment( environment );
 
@@ -1108,11 +1107,11 @@ public class EnvironmentManagerImpl extends HostListener
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
-        if ( environment instanceof HubEnvironment )
+        if ( environment instanceof BazaarEnvironment )
         {
             try
             {
-                environmentAdapter.destroyContainer( ( HubEnvironment ) environment, containerId );
+                environmentAdapter.destroyContainer( ( BazaarEnvironment ) environment, containerId );
             }
             catch ( IllegalStateException e )
             {
@@ -1331,7 +1330,7 @@ public class EnvironmentManagerImpl extends HostListener
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        // First get from Hub
+        // First get frombazaar
         LocalEnvironment environment = environmentAdapter.get( environmentId );
 
         if ( environment != null )
@@ -1843,9 +1842,9 @@ public class EnvironmentManagerImpl extends HostListener
 
     public synchronized LocalEnvironment update( LocalEnvironment environment )
     {
-        if ( environment instanceof HubEnvironment )
+        if ( environment instanceof BazaarEnvironment )
         {
-            // Environment from Hub
+            // Environment frombazaar
             return environment;
         }
 
@@ -1870,7 +1869,7 @@ public class EnvironmentManagerImpl extends HostListener
 
     public void remove( final LocalEnvironment environment )
     {
-        if ( !environmentAdapter.isRegisteredWithHub() || environmentAdapter.removeEnvironment( environment ) )
+        if ( !environmentAdapter.isRegisteredWithBazaar() || environmentAdapter.removeEnvironment( environment ) )
         {
             environmentService.remove( environment.getId() );
         }
@@ -2068,13 +2067,6 @@ public class EnvironmentManagerImpl extends HostListener
 
 
     @Override
-    public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
-    {
-        LOG.info( "Plugin event, id: {}, state: {}", pluginUid, state );
-    }
-
-
-    @Override
     public void addSshKeyToEnvironmentEntity( final String environmentId, final String sshKey )
             throws EnvironmentNotFoundException
     {
@@ -2215,21 +2207,21 @@ public class EnvironmentManagerImpl extends HostListener
 
         try
         {
-            // add hub env-s
-            Set<HubEnvironment> hubEnvironments = environmentAdapter.getEnvironments( true );
+            // add bazaar env-s
+            Set<BazaarEnvironment> bazaarEnvironments = environmentAdapter.getEnvironments( true );
 
-            // remove environments that exist on Hub but don't exist on peer
+            // remove environments that exist onbazaar but don't exist on peer
             // workaround for https://github.com/subutai-io/base/issues/1464
-            removeStaleHubEnvironments( hubEnvironments );
+            removeStaleBazaarEnvironments( bazaarEnvironments );
 
-            environments.addAll( hubEnvironments );
+            environments.addAll( bazaarEnvironments );
 
             // add remote env-s
             environments.addAll( getRemoteEnvironments( true ) );
         }
         catch ( ActionFailedException e )
         {
-            //failed to obtain Hub metadata, return all locally registered env-s
+            //failed to obtainbazaar metadata, return all locally registered env-s
             environments.addAll( getRemoteEnvironments( true ) );
         }
 
@@ -2240,9 +2232,9 @@ public class EnvironmentManagerImpl extends HostListener
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             environment.getContainerDtos(),
-                            environment instanceof HubEnvironment || String.format( "Of %s", Common.HUB_ID )
-                                                                           .equals( environment.getName() ) ?
-                            Common.HUB_ID : Common.SUBUTAI_ID, getEnvironmentOwnerName( environment ) );
+                            environment instanceof BazaarEnvironment || String.format( "Of %s", Common.BAZAAR_ID )
+                                                                              .equals( environment.getName() ) ?
+                            Common.BAZAAR_ID : Common.SUBUTAI_ID, getEnvironmentOwnerName( environment ) );
 
             environmentDtos.add( environmentDto );
         }
@@ -2258,11 +2250,11 @@ public class EnvironmentManagerImpl extends HostListener
         {
             RemoteEnvironment remoteEnvironment = ( RemoteEnvironment ) environment;
 
-            boolean hubEnv = Objects.equals( remoteEnvironment.getInitiatorPeerId(), Common.HUB_ID );
+            boolean isBzrEnv = Objects.equals( remoteEnvironment.getInitiatorPeerId(), Common.BAZAAR_ID );
 
-            if ( hubEnv )
+            if ( isBzrEnv )
             {
-                return remoteEnvironment.getUsername() == null ? Common.HUB_ID :
+                return remoteEnvironment.getUsername() == null ? Common.BAZAAR_ID :
                        String.format( "%s@%s", remoteEnvironment.getUsername(), remoteEnvironment.getRemoteUserId() );
             }
             else
@@ -2270,10 +2262,10 @@ public class EnvironmentManagerImpl extends HostListener
                 return remoteEnvironment.getUsername() == null ? REMOTE_OWNER_NAME : remoteEnvironment.getUsername();
             }
         }
-        else if ( environment instanceof HubEnvironment )
+        else if ( environment instanceof BazaarEnvironment )
         {
-            HubEnvironment hubEnvironment = ( ( HubEnvironment ) environment );
-            return String.format( "%s@%s", hubEnvironment.getOwner(), hubEnvironment.getOwnerHubId() );
+            BazaarEnvironment bazaarEnvironment = ( ( BazaarEnvironment ) environment );
+            return String.format( "%s@%s", bazaarEnvironment.getOwner(), bazaarEnvironment.getOwnerbazaarId() );
         }
 
         User user = ServiceLocator.lookup( IdentityManager.class ).getUser( environment.getUserId() );
@@ -2294,8 +2286,8 @@ public class EnvironmentManagerImpl extends HostListener
     {
         //let peer registration complete before sending environments for the first time
         TaskUtil.sleep( TimeUnit.SECONDS.toMillis( 10 ) );
-        //upload local environments to Hub
-        uploadPeerOwnerEnvironmentsToHub();
+        //upload local environments tobazaar
+        uploadPeerOwnerEnvironmentsToBazaar();
     }
 
 
@@ -2320,17 +2312,17 @@ public class EnvironmentManagerImpl extends HostListener
     }
 
 
-    // remove environments that exist on Hub but don't exist on peer
+    // remove environments that exist onbazaar but don't exist on peer
     // workaround for https://github.com/subutai-io/base/issues/1464
-    private void removeStaleHubEnvironments( Set<HubEnvironment> hubEnvironments )
+    private void removeStaleBazaarEnvironments( Set<BazaarEnvironment> bazaarEnvironments )
     {
         try
         {
             ReservedNetworkResources networkResources = peerManager.getLocalPeer().getReservedNetworkResources();
 
-            for ( Iterator<HubEnvironment> iterator = hubEnvironments.iterator(); iterator.hasNext(); )
+            for ( Iterator<BazaarEnvironment> iterator = bazaarEnvironments.iterator(); iterator.hasNext(); )
             {
-                HubEnvironment environment = iterator.next();
+                BazaarEnvironment environment = iterator.next();
 
                 if ( networkResources.findByEnvironmentId( environment.getId() ) == null )
                 {
@@ -2345,7 +2337,7 @@ public class EnvironmentManagerImpl extends HostListener
     }
 
 
-    private Set<RemoteEnvironment> getRemoteEnvironments( boolean includeHubEnvironments )
+    private Set<RemoteEnvironment> getRemoteEnvironments( boolean includeBazaarEnvironments )
     {
         Set<RemoteEnvironment> remoteEnvironments = Sets.newHashSet();
 
@@ -2358,7 +2350,7 @@ public class EnvironmentManagerImpl extends HostListener
                 // exclude local reservations
                 if ( !peerManager.getLocalPeer().getId().equals( networkResource.getInitiatorPeerId() ) )
                 {
-                    if ( !includeHubEnvironments && Common.HUB_ID.equals( networkResource.getInitiatorPeerId() ) )
+                    if ( !includeBazaarEnvironments && Common.BAZAAR_ID.equals( networkResource.getInitiatorPeerId() ) )
                     {
                         continue;
                     }
@@ -2382,9 +2374,9 @@ public class EnvironmentManagerImpl extends HostListener
     }
 
 
-    public Set<RemoteEnvironment> getLocallyRegisteredHubEnvironments()
+    public Set<RemoteEnvironment> getLocallyRegisteredBazaarEnvironments()
     {
-        Set<RemoteEnvironment> hubEnvironments = Sets.newHashSet();
+        Set<RemoteEnvironment> bazaarEnvironments = Sets.newHashSet();
 
         try
         {
@@ -2392,9 +2384,9 @@ public class EnvironmentManagerImpl extends HostListener
 
             for ( NetworkResource networkResource : networkResources.getNetworkResources() )
             {
-                if ( Common.HUB_ID.equals( networkResource.getInitiatorPeerId() ) )
+                if ( Common.BAZAAR_ID.equals( networkResource.getInitiatorPeerId() ) )
                 {
-                    hubEnvironments.add( new RemoteEnvironment( networkResource, Common.HUB_ID,
+                    bazaarEnvironments.add( new RemoteEnvironment( networkResource, Common.BAZAAR_ID,
                             peerManager.getLocalPeer()
                                        .findContainersByEnvironmentId( networkResource.getEnvironmentId() ) ) );
                 }
@@ -2405,7 +2397,7 @@ public class EnvironmentManagerImpl extends HostListener
             LOG.error( "Error getting locally registered Bazaar environments: {}", e.getMessage() );
         }
 
-        return hubEnvironments;
+        return bazaarEnvironments;
     }
 
 
@@ -2494,7 +2486,7 @@ public class EnvironmentManagerImpl extends HostListener
     private void syncEnvironments()
     {
         if ( System.currentTimeMillis() - lastEnvSyncTs >= TimeUnit.MINUTES
-                .toMillis( SYNC_ENVS_WITH_HUB_INTERVAL_MIN ) )
+                .toMillis( SYNC_ENVS_WITH_BAZAAR_INTERVAL_MIN ) )
         {
             lastEnvSyncTs = System.currentTimeMillis();
 
@@ -2503,9 +2495,9 @@ public class EnvironmentManagerImpl extends HostListener
                 @Override
                 public Void run()
                 {
-                    uploadPeerOwnerEnvironmentsToHub();
+                    uploadPeerOwnerEnvironmentsToBazaar();
 
-                    syncRemovedEnvironmentsWithHub();
+                    syncRemovedEnvironmentsWithBazaar();
 
                     return null;
                 }
@@ -2517,19 +2509,19 @@ public class EnvironmentManagerImpl extends HostListener
     private void doCheckContainerDiskUsage()
     {
         getCachedExecutor().execute(
-                new ContainerDiskUsageCheckTask( environmentAdapter.getHubAdapter(), peerManager.getLocalPeer(),
+                new ContainerDiskUsageCheckTask( environmentAdapter.getBazaaarAdapter(), peerManager.getLocalPeer(),
                         this ) );
     }
 
 
-    void uploadPeerOwnerEnvironmentsToHub()
+    void uploadPeerOwnerEnvironmentsToBazaar()
     {
         getCachedExecutor()
                 .execute( new UploadEnvironmentsTask( environmentAdapter, identityManager, environmentService, this ) );
     }
 
 
-    private void syncRemovedEnvironmentsWithHub()
+    private void syncRemovedEnvironmentsWithBazaar()
     {
         getCachedExecutor().execute( new RemoveEnvironmentsTask( environmentAdapter, this, environmentService ) );
     }
@@ -2630,7 +2622,7 @@ public class EnvironmentManagerImpl extends HostListener
             }
         }
 
-        if ( !environmentFound && !Common.HUB_ID.equals( containerHost.getInitiatorPeerId() ) )
+        if ( !environmentFound && !Common.BAZAAR_ID.equals( containerHost.getInitiatorPeerId() ) )
         {
             try
             {
@@ -2650,7 +2642,7 @@ public class EnvironmentManagerImpl extends HostListener
         }
         else if ( !environmentFound )
         {
-            // Hub environment
+            //bazaar environment
             environmentAdapter.handleHostnameChange( containerInfo, previousHostname, currentHostname );
         }
     }
@@ -2720,7 +2712,7 @@ public class EnvironmentManagerImpl extends HostListener
         //process an x-peer environment
         RemoteEnvironment xPeerEnvironment = null;
 
-        if ( !environmentFound && !Common.HUB_ID.equals( containerHost.getInitiatorPeerId() ) )
+        if ( !environmentFound && !Common.BAZAAR_ID.equals( containerHost.getInitiatorPeerId() ) )
         {
             Set<RemoteEnvironment> remoteEnvironments = getRemoteEnvironments( false );
 
@@ -2766,7 +2758,7 @@ public class EnvironmentManagerImpl extends HostListener
 
 
     @Override
-    public Set<String> getDeletedEnvironmentsFromHub()
+    public Set<String> getDeletedEnvironmentsFromBazaar()
     {
         return environmentAdapter.getDeletedEnvironmentsIds();
     }
@@ -2865,9 +2857,9 @@ public class EnvironmentManagerImpl extends HostListener
         EnvironmentDto environmentDto =
                 new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                         environment.getContainerDtos(),
-                        environment instanceof HubEnvironment || String.format( "Of %s", Common.HUB_ID )
-                                                                       .equals( environment.getName() ) ?
-                        Common.HUB_ID : Common.SUBUTAI_ID, getEnvironmentOwnerName( environment ) );
+                        environment instanceof BazaarEnvironment || String.format( "Of %s", Common.BAZAAR_ID )
+                                                                          .equals( environment.getName() ) ?
+                        Common.BAZAAR_ID : Common.SUBUTAI_ID, getEnvironmentOwnerName( environment ) );
 
         placeInfoIntoContainer( environmentDto, containerHost );
     }

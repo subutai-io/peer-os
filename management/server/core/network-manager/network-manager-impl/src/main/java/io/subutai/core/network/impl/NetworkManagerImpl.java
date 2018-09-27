@@ -35,8 +35,8 @@ import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.dto.domain.PortMapDto;
-import io.subutai.hub.share.dto.domain.ReservedPortMapping;
+import io.subutai.bazaar.share.dto.domain.PortMapDto;
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 
 
 /**

@@ -40,9 +40,9 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.domainContainer = {};
 	vm.editingContainer = {};
 	vm.hasPGPplugin = false;
-	vm.hubStatus = false;
+	vm.bazaarStatus = false;
 	$timeout(function() {
-		vm.hubStatus = hubRegisterStatus;
+		vm.bazaarStatus = bazaarRegisterStatus;
 		vm.hasPGPplugin = hasPGPplugin();
 	}, 2000);
 
@@ -72,7 +72,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
         return localStorage.getItem('isAdmin') == 'true';
     }
 
-	function alertForHubContainer( container )
+	function alertForBazaarContainer( container )
 	{
         if (container.dataSource != "subutai") {
 
@@ -86,7 +86,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function showDomainForm(container) {
 
-        if (alertForHubContainer(container)) {
+        if (alertForBazaarContainer(container)) {
             return;
         }
 
@@ -123,7 +123,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function addTagForm(container) {
 
-        if (alertForHubContainer(container)) {
+        if (alertForBazaarContainer(container)) {
             return;
         }
 
@@ -249,7 +249,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 							vm.containerState.length > 0
 						) {continue;}
 
-						// We don't show on UI containers created by Hub, located on other peers.
+						// We don't show on UI containers created bybazaar, located on other peers.
 						// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
 						// @todo remove when implement on backend
 						var container = vm.environments[i].containers[j];
@@ -357,7 +357,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function changeNamePopup( container ) {
 
-        if (alertForHubContainer(container)) {
+        if (alertForBazaarContainer(container)) {
             return;
         }
 

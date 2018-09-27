@@ -1,6 +1,6 @@
 dependencies {
     compile project( ":management:server:core:environment-manager:environment-manager-api")
-    compile project( ":management:server:core:hub-manager:hub-manager-api")
+    compile project( ":management:server:core:bazaar-manager:bazaar-manager-api")
     compile project( ":management:server:core:identity-manager:identity-manager-api")
     compile project( ":management:server:core:peer-manager:peer-manager-api")
     compile project( ":management:server:core:system-manager:system-manager-api")

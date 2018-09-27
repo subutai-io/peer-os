@@ -228,7 +228,7 @@ public class IdentityManagerImpl implements IdentityManager
                 assignRolePermission( role, per );
             }
 
-            // Create Env Mgr Role (system for hub users only)
+            // Create Env Mgr Role (system for bazaar users only)
             role = createRole( ENV_MANAGER_ROLE, UserType.SYSTEM.getId() );
 
             per = createPermission( PermissionObject.ENVIRONMENT_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),
@@ -236,7 +236,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             assignRolePermission( role, per );
 
-            // Create Template Mgr Role (system for hub users only)
+            // Create Template Mgr Role (system for bazaar users only)
             role = createRole( TEMPLATE_MANAGER_ROLE, UserType.SYSTEM.getId() );
 
             per = createPermission( PermissionObject.TEMPLATE_MANAGEMENT.getId(), PermissionScope.ALL_SCOPE.getId(),

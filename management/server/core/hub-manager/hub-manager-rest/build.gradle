@@ -1,9 +1,0 @@
-dependencies {
-    compile project( ":management:server:core:hub-manager:hub-manager-api")
-    compile project( ":management:server:subutai-common")
-    compile libraries.slf4j
-    compile libraries.javax_ws_rs
-
-    testCompile libraries.hamcrest
-    testCompile libraries.junit
-}

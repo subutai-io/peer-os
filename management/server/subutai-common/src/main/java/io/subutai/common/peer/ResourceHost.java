@@ -17,8 +17,8 @@ import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.hub.share.dto.domain.ReservedPortMapping;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 /**

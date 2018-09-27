@@ -23,7 +23,7 @@
 
 
   </script>
-  <div class="b-hub-status b-notification js-header-dropdown g-right"
+  <div class="b-bazaar-status b-notification js-header-dropdown g-right"
        ng-class="{'b-notification_active' : currentUserCtrl.notificationNew }"
   >
     <div class="b-notification-count">{{ currentUserCtrl.notificationsCount }}</div>
@@ -31,8 +31,8 @@
        ng-click="currentUserCtrl.notificationNew = false">
     </a>
 
-    <div class="b-hub-status__dropdown">
-      <div class="b-hub-status-dropdown js-notifications-scrollbar">
+    <div class="b-bazaar-status__dropdown">
+      <div class="b-bazaar-status-dropdown js-notifications-scrollbar">
         <ul class="list">
           <li ng-repeat="notification in currentUserCtrl.notifications" class="b-notification__{{ notification.type }}">
 						<span ng-if="notification.logId == undefined">
@@ -73,11 +73,11 @@
     </div>
   </div>
   {{isRegistrationForVisible}}
-  <div id="hub-button" class="b-hub-status js-header-dropdown g-right"
+  <div id="bzr-button" class="b-bazaar-status js-header-dropdown g-right"
        ng-click="currentUserCtrl.isRegistrationFormVisible = !currentUserCtrl.isRegistrationFormVisible"
        ng-class="getHubStatusIcon()">
-    <div class="b-hub-menu js-notification">
-      <svg class="b-hub-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
+    <div class="b-bazaar-menu js-notification">
+      <svg class="b-bazaar-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
 				<path fill="#E6EAF5" d="M6.1,7H0.9C0.5,7,0.1,6.6,0.1,6.2V0.8C0.1,0.4,0.5,0,0.9,0h5.1c0.5,0,0.8,0.4,0.8,0.8v5.3
 				C6.9,6.6,6.5,7,6.1,7z M0.9,0.3c-0.3,0-0.5,0.2-0.5,0.5v5.3c0,0.3,0.2,0.5,0.5,0.5h5.1c0.3,0,0.5-0.2,0.5-0.5V0.8
 				c0-0.3-0.2-0.5-0.5-0.5H0.9z"/>
@@ -104,29 +104,29 @@
 				C2.8,1.5,2.9,1.6,2.9,1.6z"/>
 				</g>
 			</svg>
-      <div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
+      <div class="b-bazaar-menu__text" ng-if="currentUserCtrl.bazaarStatus">
         <span
-            data-hub-email="{{ currentUserCtrl.userEmail }}">{{ currentUserCtrl.online ? 'Online' : 'Offline' }}</span>
+            data-bazaar-email="{{ currentUserCtrl.userEmail }}">{{ currentUserCtrl.online ? 'Online' : 'Offline' }}</span>
       </div>
-      <span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus && subutaiController.adminMenus">
+      <span class="b-bazaar-menu__text" ng-if="!currentUserCtrl.bazaarStatus && subutaiController.adminMenus">
 				Register Peer
 			</span>
-      <div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus == false && subutaiController.adminMenus == false">
+      <div class="b-bazaar-menu__text" ng-if="currentUserCtrl.bazaarStatus == false && subutaiController.adminMenus == false">
         Standalone
       </div>
     </div>
-    <div class="b-hub-status__dropdown" ng-if="subutaiController.adminMenus">
-      <div ng-if="!currentUserCtrl.hubStatus">
+    <div class="b-bazaar-status__dropdown" ng-if="subutaiController.adminMenus">
+      <div ng-if="!currentUserCtrl.bazaarStatus">
         <div class="header">
           Register Peer
         </div>
-        <form ng-submit="currentUserCtrl.hubRegister()">
+        <form ng-submit="currentUserCtrl.bazaarRegister()">
           <div class="body">
             <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
             <input style="display:none" type="text" name="hidden-login"/>
             <input style="display:none" type="password" name="hidden-password"/>
-            <div class="b-form__error-message" ng-if="currentUserCtrl.hubRegisterError">
-              {{ currentUserCtrl.hubRegisterError }}
+            <div class="b-form__error-message" ng-if="currentUserCtrl.bazaarRegisterError">
+              {{ currentUserCtrl.bazaarRegisterError }}
             </div>
             <div class="b-form-group g-margin-bottom">
               <div class="g-text g-margin-bottom-half">Login</div>
@@ -134,25 +134,25 @@
                      class="b-form-input b-form-input_full"
                      autofocus
                      tabindex=1
-                     ng-model="currentUserCtrl.hub.login" placeholder="Your Email address or username">
+                     ng-model="currentUserCtrl.bazaar.login" placeholder="Your Email address or username">
             </div>
             <div class="b-form-group">
               <div class="g-text g-margin-bottom-half">Password</div>
               <input type="password"
                      class="b-form-input b-form-input_full"
                      tabindex=2
-                     ng-model="currentUserCtrl.hub.password">
+                     ng-model="currentUserCtrl.bazaar.password">
             </div>
             <div class="b-form-group">
               <div class="g-text g-margin-bottom-half">Peer name</div>
               <input type="text"
                      class="b-form-input b-form-input_full"
                      tabindex=3
-                     ng-model="currentUserCtrl.hub.peerName">
+                     ng-model="currentUserCtrl.bazaar.peerName">
             </div>
             <div class="b-form-group">
               <div class="g-text g-margin-bottom-half">Scope</div>
-              <select class="b-form-input b-form-input_full" tabindex="4" ng-model="currentUserCtrl.hub.peerScope">
+              <select class="b-form-input b-form-input_full" tabindex="4" ng-model="currentUserCtrl.bazaar.peerScope">
                 <option value="Public" selected>Public</option>
                 <option value="Private">Private</option>
                 <option value="Shared">Shared</option>
@@ -160,43 +160,43 @@
             </div>
           </div>
           <div class="footer">
-            <a href="https://{{ currentUserCtrl.hubIp }}" target="_blank" tabindex=5 class="b-form-label">Sign Up</a>
+            <a href="https://{{ currentUserCtrl.bazaarIp }}" target="_blank" tabindex=5 class="b-form-label">Sign Up</a>
             <button type="submit" class="b-btn b-btn_green g-right" tabindex=6
-                    ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
+                    ng-disabled="!currentUserCtrl.bazaar.login || !currentUserCtrl.bazaar.password || !currentUserCtrl.bazaar.peerName ">
               Register
             </button>
           </div>
         </form>
       </div>
-      <div ng-if="currentUserCtrl.hubStatus">
+      <div ng-if="currentUserCtrl.bazaarStatus">
         <ul class="list">
           <li style="text-align: center;">
-            <a href="https://{{ currentUserCtrl.hubIp }}/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to
+            <a href="https://{{ currentUserCtrl.bazaarIp }}/users/{{ currentUserCtrl.userId }}/peers" target="_blank">Go to
               Bazaar</a>
             <div class="date"></div>
           </li>
           <li>
             <div style="width: 100%; text-align: center">
-              <button class="b-btn b-btn_green" ng-click="currentUserCtrl.hubHeartbeat()">Send Heartbeat</button>
+              <button class="b-btn b-btn_green" ng-click="currentUserCtrl.bazaarHeartbeat()">Send Heartbeat</button>
             </div>
           </li>
         </ul>
-        <a href ng-click="currentUserCtrl.hubUnregister()" class="show-more">Unregister</a>
+        <a href ng-click="currentUserCtrl.bazaarUnregister()" class="show-more">Unregister</a>
       </div>
-      <div class="b-loading-screen js-hub-screen">
+      <div class="b-loading-screen js-bazaar-screen">
         <div class="b-load-icon"></div>
       </div>
     </div>
-    <div class="b-hub-status__dropdown" ng-if="!subutaiController.adminMenus">
+    <div class="b-bazaar-status__dropdown" ng-if="!subutaiController.adminMenus">
       <div>
         <ul class="list">
           <li style="text-align: center;">
-            <a href="https://{{ currentUserCtrl.hubIp }}" target="_blank">Go to Bazaar</a>
+            <a href="https://{{ currentUserCtrl.bazaarIp }}" target="_blank">Go to Bazaar</a>
             <div class="date"></div>
           </li>
         </ul>
       </div>
-      <div class="b-loading-screen js-hub-screen">
+      <div class="b-loading-screen js-bazaar-screen">
         <div class="b-load-icon"></div>
       </div>
     </div>

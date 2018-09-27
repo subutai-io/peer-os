@@ -10,7 +10,7 @@ import io.subutai.common.util.PeerUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 public class SetQuotaStep

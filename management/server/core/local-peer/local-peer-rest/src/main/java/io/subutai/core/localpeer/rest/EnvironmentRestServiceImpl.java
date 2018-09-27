@@ -25,7 +25,7 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 /**

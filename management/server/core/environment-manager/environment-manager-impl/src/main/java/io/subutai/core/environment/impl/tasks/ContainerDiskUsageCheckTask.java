@@ -18,23 +18,23 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.hub.share.common.HubAdapter;
+import io.subutai.bazaar.share.common.BazaaarAdapter;
 
 
 public class ContainerDiskUsageCheckTask implements Runnable
 {
     private final static Logger LOG = LoggerFactory.getLogger( ContainerDiskUsageCheckTask.class );
     private final EnvironmentManagerImpl environmentManager;
-    private final HubAdapter hubAdapter;
+    private final BazaaarAdapter bazaaarAdapter;
     private final LocalPeer localPeer;
     private final CommandUtil commandUtil = new CommandUtil();
 
 
-    public ContainerDiskUsageCheckTask( final HubAdapter hubAdapter, final LocalPeer localPeer,
+    public ContainerDiskUsageCheckTask( final BazaaarAdapter bazaaarAdapter, final LocalPeer localPeer,
                                         final EnvironmentManagerImpl environmentManager )
     {
         this.environmentManager = environmentManager;
-        this.hubAdapter = hubAdapter;
+        this.bazaaarAdapter = bazaaarAdapter;
         this.localPeer = localPeer;
     }
 
@@ -44,8 +44,8 @@ public class ContainerDiskUsageCheckTask implements Runnable
     {
         for ( EnvironmentDto environment : environmentManager.getTenantEnvironments() )
         {
-            //iterate over hub containers
-            if ( Common.HUB_ID.equals( environment.getDataSource() ) )
+            //iterate over bazaar containers
+            if ( Common.BAZAAR_ID.equals( environment.getDataSource() ) )
             {
                 for ( ContainerDto container : environment.getContainers() )
                 {
@@ -63,8 +63,8 @@ public class ContainerDiskUsageCheckTask implements Runnable
     {
         // a. get its disk usage -> "subutai info du foo"
         // b. compare with container size disk quota limit
-        //  b.a if du is >= 90 % of quota -> notify Hub
-        //  b.b if du is >= 150 %  of quota -> stop container, notify Hub
+        //  b.a if du is >= 90 % of quota -> notifybazaar
+        //  b.b if du is >= 150 %  of quota -> stop container, notifybazaar
         try
         {
 
@@ -100,8 +100,8 @@ public class ContainerDiskUsageCheckTask implements Runnable
                     LOG.info( "Container {} is stopped due to disk quota excess", containerDto.getContainerName() );
                 }
 
-                //notify Hub
-                hubAdapter.notifyContainerDiskUsageExcess( containerDto.getPeerId(), containerDto.getEnvironmentId(),
+                //notifybazaar
+                bazaaarAdapter.notifyContainerDiskUsageExcess( containerDto.getPeerId(), containerDto.getEnvironmentId(),
                         containerDto.getId(), diskUsed, stop );
             }
         }

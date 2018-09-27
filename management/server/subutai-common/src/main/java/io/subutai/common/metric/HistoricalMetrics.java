@@ -14,11 +14,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.subutai.hub.share.dto.metrics.CpuDto;
-import io.subutai.hub.share.dto.metrics.DiskDto;
-import io.subutai.hub.share.dto.metrics.HostMetricsDto;
-import io.subutai.hub.share.dto.metrics.MemoryDto;
-import io.subutai.hub.share.dto.metrics.NetDto;
+import io.subutai.bazaar.share.dto.metrics.CpuDto;
+import io.subutai.bazaar.share.dto.metrics.DiskDto;
+import io.subutai.bazaar.share.dto.metrics.HostMetricsDto;
+import io.subutai.bazaar.share.dto.metrics.MemoryDto;
+import io.subutai.bazaar.share.dto.metrics.NetDto;
 
 
 /**
