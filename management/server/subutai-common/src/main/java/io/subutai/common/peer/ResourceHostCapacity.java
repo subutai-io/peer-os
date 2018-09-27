@@ -1,4 +1,4 @@
-package io.subutai.core.localpeer.impl;
+package io.subutai.common.peer;
 
 
 public class ResourceHostCapacity
