@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.network.UsedNetworkResources;
+import io.subutai.common.peer.FitCheckResult;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.hubmanager.api.exception.HubManagerException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -90,10 +91,17 @@ public class ExchangeInfoStateHandler extends StateHandler
             }
         }
 
-        if ( !newNodes.isEmpty() && !ctx.localPeer.canAccommodate( new Nodes( newNodes, removedContainers, null ) ) )
+        if ( !newNodes.isEmpty() )
         {
-            throw new HubManagerException(
-                    String.format( "Peer %s can not accommodate the requested containers", ctx.localPeer.getId() ) );
+            FitCheckResult fitCheckResult =
+                    ctx.localPeer.checkResources( new Nodes( newNodes, removedContainers, null ) );
+
+            if ( !fitCheckResult.canFit() )
+            {
+                throw new HubManagerException(
+                        String.format( "Peer %s can not accommodate the requested containers:%n%s",
+                                ctx.localPeer.getId(), fitCheckResult.getDescription() ) );
+            }
         }
     }
 
