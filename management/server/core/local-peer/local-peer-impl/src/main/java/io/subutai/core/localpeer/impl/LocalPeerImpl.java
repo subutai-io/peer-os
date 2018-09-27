@@ -43,6 +43,25 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.dto.metrics.HostMetricsDto;
+import io.subutai.bazaar.share.parser.CommonResourceValueParser;
+import io.subutai.bazaar.share.quota.ContainerCpuResource;
+import io.subutai.bazaar.share.quota.ContainerDiskResource;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerRamResource;
+import io.subutai.bazaar.share.quota.ContainerResource;
+import io.subutai.bazaar.share.quota.ContainerResourceFactory;
+import io.subutai.bazaar.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.Quota;
+import io.subutai.bazaar.share.quota.QuotaException;
+import io.subutai.bazaar.share.resource.ByteUnit;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.resource.CpuResource;
+import io.subutai.bazaar.share.resource.DiskResource;
+import io.subutai.bazaar.share.resource.HostResources;
+import io.subutai.bazaar.share.resource.PeerResources;
+import io.subutai.bazaar.share.resource.RamResource;
+import io.subutai.bazaar.share.resource.ResourceValue;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -171,25 +190,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
-import io.subutai.bazaar.share.dto.metrics.HostMetricsDto;
-import io.subutai.bazaar.share.parser.CommonResourceValueParser;
-import io.subutai.bazaar.share.quota.ContainerCpuResource;
-import io.subutai.bazaar.share.quota.ContainerDiskResource;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.quota.ContainerRamResource;
-import io.subutai.bazaar.share.quota.ContainerResource;
-import io.subutai.bazaar.share.quota.ContainerResourceFactory;
-import io.subutai.bazaar.share.quota.ContainerSize;
-import io.subutai.bazaar.share.quota.Quota;
-import io.subutai.bazaar.share.quota.QuotaException;
-import io.subutai.bazaar.share.resource.ByteUnit;
-import io.subutai.bazaar.share.resource.ContainerResourceType;
-import io.subutai.bazaar.share.resource.CpuResource;
-import io.subutai.bazaar.share.resource.DiskResource;
-import io.subutai.bazaar.share.resource.HostResources;
-import io.subutai.bazaar.share.resource.PeerResources;
-import io.subutai.bazaar.share.resource.RamResource;
-import io.subutai.bazaar.share.resource.ResourceValue;
 
 
 /**
@@ -877,7 +877,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public FitCheckResult checkResources( final Nodes nodes ) throws PeerException
+    public synchronized FitCheckResult checkResources( final Nodes nodes ) throws PeerException
     {
         Preconditions.checkArgument(
                 nodes != null && ( !CollectionUtil.isMapEmpty( nodes.getQuotas() ) || !CollectionUtil
