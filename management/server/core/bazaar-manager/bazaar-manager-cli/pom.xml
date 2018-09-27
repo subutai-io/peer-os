@@ -9,7 +9,7 @@
 
   <artifactId>bazaar-manager-cli</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai bazaarManager CLI</name>
+  <name>Subutai Bazaar Manager CLI</name>
 
   <dependencies>
     <dependency>

@@ -8,8 +8,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>bazaar-manager-rest</artifactId>
-  <name>Subutai bazaarManager REST</name>
-  <description>Subutai bazaarManager REST</description>
+  <name>Subutai Bazaar Manager REST</name>
+  <description>Subutai Bazaar Manager REST</description>
   <packaging>bundle</packaging>
 
   <dependencies>

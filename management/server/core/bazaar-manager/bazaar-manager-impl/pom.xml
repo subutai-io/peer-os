@@ -9,8 +9,8 @@
 
   <artifactId>bazaar-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai bazaarManager Impl</name>
-  <description>Subutai bazaarManager Impl</description>
+  <name>Subutai Bazaar Manager Impl</name>
+  <description>Subutai Bazaar Manager Impl</description>
 
   <dependencies>
     <dependency>

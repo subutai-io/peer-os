@@ -9,7 +9,7 @@
 
   <artifactId>bazaar-manager-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai bazaarManager Api</name>
+  <name>Subutai Bazaar Manager Api</name>
   <description>Subutai bazaarManager Api</description>
 
   <dependencies>
