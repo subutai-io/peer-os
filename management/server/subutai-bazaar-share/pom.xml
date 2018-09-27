@@ -22,7 +22,7 @@
   </parent>
 
   <artifactId>subutai-bazaar-share</artifactId>
-  <name>Subutai bazaarShare</name>
+  <name>Subutai Bazaar Share</name>
   <packaging>jar</packaging>
 
   <dependencies>
