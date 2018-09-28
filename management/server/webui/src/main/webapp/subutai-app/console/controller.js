@@ -130,7 +130,9 @@ function ConsoleViewCtrl($scope, consoleService, $stateParams, ngDialog, cfpLoad
 				return;
 			}
 
-			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path(), vm.daemon, vm.timeOut, vm.selectedEnvironment).success(function(data){
+			var workingDir = $scope.prompt.path().replace("~", "root")
+
+			consoleService.sendCommand(cmd.command, vm.activeConsole, workingDir, vm.daemon, vm.timeOut, vm.selectedEnvironment).success(function(data){
 				output = [];
 				if(data.stdOut.length > 0) {
 					output = data.stdOut.split('\r');
