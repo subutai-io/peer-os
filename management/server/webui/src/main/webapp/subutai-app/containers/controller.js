@@ -18,7 +18,7 @@ ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'Swee
 
 function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar, identitySrv, templateSrv) {
 
-	checkCDNToken(templateSrv, $rootScope)
+//	checkCDNToken(templateSrv, $rootScope)
 
 	var vm = this;
 
@@ -372,7 +372,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function createTemplatePopup(container){
 
-        if( hasCdnToken() ){
+//        if( hasCdnToken() ){
             vm.editingContainer = container;
 
             ngDialog.open({
@@ -380,12 +380,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
                 scope: $scope,
                 className: 'b-build-environment-info'
             });
-		} else {
-		    SweetAlert.swal(
-		    "Your key is not registered with Bazaar",
-		    "Please, register your key on Bazaar",
-		    "success");
-		}
+//		} else {
+//		    SweetAlert.swal(
+//		    "Your key is not registered with Bazaar",
+//		    "Please, register your key on Bazaar",
+//		    "success");
+//		}
 	}
 
 
