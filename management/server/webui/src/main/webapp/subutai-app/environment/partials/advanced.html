@@ -1,5 +1,4 @@
-<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="return dragOver(event)"
-     ng-init="advEnvCtrl.loadPrivateTemplates()">
+<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="return dragOver(event)">
   <div class="b-cloud__tools">
     <div class="b-cloud-tools">
       <div class="b-tabs-menu b-tabs-menu_cloud-env">
@@ -21,14 +20,14 @@
           <input type="text" class="b-search-input" ng-model="searchTemplate" ng-init="searchTemplate=''"
                  id="js-search">
         </div>
-        <div class="b-tools-menu__inpit">
-          <select class="b-search-input" ng-model="advEnvCtrl.templatesType"
-                  ng-change="advEnvCtrl.getFilteredTemplates()">
-            <option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">
-              {{ templatesType }} ({{ templateList.length }})
-            </option>
-          </select>
-        </div>
+        <!--<div class="b-tools-menu__inpit">-->
+          <!--<select class="b-search-input" ng-model="advEnvCtrl.templatesType"-->
+                  <!--ng-change="advEnvCtrl.getFilteredTemplates()">-->
+            <!--<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">-->
+              <!--{{ templatesType }} ({{ templateList.length }})-->
+            <!--</option>-->
+          <!--</select>-->
+        <!--</div>-->
         <ul>
           <li ng-repeat="template in advEnvCtrl.templatesList | filter:{'name' : searchTemplate} | orderBy: 'name' track by $index"
               data-template="{{ template.name }}"
@@ -151,16 +150,16 @@
             ng-init="advEnvCtrl.initJointJs()"
             ondrop="return drop(event);" ondragenter="return false;" ondragover="return false;">
 
-          <div class="b-environments-plugin js-no-close">
-					<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup"
-                tooltips
-                tooltip-side="right"
-                tooltip-template='CDN token'>
-					</span>
-            <div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">
-              <div class="header">{{ advEnvCtrl.getCdnToken() }}</div>
-            </div>
-          </div>
+          <!--<div class="b-environments-plugin js-no-close">-->
+					<!--<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup"-->
+                <!--tooltips-->
+                <!--tooltip-side="right"-->
+                <!--tooltip-template='CDN token'>-->
+					<!--</span>-->
+            <!--<div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">-->
+              <!--<div class="header">{{ advEnvCtrl.getCdnToken() }}</div>-->
+            <!--</div>-->
+          <!--</div>-->
 
           <div class="b-template-settings js-dropen-menu js-no-close">
             <div class="header"></div>

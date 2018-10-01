@@ -9,7 +9,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	var vm = this;
 
-	checkCDNToken(templateSrv, $rootScope)
+//	checkCDNToken(templateSrv, $rootScope)
 
 	var GRID_CELL_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
@@ -83,7 +83,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     }
 
     loadTemplates();
-    loadOwnTemplates();
+//    loadOwnTemplates();
 
     $rootScope.$on('cdnTokenSet', function(event, data){
         loadOwnTemplates();
