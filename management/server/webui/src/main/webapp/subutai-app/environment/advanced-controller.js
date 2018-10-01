@@ -21,7 +21,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     var vm = this;
 
-	checkCDNToken(templateSrv, $rootScope)
+//	checkCDNToken(templateSrv, $rootScope)
 
     vm.buildEnvironment = buildEnvironment;
     vm.buildEditedEnvironment = buildEditedEnvironment;
@@ -98,7 +98,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     }
 
     loadTemplates();
-    loadOwnTemplates();
+//    loadOwnTemplates();
 
     $rootScope.$on('cdnTokenSet', function (event, data) {
         loadOwnTemplates();
