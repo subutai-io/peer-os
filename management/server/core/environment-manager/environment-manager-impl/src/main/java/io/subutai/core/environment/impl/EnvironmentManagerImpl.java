@@ -34,6 +34,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.common.BazaarEventListener;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.ContainerDto;
@@ -50,6 +53,7 @@ import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
@@ -94,8 +98,8 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.BazaarEnvironment;
+import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -127,9 +131,6 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.bazaar.share.common.BazaaarAdapter;
-import io.subutai.bazaar.share.common.BazaarEventListener;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 /**
@@ -174,8 +175,9 @@ public class EnvironmentManagerImpl extends HostListener
 
     public EnvironmentManagerImpl( final TemplateManager templateManager, final PeerManager peerManager,
                                    SecurityManager securityManager, final IdentityManager identityManager,
-                                   final Tracker tracker, final RelationManager relationManager, BazaaarAdapter bazaaarAdapter,
-                                   final EnvironmentService environmentService, final SystemManager systemManager )
+                                   final Tracker tracker, final RelationManager relationManager,
+                                   BazaaarAdapter bazaaarAdapter, final EnvironmentService environmentService,
+                                   final SystemManager systemManager )
     {
         Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( peerManager );
@@ -2458,6 +2460,8 @@ public class EnvironmentManagerImpl extends HostListener
         }
     }
 
+    //TODO need to remember if env got unhealthy during key exchange
+
 
     protected void doResetP2Pkeys()
     {
@@ -2466,9 +2470,9 @@ public class EnvironmentManagerImpl extends HostListener
             //process only SS side environments
             for ( Environment environment : environmentService.getAll() )
             {
-                if ( !( environment.getStatus() != EnvironmentStatus.HEALTHY || (
-                        ( System.currentTimeMillis() - environment.getCreationTimestamp() ) < TimeUnit.MINUTES
-                                .toMillis( RESET_ENVS_P2P_KEYS_INTERVAL_MIN ) ) ) )
+                if ( !( ( environment.getStatus() != EnvironmentStatus.HEALTHY && !allContainersAreRunning(
+                        environment ) ) || ( ( System.currentTimeMillis() - environment.getCreationTimestamp() )
+                        < TimeUnit.MINUTES.toMillis( RESET_ENVS_P2P_KEYS_INTERVAL_MIN ) ) ) )
                 {
                     final String secretKey = UUID.randomUUID().toString();
                     final long keyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
@@ -2480,6 +2484,20 @@ public class EnvironmentManagerImpl extends HostListener
         {
             LOG.warn( e.getMessage() );
         }
+    }
+
+
+    private boolean allContainersAreRunning( final Environment environment )
+    {
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            if ( containerHost.getState() != ContainerHostState.RUNNING )
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
