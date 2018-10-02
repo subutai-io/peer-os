@@ -8,6 +8,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.subutai.bazaar.share.dto.ansible.AnsibleDto;
+import io.subutai.bazaar.share.dto.ansible.Group;
+import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -22,9 +25,6 @@ import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.bazaarmanager.impl.environment.state.Context;
 import io.subutai.core.bazaarmanager.impl.environment.state.StateHandler;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.bazaar.share.dto.ansible.AnsibleDto;
-import io.subutai.bazaar.share.dto.ansible.Group;
-import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
 
 
 public class ConfigureEnvironmentStateHandler extends StateHandler
@@ -32,9 +32,6 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     private static final String ENV_APPS_URL = "/rest/v1/environments/%s/apps";
 
     private static final String TMP_DIR = "/root/";
-    private static final String EXTRA_VARS_FILE_NAME = "extra-vars.json";
-    private static final String CREATE_EXTRA_VARS_FILE_CMD = "cd %s; cat > %s <<EOL\n" + "%s" + "\n" + "EOL\n";
-    private static final String RUN_PLAYBOOK_CMD = "cd %s; ansible-playbook  %s -e \"@%s\" -i %s";
 
     private long commandTimeout = 5L;
 
@@ -116,16 +113,11 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             extraVars = "{}";
         }
 
-        String extraVarsCmd =
-                String.format( CREATE_EXTRA_VARS_FILE_CMD, TMP_DIR + fileName, EXTRA_VARS_FILE_NAME, extraVars );
-
-        String cmd = String.format( RUN_PLAYBOOK_CMD, TMP_DIR + fileName, mainAnsibleScript, EXTRA_VARS_FILE_NAME,
-                inventoryFile );
+        String cmd = String.format( "cd %s; ansible-playbook  %s -e %s -i %s", TMP_DIR + fileName, mainAnsibleScript,
+                extraVars, inventoryFile );
 
         try
         {
-            runCmd( containerId, extraVarsCmd );
-
             runCmdAsync( containerId, cmd, envSubutaiId );
         }
         catch ( Exception e )
