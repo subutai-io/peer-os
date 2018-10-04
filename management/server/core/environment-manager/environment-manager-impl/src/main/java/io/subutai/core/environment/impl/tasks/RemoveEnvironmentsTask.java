@@ -53,7 +53,7 @@ public class RemoveEnvironmentsTask implements Runnable
                     environmentManager.getLocallyRegisteredBazaarEnvironments();
 
 
-            // 1. remove environments onbazaar that are missing locally
+            // 1. remove environments on bazaar that are missing locally
 
             Set<Environment> environmentsMissingLocally = Sets.newHashSet();
 
@@ -77,7 +77,7 @@ public class RemoveEnvironmentsTask implements Runnable
                 }
             }
 
-            // remove all missing env-s frombazaar
+            // remove all missing env-s from bazaar
 
             for ( Environment environment : environmentsMissingLocally )
             {
@@ -85,7 +85,7 @@ public class RemoveEnvironmentsTask implements Runnable
             }
 
 
-            // 2. remove local environments that are missing onbazaar
+            // 2. remove local environments that are missing on bazaar
 
             Set<String> deletedEnvironmentsIdsOnBazaar = environmentAdapter.getDeletedEnvironmentsIds();
             Set<Environment> environmentsMissingOnBazaar = Sets.newHashSet();
@@ -110,7 +110,7 @@ public class RemoveEnvironmentsTask implements Runnable
                 }
             }
 
-            // destroy local env-s missing onbazaar
+            // destroy local env-s missing on bazaar
 
             for ( Environment environment : environmentsMissingOnBazaar )
             {
@@ -119,14 +119,14 @@ public class RemoveEnvironmentsTask implements Runnable
                 environmentManager.notifyOnEnvironmentDestroyed( environment.getId() );
             }
 
-            // notifybazaar about environment deletion
+            // notify bazaar about environment deletion
 
             for ( String bzrEnvironmentId : deletedEnvironmentsIdsOnBazaar )
             {
                 environmentAdapter.removeEnvironment( bzrEnvironmentId );
             }
 
-            // 3. Remove deleted local env-s frombazaar
+            // 3. Remove deleted local env-s from bazaar
 
             Collection<LocalEnvironment> deletedEnvs = environmentService.getDeleted();
 

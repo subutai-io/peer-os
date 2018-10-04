@@ -53,10 +53,10 @@ function TenantsViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTO
 	}
 
 	function actionDelete(data, type, full, meta) {
-		return '<a href class="b-icon b-icon_remove" ng-click="tenantsViewCtrl.deleteEnvironment(\'' + data.id + '\')"></a>';
+		return '<a href class="b-icon b-icon_remove" ng-click="tenantsViewCtrl.deleteEnvironment(\'' + data.id + '\',\'' + data.dataSource + '\')"></a>';
 	}
 
-	function deleteEnvironment(environmentId) {
+	function deleteEnvironment(environmentId, source) {
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
@@ -83,7 +83,11 @@ function TenantsViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTO
 					);
 
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
-						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
+                        if (source == "bazaar"){
+                            SweetAlert.swal("Accepted!", "Your environment deletion has been started", "success");
+                        }else{
+                            SweetAlert.swal("Destroyed!", "Your environment has been destroyed", "success");
+                        }
 						vm.dtInstance.reloadData(null, false);
 					}).error(function (data) {
 						$timeout(function() {
