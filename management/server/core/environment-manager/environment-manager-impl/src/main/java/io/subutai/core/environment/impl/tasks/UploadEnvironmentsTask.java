@@ -44,7 +44,7 @@ public class UploadEnvironmentsTask implements Runnable
     @Override
     public void run()
     {
-        //0. check if peer is registered withbazaar andbazaar is reachable
+        //0. check if peer is registered with bazaar and bazaar is reachable
         if ( !environmentAdapter.canWorkWithBazaar() )
         {
             return;
@@ -76,7 +76,7 @@ public class UploadEnvironmentsTask implements Runnable
         }
 
 
-        //3. upload them tobazaar
+        //3. upload them to bazaar
         Set<Environment> environments = Sets.newHashSet();
 
         environments.addAll( envs );

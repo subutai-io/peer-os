@@ -25,20 +25,20 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response triggerHeartbeat();
 
-    //Register tobazaar
+    //Register to bazaar
     @POST
     @Path( "/register" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response register( @FormParam( "email" ) String email, @FormParam( "password" ) String password,
                        @FormParam( "peerName" ) String peerName, @FormParam( "peerScope" ) String peerScope );
 
-    //Register tobazaar
+    //Return bazaar IP
     @GET
     @Path( "/ip" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response getBazaarIp();
 
-    //Unregister tobazaar
+    //Unregister from bazaar
     @DELETE
     @Path( "/unregister" )
     @Produces( { MediaType.APPLICATION_JSON } )
