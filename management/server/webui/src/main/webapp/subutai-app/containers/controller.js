@@ -409,7 +409,9 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
                 var percent = parseInt(data.templatesUploadProgress[0].templatesUploadProgress[templateName]);
 
-                timeout = setTimeout (function(){ showUploadProgress(templateName, true); }, 3000);
+                if (percent != 100) {
+                    timeout = setTimeout (function(){ showUploadProgress(templateName, true); }, 3000);
+                }
 
                 if(isScheduled) vm.uploadPercent = isNaN(percent) ? 0: percent;
 
