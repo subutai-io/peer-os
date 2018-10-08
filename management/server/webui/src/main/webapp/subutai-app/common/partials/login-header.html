@@ -75,7 +75,7 @@
   {{isRegistrationForVisible}}
   <div id="bzr-button" class="b-bazaar-status js-header-dropdown g-right"
        ng-click="currentUserCtrl.isRegistrationFormVisible = !currentUserCtrl.isRegistrationFormVisible"
-       ng-class="getHubStatusIcon()">
+       ng-class="getBazaarStatusIcon()">
     <div class="b-bazaar-menu js-notification">
       <svg class="b-bazaar-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
 				<path fill="#E6EAF5" d="M6.1,7H0.9C0.5,7,0.1,6.6,0.1,6.2V0.8C0.1,0.4,0.5,0,0.9,0h5.1c0.5,0,0.8,0.4,0.8,0.8v5.3
@@ -151,11 +151,12 @@
                      ng-model="currentUserCtrl.bazaar.peerName">
             </div>
             <div class="b-form-group">
-              <div class="g-text g-margin-bottom-half">Scope</div>
-              <select class="b-form-input b-form-input_full" tabindex="4" ng-model="currentUserCtrl.bazaar.peerScope">
-                <option value="Public" selected>Public</option>
-                <option value="Private">Private</option>
+              <div class="g-text g-margin-bottom-half" tooltips tooltip-template='<span class="b-nowrap">Private: only you can use the peer</span><br/><span class="b-nowrap">Shared: you can share the peer with other users</span><br/><span class="b-nowrap">Public: anyone can use the peer'>Scope</div>
+              <select class="b-form-input b-form-input_full" tabindex="4" ng-model="currentUserCtrl.bazaar.peerScope" required>
+                <option disabled selected value> -- select an option -- </option>
+                <option value="Private" >Private</option>
                 <option value="Shared">Shared</option>
+                <option value="Public">Public</option>
               </select>
             </div>
           </div>

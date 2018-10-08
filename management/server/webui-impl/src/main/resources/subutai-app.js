@@ -141,7 +141,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         checkIfRegistered();
     }, 120000);
 
-    $scope.getHubStatusIcon = function(){
+    $scope.getBazaarStatusIcon = function(){
         return vm.bazaarStatus ?
           ( vm.online ? 'b-bazaar-status_regged' : 'b-bazaar-status_offline' )
           : 'b-bazaar-status_unregged' ;
@@ -151,7 +151,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         login: "",
         password: "",
         peerName: "",
-        peerScope: "Public"
+        peerScope: ""
     };
 
 
