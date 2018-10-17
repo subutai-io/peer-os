@@ -1,0 +1,25 @@
+
+Export-Package: \
+     io.subutai.bazaar.share,\
+     io.subutai.bazaar.share.common,\
+     io.subutai.bazaar.share.common.util,\
+     io.subutai.bazaar.share.dto,\
+     io.subutai.bazaar.share.dto.ansible,\
+     io.subutai.bazaar.share.dto.domain,\
+     io.subutai.bazaar.share.dto.environment,\
+     io.subutai.bazaar.share.dto.environment.container,\
+     io.subutai.bazaar.share.dto.metrics,\
+     io.subutai.bazaar.share.dto.product,\
+     io.subutai.bazaar.share.event,\
+     io.subutai.bazaar.share.event.meta,\
+     io.subutai.bazaar.share.event.payload,\
+     io.subutai.bazaar.share.json,\
+     io.subutai.bazaar.share.parser,\
+     io.subutai.bazaar.share.pgp.crypto,\
+     io.subutai.bazaar.share.pgp.key,\
+     io.subutai.bazaar.share.pgp.message,\
+     io.subutai.bazaar.share.quota,\
+     io.subutai.bazaar.share.resource
+
+
+Import-Package: *

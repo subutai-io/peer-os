@@ -1,0 +1,21 @@
+<div class="b-popup b-popup_min">
+	<div class="b-popup__header">
+		Registration
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<div class="b-popup__body">
+
+		<p class="b-popup__text g-text-green">
+			Successfully registered to Bazaar!
+		</p>
+
+	</div>
+	<div class="b-popup__footer">
+		<a href="https://{{ currentUserCtrl.bazaarIp }}/users/{{ currentUserCtrl.userId }}/peers" class="b-btn b-btn_green g-right" target="_blank">
+			Go to Bazaar
+		</a>
+		<div class="clear"></div>
+	</div>
+</div>

@@ -203,9 +203,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getHubIp()
+    public Response getBazaarIp()
     {
-        return Response.status( Response.Status.OK ).entity( systemManager.getHubIp() ).build();
+        return Response.status( Response.Status.OK ).entity( systemManager.getBazaarIp() ).build();
     }
 
 

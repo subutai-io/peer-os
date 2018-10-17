@@ -38,5 +38,5 @@ public interface SystemManager
 
     boolean isEnvironmentWorkflowInProgress();
 
-    String getHubIp();
+    String getBazaarIp();
 }

@@ -35,7 +35,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     var vm = this;
     vm.currentUser = localStorage.getItem('currentUser');
-    vm.hubStatus = false;
+    vm.bazaarStatus = false;
     vm.online = false;
     vm.userId = "";
     vm.userEmail = "";
@@ -47,28 +47,28 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.currentLog = [];
     vm.currentUserRoles = [];
     $rootScope.notifications = {};
-    vm.hubRegisterError = false;
+    vm.bazaarRegisterError = false;
     vm.isRegistrationFormVisible = false;
     vm.peerNameValue = false;
 
-    function updateHubIp() {
-        $http.get(SERVER_URL + 'rest/v1/system/hub_ip', {
+    function updateBazaarIp() {
+        $http.get(SERVER_URL + 'rest/v1/system/bazaar_ip', {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
         }).success(function (data) {
-            vm.hubIp = data;
-            localStorage.setItem("hubIp", data);
+            vm.bazaarIp = data;
+            localStorage.setItem("bazaarIp", data);
         }).error(function (error) {
-            if(!$.trim(vm.hubIp)){
-                vm.hubIp = 'bazaar.subutai.io';
-                localStorage.setItem("hubIp", vm.hubIp);
+            if(!$.trim(vm.bazaarIp)){
+                vm.bazaarIp = 'bazaar.subutai.io';
+                localStorage.setItem("bazaarIp", vm.bazaarIp);
             }
         });
     }
 
-    updateHubIp();
+    updateBazaarIp();
 
-    setInterval(updateHubIp, 30000);
+    setInterval(updateBazaarIp, 30000);
 
     vm.getRegistrationFormVisibilityStatus = function () {
         return vm.isRegistrationFormVisible;
@@ -107,28 +107,28 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     function checkIfRegistered(afterRegistration) {
         if (afterRegistration === undefined || afterRegistration === null) afterRegistration = false;
-        $http.get(SERVER_URL + "rest/v1/hub/registration_state", {
+        $http.get(SERVER_URL + "rest/v1/bazaar/registration_state", {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
         }).success(function (data) {
 
-            vm.hubStatus = data.isRegisteredToHub;
-            vm.online = data.isHubReachable;
+            vm.bazaarStatus = data.isRegisteredToBazaar;
+            vm.online = data.isBazaarReachable;
             vm.userId = data.ownerId;
             vm.userEmail = data.currentUserEmail;
 
-            if (vm.hubStatus != "true" && vm.hubStatus != true) {
-                vm.hubStatus = false;
+            if (vm.bazaarStatus != "true" && vm.bazaarStatus != true) {
+                vm.bazaarStatus = false;
             } else {
-                vm.hubStatus = true;
+                vm.bazaarStatus = true;
 				vm.peerNameValue = data.peerName;
             }
-			hubRegisterStatus = vm.hubStatus;
+			bazaarRegisterStatus = vm.bazaarStatus;
 
             if (afterRegistration) {
-                hubPopupLoadScreen();
+                bazaarPopupLoadScreen();
                 ngDialog.open({
-                    template: 'subutai-app/common/partials/hubSuccessMessage.html',
+                            template: 'subutai-app/common/partials/bazaarSuccessMessage.html',
                     scope: $scope
                 });
             }
@@ -141,45 +141,45 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         checkIfRegistered();
     }, 120000);
 
-    $scope.getHubStatusIcon = function(){
-        return vm.hubStatus ?
-          ( vm.online ? 'b-hub-status_regged' : 'b-hub-status_offline' )
-          : 'b-hub-status_unregged' ;
+    $scope.getBazaarStatusIcon = function(){
+        return vm.bazaarStatus ?
+          ( vm.online ? 'b-bazaar-status_regged' : 'b-bazaar-status_offline' )
+          : 'b-bazaar-status_unregged' ;
     }
 
-    vm.hub = {
+    vm.bazaar = {
         login: "",
         password: "",
         peerName: "",
-        peerScope: "Public"
+        peerScope: ""
     };
 
 
     //function
     vm.logout = logout;
-    vm.hubRegister = hubRegister;
-    vm.hubUnregister = hubUnregister;
-    vm.hubHeartbeat = hubHeartbeat;
+    vm.bazaarRegister = bazaarRegister;
+    vm.bazaarUnregister = bazaarUnregister;
+    vm.bazaarHeartbeat = bazaarHeartbeat;
     vm.clearLogs = clearLogs;
     vm.viewLogs = viewLogs;
 
 
-    function hubPopupLoadScreen(show) {
+    function bazaarPopupLoadScreen(show) {
         if (show == undefined || show == null) show = false;
         if (show) {
-            $('.js-hub-screen').show();
+            $('.js-bazaar-screen').show();
         } else {
-            $('.js-hub-screen').hide();
+            $('.js-bazaar-screen').hide();
         }
     }
 
 
-    function hubRegister() {
-        vm.hubRegisterError = false;
-        hubPopupLoadScreen(true);
+    function bazaarRegister() {
+        vm.bazaarRegisterError = false;
+        bazaarPopupLoadScreen(true);
 
-        var postData = 'email=' + vm.hub.login + '&peerName=' + vm.hub.peerName + '&password=' + encodeURIComponent(vm.hub.password) + '&peerScope=' + vm.hub.peerScope;
-        $http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
+        var postData = 'email=' + vm.bazaar.login + '&peerName=' + vm.bazaar.peerName + '&password=' + encodeURIComponent(vm.bazaar.password) + '&peerScope=' + vm.bazaar.peerScope;
+        $http.post(SERVER_URL + 'rest/v1/bazaar/register', postData, {
             withCredentials: true,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         })
@@ -187,27 +187,27 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
                 checkIfRegistered(true);
 
-                $http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat', {
+                $http.post(SERVER_URL + 'rest/v1/bazaar/send-heartbeat', {
                     withCredentials: true,
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 })
                     .success(function () {
                     }).error(function (error) {
                     console.log('bazaar/register error: ', error);
-                    vm.hubRegisterError = error;
+                    vm.bazaarRegisterError = error;
                 });
 
-				vm.peerNameValue = vm.hub.peerName;
+				vm.peerNameValue = vm.bazaar.peerName;
 
             }).error(function (error) {
             console.log('bazaar/register error: ', error);
-            vm.hubRegisterError = error;
-            hubPopupLoadScreen();
+            vm.bazaarRegisterError = error;
+            bazaarPopupLoadScreen();
         });
     }
 
 
-    function hubUnregister() {
+    function bazaarUnregister() {
 
         var previousWindowKeyDown = window.onkeydown;
         SweetAlert.swal({
@@ -226,15 +226,15 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             window.onkeydown = previousWindowKeyDown;
             if (isConfirm) {
 
-                hubPopupLoadScreen(true);
-                $http.delete(SERVER_URL + 'rest/v1/hub/unregister')
+                bazaarPopupLoadScreen(true);
+                $http.delete(SERVER_URL + 'rest/v1/bazaar/unregister')
                     .success(function () {
-                        hubPopupLoadScreen();
-                        vm.hubStatus = false;
+                        bazaarPopupLoadScreen();
+                        vm.bazaarStatus = false;
                         vm.peerNameValue = false;
                         SweetAlert.swal ("Success!", "Your peer was unregistered from Bazaar", "success");
                     }).error(function (error) {
-                    hubPopupLoadScreen();
+                    bazaarPopupLoadScreen();
                     SweetAlert.swal("ERROR!", error, "error");
                 });
 
@@ -243,17 +243,16 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     }
 
 
-    function hubHeartbeat() {
-        //should be rest/v1/hub no need to change
-        hubPopupLoadScreen(true);
-        $http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat', {withCredentials: true})
+    function bazaarHeartbeat() {
+        bazaarPopupLoadScreen(true);
+        $http.post(SERVER_URL + 'rest/v1/bazaar/send-heartbeat', {withCredentials: true})
             .success(function () {
-                hubPopupLoadScreen();
-                vm.hubStatus = true;
+                bazaarPopupLoadScreen();
+                vm.bazaarStatus = true;
                 vm.online = true;
                 SweetAlert.swal("Success!", "Heartbeat sent successfully.", "success");
             }).error(function (error) {
-            hubPopupLoadScreen();
+            bazaarPopupLoadScreen();
             vm.online = false;
             SweetAlert.swal("ERROR!", "Error performing heartbeat: " + error.replace(/\\n/g, " "), "error");
         });
@@ -985,7 +984,7 @@ app.directive('focusInput', function ($timeout, $parse) {
 //Global variables
 
 var bazaarUpdate = false;
-var hubRegisterStatus = false;
+var bazaarRegisterStatus = false;
 
 var SERVER_URL = '/';
 

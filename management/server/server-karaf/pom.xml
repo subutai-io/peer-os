@@ -15,7 +15,6 @@
 
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
-    <hubEnv>hub</hubEnv>
     <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
   </properties>
 

@@ -357,7 +357,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			var container = containers[index];
 			var remoteProxyContainer = !container.local && container.dataSource != "subutai";
 
-			// We don't show on UI containers created by Hub, located on other peers.
+			// We don't show on UI containers created bybazaar, located on other peers.
 			// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
 			if ( remoteProxyContainer )
 			{
@@ -491,7 +491,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function showSSHKeyForm(environmentId) {
 
-		if ( alertForHubEnvironment( environmentId ) )
+		if ( alertForBazaarEnvironment( environmentId ) )
 		{
 			return;
 		}
@@ -505,7 +505,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 
-	function alertForHubEnvironment( envId )
+	function alertForBazaarEnvironment( envId )
 	{
 		var env = getEnvironment( envId );
 
@@ -536,7 +536,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function showSSHKeysPopup(environmentId) {
 
-		if ( alertForHubEnvironment( environmentId ) )
+		if ( alertForBazaarEnvironment( environmentId ) )
 		{
 			return;
 		}
@@ -577,7 +577,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function showDomainForm(environmentId) {
 
-		if ( alertForHubEnvironment( environmentId ) )
+		if ( alertForBazaarEnvironment( environmentId ) )
 		{
 			return;
 		}

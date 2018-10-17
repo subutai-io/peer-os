@@ -5,10 +5,10 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.Quota;
-import io.subutai.hub.share.resource.ByteUnit;
-import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.Quota;
+import io.subutai.bazaar.share.resource.ByteUnit;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
 
 
 /**

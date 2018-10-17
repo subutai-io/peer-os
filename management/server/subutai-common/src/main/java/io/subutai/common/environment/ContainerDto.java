@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 /**
@@ -48,7 +48,7 @@ public class ContainerDto
     private ContainerQuotaDto quota;
 
 
-    // Where environment of container created: subutai, hub
+    // Where environment of container created: subutai, bazaar
     @JsonProperty( "dataSource" )
     private String dataSource;
 

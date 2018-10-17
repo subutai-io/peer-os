@@ -1,7 +1,7 @@
 package io.subutai.core.environment.rest;
 
 
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 public class NodeDto

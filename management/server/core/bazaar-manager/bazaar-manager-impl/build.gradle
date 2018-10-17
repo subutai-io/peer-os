@@ -1,0 +1,20 @@
+dependencies {
+    compile project( ":management:server:core:desktop-manager:desktop-manager-api")
+    compile project( ":management:server:core:command-executor:command-executor-api")
+    compile project( ":management:server:core:host-registry:host-registry-api")
+    compile project( ":management:server:core:bazaar-manager:bazaar-manager-api")
+    compile project( ":management:server:core:metric:metric-api")
+    compile project( ":management:server:core:peer-manager:peer-manager-api")
+    compile project( ":management:server:core:security-manager:security-manager-api")
+    compile project( ":management:server:core:subutai-appender")
+    compile project( ":management:server:core:system-manager:system-manager-api")
+    compile project( ":management:server:subutai-common")
+    compile libraries.commons_lang3
+    compile libraries.guava
+    compile libraries.http_client
+    compile libraries.javax_annotation
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+}

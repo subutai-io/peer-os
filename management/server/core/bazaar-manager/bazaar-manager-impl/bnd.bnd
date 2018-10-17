@@ -1,0 +1,20 @@
+
+Private-Package: \
+     io.subutai.core.bazaarmanager.impl, \
+     io.subutai.core.bazaarmanager.impl.adapter, \
+     io.subutai.core.bazaarmanager.impl.appscale, \
+     io.subutai.core.bazaarmanager.impl.dao, \
+     io.subutai.core.bazaarmanager.impl.environment.state, \
+     io.subutai.core.bazaarmanager.impl.environment.state.create, \
+     io.subutai.core.bazaarmanager.impl.environment.state.change, \
+     io.subutai.core.bazaarmanager.impl.environment.state.destroy, \
+     io.subutai.core.bazaarmanager.impl.http, \
+     io.subutai.core.bazaarmanager.impl.model, \
+     io.subutai.core.bazaarmanager.impl.processor, \
+     io.subutai.core.bazaarmanager.impl.processor.port_map, \
+     io.subutai.core.bazaarmanager.impl.requestor, \
+     io.subutai.core.bazaarmanager.impl.tunnel, \
+     io.subutai.core.bazaarmanager.impl.util
+
+
+Import-Package: *

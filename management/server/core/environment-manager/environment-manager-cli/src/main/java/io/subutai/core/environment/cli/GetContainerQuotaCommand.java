@@ -8,8 +8,8 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.Quota;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.Quota;
 
 
 @Command( scope = "environment", name = "get-quota", description = "gets quota information from peer for container" )

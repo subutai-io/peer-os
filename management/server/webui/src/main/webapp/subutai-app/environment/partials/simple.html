@@ -1,5 +1,4 @@
-<div class="b-cloud" ng-controller="EnvironmentSimpleViewCtrl as environmentSimpleViewCtrl"
-     ng-init="environmentSimpleViewCtrl.loadPrivateTemplates()">
+<div class="b-cloud" ng-controller="EnvironmentSimpleViewCtrl as environmentSimpleViewCtrl">
   <div class="b-cloud__tools g-right">
     <div class="b-cloud-tools">
       <div class="b-tabs-menu b-tabs-menu_cloud-env">
@@ -17,15 +16,15 @@
           <input type="text" class="b-search-input" ng-model="searchTemplate" ng-init="searchTemplate=''" id="js-search"
                  placeholder="Search...">
         </div>
-        <div class="b-tools-menu__inpit">
-          <select class="b-search-input" ng-model="environmentSimpleViewCtrl.templatesType"
-                  ng-change="environmentSimpleViewCtrl.getFilteredTemplates()">
-            <option ng-repeat="(templatesType, templateList) in environmentSimpleViewCtrl.templates"
-                    value="{{ templatesType }}">
-              {{ templatesType }} ({{ templateList.length }})
-            </option>
-          </select>
-        </div>
+        <!--<div class="b-tools-menu__inpit">-->
+          <!--<select class="b-search-input" ng-model="environmentSimpleViewCtrl.templatesType"-->
+                  <!--ng-change="environmentSimpleViewCtrl.getFilteredTemplates()">-->
+            <!--<option ng-repeat="(templatesType, templateList) in environmentSimpleViewCtrl.templates"-->
+                    <!--value="{{ templatesType }}">-->
+              <!--{{ templatesType }} ({{ templateList.length }})-->
+            <!--</option>-->
+          <!--</select>-->
+        <!--</div>-->
         <ul>
           <li ng-repeat="template in environmentSimpleViewCtrl.templatesList | filter:{'name' : searchTemplate} | orderBy: 'name' track by $index">
 						<span class="b-tools-menu__item"
@@ -53,16 +52,16 @@
             id="js-environment-creation"
             ng-init="environmentSimpleViewCtrl.initJointJs()">
 
-          <div class="b-environments-plugin js-no-close">
-						<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup"
-                  tooltips
-                  tooltip-side="right"
-                  tooltip-template='CDN token'>
-						</span>
-            <div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">
-              <div class="header">{{ environmentSimpleViewCtrl.getCdnToken() }}</div>
-            </div>
-          </div>
+          <!--<div class="b-environments-plugin js-no-close">-->
+						<!--<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup"-->
+                  <!--tooltips-->
+                  <!--tooltip-side="right"-->
+                  <!--tooltip-template='CDN token'>-->
+						<!--</span>-->
+            <!--<div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">-->
+              <!--<div class="header">{{ environmentSimpleViewCtrl.getCdnToken() }}</div>-->
+            <!--</div>-->
+          <!--</div>-->
 
           <div class="b-template-settings js-dropen-menu js-no-close">
             <div class="header"></div>

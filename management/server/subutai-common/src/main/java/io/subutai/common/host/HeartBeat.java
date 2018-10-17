@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.hub.share.resource.ByteUnit;
-import io.subutai.hub.share.resource.ByteValueResource;
-import io.subutai.hub.share.resource.ContainerResourceType;
-import io.subutai.hub.share.resource.NumericValueResource;
+import io.subutai.bazaar.share.resource.ByteUnit;
+import io.subutai.bazaar.share.resource.ByteValueResource;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.resource.NumericValueResource;
 
 
 /**

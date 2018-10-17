@@ -1,0 +1,7 @@
+
+Export-Package: \
+     io.subutai.core.bazaarmanager.rest, \
+     io.subutai.core.bazaarmanager.rest.pojo
+
+
+Import-Package: *

@@ -1,0 +1,11 @@
+dependencies {
+    compile project( ":management:server:core:cli-controller")
+    compile project( ":management:server:core:bazaar-manager:bazaar-manager-api")
+    compile libraries.guava
+    compile libraries.karaf_shell
+    compile libraries.slf4j
+
+    testCompile libraries.hamcrest
+    testCompile libraries.junit
+    testCompile libraries.mockito
+}

@@ -123,7 +123,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/list-deleted-on-bazaar">
-      <action class="io.subutai.core.environment.cli.ListDeletedHubEnvironmentsCommand">
+      <action class="io.subutai.core.environment.cli.ListDeletedBazaarEnvironmentsCommand">
         <argument ref="environmentManager" />
       </action>
     </command>

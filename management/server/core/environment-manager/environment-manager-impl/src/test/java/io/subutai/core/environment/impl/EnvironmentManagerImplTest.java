@@ -61,7 +61,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
-import io.subutai.core.environment.impl.adapter.HubEnvironment;
+import io.subutai.core.environment.impl.adapter.BazaarEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
@@ -86,9 +86,9 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.hub.share.common.HubAdapter;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerSize;
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -132,7 +132,7 @@ public class EnvironmentManagerImplTest
     @Mock
     RelationManager relationManager;
     @Mock
-    HubAdapter hubAdapter;
+    BazaaarAdapter bazaaarAdapter;
     @Mock
     EnvironmentService environmentService;
     @Mock
@@ -174,7 +174,7 @@ public class EnvironmentManagerImplTest
     @Mock
     Map<String, CancellableWorkflow> activeWorkflows;
     @Mock
-    HubEnvironment hubEnvironment;
+    BazaarEnvironment bzrEnvironment;
     @Mock
     KeyManager keyManager;
     @Mock
@@ -190,15 +190,16 @@ public class EnvironmentManagerImplTest
         public EnvironmentManagerImplSUT( final TemplateManager templateManager, final PeerManager peerManager,
                                           final SecurityManager securityManager, final IdentityManager identityManager,
                                           final Tracker tracker, final RelationManager relationManager,
-                                          final HubAdapter hubAdapter, final EnvironmentService environmentService,
+                                          final BazaaarAdapter bazaaarAdapter, final EnvironmentService environmentService,
                                           final SystemManager systemManager )
         {
-            super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager, hubAdapter,
+            super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager,
+                    bazaaarAdapter,
                     environmentService, systemManager );
         }
 
 
-        protected EnvironmentAdapter getEnvironmentAdapter( HubAdapter hubAdapter )
+        protected EnvironmentAdapter getEnvironmentAdapter( BazaaarAdapter bazaaarAdapter )
         {
             return environmentAdapter;
         }
@@ -225,7 +226,7 @@ public class EnvironmentManagerImplTest
 
         environmentManager =
                 spy( new EnvironmentManagerImplSUT( templateManager, peerManager, securityManager, identityManager,
-                        tracker, relationManager, hubAdapter, environmentService, systemManager ) );
+                        tracker, relationManager, bazaaarAdapter, environmentService, systemManager ) );
         environmentManager.jsonUtil = jsonUtil;
         environmentManager.pgpKeyUtil = pgpKeyUtil;
         environmentManager.activeWorkflows = activeWorkflows;
@@ -743,11 +744,11 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        doReturn( hubEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+        doReturn( bzrEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         environmentManager.destroyEnvironment( TestHelper.ENV_ID, false );
 
-        verify( environmentAdapter ).removeEnvironment( hubEnvironment );
+        verify( environmentAdapter ).removeEnvironment( bzrEnvironment );
     }
 
 
@@ -811,11 +812,11 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        doReturn( hubEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+        doReturn( bzrEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         environmentManager.destroyContainer( TestHelper.ENV_ID, TestHelper.CONTAINER_ID, false );
 
-        verify( environmentAdapter ).destroyContainer( hubEnvironment, TestHelper.CONTAINER_ID );
+        verify( environmentAdapter ).destroyContainer( bzrEnvironment, TestHelper.CONTAINER_ID );
     }
 
 
@@ -926,7 +927,7 @@ public class EnvironmentManagerImplTest
         }
 
 
-        doReturn( hubEnvironment ).when( environmentAdapter ).get( TestHelper.ENV_ID );
+        doReturn( bzrEnvironment ).when( environmentAdapter ).get( TestHelper.ENV_ID );
         reset( environmentService );
 
         environmentManager.loadEnvironment( TestHelper.ENV_ID );
@@ -1204,10 +1205,10 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        HubEnvironment hubEnvironment = mock( HubEnvironment.class );
+        BazaarEnvironment bzrEnvironment = mock( BazaarEnvironment.class );
         reset( environmentService );
 
-        environmentManager.update( hubEnvironment );
+        environmentManager.update( bzrEnvironment );
 
         verify( environmentService, never() ).merge( environment );
     }
@@ -1366,7 +1367,7 @@ public class EnvironmentManagerImplTest
     {
         environmentManager.onRegistrationSucceeded();
 
-        verify( environmentManager ).uploadPeerOwnerEnvironmentsToHub();
+        verify( environmentManager ).uploadPeerOwnerEnvironmentsToBazaar();
     }
 
 

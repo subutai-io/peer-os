@@ -1,6 +1,6 @@
 dependencies {
     compile project( ":management:server:subutai-common")
-    compile project( ":management:server:subutai-hub-share")
+    compile project( ":management:server:subutai-bazaar-share")
     compile libraries.slf4j
     compile libraries.servicemix_beanflow
 

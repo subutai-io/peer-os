@@ -1,9 +1,0 @@
-
-Export-Package: \
-     io.subutai.core.hubmanager.api, \
-     io.subutai.core.hubmanager.api.dao, \
-     io.subutai.core.hubmanager.api.exception, \
-     io.subutai.core.hubmanager.api.model
-
-
-Import-Package: *

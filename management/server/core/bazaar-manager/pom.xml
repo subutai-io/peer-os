@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <groupId>io.subutai</groupId>
+    <version>7.1.2-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>bazaar-manager</artifactId>
+  <name>Subutai Bazaar Manager Parent</name>
+  <description>Subutai Bazaar Manager Parent</description>
+  <packaging>pom</packaging>
+  <modules>
+    <module>bazaar-manager-api</module>
+    <module>bazaar-manager-impl</module>
+    <module>bazaar-manager-rest</module>
+    <module>bazaar-manager-cli</module>
+  </modules>
+
+</project>

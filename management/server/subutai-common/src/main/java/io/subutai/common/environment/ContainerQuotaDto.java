@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.subutai.hub.share.quota.ContainerCpuResource;
-import io.subutai.hub.share.quota.ContainerDiskResource;
-import io.subutai.hub.share.quota.ContainerQuota;
-import io.subutai.hub.share.quota.ContainerRamResource;
-import io.subutai.hub.share.quota.ContainerSize;
-import io.subutai.hub.share.quota.Quota;
-import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.quota.ContainerCpuResource;
+import io.subutai.bazaar.share.quota.ContainerDiskResource;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerRamResource;
+import io.subutai.bazaar.share.quota.ContainerSize;
+import io.subutai.bazaar.share.quota.Quota;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
 
 
 @JsonIgnoreProperties( ignoreUnknown = true )
