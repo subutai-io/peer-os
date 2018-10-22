@@ -3,7 +3,7 @@ package io.subutai.common.security;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.StdArraySerializers;
+import com.fasterxml.jackson.databind.ser.std.ByteArraySerializer;
 
 
 /**
@@ -20,9 +20,8 @@ public class PublicKeyContainer
 
 
     public PublicKeyContainer( @JsonProperty( "hostId" ) final String hostId,
-                               @JsonSerialize( using = StdArraySerializers.ByteArraySerializer.class )
-                               @JsonProperty( "fingerprint" ) final byte[] fingerprint,
-                               @JsonProperty( "key" ) final String key )
+                               @JsonSerialize( using = ByteArraySerializer.class ) @JsonProperty( "fingerprint" )
+                               final byte[] fingerprint, @JsonProperty( "key" ) final String key )
     {
         this.hostId = hostId;
         this.fingerprint = fingerprint;
