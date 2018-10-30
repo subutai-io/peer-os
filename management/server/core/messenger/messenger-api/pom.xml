@@ -5,7 +5,7 @@
   <parent>
     <artifactId>messenger-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>7.1.2-SNAPSHOT</version>
+    <version>8.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>messenger-api</artifactId>
