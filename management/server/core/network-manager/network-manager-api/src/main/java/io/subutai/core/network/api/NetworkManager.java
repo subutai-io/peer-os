@@ -7,9 +7,7 @@ import java.util.Set;
 import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Protocol;
@@ -133,10 +131,6 @@ public interface NetworkManager
      * @return - port to which clients should connect to access the container via ssh
      */
     SshTunnel setupContainerSshTunnel( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
-
-    void addCustomProxy( CustomProxyConfig proxyConfig, ContainerHost containerHost ) throws NetworkManagerException;
-
-    void removeCustomProxy( String vlan ) throws NetworkManagerException;
 
     ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException;
 

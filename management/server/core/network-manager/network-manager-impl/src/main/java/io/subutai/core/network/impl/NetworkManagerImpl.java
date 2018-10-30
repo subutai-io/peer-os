@@ -20,10 +20,8 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
@@ -442,32 +440,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void addCustomProxy( final CustomProxyConfig proxyConfig, ContainerHost containerHost )
-            throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( proxyConfig );
-        Preconditions.checkNotNull( containerHost );
-
-        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( proxyConfig.getVlan() ) );
-        execute( getManagementHost(), commands.getSetVlanDomainCommand( proxyConfig.getVlan(), proxyConfig.getDomain(),
-                ProxyLoadBalanceStrategy.NONE,
-                String.format( " %s:/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
-        execute( getManagementHost(), commands.getAddIpToVlanDomainCommand(
-                containerHost.getIp() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
-                proxyConfig.getVlan() ) );
-    }
-
-
-    @Override
-    public void removeCustomProxy( final String vlan ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( vlan ) );
-
-        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( vlan ) );
-    }
-
-
-    @Override
     public ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
@@ -525,6 +497,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
+    //TODO fix parsing of mappings
     @Override
     public List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException
     {
@@ -597,8 +570,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
 
-        execute( host,
-                commands.getMapContainerPortCommand( protocol, containerIp, containerPort, rhPort ) );
+        execute( host, commands.getMapContainerPortCommand( protocol, containerIp, containerPort, rhPort ) );
     }
 
 

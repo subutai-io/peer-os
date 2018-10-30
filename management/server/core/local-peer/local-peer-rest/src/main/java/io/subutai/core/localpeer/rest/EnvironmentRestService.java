@@ -11,16 +11,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 public interface EnvironmentRestService
@@ -150,18 +149,6 @@ public interface EnvironmentRestService
                                                        @PathParam( "oldHostname" ) String oldHostname,
                                                        @PathParam( "newHostname" ) String newHostname );
 
-
-    @POST
-    @Path( "{environmentId}/container/{containerId}/customProxy/add" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response addCustomProxy( CustomProxyConfig proxyConfig );
-
-    @POST
-    @Path( "{environmentId}/container/{containerId}/customProxy/remove" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response removeCustomProxy( CustomProxyConfig proxyConfig );
 
     @POST
     @Path( "{environmentId}/peers/{peerId}/exclude" )

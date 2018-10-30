@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.resource.PeerResources;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -25,7 +27,6 @@ import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
@@ -35,8 +36,6 @@ import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.resource.PeerResources;
 
 
 /**
@@ -274,10 +273,6 @@ public interface Peer extends RelationLink
     void addToAuthorizedKeys( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
-
-    void addCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
-
-    void removeCustomProxy( CustomProxyConfig proxyConfig ) throws PeerException;
 
     SshKeys getSshKeys( EnvironmentId environmentId, SshEncryptionType sshEncryptionType ) throws PeerException;
 
