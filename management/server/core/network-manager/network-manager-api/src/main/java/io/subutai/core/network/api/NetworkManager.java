@@ -4,6 +4,7 @@ package io.subutai.core.network.api;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.ContainerHost;
@@ -14,7 +15,6 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 
 
 public interface NetworkManager
@@ -159,19 +159,6 @@ public interface NetworkManager
                                    final String ipAddress, final int internalPort, final String domain )
             throws NetworkManagerException;
 
-
-    /**
-     * Maps specified container port to random RH port
-     *
-     * @param host RH host
-     * @param protocol protocol
-     * @param containerIp ip of container
-     * @param containerPort container port
-     *
-     * @return mapped random RH port
-     */
-    int mapContainerPort( Host host, Protocol protocol, String containerIp, int containerPort )
-            throws NetworkManagerException;
 
     /**
      * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)

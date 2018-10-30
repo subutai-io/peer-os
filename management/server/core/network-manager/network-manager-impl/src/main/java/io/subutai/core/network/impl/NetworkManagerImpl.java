@@ -13,6 +13,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.dto.domain.PortMapDto;
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
@@ -35,8 +37,6 @@ import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.bazaar.share.dto.domain.PortMapDto;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 
 
 /**
@@ -587,23 +587,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public int mapContainerPort( final Host host, final Protocol protocol, final String containerIp,
-                                 final int containerPort ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host );
-        Preconditions.checkNotNull( protocol );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
-        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
-
-        CommandResult result = execute( host,
-                commands.getMapContainerPortToRandomPortCommand( protocol, containerIp, containerPort ) );
-
-        return Integer.parseInt( result.getStdOut().trim() );
-    }
-
-
-    @Override
     public void mapContainerPort( final Host host, final Protocol protocol, final String containerIp,
                                   final int containerPort, final int rhPort ) throws NetworkManagerException
     {
@@ -615,7 +598,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
 
         execute( host,
-                commands.getMapContainerPortToSpecificPortCommand( protocol, containerIp, containerPort, rhPort ) );
+                commands.getMapContainerPortCommand( protocol, containerIp, containerPort, rhPort ) );
     }
 
 
