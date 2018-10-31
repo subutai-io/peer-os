@@ -1,7 +1,6 @@
 package io.subutai.core.environment.rest.ui;
 
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -13,9 +12,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 
 public interface RestService
@@ -94,45 +90,6 @@ public interface RestService
     @Path( "{environmentId}/keys" )
     Response removeSshKey( @PathParam( "environmentId" ) String environmentId, @QueryParam( "key" ) String key );
 
-
-    /** Environment domains **************************************************** */
-
-    @GET
-    @Path( "{environmentId}/domain" )
-    Response getEnvironmentDomain( @PathParam( "environmentId" ) String environmentId );
-
-
-    @GET
-    @Path( "/domains/strategies" )
-    Response listDomainLoadBalanceStrategies();
-
-
-    @POST
-    @Consumes( MediaType.MULTIPART_FORM_DATA )
-    @Path( "{environmentId}/domains" )
-    Response addEnvironmentDomain( @PathParam( "environmentId" ) String environmentId,
-                                   @Multipart( "hostName" ) String hostName,
-                                   @Multipart( "strategy" ) String strategyJson,
-                                   @Multipart( value = "file" ) Attachment attr );
-
-
-    @DELETE
-    @Path( "{environmentId}/domains" )
-    Response removeEnvironmentDomain( @PathParam( "environmentId" ) String environmentId );
-
-
-    @GET
-    @Path( "{environmentId}/containers/{containerId}/domainnport" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getContainerDomainNPort( @PathParam( "environmentId" ) String environmentId,
-                                      @PathParam( "containerId" ) String containerId );
-
-
-    @PUT
-    @Path( "{environmentId}/containers/{containerId}/domainnport" )
-    Response setContainerDomainNPort( @PathParam( "environmentId" ) String environmentId,
-                                      @PathParam( "containerId" ) String containerId,
-                                      @QueryParam( "state" ) Boolean state, @QueryParam( "port" ) int port );
 
     @PUT
     @Path( "{environmentId}/containers/{containerId}/name" )

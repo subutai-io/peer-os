@@ -56,7 +56,6 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.NetworkResource;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
@@ -88,7 +87,6 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.TaskUtil;
@@ -1380,189 +1378,7 @@ public class EnvironmentManagerImpl extends HostListener
     }
 
 
-    @Override
-    public void removeEnvironmentDomain( final String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        modifyEnvironmentDomain( environmentId, null, null, null );
-    }
-
-
-    @Override
-    public void assignEnvironmentDomain( final String environmentId, final String newDomain,
-                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                                         final String sslCertPath )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
-        Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
-        Preconditions.checkNotNull( proxyLoadBalanceStrategy );
-
-        modifyEnvironmentDomain( environmentId, newDomain, proxyLoadBalanceStrategy, sslCertPath );
-    }
-
-
-    void modifyEnvironmentDomain( final String environmentId, final String domain,
-                                  final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, final String sslCertPath )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
-
-        boolean assign = !Strings.isNullOrEmpty( domain );
-
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Modifying domain for environment %s", environment.getName() ) );
-
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
-                || environment.getStatus() == EnvironmentStatus.CANCELLED )
-        {
-            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
-
-            throw new EnvironmentModificationException(
-                    String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-        try
-        {
-            if ( assign )
-            {
-                peerManager.getLocalPeer()
-                           .setVniDomain( environment.getVni(), domain, proxyLoadBalanceStrategy, sslCertPath );
-            }
-            else
-            {
-                peerManager.getLocalPeer().removeVniDomain( environment.getVni() );
-            }
-
-            operationTracker.addLogDone( "Environment domain modified" );
-        }
-        catch ( Exception e )
-        {
-            operationTracker.addLogFailed( String.format( "Error modifying environment domain: %s", e.getMessage() ) );
-            throw new EnvironmentModificationException( e );
-        }
-    }
-
-
-    @Override
-    public String getEnvironmentDomain( final String environmentId )
-            throws EnvironmentManagerException, EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
-
-        try
-        {
-            return peerManager.getLocalPeer().getVniDomain( environment.getVni() );
-        }
-        catch ( PeerException e )
-        {
-            throw new EnvironmentManagerException( "Error obtaining environment domain", e );
-        }
-    }
-
-
-    @Override
-    public boolean isContainerInEnvironmentDomain( final String containerHostId, final String environmentId )
-            throws EnvironmentManagerException, EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
-
-        try
-        {
-            EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
-
-            return peerManager.getLocalPeer()
-                              .isIpInVniDomain( containerHost.getIp() + ":" + containerHost.getDomainPort(),
-                                      environment.getVni() );
-        }
-        catch ( PeerException e )
-        {
-            throw new EnvironmentManagerException( "Error checking container domain", e );
-        }
-    }
-
     //************ utility methods
-
-
-    @Override
-    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId, int port )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( port, Common.MIN_PORT, Common.MAX_PORT ) );
-        toggleContainerDomain( containerHostId, environmentId, port, true );
-    }
-
-
-    @Override
-    public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-
-        toggleContainerDomain( containerHostId, environmentId, -1, false );
-    }
-
-
-    public void toggleContainerDomain( final String containerHostId, final String environmentId, int port,
-                                       final boolean add )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
-
-        EnvironmentContainerHost containerHost = environment.getContainerHostById( containerHostId );
-
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "%s container %s environment domain", add ? "Adding" : "Removing",
-                        containerHost.getHostname() ) );
-
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
-                || environment.getStatus() == EnvironmentStatus.CANCELLED )
-        {
-            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
-
-            throw new EnvironmentModificationException(
-                    String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-        try
-        {
-            if ( add )
-            {
-                peerManager.getLocalPeer().addIpToVniDomain( containerHost.getIp() + ":" + port, environment.getVni() );
-
-                ( ( EnvironmentContainerImpl ) containerHost ).setDomainPort( port );
-            }
-            else
-            {
-                peerManager.getLocalPeer()
-                           .removeIpFromVniDomain( containerHost.getIp() + ":" + containerHost.getDomainPort(),
-                                   environment.getVni() );
-
-                ( ( EnvironmentContainerImpl ) containerHost ).setDomainPort( null );
-            }
-
-            update( ( EnvironmentContainerImpl ) containerHost );
-
-            operationTracker.addLogDone(
-                    String.format( "Container is %s environment domain", add ? "included in" : "excluded from" ) );
-        }
-        catch ( Exception e )
-        {
-            operationTracker.addLogFailed( String.format( "Error %s environment domain: %s",
-                    add ? "including container in" : "excluding container from", e.getMessage() ) );
-            throw new EnvironmentModificationException( e );
-        }
-    }
 
 
     @Override

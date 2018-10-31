@@ -37,6 +37,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -84,9 +87,6 @@ import io.subutai.core.localpeer.impl.command.TemplateUploadTracker;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.HostRegistrationManager;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 /**
@@ -1447,21 +1447,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( String.format( "Failed to get reserved ports: %s", e.getMessage() ), e );
-        }
-    }
-
-
-    @Override
-    public int mapContainerPort( final Protocol protocol, final String containerIp, final int containerPort )
-            throws ResourceHostException
-    {
-        try
-        {
-            return getNetworkManager().mapContainerPort( this, protocol, containerIp, containerPort );
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new ResourceHostException( String.format( "Failed to map container port %s", e.getMessage() ), e );
         }
     }
 

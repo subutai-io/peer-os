@@ -21,6 +21,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
@@ -33,7 +36,6 @@ import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.AlertValue;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
@@ -59,9 +61,8 @@ import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.BazaarEnvironment;
+import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
@@ -86,9 +87,6 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.bazaar.share.common.BazaaarAdapter;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.quota.ContainerSize;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -190,12 +188,12 @@ public class EnvironmentManagerImplTest
         public EnvironmentManagerImplSUT( final TemplateManager templateManager, final PeerManager peerManager,
                                           final SecurityManager securityManager, final IdentityManager identityManager,
                                           final Tracker tracker, final RelationManager relationManager,
-                                          final BazaaarAdapter bazaaarAdapter, final EnvironmentService environmentService,
+                                          final BazaaarAdapter bazaaarAdapter,
+                                          final EnvironmentService environmentService,
                                           final SystemManager systemManager )
         {
             super( templateManager, peerManager, securityManager, identityManager, tracker, relationManager,
-                    bazaaarAdapter,
-                    environmentService, systemManager );
+                    bazaaarAdapter, environmentService, systemManager );
         }
 
 
@@ -933,130 +931,6 @@ public class EnvironmentManagerImplTest
         environmentManager.loadEnvironment( TestHelper.ENV_ID );
 
         verify( environmentService, never() ).find( TestHelper.ENV_ID );
-    }
-
-
-    @Test
-    public void testRemoveEnvironmentDomain() throws Exception
-    {
-        environmentManager.removeEnvironmentDomain( TestHelper.ENV_ID );
-
-        verify( environmentManager ).modifyEnvironmentDomain( TestHelper.ENV_ID, null, null, null );
-    }
-
-
-    @Test
-    public void testAssignEnvironmentDomain() throws Exception
-    {
-        environmentManager
-                .assignEnvironmentDomain( TestHelper.ENV_ID, "new", ProxyLoadBalanceStrategy.STICKY_SESSION, "path" );
-
-        verify( environmentManager )
-                .modifyEnvironmentDomain( TestHelper.ENV_ID, "new", ProxyLoadBalanceStrategy.STICKY_SESSION, "path" );
-    }
-
-
-    @Test
-    public void testModifyDomain() throws Exception
-    {
-        environmentManager
-                .modifyEnvironmentDomain( TestHelper.ENV_ID, "new", ProxyLoadBalanceStrategy.STICKY_SESSION, "path" );
-
-        verify( localPeer ).setVniDomain( TestHelper.VNI, "new", ProxyLoadBalanceStrategy.STICKY_SESSION, "path" );
-
-        //-----
-
-        environmentManager.modifyEnvironmentDomain( TestHelper.ENV_ID, null, null, null );
-
-        verify( localPeer ).removeVniDomain( TestHelper.VNI );
-    }
-
-
-    @Test( expected = EnvironmentManagerException.class )
-    public void testGetEnvironmentDomain() throws Exception
-    {
-        environmentManager.getEnvironmentDomain( TestHelper.ENV_ID );
-
-        verify( localPeer ).getVniDomain( TestHelper.VNI );
-
-        doThrow( new PeerException() ).when( localPeer ).getVniDomain( TestHelper.VNI );
-
-        environmentManager.getEnvironmentDomain( TestHelper.ENV_ID );
-    }
-
-
-    @Test( expected = EnvironmentManagerException.class )
-    public void testIsContainerInEnvironmentDomain() throws Exception
-    {
-
-        doReturn( PORT ).when( environmentContainer ).getDomainPort();
-
-        environmentManager.isContainerInEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
-
-        verify( localPeer ).isIpInVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
-
-        doThrow( new ContainerHostNotFoundException( "" ) ).when( environment )
-                                                           .getContainerHostById( TestHelper.CONTAINER_ID );
-
-        environmentManager.isContainerInEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
-    }
-
-
-    @Test
-    public void testAddContainerToEnvironmentDomain() throws Exception
-    {
-        environmentManager.addContainerToEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT );
-
-        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
-    }
-
-
-    @Test
-    public void testRemoveContainerFromEnvironmentDomain() throws Exception
-    {
-        environmentManager.removeContainerFromEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
-
-        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
-    }
-
-
-    @Test
-    public void testToggleContainerDomain() throws Exception
-    {
-        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, PORT, true );
-
-        verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
-
-        doReturn( PORT ).when( environmentContainer ).getDomainPort();
-
-        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
-
-        verify( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
-
-        doThrow( new PeerException() ).when( localPeer )
-                                      .removeIpFromVniDomain( Common.LOCAL_HOST_IP + ":" + PORT, TestHelper.VNI );
-
-        try
-        {
-            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
-
-            fail( "Expected EnvironmentModificationException" );
-        }
-        catch ( EnvironmentModificationException e )
-        {
-        }
-
-        doReturn( EnvironmentStatus.UNDER_MODIFICATION ).when( environment ).getStatus();
-
-        try
-        {
-            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, -1, false );
-
-            fail( "Expected EnvironmentModificationException" );
-        }
-        catch ( EnvironmentModificationException e )
-        {
-        }
     }
 
 

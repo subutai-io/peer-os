@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
@@ -18,14 +19,12 @@ import io.subutai.common.host.Quota;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 /**
@@ -439,44 +438,6 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
             localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname,
                     sshEncryptionType );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response addCustomProxy( final CustomProxyConfig proxyConfig )
-    {
-        try
-        {
-            Preconditions.checkNotNull( proxyConfig );
-
-            localPeer.addCustomProxy( proxyConfig );
-
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response removeCustomProxy( final CustomProxyConfig proxyConfig )
-    {
-        try
-        {
-            Preconditions.checkNotNull( proxyConfig );
-
-            localPeer.removeCustomProxy( proxyConfig );
-
-            return Response.ok().build();
         }
         catch ( Exception e )
         {

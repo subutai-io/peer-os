@@ -16,7 +16,6 @@ function environmentService($http, $q) {
 
 	var CONTAINERS_URL = ENVIRONMENTS_URL + 'containers/';
 	var CONTAINER_TYPES_URL = CONTAINERS_URL + 'types/';
-	var DOMAINS_URL = ENVIRONMENTS_URL + 'domains/';
 
 	var VERIFIED_TEMPLATE_URL = ENVIRONMENTS_URL + 'templates/verified/';
 
@@ -43,17 +42,9 @@ function environmentService($http, $q) {
 		removeSshKey : removeSshKey,
 
 
-		getDomainStrategies : getDomainStrategies,
-		getDomain : getDomain,
-		setDomain : setDomain,
-		removeDomain : removeDomain,
-
-
 		getContainerStatus : getContainerStatus,
 		destroyContainer : destroyContainer,
 		switchContainer : switchContainer,
-		getContainerDomainNPort : getContainerDomainNPort,
-		setContainerDomainNPort : setContainerDomainNPort,
 		setContainerName : setContainerName,
 		createTemplate : createTemplate,
 
@@ -184,27 +175,6 @@ function environmentService($http, $q) {
 	}
 
 
-	function getDomain(environmentId) {
-		return $http.get(
-			ENVIRONMENTS_URL + environmentId + '/domain',
-			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
-		);
-	}
-
-
-	function setContainerDomainNPort(container, state, port) {
-		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domainnport' +
-			'?state=' + state + '&port=' + port);
-	}
-
-	function getContainerDomainNPort(container, state) {
-		return $http.get(
-			ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domainnport',
-			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
-		);
-	}
-
-
 	function setContainerName( container, name ) {
 		return $http.put( ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/name' +
 			'?name=' + name );
@@ -213,39 +183,6 @@ function environmentService($http, $q) {
 	function createTemplate( container,name, version, isPrivate ) {
 	    var URL = ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/export/' + name + "/" + version + "/" + ( isPrivate == true ? "true" : "false" ) ;
 		return $http.post( URL );
-	}
-
-
-	function getDomainStrategies() {
-		return $http.get(
-			DOMAINS_URL + 'strategies/',
-			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
-		);
-	}
-
-
-	function setDomain(domain, envId, file) {
-		var fd = new FormData();
-		fd.append('hostName', domain.name);
-		fd.append('strategy', domain.strategy);
-		if( !jQuery.isEmptyObject(file) )
-		{
-			fd.append('file', file);
-		}
-		else
-		{
-			fd.append('file', "");
-		}
-
-		return $http.post(
-			ENVIRONMENTS_URL + envId + '/domains',
-			fd,
-			{transformRequest: angular.identity, headers: {'Content-Type': undefined}}
-		);
-	}
-
-	function removeDomain( envId ) {
-		return $http.delete( ENVIRONMENTS_URL + envId + '/domains' );
 	}
 
 
