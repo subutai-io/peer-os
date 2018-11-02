@@ -115,7 +115,7 @@ public class ConfigManager
     }
 
 
-    public String getbazaarIp()
+    public String getBazaarIp()
     {
         return Common.BAZAAR_IP;
     }

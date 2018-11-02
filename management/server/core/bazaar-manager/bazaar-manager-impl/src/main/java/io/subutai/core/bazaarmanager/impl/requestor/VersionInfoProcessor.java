@@ -1,8 +1,10 @@
 package io.subutai.core.bazaarmanager.impl.requestor;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -12,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
+import io.subutai.bazaar.share.dto.PeerInfoDto;
+import io.subutai.bazaar.share.dto.RhVersionInfoDto;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.core.bazaarmanager.api.BazaarRequester;
@@ -59,6 +63,7 @@ public class VersionInfoProcessor extends BazaarRequester
     }
 
 
+    @Deprecated
     private void sendVersionInfo() throws BazaarManagerException
     {
         String path = format( "/rest/v1/peers/%s/version-info", peerManager.getLocalPeer().getId() );
@@ -92,6 +97,62 @@ public class VersionInfoProcessor extends BazaarRequester
             versionInfoDto.setCommitId( SubutaiInfo.getCommitId() );
 
             RestResult<Object> restResult = restClient.post( path, versionInfoDto );
+
+            if ( restResult.isSuccess() )
+            {
+                if ( restResult.getEntity() != null && restResult.getEntity() instanceof String && StringUtils
+                        .isNotBlank( ( String ) restResult.getEntity() ) )
+                {
+                    ( ( BazaarManagerImpl ) bazaarManager ).setPeerName( ( String ) restResult.getEntity() );
+                    setChangedVersions( ssV, rhV, p2pV );
+                }
+            }
+            else
+            {
+                throw new BazaarManagerException( "Error on sending version info to Bazaar: " + restResult.getError() );
+            }
+        }
+    }
+
+
+    private void sendPeerInfo() throws BazaarManagerException
+    {
+        String path = format( "/rest/v1/peers/%s/info", peerManager.getLocalPeer().getId() );
+
+        List<RhVersionInfoDto> rhVersions;
+
+        try
+        {
+            rhVersions = new ArrayList<>();
+
+            for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
+            {
+                RhVersionInfoDto rhDto = new RhVersionInfoDto();
+
+                rhDto.setManagement( rh.isManagementHost() );
+                rhDto.setP2pVersion( rh.getP2pVersion() );
+                rhDto.setRhVersion( rh.getRhVersion() );
+
+                rhVersions.add( rhDto );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error getting system info: {}", e.getMessage() );
+        }
+
+        if ( areVersionsChanged( ssV, rhV, p2pV ) )
+        {
+            PeerInfoDto infoDto = new PeerInfoDto();
+
+            infoDto.setId( configManager.getPeerId() );
+            infoDto.setBuildTime( SubutaiInfo.getBuildTime() );
+            infoDto.setBranch( SubutaiInfo.getBranch() );
+            infoDto.setCommitId( SubutaiInfo.getCommitId() );
+
+            infoDto.setRhVersionInfoDtoList( rhVersions );
+
+            RestResult<Object> restResult = restClient.post( path, infoDto );
 
             if ( restResult.isSuccess() )
             {

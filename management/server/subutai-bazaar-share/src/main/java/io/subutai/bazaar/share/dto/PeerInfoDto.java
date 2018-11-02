@@ -1,19 +1,66 @@
 package io.subutai.bazaar.share.dto;
 
 
+import java.util.List;
+
+
 public class PeerInfoDto
 {
     private String id;
-
     private String name;
-
     private String version;
-
     private String scope;
+    private String commitId;
+    private String buildTime;
+    private String branch;
+
+    private List<RhVersionInfoDto> rhVersionInfoDtoList;
 
 
     public PeerInfoDto()
     {
+    }
+
+
+    public void setRhVersionInfoDtoList( final List<RhVersionInfoDto> rhVersionInfoDtoList )
+    {
+        this.rhVersionInfoDtoList = rhVersionInfoDtoList;
+    }
+
+
+    public String getCommitId()
+    {
+        return commitId;
+    }
+
+
+    public void setCommitId( final String commitId )
+    {
+        this.commitId = commitId;
+    }
+
+
+    public String getBuildTime()
+    {
+        return buildTime;
+    }
+
+
+    public void setBuildTime( final String buildTime )
+    {
+        this.buildTime = buildTime;
+    }
+
+
+    public String getBranch()
+    {
+        return branch;
+    }
+
+
+    public void setBranch( final String branch )
+    {
+        this.branch = branch;
     }
 
 
