@@ -3,13 +3,26 @@ package io.subutai.bazaar.share.dto;
 
 public class RhVersionInfoDto
 {
+    private String rhId;
     private boolean isManagement;
     private String rhVersion;
     private String p2pVersion;
 
 
-    RhVersionInfoDto()
+    public RhVersionInfoDto()
     {
+    }
+
+
+    public String getRhId()
+    {
+        return rhId;
+    }
+
+
+    public void setRhId( final String rhId )
+    {
+        this.rhId = rhId;
     }
 
 

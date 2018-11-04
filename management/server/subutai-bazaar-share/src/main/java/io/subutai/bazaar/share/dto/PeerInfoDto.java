@@ -22,6 +22,12 @@ public class PeerInfoDto
     }
 
 
+    public List<RhVersionInfoDto> getRhVersionInfoDtoList()
+    {
+        return rhVersionInfoDtoList;
+    }
+
+
     public void setRhVersionInfoDtoList( final List<RhVersionInfoDto> rhVersionInfoDtoList )
     {
         this.rhVersionInfoDtoList = rhVersionInfoDtoList;

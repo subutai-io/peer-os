@@ -60,6 +60,7 @@ public class VersionInfoProcessor extends BazaarRequester
     public void request() throws BazaarManagerException
     {
         sendVersionInfo();
+        sendPeerInfo();
     }
 
 
@@ -96,21 +97,7 @@ public class VersionInfoProcessor extends BazaarRequester
             versionInfoDto.setBranch( SubutaiInfo.getBranch() );
             versionInfoDto.setCommitId( SubutaiInfo.getCommitId() );
 
-            RestResult<Object> restResult = restClient.post( path, versionInfoDto );
-
-            if ( restResult.isSuccess() )
-            {
-                if ( restResult.getEntity() != null && restResult.getEntity() instanceof String && StringUtils
-                        .isNotBlank( ( String ) restResult.getEntity() ) )
-                {
-                    ( ( BazaarManagerImpl ) bazaarManager ).setPeerName( ( String ) restResult.getEntity() );
-                    setChangedVersions( ssV, rhV, p2pV );
-                }
-            }
-            else
-            {
-                throw new BazaarManagerException( "Error on sending version info to Bazaar: " + restResult.getError() );
-            }
+            checkRestResultAndSetChangedVersion( restClient.post( path, versionInfoDto ), ssV, rhV, p2pV );
         }
     }
 
@@ -119,54 +106,63 @@ public class VersionInfoProcessor extends BazaarRequester
     {
         String path = format( "/rest/v1/peers/%s/info", peerManager.getLocalPeer().getId() );
 
-        List<RhVersionInfoDto> rhVersions;
-
         try
         {
-            rhVersions = new ArrayList<>();
+            List<RhVersionInfoDto> rhVersions = new ArrayList<>();
 
             for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
             {
                 RhVersionInfoDto rhDto = new RhVersionInfoDto();
 
+                String ssV = SubutaiInfo.getVersion();
+                String rhV = rh.getRhVersion();
+                String p2pV = rh.getP2pVersion();
+
+                rhDto.setRhId( rh.getId() );
                 rhDto.setManagement( rh.isManagementHost() );
-                rhDto.setP2pVersion( rh.getP2pVersion() );
-                rhDto.setRhVersion( rh.getRhVersion() );
+                rhDto.setP2pVersion( p2pV );
+                rhDto.setRhVersion( rhV );
 
                 rhVersions.add( rhDto );
+
+                if ( areVersionsChanged( ssV, rhV, p2pV ) )
+                {
+                    PeerInfoDto infoDto = new PeerInfoDto();
+
+                    infoDto.setId( configManager.getPeerId() );
+                    infoDto.setBuildTime( SubutaiInfo.getBuildTime() );
+                    infoDto.setBranch( SubutaiInfo.getBranch() );
+                    infoDto.setCommitId( SubutaiInfo.getCommitId() );
+
+                    infoDto.setRhVersionInfoDtoList( rhVersions );
+
+                    checkRestResultAndSetChangedVersion( restClient.post( path, infoDto ), ssV, rhV, p2pV );
+                }
             }
         }
         catch ( Exception e )
         {
             LOG.error( "Error getting system info: {}", e.getMessage() );
         }
+    }
 
-        if ( areVersionsChanged( ssV, rhV, p2pV ) )
+
+    private void checkRestResultAndSetChangedVersion( RestResult<Object> restResult, String subutaiVersion,
+                                                      String rhVersion, String p2pVersion )
+            throws BazaarManagerException
+    {
+        if ( restResult.isSuccess() )
         {
-            PeerInfoDto infoDto = new PeerInfoDto();
-
-            infoDto.setId( configManager.getPeerId() );
-            infoDto.setBuildTime( SubutaiInfo.getBuildTime() );
-            infoDto.setBranch( SubutaiInfo.getBranch() );
-            infoDto.setCommitId( SubutaiInfo.getCommitId() );
-
-            infoDto.setRhVersionInfoDtoList( rhVersions );
-
-            RestResult<Object> restResult = restClient.post( path, infoDto );
-
-            if ( restResult.isSuccess() )
+            if ( restResult.getEntity() != null && restResult.getEntity() instanceof String && StringUtils
+                    .isNotBlank( ( String ) restResult.getEntity() ) )
             {
-                if ( restResult.getEntity() != null && restResult.getEntity() instanceof String && StringUtils
-                        .isNotBlank( ( String ) restResult.getEntity() ) )
-                {
-                    ( ( BazaarManagerImpl ) bazaarManager ).setPeerName( ( String ) restResult.getEntity() );
-                    setChangedVersions( ssV, rhV, p2pV );
-                }
+                ( ( BazaarManagerImpl ) bazaarManager ).setPeerName( ( String ) restResult.getEntity() );
+                setChangedVersions( subutaiVersion, rhVersion, p2pVersion );
             }
-            else
-            {
-                throw new BazaarManagerException( "Error on sending version info to Bazaar: " + restResult.getError() );
-            }
+        }
+        else
+        {
+            throw new BazaarManagerException( "Error on sending version info to Bazaar: " + restResult.getError() );
         }
     }
 
