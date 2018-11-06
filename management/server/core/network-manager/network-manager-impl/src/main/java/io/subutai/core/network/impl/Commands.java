@@ -7,7 +7,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.settings.Common;
@@ -117,58 +116,6 @@ public class Commands
     RequestBuilder getGetTunnelsCommand()
     {
         return new RequestBuilder( VXLAN_BINDING ).withCmdArgs( "list" );
-    }
-
-
-    RequestBuilder getGetVlanDomainCommand( int vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "domain", "check", String.valueOf( vLanId ) );
-    }
-
-
-    RequestBuilder getRemoveVlanDomainCommand( final String vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "domain", "del", vLanId );
-    }
-
-
-    RequestBuilder getSetVlanDomainCommand( final String vLanId, final String domain,
-                                            final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                                            final String sslCertPath )
-    {
-        List<String> args = Lists.newArrayList( "domain", "add", vLanId, domain );
-
-        if ( proxyLoadBalanceStrategy != ProxyLoadBalanceStrategy.NONE )
-        {
-            args.add( "-b" );
-            args.add( proxyLoadBalanceStrategy.getValue() );
-        }
-
-        if ( !Strings.isNullOrEmpty( sslCertPath ) )
-        {
-            args.add( "-f" );
-            args.add( sslCertPath );
-        }
-
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( args.toArray( new String[0] ) );
-    }
-
-
-    RequestBuilder getCheckIpInVlanDomainCommand( final String hostIp, final int vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "check", String.valueOf( vLanId ), hostIp );
-    }
-
-
-    RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final String vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "add", vLanId, hostIp );
-    }
-
-
-    RequestBuilder getRemoveIpFromVlanDomainCommand( final String hostIp, final int vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "del", String.valueOf( vLanId ), hostIp );
     }
 
 

@@ -10,7 +10,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
@@ -26,12 +25,9 @@ import io.subutai.core.peer.api.PeerManager;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -207,77 +203,6 @@ public class NetworkManagerImplTest
         Tunnels tunnels = networkManager.getTunnels( resourceHost );
 
         assertFalse( tunnels.isEmpty() );
-    }
-
-
-    @Test( expected = NetworkManagerException.class )
-    public void testGetVlanDomain() throws Exception
-    {
-        doReturn( DOMAIN ).when( commandResult ).getStdOut();
-
-        networkManager.getVlanDomain( VLAN_ID );
-
-        verify( commandResult, atLeastOnce() ).getStdOut();
-
-        doReturn( false ).when( commandResult ).hasSucceeded();
-
-        assertNull( networkManager.getVlanDomain( VLAN_ID ) );
-
-        doThrow( new CommandException( "" ) ).when( managementHost ).execute( any( RequestBuilder.class ) );
-
-        networkManager.getVlanDomain( VLAN_ID );
-    }
-
-
-    @Test
-    public void testRemoveVlanDomain() throws Exception
-    {
-        networkManager.removeVlanDomain( VLAN_ID );
-
-        verify( networkManager ).execute( eq( managementHost ), any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testSetVlanDomain() throws Exception
-    {
-        networkManager.setVlanDomain( VLAN_ID, DOMAIN, ProxyLoadBalanceStrategy.STICKY_SESSION, null );
-
-        verify( networkManager ).execute( eq( managementHost ), any( RequestBuilder.class ) );
-    }
-
-
-    @Test( expected = NetworkManagerException.class )
-    public void testIsIpInVlanDomain() throws Exception
-    {
-        doReturn( "Host is in domain" ).when( commandResult ).getStdOut();
-        assertTrue( networkManager.isIpInVlanDomain( LOCAL_IP, VLAN_ID ) );
-
-        doReturn( false ).when( commandResult ).hasSucceeded();
-
-        assertFalse( networkManager.isIpInVlanDomain( LOCAL_IP, VLAN_ID ) );
-
-        doThrow( new CommandException( "" ) ).when( managementHost ).execute( any( RequestBuilder.class ) );
-
-        networkManager.isIpInVlanDomain( LOCAL_IP, VLAN_ID );
-    }
-
-
-    @Test
-    public void testAddIpToVlanDomain() throws Exception
-    {
-        networkManager.addIpToVlanDomain( LOCAL_IP, VLAN_ID );
-
-        verify( networkManager ).execute( eq( managementHost ), any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveIpFromVlanDomain() throws Exception
-    {
-        networkManager.removeIpFromVlanDomain( LOCAL_IP, VLAN_ID );
-
-        verify( networkManager ).execute( eq( managementHost ), any( RequestBuilder.class ) );
     }
 
 
