@@ -182,12 +182,14 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         try
         {
+            runCmd( containerId, String.format( "echo '%s' > /etc/ansible/%s",  "#" , inventoryFile ) );
+
             for ( Group group : groups )
             {
 
                 groupName = String.format( "[%s]", group.getName() );
 
-                runCmd( containerId, String.format( "echo '%s' > /etc/ansible/%s",  groupName, inventoryFile ) );
+                runCmd( containerId, String.format( "echo '%s' >> /etc/ansible/%s",  groupName, inventoryFile ) );
 
                 for ( io.subutai.bazaar.share.dto.ansible.Host host : group.getHosts() )
                 {
