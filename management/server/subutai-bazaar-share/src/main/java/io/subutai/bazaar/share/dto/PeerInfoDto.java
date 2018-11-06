@@ -1,7 +1,7 @@
 package io.subutai.bazaar.share.dto;
 
 
-import java.util.List;
+import java.util.Set;
 
 
 public class PeerInfoDto
@@ -14,7 +14,7 @@ public class PeerInfoDto
     private String buildTime;
     private String branch;
 
-    private List<RhVersionInfoDto> rhVersionInfoDtoList;
+    private Set<RhVersionInfoDto> rhVersionInfoDtoList;
 
 
     public PeerInfoDto()
@@ -22,13 +22,13 @@ public class PeerInfoDto
     }
 
 
-    public List<RhVersionInfoDto> getRhVersionInfoDtoList()
+    public Set<RhVersionInfoDto> getRhVersionInfoDtoList()
     {
         return rhVersionInfoDtoList;
     }
 
 
-    public void setRhVersionInfoDtoList( final List<RhVersionInfoDto> rhVersionInfoDtoList )
+    public void setRhVersionInfoDtoList( final Set<RhVersionInfoDto> rhVersionInfoDtoList )
     {
         this.rhVersionInfoDtoList = rhVersionInfoDtoList;
     }

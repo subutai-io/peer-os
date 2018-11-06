@@ -1,11 +1,10 @@
 package io.subutai.core.bazaarmanager.impl.requestor;
 
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.subutai.bazaar.share.dto.PeerInfoDto;
 import io.subutai.bazaar.share.dto.RhVersionInfoDto;
@@ -108,7 +108,7 @@ public class VersionInfoProcessor extends BazaarRequester
 
         try
         {
-            List<RhVersionInfoDto> rhVersions = new ArrayList<>();
+            Set<RhVersionInfoDto> rhVersions = Sets.newHashSet();
             boolean wasChanged = false;
             PeerInfoDto infoDto = null;
             String ssV = "", rhV = "", p2pV = "";
