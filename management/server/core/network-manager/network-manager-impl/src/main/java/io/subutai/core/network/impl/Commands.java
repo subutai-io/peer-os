@@ -216,7 +216,7 @@ public class Commands
         if ( loadBalancing != null )
         {
             args.add( "-b" );
-            args.add( loadBalancing.name().toLowerCase() );
+            args.add( loadBalancing.getPolicyName().toLowerCase() );
         }
 
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[0] ) );
