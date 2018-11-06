@@ -97,7 +97,9 @@ public class VersionInfoProcessor extends BazaarRequester
             versionInfoDto.setBranch( SubutaiInfo.getBranch() );
             versionInfoDto.setCommitId( SubutaiInfo.getCommitId() );
 
-            checkRestResultAndSetChangedVersion( restClient.post( path, versionInfoDto ), ssV, rhV, p2pV );
+            RestResult<Object> restResult = restClient.post( path, versionInfoDto );
+
+            checkRestResultAndSetChangedVersion( restResult, ssV, rhV, p2pV );
         }
     }
 
@@ -144,9 +146,11 @@ public class VersionInfoProcessor extends BazaarRequester
                 }
             }
 
+            RestResult<Object> restResult = restClient.post( path, infoDto );
+
             if ( wasChanged )
             {
-                checkRestResultAndSetChangedVersion( restClient.post( path, infoDto ), ssV, rhV, p2pV );
+                checkRestResultAndSetChangedVersion( restResult, ssV, rhV, p2pV );
             }
         }
         catch ( Exception e )
