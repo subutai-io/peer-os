@@ -109,17 +109,21 @@ public class VersionInfoProcessor extends BazaarRequester
         try
         {
             List<RhVersionInfoDto> rhVersions = new ArrayList<>();
+            boolean wasChanged = false;
+            PeerInfoDto infoDto = null;
+            String ssV = "", rhV = "", p2pV = "";
 
             for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
             {
                 RhVersionInfoDto rhDto = new RhVersionInfoDto();
 
-                String ssV = SubutaiInfo.getVersion();
-                String rhV = rh.getRhVersion();
-                String p2pV = rh.getP2pVersion();
+                ssV = SubutaiInfo.getVersion();
+                rhV = rh.getRhVersion();
+                p2pV = rh.getP2pVersion();
 
                 rhDto.setRhId( rh.getId() );
                 rhDto.setManagement( rh.isManagementHost() );
+                rhDto.setSsVersion( ssV );
                 rhDto.setP2pVersion( p2pV );
                 rhDto.setRhVersion( rhV );
 
@@ -127,7 +131,9 @@ public class VersionInfoProcessor extends BazaarRequester
 
                 if ( areVersionsChanged( ssV, rhV, p2pV ) )
                 {
-                    PeerInfoDto infoDto = new PeerInfoDto();
+                    wasChanged = true;
+
+                    infoDto = new PeerInfoDto();
 
                     infoDto.setId( configManager.getPeerId() );
                     infoDto.setBuildTime( SubutaiInfo.getBuildTime() );
@@ -135,9 +141,12 @@ public class VersionInfoProcessor extends BazaarRequester
                     infoDto.setCommitId( SubutaiInfo.getCommitId() );
 
                     infoDto.setRhVersionInfoDtoList( rhVersions );
-
-                    checkRestResultAndSetChangedVersion( restClient.post( path, infoDto ), ssV, rhV, p2pV );
                 }
+            }
+
+            if ( wasChanged )
+            {
+                checkRestResultAndSetChangedVersion( restClient.post( path, infoDto ), ssV, rhV, p2pV );
             }
         }
         catch ( Exception e )

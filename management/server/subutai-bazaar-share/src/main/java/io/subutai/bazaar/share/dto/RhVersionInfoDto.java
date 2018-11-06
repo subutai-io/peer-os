@@ -5,6 +5,7 @@ public class RhVersionInfoDto
 {
     private String rhId;
     private boolean isManagement;
+    private String ssVersion;
     private String rhVersion;
     private String p2pVersion;
 
@@ -35,6 +36,18 @@ public class RhVersionInfoDto
     public void setManagement( final boolean management )
     {
         isManagement = management;
+    }
+
+
+    public String getSsVersion()
+    {
+        return ssVersion;
+    }
+
+
+    public void setSsVersion( final String ssVersion )
+    {
+        this.ssVersion = ssVersion;
     }
 
 
