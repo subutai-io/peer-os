@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.settings.Common;
 
 import static org.junit.Assert.assertNotNull;
@@ -71,49 +70,6 @@ public class CommandsTest
     public void testGetGetTunnelsCommand() throws Exception
     {
         assertNotNull( commands.getGetTunnelsCommand() );
-    }
-
-
-    @Test
-    public void testGetGetVlanDomainCommand() throws Exception
-    {
-        assertNotNull( commands.getGetVlanDomainCommand( VLAN_ID ) );
-    }
-
-
-    @Test
-    public void testGetRemoveVlanDomainCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveVlanDomainCommand( VLAN_ID + "" ) );
-    }
-
-
-    @Test
-    public void testGetSetVlanDomainCommand() throws Exception
-    {
-        assertNotNull( commands.getSetVlanDomainCommand( VLAN_ID + "", DOMAIN, ProxyLoadBalanceStrategy.STICKY_SESSION,
-                "path" ) );
-    }
-
-
-    @Test
-    public void testGetCheckIpInVlanDomainCommand() throws Exception
-    {
-        assertNotNull( commands.getCheckIpInVlanDomainCommand( LOCAL_IP, VLAN_ID ) );
-    }
-
-
-    @Test
-    public void testGetAddIpToVlanDomainCommand() throws Exception
-    {
-        assertNotNull( commands.getAddIpToVlanDomainCommand( LOCAL_IP, VLAN_ID + "" ) );
-    }
-
-
-    @Test
-    public void testGetRemoveIpFromVlanDomainCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveIpFromVlanDomainCommand( LOCAL_IP, VLAN_ID ) );
     }
 
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.LoadBalancing;
@@ -67,60 +66,6 @@ public interface NetworkManager
 
     Tunnels getTunnels( Host host ) throws NetworkManagerException;
 
-
-    /**
-     * Returns reverse proxy domain assigned to vlan
-     *
-     * @param vLanId - vlan id
-     *
-     * @return - domain or null if not assigned
-     */
-    String getVlanDomain( int vLanId ) throws NetworkManagerException;
-
-
-    /**
-     * Removes reverse proxy domain assigned to vlan if any
-     *
-     * @param vLanId - vlan id
-     */
-    void removeVlanDomain( int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Assigns reverse proxy domain to vlan
-     *
-     * @param vLanId - vlan id
-     * @param proxyLoadBalanceStrategy - strategy to load balance requests to the domain
-     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
-     */
-    void setVlanDomain( int vLanId, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                        String sslCertPath ) throws NetworkManagerException;
-
-
-    /**
-     * Checks if IP is in vlan reverse proxy domain
-     *
-     * @param hostIp - ip to check
-     * @param vLanId - vlan id
-     *
-     * @return - true if ip is in vlan domain, false otherwise
-     */
-    boolean isIpInVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Adds ip to vlan reverse proxy domain
-     *
-     * @param hostIp - ip to add
-     * @param vLanId - vlan id
-     */
-    void addIpToVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Removes ip from reverse proxy domain
-     *
-     * @param hostIp - ip to remove
-     * @param vLanId - vlan id
-     */
-    void removeIpFromVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
 
     /**
      * Sets up SSH connectivity for container identified by @param containerIp
