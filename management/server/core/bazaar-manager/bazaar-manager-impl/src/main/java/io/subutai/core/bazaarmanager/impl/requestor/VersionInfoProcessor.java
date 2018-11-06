@@ -146,10 +146,9 @@ public class VersionInfoProcessor extends BazaarRequester
                 }
             }
 
-            RestResult<Object> restResult = restClient.post( path, infoDto );
-
             if ( wasChanged )
             {
+                RestResult<Object> restResult = restClient.post( path, infoDto );
                 checkRestResultAndSetChangedVersion( restResult, ssV, rhV, p2pV );
             }
         }
