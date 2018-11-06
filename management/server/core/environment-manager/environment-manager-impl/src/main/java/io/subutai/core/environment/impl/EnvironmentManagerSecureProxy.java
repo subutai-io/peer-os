@@ -17,6 +17,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.common.BazaarEventListener;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
@@ -30,7 +33,6 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
@@ -78,9 +80,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.bazaar.share.common.BazaaarAdapter;
-import io.subutai.bazaar.share.common.BazaarEventListener;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 @PermitAll
@@ -97,7 +96,8 @@ public class EnvironmentManagerSecureProxy extends HostListener
     public EnvironmentManagerSecureProxy( final TemplateManager templateManager, final PeerManager peerManager,
                                           SecurityManager securityManager, final IdentityManager identityManager,
                                           final Tracker tracker, final RelationManager relationManager,
-                                          final BazaaarAdapter bazaaarAdapter, final EnvironmentService environmentService,
+                                          final BazaaarAdapter bazaaarAdapter,
+                                          final EnvironmentService environmentService,
                                           final SystemManager systemManager )
     {
         Preconditions.checkNotNull( templateManager );
@@ -112,14 +112,14 @@ public class EnvironmentManagerSecureProxy extends HostListener
         this.relationManager = relationManager;
         this.tracker = tracker;
         this.identityManager = identityManager;
-        this.environmentManager =
-                getEnvironmentManager( templateManager, peerManager, securityManager, bazaaarAdapter, environmentService,
-                        systemManager );
+        this.environmentManager = getEnvironmentManager( templateManager, peerManager, securityManager, bazaaarAdapter,
+                environmentService, systemManager );
     }
 
 
     protected EnvironmentManagerImpl getEnvironmentManager( TemplateManager templateManager, PeerManager peerManager,
-                                                            SecurityManager securityManager, BazaaarAdapter bazaaarAdapter,
+                                                            SecurityManager securityManager,
+                                                            BazaaarAdapter bazaaarAdapter,
                                                             EnvironmentService environmentService,
                                                             SystemManager systemManager )
     {
@@ -453,78 +453,6 @@ public class EnvironmentManagerSecureProxy extends HostListener
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    public void removeEnvironmentDomain( final String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;update=true" ) );
-
-        environmentManager.removeEnvironmentDomain( environmentId );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Update" )
-    public void assignEnvironmentDomain( final String environmentId, final String newDomain,
-                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                                         final String sslCertPath )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;update=true" ) );
-
-        environmentManager.assignEnvironmentDomain( environmentId, newDomain, proxyLoadBalanceStrategy, sslCertPath );
-    }
-
-
-    @Override
-    @PermitAll
-    public String getEnvironmentDomain( final String environmentId )
-            throws EnvironmentManagerException, EnvironmentNotFoundException
-    {
-        checkEnvironmentPermission( environmentId, traitsBuilder( "ownership=All;read=true" ) );
-
-        return environmentManager.getEnvironmentDomain( environmentId );
-    }
-
-
-    @Override
-    @PermitAll
-    public boolean isContainerInEnvironmentDomain( final String containerHostId, final String environmentId )
-            throws EnvironmentManagerException, EnvironmentNotFoundException
-    {
-        try
-        {
-            checkContainerPermission( environmentId, containerHostId, traitsBuilder( "ownership=All;read=true" ) );
-        }
-        catch ( ContainerHostNotFoundException e )
-        {
-            throw new EnvironmentManagerException( e.getMessage(), e );
-        }
-
-        return environmentManager.isContainerInEnvironmentDomain( containerHostId, environmentId );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Update" )
-    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId,
-                                                 final int port )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-        try
-        {
-            checkContainerPermission( environmentId, containerHostId, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( ContainerHostNotFoundException e )
-        {
-            throw new ContainerHostNotFoundException( e.getMessage() );
-        }
-
-        environmentManager.addContainerToEnvironmentDomain( containerHostId, environmentId, port );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Update" )
     public SshTunnel setupSshTunnelForContainer( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
@@ -538,24 +466,6 @@ public class EnvironmentManagerSecureProxy extends HostListener
         }
 
         return environmentManager.setupSshTunnelForContainer( containerHostId, environmentId );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Update" )
-    public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-        try
-        {
-            checkContainerPermission( environmentId, containerHostId, traitsBuilder( "ownership=All;update=true" ) );
-        }
-        catch ( ContainerHostNotFoundException e )
-        {
-            throw new ContainerHostNotFoundException( e.getMessage() );
-        }
-
-        environmentManager.removeContainerFromEnvironmentDomain( containerHostId, environmentId );
     }
 
 

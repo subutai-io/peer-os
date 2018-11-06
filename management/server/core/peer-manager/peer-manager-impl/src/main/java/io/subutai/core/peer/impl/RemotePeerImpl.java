@@ -18,6 +18,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.resource.PeerResources;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandRequest;
@@ -56,7 +58,6 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
@@ -89,8 +90,6 @@ import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.resource.PeerResources;
 
 
 /**
@@ -1015,25 +1014,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( peerId, "Invalid peer id" );
 
         return peerWebClient.getResourceLimits( peerId );
-    }
-
-
-    @Override
-    public void addCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
-    {
-        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
-
-        environmentWebClient.addCustomProxy( proxyConfig );
-    }
-
-
-    @Override
-    public void removeCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
-    {
-        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
-
-
-        environmentWebClient.removeCustomProxy( proxyConfig );
     }
 
 

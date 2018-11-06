@@ -178,16 +178,8 @@ public class Commands
     }
 
 
-    RequestBuilder getMapContainerPortToRandomPortCommand( final Protocol protocol, final String containerIp,
-                                                           final int containerPort )
-    {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", "-p", protocol.name().toLowerCase(), "-i",
-                String.format( "%s:%s", containerIp, containerPort ) );
-    }
-
-
-    RequestBuilder getMapContainerPortToSpecificPortCommand( final Protocol protocol, final String containerIp,
-                                                             final int containerPort, final int rhPort )
+    RequestBuilder getMapContainerPortCommand( final Protocol protocol, final String containerIp,
+                                               final int containerPort, final int rhPort )
     {
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ) );
@@ -224,7 +216,7 @@ public class Commands
         if ( loadBalancing != null )
         {
             args.add( "-b" );
-            args.add( loadBalancing.name().toLowerCase() );
+            args.add( loadBalancing.getPolicyName().toLowerCase() );
         }
 
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[0] ) );
