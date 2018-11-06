@@ -4,19 +4,18 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.bazaar.share.quota.Quota;
+import io.subutai.bazaar.share.resource.ContainerResourceType;
+import io.subutai.bazaar.share.resource.PeerResources;
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.util.HostUtil;
-import io.subutai.bazaar.share.quota.Quota;
-import io.subutai.bazaar.share.resource.ContainerResourceType;
-import io.subutai.bazaar.share.resource.PeerResources;
 
 
 /**
@@ -127,47 +126,6 @@ public interface LocalPeer extends Peer
 
     void removeResourceHost( String rhId ) throws HostNotFoundException;
 
-
-    /**
-     * Returns domain assigned to vni if any
-     *
-     * @param vni - vni
-     *
-     * @return - domain or null if no domain assigned to the vni
-     */
-    String getVniDomain( Long vni ) throws PeerException;
-
-    /**
-     * Removes domain from vni if any
-     *
-     * @param vni -vni
-     */
-    void removeVniDomain( Long vni ) throws PeerException;
-
-    /**
-     * Assigns domain to vni
-     *
-     * @param vni - vni
-     * @param domain -  domain to assign
-     * @param proxyLoadBalanceStrategy - strategy to load balance requests to the domain
-     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
-     */
-
-    void setVniDomain( Long vni, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, String sslCertPath )
-            throws PeerException;
-
-
-    /**
-     * Returns true if hostIp is added to domain by vni
-     *
-     * @param hostIp - ip of host to check
-     * @param vni - vni
-     */
-    boolean isIpInVniDomain( String hostIp, Long vni ) throws PeerException;
-
-    void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
-
-    void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
 
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 

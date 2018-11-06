@@ -18,7 +18,6 @@ import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
@@ -268,106 +267,6 @@ public class NetworkManagerImpl implements NetworkManager
         }
 
         return tunnels;
-    }
-
-
-    @Override
-    public String getVlanDomain( final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-
-        try
-        {
-            CommandResult result = getManagementHost().execute( commands.getGetVlanDomainCommand( vLanId ) );
-            if ( result.hasSucceeded() && !result.getStdOut().toLowerCase().contains( "no domain" ) )
-            {
-                return result.getStdOut();
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-
-        return null;
-    }
-
-
-    @Override
-    public void removeVlanDomain( final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-
-        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( String.valueOf( vLanId ) ) );
-    }
-
-
-    @Override
-    public void setVlanDomain( final int vLanId, final String domain,
-                               final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, final String sslCertPath )
-            throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
-        Preconditions.checkNotNull( proxyLoadBalanceStrategy, "Invalid strategy" );
-
-        execute( getManagementHost(),
-                commands.getSetVlanDomainCommand( String.valueOf( vLanId ), domain, proxyLoadBalanceStrategy,
-                        sslCertPath ) );
-    }
-
-
-    @Override
-    public boolean isIpInVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
-
-        try
-        {
-            CommandResult result =
-                    getManagementHost().execute( commands.getCheckIpInVlanDomainCommand( hostIp, vLanId ) );
-            if ( result.hasSucceeded() && result.getStdOut().toLowerCase().contains( "is in domain" ) )
-            {
-                return true;
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-
-        return false;
-    }
-
-
-    @Override
-    public void addIpToVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
-
-        execute( getManagementHost(), commands.getAddIpToVlanDomainCommand( hostIp, String.valueOf( vLanId ) ) );
-    }
-
-
-    @Override
-    public void removeIpFromVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
-
-        execute( getManagementHost(), commands.getRemoveIpFromVlanDomainCommand( hostIp, vLanId ) );
     }
 
 
