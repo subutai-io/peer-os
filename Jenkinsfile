@@ -45,7 +45,7 @@ try {
         git checkout ${env.BRANCH_NAME}
 		sed 's/export BAZAAR_IP=.*/export BAZAAR_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
-			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
+			${mvnHome}/bin/mvn clean install -x -e -Dmaven.test.skip=false -P deb -Dgit.branch=${env.BRANCH_NAME}
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
