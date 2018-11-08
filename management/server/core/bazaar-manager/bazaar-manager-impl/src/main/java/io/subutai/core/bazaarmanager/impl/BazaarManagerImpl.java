@@ -26,6 +26,7 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.TaskUtil;
@@ -339,7 +340,7 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void registerPeer( String email, String password, String peerName, String peerScope )
-            throws BazaarManagerException
+            throws BazaarManagerException, ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );

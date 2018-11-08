@@ -138,6 +138,7 @@ public class VersionInfoProcessor extends BazaarRequester
                     infoDto = new PeerInfoDto();
 
                     infoDto.setId( configManager.getPeerId() );
+                    infoDto.setVersion( SubutaiInfo.getVersion() );
                     infoDto.setBuildTime( SubutaiInfo.getBuildTime() );
                     infoDto.setBranch( SubutaiInfo.getBranch() );
                     infoDto.setCommitId( SubutaiInfo.getCommitId() );
