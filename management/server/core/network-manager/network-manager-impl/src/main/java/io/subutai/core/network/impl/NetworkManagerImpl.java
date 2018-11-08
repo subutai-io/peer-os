@@ -499,7 +499,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( protocol );
         Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
         //for https protocol there always must be an SSL cert specified
-        Preconditions.checkArgument( protocol == Protocol.HTTP || !Strings.isNullOrEmpty( sslCertPath ) );
+//        Preconditions.checkArgument( protocol == Protocol.HTTP || !Strings.isNullOrEmpty( sslCertPath ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
