@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.dto.domain.ContainerPortMapDto;
+import io.subutai.bazaar.share.dto.domain.PortMapDto;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
@@ -21,8 +23,6 @@ import io.subutai.core.bazaarmanager.api.RestResult;
 import io.subutai.core.bazaarmanager.api.StateLinkProcessor;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.bazaarmanager.impl.environment.state.Context;
-import io.subutai.bazaar.share.dto.domain.ContainerPortMapDto;
-import io.subutai.bazaar.share.dto.domain.PortMapDto;
 
 import static java.lang.String.format;
 
@@ -100,7 +100,8 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     .post( format( "/rest/v1/environments/%s/ports/map", containerPortMapDto.getEnvironmentSSId() ),
                             containerPortMapDto );
 
-            log.info( !restRes.isSuccess() ? "Could not send port map data to Bazaar" : "Sent port map data to Bazaar" );
+            log.info(
+                    !restRes.isSuccess() ? "Could not send port map data to Bazaar" : "Sent port map data to Bazaar" );
         }
         catch ( Exception e )
         {
@@ -185,7 +186,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     resourceHost
                             .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
                                     portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
-                                    LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
+                                    LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend(), portMapDto.isRedirect() );
                 }
             }
 
@@ -209,12 +210,12 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     else
                     {
                         String sslCertPath =
-                                protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, mngHost ) :
-                                null;
+                                protocol == Protocol.HTTPS && StringUtils.isNotEmpty( portMapDto.getSslCertPem() ) ?
+                                saveSslCertificateToFilesystem( portMapDto, mngHost ) : null;
 
                         mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
                                 portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
-                                LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
+                                LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend(), portMapDto.isRedirect() );
                     }
                 }
             }

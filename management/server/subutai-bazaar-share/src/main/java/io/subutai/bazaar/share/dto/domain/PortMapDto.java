@@ -41,6 +41,8 @@ public class PortMapDto
 
     private boolean sslBackend;
 
+    private boolean redirect;
+
     private String errorLog;
 
     private boolean isProxied;
@@ -181,6 +183,18 @@ public class PortMapDto
     public void setSslBackend( final boolean sslBackend )
     {
         this.sslBackend = sslBackend;
+    }
+
+
+    public boolean isRedirect()
+    {
+        return redirect;
+    }
+
+
+    public void setRedirect( final boolean redirect )
+    {
+        this.redirect = redirect;
     }
 
 
