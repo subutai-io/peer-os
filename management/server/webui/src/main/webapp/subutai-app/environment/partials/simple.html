@@ -23,7 +23,7 @@
                   title="Version: {{ template.version }} Size: {{ environmentViewCtrl.humanFileSize(template.size, true) }} Parent: {{ template.parent }} Owner: {{template.owner}}">
 							<span class="b-cloud-item">
 								<img
-                    ng-src="assets/templates/{{ template.name }}.jpg"
+                    ng-src="{{ template.icon ? template.icon : 'assets/templates/no-image.jpg' }}"
                     alt="{{ template.name }}"
                     on-error-src="assets/templates/no-image.jpg">
 							</span>
@@ -42,17 +42,6 @@
             class="b-cloud-space-work"
             id="js-environment-creation"
             ng-init="environmentSimpleViewCtrl.initJointJs()">
-
-          <!--<div class="b-environments-plugin js-no-close">-->
-						<!--<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup"-->
-                  <!--tooltips-->
-                  <!--tooltip-side="right"-->
-                  <!--tooltip-template='CDN token'>-->
-						<!--</span>-->
-            <!--<div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">-->
-              <!--<div class="header">{{ environmentSimpleViewCtrl.getCdnToken() }}</div>-->
-            <!--</div>-->
-          <!--</div>-->
 
           <div class="b-template-settings js-dropen-menu js-no-close">
             <div class="header"></div>
