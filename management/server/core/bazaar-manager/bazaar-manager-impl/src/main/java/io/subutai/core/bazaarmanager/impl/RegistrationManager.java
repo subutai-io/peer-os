@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SubutaiInfo;
@@ -55,7 +56,7 @@ class RegistrationManager
 
 
     void registerPeer( String email, String password, String peerName, String peerScope )
-            throws BazaarManagerException
+            throws BazaarManagerException, ResourceHostException
     {
         registerPeerPubKey();
 
@@ -86,7 +87,8 @@ class RegistrationManager
 
         if ( !restResult.isSuccess() )
         {
-            throw new BazaarManagerException( "Error registering peer public key with Bazaar: " + restResult.getError() );
+            throw new BazaarManagerException(
+                    "Error registering peer public key with Bazaar: " + restResult.getError() );
         }
 
         log.info( "Public key successfully registered" );
@@ -94,13 +96,18 @@ class RegistrationManager
 
 
     private RegistrationDto getRegistrationDto( String email, String password, String peerName, String peerScope )
+            throws ResourceHostException
     {
         PeerInfoDto peerInfoDto = new PeerInfoDto();
 
         peerInfoDto.setId( configManager.getPeerId() );
-        peerInfoDto.setVersion( String.valueOf( SubutaiInfo.getVersion() ) );
+        peerInfoDto.setVersion( SubutaiInfo.getVersion() );
         peerInfoDto.setName( peerName );
         peerInfoDto.setScope( peerScope );
+        peerInfoDto.setBuildTime( SubutaiInfo.getBuildTime() );
+        peerInfoDto.setCommitId( SubutaiInfo.getCommitId() );
+        peerInfoDto.setBranch( SubutaiInfo.getBranch() );
+        peerInfoDto.setRhVersionInfoDtoList( configManager.getRhsVersionInfoDtos() );
 
         RegistrationDto dto = new RegistrationDto( PGPKeyHelper.getFingerprint( configManager.getOwnerPublicKey() ) );
         User activeUser = configManager.getActiveUser();
@@ -120,8 +127,8 @@ class RegistrationManager
     }
 
 
-    private void register( String email, String password, String peerName, String peerScope ) throws
-            BazaarManagerException
+    private void register( String email, String password, String peerName, String peerScope )
+            throws BazaarManagerException, ResourceHostException
     {
         log.info( "Registering peer with Bazaar..." );
 
@@ -136,8 +143,8 @@ class RegistrationManager
             throw new BazaarManagerException( "Error registering peer: " + restResult.getError() );
         }
 
-
         Config config;
+
         try
         {
             config = new ConfigEntity( regDto.getPeerInfo().getId(), Common.BAZAAR_IP,
