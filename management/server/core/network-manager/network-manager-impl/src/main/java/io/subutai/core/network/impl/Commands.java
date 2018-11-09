@@ -144,7 +144,7 @@ public class Commands
     RequestBuilder getMapContainerPortToDomainCommand( final Protocol protocol, final String containerIp,
                                                        final int containerPort, final int rhPort, final String domain,
                                                        final String sslCertPath, final LoadBalancing loadBalancing,
-                                                       final boolean sslBackend, final boolean redirect )
+                                                       final boolean sslBackend )
     {
         List<String> args = Lists.newArrayList( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-n", domain );
@@ -158,11 +158,6 @@ public class Commands
         if ( sslBackend )
         {
             args.add( "--sslbackend" );
-        }
-
-        if ( redirect)
-        {
-            args.add( "--redirect" );
         }
 
         if ( loadBalancing != null )

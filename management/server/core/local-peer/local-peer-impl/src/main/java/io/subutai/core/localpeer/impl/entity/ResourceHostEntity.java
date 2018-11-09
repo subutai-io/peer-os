@@ -982,8 +982,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             updateTemplateUploadProgress( templateName, 0 );
 
             commandUtil.execute( resourceHostCommands
-                            .getExportTemplateCommand( containerName, templateName, version, isPrivateTemplate,
-                                    token ), this,
+                            .getExportTemplateCommand( containerName, templateName, version, isPrivateTemplate, token
+                                                     ), this,
                     new TemplateUploadTracker( this, templateName ) );
         }
         catch ( CommandException e )
@@ -1485,14 +1485,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void mapContainerPortToDomain( final Protocol protocol, final String containerIp, final int containerPort,
                                           final int rhPort, final String domain, final String sslCertPath,
-                                          final LoadBalancing loadBalancing, final boolean sslBackend,
-                                          final boolean redirect ) throws ResourceHostException
+                                          final LoadBalancing loadBalancing, final boolean sslBackend )
+            throws ResourceHostException
     {
         try
         {
             getNetworkManager()
                     .mapContainerPortToDomain( this, protocol, containerIp, containerPort, rhPort, domain, sslCertPath,
-                            loadBalancing, sslBackend, redirect );
+                            loadBalancing, sslBackend );
         }
         catch ( NetworkManagerException e )
         {
