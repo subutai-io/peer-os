@@ -1,10 +1,6 @@
 package io.subutai.bazaar.share.dto.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-
-@JsonIgnoreProperties( ignoreUnknown = true )
 public class PortMapDto
 {
     public enum Protocol
@@ -44,8 +40,6 @@ public class PortMapDto
     private String sslCertPem;
 
     private boolean sslBackend;
-
-    private boolean redirect;
 
     private String errorLog;
 
@@ -187,18 +181,6 @@ public class PortMapDto
     public void setSslBackend( final boolean sslBackend )
     {
         this.sslBackend = sslBackend;
-    }
-
-
-    public boolean isRedirect()
-    {
-        return redirect;
-    }
-
-
-    public void setRedirect( final boolean redirect )
-    {
-        this.redirect = redirect;
     }
 
 
