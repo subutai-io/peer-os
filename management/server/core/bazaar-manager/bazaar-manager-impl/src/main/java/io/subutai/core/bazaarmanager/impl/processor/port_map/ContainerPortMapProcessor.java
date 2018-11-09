@@ -186,7 +186,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                     resourceHost
                             .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
                                     portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
-                                    LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend(), portMapDto.isRedirect() );
+                                    LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
                 }
             }
 
@@ -215,7 +215,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
 
                         mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
                                 portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
-                                LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend(), portMapDto.isRedirect() );
+                                LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend() );
                     }
                 }
             }

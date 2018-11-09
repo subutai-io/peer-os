@@ -184,11 +184,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param sslCertPath optional path to SSL cert, pass null if not needed
      * @param loadBalancing optional load balancing method, pass null if not needed
      * @param sslBackend determines if backend is working over SSL or not
-     * @param redirect determines redirect HTTP to HTTPS
      */
     void mapContainerPortToDomain( Protocol protocol, String containerIp, int containerPort, int rhPort, String domain,
-                                   String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend,
-                                   final boolean redirect ) throws ResourceHostException;
+                                   String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend ) throws ResourceHostException;
 
     /**
      * Removes specified container port domain mapping
