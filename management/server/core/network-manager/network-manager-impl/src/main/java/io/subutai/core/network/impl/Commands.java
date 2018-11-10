@@ -149,10 +149,16 @@ public class Commands
         List<String> args = Lists.newArrayList( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-n", domain );
 
-        if ( !Strings.isNullOrEmpty( sslCertPath ) )
+        if ( protocol == Protocol.HTTPS )
         {
-            args.add( "-c" );
-            args.add( sslCertPath );
+            if ( !Strings.isNullOrEmpty( sslCertPath ) )
+            {
+                args.add( "-c" );
+                args.add( sslCertPath );
+            }
+
+            // always redirect http to https
+            args.add( "-r" );
         }
 
         if ( sslBackend )

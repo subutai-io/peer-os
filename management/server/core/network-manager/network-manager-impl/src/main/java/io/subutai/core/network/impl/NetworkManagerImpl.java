@@ -492,14 +492,11 @@ public class NetworkManagerImpl implements NetworkManager
     public void mapContainerPortToDomain( final Host host, final Protocol protocol, final String containerIp,
                                           final int containerPort, final int rhPort, final String domain,
                                           final String sslCertPath, final LoadBalancing loadBalancing,
-                                          final boolean sslBackend )
-            throws NetworkManagerException
+                                          final boolean sslBackend ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
         Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
-        //for https protocol there always must be an SSL cert specified
-//        Preconditions.checkArgument( protocol == Protocol.HTTP || !Strings.isNullOrEmpty( sslCertPath ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
