@@ -1026,7 +1026,19 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
+            if ( !resourceHost.isConnected() )
+            {
+                throw new PeerException(
+                        String.format( "Resource host %s is not connected", resourceHost.getHostname() ) );
+            }
+
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( resourceHost );
+
+            if ( resourceHostMetric == null )
+            {
+                throw new PeerException(
+                        String.format( "Failed to obtain metrics of resource host %s", resourceHost.getHostname() ) );
+            }
 
             double availPeerRam = resourceHostMetric.getAvailableRam();
             double availPeerDisk = resourceHostMetric.getAvailableSpace();
