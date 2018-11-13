@@ -1026,7 +1026,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
-            if(!resourceHost.isConnected())
+            if( !resourceHost.isConnected() )
             {
                 continue;
             }
@@ -2271,7 +2271,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( final ResourceHost resourceHost : resourceHostSet )
         {
-            if(!resourceHost.isConnected())
+            if( !resourceHost.isConnected() )
             {
                 continue;
             }
