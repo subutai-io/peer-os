@@ -1026,6 +1026,11 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
+            if(!resourceHost.isConnected())
+            {
+                continue;
+            }
+
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( resourceHost );
 
             double availPeerRam = resourceHostMetric.getAvailableRam();
@@ -2266,6 +2271,11 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( final ResourceHost resourceHost : resourceHostSet )
         {
+            if(!resourceHost.isConnected())
+            {
+                continue;
+            }
+
             hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
         }
 
