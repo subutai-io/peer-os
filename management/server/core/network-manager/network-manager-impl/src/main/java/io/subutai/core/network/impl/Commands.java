@@ -156,9 +156,6 @@ public class Commands
                 args.add( "-c" );
                 args.add( sslCertPath );
             }
-
-            // always redirect http to https
-            args.add( "-r" );
         }
 
         if ( sslBackend )
