@@ -874,7 +874,6 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     }
 
 
-    //TODO check requested and available resources only for requested containers' RHs
     @Override
     public synchronized FitCheckResult checkResources( final Nodes nodes ) throws PeerException
     {
