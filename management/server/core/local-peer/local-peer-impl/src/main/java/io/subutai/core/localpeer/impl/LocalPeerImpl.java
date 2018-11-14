@@ -874,6 +874,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     }
 
 
+    //TODO check requested and available resources only for requested containers' RHs
     @Override
     public synchronized FitCheckResult checkResources( final Nodes nodes ) throws PeerException
     {
@@ -883,8 +884,49 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         Map<ResourceHost, ResourceHostCapacity> requestedResources = Maps.newHashMap();
 
+        //collect ids of involved RHs
+        Set<String> requestedRhIds = Sets.newHashSet();
+        if ( nodes.getNewNodes() != null )
+        {
+            for ( Node node : nodes.getNewNodes() )
+            {
+                requestedRhIds.add( node.getHostId() );
+            }
+        }
+        if ( nodes.getQuotas() != null )
+        {
+            for ( String containerId : nodes.getQuotas().keySet() )
+            {
+                try
+                {
+                    ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( containerId );
+                    ResourceHostInfo resourceHostInfo =
+                            hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+                    requestedRhIds.add( resourceHostInfo.getId() );
+                }
+                catch ( HostDisconnectedException e )
+                {
+                    throw new PeerException( e );
+                }
+            }
+        }
+
         for ( ContainerHostInfo containerHostInfo : hostRegistry.getContainerHostsInfo() )
         {
+            try
+            {
+                ResourceHostInfo resourceHostInfo = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+                //skip RHs that are not involved
+                if ( !requestedRhIds.contains( resourceHostInfo.getId() ) )
+                {
+                    continue;
+                }
+            }
+            catch ( HostDisconnectedException e )
+            {
+                throw new PeerException( e );
+            }
+
             double requestedRam = 0, requestedCpu = 0, requestedDisk = 0;
 
             //exclude container from calculations if it is included into removed containers
@@ -1026,6 +1068,11 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
+            //skip RHs that are not involved
+            if (!requestedRhIds.contains( resourceHost.getId() )){
+                continue;
+            }
+
             if ( !resourceHost.isConnected() )
             {
                 throw new PeerException(
