@@ -883,8 +883,49 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         Map<ResourceHost, ResourceHostCapacity> requestedResources = Maps.newHashMap();
 
+        //collect ids of involved RHs
+        Set<String> requestedRhIds = Sets.newHashSet();
+        if ( nodes.getNewNodes() != null )
+        {
+            for ( Node node : nodes.getNewNodes() )
+            {
+                requestedRhIds.add( node.getHostId() );
+            }
+        }
+        if ( nodes.getQuotas() != null )
+        {
+            for ( String containerId : nodes.getQuotas().keySet() )
+            {
+                try
+                {
+                    ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( containerId );
+                    ResourceHostInfo resourceHostInfo =
+                            hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+                    requestedRhIds.add( resourceHostInfo.getId() );
+                }
+                catch ( HostDisconnectedException e )
+                {
+                    throw new PeerException( e );
+                }
+            }
+        }
+
         for ( ContainerHostInfo containerHostInfo : hostRegistry.getContainerHostsInfo() )
         {
+            try
+            {
+                ResourceHostInfo resourceHostInfo = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+                //skip RHs that are not involved
+                if ( !requestedRhIds.contains( resourceHostInfo.getId() ) )
+                {
+                    continue;
+                }
+            }
+            catch ( HostDisconnectedException e )
+            {
+                throw new PeerException( e );
+            }
+
             double requestedRam = 0, requestedCpu = 0, requestedDisk = 0;
 
             //exclude container from calculations if it is included into removed containers
@@ -1026,7 +1067,24 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
+            //skip RHs that are not involved
+            if (!requestedRhIds.contains( resourceHost.getId() )){
+                continue;
+            }
+
+            if ( !resourceHost.isConnected() )
+            {
+                throw new PeerException(
+                        String.format( "Resource host %s is not connected", resourceHost.getHostname() ) );
+            }
+
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( resourceHost );
+
+            if ( resourceHostMetric == null )
+            {
+                throw new PeerException(
+                        String.format( "Failed to obtain metrics of resource host %s", resourceHost.getHostname() ) );
+            }
 
             double availPeerRam = resourceHostMetric.getAvailableRam();
             double availPeerDisk = resourceHostMetric.getAvailableSpace();
