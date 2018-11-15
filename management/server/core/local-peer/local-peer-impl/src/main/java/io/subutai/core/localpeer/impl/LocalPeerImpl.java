@@ -1068,7 +1068,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             //skip RHs that are not involved
-            if (!requestedRhIds.contains( resourceHost.getId() )){
+            if ( !requestedRhIds.contains( resourceHost.getId() ) )
+            {
                 continue;
             }
 
@@ -2318,30 +2319,32 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
 
-        Set<ResourceHost> resourceHostSet = getResourceHosts();
-
-        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
-
-        for ( final ResourceHost resourceHost : resourceHostSet )
+        if ( Common.CHECK_RESERVED_RESOURCES )
         {
-            hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
+            Set<ResourceHost> resourceHostSet = getResourceHosts();
+
+            HostUtil.Tasks hostTasks = new HostUtil.Tasks();
+
+            for ( final ResourceHost resourceHost : resourceHostSet )
+            {
+                hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
+            }
+
+            HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
+
+            if ( results.hasFailures() )
+            {
+                HostUtil.Task task = results.getFirstFailedTask();
+
+                String errMsg =
+                        String.format( "Error gathering reserved net resources on host %s: %s", task.getHost().getId(),
+                                task.getFailureReason() );
+
+                LOG.error( errMsg );
+
+                throw new PeerException( errMsg, task.getException() );
+            }
         }
-
-        HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
-
-        if ( results.hasFailures() )
-        {
-            HostUtil.Task task = results.getFirstFailedTask();
-
-            String errMsg =
-                    String.format( "Error gathering reserved net resources on host %s: %s", task.getHost().getId(),
-                            task.getFailureReason() );
-
-            LOG.error( errMsg );
-
-            throw new PeerException( errMsg, task.getException() );
-        }
-
 
         //add reserved ones too
         for ( NetworkResource networkResource : getReservedNetworkResources().getNetworkResources() )
