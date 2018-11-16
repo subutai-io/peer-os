@@ -2319,17 +2319,20 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
 
-        if ( Common.CHECK_RESERVED_RESOURCES )
+        Set<ResourceHost> resourceHostSet = getResourceHosts();
+
+        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
+
+        for ( final ResourceHost resourceHost : resourceHostSet )
         {
-            Set<ResourceHost> resourceHostSet = getResourceHosts();
-
-            HostUtil.Tasks hostTasks = new HostUtil.Tasks();
-
-            for ( final ResourceHost resourceHost : resourceHostSet )
+            if ( resourceHost.isConnected() || Common.CHECK_RESERVED_RESOURCES )
             {
                 hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
             }
+        }
 
+        if ( !hostTasks.isEmpty() )
+        {
             HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
 
             if ( results.hasFailures() )
