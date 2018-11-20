@@ -98,7 +98,6 @@ import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.NetworkResourceImpl;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.network.UsedNetworkResources;
@@ -122,7 +121,6 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostCapacity;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -885,8 +883,49 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         Map<ResourceHost, ResourceHostCapacity> requestedResources = Maps.newHashMap();
 
+        //collect ids of involved RHs
+        Set<String> requestedRhIds = Sets.newHashSet();
+        if ( nodes.getNewNodes() != null )
+        {
+            for ( Node node : nodes.getNewNodes() )
+            {
+                requestedRhIds.add( node.getHostId() );
+            }
+        }
+        if ( nodes.getQuotas() != null )
+        {
+            for ( String containerId : nodes.getQuotas().keySet() )
+            {
+                try
+                {
+                    ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( containerId );
+                    ResourceHostInfo resourceHostInfo =
+                            hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+                    requestedRhIds.add( resourceHostInfo.getId() );
+                }
+                catch ( HostDisconnectedException e )
+                {
+                    throw new PeerException( e );
+                }
+            }
+        }
+
         for ( ContainerHostInfo containerHostInfo : hostRegistry.getContainerHostsInfo() )
         {
+            try
+            {
+                ResourceHostInfo resourceHostInfo = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+                //skip RHs that are not involved
+                if ( !requestedRhIds.contains( resourceHostInfo.getId() ) )
+                {
+                    continue;
+                }
+            }
+            catch ( HostDisconnectedException e )
+            {
+                throw new PeerException( e );
+            }
+
             double requestedRam = 0, requestedCpu = 0, requestedDisk = 0;
 
             //exclude container from calculations if it is included into removed containers
@@ -1028,7 +1067,25 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
+            //skip RHs that are not involved
+            if ( !requestedRhIds.contains( resourceHost.getId() ) )
+            {
+                continue;
+            }
+
+            if ( !resourceHost.isConnected() )
+            {
+                throw new PeerException(
+                        String.format( "Resource host %s is not connected", resourceHost.getHostname() ) );
+            }
+
             ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( resourceHost );
+
+            if ( resourceHostMetric == null )
+            {
+                throw new PeerException(
+                        String.format( "Failed to obtain metrics of resource host %s", resourceHost.getHostname() ) );
+            }
 
             double availPeerRam = resourceHostMetric.getAvailableRam();
             double availPeerDisk = resourceHostMetric.getAvailableSpace();
@@ -1817,181 +1874,6 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     //networking
 
 
-    @Override
-    public String getVniDomain( final Long vni ) throws PeerException
-    {
-        NetworkResource reservedNetworkResource = getReservedNetworkResources().findByVni( vni );
-
-        if ( reservedNetworkResource != null )
-        {
-            try
-            {
-                return getNetworkManager().getVlanDomain( reservedNetworkResource.getVlan() );
-            }
-            catch ( NetworkManagerException e )
-            {
-                String errMsg =
-                        String.format( "Error obtaining domain by vlan %d: %s", reservedNetworkResource.getVlan(),
-                                e.getMessage() );
-                LOG.error( errMsg, e );
-                throw new PeerException( errMsg, e );
-            }
-        }
-        else
-        {
-            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
-        }
-    }
-
-
-    //    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public void removeVniDomain( final Long vni ) throws PeerException
-    {
-        NetworkResource reservedNetworkResource = getReservedNetworkResources().findByVni( vni );
-
-        if ( reservedNetworkResource != null )
-        {
-            try
-            {
-                getNetworkManager().removeVlanDomain( reservedNetworkResource.getVlan() );
-            }
-            catch ( NetworkManagerException e )
-            {
-                String errMsg =
-                        String.format( "Error removing domain by vlan %d: %s", reservedNetworkResource.getVlan(),
-                                e.getMessage() );
-                LOG.error( errMsg, e );
-                throw new PeerException( errMsg, e );
-            }
-        }
-        else
-        {
-            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
-        }
-    }
-
-
-    //    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void setVniDomain( final Long vni, final String domain,
-                              final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, final String sslCertPath )
-            throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
-        Preconditions.checkNotNull( proxyLoadBalanceStrategy );
-
-        NetworkResource reservedNetworkResource = getReservedNetworkResources().findByVni( vni );
-
-        if ( reservedNetworkResource != null )
-        {
-            try
-            {
-                getNetworkManager().setVlanDomain( reservedNetworkResource.getVlan(), domain, proxyLoadBalanceStrategy,
-                        sslCertPath );
-            }
-            catch ( NetworkManagerException e )
-            {
-                String errMsg = String.format( "Error setting domain by vlan %d: %s", reservedNetworkResource.getVlan(),
-                        e.getMessage() );
-                LOG.error( errMsg, e );
-                throw new PeerException( errMsg, e );
-            }
-        }
-        else
-        {
-            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
-        }
-    }
-
-
-    @Override
-    public boolean isIpInVniDomain( final String hostIp, final Long vni ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ) );
-
-        NetworkResource reservedNetworkResource = getReservedNetworkResources().findByVni( vni );
-
-        if ( reservedNetworkResource != null )
-        {
-            try
-            {
-                return getNetworkManager().isIpInVlanDomain( hostIp, reservedNetworkResource.getVlan() );
-            }
-            catch ( NetworkManagerException e )
-            {
-                String errMsg = String.format( "Error checking domain by ip %s and vlan %d: %s", hostIp,
-                        reservedNetworkResource.getVlan(), e.getMessage() );
-                LOG.error( errMsg, e );
-                throw new PeerException( errMsg, e );
-            }
-        }
-        else
-        {
-            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
-        }
-    }
-
-
-    //    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void addIpToVniDomain( final String hostIp, final Long vni ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ) );
-
-        NetworkResource reservedNetworkResource = getReservedNetworkResources().findByVni( vni );
-
-        if ( reservedNetworkResource != null )
-        {
-            try
-            {
-                getNetworkManager().addIpToVlanDomain( hostIp, reservedNetworkResource.getVlan() );
-            }
-            catch ( NetworkManagerException e )
-            {
-                String errMsg = String.format( "Error adding ip %s to domain by vlan %d: %s", hostIp,
-                        reservedNetworkResource.getVlan(), e.getMessage() );
-                LOG.error( errMsg, e );
-                throw new PeerException( errMsg, e );
-            }
-        }
-        else
-        {
-            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
-        }
-    }
-
-
-    //    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void removeIpFromVniDomain( final String hostIp, final Long vni ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ) );
-
-        NetworkResource reservedNetworkResource = getReservedNetworkResources().findByVni( vni );
-
-        if ( reservedNetworkResource != null )
-        {
-            try
-            {
-                getNetworkManager().removeIpFromVlanDomain( hostIp, reservedNetworkResource.getVlan() );
-            }
-            catch ( NetworkManagerException e )
-            {
-                String errMsg = String.format( "Error removing ip %s from domain by vlan %d: %s", hostIp,
-                        reservedNetworkResource.getVlan(), e.getMessage() );
-                LOG.error( errMsg, e );
-                throw new PeerException( errMsg, e );
-            }
-        }
-        else
-        {
-
-            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
-        }
-    }
-
-
     @RolesAllowed( "Environment-Management|Update" )
     @Override
     public SshTunnel setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout )
@@ -2443,24 +2325,29 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( final ResourceHost resourceHost : resourceHostSet )
         {
-            hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
+            if ( resourceHost.isConnected() || Common.CHECK_RESERVED_RESOURCES )
+            {
+                hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
+            }
         }
 
-        HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
-
-        if ( results.hasFailures() )
+        if ( !hostTasks.isEmpty() )
         {
-            HostUtil.Task task = results.getFirstFailedTask();
+            HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
 
-            String errMsg =
-                    String.format( "Error gathering reserved net resources on host %s: %s", task.getHost().getId(),
-                            task.getFailureReason() );
+            if ( results.hasFailures() )
+            {
+                HostUtil.Task task = results.getFirstFailedTask();
 
-            LOG.error( errMsg );
+                String errMsg =
+                        String.format( "Error gathering reserved net resources on host %s: %s", task.getHost().getId(),
+                                task.getFailureReason() );
 
-            throw new PeerException( errMsg, task.getException() );
+                LOG.error( errMsg );
+
+                throw new PeerException( errMsg, task.getException() );
+            }
         }
-
 
         //add reserved ones too
         for ( NetworkResource networkResource : getReservedNetworkResources().getNetworkResources() )
@@ -3183,42 +3070,6 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( e.getMessage(), e );
-        }
-    }
-
-
-    @Override
-    public void addCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
-    {
-        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
-
-        ContainerHost containerHost = getContainerHostById( proxyConfig.getContainerId() );
-
-        try
-        {
-            getNetworkManager().addCustomProxy( proxyConfig, containerHost );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error on adding custom reverse proxy: %s", e.getMessage() ) );
-        }
-    }
-
-
-    @Override
-    public void removeCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
-    {
-        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
-
-        try
-        {
-            getNetworkManager().removeCustomProxy( proxyConfig.getVlan() );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error on removing custom reverse proxy: %s", e.getMessage() ) );
         }
     }
 

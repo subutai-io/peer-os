@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
@@ -13,7 +14,6 @@ import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -27,7 +27,6 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 public interface EnvironmentManager
@@ -181,48 +180,6 @@ public interface EnvironmentManager
      */
     Environment loadEnvironment( String environmentId ) throws EnvironmentNotFoundException;
 
-
-    /**
-     * Removes an assigned domain if any from the environment
-     *
-     * @param environmentId - id of the environment which domain to remove
-     */
-    void removeEnvironmentDomain( String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException;
-
-    /**
-     * Assigns a domain to the environment. External client would be able to access the environment containers via the
-     * domain name.
-     *
-     * @param environmentId - id of the environment to assign the passed domain to
-     * @param newDomain - domain url
-     * @param proxyLoadBalanceStrategy - strategy to load balance requests to the domain
-     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domain only, null if not needed
-     */
-    void assignEnvironmentDomain( String environmentId, String newDomain,
-                                  ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, String sslCertPath )
-            throws EnvironmentModificationException, EnvironmentNotFoundException;
-
-    /**
-     * Returns the currently assigned domain
-     *
-     * @param environmentId - id of the environment which domain to return
-     *
-     * @return - domain url or null if not assigned
-     */
-    String getEnvironmentDomain( String environmentId )
-            throws EnvironmentManagerException, EnvironmentNotFoundException;
-
-
-    boolean isContainerInEnvironmentDomain( String containerHostId, String environmentId )
-            throws EnvironmentManagerException, EnvironmentNotFoundException;
-
-
-    void addContainerToEnvironmentDomain( String containerHostId, String environmentId, int port )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
-
-    void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     /**
      * Sets up ssh connectivity for container. Clients can connect to the container via ssh during 30 seconds after this

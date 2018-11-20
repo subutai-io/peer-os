@@ -3,6 +3,7 @@ package io.subutai.core.bazaarmanager.api;
 
 import java.util.Map;
 
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.bazaarmanager.api.model.Config;
 import io.subutai.core.identity.api.model.UserToken;
@@ -12,7 +13,8 @@ public interface BazaarManager
 {
     String BAZAAR_EMAIL_SUFFIX = "@bazaar.subutai.io";
 
-    void registerPeer( String email, String password, String peerName, String peerScope ) throws BazaarManagerException;
+    void registerPeer( String email, String password, String peerName, String peerScope ) throws BazaarManagerException,
+            ResourceHostException;
 
     void unregisterPeer() throws BazaarManagerException;
 

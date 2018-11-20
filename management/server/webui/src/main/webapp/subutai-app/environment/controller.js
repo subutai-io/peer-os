@@ -82,8 +82,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.showSSHKeysPopup = showSSHKeysPopup;
 	vm.deleteSSHKey = deleteSSHKey;
 	vm.sshKeyFormat = sshKeyFormat;
-	vm.showDomainForm = showDomainForm;
-	vm.setDomain = setDomain;
 	vm.removeDomain = removeDomain;
 	vm.minimizeLogs = minimizeLogs;
 	vm.getQuotaColor = getQuotaColor;
@@ -214,10 +212,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	$scope.$on('reloadEnvironmentsList', function(event) {
 		loadEnvironments();
-	});
-
-	environmentService.getDomainStrategies().success(function (data) {
-		vm.domainStrategies = data;
 	});
 
 	//installed environment table options
@@ -575,42 +569,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		return splitedSSH[0];
 	}
 
-	function showDomainForm(environmentId) {
-
-		if ( alertForBazaarEnvironment( environmentId ) )
-		{
-			return;
-		}
-
-		vm.environmentForDomain = environmentId;
-		vm.currentDomain = {};
-		LOADING_SCREEN();
-		environmentService.getDomain(environmentId).success(function (data) {
-			vm.currentDomain = data;
-			ngDialog.open({
-				template: 'subutai-app/environment/partials/popups/domainForm.html',
-				scope: $scope
-			});
-			LOADING_SCREEN('none');
-		});
-	}
-
-	function setDomain(domain) {
-		var file = fileUploader;
-		var environment = getEnvironment(vm.environmentForDomain);
-		LOADING_SCREEN();
-		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
-			fileUploader = {};
-			SweetAlert.swal("Success!", "You have successfully added domain for '" + environment.name + "' environment!", "success");
-			ngDialog.closeAll();
-			LOADING_SCREEN('none');
-		}).error(function (data) {
-			fileUploader = {};
-			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");
-			ngDialog.closeAll();
-			LOADING_SCREEN('none');
-		});
-	}
 
 	function removeDomain(environmentId) {
 		ngDialog.closeAll();

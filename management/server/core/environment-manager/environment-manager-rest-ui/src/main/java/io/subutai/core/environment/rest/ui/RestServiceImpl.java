@@ -1,7 +1,6 @@
 package io.subutai.core.environment.rest.ui;
 
 
-import java.io.File;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -39,6 +37,9 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
+import io.subutai.common.environment.BazaarEnvironment;
 import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.ContainerQuotaDto;
@@ -47,14 +48,12 @@ import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentDto;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.BazaarEnvironment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -79,8 +78,6 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.template.api.TemplateManager;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.quota.ContainerSize;
 
 import static io.subutai.common.util.JsonUtil.mapper;
 
@@ -525,6 +522,7 @@ public class RestServiceImpl implements RestService
         }
     }
 
+    /** Environments SSH keys **************************************************** */
 
     @Override
     public Response addSshKey( final String environmentId, final String key )
@@ -555,7 +553,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Environments SSH keys **************************************************** */
 
     @Override
     public Response removeSshKey( final String environmentId, final String key )
@@ -580,144 +577,6 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
-
-        return Response.ok().build();
-    }
-
-
-    @Override
-    public Response getEnvironmentDomain( final String environmentId )
-    {
-        try
-        {
-            return Response.ok( JsonUtil.toJson( environmentManager.getEnvironmentDomain( environmentId ) ) ).build();
-        }
-        catch ( Exception e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
-        }
-    }
-
-
-    /** Environment domains **************************************************** */
-
-    @Override
-    public Response listDomainLoadBalanceStrategies()
-    {
-        return Response.ok( JsonUtil.toJson( ProxyLoadBalanceStrategy.values() ) ).build();
-    }
-
-
-    @Override
-    public Response addEnvironmentDomain( String environmentId, String hostName, String strategyJson, Attachment attr )
-    {
-        try
-        {
-            String path = null;
-
-            ProxyLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, ProxyLoadBalanceStrategy.class );
-
-            try
-            {
-                // will throw exception if no attachment
-                attr.getDataHandler().getContent();
-
-                String certPath = System.getProperty( "java.io.tmpdir" ) + "/" + environmentId;
-
-                File file = new File( certPath );
-
-                if ( !file.createNewFile() )
-                {
-                    LOG.warn( "Domain ssl cert exists, overwriting..." );
-                }
-
-                attr.transferTo( file );
-
-                // prefix path to enable agent auto-prepend full path from RH to cert location
-                path = Common.MANAGEMENT_HOSTNAME + ":" + certPath;
-            }
-            catch ( Exception e )
-            {
-                // path
-            }
-
-            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy, path );
-        }
-        catch ( Exception e )
-        {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
-
-        return Response.ok().build();
-    }
-
-
-    @Override
-    public Response removeEnvironmentDomain( String environmentId )
-    {
-        try
-        {
-            environmentManager.removeEnvironmentDomain( environmentId );
-        }
-        catch ( Exception e )
-        {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
-
-        return Response.ok().build();
-    }
-
-
-    @Override
-    public Response getContainerDomainNPort( final String environmentId, final String containerId )
-    {
-        try
-        {
-            if ( environmentManager.getEnvironmentDomain( environmentId ) == null )
-            {
-                return Response.serverError()
-                               .entity( JsonUtil.toJson( "You must first register domain for environment" ) ).build();
-            }
-
-            Map<String, String> result = new HashMap<>();
-
-            Environment environment = environmentManager.loadEnvironment( environmentId );
-
-            EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
-
-            result.put( "status",
-                    String.valueOf( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) );
-
-            result.put( "port", String.valueOf( containerHost.getDomainPort() ) );
-
-            return Response.ok( JsonUtil.toJson( result ) ).build();
-        }
-        catch ( Exception e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
-        }
-    }
-
-
-    @Override
-    public Response setContainerDomainNPort( final String environmentId, final String containerId, final Boolean state,
-                                             final int port )
-    {
-        try
-        {
-            if ( !state )
-            {
-                environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId );
-            }
-            else
-            {
-                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId, port );
-            }
-        }
-        catch ( Exception e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
         }
 
         return Response.ok().build();
@@ -1166,11 +1025,10 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                String dataSource = ( environment instanceof BazaarEnvironment
-                        || String.format( "Of %s", Common.BAZAAR_ID )
-                                 .equals(
-                                                                                             environment.getName() ) ) ?
-                                    Common.BAZAAR_ID : Common.SUBUTAI_ID;
+                String dataSource =
+                        ( environment instanceof BazaarEnvironment || String.format( "Of %s", Common.BAZAAR_ID )
+                                                                            .equals( environment.getName() ) ) ?
+                        Common.BAZAAR_ID : Common.SUBUTAI_ID;
 
                 EnvironmentDto environmentDto =
                         new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),

@@ -54,8 +54,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.addTagForm = addTagForm;
 	vm.addTags = addTags;
 	vm.removeTag = removeTag;
-	vm.showDomainForm = showDomainForm;
-	vm.setContainerDomain = setContainerDomain;
 	vm.getContainerStatus = getContainerStatus;
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
@@ -84,42 +82,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		return false;
 	}
 
-	function showDomainForm(container) {
-
-        if (alertForBazaarContainer(container)) {
-            return;
-        }
-
-		LOADING_SCREEN();
-		vm.currentDomainStatus = {};
-		vm.currentDomainPort = {};
-		vm.domainContainer = container;
-		environmentService.getContainerDomainNPort(container).success(function (data) {
-			vm.currentDomainStatus = data.status == "true";
-			vm.currentDomainPort = parseInt( data.port, 10);
-			ngDialog.open({
-				template: 'subutai-app/containers/partials/addToDomain.html',
-				scope: $scope
-			});			
-			LOADING_SCREEN('none');
-		}).error(function(error){
-			LOADING_SCREEN('none');
-			SweetAlert.swal ("ERROR!", error.replace(/\\n/g, " "));
-			ngDialog.closeAll();
-		});
-	}
-
-	function setContainerDomain() {
-		environmentService.setContainerDomainNPort(vm.domainContainer, vm.currentDomainStatus, vm.currentDomainPort).success(function (data) {
-			vm.currentDomainStatus = data.status == "true";
-			vm.currentDomainPort = parseInt( data.port, 10);
-		}).error(function(error){
-          			LOADING_SCREEN('none');
-          			SweetAlert.swal ("ERROR!", error.replace(/\\n/g, " "));
-          			ngDialog.closeAll();
-        });
-		ngDialog.closeAll();
-	}
 
 	function addTagForm(container) {
 

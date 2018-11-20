@@ -106,14 +106,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="environment/add-domain">
-      <action class="io.subutai.core.environment.cli.AddDomainToEnvironmentCommand">
-        <argument ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/find-container">
       <action class="io.subutai.core.environment.cli.FindContainerByHostnameCommand">
         <argument ref="environmentManager" />

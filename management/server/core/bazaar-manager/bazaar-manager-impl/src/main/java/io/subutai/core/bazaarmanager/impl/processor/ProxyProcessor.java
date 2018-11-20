@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.dto.domain.PortMapDto;
+import io.subutai.bazaar.share.dto.domain.ProxyDto;
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
@@ -22,9 +25,6 @@ import io.subutai.core.bazaarmanager.api.RestResult;
 import io.subutai.core.bazaarmanager.api.StateLinkProcessor;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.bazaar.share.dto.domain.PortMapDto;
-import io.subutai.bazaar.share.dto.domain.ProxyDto;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 
 
 public class ProxyProcessor implements StateLinkProcessor
@@ -242,8 +242,9 @@ public class ProxyProcessor implements StateLinkProcessor
 
                             portMapDto.setState( PortMapDto.State.USED );
                         }
-                        else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING )
-                                || portMapDto.getState().equals( PortMapDto.State.DELETED ) )
+                        else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING ) || portMapDto.getState()
+                                                                                                           .equals(
+                                                                                                                   PortMapDto.State.DELETED ) )
                         {
                             resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getIpAddr(),
                                     portMapDto.getExternalPort(), portMapDto.getExternalPort(),
@@ -266,8 +267,9 @@ public class ProxyProcessor implements StateLinkProcessor
 
                             portMapDto.setState( PortMapDto.State.USED );
                         }
-                        else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING )
-                                || portMapDto.getState().equals( PortMapDto.State.DELETED ) )
+                        else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING ) || portMapDto.getState()
+                                                                                                           .equals(
+                                                                                                                   PortMapDto.State.DELETED ) )
                         {
                             resourceHost.removeContainerPortMapping( protocol, portMapDto.getIpAddr(),
                                     portMapDto.getExternalPort(), portMapDto.getExternalPort() );

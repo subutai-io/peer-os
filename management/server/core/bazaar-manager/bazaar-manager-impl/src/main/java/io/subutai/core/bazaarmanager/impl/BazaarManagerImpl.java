@@ -21,18 +21,18 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.common.BazaarEventListener;
+import io.subutai.bazaar.share.dto.PeerDto;
+import io.subutai.bazaar.share.dto.UserDto;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.TaskUtil;
-import io.subutai.core.desktop.api.DesktopManager;
-import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.bazaarmanager.api.BazaarManager;
 import io.subutai.core.bazaarmanager.api.BazaarRequester;
 import io.subutai.core.bazaarmanager.api.RestClient;
@@ -42,15 +42,13 @@ import io.subutai.core.bazaarmanager.api.dao.ConfigDataService;
 import io.subutai.core.bazaarmanager.api.dao.ContainerMetricsService;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.bazaarmanager.api.model.Config;
-import io.subutai.core.bazaarmanager.impl.appscale.AppScaleManager;
-import io.subutai.core.bazaarmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.bazaarmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.bazaarmanager.impl.dao.ContainerMetricsServiceImpl;
 import io.subutai.core.bazaarmanager.impl.environment.state.Context;
 import io.subutai.core.bazaarmanager.impl.http.BazaarRestClient;
 import io.subutai.core.bazaarmanager.impl.model.ConfigEntity;
-import io.subutai.core.bazaarmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.BazaarEnvironmentProcessor;
+import io.subutai.core.bazaarmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.ProxyProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.UserTokenProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.port_map.ContainerPortMapProcessor;
@@ -64,6 +62,10 @@ import io.subutai.core.bazaarmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.bazaarmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.bazaarmanager.impl.util.EnvironmentUserHelper;
 import io.subutai.core.bazaarmanager.impl.util.ReschedulableTimer;
+import io.subutai.core.desktop.api.DesktopManager;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
@@ -71,9 +73,6 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.systemmanager.api.SystemManager;
-import io.subutai.bazaar.share.common.BazaarEventListener;
-import io.subutai.bazaar.share.dto.PeerDto;
-import io.subutai.bazaar.share.dto.UserDto;
 
 
 public class BazaarManagerImpl extends HostListener implements BazaarManager
@@ -257,8 +256,6 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
 
         StateLinkProcessor bazaarEnvironmentProcessor = new BazaarEnvironmentProcessor( ctx );
 
-        AppScaleProcessor appScaleProcessor = new AppScaleProcessor( new AppScaleManager( peerManager ), restClient );
-
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager, restClient );
 
@@ -270,9 +267,8 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
 
         heartbeatProcessor = new HeartbeatProcessor( this, peerManager, restClient, localPeer.getId() )
                 .addProcessor( bazaarEnvironmentProcessor ).addProcessor( tunnelProcessor )
-                .addProcessor( environmentTelemetryProcessor ).addProcessor( appScaleProcessor )
-                .addProcessor( proxyProcessor ).addProcessor( containerPortMapProcessor )
-                .addProcessor( userTokenProcessor );
+                .addProcessor( environmentTelemetryProcessor ).addProcessor( proxyProcessor )
+                .addProcessor( containerPortMapProcessor ).addProcessor( userTokenProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -339,7 +335,7 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void registerPeer( String email, String password, String peerName, String peerScope )
-            throws BazaarManagerException
+            throws BazaarManagerException, ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );

@@ -1,6 +1,8 @@
 package io.subutai.core.bazaarmanager.impl.environment.state;
 
 
+import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState;
+import io.subutai.core.bazaarmanager.impl.environment.state.change.ContainerStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.BuildContainerStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.CheckNetworkStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.ConfigureContainerStateHandler;
@@ -8,16 +10,12 @@ import io.subutai.core.bazaarmanager.impl.environment.state.create.ConfigureEnvi
 import io.subutai.core.bazaarmanager.impl.environment.state.create.ExchangeInfoStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.ReserveNetworkStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.SetupTunnelStateHandler;
-import io.subutai.core.bazaarmanager.impl.environment.state.change.ContainerStateHandler;
-import io.subutai.core.bazaarmanager.impl.environment.state.change.DomainStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.destroy.DeletePeerStateHandler;
-import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState;
 
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.BUILD_CONTAINER;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.CHANGE_CONTAINER_STATE;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.CHECK_NETWORK;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_CONTAINER;
-import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_DOMAIN;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_ENVIRONMENT;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.DELETE_PEER;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.EXCHANGE_INFO;
@@ -41,8 +39,6 @@ public class StateHandlerFactory
 
     private final StateHandler containerStateHandler;
 
-    private final StateHandler domainStateHandler;
-
     private final StateHandler notFoundStateHandler;
 
     private final StateHandler configureEnvironmentStateHandler;
@@ -65,8 +61,6 @@ public class StateHandlerFactory
         deletePeerStateHandler = new DeletePeerStateHandler( ctx );
 
         containerStateHandler = new ContainerStateHandler( ctx );
-
-        domainStateHandler = new DomainStateHandler( ctx );
 
         notFoundStateHandler = new NotFoundStateHandler( ctx );
 
@@ -103,10 +97,6 @@ public class StateHandlerFactory
         else if ( state == CHANGE_CONTAINER_STATE )
         {
             handler = containerStateHandler;
-        }
-        else if ( state == CONFIGURE_DOMAIN )
-        {
-            handler = domainStateHandler;
         }
         else if ( state == DELETE_PEER )
         {

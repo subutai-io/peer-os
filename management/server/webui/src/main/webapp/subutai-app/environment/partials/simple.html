@@ -16,15 +16,6 @@
           <input type="text" class="b-search-input" ng-model="searchTemplate" ng-init="searchTemplate=''" id="js-search"
                  placeholder="Search...">
         </div>
-        <!--<div class="b-tools-menu__inpit">-->
-          <!--<select class="b-search-input" ng-model="environmentSimpleViewCtrl.templatesType"-->
-                  <!--ng-change="environmentSimpleViewCtrl.getFilteredTemplates()">-->
-            <!--<option ng-repeat="(templatesType, templateList) in environmentSimpleViewCtrl.templates"-->
-                    <!--value="{{ templatesType }}">-->
-              <!--{{ templatesType }} ({{ templateList.length }})-->
-            <!--</option>-->
-          <!--</select>-->
-        <!--</div>-->
         <ul>
           <li ng-repeat="template in environmentSimpleViewCtrl.templatesList | filter:{'name' : searchTemplate} | orderBy: 'name' track by $index">
 						<span class="b-tools-menu__item"
@@ -32,7 +23,7 @@
                   title="Version: {{ template.version }} Size: {{ environmentViewCtrl.humanFileSize(template.size, true) }} Parent: {{ template.parent }} Owner: {{template.owner}}">
 							<span class="b-cloud-item">
 								<img
-                    ng-src="assets/templates/{{ template.name }}.jpg"
+                    ng-src="{{ template.icon ? template.icon : 'assets/templates/no-image.jpg' }}"
                     alt="{{ template.name }}"
                     on-error-src="assets/templates/no-image.jpg">
 							</span>
@@ -51,17 +42,6 @@
             class="b-cloud-space-work"
             id="js-environment-creation"
             ng-init="environmentSimpleViewCtrl.initJointJs()">
-
-          <!--<div class="b-environments-plugin js-no-close">-->
-						<!--<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup"-->
-                  <!--tooltips-->
-                  <!--tooltip-side="right"-->
-                  <!--tooltip-template='CDN token'>-->
-						<!--</span>-->
-            <!--<div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">-->
-              <!--<div class="header">{{ environmentSimpleViewCtrl.getCdnToken() }}</div>-->
-            <!--</div>-->
-          <!--</div>-->
 
           <div class="b-template-settings js-dropen-menu js-no-close">
             <div class="header"></div>
@@ -169,7 +149,6 @@
             <th></th>
             <th>Name</th>
             <th>SSH Key</th>
-            <th>Domains</th>
             <th>Containers</th>
             <th>Actions</th>
           </tr>
@@ -195,10 +174,7 @@
               </a>
             </td>
             <td><a href ng-click="environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/
-              <a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a></td>
-            <td>
-              <button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(environment.id)">Configure
-              </button>
+              <a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a>
             </td>
             <td>
 								<span class="g-circle-label g-circle-label_blue g-margin-left-quarter"

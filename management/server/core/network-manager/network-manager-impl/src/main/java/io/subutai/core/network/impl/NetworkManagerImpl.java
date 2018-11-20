@@ -13,15 +13,14 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.dto.domain.PortMapDto;
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
@@ -35,8 +34,6 @@ import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.bazaar.share.dto.domain.PortMapDto;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 
 
 /**
@@ -274,106 +271,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public String getVlanDomain( final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-
-        try
-        {
-            CommandResult result = getManagementHost().execute( commands.getGetVlanDomainCommand( vLanId ) );
-            if ( result.hasSucceeded() && !result.getStdOut().toLowerCase().contains( "no domain" ) )
-            {
-                return result.getStdOut();
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-
-        return null;
-    }
-
-
-    @Override
-    public void removeVlanDomain( final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-
-        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( String.valueOf( vLanId ) ) );
-    }
-
-
-    @Override
-    public void setVlanDomain( final int vLanId, final String domain,
-                               final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, final String sslCertPath )
-            throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
-        Preconditions.checkNotNull( proxyLoadBalanceStrategy, "Invalid strategy" );
-
-        execute( getManagementHost(),
-                commands.getSetVlanDomainCommand( String.valueOf( vLanId ), domain, proxyLoadBalanceStrategy,
-                        sslCertPath ) );
-    }
-
-
-    @Override
-    public boolean isIpInVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
-
-        try
-        {
-            CommandResult result =
-                    getManagementHost().execute( commands.getCheckIpInVlanDomainCommand( hostIp, vLanId ) );
-            if ( result.hasSucceeded() && result.getStdOut().toLowerCase().contains( "is in domain" ) )
-            {
-                return true;
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-
-        return false;
-    }
-
-
-    @Override
-    public void addIpToVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
-
-        execute( getManagementHost(), commands.getAddIpToVlanDomainCommand( hostIp, String.valueOf( vLanId ) ) );
-    }
-
-
-    @Override
-    public void removeIpFromVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
-        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX_WITH_PORT ), "Invalid host IP" );
-
-        execute( getManagementHost(), commands.getRemoveIpFromVlanDomainCommand( hostIp, vLanId ) );
-    }
-
-
-    @Override
     public SshTunnel setupContainerSshTunnel( final String containerIp, final int sshIdleTimeout )
             throws NetworkManagerException
     {
@@ -442,32 +339,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void addCustomProxy( final CustomProxyConfig proxyConfig, ContainerHost containerHost )
-            throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( proxyConfig );
-        Preconditions.checkNotNull( containerHost );
-
-        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( proxyConfig.getVlan() ) );
-        execute( getManagementHost(), commands.getSetVlanDomainCommand( proxyConfig.getVlan(), proxyConfig.getDomain(),
-                ProxyLoadBalanceStrategy.NONE,
-                String.format( " %s:/etc/nginx/ssl.pem", containerHost.getContainerName() ) ) );
-        execute( getManagementHost(), commands.getAddIpToVlanDomainCommand(
-                containerHost.getIp() + ( proxyConfig.getPort() == -1 ? "" : ":" + proxyConfig.getPort() ),
-                proxyConfig.getVlan() ) );
-    }
-
-
-    @Override
-    public void removeCustomProxy( final String vlan ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( vlan ) );
-
-        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( vlan ) );
-    }
-
-
-    @Override
     public ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
@@ -525,6 +396,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
+    //TODO fix parsing of mappings
     @Override
     public List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException
     {
@@ -587,23 +459,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public int mapContainerPort( final Host host, final Protocol protocol, final String containerIp,
-                                 final int containerPort ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host );
-        Preconditions.checkNotNull( protocol );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
-        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
-
-        CommandResult result = execute( host,
-                commands.getMapContainerPortToRandomPortCommand( protocol, containerIp, containerPort ) );
-
-        return Integer.parseInt( result.getStdOut().trim() );
-    }
-
-
-    @Override
     public void mapContainerPort( final Host host, final Protocol protocol, final String containerIp,
                                   final int containerPort, final int rhPort ) throws NetworkManagerException
     {
@@ -614,8 +469,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
 
-        execute( host,
-                commands.getMapContainerPortToSpecificPortCommand( protocol, containerIp, containerPort, rhPort ) );
+        execute( host, commands.getMapContainerPortCommand( protocol, containerIp, containerPort, rhPort ) );
     }
 
 
@@ -643,8 +497,6 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
         Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
-        //for https protocol there always must be an SSL cert specified
-        Preconditions.checkArgument( protocol == Protocol.HTTP || !Strings.isNullOrEmpty( sslCertPath ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );

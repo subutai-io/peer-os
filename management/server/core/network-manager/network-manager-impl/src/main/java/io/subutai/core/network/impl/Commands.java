@@ -7,7 +7,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.settings.Common;
@@ -120,74 +119,14 @@ public class Commands
     }
 
 
-    RequestBuilder getGetVlanDomainCommand( int vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "domain", "check", String.valueOf( vLanId ) );
-    }
-
-
-    RequestBuilder getRemoveVlanDomainCommand( final String vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "domain", "del", vLanId );
-    }
-
-
-    RequestBuilder getSetVlanDomainCommand( final String vLanId, final String domain,
-                                            final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                                            final String sslCertPath )
-    {
-        List<String> args = Lists.newArrayList( "domain", "add", vLanId, domain );
-
-        if ( proxyLoadBalanceStrategy != ProxyLoadBalanceStrategy.NONE )
-        {
-            args.add( "-b" );
-            args.add( proxyLoadBalanceStrategy.getValue() );
-        }
-
-        if ( !Strings.isNullOrEmpty( sslCertPath ) )
-        {
-            args.add( "-f" );
-            args.add( sslCertPath );
-        }
-
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( args.toArray( new String[0] ) );
-    }
-
-
-    RequestBuilder getCheckIpInVlanDomainCommand( final String hostIp, final int vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "check", String.valueOf( vLanId ), hostIp );
-    }
-
-
-    RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final String vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "add", vLanId, hostIp );
-    }
-
-
-    RequestBuilder getRemoveIpFromVlanDomainCommand( final String hostIp, final int vLanId )
-    {
-        return new RequestBuilder( PROXY_BINDING ).withCmdArgs( "host", "del", String.valueOf( vLanId ), hostIp );
-    }
-
-
     RequestBuilder getSetupContainerSshTunnelCommand( final String containerIp, final int sshIdleTimeout )
     {
         return new RequestBuilder( TUNNEL_BINDING ).withCmdArgs( "add", containerIp, String.valueOf( sshIdleTimeout ) );
     }
 
 
-    RequestBuilder getMapContainerPortToRandomPortCommand( final Protocol protocol, final String containerIp,
-                                                           final int containerPort )
-    {
-        return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", "-p", protocol.name().toLowerCase(), "-i",
-                String.format( "%s:%s", containerIp, containerPort ) );
-    }
-
-
-    RequestBuilder getMapContainerPortToSpecificPortCommand( final Protocol protocol, final String containerIp,
-                                                             final int containerPort, final int rhPort )
+    RequestBuilder getMapContainerPortCommand( final Protocol protocol, final String containerIp,
+                                               final int containerPort, final int rhPort )
     {
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ) );
@@ -210,10 +149,13 @@ public class Commands
         List<String> args = Lists.newArrayList( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-n", domain );
 
-        if ( !Strings.isNullOrEmpty( sslCertPath ) )
+        if ( protocol == Protocol.HTTPS )
         {
-            args.add( "-c" );
-            args.add( sslCertPath );
+            if ( !Strings.isNullOrEmpty( sslCertPath ) )
+            {
+                args.add( "-c" );
+                args.add( sslCertPath );
+            }
         }
 
         if ( sslBackend )
@@ -224,7 +166,7 @@ public class Commands
         if ( loadBalancing != null )
         {
             args.add( "-b" );
-            args.add( loadBalancing.name().toLowerCase() );
+            args.add( loadBalancing.getPolicyName().toLowerCase() );
         }
 
         return new RequestBuilder( MAP_BINDING ).withCmdArgs( args.toArray( new String[0] ) );

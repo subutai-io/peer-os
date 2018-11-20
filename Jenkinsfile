@@ -12,21 +12,18 @@ try {
     switch (env.BRANCH_NAME) {
         case ~/master/: cdnHost = "masterbazaar.subutai.io"; break;
         case ~/dev/: cdnHost = "devbazaar.subutai.io"; break;
-        case ~/sysnet/: cdnHost = "devbazaar.subutai.io"; break;
         default: cdnHost = "bazaar.subutai.io"
     }
 
     switch (env.BRANCH_NAME) {
         case ~/master/: jumpServer = "mastertun.subutai.io"; break;
         case ~/dev/: jumpServer = "devtun.subutai.io"; break;
-        case ~/sysnet/: jumpServer = "devtun.subutai.io"; break;
         default: jumpServer = "tun.subutai.io"
     }
 
     switch (env.BRANCH_NAME) {
         case ~/master/: aptRepo = "master"; break;
         case ~/dev/: aptRepo = "dev"; break;
-        case ~/sysnet/: aptRepo = "dev"; break;
         default: aptRepo = "prod"
     }
 
@@ -48,7 +45,7 @@ try {
         git checkout ${env.BRANCH_NAME}
 		sed 's/export BAZAAR_IP=.*/export BAZAAR_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
-			${mvnHome}/bin/mvn clean install -P deb -Dgit.branch=${env.BRANCH_NAME}
+			${mvnHome}/bin/mvn clean install -X -Dmaven.test.skip=false -P deb -Dgit.branch=${env.BRANCH_NAME}
 		else 
 			${mvnHome}/bin/mvn clean install -Dmaven.test.skip=true -P deb -Dgit.branch=${env.BRANCH_NAME}
 		fi		
@@ -114,7 +111,7 @@ try {
             """
             //remove existing template metadata
             String OLD_ID = sh(script: """
-            var=\$(curl -s https://${cdnHost}/rest/v1/cdn/template?name=management) ; if [[ \$var != "Template not found" ]]; then echo \$var | grep -Po '"id"\\s*:\\s*"\\K([a-zA-Z0-9]+)' ; else echo \$var; fi
+            var=\$(curl -s https://${cdnHost}/rest/v1/cdn/template?name=management) ; if [[ \$var != "Template not found" ]]; then echo \$var | jq -r \'.id\' ; else echo \$var; fi
             """, returnStdout: true)
             OLD_ID = OLD_ID.trim()
 

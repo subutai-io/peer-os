@@ -4,17 +4,14 @@ package io.subutai.core.network.api;
 import java.util.List;
 import java.util.Set;
 
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.network.SshTunnel;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
-import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 
 
 public interface NetworkManager
@@ -71,60 +68,6 @@ public interface NetworkManager
 
 
     /**
-     * Returns reverse proxy domain assigned to vlan
-     *
-     * @param vLanId - vlan id
-     *
-     * @return - domain or null if not assigned
-     */
-    String getVlanDomain( int vLanId ) throws NetworkManagerException;
-
-
-    /**
-     * Removes reverse proxy domain assigned to vlan if any
-     *
-     * @param vLanId - vlan id
-     */
-    void removeVlanDomain( int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Assigns reverse proxy domain to vlan
-     *
-     * @param vLanId - vlan id
-     * @param proxyLoadBalanceStrategy - strategy to load balance requests to the domain
-     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
-     */
-    void setVlanDomain( int vLanId, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                        String sslCertPath ) throws NetworkManagerException;
-
-
-    /**
-     * Checks if IP is in vlan reverse proxy domain
-     *
-     * @param hostIp - ip to check
-     * @param vLanId - vlan id
-     *
-     * @return - true if ip is in vlan domain, false otherwise
-     */
-    boolean isIpInVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Adds ip to vlan reverse proxy domain
-     *
-     * @param hostIp - ip to add
-     * @param vLanId - vlan id
-     */
-    void addIpToVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Removes ip from reverse proxy domain
-     *
-     * @param hostIp - ip to remove
-     * @param vLanId - vlan id
-     */
-    void removeIpFromVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
-
-    /**
      * Sets up SSH connectivity for container identified by @param containerIp
      *
      * @param containerIp - ip fo container
@@ -133,10 +76,6 @@ public interface NetworkManager
      * @return - port to which clients should connect to access the container via ssh
      */
     SshTunnel setupContainerSshTunnel( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
-
-    void addCustomProxy( CustomProxyConfig proxyConfig, ContainerHost containerHost ) throws NetworkManagerException;
-
-    void removeCustomProxy( String vlan ) throws NetworkManagerException;
 
     ReservedPorts getReservedPorts( final Host host ) throws NetworkManagerException;
 
@@ -159,19 +98,6 @@ public interface NetworkManager
                                    final String ipAddress, final int internalPort, final String domain )
             throws NetworkManagerException;
 
-
-    /**
-     * Maps specified container port to random RH port
-     *
-     * @param host RH host
-     * @param protocol protocol
-     * @param containerIp ip of container
-     * @param containerPort container port
-     *
-     * @return mapped random RH port
-     */
-    int mapContainerPort( Host host, Protocol protocol, String containerIp, int containerPort )
-            throws NetworkManagerException;
 
     /**
      * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)

@@ -20,14 +20,6 @@
           <input type="text" class="b-search-input" ng-model="searchTemplate" ng-init="searchTemplate=''"
                  id="js-search">
         </div>
-        <!--<div class="b-tools-menu__inpit">-->
-          <!--<select class="b-search-input" ng-model="advEnvCtrl.templatesType"-->
-                  <!--ng-change="advEnvCtrl.getFilteredTemplates()">-->
-            <!--<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">-->
-              <!--{{ templatesType }} ({{ templateList.length }})-->
-            <!--</option>-->
-          <!--</select>-->
-        <!--</div>-->
         <ul>
           <li ng-repeat="template in advEnvCtrl.templatesList | filter:{'name' : searchTemplate} | orderBy: 'name' track by $index"
               data-template="{{ template.name }}"
@@ -35,7 +27,7 @@
 					<span class="b-tools-menu__item">
 						<span class="b-cloud-item">
 							<img
-                  ng-src="assets/templates/{{ template.name }}.jpg"
+                  ng-src="{{ template.icon ? template.icon : 'assets/templates/no-image.jpg' }}"
                   alt="{{ template.name }}"
                   on-error-src="assets/templates/no-image.jpg">
 						</span>
@@ -264,7 +256,6 @@
             <th></th>
             <th>Name</th>
             <th>SSH Key</th>
-            <th>Domains</th>
             <th>Containers</th>
             <th>Actions</th>
           </tr>
@@ -288,10 +279,7 @@
               </a>
             </td>
             <td><a href ng-click="environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/
-              <a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a></td>
-            <td>
-              <button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(environment.id)">Configure
-              </button>
+              <a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a>
             </td>
             <td ng-init="environmentViewCtrl.containersTags(environment)">
 							<span class="g-circle-label g-circle-label_blue g-margin-left-quarter"

@@ -4,6 +4,8 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.environment.RhTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostState;
@@ -17,8 +19,6 @@ import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 /**
@@ -139,8 +139,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void removeContainerHost( ContainerHost containerHost );
 
-    void exportTemplate( String containerName, String templateName, String version,
-                                     boolean isPrivateTemplate, String token ) throws ResourceHostException;
+    void exportTemplate( String containerName, String templateName, String version, boolean isPrivateTemplate,
+                         String token ) throws ResourceHostException;
 
     Set<String> listExistingContainerNames() throws ResourceHostException;
 
@@ -150,15 +150,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     ReservedPorts getReservedPorts() throws ResourceHostException;
 
     ReservedPorts getContainerPortMappings( final Protocol protocol ) throws ResourceHostException;
-
-    /**
-     * Maps specified container port to random RH port
-     *
-     * @param protocol protocol
-     * @param containerIp ip of container
-     * @param containerPort container port
-     */
-    int mapContainerPort( Protocol protocol, String containerIp, int containerPort ) throws ResourceHostException;
 
     /**
      * Maps specified container port to specified RH port (RH port acts as a clustered group for multiple containers)
@@ -195,8 +186,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param sslBackend determines if backend is working over SSL or not
      */
     void mapContainerPortToDomain( Protocol protocol, String containerIp, int containerPort, int rhPort, String domain,
-                                   String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend )
-            throws ResourceHostException;
+                                   String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend ) throws ResourceHostException;
 
     /**
      * Removes specified container port domain mapping

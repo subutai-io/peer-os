@@ -1,6 +1,11 @@
 package io.subutai.bazaar.share.dto;
 
 
+/**
+ * Only for backward compatibility. All versions info sends by PeerInfoDto.
+ */
+
+@Deprecated
 public class VersionInfoDto
 {
     private String peerId;
