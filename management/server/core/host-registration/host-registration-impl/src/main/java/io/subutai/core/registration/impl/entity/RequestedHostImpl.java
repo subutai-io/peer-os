@@ -230,6 +230,12 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
     }
 
 
+    public void setHostInfos( final Set<ContainerInfo> hostInfos )
+    {
+        this.hostInfos = hostInfos;
+    }
+
+
     @Override
     public InstanceType getInstanceType()
     {
