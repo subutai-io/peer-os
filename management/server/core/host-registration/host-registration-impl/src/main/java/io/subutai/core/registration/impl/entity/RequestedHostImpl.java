@@ -232,7 +232,13 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
 
     public void setHostInfos( final Set<ContainerInfo> hostInfos )
     {
-        this.hostInfos = hostInfos;
+        this.hostInfos.clear();
+        for ( final ContainerInfo containerInfo : hostInfos )
+        {
+            ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( containerInfo );
+            containerInfoImpl.setRequestedHost( this );
+            this.hostInfos.add( containerInfoImpl );
+        }
     }
 
 
