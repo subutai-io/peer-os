@@ -49,8 +49,9 @@ public class ListContainerPortMappingsCommand extends SubutaiShellCommandSupport
 
             for ( ReservedPort reservedPort : reservedPorts.getReservedPorts() )
             {
-                System.out.format( "%s %s %s%n", reservedPort.getProtocol(), reservedPort.getPort(),
-                        reservedPort.getContainerIpPort() );
+                System.out.format( "%s %s %s %s%n", reservedPort.getProtocol(), reservedPort.getPort(),
+                        reservedPort.getContainerIpPort(),
+                        reservedPort.getDomain() == null ? "" : reservedPort.getDomain() );
             }
         }
         catch ( Exception e )
