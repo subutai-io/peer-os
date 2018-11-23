@@ -2,7 +2,6 @@ package io.subutai.core.network.impl;
 
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -10,11 +9,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import io.subutai.bazaar.share.dto.domain.PortMapDto;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
@@ -386,8 +382,10 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() >= 3 )
             {
+                String[] containerIpPort = m.group( 3 ).split( ":" );
                 reservedPorts.addReservedPort( new ReservedPort( Protocol.valueOf( m.group( 1 ).toUpperCase() ),
-                        Integer.parseInt( m.group( 2 ) ), m.group( 3 ), m.groupCount() > 3 ? m.group( 4 ) : null ) );
+                        Integer.parseInt( m.group( 2 ) ), containerIpPort[0], Integer.parseInt( containerIpPort[1] ),
+                        m.groupCount() > 3 ? m.group( 4 ) : null ) );
             }
         }
 
@@ -397,49 +395,16 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException
-    {
-        List<ReservedPortMapping> mappedPorts = Lists.newArrayList();
-
-        Preconditions.checkNotNull( host );
-
-        ReservedPorts reservedPorts = getContainerPortMappings( host, null );
-        for ( ReservedPort reservedPort : reservedPorts.getReservedPorts() )
-        {
-            try
-            {
-                ReservedPortMapping mapping = new ReservedPortMapping();
-
-                mapping.setProtocol( PortMapDto.Protocol.valueOf( reservedPort.getProtocol().name() ) );
-                mapping.setExternalPort( reservedPort.getPort() );
-                String[] containerIpPort = reservedPort.getContainerIpPort().split( ":" );
-                mapping.setIpAddress( containerIpPort[0] );
-                mapping.setInternalPort( Integer.parseInt( containerIpPort[1] ) );
-                mapping.setDomain( reservedPort.getDomain() );
-
-                mappedPorts.add( mapping );
-            }
-            catch ( NumberFormatException e )
-            {
-                //ignore
-            }
-        }
-
-        return mappedPorts;
-    }
-
-
-    @Override
     public boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
                                           final String ipAddress, final int internalPort, final String domain )
             throws NetworkManagerException
     {
-        for ( final ReservedPortMapping mapping : getReservedPortMappings( host ) )
+        for ( final ReservedPort mapping : getContainerPortMappings( host, null ).getReservedPorts() )
         {
-            if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() )
-                    && mapping.getExternalPort() == externalPort && mapping.getInternalPort() == internalPort && mapping
-                    .getIpAddress().equalsIgnoreCase( ipAddress ) && ( domain == null || domain
-                    .equals( mapping.getDomain() ) ) )
+            if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() ) && mapping.getPort() == externalPort
+                    && mapping.getContainerPort() == internalPort && mapping.getContainerIp()
+                                                                            .equalsIgnoreCase( ipAddress ) && (
+                    domain == null || domain.equals( mapping.getDomain() ) ) )
             {
                 return true;
             }
