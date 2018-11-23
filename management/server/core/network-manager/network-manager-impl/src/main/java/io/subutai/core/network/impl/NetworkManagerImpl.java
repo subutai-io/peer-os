@@ -376,7 +376,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile( "\\s*(\\w+)\\s+(\\d+)\\s+(\\S+)\\s*" );
+        Pattern p = Pattern.compile( "\\s*(\\w+)\\s+(\\d+)\\s+(\\S+)\\s+(\\S+)?" );
 
         ReservedPorts reservedPorts = new ReservedPorts();
 
@@ -384,10 +384,10 @@ public class NetworkManagerImpl implements NetworkManager
         {
             Matcher m = p.matcher( st.nextToken() );
 
-            if ( m.find() && m.groupCount() == 3 )
+            if ( m.find() && m.groupCount() >= 3 )
             {
                 reservedPorts.addReservedPort( new ReservedPort( Protocol.valueOf( m.group( 1 ).toUpperCase() ),
-                        Integer.parseInt( m.group( 2 ) ), m.group( 3 ) ) );
+                        Integer.parseInt( m.group( 2 ) ), m.group( 3 ), m.groupCount() > 3 ? m.group( 4 ) : null ) );
             }
         }
 
@@ -396,7 +396,6 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    //TODO fix parsing of mappings
     @Override
     public List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException
     {
@@ -404,33 +403,25 @@ public class NetworkManagerImpl implements NetworkManager
 
         Preconditions.checkNotNull( host );
 
-        CommandResult result = execute( host, commands.getListPortMappingsCommand( null ) );
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        while ( st.hasMoreTokens() )
+        ReservedPorts reservedPorts = getContainerPortMappings( host, null );
+        for ( ReservedPort reservedPort : reservedPorts.getReservedPorts() )
         {
-            StringTokenizer parts = new StringTokenizer( st.nextToken(), "\t:" );
-
-            if ( parts.countTokens() >= 4 )
+            try
             {
-                try
-                {
-                    ReservedPortMapping mapping = new ReservedPortMapping();
+                ReservedPortMapping mapping = new ReservedPortMapping();
 
-                    mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
-                    parts.nextToken();// 0.0.0.0 we need skip output
-                    mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
-                    mapping.setIpAddress( parts.nextToken() );
-                    mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
-                    mapping.setDomain( parts.hasMoreTokens() ? parts.nextToken() : null );
+                mapping.setProtocol( PortMapDto.Protocol.valueOf( reservedPort.getProtocol().name() ) );
+                mapping.setExternalPort( reservedPort.getPort() );
+                String[] containerIpPort = reservedPort.getContainerIpPort().split( ":" );
+                mapping.setIpAddress( containerIpPort[0] );
+                mapping.setInternalPort( Integer.parseInt( containerIpPort[1] ) );
+                mapping.setDomain( reservedPort.getDomain() );
 
-                    mappedPorts.add( mapping );
-                }
-                catch ( NumberFormatException e )
-                {
-                    continue;
-                }
+                mappedPorts.add( mapping );
+            }
+            catch ( NumberFormatException e )
+            {
+                //ignore
             }
         }
 
