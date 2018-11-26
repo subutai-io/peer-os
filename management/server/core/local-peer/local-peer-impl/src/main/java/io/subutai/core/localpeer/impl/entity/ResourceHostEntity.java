@@ -1508,14 +1508,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            // check existence of the port mapping
-            if ( getNetworkManager()
-                    .isPortMappingReserved( this, protocol, rhPort, containerIp, containerPort, domain ) )
-            {
-                // remove port mapping
-                getNetworkManager()
-                        .removeContainerPortDomainMapping( this, protocol, containerIp, containerPort, rhPort, domain );
-            }
+            getNetworkManager()
+                    .removeContainerPortDomainMapping( this, protocol, containerIp, containerPort, rhPort, domain );
         }
         catch ( NetworkManagerException e )
         {

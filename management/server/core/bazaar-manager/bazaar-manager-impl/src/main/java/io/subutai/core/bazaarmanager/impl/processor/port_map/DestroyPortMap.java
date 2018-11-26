@@ -37,6 +37,13 @@ public class DestroyPortMap
 
             Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
 
+            if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
+                    portMapDto.getInternalPort(), portMapDto.getDomain() ) )
+            {
+                // skip not existing port mapping
+                portMapDto.setState( PortMapDto.State.DESTROYING );
+                return;
+            }
 
             if ( protocol == Protocol.HTTP || protocol == Protocol.HTTPS )
             {

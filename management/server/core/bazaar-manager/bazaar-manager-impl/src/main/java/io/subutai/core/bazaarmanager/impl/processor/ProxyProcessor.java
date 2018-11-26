@@ -161,6 +161,15 @@ public class ProxyProcessor implements StateLinkProcessor
             {
                 protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
 
+                if ( !resourceHost
+                        .isPortMappingReserved( protocol, portMapDto.getExternalPort(), portMapDto.getIpAddr(),
+                                portMapDto.getInternalPort(), portMapDto.getDomain() ) )
+                {
+                    // skip not existing port mapping
+                    portMapDto.setState( PortMapDto.State.DELETED );
+                    continue;
+                }
+
                 if ( portMapDto.getProtocol().isHttpOrHttps() )
                 {
                     resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getIpAddr(),
