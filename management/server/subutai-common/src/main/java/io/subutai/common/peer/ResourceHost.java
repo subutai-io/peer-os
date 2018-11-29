@@ -1,10 +1,8 @@
 package io.subutai.common.peer;
 
 
-import java.util.List;
 import java.util.Set;
 
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.environment.RhTemplatesUploadProgress;
@@ -15,6 +13,7 @@ import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Protocol;
+import io.subutai.common.protocol.ReservedPort;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
@@ -204,7 +203,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     boolean isPortMappingReserved( final Protocol protocol, final int externalPort, final String ipAddress,
                                    final int internalPort, final String domain ) throws ResourceHostException;
 
-    List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException;
+    Set<ReservedPort> getReservedPortMappings() throws ResourceHostException;
 
     String getIp() throws ResourceHostException;
 

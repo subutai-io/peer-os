@@ -4,12 +4,12 @@ package io.subutai.core.bazaarmanager.impl.processor.port_map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.bazaar.share.dto.domain.PortMapDto;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Protocol;
+import io.subutai.common.protocol.ReservedPort;
 import io.subutai.core.bazaarmanager.impl.environment.state.Context;
-import io.subutai.bazaar.share.dto.domain.PortMapDto;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 
 
 public class DestroyPortMap
@@ -37,6 +37,13 @@ public class DestroyPortMap
 
             Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
 
+            if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
+                    portMapDto.getInternalPort(), portMapDto.getDomain() ) )
+            {
+                // skip not existing port mapping
+                portMapDto.setState( PortMapDto.State.DESTROYING );
+                return;
+            }
 
             if ( protocol == Protocol.HTTP || protocol == Protocol.HTTPS )
             {
@@ -55,10 +62,10 @@ public class DestroyPortMap
                 boolean mappingIsInUseOnRH = false;
 
                 // check if port mapping on MH is not used for other container on this RH
-                for ( final ReservedPortMapping mapping : resourceHost.getReservedPortMappings() )
+                for ( final ReservedPort mapping : resourceHost.getReservedPortMappings() )
                 {
-                    if ( mapping.getProtocol() == portMapDto.getProtocol() && mapping.getExternalPort() == portMapDto
-                            .getExternalPort() )
+                    if ( mapping.getProtocol().name().equals( portMapDto.getProtocol().name() )
+                            && mapping.getPort() == portMapDto.getExternalPort() )
                     {
                         mappingIsInUseOnRH = true;
                         break;

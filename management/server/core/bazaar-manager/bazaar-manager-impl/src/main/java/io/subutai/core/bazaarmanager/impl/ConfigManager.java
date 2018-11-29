@@ -2,6 +2,7 @@ package io.subutai.core.bazaarmanager.impl;
 
 
 import java.security.KeyStore;
+import java.util.Set;
 
 
 import org.bouncycastle.openpgp.PGPPrivateKey;
@@ -9,6 +10,11 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
+import com.google.common.collect.Sets;
+
+import io.subutai.bazaar.share.dto.RhVersionInfoDto;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.TokenType;
@@ -115,7 +121,7 @@ public class ConfigManager
     }
 
 
-    public String getbazaarIp()
+    public String getBazaarIp()
     {
         return Common.BAZAAR_IP;
     }
@@ -131,5 +137,25 @@ public class ConfigManager
     User getActiveUser()
     {
         return identityManager.getActiveUser();
+    }
+
+
+    Set<RhVersionInfoDto> getRhsVersionInfoDtos() throws ResourceHostException
+    {
+        Set<RhVersionInfoDto> result = Sets.newHashSet();
+
+        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
+        {
+            RhVersionInfoDto rhVersionDto = new RhVersionInfoDto();
+
+            rhVersionDto.setRhVersion( rh.getRhVersion() );
+            rhVersionDto.setP2pVersion( rh.getP2pVersion() );
+            rhVersionDto.setManagement( rh.isManagementHost() );
+            rhVersionDto.setRhId( rh.getId() );
+
+            result.add( rhVersionDto );
+        }
+
+        return result;
     }
 }

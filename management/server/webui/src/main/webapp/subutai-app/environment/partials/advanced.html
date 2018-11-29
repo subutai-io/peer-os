@@ -27,7 +27,7 @@
 					<span class="b-tools-menu__item">
 						<span class="b-cloud-item">
 							<img
-                  ng-src="assets/templates/{{ template.name }}.jpg"
+                  ng-src="{{ template.icon ? template.icon : 'assets/templates/no-image.jpg' }}"
                   alt="{{ template.name }}"
                   on-error-src="assets/templates/no-image.jpg">
 						</span>

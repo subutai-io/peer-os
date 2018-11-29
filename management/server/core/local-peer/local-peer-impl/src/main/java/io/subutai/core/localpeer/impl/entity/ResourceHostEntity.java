@@ -2,7 +2,6 @@ package io.subutai.core.localpeer.impl.entity;
 
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -37,7 +36,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.bazaar.share.quota.ContainerSize;
 import io.subutai.common.command.CommandCallback;
@@ -68,6 +66,7 @@ import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Protocol;
+import io.subutai.common.protocol.ReservedPort;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
@@ -1538,11 +1537,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public List<ReservedPortMapping> getReservedPortMappings() throws ResourceHostException
+    public Set<ReservedPort> getReservedPortMappings() throws ResourceHostException
     {
         try
         {
-            return getNetworkManager().getReservedPortMappings( this );
+            return getNetworkManager().getReservedPorts( this ).getReservedPorts();
         }
         catch ( NetworkManagerException e )
         {
