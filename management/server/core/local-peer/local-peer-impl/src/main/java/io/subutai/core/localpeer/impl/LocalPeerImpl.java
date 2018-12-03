@@ -912,7 +912,25 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( ContainerHostInfo containerHostInfo : hostRegistry.getContainerHostsInfo() )
         {
-            ResourceHost resourceHost = getResourceHostByContainerId( containerHostInfo.getId() );
+            ResourceHost resourceHost;
+            try
+            {
+                resourceHost = getResourceHostByContainerId( containerHostInfo.getId() );
+            }
+            catch ( HostNotFoundException e )
+            {
+                //try to obtain resource host via host registry to handle the case this is a manually created container
+                try
+                {
+                    ResourceHostInfo resourceHostInfo =
+                            hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+                    resourceHost = getResourceHostById( resourceHostInfo.getId() );
+                }
+                catch ( HostDisconnectedException ignore )
+                {
+                    throw e;
+                }
+            }
 
             //skip RHs that are not involved
             if ( !requestedRhIds.contains( resourceHost.getId() ) )
