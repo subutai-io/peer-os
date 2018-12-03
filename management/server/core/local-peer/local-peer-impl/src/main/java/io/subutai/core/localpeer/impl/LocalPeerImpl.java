@@ -912,18 +912,24 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( ContainerHostInfo containerHostInfo : hostRegistry.getContainerHostsInfo() )
         {
-            try
+            ResourceHost resourceHost = getResourceHostByContainerId( containerHostInfo.getId() );
+
+            //skip RHs that are not involved
+            if ( !requestedRhIds.contains( resourceHost.getId() ) )
             {
-                ResourceHostInfo resourceHostInfo = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
-                //skip RHs that are not involved
-                if ( !requestedRhIds.contains( resourceHostInfo.getId() ) )
-                {
-                    continue;
-                }
+                continue;
             }
-            catch ( HostDisconnectedException e )
+            else
             {
-                throw new PeerException( e );
+                //check if RH is connected
+                try
+                {
+                    hostRegistry.getResourceHostInfoById( resourceHost.getId() );
+                }
+                catch ( HostDisconnectedException e )
+                {
+                    throw new PeerException( e );
+                }
             }
 
             double requestedRam = 0, requestedCpu = 0, requestedDisk = 0;
@@ -1006,18 +1012,6 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             {
                 //skip unregistered containers, b/c their quotas are not considered
             }
-
-            ResourceHostInfo resourceHostInfo;
-            try
-            {
-                resourceHostInfo = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
-            }
-            catch ( HostDisconnectedException e )
-            {
-                throw new PeerException( e );
-            }
-
-            ResourceHost resourceHost = getResourceHostById( resourceHostInfo.getId() );
 
             ResourceHostCapacity resourceHostCapacity = requestedResources.get( resourceHost );
 
