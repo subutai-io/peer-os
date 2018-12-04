@@ -4,6 +4,7 @@ package io.subutai.bazaar.share.quota;
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -19,6 +20,7 @@ import io.subutai.bazaar.share.resource.ContainerResourceType;
  */
 @JsonSerialize( using = ContainerResourceSerializer.class )
 @JsonTypeName( "disk" )
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class ContainerDiskResource extends ContainerResource<ByteValueResource>
 {
     public ContainerDiskResource( final ByteValueResource value )

@@ -2,12 +2,13 @@ package io.subutai.bazaar.share.quota;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
 import io.subutai.bazaar.share.resource.ContainerResourceType;
 
-
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class Quota
 {
     @JsonProperty( "resource" )

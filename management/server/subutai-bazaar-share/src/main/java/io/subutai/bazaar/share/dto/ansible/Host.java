@@ -1,6 +1,10 @@
 package io.subutai.bazaar.share.dto.ansible;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class Host
 {
     private String hostname;

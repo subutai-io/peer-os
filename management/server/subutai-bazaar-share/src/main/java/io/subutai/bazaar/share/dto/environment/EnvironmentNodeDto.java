@@ -4,9 +4,11 @@ package io.subutai.bazaar.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import io.subutai.bazaar.share.quota.ContainerQuota;
 
-
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class EnvironmentNodeDto
 {
     private String hostId;

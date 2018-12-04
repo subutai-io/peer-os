@@ -3,7 +3,10 @@ package io.subutai.bazaar.share.dto.domain;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class DomainDto
 {
     public enum DomainState
