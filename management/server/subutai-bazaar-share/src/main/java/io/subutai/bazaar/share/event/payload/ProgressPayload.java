@@ -3,9 +3,10 @@ package io.subutai.bazaar.share.event.payload;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class ProgressPayload extends Payload
 {
     @JsonProperty( value = "step", required = true )

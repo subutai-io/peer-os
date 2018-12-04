@@ -2,6 +2,7 @@ package io.subutai.bazaar.share.quota;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -16,6 +17,7 @@ import io.subutai.bazaar.share.resource.NumericValueResource;
  */
 @JsonSerialize( using = ContainerResourceSerializer.class )
 @JsonTypeName( "net" )
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class ContainerNetResource extends ContainerResource<NumericValueResource>
 {
 

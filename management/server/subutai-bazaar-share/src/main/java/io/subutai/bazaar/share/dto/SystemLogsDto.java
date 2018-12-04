@@ -4,7 +4,10 @@ package io.subutai.bazaar.share.dto;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class SystemLogsDto
 {
     private Set<SubutaiSystemLog> subutaiSystemLogs;

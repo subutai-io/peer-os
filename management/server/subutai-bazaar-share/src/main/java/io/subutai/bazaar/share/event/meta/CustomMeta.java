@@ -1,6 +1,10 @@
 package io.subutai.bazaar.share.event.meta;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class CustomMeta implements Meta
 {
     private String key;

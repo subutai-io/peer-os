@@ -1,6 +1,10 @@
 package io.subutai.bazaar.share.dto.environment.container;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class ContainerDesktopInfoDto
 {
     private String id;

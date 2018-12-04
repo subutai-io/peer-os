@@ -4,12 +4,14 @@ package io.subutai.bazaar.share.resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
  * Peer resources class
  */
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class PeerResources
 {
     @JsonProperty( "peerId" )
