@@ -4,13 +4,14 @@ package io.subutai.bazaar.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.subutai.bazaar.share.dto.PublicKeyContainer;
 import io.subutai.bazaar.share.dto.UserTokenDto;
 import io.subutai.bazaar.share.dto.ansible.AnsibleDto;
 
-
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class EnvironmentPeerDto
 {
     public enum PeerState

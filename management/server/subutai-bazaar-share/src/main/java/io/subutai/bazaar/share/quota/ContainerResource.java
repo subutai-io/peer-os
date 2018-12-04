@@ -1,6 +1,7 @@
 package io.subutai.bazaar.share.quota;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -17,7 +18,7 @@ import io.subutai.bazaar.share.resource.ResourceValue;
         @JsonSubTypes.Type( value = ContainerCpuSetResource.class, name = "cpuset" ),
 } )
 
-
+@JsonIgnoreProperties( ignoreUnknown = true )
 public abstract class ContainerResource<T extends ResourceValue>
 {
     private ContainerResourceType containerResourceType;

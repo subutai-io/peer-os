@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.subutai.bazaar.share.parser.CommonResourceValueParser;
 import io.subutai.bazaar.share.resource.ByteUnit;
@@ -25,6 +26,7 @@ import io.subutai.bazaar.share.resource.ResourceValueParser;
 /**
  * Container size enumeration
  */
+@JsonIgnoreProperties( ignoreUnknown = true )
 public enum ContainerSize
 {
 

@@ -3,7 +3,10 @@ package io.subutai.bazaar.share.dto;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class PeerInfoDto
 {
     private String id;

@@ -4,12 +4,14 @@ package io.subutai.bazaar.share.resource;
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
  * Numeric value resource
  */
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class NumericValueResource implements ResourceValue<BigDecimal>
 {
     @JsonProperty( "value" )

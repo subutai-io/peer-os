@@ -1,12 +1,14 @@
 package io.subutai.bazaar.share.resource;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
  * String value resource
  */
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class StringValueResource implements ResourceValue<String>
 {
     @JsonProperty( "value" )

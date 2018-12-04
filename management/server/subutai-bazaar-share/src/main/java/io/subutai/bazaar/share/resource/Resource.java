@@ -2,12 +2,14 @@ package io.subutai.bazaar.share.resource;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
  * Resource of resource host
  */
+@JsonIgnoreProperties( ignoreUnknown = true )
 public abstract class Resource<T extends ResourceValue>
 {
     @JsonProperty( "resourceType" )

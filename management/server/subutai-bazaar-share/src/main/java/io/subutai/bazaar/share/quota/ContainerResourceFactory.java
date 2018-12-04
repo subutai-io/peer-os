@@ -1,6 +1,8 @@
 package io.subutai.bazaar.share.quota;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import io.subutai.bazaar.share.resource.ByteValueResource;
 import io.subutai.bazaar.share.resource.ContainerResourceType;
 import io.subutai.bazaar.share.resource.NumericValueResource;
@@ -11,6 +13,7 @@ import io.subutai.bazaar.share.resource.StringValueResource;
 /**
  * Factory method for container resource classes
  */
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class ContainerResourceFactory
 {
     private ContainerResourceFactory()

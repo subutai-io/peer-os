@@ -2,11 +2,13 @@ package io.subutai.bazaar.share.event.meta;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
         setterVisibility = JsonAutoDetect.Visibility.NONE )
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class SourceMeta implements Meta
 {
     public enum Type
