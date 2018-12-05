@@ -3,7 +3,10 @@ package io.subutai.bazaar.share.dto;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class TunnelInfoDto implements Serializable
 {
 

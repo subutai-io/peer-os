@@ -2,7 +2,6 @@ package io.subutai.core.network.impl;
 
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -10,11 +9,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import io.subutai.bazaar.share.dto.domain.PortMapDto;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
@@ -376,7 +372,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile( "\\s*(\\w+)\\s+(\\d+)\\s+(\\S+)\\s*" );
+        Pattern p = Pattern.compile( "\\s*(\\w+)\\s+(\\d+)\\s+(\\S+)\\s+(\\S+)?" );
 
         ReservedPorts reservedPorts = new ReservedPorts();
 
@@ -384,10 +380,12 @@ public class NetworkManagerImpl implements NetworkManager
         {
             Matcher m = p.matcher( st.nextToken() );
 
-            if ( m.find() && m.groupCount() == 3 )
+            if ( m.find() && m.groupCount() >= 3 )
             {
+                String[] containerIpPort = m.group( 3 ).split( ":" );
                 reservedPorts.addReservedPort( new ReservedPort( Protocol.valueOf( m.group( 1 ).toUpperCase() ),
-                        Integer.parseInt( m.group( 2 ) ), m.group( 3 ) ) );
+                        Integer.parseInt( m.group( 2 ) ), containerIpPort[0], Integer.parseInt( containerIpPort[1] ),
+                        m.groupCount() > 3 ? m.group( 4 ) : null ) );
             }
         }
 
@@ -396,59 +394,17 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    //TODO fix parsing of mappings
-    @Override
-    public List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException
-    {
-        List<ReservedPortMapping> mappedPorts = Lists.newArrayList();
-
-        Preconditions.checkNotNull( host );
-
-        CommandResult result = execute( host, commands.getListPortMappingsCommand( null ) );
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        while ( st.hasMoreTokens() )
-        {
-            StringTokenizer parts = new StringTokenizer( st.nextToken(), "\t:" );
-
-            if ( parts.countTokens() >= 4 )
-            {
-                try
-                {
-                    ReservedPortMapping mapping = new ReservedPortMapping();
-
-                    mapping.setProtocol( PortMapDto.Protocol.valueOf( parts.nextToken().toUpperCase() ) );
-                    parts.nextToken();// 0.0.0.0 we need skip output
-                    mapping.setExternalPort( Integer.parseInt( parts.nextToken() ) );
-                    mapping.setIpAddress( parts.nextToken() );
-                    mapping.setInternalPort( Integer.parseInt( parts.nextToken() ) );
-                    mapping.setDomain( parts.hasMoreTokens() ? parts.nextToken() : null );
-
-                    mappedPorts.add( mapping );
-                }
-                catch ( NumberFormatException e )
-                {
-                    continue;
-                }
-            }
-        }
-
-        return mappedPorts;
-    }
-
-
     @Override
     public boolean isPortMappingReserved( final Host host, final Protocol protocol, final int externalPort,
                                           final String ipAddress, final int internalPort, final String domain )
             throws NetworkManagerException
     {
-        for ( final ReservedPortMapping mapping : getReservedPortMappings( host ) )
+        for ( final ReservedPort mapping : getContainerPortMappings( host, null ).getReservedPorts() )
         {
-            if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() )
-                    && mapping.getExternalPort() == externalPort && mapping.getInternalPort() == internalPort && mapping
-                    .getIpAddress().equalsIgnoreCase( ipAddress ) && ( domain == null || domain
-                    .equals( mapping.getDomain() ) ) )
+            if ( mapping.getProtocol().name().equalsIgnoreCase( protocol.name() ) && mapping.getPort() == externalPort
+                    && mapping.getContainerPort() == internalPort && mapping.getContainerIp()
+                                                                            .equalsIgnoreCase( ipAddress ) && (
+                    domain == null || domain.equals( mapping.getDomain() ) ) )
             {
                 return true;
             }

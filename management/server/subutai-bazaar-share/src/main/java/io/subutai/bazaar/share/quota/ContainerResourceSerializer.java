@@ -3,12 +3,13 @@ package io.subutai.bazaar.share.quota;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class ContainerResourceSerializer extends StdSerializer<ContainerResource>
 {
 

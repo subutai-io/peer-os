@@ -5,7 +5,9 @@ public class ReservedPort
 {
     private Protocol protocol;
     private int port;
-    private String containerIpPort;
+    private String containerIp;
+    private int containerPort;
+    private String domain;
 
 
     public ReservedPort( final Protocol protocol, final int port )
@@ -15,10 +17,13 @@ public class ReservedPort
     }
 
 
-    public ReservedPort( final Protocol protocol, final int port, final String containerIpPort )
+    public ReservedPort( final Protocol protocol, final int port, final String containerIp, final int containerPort,
+                         final String domain )
     {
         this( protocol, port );
-        this.containerIpPort = containerIpPort;
+        this.containerIp = containerIp;
+        this.containerPort = containerPort;
+        this.domain = domain;
     }
 
 
@@ -34,8 +39,20 @@ public class ReservedPort
     }
 
 
-    public String getContainerIpPort()
+    public String getContainerIp()
     {
-        return containerIpPort;
+        return containerIp;
+    }
+
+
+    public int getContainerPort()
+    {
+        return containerPort;
+    }
+
+
+    public String getDomain()
+    {
+        return domain;
     }
 }

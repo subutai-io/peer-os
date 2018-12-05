@@ -3,7 +3,10 @@ package io.subutai.bazaar.share.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class P2PDto
 {
     private String rhId;

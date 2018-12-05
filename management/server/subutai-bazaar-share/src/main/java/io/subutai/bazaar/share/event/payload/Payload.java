@@ -2,6 +2,7 @@ package io.subutai.bazaar.share.event.payload;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 } )
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
         setterVisibility = JsonAutoDetect.Visibility.NONE )
+@JsonIgnoreProperties( ignoreUnknown = true )
 abstract public class Payload
 {
     public enum Nature

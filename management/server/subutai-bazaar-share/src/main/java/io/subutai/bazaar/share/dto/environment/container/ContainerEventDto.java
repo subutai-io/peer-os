@@ -7,9 +7,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import io.subutai.bazaar.share.dto.environment.ContainerStateDto;
 
-
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class ContainerEventDto
 {
     private String id;

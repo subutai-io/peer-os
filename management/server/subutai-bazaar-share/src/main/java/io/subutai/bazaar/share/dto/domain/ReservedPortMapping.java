@@ -1,6 +1,10 @@
 package io.subutai.bazaar.share.dto.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class ReservedPortMapping
 {
     private PortMapDto.Protocol protocol;

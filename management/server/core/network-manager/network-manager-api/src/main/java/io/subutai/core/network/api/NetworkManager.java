@@ -1,10 +1,8 @@
 package io.subutai.core.network.api;
 
 
-import java.util.List;
 import java.util.Set;
 
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.LoadBalancing;
@@ -81,12 +79,6 @@ public interface NetworkManager
 
     ReservedPorts getContainerPortMappings( final Host host, final Protocol protocol ) throws NetworkManagerException;
 
-    /**
-     * Returns list of ports, mapped using 'subutai map' command. See https://github.com/subutai-io/subos/wiki/Map
-     *
-     * @param host RH host
-     */
-    List<ReservedPortMapping> getReservedPortMappings( final Host host ) throws NetworkManagerException;
 
     /**
      * Check if port is already mapped using 'subutai map' command

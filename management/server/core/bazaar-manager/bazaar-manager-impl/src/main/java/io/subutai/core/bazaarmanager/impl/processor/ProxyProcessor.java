@@ -1,7 +1,6 @@
 package io.subutai.core.bazaarmanager.impl.processor;
 
 
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -13,13 +12,14 @@ import com.google.common.collect.Sets;
 
 import io.subutai.bazaar.share.dto.domain.PortMapDto;
 import io.subutai.bazaar.share.dto.domain.ProxyDto;
-import io.subutai.bazaar.share.dto.domain.ReservedPortMapping;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.Protocol;
+import io.subutai.common.protocol.ReservedPort;
+import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.core.bazaarmanager.api.RestClient;
 import io.subutai.core.bazaarmanager.api.RestResult;
 import io.subutai.core.bazaarmanager.api.StateLinkProcessor;
@@ -161,6 +161,15 @@ public class ProxyProcessor implements StateLinkProcessor
             {
                 protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
 
+                if ( !resourceHost
+                        .isPortMappingReserved( protocol, portMapDto.getExternalPort(), portMapDto.getIpAddr(),
+                                portMapDto.getInternalPort(), portMapDto.getDomain() ) )
+                {
+                    // skip not existing port mapping
+                    portMapDto.setState( PortMapDto.State.DELETED );
+                    continue;
+                }
+
                 if ( portMapDto.getProtocol().isHttpOrHttps() )
                 {
                     resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getIpAddr(),
@@ -182,24 +191,22 @@ public class ProxyProcessor implements StateLinkProcessor
             String proxyP2PIpAddr = proxyDto.getP2pIpAddr();
             proxyP2PIpAddr = proxyP2PIpAddr.substring( 0, 1 + proxyP2PIpAddr.lastIndexOf( '.' ) );
 
-            List<ReservedPortMapping> reservedPortMappings = resourceHost.getReservedPortMappings();
+            ReservedPorts reservedPortMappings = resourceHost.getContainerPortMappings( null );
 
-            for ( final ReservedPortMapping pm : reservedPortMappings )
+            for ( final ReservedPort pm : reservedPortMappings.getReservedPorts() )
             {
-                if ( pm.getIpAddress().startsWith( proxyP2PIpAddr ) )
+                if ( pm.getContainerIp().startsWith( proxyP2PIpAddr ) )
                 {
-                    protocol = Protocol.valueOf( pm.getProtocol().name() );
 
                     if ( pm.getProtocol().isHttpOrHttps() )
                     {
-                        resourceHost
-                                .removeContainerPortDomainMapping( protocol, pm.getIpAddress(), pm.getExternalPort(),
-                                        pm.getExternalPort(), pm.getDomain() );
+                        resourceHost.removeContainerPortDomainMapping( pm.getProtocol(), pm.getContainerIp(),
+                                pm.getContainerPort(), pm.getPort(), pm.getDomain() );
                     }
                     else
                     {
-                        resourceHost.removeContainerPortMapping( protocol, pm.getIpAddress(), pm.getExternalPort(),
-                                pm.getExternalPort() );
+                        resourceHost.removeContainerPortMapping( pm.getProtocol(), pm.getContainerIp(),
+                                pm.getContainerPort(), pm.getPort() );
                     }
                 }
             }
