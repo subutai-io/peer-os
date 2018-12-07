@@ -149,6 +149,7 @@ import io.subutai.common.task.CloneRequest;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
@@ -3824,16 +3825,17 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                 LOG.error( e.getMessage(), e );
             }
 
-            //b) ignore manually created containers
+            //b) skip manually created containers
             for ( Iterator<ContainerHostInfo> iterator = lostContainers.iterator(); iterator.hasNext(); )
             {
                 ContainerHostInfo lostContainer = iterator.next();
 
-                //filter out containers created by system, not by user
                 try
                 {
-                    //system containers should have both vlan and envId
-                    if ( lostContainer.getVlan() == null || lostContainer.getEnvId() == null )
+                    //manually created containers have IP in form 10.*
+                    HostInterfaceModel iface =
+                            lostContainer.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE );
+                    if ( IPUtil.isIpValid( iface ) && iface.getIp().matches( "10.*" ) )
                     {
                         iterator.remove();
                     }
