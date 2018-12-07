@@ -13,14 +13,13 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * Service Locator allows to locate OSGi services by interface and caches them locally
+ * Service Locator allows to locate OSGi services by interface
  */
 public class ServiceLocator
 {
 
-
     /**
-     * Returns service by Interface, bypasses cache
+     * Returns service by Interface
      *
      * @param clazz Service Interface class to look up for
      *

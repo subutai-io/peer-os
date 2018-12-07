@@ -18,10 +18,12 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.HostNotFoundException;
@@ -29,6 +31,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -206,6 +209,8 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
                     requestedHostImpl.setHostname( requestedHost.getHostname() );
                 }
 
+                requestedHostImpl.setHostInfos( requestedHost.getHostInfos() );
+
                 requestedHostImpl.refreshDateUpdated();
 
                 requestDataService.update( requestedHostImpl );
@@ -261,6 +266,42 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
                 return;
             }
 
+
+            //check if request contains containers of other peer
+            //we need to check each (not manually created) container for registration with local peer
+            //manually created containers have 10.* subnet (env containers have 172.* subnet)
+            //if RH has containers with 172.* and not registered with local peer, deny approval
+            Set<ContainerHostInfo> alienContainers = Sets.newHashSet();
+            LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
+            for ( ContainerHostInfo containerInfo : registrationRequest.getContainers() )
+            {
+                HostInterfaceModel iface =
+                        containerInfo.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE );
+                if ( IPUtil.isIpValid( iface ) && iface.getIp().matches( "172.*" ) )
+                {
+                    //check this container
+                    try
+                    {
+                        localPeer.getContainerHostById( containerInfo.getId() );
+                    }
+                    catch ( HostNotFoundException e )
+                    {
+                        //the container is not registered with us
+                        alienContainers.add( containerInfo );
+                    }
+                }
+            }
+
+            if ( !alienContainers.isEmpty() )
+            {
+                StringBuilder errMsg = new StringBuilder( "Can not approve, the host has containers of other peer: " );
+                for ( ContainerHostInfo containerHostInfo : alienContainers )
+                {
+                    errMsg.append( containerHostInfo.getContainerName() ).append( " " );
+                }
+                throw new HostRegistrationException( errMsg.toString() );
+            }
+
             registrationRequest.setStatus( ResourceHostRegistrationStatus.APPROVED );
 
             requestDataService.update( registrationRequest );
@@ -275,7 +316,6 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
             }
 
             //register resource host
-            LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
             localPeer.registerResourceHost( registrationRequest );
         }
         catch ( Exception e )
