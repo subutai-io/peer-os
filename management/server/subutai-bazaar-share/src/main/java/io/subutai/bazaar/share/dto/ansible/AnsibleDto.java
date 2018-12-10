@@ -23,6 +23,7 @@ public class AnsibleDto
     private String logs;
     private String vars;
     private Long commandTimeout; //this is for RequestBuilder timeout
+    private String subutaiDirectory;
 
 
 
@@ -123,5 +124,17 @@ public class AnsibleDto
     public void setCommandTimeout( final Long commandTimeout )
     {
         this.commandTimeout = commandTimeout;
+    }
+
+
+    public String getSubutaiDirectory()
+    {
+        return subutaiDirectory;
+    }
+
+
+    public void setSubutaiDirectory( final String subutaiDirectory )
+    {
+        this.subutaiDirectory = subutaiDirectory;
     }
 }
