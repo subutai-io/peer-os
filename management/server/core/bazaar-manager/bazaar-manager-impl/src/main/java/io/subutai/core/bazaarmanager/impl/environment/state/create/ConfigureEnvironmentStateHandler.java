@@ -32,6 +32,9 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     private static final String ENV_APPS_URL = "/rest/v1/environments/%s/apps";
 
     private static final String TMP_DIR = "/root/";
+    private static final String CREATE_EXTRA_VARS_FILE_CMD = "cd %s; cat > %s <<EOL\n" + "%s" + "\n" + "EOL\n";
+    private static final String EXTRA_VARS_FILE_NAME = "extra-vars.json";
+
 
     private long commandTimeout = 5L;
 
@@ -71,13 +74,15 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             commandTimeout = ansibleDto.getCommandTimeout();
         }
 
-        final String fileName = getBPFilename( ansibleDto.getRepoLink() );
+        final String dir = getBPFilename( ansibleDto.getRepoLink() );
 
-        prepareHostsFile( fileName, ansibleDto.getAnsibleContainerId(), ansibleDto.getGroups() );
+        prepareHostsFile( dir, ansibleDto.getAnsibleContainerId(), ansibleDto.getGroups() );
 
         copyRepoUnpack( ansibleDto.getAnsibleContainerId(), ansibleDto.getRepoLink() );
 
-        runAnsibleScript( fileName, ansibleDto, peerDto.getEnvironmentInfo().getId() );
+        prepareSubutaiVariables( dir, ansibleDto );
+
+        runAnsibleScript( dir, ansibleDto, peerDto.getEnvironmentInfo().getId() );
 
 
         try
@@ -100,6 +105,35 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
     }
 
 
+    private void prepareSubutaiVariables( final String dir, final AnsibleDto ansibleDto )
+    {
+        String extraVars = ansibleDto.getSubutaiDirectory();
+
+        try
+        {
+            if ( StringUtils.isEmpty( ansibleDto.getVars() ) )
+            {
+                extraVars = "{}";
+            }
+
+            String extraVarsCmd =
+                    String.format( CREATE_EXTRA_VARS_FILE_CMD, TMP_DIR + dir, EXTRA_VARS_FILE_NAME, extraVars );
+
+            runCmd( ansibleDto.getAnsibleContainerId(), extraVarsCmd );
+        }
+        catch ( HostNotFoundException e )
+        {
+            e.printStackTrace();
+            log.error( "Error configuring environment", e );
+        }
+        catch ( CommandException e )
+        {
+            log.error( "Error configuring environment", e );
+            e.printStackTrace();
+        }
+    }
+
+
     private void runAnsibleScript( String fileName, AnsibleDto ansibleDto, String envSubutaiId )
     {
         final String containerId = ansibleDto.getAnsibleContainerId();
@@ -113,8 +147,7 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
             extraVars = "{}";
         }
 
-        String cmd = String.format( "cd %s; ansible-playbook  %s -e %s -i %s", TMP_DIR + fileName, mainAnsibleScript,
-                extraVars, inventoryFile );
+        String cmd = String.format( "cd %s; ansible-playbook %s  -e '@%s' -e %s -i %s", TMP_DIR + fileName, mainAnsibleScript, EXTRA_VARS_FILE_NAME, extraVars, inventoryFile );
 
         try
         {
@@ -182,14 +215,14 @@ public class ConfigureEnvironmentStateHandler extends StateHandler
 
         try
         {
-            runCmd( containerId, String.format( "echo '%s' > /etc/ansible/%s",  "#" , inventoryFile ) );
+            runCmd( containerId, String.format( "echo '%s' > /etc/ansible/%s", "#", inventoryFile ) );
 
             for ( Group group : groups )
             {
 
                 groupName = String.format( "[%s]", group.getName() );
 
-                runCmd( containerId, String.format( "echo '%s' >> /etc/ansible/%s",  groupName, inventoryFile ) );
+                runCmd( containerId, String.format( "echo '%s' >> /etc/ansible/%s", groupName, inventoryFile ) );
 
                 for ( io.subutai.bazaar.share.dto.ansible.Host host : group.getHosts() )
                 {
