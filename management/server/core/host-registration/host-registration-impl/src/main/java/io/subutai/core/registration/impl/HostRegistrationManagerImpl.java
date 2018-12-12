@@ -198,6 +198,7 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
             if ( requestedHostImpl != null )
             {
                 LOG.info( "Already requested registration" );
+                //todo may be for issue 2749 just remove and readd request? sync with other methods
 
                 //update hostname
 
