@@ -53,7 +53,25 @@ public class BazaarEnvironment extends LocalEnvironment implements io.subutai.co
 
         setVni( json.get( "vni" ).asLong() );
 
-        setStatus( EnvironmentStatus.HEALTHY );
+        /*
+        PENDING,
+        EMPTY,
+        UNDER_MODIFICATION,
+        HEALTHY,
+        IMPORTING,
+        UNHEALTHY;
+        * */
+        String envState = json.get( "state" ).asText();
+        EnvironmentStatus status = EnvironmentStatus.UNKNOWN;
+        try
+        {
+            status = EnvironmentStatus.valueOf( envState );
+        }
+        catch ( IllegalArgumentException ignore )
+        {
+            log.warn( "Failed to parse environment state " + envState );
+        }
+        setStatus( status );
 
         this.owner = json.get( "owner" ).asText();
         this.ownerbazaarId = json.get( "ownerbazaarId" ).asText();
