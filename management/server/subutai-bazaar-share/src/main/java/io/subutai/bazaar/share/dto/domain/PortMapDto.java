@@ -1,6 +1,8 @@
 package io.subutai.bazaar.share.dto.domain;
 
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
@@ -48,6 +50,8 @@ public class PortMapDto
     private String errorLog;
 
     private boolean isProxied;
+
+    private UUID correlationId;
 
 
     public PortMapDto()
@@ -200,11 +204,24 @@ public class PortMapDto
     }
 
 
+    public UUID getCorrelationId()
+    {
+        return correlationId;
+    }
+
+
+    public void setCorrelationId( final UUID correlationId )
+    {
+        this.correlationId = correlationId;
+    }
+
+
     @Override
     public String toString()
     {
         return "PortMapDto{" + "containerSSId=" + containerSSId + ", protocol=" + protocol + ", internalPort="
                 + internalPort + ", externalPort=" + externalPort + ", state=" + state + ", domain=" + domain
-                + ", sslBackend=" + sslBackend + ", ipAddr=" + ipAddr + ", isProxied=" + isProxied + '}';
+                + ", sslBackend=" + sslBackend + ", ipAddr=" + ipAddr + ", isProxied=" + isProxied + ", correlationId="
+                + correlationId + '}';
     }
 }
