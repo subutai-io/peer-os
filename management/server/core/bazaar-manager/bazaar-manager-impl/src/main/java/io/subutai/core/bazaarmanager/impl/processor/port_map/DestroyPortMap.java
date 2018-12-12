@@ -41,7 +41,7 @@ public class DestroyPortMap
                     portMapDto.getInternalPort(), portMapDto.getDomain() ) )
             {
                 // skip not existing port mapping
-                portMapDto.setState( PortMapDto.State.DESTROYING );
+                portMapDto.setState( PortMapDto.State.DELETED );
                 return;
             }
 
@@ -91,7 +91,7 @@ public class DestroyPortMap
                 }
             }
 
-            portMapDto.setState( PortMapDto.State.DESTROYING );
+            portMapDto.setState( PortMapDto.State.DELETED );
         }
         catch ( Exception e )
         {
