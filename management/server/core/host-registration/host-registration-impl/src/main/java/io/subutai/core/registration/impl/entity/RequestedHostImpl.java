@@ -172,6 +172,12 @@ public class RequestedHostImpl implements RequestedHost, ResourceHostInfo, Seria
     }
 
 
+    public void setAddress( final String address )
+    {
+        this.address = address;
+    }
+
+
     @Override
     public HostArchitecture getArch()
     {

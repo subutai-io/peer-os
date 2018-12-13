@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -198,19 +197,15 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
             if ( requestedHostImpl != null )
             {
                 LOG.info( "Already requested registration" );
-                //todo may be for issue 2749 just remove and readd request? sync with other methods
 
                 //update hostname
+                requestedHostImpl.setHostname( requestedHost.getHostname() );
 
-                if ( !Strings.isNullOrEmpty( requestedHost.getHostname() ) && !requestedHostImpl.getHostname()
-                                                                                                .equalsIgnoreCase(
-                                                                                                        requestedHost
-                                                                                                                .getHostname() ) )
-                {
-                    requestedHostImpl.setHostname( requestedHost.getHostname() );
-                }
-
+                //update containers
                 requestedHostImpl.setHostInfos( requestedHost.getHostInfos() );
+
+                //update ip
+                requestedHostImpl.setAddress( requestedHost.getAddress() );
 
                 requestedHostImpl.refreshDateUpdated();
 
@@ -465,7 +460,11 @@ public class HostRegistrationManagerImpl extends HostListener implements HostReg
 
             if ( registrationRequest != null )
             {
+                //update hostname
                 registrationRequest.setHostname( resourceHostInfo.getHostname() );
+
+                //update ip
+                registrationRequest.setAddress( resourceHostInfo.getAddress() );
 
                 requestDataService.update( registrationRequest );
             }
