@@ -83,11 +83,38 @@ public class ProxyProcessor implements StateLinkProcessor
                     // join env. p2p swarm, get IP address of newly created p2p interface
                     joinEnvironmentP2PSwarm( proxyDto );
                     // create port maps
-                    setupPortMap( proxyDto );
+                    setupPortMap( proxyDto.getPortMaps() );
                     break;
                 case UPDATE:
-                    // add new or delete old port maps
-                    setupPortMap( proxyDto );
+
+                    // First, process port mappings which needs to be deleted
+
+                    Set<PortMapDto> portMappingToDelete = Sets.newHashSet();
+                    for ( final PortMapDto portMap : proxyDto.getPortMaps() )
+                    {
+                        if ( portMap.getState() == PortMapDto.State.DESTROYING
+                                || portMap.getState() == PortMapDto.State.DELETED )
+                        {
+                            portMappingToDelete.add( portMap );
+                        }
+                    }
+
+                    setupPortMap( portMappingToDelete );
+
+                    // Secondly, process port mappings which need to be created.
+
+                    Set<PortMapDto> portMappingToCreateOrUpdate = Sets.newHashSet();
+                    for ( final PortMapDto portMap : proxyDto.getPortMaps() )
+                    {
+                        if ( portMap.getState() == PortMapDto.State.CREATING
+                                || portMap.getState() == PortMapDto.State.USED )
+                        {
+                            portMappingToCreateOrUpdate.add( portMap );
+                        }
+                    }
+
+                    setupPortMap( portMappingToCreateOrUpdate );
+
                     proxyDto.setState( ProxyDto.State.READY );
                     break;
                 case DESTROY:
@@ -218,13 +245,13 @@ public class ProxyProcessor implements StateLinkProcessor
     }
 
 
-    private void setupPortMap( ProxyDto proxyDto )
+    private void setupPortMap( Set<PortMapDto> portMaps )
     {
         try
         {
             ResourceHost resourceHost = peerManager.getLocalPeer().getManagementHost();
 
-            for ( PortMapDto portMapDto : proxyDto.getPortMaps() )
+            for ( PortMapDto portMapDto : portMaps )
             {
                 try
                 {
@@ -253,10 +280,13 @@ public class ProxyProcessor implements StateLinkProcessor
                                                                                                            .equals(
                                                                                                                    PortMapDto.State.DELETED ) )
                         {
-                            resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getIpAddr(),
-                                    portMapDto.getExternalPort(), portMapDto.getExternalPort(),
-                                    portMapDto.getDomain() );
-
+                            if ( resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
+                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
+                            {
+                                resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getIpAddr(),
+                                        portMapDto.getExternalPort(), portMapDto.getExternalPort(),
+                                        portMapDto.getDomain() );
+                            }
                             portMapDto.setState( PortMapDto.State.DELETED );
                         }
                     }
@@ -278,8 +308,12 @@ public class ProxyProcessor implements StateLinkProcessor
                                                                                                            .equals(
                                                                                                                    PortMapDto.State.DELETED ) )
                         {
-                            resourceHost.removeContainerPortMapping( protocol, portMapDto.getIpAddr(),
-                                    portMapDto.getExternalPort(), portMapDto.getExternalPort() );
+                            if ( resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
+                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
+                            {
+                                resourceHost.removeContainerPortMapping( protocol, portMapDto.getIpAddr(),
+                                        portMapDto.getExternalPort(), portMapDto.getExternalPort() );
+                            }
 
                             portMapDto.setState( PortMapDto.State.DELETED );
                         }
