@@ -115,7 +115,9 @@ import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModifi
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -2322,13 +2324,29 @@ public class EnvironmentManagerImpl extends HostListener
 
         for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
-            if ( containerHost.getState() != ContainerHostState.RUNNING )
+            try
+            {
+                ContainerHostInfo containerHostInfo =
+                        getHostRegistry().getContainerHostInfoById( containerHost.getId() );
+
+                if ( containerHostInfo.getState() != ContainerHostState.RUNNING )
+                {
+                    return false;
+                }
+            }
+            catch ( HostDisconnectedException ignore )
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+
+    protected HostRegistry getHostRegistry()
+    {
+        return ServiceLocator.lookup( HostRegistry.class );
     }
 
 
