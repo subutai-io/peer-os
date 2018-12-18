@@ -34,6 +34,7 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ReservedNetworkResources;
@@ -1250,6 +1251,8 @@ public class EnvironmentManagerImplTest
     {
         doNothing().when( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
         doReturn( EnvironmentStatus.HEALTHY ).when( environment ).getStatus();
+        doReturn( ContainerHostState.RUNNING ).when( environmentContainer ).getState();
+        doReturn( Sets.newHashSet( environmentContainer ) ).when( environment ).getContainerHosts();
 
         environmentManager.doResetP2Pkeys();
 
