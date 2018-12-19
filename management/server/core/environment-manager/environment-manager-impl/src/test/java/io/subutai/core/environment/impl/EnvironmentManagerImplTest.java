@@ -34,6 +34,8 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ReservedNetworkResources;
@@ -74,6 +76,7 @@ import io.subutai.core.environment.impl.workflow.modification.HostnameModificati
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -181,6 +184,11 @@ public class EnvironmentManagerImplTest
     TemplateManager templateManager;
     @Mock
     SystemManager systemManager;
+
+    @Mock
+    HostRegistry hostRegistry;
+    @Mock
+    ContainerHostInfo containerHostInfo;
 
 
     class EnvironmentManagerImplSUT extends EnvironmentManagerImpl
@@ -1250,6 +1258,11 @@ public class EnvironmentManagerImplTest
     {
         doNothing().when( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
         doReturn( EnvironmentStatus.HEALTHY ).when( environment ).getStatus();
+        doReturn( Sets.newHashSet( environmentContainer ) ).when( environment ).getContainerHosts();
+
+        doReturn( hostRegistry ).when( environmentManager ).getHostRegistry();
+        doReturn( containerHostInfo ).when( hostRegistry ).getContainerHostInfoById( anyString() );
+        doReturn( ContainerHostState.RUNNING ).when( containerHostInfo ).getState();
 
         environmentManager.doResetP2Pkeys();
 
