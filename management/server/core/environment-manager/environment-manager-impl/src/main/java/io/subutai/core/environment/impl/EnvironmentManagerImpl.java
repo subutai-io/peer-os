@@ -115,7 +115,9 @@ import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModifi
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.environment.impl.xpeer.RemoteEnvironment;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -2276,19 +2278,29 @@ public class EnvironmentManagerImpl extends HostListener
         }
     }
 
-    //TODO need to remember if env got unhealthy during key exchange
-
 
     protected void doResetP2Pkeys()
     {
         try
         {
             //process only SS side environments
-            for ( Environment environment : environmentService.getAll() )
+            for ( LocalEnvironment environment : environmentService.getAll() )
             {
-                if ( !( ( environment.getStatus() != EnvironmentStatus.HEALTHY && !allContainersAreRunning(
-                        environment ) ) || ( ( System.currentTimeMillis() - environment.getCreationTimestamp() )
-                        < TimeUnit.MINUTES.toMillis( RESET_ENVS_P2P_KEYS_INTERVAL_MIN ) ) ) )
+                if (
+                    //process only healthy environments
+                        ( environment.getStatus() == EnvironmentStatus.HEALTHY ||
+
+                                //or environments unhealthy due to p2p key reset
+                                ( environment.getStatus() == EnvironmentStatus.UNHEALTHY && Objects
+                                        .equals( environment.getStatusDescription(),
+                                                P2PSecretKeyModificationWorkflow.P2P_CAUSE ) )
+
+                        ) &&
+
+                                allContainersAreRunning( environment ) &&
+
+                                ( System.currentTimeMillis() - environment.getCreationTimestamp() ) >= TimeUnit.MINUTES
+                                        .toMillis( RESET_ENVS_P2P_KEYS_INTERVAL_MIN ) )
                 {
                     final String secretKey = UUID.randomUUID().toString();
                     final long keyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
@@ -2305,15 +2317,36 @@ public class EnvironmentManagerImpl extends HostListener
 
     private boolean allContainersAreRunning( final Environment environment )
     {
+        if ( CollectionUtil.isCollectionEmpty( environment.getContainerHosts() ) )
+        {
+            return false;
+        }
+
         for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
-            if ( containerHost.getState() != ContainerHostState.RUNNING )
+            try
+            {
+                ContainerHostInfo containerHostInfo =
+                        getHostRegistry().getContainerHostInfoById( containerHost.getId() );
+
+                if ( containerHostInfo.getState() != ContainerHostState.RUNNING )
+                {
+                    return false;
+                }
+            }
+            catch ( HostDisconnectedException ignore )
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+
+    protected HostRegistry getHostRegistry()
+    {
+        return ServiceLocator.lookup( HostRegistry.class );
     }
 
 

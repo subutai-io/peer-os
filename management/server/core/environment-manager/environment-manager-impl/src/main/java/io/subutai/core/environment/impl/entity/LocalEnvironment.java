@@ -136,6 +136,10 @@ public class LocalEnvironment implements Environment, Serializable
     @JsonProperty( "status" )
     private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
+    @JsonIgnore
+    private String statusDescription;
+
+
     @Column( name = "initial_blueprint" )
     @JsonIgnore
     @Lob
@@ -343,6 +347,18 @@ public class LocalEnvironment implements Environment, Serializable
         Preconditions.checkNotNull( status );
 
         this.status = status;
+    }
+
+
+    public String getStatusDescription()
+    {
+        return statusDescription;
+    }
+
+
+    public void setStatusDescription( final String statusDescription )
+    {
+        this.statusDescription = statusDescription;
     }
 
 

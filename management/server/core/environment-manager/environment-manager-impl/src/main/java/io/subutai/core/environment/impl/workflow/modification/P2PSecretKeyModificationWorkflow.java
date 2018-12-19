@@ -13,6 +13,7 @@ import io.subutai.core.environment.impl.workflow.modification.steps.P2PSecretKey
 public class P2PSecretKeyModificationWorkflow
         extends CancellableWorkflow<P2PSecretKeyModificationWorkflow.P2PSecretKeyModificationPhase>
 {
+    public static final String P2P_CAUSE = "P2P key reset failed";
     private LocalEnvironment environment;
     private final String p2pSecretKey;
     private final long p2pSecretKeyTtlSeconds;
@@ -96,6 +97,8 @@ public class P2PSecretKeyModificationWorkflow
     public void fail( final String message, final Throwable e )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        environment.setStatusDescription( P2P_CAUSE );
 
         saveEnvironment();
 
