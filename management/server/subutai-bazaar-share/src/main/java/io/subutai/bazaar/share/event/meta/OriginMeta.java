@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
-import io.subutai.bazaar.share.Utils;
+import static java.lang.String.format;
 
 
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
@@ -45,7 +45,7 @@ public class OriginMeta implements Meta
 
     public String getId()
     {
-        return Utils.buildSubutaiOrigin( this.environmentId, this.peerId, this.containerId );
+        return format( "%s:%s:%s", this.environmentId, this.peerId, this.containerId );
     }
 
 

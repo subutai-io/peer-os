@@ -30,6 +30,7 @@
     <module>security-manager</module>
     <module>host-registration</module>
     <module>environment-manager</module>
+    <module>environment-metadata-manager</module>
     <module>test</module>
     <module>object-relation-manager</module>
     <module>system-manager</module>
