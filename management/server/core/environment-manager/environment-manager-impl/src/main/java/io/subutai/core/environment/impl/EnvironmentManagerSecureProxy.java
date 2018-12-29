@@ -801,6 +801,13 @@ public class EnvironmentManagerSecureProxy extends HostListener
 
 
     @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+        environmentManager.onContainerDestroyed( containerInfo );
+    }
+
+
+    @Override
     public void onRhConnected( final ResourceHostInfo resourceHostInfo )
     {
         environmentManager.onRhConnected( resourceHostInfo );
