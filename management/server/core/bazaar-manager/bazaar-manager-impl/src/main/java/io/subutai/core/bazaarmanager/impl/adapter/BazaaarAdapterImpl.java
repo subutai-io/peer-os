@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.event.payload.Payload;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.host.ContainerHostInfo;
@@ -17,17 +19,16 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.environment.api.EnvironmentEventListener;
-import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.bazaarmanager.api.BazaarManager;
 import io.subutai.core.bazaarmanager.api.RestClient;
 import io.subutai.core.bazaarmanager.api.RestResult;
 import io.subutai.core.bazaarmanager.api.dao.ConfigDataService;
 import io.subutai.core.bazaarmanager.impl.dao.ConfigDataServiceImpl;
+import io.subutai.core.environment.api.EnvironmentEventListener;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.bazaar.share.common.BazaaarAdapter;
 
 import static java.lang.String.format;
 
@@ -255,6 +256,35 @@ public class BazaaarAdapterImpl extends HostListener implements BazaaarAdapter, 
             log.error( "Error notifying Bazaar about container disk usage excess: HTTP {} - {}", result.getStatus(),
                     result.getReasonPhrase() );
         }
+    }
+
+
+    @Override
+    public void pushEvent( final Payload message )
+    {
+        RestResult result =
+                getRestClient().post( String.format( "/rest/v1/peers/%s/event", peerId ), message, message.getClass() );
+
+        if ( !result.isSuccess() )
+        {
+            log.error( "Error pushing event to Bazaar: HTTP {} - {}", result.getStatus(), result.getReasonPhrase() );
+        }
+    }
+
+
+    @Override
+    public Payload getMetaData( final String environmentId, final String type )
+    {
+        RestResult result = getRestClient()
+                .get( String.format( "/rest/v1/peers/%s/meta/%s/%s", peerId, environmentId, type ), Payload.class );
+
+        if ( !result.isSuccess() )
+        {
+            log.error( "Error retrieving meta data from Bazaar: HTTP {} - {}", result.getStatus(),
+                    result.getReasonPhrase() );
+        }
+
+        return ( Payload ) result.getEntity();
     }
 
 

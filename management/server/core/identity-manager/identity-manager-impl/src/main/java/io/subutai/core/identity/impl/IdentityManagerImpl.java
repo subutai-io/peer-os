@@ -46,6 +46,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.SubutaiOrigin;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
@@ -333,7 +334,7 @@ public class IdentityManagerImpl implements IdentityManager
             }
 
             Map<String, List<String>> headers = ( Map<String, List<String>> ) message.get( Message.PROTOCOL_HEADERS );
-            headers.put( "subutaiOrigin", Arrays.asList( token.getSubject() ) );
+            headers.put( SUBUTAI_ORIGIN_HEADER_KEY, Arrays.asList( token.getSubject() ) );
 
             message.put( Message.PROTOCOL_HEADERS, headers );
 
@@ -360,23 +361,23 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
-    public String issueJWTToken( String origin ) throws TokenCreateException
+    public String issueJWTToken( SubutaiOrigin origin ) throws TokenCreateException
 
     {
         final String secret = UUID.randomUUID().toString();
         DateTime issueDate = DateTime.now();
         DateTime expireDate = issueDate.plusSeconds( JWT_TOKEN_EXPIRATION_TIME );
         String token =
-                new TokenHelperImpl( TOKEN_ISSUER, origin, issueDate.toDate(), expireDate.toDate(), secret ).getToken();
+                new TokenHelperImpl( TOKEN_ISSUER, origin.toString(), issueDate.toDate(), expireDate.toDate(), secret )
+                        .getToken();
 
-        this.jwtTokenCache.put( origin, secret );
+        this.jwtTokenCache.put( origin.toString(), secret );
         return token;
     }
 
 
     @Override
     public boolean verifyJWTToken( String token ) throws TokenParseException
-
     {
         final TokenHelperImpl signedToken = new TokenHelperImpl( token );
         if ( signedToken.getExpirationTime().before( new Date() ) )
@@ -1798,6 +1799,11 @@ public class IdentityManagerImpl implements IdentityManager
         if ( user == null )
         {
             return false;
+        }
+
+        if ( user.getType() == UserType.SYSTEM.getId() )
+        {
+            return true;
         }
 
         List<Role> roles = user.getRoles();

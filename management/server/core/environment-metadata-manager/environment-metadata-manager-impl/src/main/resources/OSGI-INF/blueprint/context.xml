@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+    default-activation="eager"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+>
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
+
+  <reference id="peerManager"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
+  <reference id="environmentManager"
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
+
+  <reference id="identityManager"
+             interface="io.subutai.core.identity.api.IdentityManager" />
+
+  <reference id="bazaarAdapter"
+             interface="io.subutai.bazaar.share.common.BazaaarAdapter" />
+
+  <bean id="environmentMetadataManager" scope="singleton" init-method="init" destroy-method="dispose"
+        class="io.subutai.core.environment.metadata.impl.EnvironmentMetadataManagerImpl">
+    <argument ref="peerManager" />
+    <argument ref="environmentManager" />
+    <argument ref="identityManager" />
+    <argument ref="bazaarAdapter" />
+  </bean>
+
+  <service ref="environmentMetadataManager"
+           interface="io.subutai.core.environment.metadata.api.EnvironmentMetadataManager" />
+</blueprint>
