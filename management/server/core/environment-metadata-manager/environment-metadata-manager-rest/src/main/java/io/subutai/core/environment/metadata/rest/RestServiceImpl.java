@@ -6,8 +6,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.bazaar.share.dto.environment.EnvironmentInfoDto;
-import io.subutai.bazaar.share.events.Event;
+import io.subutai.bazaar.share.event.payload.Payload;
 import io.subutai.common.host.SubutaiOrigin;
 import io.subutai.core.environment.metadata.api.EnvironmentMetadataManager;
 import io.subutai.core.identity.api.exception.TokenCreateException;
@@ -50,18 +49,17 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getEnvironmentDto( final SubutaiOrigin origin )
+    public Response getEnvironmentDto( final SubutaiOrigin origin, final String type )
     {
-        EnvironmentInfoDto environmentInfoDto =
-                environmentMetadataManager.getEnvironmentInfoDto( origin.getEnvironmentId() );
+        Payload environmentInfoDto = environmentMetadataManager.getEnvironmentInfoDto( origin.getEnvironmentId(), type );
         return Response.ok( environmentInfoDto ).build();
     }
 
 
     @Override
-    public Response pushEvent( final SubutaiOrigin origin, final Event event )
+    public Response pushEvent( final SubutaiOrigin origin, final Payload payload )
     {
-        environmentMetadataManager.pushEvent( event );
+        environmentMetadataManager.pushEvent( payload );
         return Response.noContent().build();
     }
 }

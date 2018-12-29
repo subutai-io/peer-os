@@ -16,11 +16,15 @@
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="bazaarAdapter"
+             interface="io.subutai.bazaar.share.common.BazaaarAdapter" />
+
   <bean id="environmentMetadataManager" scope="singleton" init-method="init" destroy-method="dispose"
         class="io.subutai.core.environment.metadata.impl.EnvironmentMetadataManagerImpl">
     <argument ref="peerManager" />
     <argument ref="environmentManager" />
     <argument ref="identityManager" />
+    <argument ref="bazaarAdapter" />
   </bean>
 
   <service ref="environmentMetadataManager"

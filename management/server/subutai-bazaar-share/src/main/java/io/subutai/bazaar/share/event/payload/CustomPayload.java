@@ -31,6 +31,6 @@ public class CustomPayload extends Payload
     @Override
     public String toString()
     {
-        return "StringPayload{" + "message='" + message + '\'' + '}';
+        return "CustomPayload{" + "message='" + message + '\'' + '}';
     }
 }

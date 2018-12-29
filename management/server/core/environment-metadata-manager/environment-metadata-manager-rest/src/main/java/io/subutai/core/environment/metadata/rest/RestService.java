@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.subutai.bazaar.share.events.Event;
+import io.subutai.bazaar.share.event.payload.Payload;
 import io.subutai.common.host.SubutaiOrigin;
 import io.subutai.core.identity.api.IdentityManager;
 
@@ -30,13 +30,14 @@ public interface RestService
     @GET
     Response echo( @HeaderParam( "containerId" ) String containerId, @PathParam( "message" ) String message );
 
-    @Path( "/info" )
+    @Path( "/info/{type}" )
     @Produces( MediaType.APPLICATION_JSON )
     @GET
-    Response getEnvironmentDto( @HeaderParam( IdentityManager.SUBUTAI_ORIGIN_HEADER_KEY ) SubutaiOrigin origin );
+    Response getEnvironmentDto( @HeaderParam( IdentityManager.SUBUTAI_ORIGIN_HEADER_KEY ) SubutaiOrigin origin, @PathParam( "type" ) String type );
 
     @Path( "/event" )
     @Consumes( MediaType.APPLICATION_JSON )
     @POST
-    Response pushEvent( @HeaderParam( IdentityManager.SUBUTAI_ORIGIN_HEADER_KEY ) SubutaiOrigin origin, Event event );
+    Response pushEvent( @HeaderParam( IdentityManager.SUBUTAI_ORIGIN_HEADER_KEY ) SubutaiOrigin origin,
+                        Payload payload );
 }

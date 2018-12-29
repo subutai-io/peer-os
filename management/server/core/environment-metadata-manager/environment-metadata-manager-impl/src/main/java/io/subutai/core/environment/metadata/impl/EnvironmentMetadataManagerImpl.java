@@ -4,12 +4,10 @@ package io.subutai.core.environment.metadata.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.bazaar.share.dto.environment.EnvironmentInfoDto;
-import io.subutai.bazaar.share.events.Event;
+import io.subutai.bazaar.share.common.BazaaarAdapter;
+import io.subutai.bazaar.share.event.payload.Payload;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.SubutaiOrigin;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
@@ -29,14 +27,16 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
     private final IdentityManager identityManager;
     private PeerManager peerManager;
     private EnvironmentManager environmentManager;
+    private BazaaarAdapter bazaarAdapter;
 
 
     public EnvironmentMetadataManagerImpl( PeerManager peerManager, EnvironmentManager environmentManager,
-                                           IdentityManager identityManager )
+                                           IdentityManager identityManager, BazaaarAdapter bazaaarAdapter )
     {
         this.peerManager = peerManager;
         this.environmentManager = environmentManager;
         this.identityManager = identityManager;
+        this.bazaarAdapter = bazaaarAdapter;
     }
 
 
@@ -74,27 +74,17 @@ public class EnvironmentMetadataManagerImpl implements EnvironmentMetadataManage
 
 
     @Override
-    public EnvironmentInfoDto getEnvironmentInfoDto( final String environmentId )
+    public Payload getEnvironmentInfoDto( final String environmentId, final String type )
     {
-        final EnvironmentInfoDto result = new EnvironmentInfoDto();
-        try
-        {
-            Environment environment = environmentManager.loadEnvironment( environmentId );
-            result.setName( environment.getName() );
-            result.setSubnetCidr( environment.getSubnetCidr() );
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            // ignore
-        }
-        return result;
+        return bazaarAdapter.getMetaData( environmentId, type );
     }
 
 
     @Override
-    public void pushEvent( final Event event )
+    public void pushEvent( final Payload eventMessage )
     {
-        LOG.debug( "Event received: {}", event );
+        LOG.debug( "Event received: {}", eventMessage );
+        bazaarAdapter.pushEvent( eventMessage );
     }
 
 

@@ -1,8 +1,7 @@
 package io.subutai.core.environment.metadata.api;
 
 
-import io.subutai.bazaar.share.dto.environment.EnvironmentInfoDto;
-import io.subutai.bazaar.share.events.Event;
+import io.subutai.bazaar.share.event.payload.Payload;
 import io.subutai.core.identity.api.exception.TokenCreateException;
 
 
@@ -18,7 +17,7 @@ public interface EnvironmentMetadataManager
 
     void issueToken( String containerIp ) throws TokenCreateException;
 
-    EnvironmentInfoDto getEnvironmentInfoDto( String environmentId );
+    Payload getEnvironmentInfoDto( String environmentId, String type );
 
-    void pushEvent( Event event );
+    void pushEvent( Payload eventMessage );
 }

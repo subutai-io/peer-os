@@ -2,6 +2,7 @@ package io.subutai.bazaar.share.event.meta;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
@@ -23,11 +24,11 @@ public class OriginMeta implements Meta
     @JsonProperty
     private String environmentId;
 
-
+    @JsonCreator
     public OriginMeta( final String subutaiOrigin )
     {
         Preconditions.checkNotNull( subutaiOrigin );
-        final String[] parts = subutaiOrigin.split( "\\." );
+        final String[] parts = subutaiOrigin.split( ":" );
         if ( parts.length != 3 )
         {
             throw new IllegalArgumentException( "Invalid origin argument." );
