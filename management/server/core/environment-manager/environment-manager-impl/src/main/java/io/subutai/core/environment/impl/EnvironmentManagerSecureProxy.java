@@ -30,7 +30,6 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.network.SshTunnel;
@@ -798,31 +797,6 @@ public class EnvironmentManagerSecureProxy extends HostListener
     public void onContainerCreated( final ContainerHostInfo containerInfo )
     {
         environmentManager.onContainerCreated( containerInfo );
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceChanged( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel oldNetInterface,
-                                                final HostInterfaceModel newNetInterface )
-    {
-        environmentManager.onContainerNetInterfaceChanged( containerInfo, oldNetInterface, newNetInterface );
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceAdded( final ContainerHostInfo containerInfo,
-                                              final HostInterfaceModel netInterface )
-    {
-        environmentManager.onContainerNetInterfaceAdded( containerInfo, netInterface );
-    }
-
-
-    @Override
-    public void onContainerNetInterfaceRemoved( final ContainerHostInfo containerInfo,
-                                                final HostInterfaceModel netInterface )
-    {
-        environmentManager.onContainerNetInterfaceRemoved( containerInfo, netInterface );
     }
 
 
