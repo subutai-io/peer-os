@@ -1640,6 +1640,21 @@ public class EnvironmentManagerImpl extends HostListener
     }
 
 
+    @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+        try
+        {
+            ContainerHost containerHost = peerManager.getLocalPeer().getContainerHostById( containerInfo.getId() );
+            onContainerDestroyed( containerHost );
+        }
+        catch ( HostNotFoundException ignore )
+        {
+            //no-op
+        }
+    }
+
+
     protected Long getUserId()
     {
         return identityManager.getActiveUser().getId();
