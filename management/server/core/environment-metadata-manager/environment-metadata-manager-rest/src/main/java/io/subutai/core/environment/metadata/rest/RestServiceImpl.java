@@ -1,12 +1,18 @@
 package io.subutai.core.environment.metadata.rest;
 
 
+import java.io.IOException;
+
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import io.subutai.bazaar.share.event.payload.CustomPayload;
 import io.subutai.bazaar.share.event.payload.Payload;
+import io.subutai.bazaar.share.json.JsonUtil;
 import io.subutai.common.host.SubutaiOrigin;
 import io.subutai.core.environment.metadata.api.EnvironmentMetadataManager;
 import io.subutai.core.identity.api.exception.TokenCreateException;
@@ -51,8 +57,25 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getEnvironmentDto( final SubutaiOrigin origin, final String type )
     {
-        Payload environmentInfoDto = environmentMetadataManager.getEnvironmentInfoDto( origin.getEnvironmentId(), type );
-        return Response.ok( environmentInfoDto ).build();
+        Payload environmentInfoDto =
+                environmentMetadataManager.getEnvironmentInfoDto( origin.getEnvironmentId(), type );
+
+        if ( environmentInfoDto instanceof CustomPayload )
+        {
+            try
+            {
+                JsonNode json = JsonUtil.MAPPER.readTree( ( ( CustomPayload ) environmentInfoDto ).getMessage() );
+                return Response.ok( json ).build();
+            }
+            catch ( IOException e )
+            {
+                return Response.serverError().build();
+            }
+        }
+        else
+        {
+            return Response.ok( environmentInfoDto ).build();
+        }
     }
 
 
