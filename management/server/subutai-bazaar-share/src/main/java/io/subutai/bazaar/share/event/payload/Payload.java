@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 
-@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type" )
+@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, property = "type" )
 @JsonSubTypes( {
         @JsonSubTypes.Type( value = CustomPayload.class, name = "custom" ),
         @JsonSubTypes.Type( value = LogPayload.class, name = "log" ),
@@ -18,8 +18,4 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties( ignoreUnknown = true )
 abstract public class Payload
 {
-    public enum Nature
-    {
-        CUSTOM, LOG, PROGRESS
-    }
 }

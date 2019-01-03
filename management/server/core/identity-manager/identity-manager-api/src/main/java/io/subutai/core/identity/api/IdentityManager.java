@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.message.Message;
 
+import io.subutai.common.host.SubutaiOrigin;
 import io.subutai.common.security.exception.SystemSecurityException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -42,6 +43,7 @@ public interface IdentityManager
 
     String ENV_MANAGER_ROLE = "Environment-Manager";
     String TEMPLATE_MANAGER_ROLE = "Template-Manager";
+    String SUBUTAI_ORIGIN_HEADER_KEY = "subutaiOrigin";
     //    String ENV_OWNER_ROLE = "Environment-Owner";
 
 
@@ -336,7 +338,7 @@ public interface IdentityManager
     Session loginSystemUser();
 
 
-    String issueJWTToken( final String origin ) throws TokenCreateException;
+    String issueJWTToken( final SubutaiOrigin origin ) throws TokenCreateException;
 
     boolean verifyJWTToken( final String token ) throws TokenParseException;
 

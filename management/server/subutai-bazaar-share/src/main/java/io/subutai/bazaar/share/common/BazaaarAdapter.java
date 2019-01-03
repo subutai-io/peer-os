@@ -1,6 +1,10 @@
 package io.subutai.bazaar.share.common;
 
 
+import io.subutai.bazaar.share.event.EventMessage;
+import io.subutai.bazaar.share.event.payload.Payload;
+
+
 public interface BazaaarAdapter
 {
     //
@@ -27,4 +31,8 @@ public interface BazaaarAdapter
 
     void notifyContainerDiskUsageExcess( String peerId, String envId, String contId, long diskUsage,
                                          boolean containerWasStopped );
+
+    Payload getMetaData( final String environmentId, final String type );
+
+    void pushEvent( Payload message );
 }

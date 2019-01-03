@@ -5,7 +5,6 @@ import java.util.Set;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 
@@ -26,12 +25,13 @@ public abstract class HostListener
 
 
     public void onContainerStateChanged( ContainerHostInfo containerInfo, ContainerHostState previousState,
-                                  ContainerHostState currentState )
+                                         ContainerHostState currentState )
     {
     }
 
 
-    public void onContainerHostnameChanged( ContainerHostInfo containerInfo, String previousHostname, String currentHostname )
+    public void onContainerHostnameChanged( ContainerHostInfo containerInfo, String previousHostname,
+                                            String currentHostname )
     {
     }
 
@@ -41,18 +41,7 @@ public abstract class HostListener
     }
 
 
-    public void onContainerNetInterfaceChanged( ContainerHostInfo containerInfo, HostInterfaceModel oldNetInterface,
-                                         HostInterfaceModel newNetInterface )
-    {
-    }
-
-
-    public void onContainerNetInterfaceAdded( ContainerHostInfo containerInfo, HostInterfaceModel netInterface )
-    {
-    }
-
-
-    public void onContainerNetInterfaceRemoved( ContainerHostInfo containerInfo, HostInterfaceModel netInterface )
+    public void onContainerDestroyed( ContainerHostInfo containerInfo )
     {
     }
 

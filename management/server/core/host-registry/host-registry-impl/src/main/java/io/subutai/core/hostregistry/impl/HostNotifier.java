@@ -7,9 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostListener;
 
 
@@ -134,75 +138,6 @@ public class HostNotifier implements Runnable
                         }
                     }
 
-                    // 3. check if container interfaces have been changed/added
-                    for ( final HostInterfaceModel newNetInterface : newContainerInfo.getHostInterfaces().getAll() )
-                    {
-                        boolean interfaceExistedBefore = false;
-
-                        for ( final HostInterfaceModel oldNetInterface : oldContainerInfo.getHostInterfaces().getAll() )
-                        {
-                            if ( newNetInterface.getName().equalsIgnoreCase( oldNetInterface.getName() ) )
-                            {
-                                if ( !newNetInterface.getIp().equals( oldNetInterface.getIp() ) )
-                                {
-                                    try
-                                    {
-                                        listener.onContainerNetInterfaceChanged( newContainerInfo, oldNetInterface,
-                                                newNetInterface );
-                                    }
-                                    catch ( Exception e )
-                                    {
-                                        LOG.warn( ERR_MSG_TEMPLATE, e.getMessage() );
-                                    }
-                                }
-
-                                interfaceExistedBefore = true;
-
-                                break;
-                            }
-                        }
-
-                        if ( !interfaceExistedBefore )
-                        {
-                            try
-                            {
-                                listener.onContainerNetInterfaceAdded( newContainerInfo, newNetInterface );
-                            }
-                            catch ( Exception e )
-                            {
-                                LOG.warn( ERR_MSG_TEMPLATE, e.getMessage() );
-                            }
-                        }
-                    }
-
-                    // 4. check if net interfaces have been removed
-                    for ( final HostInterfaceModel oldNetInterface : oldContainerInfo.getHostInterfaces().getAll() )
-                    {
-                        boolean interfaceStillExists = false;
-
-                        for ( HostInterfaceModel newNetInterface : newContainerInfo.getHostInterfaces().getAll() )
-                        {
-                            if ( oldNetInterface.getName().equalsIgnoreCase( newNetInterface.getName() ) )
-                            {
-                                interfaceStillExists = true;
-
-                                break;
-                            }
-                        }
-
-                        if ( !interfaceStillExists )
-                        {
-                            try
-                            {
-                                listener.onContainerNetInterfaceRemoved( newContainerInfo, oldNetInterface );
-                            }
-                            catch ( Exception e )
-                            {
-                                LOG.warn( ERR_MSG_TEMPLATE, e.getMessage() );
-                            }
-                        }
-                    }
-
 
                     containerExistedBefore = true;
 
@@ -210,7 +145,7 @@ public class HostNotifier implements Runnable
                 }
             }
 
-            // 5. notify that container has been created
+            // 3. notify that container has been created
             if ( !containerExistedBefore )
             {
                 try
@@ -224,33 +159,63 @@ public class HostNotifier implements Runnable
             }
         }
 
-        //disabled due to https://github.com/subutai-io/base/issues/1735
-        //        // 6. check if container has been destroyed
-        //        for ( final ContainerHostInfo oldContainerInfo : oldRhInfo.getContainers() )
-        //        {
-        //            boolean containerStillExists = false;
-        //
-        //            for ( final ContainerHostInfo newContainerInfo : newRhInfo.getContainers() )
-        //            {
-        //                if ( oldContainerInfo.getId().equalsIgnoreCase( newContainerInfo.getId() ) )
-        //                {
-        //                    containerStillExists = true;
-        //
-        //                    break;
-        //                }
-        //            }
-        //
-        //            if ( !containerStillExists )
-        //            {
-        //                try
-        //                {
-        //                    listener.onContainerDestroyed( oldContainerInfo );
-        //                }
-        //                catch ( Exception e )
-        //                {
-        //                    LOG.warn( ERR_MSG_TEMPLATE, e.getMessage() );
-        //                }
-        //            }
-        //        }
+        // 4. check if container has been destroyed
+        for ( final ContainerHostInfo oldContainerInfo : oldRhInfo.getContainers() )
+        {
+            boolean containerStillExists = false;
+
+            for ( final ContainerHostInfo newContainerInfo : newRhInfo.getContainers() )
+            {
+                if ( oldContainerInfo.getId().equalsIgnoreCase( newContainerInfo.getId() ) )
+                {
+                    containerStillExists = true;
+
+                    break;
+                }
+            }
+
+            //check on RH once more to make sure
+            if ( !containerStillExists )
+            {
+                LocalPeer localPeer = ServiceLocator.lookup( LocalPeer.class );
+                try
+                {
+                    ResourceHost resourceHost = localPeer.getResourceHostByContainerId( oldContainerInfo.getId() );
+
+                    try
+                    {
+                        for ( String name : resourceHost.listExistingContainerNames() )
+                        {
+                            if ( oldContainerInfo.getContainerName().equalsIgnoreCase( name ) )
+                            {
+                                containerStillExists = true;
+                                break;
+                            }
+                        }
+                    }
+                    catch ( ResourceHostException e )
+                    {
+                        //just in case skip container removal in this round since we can not check
+                        containerStillExists = true;
+                    }
+                }
+                catch ( HostNotFoundException ignore )
+                {
+                    //no-op
+                }
+            }
+
+            if ( !containerStillExists )
+            {
+                try
+                {
+                    listener.onContainerDestroyed( oldContainerInfo );
+                }
+                catch ( Exception e )
+                {
+                    LOG.warn( ERR_MSG_TEMPLATE, e.getMessage() );
+                }
+            }
+        }
     }
 }
