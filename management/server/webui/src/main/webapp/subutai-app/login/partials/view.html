@@ -26,7 +26,7 @@
                   tabindex=1
                   type="text">
             </div>
-            <div ng-hide="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
+            <div ng-if="!(loginCtrl.passExpired || loginCtrl.resetPwd)" class="b-form__wrapper g-margin-bottom">
               <label class="b-form-label">Password</label>
               <input
                   class="b-form-input b-form-input_full"
@@ -37,7 +37,7 @@
                   type="password">
             </div>
 
-            <div ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
+            <div ng-if="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
               <label class="b-form-label">New Password</label>
               <input
                   pattern="(?=^.{4,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[a-z]).*$"
@@ -51,7 +51,7 @@
                   type="password">
             </div>
 
-            <div ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
+            <div ng-if="loginCtrl.passExpired || loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
               <label class="b-form-label">Confirm Password</label>
               <input
                   class="b-form-input b-form-input_full"
@@ -61,7 +61,7 @@
                   type="password">
             </div>
 
-            <div ng-show="loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
+            <div ng-if="loginCtrl.resetPwd" class="b-form__wrapper g-margin-bottom">
               <label class="b-form-label">Sign Request</label>
               <textarea
                   class="b-form-input b-form-input_full b-form-input_textarea e2e-sign-message"
@@ -70,11 +70,11 @@
             </div>
 
             <div class="b-login-form-btn">
-              <button ng-hide="loginCtrl.passExpired || loginCtrl.resetPwd" type="submit"
+              <button ng-if="!(loginCtrl.passExpired || loginCtrl.resetPwd)" type="submit"
                       class="b-btn b-btn_green b-btn_full-width" id="subt-button__login" tabindex=3>
                 Login
               </button>
-              <button ng-show="loginCtrl.passExpired || loginCtrl.resetPwd" type="submit"
+              <button ng-if="loginCtrl.passExpired || loginCtrl.resetPwd" type="submit"
                       class="b-btn b-btn_green b-btn_full-width"
                       tabindex=3>
                 Save and login
