@@ -1,6 +1,6 @@
-# Subutai Server repository
+# PeerOS repository
 
-This repository contains source code of Subutai Server Project.
+This repository contains source code of Subutai PeerOS project.
 This is a multi-module Maven Java project.
 
 ## Building the project
