@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl;
 import java.util.Map;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
 
@@ -130,5 +131,12 @@ public class LocalPeerCommands
     {
         return new RequestBuilder( String.format( "subutai destroy %s", containerName ) )
                 .withTimeout( Common.DESTROY_CONTAINER_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getRemoveHostnameFromEtcHostsCommand( final HostAddresses hostAddresses )
+    {
+        //TODO
+        return null;
     }
 }

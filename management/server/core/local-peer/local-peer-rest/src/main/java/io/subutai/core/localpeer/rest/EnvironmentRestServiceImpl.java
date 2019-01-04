@@ -425,6 +425,24 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
+    public void removeHostnamesFromEtcHosts( final EnvironmentId environmentId, final HostAddresses hostAddresses )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkNotNull( hostAddresses );
+
+            localPeer.removeHostnamesFromEtcHosts( environmentId, hostAddresses );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
     public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
                                                               final SshEncryptionType sshEncryptionType,
                                                               final String oldHostname, final String newHostname )

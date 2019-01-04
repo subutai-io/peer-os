@@ -570,6 +570,35 @@ public class EnvironmentWebClient
     }
 
 
+    public void removeHostnamesFromEtcHosts( final EnvironmentId environmentId, final HostAddresses hostAddresses )
+            throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            String path = String.format( "/%s/containers/etchosts", environmentId.getId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
+            response = client.put( hostAddresses );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error removing hostnames : " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
     public void updateAuthorizedKeysWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
                                                               String newHostname, SshEncryptionType sshEncryptionType )
             throws PeerException
