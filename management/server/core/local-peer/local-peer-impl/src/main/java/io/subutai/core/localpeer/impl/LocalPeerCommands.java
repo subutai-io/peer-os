@@ -136,7 +136,18 @@ public class LocalPeerCommands
 
     public RequestBuilder getRemoveHostnameFromEtcHostsCommand( final HostAddresses hostAddresses )
     {
-        //TODO
-        return null;
+        StringBuilder egrepValues = new StringBuilder();
+        for ( Map.Entry<String, String> entry : hostAddresses.getHostAddresses().entrySet() )
+        {
+            String hostname = entry.getKey();
+            //            String ip = entry.getValue();
+
+            egrepValues.append( hostname ).append( "." ).append( Common.DEFAULT_DOMAIN_NAME ).append( "|" );
+        }
+        //drop pipe | symbol
+        egrepValues.setLength( egrepValues.length() - 1 );
+
+        return new RequestBuilder(
+                String.format( "cat /etc/hosts | egrep -v '%s' > /etc/hosts", egrepValues.toString() ) );
     }
 }
