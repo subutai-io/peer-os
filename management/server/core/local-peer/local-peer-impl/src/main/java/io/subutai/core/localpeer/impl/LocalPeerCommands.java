@@ -148,6 +148,7 @@ public class LocalPeerCommands
         egrepValues.setLength( egrepValues.length() - 1 );
 
         return new RequestBuilder(
-                String.format( "cat /etc/hosts | egrep -v '%s' > /etc/hosts", egrepValues.toString() ) );
+                String.format( "cat %1$s | egrep -v '%2$s' > etc-hosts-cleaned; mv etc-hosts-cleaned %1$s",
+                        Common.ETC_HOSTS_FILE, egrepValues.toString() ) );
     }
 }
