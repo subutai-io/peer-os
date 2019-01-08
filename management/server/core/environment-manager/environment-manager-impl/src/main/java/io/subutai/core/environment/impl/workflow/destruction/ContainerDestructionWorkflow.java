@@ -1,6 +1,8 @@
 package io.subutai.core.environment.impl.workflow.destruction;
 
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.security.relation.RelationManager;
@@ -9,6 +11,7 @@ import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.LocalEnvironment;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.RemoveHostnamesFromEtcHostsStep;
 
 
 public class ContainerDestructionWorkflow
@@ -23,7 +26,7 @@ public class ContainerDestructionWorkflow
 
     public enum ContainerDestructionPhase
     {
-        INIT, VALIDATE, DESTROY_CONTAINER, FINALIZE
+        INIT, VALIDATE, DESTROY_CONTAINER, REMOVE_HOSTNAMES, FINALIZE
     }
 
 
@@ -94,6 +97,26 @@ public class ContainerDestructionWorkflow
             relationManager.removeRelation( containerHost );
 
             saveEnvironment();
+
+            return ContainerDestructionPhase.REMOVE_HOSTNAMES;
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+
+            return null;
+        }
+    }
+
+
+    public ContainerDestructionPhase REMOVE_HOSTNAMES()
+    {
+        operationTracker.addLog( "Removing hostnames" );
+
+        try
+        {
+            new RemoveHostnamesFromEtcHostsStep( environment, Sets.newHashSet( containerHost ), operationTracker )
+                    .execute();
 
             return ContainerDestructionPhase.FINALIZE;
         }

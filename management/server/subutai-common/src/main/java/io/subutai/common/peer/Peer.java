@@ -202,6 +202,8 @@ public interface Peer extends RelationLink
                                                        String newHostname, SshEncryptionType sshEncryptionType )
             throws PeerException;
 
+    void removeHostnamesFromEtcHosts( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
+
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers

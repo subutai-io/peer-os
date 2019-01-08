@@ -1,12 +1,15 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
@@ -20,15 +23,16 @@ import io.subutai.core.environment.impl.workflow.creation.steps.SetQuotaStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ChangeQuotaStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.DestroyContainersStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.RemoveHostnamesFromEtcHostsStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
-public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
+public class EnvironmentModifyWorkflow
+        extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentModificationPhase>
 {
     private final IdentityManager identityManager;
     private final PeerManager peerManager;
@@ -46,13 +50,14 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     private boolean hasContainerDestruction = false;
     private boolean hasContainerCreation = false;
     private Map<String, ContainerQuota> containerQuotas;
+    private Set<ContainerHost> removedContainerHosts = Sets.newHashSet();
 
 
     //environment modification phases
-    public enum EnvironmentGrowingPhase
+    public enum EnvironmentModificationPhase
     {
         INIT, GENERATE_KEYS, RESERVE_NET, SETUP_P2P, PREPARE_TEMPLATES, CLONE_CONTAINERS, CONFIGURE_HOSTS,
-        CONFIGURE_SSH, SET_QUOTA, MODIFY_QUOTA, DESTROY_CONTAINERS, FINALIZE
+        CONFIGURE_SSH, SET_QUOTA, MODIFY_QUOTA, DESTROY_CONTAINERS, REMOVE_HOSTNAMES, FINALIZE
 
     }
 
@@ -63,7 +68,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
                                       TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
 
-        super( EnvironmentGrowingPhase.INIT );
+        super( EnvironmentModificationPhase.INIT );
 
         this.identityManager = identityManager;
         this.peerManager = peerManager;
@@ -74,7 +79,6 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
         this.defaultDomain = defaultDomain;
         this.environmentManager = environmentManager;
         this.removedContainers = removedContainers;
-        this.changedContainers = new HashMap<>();
         this.changedContainers = changedContainers;
     }
 
@@ -82,7 +86,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     //********************* WORKFLOW STEPS ************
 
 
-    public EnvironmentGrowingPhase INIT()
+    public EnvironmentModificationPhase INIT()
     {
         hasQuotaModification = !CollectionUtil.isMapEmpty( changedContainers );
         hasContainerDestruction = !CollectionUtil.isCollectionEmpty( removedContainers );
@@ -94,13 +98,13 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         saveEnvironment();
 
-        return hasContainerCreation ? EnvironmentGrowingPhase.GENERATE_KEYS :
-               ( hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_QUOTA :
-                 EnvironmentGrowingPhase.DESTROY_CONTAINERS );
+        return hasContainerCreation ? EnvironmentModificationPhase.GENERATE_KEYS :
+               ( hasQuotaModification ? EnvironmentModificationPhase.MODIFY_QUOTA :
+                 EnvironmentModificationPhase.DESTROY_CONTAINERS );
     }
 
 
-    public EnvironmentGrowingPhase GENERATE_KEYS()
+    public EnvironmentModificationPhase GENERATE_KEYS()
     {
         operationTracker.addLog( "Securing channel" );
 
@@ -110,7 +114,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return EnvironmentGrowingPhase.RESERVE_NET;
+            return EnvironmentModificationPhase.RESERVE_NET;
         }
         catch ( Exception e )
         {
@@ -121,7 +125,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase RESERVE_NET()
+    public EnvironmentModificationPhase RESERVE_NET()
     {
         operationTracker.addLog( "Reserving network resources" );
 
@@ -131,7 +135,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return EnvironmentGrowingPhase.SETUP_P2P;
+            return EnvironmentModificationPhase.SETUP_P2P;
         }
         catch ( Exception e )
         {
@@ -142,7 +146,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase SETUP_P2P()
+    public EnvironmentModificationPhase SETUP_P2P()
     {
         operationTracker.addLog( "Setting up networking" );
 
@@ -152,7 +156,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return EnvironmentGrowingPhase.PREPARE_TEMPLATES;
+            return EnvironmentModificationPhase.PREPARE_TEMPLATES;
         }
         catch ( Exception e )
         {
@@ -163,7 +167,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase PREPARE_TEMPLATES()
+    public EnvironmentModificationPhase PREPARE_TEMPLATES()
     {
         operationTracker.addLog( "Preparing templates" );
 
@@ -174,7 +178,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return EnvironmentGrowingPhase.CLONE_CONTAINERS;
+            return EnvironmentModificationPhase.CLONE_CONTAINERS;
         }
         catch ( Exception e )
         {
@@ -184,7 +188,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase CLONE_CONTAINERS()
+    public EnvironmentModificationPhase CLONE_CONTAINERS()
     {
         operationTracker.addLog( "Cloning containers" );
 
@@ -196,7 +200,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return EnvironmentGrowingPhase.CONFIGURE_HOSTS;
+            return EnvironmentModificationPhase.CONFIGURE_HOSTS;
         }
         catch ( Exception e )
         {
@@ -207,7 +211,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase CONFIGURE_HOSTS()
+    public EnvironmentModificationPhase CONFIGURE_HOSTS()
     {
         operationTracker.addLog( "Configuring hosts" );
 
@@ -217,7 +221,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return EnvironmentGrowingPhase.CONFIGURE_SSH;
+            return EnvironmentModificationPhase.CONFIGURE_SSH;
         }
         catch ( Exception e )
         {
@@ -228,7 +232,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase CONFIGURE_SSH()
+    public EnvironmentModificationPhase CONFIGURE_SSH()
     {
         operationTracker.addLog( "Configuring ssh" );
 
@@ -238,7 +242,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return EnvironmentGrowingPhase.SET_QUOTA;
+            return EnvironmentModificationPhase.SET_QUOTA;
         }
         catch ( Exception e )
         {
@@ -249,7 +253,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase SET_QUOTA()
+    public EnvironmentModificationPhase SET_QUOTA()
     {
         operationTracker.addLog( "Setting quotas" );
 
@@ -259,9 +263,9 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_QUOTA :
-                   ( hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
-                     EnvironmentGrowingPhase.FINALIZE );
+            return hasQuotaModification ? EnvironmentModificationPhase.MODIFY_QUOTA :
+                   ( hasContainerDestruction ? EnvironmentModificationPhase.DESTROY_CONTAINERS :
+                     EnvironmentModificationPhase.FINALIZE );
         }
         catch ( Exception e )
         {
@@ -272,7 +276,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase MODIFY_QUOTA()
+    public EnvironmentModificationPhase MODIFY_QUOTA()
     {
         operationTracker.addLog( "Changing container quotas" );
 
@@ -282,8 +286,8 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             environment = ( LocalEnvironment ) environmentManager.loadEnvironment( environment.getId() );
 
-            return hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
-                   EnvironmentGrowingPhase.FINALIZE;
+            return hasContainerDestruction ? EnvironmentModificationPhase.DESTROY_CONTAINERS :
+                   EnvironmentModificationPhase.FINALIZE;
         }
         catch ( Exception e )
         {
@@ -294,7 +298,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     }
 
 
-    public EnvironmentGrowingPhase DESTROY_CONTAINERS()
+    public EnvironmentModificationPhase DESTROY_CONTAINERS()
     {
         operationTracker.addLog( "Destroying containers" );
 
@@ -313,17 +317,43 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
                 {
                     operationTracker.addLog( errMsg );
                 }
+
+                return EnvironmentModificationPhase.FINALIZE;
             }
             else
             {
+                for ( String removeContainerHostId : removedContainers )
+                {
+                    removedContainerHosts.add( environment.getContainerHostById( removeContainerHostId ) );
+                }
 
                 environment = ( LocalEnvironment ) new DestroyContainersStep( environment, environmentManager,
                         removedContainers, operationTracker ).execute();
 
                 saveEnvironment();
-            }
 
-            return EnvironmentGrowingPhase.FINALIZE;
+                return EnvironmentModificationPhase.REMOVE_HOSTNAMES;
+            }
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+
+            return null;
+        }
+    }
+
+
+    public EnvironmentModificationPhase REMOVE_HOSTNAMES()
+    {
+
+        operationTracker.addLog( "Removing hostnames" );
+
+        try
+        {
+            new RemoveHostnamesFromEtcHostsStep( environment, removedContainerHosts, operationTracker ).execute();
+
+            return EnvironmentModificationPhase.FINALIZE;
         }
         catch ( Exception e )
         {

@@ -56,7 +56,7 @@ public class EnvironmentModifyWorkflowTest
         }
 
 
-        public void addStep( EnvironmentGrowingPhase step )
+        public void addStep( EnvironmentModificationPhase step )
         {
             //no-op
         }

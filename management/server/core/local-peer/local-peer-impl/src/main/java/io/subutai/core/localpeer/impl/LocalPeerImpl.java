@@ -3200,6 +3200,42 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
+    public void removeHostnamesFromEtcHosts( final EnvironmentId environmentId, final HostAddresses hostAddresses )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( hostAddresses );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        CommandUtil.HostCommandResults results = commandUtil
+                .execute( localPeerCommands.getRemoveHostnameFromEtcHostsCommand( hostAddresses ), hosts,
+                        environmentId.getId() );
+
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
+        {
+            if ( !result.hasSucceeded() )
+            {
+                LOG.error( "Failed to remove hostnames on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
+        }
+
+        if ( results.hasFailures() )
+        {
+            throw new PeerException( "Failed to remove hostnames on every host" );
+        }
+    }
+
+
+    @Override
     public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
                                                               final String oldHostname, final String newHostname,
                                                               final SshEncryptionType sshEncryptionType )

@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl;
 import java.util.Map;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
 
@@ -130,5 +131,24 @@ public class LocalPeerCommands
     {
         return new RequestBuilder( String.format( "subutai destroy %s", containerName ) )
                 .withTimeout( Common.DESTROY_CONTAINER_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getRemoveHostnameFromEtcHostsCommand( final HostAddresses hostAddresses )
+    {
+        StringBuilder egrepValues = new StringBuilder();
+        for ( Map.Entry<String, String> entry : hostAddresses.getHostAddresses().entrySet() )
+        {
+            String hostname = entry.getKey();
+            //            String ip = entry.getValue();
+
+            egrepValues.append( hostname ).append( "." ).append( Common.DEFAULT_DOMAIN_NAME ).append( "|" );
+        }
+        //drop pipe | symbol
+        egrepValues.setLength( egrepValues.length() - 1 );
+
+        return new RequestBuilder(
+                String.format( "cat %1$s | egrep -v '%2$s' > etc-hosts-cleaned; mv etc-hosts-cleaned %1$s",
+                        Common.ETC_HOSTS_FILE, egrepValues.toString() ) );
     }
 }

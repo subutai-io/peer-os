@@ -142,6 +142,11 @@ public interface EnvironmentRestService
                                                  @PathParam( "oldHostname" ) String oldHostname,
                                                  @PathParam( "newHostname" ) String newHostname );
 
+    @PUT
+    @Path( "{environmentId}/containers/etchosts" )
+    void removeHostnamesFromEtcHosts( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                      HostAddresses hostAddresses );
+
     @POST
     @Path( "{environmentId}/containers/authorizedkeys/{encType}/{oldHostname}/{newHostname}" )
     void updateAuthorizedKeysWithNewContainerHostname( @PathParam( "environmentId" ) EnvironmentId environmentId,

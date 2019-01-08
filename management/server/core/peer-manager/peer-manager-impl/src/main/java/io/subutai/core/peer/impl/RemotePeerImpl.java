@@ -907,6 +907,17 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void removeHostnamesFromEtcHosts( final EnvironmentId environmentId, final HostAddresses hostAddresses )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( hostAddresses );
+
+        environmentWebClient.removeHostnamesFromEtcHosts( environmentId, hostAddresses );
+    }
+
+
+    @Override
     public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
                                                               final String oldHostname, final String newHostname,
                                                               final SshEncryptionType sshEncryptionType )
