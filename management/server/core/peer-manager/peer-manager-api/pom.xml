@@ -5,7 +5,7 @@
   <parent>
     <artifactId>peer-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>8.2.1-SNAPSHOT</version>
+    <version>8.2.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>peer-manager-api</artifactId>
