@@ -25,6 +25,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -48,7 +49,7 @@ public class TemplateManagerImpl implements TemplateManager
     private static final int TEMPLATE_CACHE_TTL_SEC = 60;
     private static final int HIT_CACHE_IF_ERROR_INTERVAL_SEC = 30;
     private static final String[] VERIFIED_OWNERS = { "subutai", "jenkins" };
-    private Set<Template> templatesCache = Sets.newConcurrentHashSet();
+    private Set<Template> templatesCache = Sets.newLinkedHashSet();
     private volatile long lastTemplatesFetchTime = 0L;
     private volatile long lastTemplatesFetchErrorTime = 0L;
     private final ReentrantLock lock = new ReentrantLock( true );
@@ -71,12 +72,12 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    private boolean needToUpdateCache()
+    private boolean isCacheUpToDate()
     {
-        return templatesCache.isEmpty() || System.currentTimeMillis() - lastTemplatesFetchTime >= TimeUnit.SECONDS
+        return !templatesCache.isEmpty() && ( System.currentTimeMillis() - lastTemplatesFetchTime < TimeUnit.SECONDS
                 .toMillis( TEMPLATE_CACHE_TTL_SEC )
-                && System.currentTimeMillis() - lastTemplatesFetchErrorTime > TimeUnit.SECONDS
-                .toMillis( HIT_CACHE_IF_ERROR_INTERVAL_SEC );
+                || System.currentTimeMillis() - lastTemplatesFetchErrorTime < TimeUnit.SECONDS
+                .toMillis( HIT_CACHE_IF_ERROR_INTERVAL_SEC ) );
     }
 
 
@@ -84,7 +85,7 @@ public class TemplateManagerImpl implements TemplateManager
     public Set<Template> getTemplates()
     {
 
-        if ( !needToUpdateCache() )
+        if ( isCacheUpToDate() )
         {
             return templatesCache;
         }
@@ -94,7 +95,7 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             //check again just in case
-            if ( !needToUpdateCache() )
+            if ( isCacheUpToDate() )
             {
                 return templatesCache;
             }
@@ -103,13 +104,12 @@ public class TemplateManagerImpl implements TemplateManager
             CloseableHttpClient client = getHttpsClient();
             try
             {
-                HttpGet httpGet = new HttpGet(
-                        String.format( "https://%s/rest/v1/cdn/templates?version=latest", Common.BAZAAR_IP ) );
+                HttpGet httpGet = new HttpGet( String.format( "https://%s/rest/v1/cdn/templates", Common.BAZAAR_IP ) );
                 CloseableHttpResponse response = client.execute( httpGet );
 
                 try
                 {
-                    Set<Template> freshTemplateList = Sets.newHashSet();
+                    List<Template> freshTemplateList = Lists.newArrayList();
 
                     String json = readContent( response );
 
@@ -126,6 +126,12 @@ public class TemplateManagerImpl implements TemplateManager
                     if ( !CollectionUtil.isCollectionEmpty( freshTemplateList ) )
                     {
                         lastTemplatesFetchTime = System.currentTimeMillis();
+
+                        freshTemplateList.sort( ( o1, o2 ) -> {
+                            ComparableVersion v1 = new ComparableVersion( o1.getVersion() );
+                            ComparableVersion v2 = new ComparableVersion( o2.getVersion() );
+                            return v2.compareTo( v1 );
+                        } );
 
                         templatesCache.clear();
 
@@ -274,7 +280,7 @@ public class TemplateManagerImpl implements TemplateManager
     //Bazaar CDN
 
 
-    protected CloseableHttpClient getHttpsClient()
+    CloseableHttpClient getHttpsClient()
     {
         try
         {
@@ -297,7 +303,7 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    protected String readContent( CloseableHttpResponse response )
+    String readContent( CloseableHttpResponse response )
     {
         try
         {
@@ -346,7 +352,8 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             HttpGet httpGet = new HttpGet(
-                    String.format( "https://%s/rest/v1/cdn/token?fingerprint=%s", Common.BAZAAR_IP, getFingerprint() ) );
+                    String.format( "https://%s/rest/v1/cdn/token?fingerprint=%s", Common.BAZAAR_IP,
+                            getFingerprint() ) );
             CloseableHttpResponse response = client.execute( httpGet );
             try
             {
@@ -434,8 +441,8 @@ public class TemplateManagerImpl implements TemplateManager
         CloseableHttpClient client = getHttpsClient();
         try
         {
-            HttpGet httpGet =
-                    new HttpGet( String.format( "https://%s/rest/v1/cdn/users/%s", Common.BAZAAR_IP, getFingerprint() ) );
+            HttpGet httpGet = new HttpGet(
+                    String.format( "https://%s/rest/v1/cdn/users/%s", Common.BAZAAR_IP, getFingerprint() ) );
             CloseableHttpResponse response = client.execute( httpGet );
             try
             {

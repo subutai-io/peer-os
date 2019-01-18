@@ -2829,13 +2829,6 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public Set<Template> getTemplates()
-    {
-        return templateManager.getTemplates();
-    }
-
-
-    @Override
     public Template getTemplateByName( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
