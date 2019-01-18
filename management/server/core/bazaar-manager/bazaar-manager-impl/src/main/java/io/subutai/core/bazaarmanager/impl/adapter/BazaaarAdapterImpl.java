@@ -341,6 +341,13 @@ public class BazaaarAdapterImpl extends HostListener implements BazaaarAdapter, 
 
 
     @Override
+    public void onContainerDestroyed( final ContainerHostInfo containerInfo )
+    {
+        destroyContainer( containerInfo.getEnvId(), containerInfo.getId() );
+    }
+
+
+    @Override
     public void onEnvironmentDestroyed( final String environmentId )
     {
         getbazaarmanager().schedulePeerMetrics();
