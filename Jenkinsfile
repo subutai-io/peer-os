@@ -210,7 +210,7 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
     def mattermost_rest = "https://mm.subutai.io/hooks/dhdtqg4eci8hxd1358icgujq9w"
     // Send notifications
     //slackSend(color: colorCode, message: summary, teamDomain: 'optdyn', token: "${slackToken}")
-    mattermostSend(color: colorCode, icon: "https://jenkins.io/images/logos/jenkins/jenkins.png", message: message, channel: ss-bots, endpoint: ${mattermost_rest} )
+    mattermostSend(color: colorCode, icon: "https://jenkins.io/images/logos/jenkins/jenkins.png", message: summary, channel: ss-bots, endpoint: ${mattermost_rest} )
 }
 
 // get slack token from global jenkins credentials store
