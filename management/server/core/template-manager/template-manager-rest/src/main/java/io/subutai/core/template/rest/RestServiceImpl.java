@@ -1,7 +1,7 @@
 package io.subutai.core.template.rest;
 
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -33,10 +33,10 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
-        Set<Template> templates = templateManager.getTemplates().stream().filter(
+        List<Template> templates = templateManager.getTemplates().stream().filter(
                 n -> !Strings.isNullOrEmpty( n.getName() ) && !n.getName()
                                                                 .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                 .collect( Collectors.toSet() );
+                                                  .collect( Collectors.toList() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
@@ -45,10 +45,10 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listOwnTemplates()
     {
-        Set<Template> templates = templateManager.getOwnTemplates().stream().filter(
+        List<Template> templates = templateManager.getOwnTemplates().stream().filter(
                 n -> !Strings.isNullOrEmpty( n.getName() ) && !n.getName()
                                                                 .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                 .collect( Collectors.toSet() );
+                                                  .collect( Collectors.toList() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
@@ -83,7 +83,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response isRegisteredWithCdn()
+     public Response isRegisteredWithCdn()
     {
         return Response.ok().entity( templateManager.isRegisteredWithCdn() ).build();
     }

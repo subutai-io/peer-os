@@ -12,13 +12,9 @@ public class EnvironmentNodesDto
 {
     private String peerId;
 
-    private String environmentName;
-
     private String environmentId;
 
     private List<EnvironmentNodeDto> nodes = new ArrayList<>();
-
-    private String VEHS;
 
 
     public EnvironmentNodesDto()
@@ -35,18 +31,6 @@ public class EnvironmentNodesDto
     public void setPeerId( final String peerId )
     {
         this.peerId = peerId;
-    }
-
-
-    public String getEnvironmentName()
-    {
-        return environmentName;
-    }
-
-
-    public void setEnvironmentName( final String environmentName )
-    {
-        this.environmentName = environmentName;
     }
 
 
@@ -83,17 +67,5 @@ public class EnvironmentNodesDto
     public void removeNode( final EnvironmentNodeDto nodeDto )
     {
         this.nodes.remove( nodeDto );
-    }
-
-
-    public String getVEHS()
-    {
-        return VEHS;
-    }
-
-
-    public void setVEHS( final String VEHS )
-    {
-        this.VEHS = VEHS;
     }
 }
