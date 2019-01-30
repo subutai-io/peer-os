@@ -185,8 +185,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param sslBackend determines if backend is working over SSL or not
      */
     void mapContainerPortToDomain( Protocol protocol, String containerIp, int containerPort, int rhPort, String domain,
-                                   String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend )
-            throws ResourceHostException;
+                                   String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend,
+                                   boolean redirect, boolean http2 ) throws ResourceHostException;
 
     /**
      * Removes specified container port domain mapping
