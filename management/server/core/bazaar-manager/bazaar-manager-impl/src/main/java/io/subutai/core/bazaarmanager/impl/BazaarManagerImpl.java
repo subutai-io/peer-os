@@ -49,7 +49,7 @@ import io.subutai.core.bazaarmanager.impl.http.BazaarRestClient;
 import io.subutai.core.bazaarmanager.impl.model.ConfigEntity;
 import io.subutai.core.bazaarmanager.impl.processor.BazaarEnvironmentProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.HeartbeatProcessor;
-import io.subutai.core.bazaarmanager.impl.processor.ProxyProcessor;
+import io.subutai.core.bazaarmanager.impl.processor.port_map.ProxyProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.UserTokenProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.port_map.ContainerPortMapProcessor;
 import io.subutai.core.bazaarmanager.impl.requestor.ContainerEventProcessor;
