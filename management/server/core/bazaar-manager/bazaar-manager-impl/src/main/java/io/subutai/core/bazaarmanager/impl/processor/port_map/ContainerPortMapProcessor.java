@@ -1,24 +1,17 @@
 package io.subutai.core.bazaarmanager.impl.processor.port_map;
 
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.google.common.collect.Sets;
 
 import io.subutai.bazaar.share.dto.domain.ContainerPortMapDto;
 import io.subutai.bazaar.share.dto.domain.PortMapDto;
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.LoadBalancing;
-import io.subutai.common.protocol.Protocol;
 import io.subutai.core.bazaarmanager.api.RestResult;
 import io.subutai.core.bazaarmanager.api.StateLinkProcessor;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
@@ -36,11 +29,6 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     private static final Set<PortMapDto> PORT_CACHE = Sets.newConcurrentHashSet();
 
     private Context ctx;
-
-
-    public ContainerPortMapProcessor()
-    {
-    }
 
 
     public ContainerPortMapProcessor( final Context ctx )
@@ -140,7 +128,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
     {
         try
         {
-            if ( portMapDto.getState().equals( PortMapDto.State.USED ) )
+            if ( portMapDto.getState() == PortMapDto.State.USED )
             {
                 return;
             }
@@ -158,37 +146,7 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             ResourceHost resourceHost =
                     ctx.localPeer.getResourceHostById( containerHost.getResourceHostId().toString() );
 
-            Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
-
-
-            if ( !protocol.isHttpOrHttps() )
-            {
-                if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
-                        portMapDto.getInternalPort(), portMapDto.getDomain() ) )
-                {
-                    resourceHost.mapContainerPort( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                            portMapDto.getExternalPort() );
-                }
-                else
-                {
-                    portMapDto.setState( PortMapDto.State.USED );
-                }
-            }
-            else
-            {
-                if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
-                        portMapDto.getInternalPort(), portMapDto.getDomain() ) )
-                {
-                    String sslCertPath =
-                            protocol == Protocol.HTTPS ? saveSslCertificateToFilesystem( portMapDto, resourceHost ) :
-                            null;
-
-                    resourceHost
-                            .mapContainerPortToDomain( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                                    portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
-                                    LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend(), false, false );
-                }
-            }
+            PortMapUtil.mapPortToIp( portMapDto, resourceHost, containerHost.getIp(), portMapDto.getInternalPort() );
 
             if ( !resourceHost.isManagementHost() && !portMapDto.isProxied() )
             {
@@ -197,29 +155,9 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 // 'external port -> internal port' mapping should occur.
 
                 ResourceHost mngHost = ctx.localPeer.getManagementHost();
-                String rhIpAddr = resourceHost.getAddress();
 
-                if ( !mngHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), rhIpAddr,
-                        portMapDto.getExternalPort(), portMapDto.getDomain() ) )
-                {
-                    if ( !protocol.isHttpOrHttps() )
-                    {
-                        mngHost.mapContainerPort( protocol, rhIpAddr, portMapDto.getExternalPort(),
-                                portMapDto.getExternalPort() );
-                    }
-                    else
-                    {
-                        String sslCertPath =
-                                protocol == Protocol.HTTPS && StringUtils.isNotEmpty( portMapDto.getSslCertPem() ) ?
-                                saveSslCertificateToFilesystem( portMapDto, mngHost ) : null;
-
-                        mngHost.mapContainerPortToDomain( protocol, rhIpAddr, portMapDto.getExternalPort(),
-                                portMapDto.getExternalPort(), portMapDto.getDomain(), sslCertPath,
-                                LoadBalancing.ROUND_ROBIN, portMapDto.isSslBackend(), false, false );
-                    }
-                }
+                PortMapUtil.mapPortToIp( portMapDto, mngHost, resourceHost.getIp(), portMapDto.getExternalPort() );
             }
-
 
             portMapDto.setState( PortMapDto.State.USED );
         }
@@ -229,25 +167,5 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             portMapDto.setErrorLog( e.getMessage() );
             log.error( "*********", e );
         }
-    }
-
-
-    private String saveSslCertificateToFilesystem( PortMapDto portMapDto, ResourceHost rh )
-            throws IOException, CommandException
-    {
-        if ( StringUtils.isBlank( portMapDto.getSslCertPem() ) )
-        {
-            return null;
-        }
-
-        String fileName = String.format( "%s-%d-%d", portMapDto.getDomain(), portMapDto.getExternalPort(),
-                portMapDto.getInternalPort() );
-
-        String sslCertPath = "/tmp/" + fileName + ".pem";
-
-        rh.execute(
-                new RequestBuilder( String.format( "echo \"%s\" > %s", portMapDto.getSslCertPem(), sslCertPath ) ) );
-
-        return sslCertPath;
     }
 }

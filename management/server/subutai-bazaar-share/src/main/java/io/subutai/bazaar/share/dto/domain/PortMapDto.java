@@ -51,6 +51,10 @@ public class PortMapDto
 
     private boolean isProxied;
 
+    private boolean redirectHttpToHttps;
+
+    private boolean isHttp2;
+
     private UUID correlationId;
 
 
@@ -201,6 +205,30 @@ public class PortMapDto
     public void setProxied( final boolean proxied )
     {
         isProxied = proxied;
+    }
+
+
+    public boolean isRedirectHttpToHttps()
+    {
+        return redirectHttpToHttps;
+    }
+
+
+    public void setRedirectHttpToHttps( final boolean redirectHttpToHttps )
+    {
+        this.redirectHttpToHttps = redirectHttpToHttps;
+    }
+
+
+    public boolean isHttp2()
+    {
+        return isHttp2;
+    }
+
+
+    public void setHttp2( final boolean http2 )
+    {
+        isHttp2 = http2;
     }
 
 
