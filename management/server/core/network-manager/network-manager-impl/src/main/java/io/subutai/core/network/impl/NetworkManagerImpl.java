@@ -448,7 +448,8 @@ public class NetworkManagerImpl implements NetworkManager
     public void mapContainerPortToDomain( final Host host, final Protocol protocol, final String containerIp,
                                           final int containerPort, final int rhPort, final String domain,
                                           final String sslCertPath, final LoadBalancing loadBalancing,
-                                          final boolean sslBackend ) throws NetworkManagerException
+                                          final boolean sslBackend, final boolean redirect, final boolean http2 )
+            throws NetworkManagerException
     {
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
@@ -462,7 +463,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( host,
                 commands.getMapContainerPortToDomainCommand( protocol, containerIp, containerPort, rhPort, domain,
-                        sslCertPath, loadBalancing, sslBackend ) );
+                        sslCertPath, loadBalancing, sslBackend, redirect, http2 ) );
     }
 
 

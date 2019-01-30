@@ -271,7 +271,7 @@ public class ProxyProcessor implements StateLinkProcessor
                                 resourceHost.mapContainerPortToDomain( protocol, portMapDto.getIpAddr(),
                                         portMapDto.getExternalPort(), portMapDto.getExternalPort(),
                                         portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
-                                        portMapDto.isSslBackend() );
+                                        portMapDto.isSslBackend(), false, false );
                             }
 
                             portMapDto.setState( PortMapDto.State.USED );

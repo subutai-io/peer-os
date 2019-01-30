@@ -21,7 +21,6 @@ public class Commands
     private static final String TUNNEL_BINDING = "subutai tunnel";
     private static final String VXLAN_BINDING = "subutai vxlan";
     private static final String P2P_BINDING = "p2p";
-    private static final String PROXY_BINDING = "subutai proxy";
     private static final String INFO_BINDING = "subutai info";
     private static final String MAP_BINDING = "subutai map";
 
@@ -144,7 +143,8 @@ public class Commands
     RequestBuilder getMapContainerPortToDomainCommand( final Protocol protocol, final String containerIp,
                                                        final int containerPort, final int rhPort, final String domain,
                                                        final String sslCertPath, final LoadBalancing loadBalancing,
-                                                       final boolean sslBackend )
+                                                       final boolean sslBackend, final boolean redirect,
+                                                       final boolean http2 )
     {
         List<String> args = Lists.newArrayList( "add", "-p", protocol.name().toLowerCase(), "-i",
                 String.format( "%s:%s", containerIp, containerPort ), "-e", String.valueOf( rhPort ), "-n", domain );
@@ -161,6 +161,16 @@ public class Commands
         if ( sslBackend )
         {
             args.add( "--sslbackend" );
+        }
+
+        if ( redirect )
+        {
+            args.add( "--redirect" );
+        }
+
+        if ( http2 )
+        {
+            args.add( "--http2" );
         }
 
         if ( loadBalancing != null )

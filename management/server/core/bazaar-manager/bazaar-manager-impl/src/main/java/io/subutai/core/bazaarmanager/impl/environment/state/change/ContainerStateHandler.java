@@ -43,6 +43,10 @@ public class ContainerStateHandler extends StateHandler
 
             EnvironmentDto resultEnvDto = null;
 
+            //todo figure out from envDto.getNodes() containers that have state ABORTING
+            //and remove their hostnames from /etc/hosts of the other containers that belong to this peer
+            //EnvironmentNodesDto.getPeerId() == ctx.localPeer.getId()
+
             for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
             {
                 PeerId peerId = new PeerId( nodesDto.getPeerId() );
