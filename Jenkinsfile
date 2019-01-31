@@ -207,7 +207,7 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
     }
     // Get token
     def slackToken = getSlackToken('ss-bots')
-    def mattermost_rest = "https://mm.subutai.io/hooks/dhdtqg4eci8hxd1358icgujq9w"
+    def mattermost_rest = "https://mm.optdyn.com/hooks/dhdtqg4eci8hxd1358icgujq9w"
     // Send notifications
     //slackSend(color: colorCode, message: summary, teamDomain: 'optdyn', token: "${slackToken}")
     mattermostSend(color: colorCode, icon: "https://jenkins.io/images/logos/jenkins/jenkins.png", message: summary, channel: "#ss-bots", endpoint: "${mattermost_rest}" )
