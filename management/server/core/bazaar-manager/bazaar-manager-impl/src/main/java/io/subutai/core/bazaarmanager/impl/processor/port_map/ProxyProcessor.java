@@ -1,4 +1,4 @@
-package io.subutai.core.bazaarmanager.impl.processor;
+package io.subutai.core.bazaarmanager.impl.processor.port_map;
 
 
 import java.util.Set;
@@ -12,12 +12,8 @@ import com.google.common.collect.Sets;
 
 import io.subutai.bazaar.share.dto.domain.PortMapDto;
 import io.subutai.bazaar.share.dto.domain.ProxyDto;
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.Protocol;
 import io.subutai.common.protocol.ReservedPort;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.core.bazaarmanager.api.RestClient;
@@ -182,36 +178,11 @@ public class ProxyProcessor implements StateLinkProcessor
         {
             ResourceHost resourceHost = peerManager.getLocalPeer().getManagementHost();
 
-            Protocol protocol;
-
             for ( final PortMapDto portMapDto : proxyDto.getPortMaps() )
             {
-                protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
-
-                if ( !resourceHost
-                        .isPortMappingReserved( protocol, portMapDto.getExternalPort(), portMapDto.getIpAddr(),
-                                portMapDto.getInternalPort(), portMapDto.getDomain() ) )
-                {
-                    // skip not existing port mapping
-                    portMapDto.setState( PortMapDto.State.DELETED );
-                    continue;
-                }
-
-                if ( portMapDto.getProtocol().isHttpOrHttps() )
-                {
-                    resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getIpAddr(),
-                            portMapDto.getExternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain() );
-
-                    portMapDto.setState( PortMapDto.State.DELETED );
-                }
-                else
-                {
-                    resourceHost
-                            .removeContainerPortMapping( protocol, portMapDto.getIpAddr(), portMapDto.getExternalPort(),
-                                    portMapDto.getExternalPort() );
-
-                    portMapDto.setState( PortMapDto.State.DELETED );
-                }
+                PortMapUtil.destroyPortMapping( portMapDto, resourceHost, portMapDto.getIpAddr(),
+                        portMapDto.getExternalPort() );
+                portMapDto.setState( PortMapDto.State.DELETED );
             }
 
             // cleanup port mappings, if any is left. Search them by proxy p2p IP interface.
@@ -255,68 +226,21 @@ public class ProxyProcessor implements StateLinkProcessor
             {
                 try
                 {
-                    Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
-
-                    if ( protocol.isHttpOrHttps() )
+                    if ( portMapDto.getState() == PortMapDto.State.CREATING
+                            || portMapDto.getState() == PortMapDto.State.USED )
                     {
-                        if ( portMapDto.getState().equals( PortMapDto.State.CREATING ) || portMapDto.getState().equals(
-                                PortMapDto.State.USED ) )
-                        {
-                            if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
-                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
-                            {
-                                String sslCertPath = protocol == Protocol.HTTPS ?
-                                                     saveSslCertificateToFilesystem( portMapDto, resourceHost ) : null;
+                        PortMapUtil.mapPortToIp( portMapDto, resourceHost, portMapDto.getIpAddr(),
+                                portMapDto.getExternalPort() );
 
-                                resourceHost.mapContainerPortToDomain( protocol, portMapDto.getIpAddr(),
-                                        portMapDto.getExternalPort(), portMapDto.getExternalPort(),
-                                        portMapDto.getDomain(), sslCertPath, LoadBalancing.ROUND_ROBIN,
-                                        portMapDto.isSslBackend() );
-                            }
-
-                            portMapDto.setState( PortMapDto.State.USED );
-                        }
-                        else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING ) || portMapDto.getState()
-                                                                                                           .equals(
-                                                                                                                   PortMapDto.State.DELETED ) )
-                        {
-                            if ( resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
-                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
-                            {
-                                resourceHost.removeContainerPortDomainMapping( protocol, portMapDto.getIpAddr(),
-                                        portMapDto.getExternalPort(), portMapDto.getExternalPort(),
-                                        portMapDto.getDomain() );
-                            }
-                            portMapDto.setState( PortMapDto.State.DELETED );
-                        }
+                        portMapDto.setState( PortMapDto.State.USED );
                     }
-                    else
+                    else if ( portMapDto.getState() == PortMapDto.State.DESTROYING
+                            || portMapDto.getState() == PortMapDto.State.DELETED )
                     {
-                        if ( portMapDto.getState().equals( PortMapDto.State.CREATING ) || portMapDto.getState().equals(
-                                PortMapDto.State.USED ) )
-                        {
-                            if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
-                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
-                            {
-                                resourceHost.mapContainerPort( protocol, portMapDto.getIpAddr(),
-                                        portMapDto.getExternalPort(), portMapDto.getExternalPort() );
-                            }
+                        PortMapUtil.destroyPortMapping( portMapDto, resourceHost, portMapDto.getIpAddr(),
+                                portMapDto.getInternalPort() );
 
-                            portMapDto.setState( PortMapDto.State.USED );
-                        }
-                        else if ( portMapDto.getState().equals( PortMapDto.State.DESTROYING ) || portMapDto.getState()
-                                                                                                           .equals(
-                                                                                                                   PortMapDto.State.DELETED ) )
-                        {
-                            if ( resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(),
-                                    portMapDto.getIpAddr(), portMapDto.getExternalPort(), portMapDto.getDomain() ) )
-                            {
-                                resourceHost.removeContainerPortMapping( protocol, portMapDto.getIpAddr(),
-                                        portMapDto.getExternalPort(), portMapDto.getExternalPort() );
-                            }
-
-                            portMapDto.setState( PortMapDto.State.DELETED );
-                        }
+                        portMapDto.setState( PortMapDto.State.DELETED );
                     }
                 }
                 catch ( Exception e )
@@ -331,25 +255,6 @@ public class ProxyProcessor implements StateLinkProcessor
         {
             log.error( "Error during setting up port mappings: {}", e.getMessage() );
         }
-    }
-
-
-    private String saveSslCertificateToFilesystem( PortMapDto portMapDto, ResourceHost rh ) throws CommandException
-    {
-        if ( StringUtils.isBlank( portMapDto.getSslCertPem() ) )
-        {
-            return null;
-        }
-
-        String fileName = String.format( "%s-%d-%d", portMapDto.getDomain(), portMapDto.getExternalPort(),
-                portMapDto.getInternalPort() );
-
-        String sslCertPath = "/tmp/" + fileName + ".pem";
-
-        rh.execute(
-                new RequestBuilder( String.format( "echo \"%s\" > %s", portMapDto.getSslCertPem(), sslCertPath ) ) );
-
-        return sslCertPath;
     }
 
 

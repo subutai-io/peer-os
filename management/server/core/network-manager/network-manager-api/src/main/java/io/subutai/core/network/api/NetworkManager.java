@@ -129,8 +129,8 @@ public interface NetworkManager
      * @param sslBackend determines if backend is working over SSL or not
      */
     void mapContainerPortToDomain( Host host, Protocol protocol, String containerIp, int containerPort, int rhPort,
-                                   String domain, String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend )
-            throws NetworkManagerException;
+                                   String domain, String sslCertPath, LoadBalancing loadBalancing, boolean sslBackend,
+                                   boolean redirect, boolean http2 ) throws NetworkManagerException;
 
     /**
      * Removes specified container port domain mapping

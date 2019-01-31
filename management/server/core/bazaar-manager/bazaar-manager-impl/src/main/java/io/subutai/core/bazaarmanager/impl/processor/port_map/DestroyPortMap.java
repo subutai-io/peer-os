@@ -35,59 +35,34 @@ public class DestroyPortMap
             ResourceHost resourceHost =
                     ctx.localPeer.getResourceHostById( containerHost.getResourceHostId().toString() );
 
-            Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
-
-            if ( !resourceHost.isPortMappingReserved( protocol, portMapDto.getExternalPort(), containerHost.getIp(),
-                    portMapDto.getInternalPort(), portMapDto.getDomain() ) )
+            if ( !PortMapUtil.destroyPortMapping( portMapDto, resourceHost, containerHost.getIp(),
+                    portMapDto.getInternalPort() ) )
             {
                 // skip not existing port mapping
                 portMapDto.setState( PortMapDto.State.DELETED );
                 return;
             }
 
-            if ( protocol == Protocol.HTTP || protocol == Protocol.HTTPS )
-            {
-                resourceHost.removeContainerPortDomainMapping( protocol, containerHost.getIp(),
-                        portMapDto.getInternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain() );
-            }
-            else
-            {
-                resourceHost.removeContainerPortMapping( protocol, containerHost.getIp(), portMapDto.getInternalPort(),
-                        portMapDto.getExternalPort() );
-            }
-
             // if it's RH, remove port mapping from MH too
             if ( !resourceHost.isManagementHost() )
             {
                 boolean mappingIsInUseOnRH = false;
+                Protocol protocol = Protocol.valueOf( portMapDto.getProtocol().name() );
 
                 // check if port mapping on MH is not used for other container on this RH
                 for ( final ReservedPort mapping : resourceHost.getReservedPortMappings() )
                 {
-                    if ( mapping.getProtocol().name().equals( portMapDto.getProtocol().name() )
-                            && mapping.getPort() == portMapDto.getExternalPort() )
+                    if ( mapping.getProtocol() == protocol && mapping.getPort() == portMapDto.getExternalPort() )
                     {
                         mappingIsInUseOnRH = true;
                         break;
                     }
                 }
 
-
                 if ( !mappingIsInUseOnRH )
                 {
-                    String rhIpAddr = resourceHost.getAddress();
-
-                    if ( protocol == Protocol.HTTP || protocol == Protocol.HTTPS )
-                    {
-                        ctx.localPeer.getManagementHost().removeContainerPortDomainMapping( protocol, rhIpAddr,
-                                portMapDto.getExternalPort(), portMapDto.getExternalPort(), portMapDto.getDomain() );
-                    }
-                    else
-                    {
-                        ctx.localPeer.getManagementHost()
-                                     .removeContainerPortMapping( protocol, rhIpAddr, portMapDto.getExternalPort(),
-                                             portMapDto.getExternalPort() );
-                    }
+                    PortMapUtil.destroyPortMapping( portMapDto, ctx.localPeer.getManagementHost(),
+                            resourceHost.getAddress(), portMapDto.getExternalPort() );
                 }
             }
 

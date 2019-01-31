@@ -140,6 +140,11 @@ public class BuildContainerStateHandler extends StateHandler
 
             templates.add( node.getTemplateId() );
         }
+        
+        if ( rhTemplates.isEmpty() )
+        {
+            return;
+        }
 
         if ( rhTemplates.isEmpty() )
         {
