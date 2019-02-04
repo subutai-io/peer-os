@@ -113,6 +113,20 @@ public class LocalPeerCommands
     }
 
 
+    protected RequestBuilder getCreateUserIfNotExistsCommand( String username )
+    {
+        return new RequestBuilder( String.format( "id -u %1$s &> /dev/null || useradd -m %1$s", username ) );
+    }
+
+
+    protected RequestBuilder getAppendSshKeyToUserCommand( String username, String key )
+    {
+        return new RequestBuilder( String.format( "mkdir -p /home/%1$s/.ssh && " + "chmod 700 /home/%1$s/.ssh && "
+                + "echo '%2$s' >> /home/%1$s/.ssh/authorized_keys && sort -u '/home/%1$s/.ssh/authorized_keys' -o "
+                + "'/home/%1$s/.ssh/authorized_keys' && chmod 644 /home/%1$s/.ssh/authorized_keys", username, key ) );
+    }
+
+
     protected RequestBuilder getConfigSSHCommand()
     {
         return new RequestBuilder( String.format(
