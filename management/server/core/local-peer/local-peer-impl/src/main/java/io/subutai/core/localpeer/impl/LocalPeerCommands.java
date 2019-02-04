@@ -119,6 +119,12 @@ public class LocalPeerCommands
     }
 
 
+    public RequestBuilder getRemoveUserIfExistsCommand( final String username )
+    {
+        return new RequestBuilder( String.format( "id -u %1$s &> /dev/null && userdel -r %1$s", username ) );
+    }
+
+
     protected RequestBuilder getAppendSshKeyToUserCommand( String username, String key )
     {
         return new RequestBuilder( String.format( "mkdir -p /home/%1$s/.ssh && " + "chmod 700 /home/%1$s/.ssh && "

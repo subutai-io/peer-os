@@ -135,9 +135,14 @@ public interface LocalPeer extends Peer
 
     List<ContainerHost> getPeerContainers( String peerId );
 
+    void createUserIfNotExists( String containerId, String username ) throws PeerException;
+
+    void removeUserIfExists( String containerId, String username ) throws PeerException;
+
     void addAuthorizedSshKeyToUser( String containerId, String username, String sshPublicKey ) throws PeerException;
 
-    void removeAuthorizedSshKeyFromUser( String containerId, String username, String sshPublicKey ) throws PeerException;
+    void removeAuthorizedSshKeyFromUser( String containerId, String username, String sshPublicKey )
+            throws PeerException;
 
     Set<HostUtil.Task> getTasks();
 

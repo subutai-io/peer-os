@@ -802,7 +802,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid username" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "Invalid username" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
 
         ContainerHost container = getContainerHostById( containerId );
@@ -824,7 +824,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                                                 final String sshPublicKey ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid username" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "Invalid username" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
 
         ContainerHost container = getContainerHostById( containerId );
@@ -836,6 +836,44 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         catch ( CommandException e )
         {
             throw new PeerException( "Error removing authorized ssh key from user", e );
+        }
+    }
+
+
+    @Override
+    public void createUserIfNotExists( final String containerId, final String username ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "Invalid username" );
+
+        ContainerHost container = getContainerHostById( containerId );
+
+        try
+        {
+            execute( localPeerCommands.getCreateUserIfNotExistsCommand( username ), container );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( "Error creating user in container", e );
+        }
+    }
+
+
+    @Override
+    public void removeUserIfExists( final String containerId, final String username ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "Invalid username" );
+
+        ContainerHost container = getContainerHostById( containerId );
+
+        try
+        {
+            execute( localPeerCommands.getRemoveUserIfExistsCommand( username ), container );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( "Error removing user from container", e );
         }
     }
 
