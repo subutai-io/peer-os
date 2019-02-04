@@ -797,6 +797,22 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     }
 
 
+    @Override
+    public void addAuthorizedSshKeyToUser( final String containerId, final String username, final String sshKey )
+            throws PeerException
+    {
+        //TODO
+    }
+
+
+    @Override
+    public void removeAuthorizedSshKeyFromUser( final String containerId, final String username, final String sshKey )
+            throws PeerException
+    {
+        //TODO
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
