@@ -798,18 +798,45 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public void addAuthorizedSshKeyToUser( final String containerId, final String username, final String sshKey )
+    public void addAuthorizedSshKeyToUser( final String containerId, final String username, final String sshPublicKey )
             throws PeerException
     {
-        //TODO
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid username" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+
+        ContainerHost container = getContainerHostById( containerId );
+
+        try
+        {
+            execute( localPeerCommands.getCreateUserIfNotExistsCommand( username ), container );
+            execute( localPeerCommands.getAppendSshKeyToUserCommand( username, sshPublicKey ), container );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( "Error adding authorized ssh key to user", e );
+        }
     }
 
 
     @Override
-    public void removeAuthorizedSshKeyFromUser( final String containerId, final String username, final String sshKey )
-            throws PeerException
+    public void removeAuthorizedSshKeyFromUser( final String containerId, final String username,
+                                                final String sshPublicKey ) throws PeerException
     {
-        //TODO
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid username" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+
+        ContainerHost container = getContainerHostById( containerId );
+
+        try
+        {
+            execute( localPeerCommands.getRemoveSshKeyFromUserCommand( username, sshPublicKey ), container );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( "Error removing authorized ssh key from user", e );
+        }
     }
 
 

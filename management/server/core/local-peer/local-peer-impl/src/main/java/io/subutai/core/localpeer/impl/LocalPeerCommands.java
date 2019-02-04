@@ -129,9 +129,10 @@ public class LocalPeerCommands
 
     protected RequestBuilder getRemoveSshKeyFromUserCommand( String username, String key )
     {
-        return new RequestBuilder( String.format( "chmod 700 /home/%1$s/.ssh/authorized_keys && "
-                + "sed -i \"\\,%2$s,d\" /home/%1$s/.ssh/authorized_keys && "
-                + "chmod 644 /home/%1$s/.ssh/authorized_keys", username, key ) );
+        return new RequestBuilder( String.format(
+                "test -e /home/%1$s/.ssh/authorized_keys && chmod 700 /home/%1$s/.ssh/authorized_keys && "
+                        + "sed -i \"\\,%2$s,d\" /home/%1$s/.ssh/authorized_keys && "
+                        + "chmod 644 /home/%1$s/.ssh/authorized_keys", username, key ) );
     }
 
 
