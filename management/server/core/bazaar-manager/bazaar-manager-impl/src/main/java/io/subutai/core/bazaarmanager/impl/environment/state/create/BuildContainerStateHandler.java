@@ -146,6 +146,11 @@ public class BuildContainerStateHandler extends StateHandler
             return;
         }
 
+        if ( rhTemplates.isEmpty() )
+        {
+            return;
+        }
+
         try
         {
             ctx.localPeer.prepareTemplates(
