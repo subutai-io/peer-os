@@ -475,7 +475,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                         Matcher m = p.matcher( snapshotLine );
                         if ( m.find() && m.groupCount() == 2 )
                         {
-                            Snapshot snapshot = new Snapshot( m.group( 1 ), m.group( 2 ) );
+                            Snapshot snapshot =
+                                    new Snapshot( containerHost.getContainerName(), m.group( 1 ), m.group( 2 ) );
                             snapshots.addSnapshot( snapshot );
                         }
                     }
