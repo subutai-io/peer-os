@@ -965,6 +965,10 @@ tip.description-tooltip {
     background-image: url('../assets/templates/no-image.jpg');
 }
 
+.b-icon_disk{
+    background-image: url('../assets/elements/icons/icon-hdd.svg');
+}
+
 .b-icon_info {
     background-image: url('../assets/elements/buttons/Info_icon-01.svg');
 }

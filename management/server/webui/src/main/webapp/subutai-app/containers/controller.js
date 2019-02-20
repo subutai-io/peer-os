@@ -18,8 +18,6 @@ ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'Swee
 
 function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar, identitySrv, templateSrv) {
 
-//	checkCDNToken(templateSrv, $rootScope)
-
 	var vm = this;
 
 	cfpLoadingBar.start();
@@ -58,8 +56,8 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
 	vm.createTemplatePopup=createTemplatePopup;
+	vm.createSnapshotsPopup=createSnapshotsPopup;
 	vm.createTemplate=createTemplate;
-	vm.hasCdnToken=hasCdnToken;
     vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
@@ -334,7 +332,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function createTemplatePopup(container){
 
-//        if( hasCdnToken() ){
             vm.editingContainer = container;
 
             ngDialog.open({
@@ -342,12 +339,17 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
                 scope: $scope,
                 className: 'b-build-environment-info'
             });
-//		} else {
-//		    SweetAlert.swal(
-//		    "Your key is not registered with Bazaar",
-//		    "Please, register your key on Bazaar",
-//		    "success");
-//		}
+	}
+
+	function createSnapshotsPopup(container){
+
+            vm.editingContainer = container;
+
+            ngDialog.open({
+                template: 'subutai-app/containers/partials/manageSnapshots.html',
+                scope: $scope,
+                className: 'b-build-environment-info'
+            });
 	}
 
 
@@ -431,10 +433,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
         });
 
-    }
-
-    function hasCdnToken(){
-        return !(localStorage.getItem('cdnToken') == undefined || localStorage.getItem('cdnToken') == null);
     }
 
 }

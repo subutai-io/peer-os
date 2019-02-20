@@ -1,0 +1,51 @@
+<div class="b-popup b-popup_min">
+	<div class="b-popup__header">
+		Manage container snapshots
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+
+  <div class="b-main-table-border">
+
+    <table
+        class="b-main-table b-main-table_with-header">
+      <thead>
+      <tr>
+        <th>Partition</th>
+        <th>Snapshot</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr><td>var</td><td>snap</td></tr>
+      <!--<tr ng-repeat="(key, container) in containerViewCtrl.containers">-->
+        <!--<td class="b-main-table__container-status">-->
+          <!--<div-->
+              <!--class="b-status-icon b-status-icon_{{ container.state }}"-->
+              <!--tooltips-->
+              <!--tooltip-template="{{ container.state.length > 0 ? container.state : 'UNCHECKED' }}"-->
+              <!--tooltip-side="right">-->
+          <!--</div>-->
+        <!--</td>-->
+      <!--</tr>-->
+      </tbody>
+    </table>
+  </div>
+
+	<!--<form ng-submit="containerViewCtrl.setContainerName(containerViewCtrl.editingContainer, containerHostname)">-->
+		<!--<div class="b-popup__body">-->
+
+			<!--<div class="popup-body-box">-->
+				<!--<input ng-model="containerHostname" required maxlength="50" ng-init="containerHostname=containerViewCtrl.editingContainer.hostname" />-->
+			<!--</div>-->
+
+		<!--</div>-->
+		<!--<div class="b-popup__footer">-->
+			<!--<button class="b-btn b-btn_green g-right" type="submit" >-->
+				<!--Save-->
+			<!--</button>-->
+			<!--<div class="clear"></div>-->
+		<!--</div>-->
+	<!--</form>-->
+</div>
+
