@@ -27,7 +27,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	vm.environments = [];
 	vm.containers = [];
-	vm.snapshots = [];
+	vm.snapshots = {};
 	vm.notRegisteredContainers = [];
 	vm.containersType = [];
 	vm.environmentId = $stateParams.environmentId;
@@ -347,7 +347,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
         vm.editingContainer = container;
 
 	    environmentService.getContainerSnapshots(container.id).success(function (data){
-	        vm.snapshots = data;
+	        vm.snapshots = {};
+	        for (var i in data){
+	            var snapshot = data[i]
+	            if(!vm.snapshots[snapshot.partition]){
+	                vm.snapshots[snapshot.partition] = []
+	            }
+	            vm.snapshots[snapshot.partition].push(snapshot.label)
+	        }
 
             ngDialog.open({
                 template: 'subutai-app/containers/partials/manageSnapshots.html',

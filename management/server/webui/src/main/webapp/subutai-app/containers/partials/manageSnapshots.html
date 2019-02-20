@@ -13,20 +13,20 @@
       <thead>
       <tr>
         <th>Partition</th>
-        <th>Snapshot</th>
+        <th>Snapshots</th>
       </tr>
       </thead>
       <tbody>
-      <tr ng-repeat="(key, snapshot) in containerViewCtrl.snapshots">
+      <tr ng-repeat="(partition, snapshots) in containerViewCtrl.snapshots">
         <td>
           <span>
-              {{ snapshot.partition }}
+              {{ partition }}
           </span>
         </td>
         <td>
-          <span>
-              {{ snapshot.label }}
-          </span>
+          <ul ng-repeat="(idx, label) in snapshots">
+              {{ label }}
+          </ul>
         </td>
       </tr>
       </tbody>
