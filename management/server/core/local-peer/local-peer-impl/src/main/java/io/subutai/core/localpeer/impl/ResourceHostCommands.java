@@ -113,4 +113,10 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( String.format( "subutai hostname rh %s", newHostname ) );
     }
+
+
+    public RequestBuilder getListContainerSnapshotsCommand( final String containerName )
+    {
+        return new RequestBuilder( String.format( "subutai snapshot list -c %s", containerName ) );
+    }
 }

@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -14,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -24,6 +26,7 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerInfo;
 import io.subutai.common.peer.HostNotFoundException;
@@ -32,10 +35,10 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.template.api.TemplateManager;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -273,6 +276,26 @@ public class ResourceHostEntityTest
     }
 
 
+    @Test
+    public void testListContainerHostSnapshots() throws Exception
+    {
+        resourceHostEntity.addContainerHost( containerHost );
+
+        doReturn( "NAME                        USED  AVAIL  REFER  MOUNTPOINT\n"
+                + "subutai/fs/bar@all           10K      -    25K  -\n"
+                + "subutai/fs/bar/home@all        0      -    19K  -\n"
+                + "subutai/fs/bar/opt@all         0      -    19K  -\n"
+                + "subutai/fs/bar/rootfs@all   330K      -   244M  -\n"
+                + "subutai/fs/bar/var@all       73K      -  6.73M  -\n" ).when( commandResult ).getStdOut();
+
+        Snapshots snapshots = resourceHostEntity.listContainerHostSnapshots( containerHost );
+
+        assertNotNull( snapshots );
+
+        assertEquals( 5, snapshots.getSnapshots().size() );
+    }
+
+
     @Test( expected = ResourceHostException.class )
     public void testDestroyContainerHost() throws Exception
     {
@@ -341,8 +364,7 @@ public class ResourceHostEntityTest
     {
         doReturn( "time=\"2017-04-11 10:01:36\" level=info msg=\"tag-test-template exported to "
                 + "/var/snap/subutai-dev/common/lxc/tmpdir/tag-test-template-subutai-template_4.0.0_amd64.tar"
-                + ".gz\" \n"
-                + "time=\"2017-04-11 10:01:38\" level=info msg=\"Template uploaded, "
+                + ".gz\" \n" + "time=\"2017-04-11 10:01:38\" level=info msg=\"Template uploaded, "
                 + "hash:7d42f1d084c405b482938bb2620cce77 md5:asdfadfadsf size:123 parent:'foo:dilshat:1.0.0'\"" )
                 .when( commandResult ).getStdOut();
 

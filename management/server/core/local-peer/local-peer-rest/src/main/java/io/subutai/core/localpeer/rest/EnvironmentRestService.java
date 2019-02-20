@@ -16,6 +16,7 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.security.SshEncryptionType;
@@ -52,6 +53,12 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     ContainerHostState getContainerState( @PathParam( "containerId" ) ContainerId containerId );
+
+    @GET
+    @Path( "{environmentId}/container/{containerId}/snapshots" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Snapshots getContainerSnapshots( @PathParam( "containerId" ) ContainerId containerId );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/quota/raw" )

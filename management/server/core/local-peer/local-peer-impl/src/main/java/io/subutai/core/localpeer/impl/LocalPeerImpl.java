@@ -92,6 +92,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -1597,6 +1598,29 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         {
             String errMsg = String.format( "Could not stop container %s: %s", containerHost.getContainerName(),
                     e.getMessage() );
+            LOG.error( errMsg, e );
+            throw new PeerException( errMsg, e );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public Snapshots listContainerHostSnapshots( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
+        ResourceHost resourceHost = containerHost.getParent();
+        try
+        {
+            return resourceHost.listContainerHostSnapshots( containerHost );
+        }
+        catch ( Exception e )
+        {
+            String errMsg =
+                    String.format( "Could not list container %s snapshots: %s", containerHost.getContainerName(),
+                            e.getMessage() );
             LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }

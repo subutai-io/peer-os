@@ -522,6 +522,7 @@ public class RestServiceImpl implements RestService
         }
     }
 
+
     /** Environments SSH keys **************************************************** */
 
     @Override
@@ -551,7 +552,6 @@ public class RestServiceImpl implements RestService
 
         return Response.ok().build();
     }
-
 
 
     @Override
@@ -742,6 +742,37 @@ public class RestServiceImpl implements RestService
             catch ( PeerException e )
             {
                 LOG.error( "Exception stopping container host", e );
+                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            }
+        }
+
+        return Response.status( Response.Status.NOT_FOUND ).build();
+    }
+
+
+    @Override
+    public Response listContainerSnapshots( final String containerId )
+    {
+        if ( Strings.isNullOrEmpty( containerId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+        }
+
+
+        Environment environment = findEnvironmentByContainerId( containerId );
+
+        if ( environment != null )
+        {
+            try
+            {
+                ContainerHost containerHost = environment.getContainerHostById( containerId );
+
+                return Response.ok( JsonUtil.toJson( containerHost.listSnapshots().getSnapshots() ) ).build();
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( "Exception listing container snapshots", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
             }
         }

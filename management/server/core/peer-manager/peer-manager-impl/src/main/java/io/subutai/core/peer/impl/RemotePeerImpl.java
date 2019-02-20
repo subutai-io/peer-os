@@ -38,6 +38,7 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -288,6 +289,17 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         environmentWebClient.stopContainer( containerId );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public Snapshots listContainerHostSnapshots( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+
+        return environmentWebClient.listContainerHostSnapshots( containerId );
     }
 
 

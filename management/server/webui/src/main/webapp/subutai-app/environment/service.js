@@ -43,6 +43,7 @@ function environmentService($http, $q) {
 
 
 		getContainerStatus : getContainerStatus,
+		getContainerSnapshots : getContainerSnapshots,
 		destroyContainer : destroyContainer,
 		switchContainer : switchContainer,
 		setContainerName : setContainerName,
@@ -148,6 +149,13 @@ function environmentService($http, $q) {
 	function getContainerStatus(containerId) {
 		return $http.get(
 			CONTAINERS_URL + containerId + '/state',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
+	}
+
+	function getContainerSnapshots(containerId) {
+		return $http.get(
+			CONTAINERS_URL + containerId + '/snapshots',
 			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
 		);
 	}

@@ -27,6 +27,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	vm.environments = [];
 	vm.containers = [];
+	vm.snapshots = [];
 	vm.notRegisteredContainers = [];
 	vm.containersType = [];
 	vm.environmentId = $stateParams.environmentId;
@@ -343,13 +344,18 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function createSnapshotsPopup(container){
 
-            vm.editingContainer = container;
+        vm.editingContainer = container;
+
+	    environmentService.getContainerSnapshots(container.id).success(function (data){
+	        vm.snapshots = data;
 
             ngDialog.open({
                 template: 'subutai-app/containers/partials/manageSnapshots.html',
                 scope: $scope,
                 className: 'b-build-environment-info'
             });
+	    });
+
 	}
 
 

@@ -23,6 +23,7 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -97,6 +98,8 @@ public interface Peer extends RelationLink
      * Destroys container on the peer
      */
     void destroyContainer( ContainerId containerId ) throws PeerException;
+
+    Snapshots listContainerHostSnapshots( ContainerId containerId ) throws PeerException;
 
 
     /**

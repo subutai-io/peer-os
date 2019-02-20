@@ -17,6 +17,7 @@ import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -108,6 +109,35 @@ public class EnvironmentWebClient
         }
 
         WebClientBuilder.checkResponse( response );
+    }
+
+
+    Snapshots listContainerHostSnapshots( ContainerId containerId ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/snapshots", containerId.getEnvironmentId().getId(),
+                    containerId.getId() );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            response = client.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error stopping container:" + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        return WebClientBuilder.checkResponse( response, Snapshots.class );
     }
 
 

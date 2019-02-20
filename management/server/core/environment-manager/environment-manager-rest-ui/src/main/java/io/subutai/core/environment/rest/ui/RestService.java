@@ -119,6 +119,11 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response stopContainer( @PathParam( "containerId" ) String containerId );
 
+    @GET
+    @Path( "containers/{containerId}/snapshots" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response listContainerSnapshots( @PathParam( "containerId" ) String containerId );
+
 
     /** Container types **************************************************** */
 
