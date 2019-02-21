@@ -1,4 +1,4 @@
-<div class="b-popup b-popup_min">
+<div class="b-popup">
   <div class="b-popup__header">
     Manage container snapshots
     <a href ng-click="closeThisDialog()">
@@ -6,17 +6,17 @@
     </a>
   </div>
 
-  <div class="b-main-table-border">
+  <div id="scrolltable">
 
-    <table
-        class="b-main-table b-main-table_with-header">
-      <thead>
+    <table>
       <tr>
-        <th>Partition</th>
-        <th>Snapshots</th>
+        <th>
+          <div>Partition</div>
+        </th>
+        <th>
+          <div>Snapshots</div>
+        </th>
       </tr>
-      </thead>
-      <tbody>
       <tr ng-repeat="(partition, snapshots) in containerViewCtrl.snapshots">
         <td>
           <span>
@@ -25,11 +25,30 @@
         </td>
         <td>
           <ul ng-repeat="(idx, label) in snapshots">
-              {{ label }}
+            <table>
+              <tr>
+                <td>{{ label }}</td>
+                <td>
+                  <a href
+                     class="b-icon b-icon_rollback"
+                     tooltips
+                     tooltip-template='Rollback partition to snapshot'
+                     ng-click="containerViewCtrl.rollbackSnapshot( containerViewCtrl.editingContainer.containerName, partition, label )">
+                  </a>
+                </td>
+                <td>
+                  <a href
+                     class="b-icon b-icon_remove"
+                     tooltips
+                     tooltip-template='Remove snapshot'
+                     ng-click="containerViewCtrl.rollbackSnapshot( containerViewCtrl.editingContainer.containerName, partition, label )">
+                  </a>
+                </td>
+              </tr>
+            </table>
           </ul>
         </td>
       </tr>
-      </tbody>
     </table>
   </div>
 </div>

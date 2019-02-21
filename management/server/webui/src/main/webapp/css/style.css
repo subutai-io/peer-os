@@ -921,6 +921,9 @@ tip.description-tooltip {
 .b-icon_ram {
     background-image: url('../assets/elements/icons/icon-ram.svg');
 }
+.b-icon_rollback {
+    background-image: url('../assets/elements/icons/rb.png');
+}
 .b-icon_add {
     background-color: rgba(1, 1, 1, 0.03);
     /*border-radius: 5px;*/
@@ -4095,3 +4098,9 @@ a[disabled] {
 /*.dataTables_empty {
   display:none;
 }*/
+
+#scrolltable { margin-top: 20px; height: 200px; overflow: auto; }
+#scrolltable table { border-collapse: collapse; }
+#scrolltable td { padding-right: 5px; }
+#scrolltable tr:nth-child(even) { background: #EEE; }
+#scrolltable th div { position: absolute; margin-top: -20px; }

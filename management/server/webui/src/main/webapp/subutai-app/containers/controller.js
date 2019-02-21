@@ -59,6 +59,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.createTemplatePopup=createTemplatePopup;
 	vm.createSnapshotsPopup=createSnapshotsPopup;
 	vm.createTemplate=createTemplate;
+	vm.rollbackSnapshot = rollbackSnapshot;
     vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
@@ -363,6 +364,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
             });
 	    });
 
+	}
+
+	function rollbackSnapshot(container, partition, label){
+	    console.log(container + '/' + partition + '@' + label);
 	}
 
 
