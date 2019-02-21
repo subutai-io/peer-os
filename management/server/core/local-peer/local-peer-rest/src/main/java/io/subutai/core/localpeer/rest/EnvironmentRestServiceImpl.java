@@ -150,6 +150,25 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
+    public void deleteContainerSnapshot( final ContainerId containerId, final String snapshotName )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerId.getId() );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( snapshotName ) );
+
+            localPeer.removeContainerSnapshot( containerId, snapshotName );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
     public Quota getRawQuota( final ContainerId containerId )
     {
         try

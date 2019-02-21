@@ -302,6 +302,17 @@ public class RemotePeerImpl implements RemotePeer
         return environmentWebClient.listContainerHostSnapshots( containerId );
     }
 
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void removeContainerSnapshot( final ContainerId containerId, final String snapshotName ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( snapshotName ), "Invalid snapshot name" );
+
+        environmentWebClient.removeContainerSnapshot(containerId, snapshotName);
+    }
+
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override

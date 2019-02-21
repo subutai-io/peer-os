@@ -759,7 +759,6 @@ public class RestServiceImpl implements RestService
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
 
-
         Environment environment = findEnvironmentByContainerId( containerId );
 
         if ( environment != null )
@@ -773,6 +772,44 @@ public class RestServiceImpl implements RestService
             catch ( PeerException e )
             {
                 LOG.error( "Exception listing container snapshots", e );
+                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            }
+        }
+
+        return Response.status( Response.Status.NOT_FOUND ).build();
+    }
+
+
+    @Override
+    public Response removeContainerSnapshot( final String containerId, final String snapshot )
+    {
+        if ( Strings.isNullOrEmpty( containerId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+        }
+
+        if ( Strings.isNullOrEmpty( snapshot ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid snapshot" ) ).build();
+        }
+
+        Environment environment = findEnvironmentByContainerId( containerId );
+
+        if ( environment != null )
+        {
+            try
+            {
+                ContainerHost containerHost = environment.getContainerHostById( containerId );
+
+                containerHost.removeSnapshot( snapshot );
+
+                return Response.ok().build();
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( "Exception removing container snapshot", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
             }
         }

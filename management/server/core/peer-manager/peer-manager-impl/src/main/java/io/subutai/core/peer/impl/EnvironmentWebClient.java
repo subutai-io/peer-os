@@ -141,6 +141,33 @@ public class EnvironmentWebClient
     }
 
 
+    void removeContainerSnapshot( ContainerId containerId, String snapshot ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/snapshots/%s", containerId.getEnvironmentId().getId(),
+                    containerId.getId(), snapshot );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            response = client.delete(  );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error removing container snapshot:" + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
     public void destroyContainer( ContainerId containerId ) throws PeerException
     {
         WebClient client = null;

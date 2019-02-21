@@ -101,6 +101,7 @@ public interface Peer extends RelationLink
 
     Snapshots listContainerHostSnapshots( ContainerId containerId ) throws PeerException;
 
+    void removeContainerSnapshot( ContainerId containerId, String snapshotName ) throws PeerException;
 
     /**
      * Returns true of the host is connected (AND running, in case it is a container host), false otherwise

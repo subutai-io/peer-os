@@ -496,6 +496,51 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public void removeContainerSnapshot( final ContainerHost containerHost, final String snapshot )
+            throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( snapshot ), "Invalid snapshot name" );
+        Preconditions.checkArgument( snapshot.contains( "@" ), "Invalid snapshot name" );
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+        try
+        {
+            String partition;
+            String[] parts = snapshot.split( "@" );
+            if ( parts[0].equalsIgnoreCase( containerHost.getContainerName() ) )
+            {
+                partition = "parent";
+            }
+            else
+            {
+                partition = parts[0];
+            }
+            String label = parts[1];
+            ;
+
+            commandUtil.execute( resourceHostCommands
+                    .getRemoveContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error removing container %s snapshot %s: %s", containerHost.getHostname(), snapshot,
+                            e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public void destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
 

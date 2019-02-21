@@ -124,6 +124,11 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listContainerSnapshots( @PathParam( "containerId" ) String containerId );
 
+    @DELETE
+    @Path( "containers/{containerId}/snapshots/{snapshot}" )
+    Response removeContainerSnapshot( @PathParam( "containerId" ) String containerId,
+                                      @PathParam( "snapshot" ) String snapshot );
+
 
     /** Container types **************************************************** */
 

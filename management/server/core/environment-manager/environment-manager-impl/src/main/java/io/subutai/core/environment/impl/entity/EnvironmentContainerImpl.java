@@ -382,6 +382,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
 
     @Override
+    public void removeSnapshot( final String snapshotName ) throws PeerException
+    {
+        getPeer().removeContainerSnapshot( getContainerId(), snapshotName );
+    }
+
+
+    @Override
     public Peer getPeer()
     {
         try

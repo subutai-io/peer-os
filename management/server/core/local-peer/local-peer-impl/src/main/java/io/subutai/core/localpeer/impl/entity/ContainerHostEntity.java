@@ -306,6 +306,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
+    public void removeSnapshot( final String snapshotName ) throws PeerException
+    {
+        getPeer().removeContainerSnapshot( getContainerId(), snapshotName );
+    }
+
+
+    @Override
     public void updateHostInfo( final HostInfo hostInfo )
     {
         super.updateHostInfo( hostInfo );

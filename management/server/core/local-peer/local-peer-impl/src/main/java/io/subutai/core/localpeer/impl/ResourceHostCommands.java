@@ -119,4 +119,12 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( String.format( "subutai snapshot list -c %s", containerName ) );
     }
+
+
+    public RequestBuilder getRemoveContainerSnapshotCommand( final String containerName, final String partition,
+                                                             String label )
+    {
+        return new RequestBuilder(
+                String.format( "subutai snapshot remove -c %s -p %s -l %s", containerName, partition, label ) );
+    }
 }

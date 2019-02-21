@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.rest;
 
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -59,6 +60,11 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Snapshots getContainerSnapshots( @PathParam( "containerId" ) ContainerId containerId );
+
+    @DELETE
+    @Path( "{environmentId}/container/{containerId}/snapshots/{snapshot}" )
+    void deleteContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
+                                  @PathParam( "snapshot" ) String snapshotName );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/quota/raw" )

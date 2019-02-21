@@ -63,6 +63,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     Snapshots listContainerHostSnapshots( ContainerHost containerHost ) throws ResourceHostException;
 
+    void removeContainerSnapshot( ContainerHost containerHost, String snapshot ) throws ResourceHostException;
+
     /**
      * Destroys hosted container
      */

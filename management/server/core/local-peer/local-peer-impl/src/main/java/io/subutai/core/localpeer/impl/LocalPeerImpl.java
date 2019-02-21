@@ -1627,6 +1627,30 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     }
 
 
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void removeContainerSnapshot( final ContainerId containerId, final String snapshotName ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( snapshotName ), "Invalid snapshot name" );
+
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
+        ResourceHost resourceHost = containerHost.getParent();
+        try
+        {
+            resourceHost.removeContainerSnapshot( containerHost, snapshotName );
+        }
+        catch ( Exception e )
+        {
+            String errMsg =
+                    String.format( "Could not remove container %s snapshot %s: %s", containerHost.getContainerName(),
+                            snapshotName, e.getMessage() );
+            LOG.error( errMsg, e );
+            throw new PeerException( errMsg, e );
+        }
+    }
+
+
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException

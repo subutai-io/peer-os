@@ -44,6 +44,7 @@ function environmentService($http, $q) {
 
 		getContainerStatus : getContainerStatus,
 		getContainerSnapshots : getContainerSnapshots,
+		removeContainerSnapshot: removeContainerSnapshot,
 		destroyContainer : destroyContainer,
 		switchContainer : switchContainer,
 		setContainerName : setContainerName,
@@ -158,6 +159,13 @@ function environmentService($http, $q) {
 			CONTAINERS_URL + containerId + '/snapshots',
 			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
 		);
+	}
+
+	function removeContainerSnapshot(containerId, partition, label){
+        return $http.delete(
+            CONTAINERS_URL + containerId + '/snapshots/' + partition + '@' + label,
+            {withCredentials: true}
+        );
 	}
 
 	function destroyContainer(containerId) {

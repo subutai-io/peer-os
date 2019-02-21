@@ -1,13 +1,13 @@
 package io.subutai.common.peer;
 
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.Snapshots;
 import io.subutai.common.protocol.Template;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 /**
@@ -32,6 +32,8 @@ public interface ContainerHost extends Host, ContainerHostInfo
     void stop() throws PeerException;
 
     Snapshots listSnapshots() throws PeerException;
+
+    void removeSnapshot( String snapshotName ) throws PeerException;
 
     Template getTemplate() throws PeerException;
 
