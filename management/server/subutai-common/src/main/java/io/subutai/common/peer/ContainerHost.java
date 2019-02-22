@@ -33,7 +33,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     Snapshots listSnapshots() throws PeerException;
 
-    void removeSnapshot( String snapshotName ) throws PeerException;
+    void removeSnapshot( String partition, String label ) throws PeerException;
 
     Template getTemplate() throws PeerException;
 

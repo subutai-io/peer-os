@@ -372,7 +372,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function removeSnapshot(containerId, partition, label){
-	    console.log(containerId + '/' + partition + '@' + label);
         environmentService.removeContainerSnapshot(containerId, partition, label ).success(function (data){
             var list = vm.snapshots[partition];
             list.splice(list.indexOf(label), 1);

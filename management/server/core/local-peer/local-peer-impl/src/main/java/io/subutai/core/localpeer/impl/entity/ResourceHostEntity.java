@@ -496,12 +496,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void removeContainerSnapshot( final ContainerHost containerHost, final String snapshot )
+    public void removeContainerSnapshot( final ContainerHost containerHost, String partition, final String label )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( snapshot ), "Invalid snapshot name" );
-        Preconditions.checkArgument( snapshot.contains( "@" ), "Invalid snapshot name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
 
         try
         {
@@ -515,18 +515,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            String partition;
-            String[] parts = snapshot.split( "@" );
-            if ( parts[0].equalsIgnoreCase( containerHost.getContainerName() ) )
+            if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
             {
                 partition = "parent";
             }
-            else
-            {
-                partition = parts[0];
-            }
-            String label = parts[1];
-            ;
 
             commandUtil.execute( resourceHostCommands
                     .getRemoveContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
@@ -534,9 +526,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( CommandException e )
         {
             throw new ResourceHostException(
-                    String.format( "Error removing container %s snapshot %s: %s", containerHost.getHostname(), snapshot,
-                            e.getMessage() ), e );
+                    String.format( "Error removing container %s snapshot %s: %s", containerHost.getHostname(),
+                            partition + "@" + label, e.getMessage() ), e );
         }
+    }
+
+
+    @Override
+    public void rollbackToContainerSnapshot( final ContainerHost containerHost, final String snapshot )
+            throws ResourceHostException
+    {
+
     }
 
 

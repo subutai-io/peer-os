@@ -150,15 +150,16 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public void deleteContainerSnapshot( final ContainerId containerId, final String snapshotName )
+    public void deleteContainerSnapshot( final ContainerId containerId, final String partition, final String label )
     {
         try
         {
             Preconditions.checkNotNull( containerId );
             Preconditions.checkNotNull( containerId.getId() );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( snapshotName ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
 
-            localPeer.removeContainerSnapshot( containerId, snapshotName );
+            localPeer.removeContainerSnapshot( containerId, partition, label );
         }
         catch ( Exception e )
         {

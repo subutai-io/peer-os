@@ -304,13 +304,14 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void removeContainerSnapshot( final ContainerId containerId, final String snapshotName ) throws PeerException
+    public void removeContainerSnapshot( final ContainerId containerId, final String partition, final String label ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( snapshotName ), "Invalid snapshot name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
 
-        environmentWebClient.removeContainerSnapshot(containerId, snapshotName);
+        environmentWebClient.removeContainerSnapshot(containerId, partition, label);
     }
 
 

@@ -163,7 +163,7 @@ function environmentService($http, $q) {
 
 	function removeContainerSnapshot(containerId, partition, label){
         return $http.delete(
-            CONTAINERS_URL + containerId + '/snapshots/' + partition + '@' + label,
+            CONTAINERS_URL + containerId + '/snapshots/partition/' + partition + '/label/' + label,
             {withCredentials: true}
         );
 	}

@@ -125,9 +125,10 @@ public interface RestService
     Response listContainerSnapshots( @PathParam( "containerId" ) String containerId );
 
     @DELETE
-    @Path( "containers/{containerId}/snapshots/{snapshot}" )
+    @Path( "containers/{containerId}/snapshots/partition/{partition}/label/{label}" )
     Response removeContainerSnapshot( @PathParam( "containerId" ) String containerId,
-                                      @PathParam( "snapshot" ) String snapshot );
+                                      @PathParam( "partition" ) String snapshot,
+                                      @PathParam( "label" ) String label );
 
 
     /** Container types **************************************************** */

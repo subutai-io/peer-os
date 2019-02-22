@@ -141,18 +141,18 @@ public class EnvironmentWebClient
     }
 
 
-    void removeContainerSnapshot( ContainerId containerId, String snapshot ) throws PeerException
+    void removeContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException
     {
         WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
-            String path = String.format( "/%s/container/%s/snapshots/%s", containerId.getEnvironmentId().getId(),
-                    containerId.getId(), snapshot );
+            String path = String.format( "/%s/container/%s/snapshots/partition/%s/label/%s",
+                    containerId.getEnvironmentId().getId(), containerId.getId(), partition, label );
             client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
-            response = client.delete(  );
+            response = client.delete();
         }
         catch ( Exception e )
         {

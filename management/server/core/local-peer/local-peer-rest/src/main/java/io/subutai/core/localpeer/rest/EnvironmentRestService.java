@@ -62,9 +62,9 @@ public interface EnvironmentRestService
     Snapshots getContainerSnapshots( @PathParam( "containerId" ) ContainerId containerId );
 
     @DELETE
-    @Path( "{environmentId}/container/{containerId}/snapshots/{snapshot}" )
+    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )
     void deleteContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
-                                  @PathParam( "snapshot" ) String snapshotName );
+                                  @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/quota/raw" )

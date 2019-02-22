@@ -781,18 +781,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response removeContainerSnapshot( final String containerId, final String snapshot )
+    public Response removeContainerSnapshot( final String containerId, final String partition, final String label )
     {
         if ( Strings.isNullOrEmpty( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
-
-        if ( Strings.isNullOrEmpty( snapshot ) )
+        if ( Strings.isNullOrEmpty( partition ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid snapshot" ) ).build();
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid partition" ) ).build();
+        }
+        if ( Strings.isNullOrEmpty( label ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid label" ) ).build();
         }
 
         Environment environment = findEnvironmentByContainerId( containerId );
@@ -803,7 +807,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                containerHost.removeSnapshot( snapshot );
+                containerHost.removeSnapshot( partition, label );
 
                 return Response.ok().build();
             }

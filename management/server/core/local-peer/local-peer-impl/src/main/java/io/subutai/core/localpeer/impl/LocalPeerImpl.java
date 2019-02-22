@@ -1629,22 +1629,24 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void removeContainerSnapshot( final ContainerId containerId, final String snapshotName ) throws PeerException
+    public void removeContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( snapshotName ), "Invalid snapshot name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
 
         ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
         ResourceHost resourceHost = containerHost.getParent();
         try
         {
-            resourceHost.removeContainerSnapshot( containerHost, snapshotName );
+            resourceHost.removeContainerSnapshot( containerHost, partition, label );
         }
         catch ( Exception e )
         {
             String errMsg =
                     String.format( "Could not remove container %s snapshot %s: %s", containerHost.getContainerName(),
-                            snapshotName, e.getMessage() );
+                            partition + "@" + label, e.getMessage() );
             LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }
