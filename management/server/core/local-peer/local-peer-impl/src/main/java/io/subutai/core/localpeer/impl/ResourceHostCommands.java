@@ -113,4 +113,34 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( String.format( "subutai hostname rh %s", newHostname ) );
     }
+
+
+    public RequestBuilder getListContainerSnapshotsCommand( final String containerName )
+    {
+        return new RequestBuilder( String.format( "subutai snapshot list -c %s", containerName ) );
+    }
+
+
+    public RequestBuilder getRemoveContainerSnapshotCommand( final String containerName, final String partition,
+                                                             String label )
+    {
+        return new RequestBuilder(
+                String.format( "subutai snapshot remove -c %s -p %s -l %s", containerName, partition, label ) );
+    }
+
+
+    public RequestBuilder getRollbackContainerSnapshotCommand( final String containerName, final String partition,
+                                                               final String label )
+    {
+        return new RequestBuilder(
+                String.format( "subutai snapshot rollback -c %s -p %s -l %s", containerName, partition, label ) );
+    }
+
+
+    public RequestBuilder getAddContainerSnapshotCommand( final String containerName, final String partition,
+                                                          final String label )
+    {
+        return new RequestBuilder(
+                String.format( "subutai snapshot add -c %s -p %s -l %s", containerName, partition, label ) );
+    }
 }

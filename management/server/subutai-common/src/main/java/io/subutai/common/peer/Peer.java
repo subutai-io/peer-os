@@ -23,6 +23,7 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -98,6 +99,13 @@ public interface Peer extends RelationLink
      */
     void destroyContainer( ContainerId containerId ) throws PeerException;
 
+    Snapshots listContainerHostSnapshots( ContainerId containerId ) throws PeerException;
+
+    void removeContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
+
+    void rollbackToContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
+
+    void addContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
 
     /**
      * Returns true of the host is connected (AND running, in case it is a container host), false otherwise

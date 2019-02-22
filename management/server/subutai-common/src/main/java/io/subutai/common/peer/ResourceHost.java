@@ -8,6 +8,7 @@ import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.environment.RhTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
@@ -59,6 +60,17 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * Stops hosted container
      */
     void stopContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+
+    Snapshots listContainerHostSnapshots( ContainerHost containerHost ) throws ResourceHostException;
+
+    void removeContainerSnapshot( ContainerHost containerHost, String partition, String label )
+            throws ResourceHostException;
+
+    void rollbackToContainerSnapshot( ContainerHost containerHost, String partition, String label )
+            throws ResourceHostException;
+
+    void addContainerSnapshot( ContainerHost containerHost, String partition, String label )
+            throws ResourceHostException;
 
     /**
      * Destroys hosted container

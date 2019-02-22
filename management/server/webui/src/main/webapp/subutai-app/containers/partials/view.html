@@ -116,6 +116,12 @@
                tooltip-template='Create template'
                ng-click="containerViewCtrl.createTemplatePopup( container )" style="visibility: visible">
             </a>
+            <a href
+               class="b-icon b-icon_disk"
+               tooltips
+               tooltip-template='Manage snapshots'
+               ng-click="containerViewCtrl.createSnapshotsPopup( container )" style="visibility: visible">
+            </a>
           </td>
           <td class="subt_text__container-ip">
             {{ container.ip }}

@@ -92,6 +92,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -1597,6 +1598,106 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         {
             String errMsg = String.format( "Could not stop container %s: %s", containerHost.getContainerName(),
                     e.getMessage() );
+            LOG.error( errMsg, e );
+            throw new PeerException( errMsg, e );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public Snapshots listContainerHostSnapshots( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
+        ResourceHost resourceHost = containerHost.getParent();
+        try
+        {
+            return resourceHost.listContainerHostSnapshots( containerHost );
+        }
+        catch ( Exception e )
+        {
+            String errMsg =
+                    String.format( "Could not list container %s snapshots: %s", containerHost.getContainerName(),
+                            e.getMessage() );
+            LOG.error( errMsg, e );
+            throw new PeerException( errMsg, e );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void removeContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
+        ResourceHost resourceHost = containerHost.getParent();
+        try
+        {
+            resourceHost.removeContainerSnapshot( containerHost, partition, label );
+        }
+        catch ( Exception e )
+        {
+            String errMsg =
+                    String.format( "Could not remove container %s snapshot %s: %s", containerHost.getContainerName(),
+                            partition + "@" + label, e.getMessage() );
+            LOG.error( errMsg, e );
+            throw new PeerException( errMsg, e );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void rollbackToContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
+        ResourceHost resourceHost = containerHost.getParent();
+        try
+        {
+            resourceHost.rollbackToContainerSnapshot( containerHost, partition, label );
+        }
+        catch ( Exception e )
+        {
+            String errMsg = String.format( "Could not rollback container %s to snapshot %s: %s",
+                    containerHost.getContainerName(), partition + "@" + label, e.getMessage() );
+            LOG.error( errMsg, e );
+            throw new PeerException( errMsg, e );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
+        ResourceHost resourceHost = containerHost.getParent();
+        try
+        {
+            resourceHost.addContainerSnapshot( containerHost, partition, label );
+        }
+        catch ( Exception e )
+        {
+            String errMsg =
+                    String.format( "Could not add container %s snapshot %s: %s", containerHost.getContainerName(),
+                            partition + "@" + label, e.getMessage() );
             LOG.error( errMsg, e );
             throw new PeerException( errMsg, e );
         }

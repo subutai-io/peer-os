@@ -43,6 +43,10 @@ function environmentService($http, $q) {
 
 
 		getContainerStatus : getContainerStatus,
+		getContainerSnapshots : getContainerSnapshots,
+		removeContainerSnapshot: removeContainerSnapshot,
+		rollbackContainerToSnapshot: rollbackContainerToSnapshot,
+		addContainerSnapshot: addContainerSnapshot,
 		destroyContainer : destroyContainer,
 		switchContainer : switchContainer,
 		setContainerName : setContainerName,
@@ -150,6 +154,34 @@ function environmentService($http, $q) {
 			CONTAINERS_URL + containerId + '/state',
 			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
 		);
+	}
+
+	function getContainerSnapshots(containerId) {
+		return $http.get(
+			CONTAINERS_URL + containerId + '/snapshots',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
+	}
+
+	function removeContainerSnapshot(containerId, partition, label){
+        return $http.delete(
+            CONTAINERS_URL + containerId + '/snapshots/partition/' + partition + '/label/' + label,
+            {withCredentials: true}
+        );
+	}
+
+	function rollbackContainerToSnapshot(containerId, partition, label){
+        return $http.put(
+            CONTAINERS_URL + containerId + '/snapshots/partition/' + partition + '/label/' + label,
+            {withCredentials: true}
+        );
+	}
+
+	function addContainerSnapshot(containerId, partition, label){
+        return $http.post(
+            CONTAINERS_URL + containerId + '/snapshots/partition/' + partition + '/label/' + label,
+            {withCredentials: true}
+        );
 	}
 
 	function destroyContainer(containerId) {

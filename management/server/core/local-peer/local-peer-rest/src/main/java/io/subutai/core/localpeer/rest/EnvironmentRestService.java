@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.rest;
 
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -16,6 +17,7 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.security.SshEncryptionType;
@@ -52,6 +54,27 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     ContainerHostState getContainerState( @PathParam( "containerId" ) ContainerId containerId );
+
+    @GET
+    @Path( "{environmentId}/container/{containerId}/snapshots" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Snapshots getContainerSnapshots( @PathParam( "containerId" ) ContainerId containerId );
+
+    @DELETE
+    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    void deleteContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
+                                  @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+
+    @PUT
+    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    void rollbackContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
+                                    @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+
+    @POST
+    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    void addContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
+                               @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/quota/raw" )
