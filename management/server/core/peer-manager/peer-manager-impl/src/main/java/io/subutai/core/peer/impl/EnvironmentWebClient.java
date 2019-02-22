@@ -196,6 +196,34 @@ public class EnvironmentWebClient
     }
 
 
+
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/snapshots/partition/%s/label/%s",
+                    containerId.getEnvironmentId().getId(), containerId.getId(), partition, label );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error adding container snapshot:" + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
     public void destroyContainer( ContainerId containerId ) throws PeerException
     {
         WebClient client = null;
@@ -885,4 +913,5 @@ public class EnvironmentWebClient
 
         return WebClientBuilder.checkResponse( response, Quota.class );
     }
+
 }

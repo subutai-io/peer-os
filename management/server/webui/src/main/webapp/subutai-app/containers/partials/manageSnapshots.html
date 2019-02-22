@@ -6,16 +6,41 @@
     </a>
   </div>
 
+  <form ng-submit="containerViewCtrl.addSnapshot(newSnapshot)" ng-init="newSnapshot.id=containerViewCtrl.editingContainer.id">
+    <div>
+      <table>
+        <tr>
+          <td>
+            <label class="b-popup-body-label">Partition</label>
+            <select ng-init="newSnapshot.partition='all'" ng-model="newSnapshot.partition" required style="width:100px">
+            <option value="all" selected>All</option>
+            <option value="rootfs">rootfs</option>
+            <option value="home">home</option>
+            <option value="opt">opt</option>
+            <option value="var">var</option>
+            <option value="{{ containerViewCtrl.editingContainer.containerName }}">{{ containerViewCtrl.editingContainer.containerName }}</option>
+          </select>
+          </td>
+          <td>
+            <label class="b-popup-body-label">Name</label>
+            <input type="text" ng-model="newSnapshot.label" ng-required="true" style="width:100px"/>
+          </td>
+          <td><button style="width:50px" class="b-btn b-btn_green g-right" type="submit">Add</button></td>
+        </tr>
+      </table>
+    </div>
+  </form>
+
   <div id="scrolltable">
 
     <table>
       <tr>
-        <th>
+        <td>
           <div>Partition</div>
-        </th>
-        <th>
+        </td>
+        <td>
           <div>Snapshots</div>
-        </th>
+        </td>
       </tr>
       <tr ng-repeat="(partition, snapshots) in containerViewCtrl.snapshots">
         <td>

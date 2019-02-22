@@ -190,6 +190,26 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerId.getId() );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
+
+            localPeer.addContainerSnapshot( containerId, partition, label );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
     public Quota getRawQuota( final ContainerId containerId )
     {
         try

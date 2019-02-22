@@ -37,6 +37,8 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     void rollbackToSnapshot( String partition, String label ) throws PeerException;
 
+    void addSnapshot( String partition, String label ) throws PeerException;
+
     Template getTemplate() throws PeerException;
 
     String getTemplateName();

@@ -61,6 +61,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.createTemplate=createTemplate;
 	vm.rollbackSnapshot = rollbackSnapshot;
 	vm.removeSnapshot = removeSnapshot;
+	vm.addSnapshot = addSnapshot;
     vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
@@ -368,21 +369,47 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function rollbackSnapshot(containerId, partition, label){
+	//TODO ask confirmation
         environmentService.rollbackContainerToSnapshot(containerId, partition, label ).success(function (data){
             SweetAlert.swal ("Success!", "Container has been rolled back", "success");
         }).error(function(data){
-            SweetAlert.swal("ERROR!", data, "error");
+            SweetAlert.swal("ERROR!", data.ERROR, "error");
         });
     }
 
 	function removeSnapshot(containerId, partition, label){
+	//TODO ask confirmation
         environmentService.removeContainerSnapshot(containerId, partition, label ).success(function (data){
             var list = vm.snapshots[partition];
             list.splice(list.indexOf(label), 1);
 
             SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
         }).error(function(data){
-            SweetAlert.swal("ERROR!", data, "error");
+            SweetAlert.swal("ERROR!", data.ERROR, "error");
+        });
+	}
+
+	function addSnapshot(snapshot){
+        environmentService.addContainerSnapshot(snapshot.id, snapshot.partition, snapshot.label ).success(function (data){
+            if (snapshot.partition == 'all'){
+                var partitions = ['home', 'rootfs', 'var', 'opt', vm.editingContainer.containerName];
+                for(var i in  partitions){
+                    var partition = partitions[i];
+                    if(!vm.snapshots[partition]){
+                        vm.snapshots[partition] = [];
+                    }
+                    vm.snapshots[partition].push(snapshot.label);
+                }
+            }else{
+                if(!vm.snapshots[snapshot.partition]){
+                    vm.snapshots[snapshot.partition] = [];
+                }
+                vm.snapshots[snapshot.partition].push(snapshot.label);
+            }
+
+            SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
+        }).error(function(data){
+            SweetAlert.swal("ERROR!", data.ERROR, "error");
         });
 	}
 

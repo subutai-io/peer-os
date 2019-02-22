@@ -71,6 +71,11 @@ public interface EnvironmentRestService
     void rollbackContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
                                     @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
 
+    @POST
+    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    void addContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
+                               @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+
     @GET
     @Path( "{environmentId}/container/{containerId}/quota/raw" )
     @Consumes( MediaType.APPLICATION_JSON )

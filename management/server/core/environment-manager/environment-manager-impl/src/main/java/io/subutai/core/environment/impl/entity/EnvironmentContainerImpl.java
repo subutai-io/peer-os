@@ -396,6 +396,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
 
     @Override
+    public void addSnapshot( final String partition, final String label ) throws PeerException
+    {
+        getPeer().addContainerSnapshot( getContainerId(), partition, label );
+    }
+
+
+    @Override
     public Peer getPeer()
     {
         try

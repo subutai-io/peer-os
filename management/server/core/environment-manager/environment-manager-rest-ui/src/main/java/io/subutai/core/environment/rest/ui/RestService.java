@@ -132,7 +132,13 @@ public interface RestService
     @PUT
     @Path( "containers/{containerId}/snapshots/partition/{partition}/label/{label}" )
     Response rollbackContainerSnapshot( @PathParam( "containerId" ) String containerId,
-                                        @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+                                        @PathParam( "partition" ) String partition,
+                                        @PathParam( "label" ) String label );
+
+    @POST
+    @Path( "containers/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    Response addContainerSnapshot( @PathParam( "containerId" ) String containerId,
+                                   @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
 
 
     /** Container types **************************************************** */

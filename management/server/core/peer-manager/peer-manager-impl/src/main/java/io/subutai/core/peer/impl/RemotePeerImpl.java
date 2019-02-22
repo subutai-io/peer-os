@@ -330,6 +330,19 @@ public class RemotePeerImpl implements RemotePeer
         environmentWebClient.rollbackContainerSnapshot( containerId, partition, label );
     }
 
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        environmentWebClient.addContainerSnapshot( containerId, partition, label );
+    }
+
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
