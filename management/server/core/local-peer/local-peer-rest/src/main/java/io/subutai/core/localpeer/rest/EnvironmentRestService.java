@@ -66,6 +66,11 @@ public interface EnvironmentRestService
     void deleteContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
                                   @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
 
+    @PUT
+    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    void rollbackContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
+                                    @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+
     @GET
     @Path( "{environmentId}/container/{containerId}/quota/raw" )
     @Consumes( MediaType.APPLICATION_JSON )

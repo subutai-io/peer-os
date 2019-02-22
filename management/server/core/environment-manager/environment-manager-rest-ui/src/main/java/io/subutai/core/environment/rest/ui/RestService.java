@@ -127,8 +127,12 @@ public interface RestService
     @DELETE
     @Path( "containers/{containerId}/snapshots/partition/{partition}/label/{label}" )
     Response removeContainerSnapshot( @PathParam( "containerId" ) String containerId,
-                                      @PathParam( "partition" ) String snapshot,
-                                      @PathParam( "label" ) String label );
+                                      @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+
+    @PUT
+    @Path( "containers/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    Response rollbackContainerSnapshot( @PathParam( "containerId" ) String containerId,
+                                        @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
 
 
     /** Container types **************************************************** */

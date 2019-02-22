@@ -822,6 +822,48 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response rollbackContainerSnapshot( final String containerId, final String partition, final String label )
+    {
+        if ( Strings.isNullOrEmpty( containerId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+        }
+        if ( Strings.isNullOrEmpty( partition ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid partition" ) ).build();
+        }
+        if ( Strings.isNullOrEmpty( label ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid label" ) ).build();
+        }
+
+        Environment environment = findEnvironmentByContainerId( containerId );
+
+        if ( environment != null )
+        {
+            try
+            {
+                ContainerHost containerHost = environment.getContainerHostById( containerId );
+
+                containerHost.rollbackToSnapshot( partition, label );
+
+                return Response.ok().build();
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( "Exception rolling back to container snapshot", e );
+                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            }
+        }
+
+        return Response.status( Response.Status.NOT_FOUND ).build();
+    }
+
+
     /** Container types **************************************************** */
     @Override
     public Response listContainerTypes()

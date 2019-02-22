@@ -127,4 +127,12 @@ public class ResourceHostCommands
         return new RequestBuilder(
                 String.format( "subutai snapshot remove -c %s -p %s -l %s", containerName, partition, label ) );
     }
+
+
+    public RequestBuilder getRollbackContainerSnapshotCommand( final String containerName, final String partition,
+                                                               final String label )
+    {
+        return new RequestBuilder(
+                String.format( "subutai snapshot rollback -c %s -p %s -l %s", containerName, partition, label ) );
+    }
 }

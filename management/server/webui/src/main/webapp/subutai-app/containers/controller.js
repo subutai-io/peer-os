@@ -367,14 +367,22 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	}
 
-	function rollbackSnapshot(container, partition, label){
-	    console.log(container + '/' + partition + '@' + label);
-	}
+	function rollbackSnapshot(containerId, partition, label){
+        environmentService.rollbackContainerToSnapshot(containerId, partition, label ).success(function (data){
+            SweetAlert.swal ("Success!", "Container has been rolled back", "success");
+        }).error(function(data){
+            SweetAlert.swal("ERROR!", data, "error");
+        });
+    }
 
 	function removeSnapshot(containerId, partition, label){
         environmentService.removeContainerSnapshot(containerId, partition, label ).success(function (data){
             var list = vm.snapshots[partition];
             list.splice(list.indexOf(label), 1);
+
+            SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
+        }).error(function(data){
+            SweetAlert.swal("ERROR!", data, "error");
         });
 	}
 

@@ -65,7 +65,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void removeContainerSnapshot( ContainerHost containerHost, String partition, String label ) throws ResourceHostException;
 
-    void rollbackToContainerSnapshot( ContainerHost containerHost, String snapshot ) throws ResourceHostException;
+    void rollbackToContainerSnapshot( ContainerHost containerHost, String partition, String label ) throws ResourceHostException;
 
     /**
      * Destroys hosted container

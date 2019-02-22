@@ -1652,6 +1652,30 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         }
     }
 
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void rollbackToContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
+        ResourceHost resourceHost = containerHost.getParent();
+        try
+        {
+            resourceHost.rollbackToContainerSnapshot( containerHost, partition, label );
+        }
+        catch ( Exception e )
+        {
+            String errMsg = String.format( "Could not rollback container %s to snapshot %s: %s",
+                    containerHost.getContainerName(), partition + "@" + label, e.getMessage() );
+            LOG.error( errMsg, e );
+            throw new PeerException( errMsg, e );
+        }
+    }
+
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override

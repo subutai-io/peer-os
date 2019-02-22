@@ -45,6 +45,7 @@ function environmentService($http, $q) {
 		getContainerStatus : getContainerStatus,
 		getContainerSnapshots : getContainerSnapshots,
 		removeContainerSnapshot: removeContainerSnapshot,
+		rollbackContainerToSnapshot: rollbackContainerToSnapshot,
 		destroyContainer : destroyContainer,
 		switchContainer : switchContainer,
 		setContainerName : setContainerName,
@@ -163,6 +164,13 @@ function environmentService($http, $q) {
 
 	function removeContainerSnapshot(containerId, partition, label){
         return $http.delete(
+            CONTAINERS_URL + containerId + '/snapshots/partition/' + partition + '/label/' + label,
+            {withCredentials: true}
+        );
+	}
+
+	function rollbackContainerToSnapshot(containerId, partition, label){
+        return $http.put(
             CONTAINERS_URL + containerId + '/snapshots/partition/' + partition + '/label/' + label,
             {withCredentials: true}
         );
