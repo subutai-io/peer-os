@@ -72,7 +72,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void addContainerSnapshot( ContainerHost containerHost, String partition, String label )
             throws ResourceHostException;
 
-    void downloadRawFileFromCdn( String fileId, String destinationDirectory ) throws ResourceHostException;
+    String downloadRawFileFromCdn( String fileId, String destinationDirectory ) throws ResourceHostException;
 
     String uploadRawFileToCdn( String pathToFile, String cdnToken ) throws ResourceHostException;
 

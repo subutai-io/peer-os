@@ -97,6 +97,20 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/upload-file">
+      <action class="io.subutai.core.localpeer.cli.UploadRawFileToCdnCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/download-file">
+      <action class="io.subutai.core.localpeer.cli.DownloadRawFileFromCdnCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
 
   <reference id="localPeer" availability="mandatory" interface="io.subutai.common.peer.LocalPeer" />
   <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />

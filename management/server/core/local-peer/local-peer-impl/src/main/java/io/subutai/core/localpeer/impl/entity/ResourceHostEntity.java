@@ -607,7 +607,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void downloadRawFileFromCdn( final String fileId, String destinationDirectory ) throws ResourceHostException
+    public String downloadRawFileFromCdn( final String fileId, String destinationDirectory )
+            throws ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fileId ), "Invalid file id" );
         if ( destinationDirectory == null || destinationDirectory.trim().isEmpty() )
@@ -617,8 +618,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getDownloadRawFileFromCdnCommand( fileId, destinationDirectory ),
-                    this );
+            CommandResult result = commandUtil
+                    .execute( resourceHostCommands.getDownloadRawFileFromCdnCommand( fileId, destinationDirectory ),
+                            this );
+
+            return result.getStdOut();
         }
         catch ( CommandException e )
         {
