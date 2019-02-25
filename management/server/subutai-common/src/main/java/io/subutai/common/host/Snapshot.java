@@ -1,14 +1,21 @@
 package io.subutai.common.host;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 public class Snapshot
 {
+    @JsonProperty( "containerName" )
     private final String containerName;
+    @JsonProperty( "partition" )
     private final String partition;
+    @JsonProperty( "label" )
     private final String label;
 
 
-    public Snapshot( final String containerName, final String partition, final String label )
+    public Snapshot( @JsonProperty( "containerName" ) final String containerName,
+                     @JsonProperty( "partition" ) final String partition, @JsonProperty( "label" ) final String label )
     {
         this.containerName = containerName;
         this.partition = partition;
