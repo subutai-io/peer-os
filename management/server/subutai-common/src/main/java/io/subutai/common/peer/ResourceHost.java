@@ -72,6 +72,12 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void addContainerSnapshot( ContainerHost containerHost, String partition, String label )
             throws ResourceHostException;
 
+    void downloadRawFileFromCdn( String fileId, String destinationDirectory ) throws ResourceHostException;
+
+    String uploadRawFileToCdn( String pathToFile, String cdnToken ) throws ResourceHostException;
+
+    String backupContainer( ContainerHost containerHost, String destinationDirectory ) throws ResourceHostException;
+
     /**
      * Destroys hosted container
      */
@@ -117,6 +123,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 
     void importTemplate( Template template, String environmentId ) throws ResourceHostException;
+
+    //TODO add parameter --backup
 
     /**
      * Clones container based on the specified arguments

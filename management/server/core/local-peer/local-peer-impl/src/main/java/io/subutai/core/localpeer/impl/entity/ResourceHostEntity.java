@@ -607,6 +607,87 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public void downloadRawFileFromCdn( final String fileId, String destinationDirectory ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( fileId ), "Invalid file id" );
+        if ( destinationDirectory == null || destinationDirectory.trim().isEmpty() )
+        {
+            destinationDirectory = Common.RH_CACHE_DIR;
+        }
+
+        try
+        {
+            commandUtil.execute( resourceHostCommands.getDownloadRawFileFromCdnCommand( fileId, destinationDirectory ),
+                    this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error downloading file %s from CDN: %s", fileId, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String uploadRawFileToCdn( final String pathToFile, final String cdnToken ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToFile ), "Invalid file path" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( cdnToken ), "Invalid CDN token" );
+
+        try
+        {
+            CommandResult result = commandUtil
+                    .execute( resourceHostCommands.getUploadRawFileToCdnCommand( pathToFile, cdnToken ), this );
+
+            return result.getStdOut();
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error uploading file %s to CDN: %s", pathToFile, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String backupContainer( final ContainerHost containerHost, String destinationDirectory )
+            throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+        if ( destinationDirectory == null || destinationDirectory.trim().isEmpty() )
+        {
+            destinationDirectory = Common.RH_CACHE_DIR;
+        }
+
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+
+        try
+        {
+            CommandResult result = commandUtil.execute( resourceHostCommands
+                    .getBackupContainerCommand( containerHost.getContainerName(), destinationDirectory ), this );
+
+            return result.getStdOut();
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error backing up container %s : %s", containerHost.getContainerName(),
+                            e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public void destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
 
