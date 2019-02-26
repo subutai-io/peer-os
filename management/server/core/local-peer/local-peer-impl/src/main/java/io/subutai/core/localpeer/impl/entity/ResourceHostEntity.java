@@ -606,6 +606,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    //todo return full path to file
     @Override
     public String downloadRawFileFromCdn( final String fileId, String destinationDirectory )
             throws ResourceHostException
@@ -632,6 +633,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    //todo return file id
     @Override
     public String uploadRawFileToCdn( final String pathToFile, final String cdnToken ) throws ResourceHostException
     {
@@ -653,6 +655,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    //todo return full path to file
     @Override
     public String backupContainer( final ContainerHost containerHost, String destinationDirectory )
             throws ResourceHostException
@@ -1252,7 +1255,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public String cloneContainer( final Template template, final String containerName, final String hostname,
-                                  final String ip, final int vlan, final String environmentId )
+                                  final String ip, final int vlan, final String environmentId, final String backupFile )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
@@ -1271,12 +1274,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
             CommandResult result = execute( resourceHostCommands
                     .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
-                            containerToken ) );
+                            containerToken, backupFile ) );
 
             //If container clone failed with message containing "{container} already exist", assume this result as
             // successful and skip the error. See https://github.com/optdyn/hub/issues/3268
             if ( !result.hasSucceeded() && !result.getStdOut()
-                                                  .contains( String.format( "%s already exist", containerName ) ) )
+                                                  .contains( String.format( "%s already exists", containerName ) ) )
             {
                 throw new RuntimeException(
                         String.format( "Failed to clone container: %s, result %s", result.getStdErr(),

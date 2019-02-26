@@ -12,6 +12,11 @@ import org.apache.commons.lang3.EnumUtils;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.bazaar.share.dto.environment.ContainerStateDto;
+import io.subutai.bazaar.share.dto.environment.EnvironmentNodeDto;
+import io.subutai.bazaar.share.dto.environment.EnvironmentNodesDto;
+import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
@@ -33,11 +38,6 @@ import io.subutai.core.bazaarmanager.api.RestResult;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.bazaarmanager.impl.environment.state.Context;
 import io.subutai.core.bazaarmanager.impl.environment.state.StateHandler;
-import io.subutai.bazaar.share.dto.environment.ContainerStateDto;
-import io.subutai.bazaar.share.dto.environment.EnvironmentNodeDto;
-import io.subutai.bazaar.share.dto.environment.EnvironmentNodesDto;
-import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 import static io.subutai.bazaar.share.dto.environment.ContainerStateDto.BUILDING;
 
@@ -140,7 +140,7 @@ public class BuildContainerStateHandler extends StateHandler
 
             templates.add( node.getTemplateId() );
         }
-        
+
         if ( rhTemplates.isEmpty() )
         {
             return;
@@ -287,7 +287,7 @@ public class BuildContainerStateHandler extends StateHandler
     private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws BazaarManagerException
     {
         return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota() );
+                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota(), null );
     }
 
 
