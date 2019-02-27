@@ -56,6 +56,7 @@ export P2P_PORT_RANGE_START=1
 export P2P_PORT_RANGE_END=65535
 export CHECK_RH_LIMITS=false
 export CHECK_RESERVED_RESOURCES=false
+export RH_CACHE_DIR="/var/cache/subutai"
 
 #memory optimization
 export MALLOC_ARENA_MAX=4
