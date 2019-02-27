@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +54,8 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.Snapshot;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerInfo;
@@ -429,6 +432,286 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException(
                     String.format( "Error stopping container %s: %s", containerHost.getHostname(), e.getMessage() ),
                     e );
+        }
+    }
+
+
+    @Override
+    public Snapshots listContainerHostSnapshots( final ContainerHost containerHost ) throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+        try
+        {
+            CommandResult commandResult = commandUtil
+                    .execute( resourceHostCommands.getListContainerSnapshotsCommand( containerHost.getContainerName() ),
+                            this );
+
+            Snapshots snapshots = new Snapshots();
+
+            //parse snapshots
+
+            if ( !StringUtils.isBlank( commandResult.getStdOut() ) )
+            {
+                Pattern p = Pattern.compile( ".+/(.+)@(.+)" );
+                StringTokenizer tokenizer = new StringTokenizer( commandResult.getStdOut(), System.lineSeparator() );
+                int i = 0;
+                while ( tokenizer.hasMoreTokens() )
+                {
+                    String line = tokenizer.nextToken().trim();
+                    //skip header
+                    if ( i > 0 )
+                    {
+                        String snapshotLine = line.split( "\\s+" )[0];
+                        Matcher m = p.matcher( snapshotLine );
+                        if ( m.find() && m.groupCount() == 2 )
+                        {
+                            Snapshot snapshot =
+                                    new Snapshot( containerHost.getContainerName(), m.group( 1 ), m.group( 2 ) );
+                            snapshots.addSnapshot( snapshot );
+                        }
+                    }
+                    i++;
+                }
+            }
+
+            return snapshots;
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error listing container %s snapshots: %s", containerHost.getHostname(),
+                            e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void removeContainerSnapshot( final ContainerHost containerHost, String partition, final String label )
+            throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+        try
+        {
+            if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
+            {
+                partition = "parent";
+            }
+
+            commandUtil.execute( resourceHostCommands
+                    .getRemoveContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error removing container %s snapshot %s: %s", containerHost.getHostname(),
+                            partition + "@" + label, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void rollbackToContainerSnapshot( final ContainerHost containerHost, String partition, final String label )
+            throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+        try
+        {
+            if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
+            {
+                partition = "parent";
+            }
+
+            commandUtil.execute( resourceHostCommands
+                    .getRollbackContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error rolling back container %s to snapshot %s: %s", containerHost.getHostname(),
+                            partition + "@" + label, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void addContainerSnapshot( final ContainerHost containerHost, String partition, final String label )
+            throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+        try
+        {
+            if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
+            {
+                partition = "parent";
+            }
+
+            commandUtil.execute( resourceHostCommands
+                    .getAddContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error adding container %s snapshot %s: %s", containerHost.getHostname(),
+                            partition + "@" + label, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String downloadRawFileFromCdn( final String fileId, String destinationDirectory )
+            throws ResourceHostException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( fileId ), "Invalid file id" );
+        if ( destinationDirectory == null || destinationDirectory.trim().isEmpty() )
+        {
+            destinationDirectory = Common.RH_CACHE_DIR;
+        }
+
+        try
+        {
+            CommandResult result = commandUtil
+                    .execute( resourceHostCommands.getDownloadRawFileFromCdnCommand( fileId, destinationDirectory ),
+                            this );
+
+            Pattern pattern = Pattern.compile( "File (\\S+) downloaded to (\\S+)\\s*\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut() );
+            if ( matcher.find() && matcher.groupCount() == 2 )
+            {
+                return Paths.get( matcher.group( 2 ), matcher.group( 1 ) ).toString();
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse file from output %s", result.getStdOut() ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error downloading file %s from CDN: %s", fileId, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String uploadRawFileToCdn( final String pathToFile, final String cdnToken ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToFile ), "Invalid file path" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( cdnToken ), "Invalid CDN token" );
+
+        try
+        {
+            CommandResult result = commandUtil
+                    .execute( resourceHostCommands.getUploadRawFileToCdnCommand( pathToFile, cdnToken ), this );
+
+            Pattern pattern = Pattern.compile( "\"id\"\\s*:\\s*\"(\\S+)\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut().replaceAll( "\\\\", "" ) );
+            if ( matcher.find() && matcher.groupCount() == 1 )
+            {
+                return matcher.group( 1 );
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse file id from output %s", result.getStdOut() ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error uploading filepath %s to CDN: %s", pathToFile, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String backupContainer( final ContainerHost containerHost, String destinationDirectory )
+            throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+        if ( destinationDirectory == null || destinationDirectory.trim().isEmpty() )
+        {
+            destinationDirectory = Common.RH_CACHE_DIR;
+        }
+
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+
+        try
+        {
+            CommandResult result = commandUtil.execute( resourceHostCommands
+                    .getBackupContainerCommand( containerHost.getContainerName(), destinationDirectory ), this );
+
+            Pattern pattern = Pattern.compile( "got backed up to (\\S+)\\s*\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut() );
+            if ( matcher.find() && matcher.groupCount() == 1 )
+            {
+                return matcher.group( 1 );
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse filepath from output %s", result.getStdOut() ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error backing up container %s : %s", containerHost.getContainerName(),
+                            e.getMessage() ), e );
         }
     }
 
@@ -994,7 +1277,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public String cloneContainer( final Template template, final String containerName, final String hostname,
-                                  final String ip, final int vlan, final String environmentId )
+                                  final String ip, final int vlan, final String environmentId, final String backupFile )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
@@ -1013,12 +1296,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
             CommandResult result = execute( resourceHostCommands
                     .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
-                            containerToken ) );
+                            containerToken, backupFile ) );
 
             //If container clone failed with message containing "{container} already exist", assume this result as
             // successful and skip the error. See https://github.com/optdyn/hub/issues/3268
             if ( !result.hasSucceeded() && !result.getStdOut()
-                                                  .contains( String.format( "%s already exist", containerName ) ) )
+                                                  .contains( String.format( "%s already exists", containerName ) ) )
             {
                 throw new RuntimeException(
                         String.format( "Failed to clone container: %s, result %s", result.getStdErr(),

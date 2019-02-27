@@ -8,6 +8,7 @@ import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.environment.RhTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.protocol.LoadBalancing;
 import io.subutai.common.protocol.P2PConnections;
@@ -59,6 +60,49 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * Stops hosted container
      */
     void stopContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+
+    Snapshots listContainerHostSnapshots( ContainerHost containerHost ) throws ResourceHostException;
+
+    void removeContainerSnapshot( ContainerHost containerHost, String partition, String label )
+            throws ResourceHostException;
+
+    void rollbackToContainerSnapshot( ContainerHost containerHost, String partition, String label )
+            throws ResourceHostException;
+
+    void addContainerSnapshot( ContainerHost containerHost, String partition, String label )
+            throws ResourceHostException;
+
+    /**
+     * Download a file from raw category on CDN
+     *
+     * @param fileId id of file to be downloaded
+     * @param destinationDirectory destination directory to download file to, if null is passed then default directory
+     * Common.RH_CACHE_DIR is used
+     *
+     * @return full path to downloaded file
+     */
+    String downloadRawFileFromCdn( String fileId, String destinationDirectory ) throws ResourceHostException;
+
+    /**
+     * Uploads a file to user raw category on CDN
+     *
+     * @param pathToFile full path to file to be uploaded
+     * @param cdnToken user CDN token
+     *
+     * @return id of file on CDN
+     */
+    String uploadRawFileToCdn( String pathToFile, String cdnToken ) throws ResourceHostException;
+
+    /**
+     * Backs up container to archive
+     *
+     * @param containerHost container t0 backup
+     * @param destinationDirectory destination directory to save backup to, if null is passed then default directory
+     * Common.RH_CACHE_DIR is used
+     *
+     * @return full path to created backup archive
+     */
+    String backupContainer( ContainerHost containerHost, String destinationDirectory ) throws ResourceHostException;
 
     /**
      * Destroys hosted container
@@ -112,7 +156,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @return ID of container
      */
     String cloneContainer( Template template, String containerName, String hostname, String ip, int vlan,
-                           String environmentId ) throws ResourceHostException;
+                           String environmentId, String backupFile ) throws ResourceHostException;
 
     void setContainerQuota( ContainerHost containerHost, ContainerQuota containerQuota ) throws ResourceHostException;
 

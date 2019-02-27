@@ -16,6 +16,7 @@ import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -122,6 +123,83 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( containerId );
             Preconditions.checkNotNull( containerId.getId() );
             return localPeer.getContainerState( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Snapshots getContainerSnapshots( final ContainerId containerId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerId.getId() );
+            return localPeer.listContainerHostSnapshots( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void deleteContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerId.getId() );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
+
+            localPeer.removeContainerSnapshot( containerId, partition, label );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void rollbackContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerId.getId() );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
+
+            localPeer.rollbackToContainerSnapshot( containerId, partition, label );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerId.getId() );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
+
+            localPeer.addContainerSnapshot( containerId, partition, label );
         }
         catch ( Exception e )
         {

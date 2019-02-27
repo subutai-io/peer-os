@@ -26,6 +26,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.quota.ContainerSize;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
@@ -35,6 +37,7 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -47,8 +50,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 /**
@@ -294,6 +295,34 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Peer peer = getPeer();
         peer.stopContainer( getContainerId() );
+    }
+
+
+    @Override
+    public Snapshots listSnapshots() throws PeerException
+    {
+        return getPeer().listContainerHostSnapshots( getContainerId() );
+    }
+
+
+    @Override
+    public void removeSnapshot( final String partition, final String label ) throws PeerException
+    {
+        getPeer().removeContainerSnapshot( getContainerId(), partition, label );
+    }
+
+
+    @Override
+    public void rollbackToSnapshot( final String partition, final String label ) throws PeerException
+    {
+        getPeer().rollbackToContainerSnapshot( getContainerId(), partition, label );
+    }
+
+
+    @Override
+    public void addSnapshot( final String partition, final String label ) throws PeerException
+    {
+        getPeer().addContainerSnapshot( getContainerId(), partition, label );
     }
 
 

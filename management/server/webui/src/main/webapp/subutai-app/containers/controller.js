@@ -18,8 +18,6 @@ ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'Swee
 
 function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar, identitySrv, templateSrv) {
 
-//	checkCDNToken(templateSrv, $rootScope)
-
 	var vm = this;
 
 	cfpLoadingBar.start();
@@ -29,6 +27,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	vm.environments = [];
 	vm.containers = [];
+	vm.snapshots = {};
 	vm.notRegisteredContainers = [];
 	vm.containersType = [];
 	vm.environmentId = $stateParams.environmentId;
@@ -58,8 +57,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.setContainerName = setContainerName;
 	vm.changeNamePopup = changeNamePopup;
 	vm.createTemplatePopup=createTemplatePopup;
+	vm.createSnapshotsPopup=createSnapshotsPopup;
 	vm.createTemplate=createTemplate;
-	vm.hasCdnToken=hasCdnToken;
+	vm.rollbackSnapshot = rollbackSnapshot;
+	vm.removeSnapshot = removeSnapshot;
+	vm.addSnapshot = addSnapshot;
     vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
@@ -334,7 +336,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function createTemplatePopup(container){
 
-//        if( hasCdnToken() ){
             vm.editingContainer = container;
 
             ngDialog.open({
@@ -342,12 +343,74 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
                 scope: $scope,
                 className: 'b-build-environment-info'
             });
-//		} else {
-//		    SweetAlert.swal(
-//		    "Your key is not registered with Bazaar",
-//		    "Please, register your key on Bazaar",
-//		    "success");
-//		}
+	}
+
+	function createSnapshotsPopup(container){
+
+        vm.editingContainer = container;
+
+	    environmentService.getContainerSnapshots(container.id).success(function (data){
+	        vm.snapshots = {};
+	        for (var i in data){
+	            var snapshot = data[i]
+	            if(!vm.snapshots[snapshot.partition]){
+	                vm.snapshots[snapshot.partition] = []
+	            }
+	            vm.snapshots[snapshot.partition].push(snapshot.label)
+	        }
+
+            ngDialog.open({
+                template: 'subutai-app/containers/partials/manageSnapshots.html',
+                scope: $scope,
+                className: 'b-build-environment-info'
+            });
+	    });
+
+	}
+
+	function rollbackSnapshot(containerId, partition, label){
+	//TODO ask confirmation
+        environmentService.rollbackContainerToSnapshot(containerId, partition, label ).success(function (data){
+            SweetAlert.swal ("Success!", "Container has been rolled back", "success");
+        }).error(function(data){
+            SweetAlert.swal("ERROR!", data.ERROR, "error");
+        });
+    }
+
+	function removeSnapshot(containerId, partition, label){
+	//TODO ask confirmation
+        environmentService.removeContainerSnapshot(containerId, partition, label ).success(function (data){
+            var list = vm.snapshots[partition];
+            list.splice(list.indexOf(label), 1);
+
+            SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
+        }).error(function(data){
+            SweetAlert.swal("ERROR!", data.ERROR, "error");
+        });
+	}
+
+	function addSnapshot(snapshot){
+        environmentService.addContainerSnapshot(snapshot.id, snapshot.partition, snapshot.label ).success(function (data){
+            if (snapshot.partition == 'all'){
+                var partitions = ['home', 'rootfs', 'var', 'opt', vm.editingContainer.containerName];
+                for(var i in  partitions){
+                    var partition = partitions[i];
+                    if(!vm.snapshots[partition]){
+                        vm.snapshots[partition] = [];
+                    }
+                    vm.snapshots[partition].push(snapshot.label);
+                }
+            }else{
+                if(!vm.snapshots[snapshot.partition]){
+                    vm.snapshots[snapshot.partition] = [];
+                }
+                vm.snapshots[snapshot.partition].push(snapshot.label);
+            }
+
+            SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
+        }).error(function(data){
+            SweetAlert.swal("ERROR!", data.ERROR, "error");
+        });
 	}
 
 
@@ -431,10 +494,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
         });
 
-    }
-
-    function hasCdnToken(){
-        return !(localStorage.getItem('cdnToken') == undefined || localStorage.getItem('cdnToken') == null);
     }
 
 }

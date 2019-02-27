@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 
 
 public class CloneRequest
@@ -33,6 +33,9 @@ public class CloneRequest
     @JsonProperty( value = "containerQuota" )
     private final ContainerQuota containerQuota;
 
+    @JsonProperty( value = "backupFile" )
+    private final String backupFile;
+
 
     public CloneRequest( @JsonProperty( value = "resourceHostId" ) final String resourceHostId,
                          @JsonProperty( value = "hostname" ) final String hostname,
@@ -40,7 +43,8 @@ public class CloneRequest
                          @JsonProperty( value = "ip" ) final String ip,
                          @JsonProperty( value = "templateId" ) final String templateId,
                          @JsonProperty( value = "templateArch" ) HostArchitecture templateArch,
-                         @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota )
+                         @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota,
+                         @JsonProperty( value = "backupFile" ) final String backupFile )
     {
         Preconditions.checkNotNull( resourceHostId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -54,6 +58,7 @@ public class CloneRequest
         this.templateId = templateId;
         this.templateArch = templateArch;
         this.containerQuota = containerQuota;
+        this.backupFile = backupFile;
     }
 
 
@@ -111,11 +116,18 @@ public class CloneRequest
     }
 
 
+    public String getBackupFile()
+    {
+        return backupFile;
+    }
+
+
     @Override
     public String toString()
     {
         return "CloneRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
                 + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", templateId='" + templateId
-                + '\'' + ", templateArch=" + templateArch + ", containerQuota=" + containerQuota + '}';
+                + '\'' + ", templateArch=" + templateArch + ", containerQuota=" + containerQuota + ", backupFile='"
+                + backupFile + '\'' + '}';
     }
 }

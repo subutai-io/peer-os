@@ -38,6 +38,7 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -288,6 +289,58 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         environmentWebClient.stopContainer( containerId );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Read" )
+    @Override
+    public Snapshots listContainerHostSnapshots( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+
+        return environmentWebClient.listContainerHostSnapshots( containerId );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void removeContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        environmentWebClient.removeContainerSnapshot( containerId, partition, label );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void rollbackToContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        environmentWebClient.rollbackContainerSnapshot( containerId, partition, label );
+    }
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+
+        environmentWebClient.addContainerSnapshot( containerId, partition, label );
     }
 
 

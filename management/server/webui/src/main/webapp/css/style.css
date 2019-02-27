@@ -921,6 +921,9 @@ tip.description-tooltip {
 .b-icon_ram {
     background-image: url('../assets/elements/icons/icon-ram.svg');
 }
+.b-icon_rollback {
+    background-image: url('../assets/elements/icons/rb.png');
+}
 .b-icon_add {
     background-color: rgba(1, 1, 1, 0.03);
     /*border-radius: 5px;*/
@@ -963,6 +966,10 @@ tip.description-tooltip {
 
 .b-icon_template{
     background-image: url('../assets/templates/no-image.jpg');
+}
+
+.b-icon_disk{
+    background-image: url('../assets/elements/icons/icon-hdd.svg');
 }
 
 .b-icon_info {
@@ -4091,3 +4098,9 @@ a[disabled] {
 /*.dataTables_empty {
   display:none;
 }*/
+
+#scrolltable { margin: 5px; min-height: 200px; max-height:300px; overflow: auto; }
+#scrolltable table { border-collapse: collapse; }
+#scrolltable td { padding-right: 5px; padding-left: 5px; }
+#scrolltable td div { text-align: center; }
+#scrolltable tr:nth-child(even) { background: #EEE; }

@@ -17,6 +17,7 @@ import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.Quota;
+import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -110,6 +111,118 @@ public class EnvironmentWebClient
         WebClientBuilder.checkResponse( response );
     }
 
+
+    Snapshots listContainerHostSnapshots( ContainerId containerId ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/snapshots", containerId.getEnvironmentId().getId(),
+                    containerId.getId() );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            response = client.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error stopping container:" + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        return WebClientBuilder.checkResponse( response, Snapshots.class );
+    }
+
+
+    void removeContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/snapshots/partition/%s/label/%s",
+                    containerId.getEnvironmentId().getId(), containerId.getId(), partition, label );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            response = client.delete();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error removing container snapshot:" + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void rollbackContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/snapshots/partition/%s/label/%s",
+                    containerId.getEnvironmentId().getId(), containerId.getId(), partition, label );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            response = client.put( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error rolling back container snapshot:" + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+            throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/snapshots/partition/%s/label/%s",
+                    containerId.getEnvironmentId().getId(), containerId.getId(), partition, label );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error adding container snapshot:" + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
 
     public void destroyContainer( ContainerId containerId ) throws PeerException
     {
@@ -800,4 +913,5 @@ public class EnvironmentWebClient
 
         return WebClientBuilder.checkResponse( response, Quota.class );
     }
+
 }
