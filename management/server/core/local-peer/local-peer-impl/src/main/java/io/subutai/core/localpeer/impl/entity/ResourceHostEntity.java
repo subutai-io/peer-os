@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -606,7 +607,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    //todo return full path to file
     @Override
     public String downloadRawFileFromCdn( final String fileId, String destinationDirectory )
             throws ResourceHostException
@@ -623,7 +623,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     .execute( resourceHostCommands.getDownloadRawFileFromCdnCommand( fileId, destinationDirectory ),
                             this );
 
-            return result.getStdOut();
+            Pattern pattern = Pattern.compile( "File (\\S+) downloaded to (\\S+)\\s*\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut() );
+            if ( matcher.find() && matcher.groupCount() == 2 )
+            {
+                return Paths.get( matcher.group( 2 ), matcher.group( 1 ) ).toString();
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse file from output %s", result.getStdOut() ) );
         }
         catch ( CommandException e )
         {
@@ -633,7 +641,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    //todo return file id
     @Override
     public String uploadRawFileToCdn( final String pathToFile, final String cdnToken ) throws ResourceHostException
     {
@@ -645,17 +652,24 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             CommandResult result = commandUtil
                     .execute( resourceHostCommands.getUploadRawFileToCdnCommand( pathToFile, cdnToken ), this );
 
-            return result.getStdOut();
+            Pattern pattern = Pattern.compile( "\"id\"\\s*:\\s*\"(\\S+)\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut().replaceAll( "\\\\", "" ) );
+            if ( matcher.find() && matcher.groupCount() == 1 )
+            {
+                return matcher.group( 1 );
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse file id from output %s", result.getStdOut() ) );
         }
         catch ( CommandException e )
         {
             throw new ResourceHostException(
-                    String.format( "Error uploading file %s to CDN: %s", pathToFile, e.getMessage() ), e );
+                    String.format( "Error uploading filepath %s to CDN: %s", pathToFile, e.getMessage() ), e );
         }
     }
 
 
-    //todo return full path to file
     @Override
     public String backupContainer( final ContainerHost containerHost, String destinationDirectory )
             throws ResourceHostException
@@ -683,7 +697,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             CommandResult result = commandUtil.execute( resourceHostCommands
                     .getBackupContainerCommand( containerHost.getContainerName(), destinationDirectory ), this );
 
-            return result.getStdOut();
+            Pattern pattern = Pattern.compile( "got backed up to (\\S+)\\s*\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut() );
+            if ( matcher.find() && matcher.groupCount() == 1 )
+            {
+                return matcher.group( 1 );
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse filepath from output %s", result.getStdOut() ) );
         }
         catch ( CommandException e )
         {

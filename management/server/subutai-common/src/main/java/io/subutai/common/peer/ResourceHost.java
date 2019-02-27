@@ -72,10 +72,36 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void addContainerSnapshot( ContainerHost containerHost, String partition, String label )
             throws ResourceHostException;
 
+    /**
+     * Download a file from raw category on CDN
+     *
+     * @param fileId id of file to be downloaded
+     * @param destinationDirectory destination directory to download file to, if null is passed then default directory
+     * Common.RH_CACHE_DIR is used
+     *
+     * @return full path to downloaded file
+     */
     String downloadRawFileFromCdn( String fileId, String destinationDirectory ) throws ResourceHostException;
 
+    /**
+     * Uploads a file to user raw category on CDN
+     *
+     * @param pathToFile full path to file to be uploaded
+     * @param cdnToken user CDN token
+     *
+     * @return id of file on CDN
+     */
     String uploadRawFileToCdn( String pathToFile, String cdnToken ) throws ResourceHostException;
 
+    /**
+     * Backs up container to archive
+     *
+     * @param containerHost container t0 backup
+     * @param destinationDirectory destination directory to save backup to, if null is passed then default directory
+     * Common.RH_CACHE_DIR is used
+     *
+     * @return full path to created backup archive
+     */
     String backupContainer( ContainerHost containerHost, String destinationDirectory ) throws ResourceHostException;
 
     /**
@@ -123,8 +149,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 
     void importTemplate( Template template, String environmentId ) throws ResourceHostException;
-
-    //TODO add parameter --backup
 
     /**
      * Clones container based on the specified arguments
