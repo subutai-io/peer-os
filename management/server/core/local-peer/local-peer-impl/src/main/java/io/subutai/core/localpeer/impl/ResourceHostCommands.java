@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl;
 
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 
@@ -66,11 +68,13 @@ public class ResourceHostCommands
 
 
     public RequestBuilder getCloneContainerCommand( final String templateId, String containerName, String hostname,
-                                                    String ip, int vlan, String environmentId, String containerToken )
+                                                    String ip, int vlan, String environmentId, String containerToken,
+                                                    String backupFile )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s && subutai hostname con %s %s",
-                        templateId, containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
+                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s %s && subutai hostname con %s %s",
+                        templateId, containerName, ip, vlan, environmentId, containerToken,
+                        Strings.isNullOrEmpty( backupFile ) ? "" : "--backup " + backupFile, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
@@ -142,5 +146,28 @@ public class ResourceHostCommands
     {
         return new RequestBuilder(
                 String.format( "subutai snapshot add -c %s -p %s -l %s", containerName, partition, label ) );
+    }
+
+
+    public RequestBuilder getDownloadRawFileFromCdnCommand( final String fileId, final String destinationDirectory )
+    {
+        return new RequestBuilder(
+                String.format( "subutai cdn get %s --destination %s", fileId, destinationDirectory ) )
+                .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getUploadRawFileToCdnCommand( final String pathToFile, final String cdnToken )
+    {
+        return new RequestBuilder( String.format( "subutai cdn put -f %s -t %s", pathToFile, cdnToken ) )
+                .withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getBackupContainerCommand( final String containerName, final String destinationDirectory )
+    {
+        return new RequestBuilder(
+                String.format( "subutai backup %s --destination %s", containerName, destinationDirectory ) )
+                .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 }

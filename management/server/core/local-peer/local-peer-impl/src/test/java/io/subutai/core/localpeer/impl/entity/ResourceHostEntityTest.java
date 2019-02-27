@@ -382,5 +382,44 @@ public class ResourceHostEntityTest
 
         assertEquals( 2, containerInfos.size() );
     }
+
+
+    @Test
+    public void testUploadRawFileToCdn() throws Exception
+    {
+        doReturn( "  io.subutai.common.peer.ResourceHostException: Failed to parse file id from output \n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n"
+                + "   0 B / 3 B    0.00%\n" + "   0 B / 3 B    0.00%\n" + "   3 B / 3 B  100.00% 0s\n"
+                + "time=\"2019-02-27 02:33:13\" level=info msg=\"File test.dat uploaded to CDN:\\n{\\n  \\\"size\\\" "
+                + ": \\\"3\\\",\\n  \\\"digest-method\\\" : \\\"sha256\\\",\\n  \\\"name\\\" : \\\"test.dat\\\",\\n  "
+                + "\\\"digest\\\" : \\\"c01a4cfa25cb895cdd0bb25181ba9c1622e93895a6de6f533a7299f70d6b0cfb\\\",\\n  "
+                + "\\\"id\\\" : \\\"QmRNJU6q9wBjT6PeqeHwuChxMf3h7ViTyuLj8h31aN2dXr\\\",\\n  \\\"md5\\\" : "
+                + "\\\"31ebdfce8b77ac49d7f5506dd1495830\\\"\\n}\"\n" ).when( commandResult ).getStdOut();
+
+        String id = resourceHostEntity.uploadRawFileToCdn( "path", "token" );
+
+        assertNotNull( id );
+    }
 }
 

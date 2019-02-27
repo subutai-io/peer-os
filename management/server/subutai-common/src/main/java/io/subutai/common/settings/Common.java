@@ -17,6 +17,7 @@ public class Common
     public static final String P2P_INTERFACE_PREFIX = "p2p";
     public static final String SUBUTAI_HTTP_HEADER = "sbt-hdr";
     public static final String KARAF_ETC = System.getProperty( "karaf.etc" );
+    public static final String RH_CACHE_DIR = System.getProperty( "rhCacheDir" );
     public static final String SUBUTAI_APP_DATA_PATH = System.getProperty( "subutaiAppDataPath" );
     public static final String BAZAAR_IP = System.getProperty( "bazaarIp" );
     public static final String P2P_PORT_RANGE_START = System.getProperty( "p2pPortRangeStart" );
