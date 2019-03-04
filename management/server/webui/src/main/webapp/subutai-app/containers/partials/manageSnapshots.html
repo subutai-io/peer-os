@@ -1,28 +1,19 @@
 <div class="b-popup">
-  <div class="b-popup__header">
-    Manage container snapshots
+  <div class="b-popup__header_small">
+
+
+    {{ containerViewCtrl.editingContainer.containerName }}'s snapshots
     <a href ng-click="closeThisDialog()">
       <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
     </a>
   </div>
 
-  <form ng-submit="containerViewCtrl.addSnapshot(newSnapshot)" ng-init="newSnapshot.id=containerViewCtrl.editingContainer.id">
+  <form ng-submit="containerViewCtrl.addSnapshot(newSnapshot)" ng-init="newSnapshot.id=containerViewCtrl.editingContainer.id; newSnapshot.partition='all'">
     <div>
       <table>
         <tr>
           <td>
-            <label class="b-popup-body-label">Partition</label>
-            <select ng-init="newSnapshot.partition='all'" ng-model="newSnapshot.partition" required style="width:100px">
-            <option value="all" selected>All</option>
-            <option value="rootfs">rootfs</option>
-            <option value="home">home</option>
-            <option value="opt">opt</option>
-            <option value="var">var</option>
-            <option value="config">config</option>
-          </select>
-          </td>
-          <td>
-            <label class="b-popup-body-label">Name</label>
+            <label class="b-popup-body-label">Snapshot name</label>
             <input type="text" ng-model="newSnapshot.label" ng-required="true" style="width:100px"/>
           </td>
           <td><button style="width:50px" class="b-btn b-btn_green g-right" type="submit">Add</button></td>
@@ -34,20 +25,7 @@
   <div id="scrolltable">
 
     <table>
-      <tr>
-        <td>
-          <div>Partition</div>
-        </td>
-        <td>
-          <div>Snapshots</div>
-        </td>
-      </tr>
       <tr ng-repeat="(partition, snapshots) in containerViewCtrl.snapshots">
-        <td>
-          <span>
-              {{ partition }}
-          </span>
-        </td>
         <td>
           <ul ng-repeat="(idx, label) in snapshots">
             <table>
@@ -58,7 +36,7 @@
                      class="b-icon b-icon_rollback"
                      tooltips
                      tooltip-template='Rollback partition to snapshot'
-                     ng-click="containerViewCtrl.rollbackSnapshot( containerViewCtrl.editingContainer.id, partition, label )">
+                     ng-click="containerViewCtrl.rollbackSnapshot( containerViewCtrl.editingContainer.id, 'all', label )">
                   </a>
                 </td>
                 <td>
@@ -66,7 +44,7 @@
                      class="b-icon b-icon_remove"
                      tooltips
                      tooltip-template='Remove snapshot'
-                     ng-click="containerViewCtrl.removeSnapshot( containerViewCtrl.editingContainer.id, partition, label )">
+                     ng-click="containerViewCtrl.removeSnapshot( containerViewCtrl.editingContainer.id, 'all', label )">
                   </a>
                 </td>
               </tr>

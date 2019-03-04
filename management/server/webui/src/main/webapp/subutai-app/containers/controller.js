@@ -353,10 +353,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	        vm.snapshots = {};
 	        for (var i in data){
 	            var snapshot = data[i]
-	            if(!vm.snapshots[snapshot.partition]){
-	                vm.snapshots[snapshot.partition] = []
+	            if (snapshot.partition == 'config'){
+                    if(!vm.snapshots['all']){
+                        vm.snapshots['all'] = []
+                    }
+                    vm.snapshots['all'].push(snapshot.label)
 	            }
-	            vm.snapshots[snapshot.partition].push(snapshot.label)
 	        }
 
             ngDialog.open({
@@ -380,8 +382,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	function removeSnapshot(containerId, partition, label){
 	//TODO ask confirmation
         environmentService.removeContainerSnapshot(containerId, partition, label ).success(function (data){
-            var list = vm.snapshots[partition];
-            list.splice(list.indexOf(label), 1);
+            var list = vm.snapshots['all']
+            if(list){
+                list.splice(list.indexOf(label), 1);
+            }
 
             SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
         }).error(function(data){
@@ -391,21 +395,21 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	function addSnapshot(snapshot){
         environmentService.addContainerSnapshot(snapshot.id, snapshot.partition, snapshot.label ).success(function (data){
-            if (snapshot.partition == 'all'){
-                var partitions = ['home', 'rootfs', 'var', 'opt', 'config'];
-                for(var i in  partitions){
-                    var partition = partitions[i];
-                    if(!vm.snapshots[partition]){
-                        vm.snapshots[partition] = [];
-                    }
-                    vm.snapshots[partition].push(snapshot.label);
-                }
-            }else{
+//            if (snapshot.partition == 'all'){
+//                var partitions = ['home', 'rootfs', 'var', 'opt', 'config'];
+//                for(var i in  partitions){
+//                    var partition = partitions[i];
+//                    if(!vm.snapshots[partition]){
+//                        vm.snapshots[partition] = [];
+//                    }
+//                    vm.snapshots[partition].push(snapshot.label);
+//                }
+//            }else{
                 if(!vm.snapshots[snapshot.partition]){
                     vm.snapshots[snapshot.partition] = [];
                 }
                 vm.snapshots[snapshot.partition].push(snapshot.label);
-            }
+//            }
 
             SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
         }).error(function(data){
