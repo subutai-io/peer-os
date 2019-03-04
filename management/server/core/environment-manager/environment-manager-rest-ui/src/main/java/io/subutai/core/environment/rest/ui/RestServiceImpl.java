@@ -849,7 +849,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                containerHost.rollbackToSnapshot( partition, label );
+                containerHost.rollbackToSnapshot( partition, label, true );
 
                 return Response.ok().build();
             }

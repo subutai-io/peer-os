@@ -389,9 +389,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
 
     @Override
-    public void rollbackToSnapshot( final String partition, final String label ) throws PeerException
+    public void rollbackToSnapshot( final String partition, final String label, final boolean force )
+            throws PeerException
     {
-        getPeer().rollbackToContainerSnapshot( getContainerId(), partition, label );
+        getPeer().rollbackToContainerSnapshot( getContainerId(), partition, label, force );
     }
 
 

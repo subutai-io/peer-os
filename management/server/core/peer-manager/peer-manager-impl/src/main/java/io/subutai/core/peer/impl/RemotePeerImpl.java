@@ -319,7 +319,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void rollbackToContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+    public void rollbackToContainerSnapshot( final ContainerId containerId, final String partition, final String label, final boolean force )
             throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
@@ -327,7 +327,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
 
-        environmentWebClient.rollbackContainerSnapshot( containerId, partition, label );
+        environmentWebClient.rollbackContainerSnapshot( containerId, partition, label, force );
     }
 
     @RolesAllowed( "Environment-Management|Update" )

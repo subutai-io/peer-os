@@ -67,9 +67,10 @@ public interface EnvironmentRestService
                                   @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
 
     @PUT
-    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}/{force}" )
     void rollbackContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
-                                    @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+                                    @PathParam( "partition" ) String partition, @PathParam( "label" ) String label,
+                                    @PathParam( "force" ) boolean force );
 
     @POST
     @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )

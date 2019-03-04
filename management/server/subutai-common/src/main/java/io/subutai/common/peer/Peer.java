@@ -103,7 +103,8 @@ public interface Peer extends RelationLink
 
     void removeContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
 
-    void rollbackToContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
+    void rollbackToContainerSnapshot( ContainerId containerId, String partition, String label, boolean force )
+            throws PeerException;
 
     void addContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
 

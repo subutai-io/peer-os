@@ -553,8 +553,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void rollbackToContainerSnapshot( final ContainerHost containerHost, String partition, final String label )
-            throws ResourceHostException
+    public void rollbackToContainerSnapshot( final ContainerHost containerHost, String partition, final String label,
+                                             final boolean force ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
@@ -578,7 +578,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
 
             commandUtil.execute( resourceHostCommands
-                    .getRollbackContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
+                            .getRollbackContainerSnapshotCommand( containerHost.getContainerName(), partition, label,
+                                    force ),
+                    this );
         }
         catch ( CommandException e )
         {

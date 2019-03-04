@@ -213,7 +213,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 							vm.containerState.length > 0
 						) {continue;}
 
-						// We don't show on UI containers created bybazaar, located on other peers.
+						// We don't show on UI containers created by bazaar, located on other peers.
 						// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
 						// @todo remove when implement on backend
 						var container = vm.environments[i].containers[j];
@@ -367,35 +367,81 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	}
 
-	function rollbackSnapshot(containerId, partition, label){
-	//TODO ask confirmation
-        environmentService.rollbackContainerToSnapshot(containerId, partition, label ).success(function (data){
-            SweetAlert.swal ("Success!", "Container has been rolled back", "success");
-        }).error(function(data){
-            SweetAlert.swal("ERROR!", data.ERROR, "error");
-        });
+	function rollbackSnapshot(containerId, snapshot){
+        var newerSnapshotsExist = false;
+        for(var i in vm.snapshots){
+            if(vm.snapshots[i].createdTimestamp > snapshot.createdTimestamp){
+                newerSnapshotsExist = true;
+                break;
+            }
+        }
+
+		var previousWindowKeyDown = window.onkeydown;
+		SweetAlert.swal({
+			title: "Are you sure?",
+			text: "Do you want to rollback to this snapshot?" + (newerSnapshotsExist ? " More recent snapshots exist and will be removed after this rollback!" : ""),
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Rollback",
+			cancelButtonText: "Cancel",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
+			if (isConfirm) {
+                environmentService.rollbackContainerToSnapshot(containerId, 'all', snapshot.label ).success(function (data){
+                    //TODO either hide this dialog or remove more recent snapshots from UI
+                    SweetAlert.swal ("Success!", "Container has been rolled back", "success");
+                }).error(function(data){
+                    SweetAlert.swal("ERROR!", data.ERROR, "error");
+                });
+			}
+		});
+
+
     }
 
-	function removeSnapshot(containerId, partition, label){
-	//TODO ask confirmation
-        environmentService.removeContainerSnapshot(containerId, partition, label ).success(function (data){
-            //remove partition from UI
-            for (var i = vm.snapshots.length - 1; i >= 0; i--) {
-                if (vm.snapshots[i].label == label){
-                    vm.snapshots.splice(i, 1);
-                }
-            }
+	function removeSnapshot(containerId, snapshot){
+		var previousWindowKeyDown = window.onkeydown;
+		SweetAlert.swal({
+			title: "Are you sure?",
+			text: "Do you want to remove the snapshot?",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Remove",
+			cancelButtonText: "Cancel",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
+			if (isConfirm) {
+                environmentService.removeContainerSnapshot(containerId, 'all', snapshot.label ).success(function (data){
+                    //remove partition from UI
+                    for (var i = vm.snapshots.length - 1; i >= 0; i--) {
+                        if (vm.snapshots[i].label == snapshot.label){
+                            vm.snapshots.splice(i, 1);
+                        }
+                    }
 
-            SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
-        }).error(function(data){
-            SweetAlert.swal("ERROR!", data.ERROR, "error");
-        });
+                    SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
+                }).error(function(data){
+                    SweetAlert.swal("ERROR!", data.ERROR, "error");
+                });
+			}
+		});
 	}
 
 	function addSnapshot(snapshot){
         environmentService.addContainerSnapshot(snapshot.containerId, snapshot.partition, snapshot.label ).success(function (data){
 
             snapshot.createdTimestamp = new Date().getTime();
+            snapshot.created = "just now";
             vm.snapshots.push(snapshot);
 
             SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
