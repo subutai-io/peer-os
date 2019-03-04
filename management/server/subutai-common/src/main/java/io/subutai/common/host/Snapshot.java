@@ -16,6 +16,8 @@ public class Snapshot
     private final String label;
     @JsonProperty( "created" )
     private final Date created;
+    @JsonProperty( "createdTimestamp" )
+    private final long createdTimestamp;
 
 
     public Snapshot( @JsonProperty( "containerName" ) final String containerName,
@@ -26,6 +28,7 @@ public class Snapshot
         this.partition = partition;
         this.label = label;
         this.created = created;
+        this.createdTimestamp = created.getTime();
     }
 
 
@@ -66,10 +69,16 @@ public class Snapshot
     }
 
 
+    public long getCreatedTimestamp()
+    {
+        return createdTimestamp;
+    }
+
+
     @Override
     public String toString()
     {
         return "Snapshot{" + "containerName='" + containerName + '\'' + ", partition='" + partition + '\'' + ", label='"
-                + label + '\'' + ", created=" + created + '}';
+                + label + '\'' + ", created=" + created + ", createdTimestamp=" + createdTimestamp + '}';
     }
 }

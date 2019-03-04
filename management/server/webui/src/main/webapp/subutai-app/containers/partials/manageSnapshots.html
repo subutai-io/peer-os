@@ -8,15 +8,18 @@
     </a>
   </div>
 
-  <form ng-submit="containerViewCtrl.addSnapshot(newSnapshot)" ng-init="newSnapshot.id=containerViewCtrl.editingContainer.id; newSnapshot.partition='all'">
+  <form ng-submit="containerViewCtrl.addSnapshot(newSnapshot)"
+        ng-init="newSnapshot.containerId=containerViewCtrl.editingContainer.id; newSnapshot.containerName=containerViewCtrl.editingContainer.containerName;newSnapshot.partition='all';">
     <div>
-      <table>
+      <table style="margin: 5px;">
         <tr>
-          <td>
+          <td style="padding-right:5px;padding-left:5px;">
             <label class="b-popup-body-label">Snapshot name</label>
             <input type="text" ng-model="newSnapshot.label" ng-required="true" style="width:100px"/>
           </td>
-          <td><button style="width:50px" class="b-btn b-btn_green g-right" type="submit">Add</button></td>
+          <td>
+            <button style="width:50px" class="b-btn b-btn_green g-right" type="submit">Add</button>
+          </td>
         </tr>
       </table>
     </div>
@@ -25,31 +28,30 @@
   <div id="scrolltable">
 
     <table>
-      <tr ng-repeat="(partition, snapshots) in containerViewCtrl.snapshots">
+      <tr>
+        <td>Snapshot</td>
+        <td>Created</td>
+        <td>Rollback</td>
+        <td>Remove</td>
+      </tr>
+      <tr ng-repeat="(idx, snapshot) in containerViewCtrl.snapshots">
+        <td>{{ snapshot.label }}</td>
+        <td>{{ snapshot.created }}</td>
         <td>
-          <ul ng-repeat="(idx, label) in snapshots">
-            <table>
-              <tr>
-                <td>{{ label }}</td>
-                <td>
-                  <a href
-                     class="b-icon b-icon_rollback"
-                     tooltips
-                     tooltip-template='Rollback partition to snapshot'
-                     ng-click="containerViewCtrl.rollbackSnapshot( containerViewCtrl.editingContainer.id, 'all', label )">
-                  </a>
-                </td>
-                <td>
-                  <a href
-                     class="b-icon b-icon_remove"
-                     tooltips
-                     tooltip-template='Remove snapshot'
-                     ng-click="containerViewCtrl.removeSnapshot( containerViewCtrl.editingContainer.id, 'all', label )">
-                  </a>
-                </td>
-              </tr>
-            </table>
-          </ul>
+          <a href
+             class="b-icon b-icon_rollback"
+             tooltips
+             tooltip-template='Rollback partition to snapshot'
+             ng-click="containerViewCtrl.rollbackSnapshot( containerViewCtrl.editingContainer.id, 'all', snapshot.label )">
+          </a>
+        </td>
+        <td>
+          <a href
+             class="b-icon b-icon_remove"
+             tooltips
+             tooltip-template='Remove snapshot'
+             ng-click="containerViewCtrl.removeSnapshot( containerViewCtrl.editingContainer.id, 'all', snapshot.label )">
+          </a>
         </td>
       </tr>
     </table>

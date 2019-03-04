@@ -537,7 +537,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
             {
-                partition = "parent";
+                partition = "config";
             }
 
             commandUtil.execute( resourceHostCommands
@@ -574,7 +574,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
             {
-                partition = "parent";
+                partition = "config";
             }
 
             commandUtil.execute( resourceHostCommands
