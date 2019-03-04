@@ -392,7 +392,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	function addSnapshot(snapshot){
         environmentService.addContainerSnapshot(snapshot.id, snapshot.partition, snapshot.label ).success(function (data){
             if (snapshot.partition == 'all'){
-                var partitions = ['home', 'rootfs', 'var', 'opt', vm.editingContainer.containerName];
+                var partitions = ['home', 'rootfs', 'var', 'opt', 'config'];
                 for(var i in  partitions){
                     var partition = partitions[i];
                     if(!vm.snapshots[partition]){
