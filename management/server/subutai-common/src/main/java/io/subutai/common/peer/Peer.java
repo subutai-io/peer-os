@@ -103,9 +103,11 @@ public interface Peer extends RelationLink
 
     void removeContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
 
-    void rollbackToContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
+    void rollbackToContainerSnapshot( ContainerId containerId, String partition, String label, boolean force )
+            throws PeerException;
 
-    void addContainerSnapshot( ContainerId containerId, String partition, String label ) throws PeerException;
+    void addContainerSnapshot( ContainerId containerId, String partition, String label, boolean stopContainer )
+            throws PeerException;
 
     /**
      * Returns true of the host is connected (AND running, in case it is a container host), false otherwise

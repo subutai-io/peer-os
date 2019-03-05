@@ -849,7 +849,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                containerHost.rollbackToSnapshot( partition, label );
+                containerHost.rollbackToSnapshot( partition, label, true );
 
                 return Response.ok().build();
             }
@@ -865,7 +865,8 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response addContainerSnapshot( final String containerId, final String partition, final String label )
+    public Response addContainerSnapshot( final String containerId, final String partition, final String label,
+                                          final boolean stopContainer )
     {
         if ( Strings.isNullOrEmpty( containerId ) )
         {
@@ -891,7 +892,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                containerHost.addSnapshot( partition, label );
+                containerHost.addSnapshot( partition, label, stopContainer );
 
                 return Response.ok().build();
             }

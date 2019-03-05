@@ -27,7 +27,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	vm.environments = [];
 	vm.containers = [];
-	vm.snapshots = {};
+	vm.snapshots = [];
 	vm.notRegisteredContainers = [];
 	vm.containersType = [];
 	vm.environmentId = $stateParams.environmentId;
@@ -213,7 +213,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 							vm.containerState.length > 0
 						) {continue;}
 
-						// We don't show on UI containers created bybazaar, located on other peers.
+						// We don't show on UI containers created by bazaar, located on other peers.
 						// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
 						// @todo remove when implement on backend
 						var container = vm.environments[i].containers[j];
@@ -350,13 +350,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
         vm.editingContainer = container;
 
 	    environmentService.getContainerSnapshots(container.id).success(function (data){
-	        vm.snapshots = {};
+	        vm.snapshots = [];
 	        for (var i in data){
 	            var snapshot = data[i]
-	            if(!vm.snapshots[snapshot.partition]){
-	                vm.snapshots[snapshot.partition] = []
+	            if (snapshot.partition == 'config'){
+                    vm.snapshots.push(snapshot)
 	            }
-	            vm.snapshots[snapshot.partition].push(snapshot.label)
 	        }
 
             ngDialog.open({
@@ -368,49 +367,110 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 	}
 
-	function rollbackSnapshot(containerId, partition, label){
-	//TODO ask confirmation
-        environmentService.rollbackContainerToSnapshot(containerId, partition, label ).success(function (data){
-            SweetAlert.swal ("Success!", "Container has been rolled back", "success");
-        }).error(function(data){
-            SweetAlert.swal("ERROR!", data.ERROR, "error");
-        });
+	function rollbackSnapshot(containerId, snapshot){
+        var newerSnapshotsExist = false;
+        for(var i in vm.snapshots){
+            if(vm.snapshots[i].createdTimestamp > snapshot.createdTimestamp){
+                newerSnapshotsExist = true;
+                break;
+            }
+        }
+
+		var previousWindowKeyDown = window.onkeydown;
+		SweetAlert.swal({
+			title: "Are you sure?",
+			text: "Do you want to rollback to this snapshot?" + (newerSnapshotsExist ? " More recent snapshots exist and will be removed after this rollback!" : ""),
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Rollback",
+			cancelButtonText: "Cancel",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
+			if (isConfirm) {
+                environmentService.rollbackContainerToSnapshot(containerId, 'all', snapshot.label ).success(function (data){
+
+                    //remove more recent snapshots from UI
+                    for (var i = vm.snapshots.length - 1; i >= 0; i--) {
+                        if (vm.snapshots[i].createdTimestamp > snapshot.createdTimestamp){
+                            vm.snapshots.splice(i, 1);
+                        }
+                    }
+
+                    SweetAlert.swal ("Success!", "Container has been rolled back", "success");
+                }).error(function(data){
+                    SweetAlert.swal("ERROR!", data.ERROR, "error");
+                });
+			}
+		});
+
+
     }
 
-	function removeSnapshot(containerId, partition, label){
-	//TODO ask confirmation
-        environmentService.removeContainerSnapshot(containerId, partition, label ).success(function (data){
-            var list = vm.snapshots[partition];
-            list.splice(list.indexOf(label), 1);
-
-            SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
-        }).error(function(data){
-            SweetAlert.swal("ERROR!", data.ERROR, "error");
-        });
+	function removeSnapshot(containerId, snapshot){
+		var previousWindowKeyDown = window.onkeydown;
+		SweetAlert.swal({
+			title: "Are you sure?",
+			text: "Do you want to remove the snapshot?",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Remove",
+			cancelButtonText: "Cancel",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
+			if (isConfirm) {
+                environmentService.removeContainerSnapshot(containerId, 'all', snapshot.label ).success(function (data){
+                    //remove partition from UI
+                    for (var i = vm.snapshots.length - 1; i >= 0; i--) {
+                        if (vm.snapshots[i].label == snapshot.label){
+                            vm.snapshots.splice(i, 1);
+                        }
+                    }
+                    SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
+                }).error(function(data){
+                    SweetAlert.swal("ERROR!", data.ERROR, "error");
+                });
+			}
+		});
 	}
 
 	function addSnapshot(snapshot){
-        environmentService.addContainerSnapshot(snapshot.id, snapshot.partition, snapshot.label ).success(function (data){
-            if (snapshot.partition == 'all'){
-                var partitions = ['home', 'rootfs', 'var', 'opt', vm.editingContainer.containerName];
-                for(var i in  partitions){
-                    var partition = partitions[i];
-                    if(!vm.snapshots[partition]){
-                        vm.snapshots[partition] = [];
-                    }
-                    vm.snapshots[partition].push(snapshot.label);
-                }
-            }else{
-                if(!vm.snapshots[snapshot.partition]){
-                    vm.snapshots[snapshot.partition] = [];
-                }
-                vm.snapshots[snapshot.partition].push(snapshot.label);
-            }
+		var previousWindowKeyDown = window.onkeydown;
+		SweetAlert.swal({
+			title: "Stop container?",
+			text: "Do you want to stop container while taking a snapshot? We recommend to choose 'Yes'",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Yes",
+			cancelButtonText: "No",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (stopContainer) {
+			window.onkeydown = previousWindowKeyDown;
 
-            SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
-        }).error(function(data){
-            SweetAlert.swal("ERROR!", data.ERROR, "error");
-        });
+            environmentService.addContainerSnapshot(snapshot.containerId, snapshot.partition, snapshot.label, stopContainer ).success(function (data){
+
+                snapshot.createdTimestamp = new Date().getTime();
+                snapshot.created = "just now";
+                vm.snapshots.push(snapshot);
+
+                SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
+            }).error(function(data){
+                SweetAlert.swal("ERROR!", data.ERROR, "error");
+            });
+		});
 	}
 
 
