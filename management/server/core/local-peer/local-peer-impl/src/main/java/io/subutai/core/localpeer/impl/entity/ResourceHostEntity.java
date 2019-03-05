@@ -1299,7 +1299,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public String cloneContainer( final Template template, final String containerName, final String hostname,
-                                  final String ip, final int vlan, final String environmentId, final String backupFile )
+                                  final String ip, final int vlan, final String environmentId )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
@@ -1318,7 +1318,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
             CommandResult result = execute( resourceHostCommands
                     .getCloneContainerCommand( template.getId(), containerName, hostname, ip, vlan, environmentId,
-                            containerToken, backupFile ) );
+                            containerToken ) );
 
             //If container clone failed with message containing "{container} already exist", assume this result as
             // successful and skip the error. See https://github.com/optdyn/hub/issues/3268

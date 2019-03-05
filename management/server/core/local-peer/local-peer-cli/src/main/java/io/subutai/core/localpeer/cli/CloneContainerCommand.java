@@ -32,9 +32,6 @@ public class CloneContainerCommand extends SubutaiShellCommandSupport
     @Argument( index = 5, name = "env id", description = "Environment id", required = true )
     private String envId;
 
-    @Argument( index = 6, name = "backup file", description = "Full path to backup file" )
-    private String backupFile;
-
     private final LocalPeer localPeer;
 
 
@@ -52,8 +49,7 @@ public class CloneContainerCommand extends SubutaiShellCommandSupport
         ResourceHost resourceHost = localPeer.getResourceHostById( rhId );
         Template template = localPeer.getTemplateByName( templateName );
 
-        String contId =
-                resourceHost.cloneContainer( template, containerName, containerName, ip, vlan, envId, backupFile );
+        String contId = resourceHost.cloneContainer( template, containerName, containerName, ip, vlan, envId );
         System.out.println( contId );
 
         return null;

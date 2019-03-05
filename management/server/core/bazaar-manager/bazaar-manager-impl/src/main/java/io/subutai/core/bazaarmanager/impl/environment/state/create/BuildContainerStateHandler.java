@@ -287,7 +287,7 @@ public class BuildContainerStateHandler extends StateHandler
     private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws BazaarManagerException
     {
         return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota(), null );
+                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota() );
     }
 
 

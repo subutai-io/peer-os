@@ -156,7 +156,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @return ID of container
      */
     String cloneContainer( Template template, String containerName, String hostname, String ip, int vlan,
-                           String environmentId, String backupFile ) throws ResourceHostException;
+                           String environmentId ) throws ResourceHostException;
 
     void setContainerQuota( ContainerHost containerHost, ContainerQuota containerQuota ) throws ResourceHostException;
 
