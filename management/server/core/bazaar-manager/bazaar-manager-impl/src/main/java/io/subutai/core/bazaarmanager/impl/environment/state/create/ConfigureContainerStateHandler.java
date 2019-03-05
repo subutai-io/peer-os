@@ -16,6 +16,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
@@ -45,7 +46,8 @@ public class ConfigureContainerStateHandler extends StateHandler
         {
             logStart();
 
-            EnvironmentDto envDto =ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
+            EnvironmentDto envDto =
+                    ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
             peerDto = configureSsh( peerDto, envDto );
 
@@ -264,6 +266,30 @@ public class ConfigureContainerStateHandler extends StateHandler
     private void configureHosts( EnvironmentDto envDto )
     {
         log.info( "Configuring hosts:" );
+
+        if ( !envDto.getDestroyedNodes().isEmpty() )
+        {
+            // <hostname, IPs>
+            final Map<String, String> hostAddresses = Maps.newHashMap();
+
+            for ( final EnvironmentNodeDto destroyedNode : envDto.getDestroyedNodes() )
+            {
+                // Remove network mask "/24" in IP
+                String ip = StringUtils.substringBefore( destroyedNode.getIp(), "/" );
+
+                hostAddresses.put( destroyedNode.getHostName(), ip );
+            }
+
+            try
+            {
+                ctx.localPeer.removeHostnamesFromEtcHosts( new EnvironmentId( envDto.getId() ),
+                        new HostAddresses( hostAddresses ) );
+            }
+            catch ( PeerException e )
+            {
+                log.error( "Failed to remove hostnames from /etc/hosts: {}", e.getMessage() );
+            }
+        }
 
         // <hostname, IPs>
         final Map<String, String> hostAddresses = Maps.newHashMap();

@@ -37,6 +37,8 @@ public class EnvironmentDto
 
     private List<EnvironmentNodesDto> nodes = new ArrayList<>();
 
+    private List<EnvironmentNodeDto> destroyedNodes = new ArrayList<>();
+
     private boolean isCreatedOnSS;
 
 
@@ -176,5 +178,17 @@ public class EnvironmentDto
     public void setCreatedOnSS( final boolean createdOnSS )
     {
         isCreatedOnSS = createdOnSS;
+    }
+
+
+    public List<EnvironmentNodeDto> getDestroyedNodes()
+    {
+        return destroyedNodes;
+    }
+
+
+    public void addDestroyedNode( final EnvironmentNodeDto destroyedNode )
+    {
+        this.destroyedNodes.add( destroyedNode );
     }
 }

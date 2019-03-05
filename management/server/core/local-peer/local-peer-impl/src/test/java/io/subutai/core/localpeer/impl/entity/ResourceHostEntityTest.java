@@ -280,12 +280,14 @@ public class ResourceHostEntityTest
     {
         resourceHostEntity.addContainerHost( containerHost );
 
-        doReturn( "NAME                        USED  AVAIL  REFER  MOUNTPOINT\n"
-                + "subutai/fs/bar@all           10K      -    25K  -\n"
-                + "subutai/fs/bar/home@all        0      -    19K  -\n"
-                + "subutai/fs/bar/opt@all         0      -    19K  -\n"
-                + "subutai/fs/bar/rootfs@all   330K      -   244M  -\n"
-                + "subutai/fs/bar/var@all       73K      -  6.73M  -\n" ).when( commandResult ).getStdOut();
+        doReturn( "NAME                                                CREATION\n"
+                + "subutai/fs/Container1-pfe-1-2@my-snapshot           Thu Feb 28 10:53 2019\n"
+                + "\n"
+                + "  \n"
+                + "subutai/fs/Container1-pfe-1-2/home@my-snapshot      Thu Feb 28 10:53 2019\n"
+                + "subutai/fs/Container1-pfe-1-2/opt@my-snapshot       Thu Feb 28 10:53 2019\n"
+                + "subutai/fs/Container1-pfe-1-2/rootfs@my-snapshot    Thu Feb 28 10:53 2019\n"
+                + "subutai/fs/Container1-pfe-1-2/var@my-snapshot       Thu Feb 28 10:53 2019" ).when( commandResult ).getStdOut();
 
         Snapshots snapshots = resourceHostEntity.listContainerHostSnapshots( containerHost );
 

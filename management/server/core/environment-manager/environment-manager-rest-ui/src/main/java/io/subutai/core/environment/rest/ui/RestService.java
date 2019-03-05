@@ -136,9 +136,10 @@ public interface RestService
                                         @PathParam( "label" ) String label );
 
     @POST
-    @Path( "containers/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    @Path( "containers/{containerId}/snapshots/partition/{partition}/label/{label}/{stop}" )
     Response addContainerSnapshot( @PathParam( "containerId" ) String containerId,
-                                   @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+                                   @PathParam( "partition" ) String partition, @PathParam( "label" ) String label,
+                                   @PathParam( "stop" ) boolean stopContainer );
 
 
     /** Container types **************************************************** */

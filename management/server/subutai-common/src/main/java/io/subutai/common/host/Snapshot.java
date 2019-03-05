@@ -1,6 +1,8 @@
 package io.subutai.common.host;
 
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -12,14 +14,21 @@ public class Snapshot
     private final String partition;
     @JsonProperty( "label" )
     private final String label;
+    @JsonProperty( "created" )
+    private final Date created;
+    @JsonProperty( "createdTimestamp" )
+    private final long createdTimestamp;
 
 
     public Snapshot( @JsonProperty( "containerName" ) final String containerName,
-                     @JsonProperty( "partition" ) final String partition, @JsonProperty( "label" ) final String label )
+                     @JsonProperty( "partition" ) final String partition, @JsonProperty( "label" ) final String label,
+                     @JsonProperty( "created" ) final Date created )
     {
         this.containerName = containerName;
         this.partition = partition;
         this.label = label;
+        this.created = created;
+        this.createdTimestamp = created.getTime();
     }
 
 
@@ -54,10 +63,22 @@ public class Snapshot
     }
 
 
+    public Date getCreated()
+    {
+        return created;
+    }
+
+
+    public long getCreatedTimestamp()
+    {
+        return createdTimestamp;
+    }
+
+
     @Override
     public String toString()
     {
         return "Snapshot{" + "containerName='" + containerName + '\'' + ", partition='" + partition + '\'' + ", label='"
-                + label + '\'' + '}';
+                + label + '\'' + ", created=" + created + ", createdTimestamp=" + createdTimestamp + '}';
     }
 }

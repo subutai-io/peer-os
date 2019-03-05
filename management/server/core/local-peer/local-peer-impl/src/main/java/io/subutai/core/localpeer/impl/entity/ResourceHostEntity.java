@@ -2,6 +2,8 @@ package io.subutai.core.localpeer.impl.entity;
 
 
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -472,12 +474,29 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     //skip header
                     if ( i > 0 )
                     {
-                        String snapshotLine = line.split( "\\s+" )[0];
+                        String[] parts = line.split( "\\s+", 2 );
+                        if ( parts.length != 2 )
+                        {
+                            continue;
+                        }
+                        String snapshotLine = parts[0];
+                        String timestamp = parts[1];
                         Matcher m = p.matcher( snapshotLine );
                         if ( m.find() && m.groupCount() == 2 )
                         {
+
+                            SimpleDateFormat parser = new SimpleDateFormat( "EEE MMM d H:mm yyyy zzz" );
+
+                            Date date = parser.parse( timestamp + " UTC" );
+
+                            String partition = m.group( 1 );
+                            if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
+                            {
+                                partition = "config";
+                            }
                             Snapshot snapshot =
-                                    new Snapshot( containerHost.getContainerName(), m.group( 1 ), m.group( 2 ) );
+                                    new Snapshot( containerHost.getContainerName(), partition, m.group( 2 ), date );
+
                             snapshots.addSnapshot( snapshot );
                         }
                     }
@@ -487,7 +506,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
             return snapshots;
         }
-        catch ( CommandException e )
+        catch ( Exception e )
         {
             throw new ResourceHostException(
                     String.format( "Error listing container %s snapshots: %s", containerHost.getHostname(),
@@ -518,7 +537,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
             {
-                partition = "parent";
+                partition = "config";
             }
 
             commandUtil.execute( resourceHostCommands
@@ -534,8 +553,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void rollbackToContainerSnapshot( final ContainerHost containerHost, String partition, final String label )
-            throws ResourceHostException
+    public void rollbackToContainerSnapshot( final ContainerHost containerHost, String partition, final String label,
+                                             final boolean force ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
@@ -555,11 +574,13 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
             {
-                partition = "parent";
+                partition = "config";
             }
 
             commandUtil.execute( resourceHostCommands
-                    .getRollbackContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
+                            .getRollbackContainerSnapshotCommand( containerHost.getContainerName(), partition, label,
+                                    force ),
+                    this );
         }
         catch ( CommandException e )
         {
@@ -571,8 +592,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void addContainerSnapshot( final ContainerHost containerHost, String partition, final String label )
-            throws ResourceHostException
+    public void addContainerSnapshot( final ContainerHost containerHost, String partition, final String label,
+                                      final boolean stopContainer ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
@@ -592,11 +613,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
             {
-                partition = "parent";
+                partition = "config";
             }
 
             commandUtil.execute( resourceHostCommands
-                    .getAddContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
+                    .getAddContainerSnapshotCommand( containerHost.getContainerName(), partition, label,
+                            stopContainer ), this );
         }
         catch ( CommandException e )
         {
