@@ -393,7 +393,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
                 environmentService.rollbackContainerToSnapshot(containerId, 'all', snapshot.label ).success(function (data){
-                    //TODO either hide this dialog or remove more recent snapshots from UI
+
+                    //remove more recent snapshots from UI
+                    for (var i = vm.snapshots.length - 1; i >= 0; i--) {
+                        if (vm.snapshots[i].createdTimestamp > snapshot.createdTimestamp){
+                            vm.snapshots.splice(i, 1);
+                        }
+                    }
+
                     SweetAlert.swal ("Success!", "Container has been rolled back", "success");
                 }).error(function(data){
                     SweetAlert.swal("ERROR!", data.ERROR, "error");
