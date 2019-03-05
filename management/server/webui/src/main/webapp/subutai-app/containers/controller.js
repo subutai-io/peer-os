@@ -435,7 +435,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
                             vm.snapshots.splice(i, 1);
                         }
                     }
-
                     SweetAlert.swal ("Success!", "Container snapshot has been removed", "success");
                 }).error(function(data){
                     SweetAlert.swal("ERROR!", data.ERROR, "error");
@@ -445,16 +444,33 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function addSnapshot(snapshot){
-        environmentService.addContainerSnapshot(snapshot.containerId, snapshot.partition, snapshot.label ).success(function (data){
+		var previousWindowKeyDown = window.onkeydown;
+		SweetAlert.swal({
+			title: "Stop container?",
+			text: "Do you want to stop container while taking a snapshot? We recommend to choose 'Yes'",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Yes",
+			cancelButtonText: "No",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (stopContainer) {
+			window.onkeydown = previousWindowKeyDown;
 
-            snapshot.createdTimestamp = new Date().getTime();
-            snapshot.created = "just now";
-            vm.snapshots.push(snapshot);
+            environmentService.addContainerSnapshot(snapshot.containerId, snapshot.partition, snapshot.label, stopContainer ).success(function (data){
 
-            SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
-        }).error(function(data){
-            SweetAlert.swal("ERROR!", data.ERROR, "error");
-        });
+                snapshot.createdTimestamp = new Date().getTime();
+                snapshot.created = "just now";
+                vm.snapshots.push(snapshot);
+
+                SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
+            }).error(function(data){
+                SweetAlert.swal("ERROR!", data.ERROR, "error");
+            });
+		});
 	}
 
 

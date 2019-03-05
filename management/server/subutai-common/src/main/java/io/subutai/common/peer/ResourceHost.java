@@ -69,7 +69,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void rollbackToContainerSnapshot( ContainerHost containerHost, String partition, String label, boolean force )
             throws ResourceHostException;
 
-    void addContainerSnapshot( ContainerHost containerHost, String partition, String label )
+    void addContainerSnapshot( ContainerHost containerHost, String partition, String label, boolean stopContainer )
             throws ResourceHostException;
 
     /**

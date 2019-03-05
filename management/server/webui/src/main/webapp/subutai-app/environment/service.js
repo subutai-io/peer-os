@@ -177,9 +177,9 @@ function environmentService($http, $q) {
         );
 	}
 
-	function addContainerSnapshot(containerId, partition, label){
+	function addContainerSnapshot(containerId, partition, label, stopContainer){
         return $http.post(
-            CONTAINERS_URL + containerId + '/snapshots/partition/' + partition + '/label/' + label,
+            CONTAINERS_URL + containerId + '/snapshots/partition/' + partition + '/label/' + label + '/' + stopContainer,
             {withCredentials: true}
         );
 	}

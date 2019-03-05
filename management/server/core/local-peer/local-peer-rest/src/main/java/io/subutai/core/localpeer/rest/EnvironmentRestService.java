@@ -73,9 +73,10 @@ public interface EnvironmentRestService
                                     @PathParam( "force" ) boolean force );
 
     @POST
-    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}" )
+    @Path( "{environmentId}/container/{containerId}/snapshots/partition/{partition}/label/{label}/{stop}" )
     void addContainerSnapshot( @PathParam( "containerId" ) ContainerId containerId,
-                               @PathParam( "partition" ) String partition, @PathParam( "label" ) String label );
+                               @PathParam( "partition" ) String partition, @PathParam( "label" ) String label,
+                               @PathParam( "stop" ) boolean stop );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/quota/raw" )

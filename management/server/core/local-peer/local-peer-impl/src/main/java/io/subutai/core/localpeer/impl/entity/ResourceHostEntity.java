@@ -592,8 +592,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void addContainerSnapshot( final ContainerHost containerHost, String partition, final String label )
-            throws ResourceHostException
+    public void addContainerSnapshot( final ContainerHost containerHost, String partition, final String label,
+                                      final boolean stopContainer ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
@@ -617,7 +617,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
 
             commandUtil.execute( resourceHostCommands
-                    .getAddContainerSnapshotCommand( containerHost.getContainerName(), partition, label ), this );
+                    .getAddContainerSnapshotCommand( containerHost.getContainerName(), partition, label,
+                            stopContainer ), this );
         }
         catch ( CommandException e )
         {

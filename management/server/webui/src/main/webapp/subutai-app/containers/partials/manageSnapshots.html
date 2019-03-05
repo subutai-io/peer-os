@@ -8,8 +8,8 @@
     </a>
   </div>
 
-  <form ng-submit="containerViewCtrl.addSnapshot(newSnapshot)"
-        ng-init="newSnapshot.containerId=containerViewCtrl.editingContainer.id; newSnapshot.containerName=containerViewCtrl.editingContainer.containerName;newSnapshot.partition='all';">
+  <form
+      ng-init="newSnapshot.containerId=containerViewCtrl.editingContainer.id; newSnapshot.containerName=containerViewCtrl.editingContainer.containerName;newSnapshot.partition='all';">
     <div>
       <table style="margin: 5px;">
         <tr>
@@ -18,7 +18,10 @@
             <input type="text" ng-model="newSnapshot.label" ng-required="true" style="width:100px"/>
           </td>
           <td>
-            <button style="width:50px" class="b-btn b-btn_green g-right" type="submit">Add</button>
+            <button style="width:50px" class="b-btn b-btn_green g-right"
+                    ng-click="containerViewCtrl.addSnapshot(newSnapshot); newSnapshot={}; newSnapshot.containerId=containerViewCtrl.editingContainer.id; newSnapshot.containerName=containerViewCtrl.editingContainer.containerName;newSnapshot.partition='all';">
+              Add
+            </button>
           </td>
         </tr>
       </table>

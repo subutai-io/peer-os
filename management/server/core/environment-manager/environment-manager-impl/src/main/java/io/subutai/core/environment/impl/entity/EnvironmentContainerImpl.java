@@ -397,9 +397,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
 
     @Override
-    public void addSnapshot( final String partition, final String label ) throws PeerException
+    public void addSnapshot( final String partition, final String label, final boolean stopContainer )
+            throws PeerException
     {
-        getPeer().addContainerSnapshot( getContainerId(), partition, label );
+        getPeer().addContainerSnapshot( getContainerId(), partition, label, stopContainer );
     }
 
 

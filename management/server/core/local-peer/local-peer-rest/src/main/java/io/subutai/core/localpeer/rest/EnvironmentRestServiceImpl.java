@@ -191,7 +191,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label,
+                                      final boolean stop )
     {
         try
         {
@@ -200,7 +201,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
 
-            localPeer.addContainerSnapshot( containerId, partition, label );
+            localPeer.addContainerSnapshot( containerId, partition, label, stop );
         }
         catch ( Exception e )
         {

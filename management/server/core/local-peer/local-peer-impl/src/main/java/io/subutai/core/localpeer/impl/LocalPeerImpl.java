@@ -1680,8 +1680,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
-            throws PeerException
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label,
+                                      final boolean stopContainer ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
@@ -1691,7 +1691,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         ResourceHost resourceHost = containerHost.getParent();
         try
         {
-            resourceHost.addContainerSnapshot( containerHost, partition, label );
+            resourceHost.addContainerSnapshot( containerHost, partition, label, stopContainer );
         }
         catch ( Exception e )
         {

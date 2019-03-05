@@ -143,10 +143,11 @@ public class ResourceHostCommands
 
 
     public RequestBuilder getAddContainerSnapshotCommand( final String containerName, final String partition,
-                                                          final String label )
+                                                          final String label, final boolean stopContainer )
     {
         return new RequestBuilder(
-                String.format( "subutai snapshot add -c %s -p %s -l %s", containerName, partition, label ) );
+                String.format( "subutai snapshot add -c %s -p %s -l %s %s", containerName, partition, label,
+                        stopContainer ? "-s" : "" ) );
     }
 
 

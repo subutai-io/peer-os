@@ -319,8 +319,8 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void rollbackToContainerSnapshot( final ContainerId containerId, final String partition, final String label, final boolean force )
-            throws PeerException
+    public void rollbackToContainerSnapshot( final ContainerId containerId, final String partition, final String label,
+                                             final boolean force ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
@@ -330,17 +330,18 @@ public class RemotePeerImpl implements RemotePeer
         environmentWebClient.rollbackContainerSnapshot( containerId, partition, label, force );
     }
 
+
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
-            throws PeerException
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label,
+                                      final boolean stopContainer ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
 
-        environmentWebClient.addContainerSnapshot( containerId, partition, label );
+        environmentWebClient.addContainerSnapshot( containerId, partition, label, stopContainer );
     }
 
 

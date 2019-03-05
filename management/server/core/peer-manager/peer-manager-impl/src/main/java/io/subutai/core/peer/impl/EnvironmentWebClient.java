@@ -196,16 +196,16 @@ public class EnvironmentWebClient
     }
 
 
-    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label )
-            throws PeerException
+    public void addContainerSnapshot( final ContainerId containerId, final String partition, final String label,
+                                      final boolean stopContainer ) throws PeerException
     {
         WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
-            String path = String.format( "/%s/container/%s/snapshots/partition/%s/label/%s",
-                    containerId.getEnvironmentId().getId(), containerId.getId(), partition, label );
+            String path = String.format( "/%s/container/%s/snapshots/partition/%s/label/%s/%b",
+                    containerId.getEnvironmentId().getId(), containerId.getId(), partition, label, stopContainer );
             client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             response = client.post( null );
