@@ -693,52 +693,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public String backupContainer( final ContainerHost containerHost, String destinationDirectory )
-            throws ResourceHostException
-    {
-        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
-        if ( destinationDirectory == null || destinationDirectory.trim().isEmpty() )
-        {
-            destinationDirectory = Common.RH_CACHE_DIR;
-        }
-
-
-        try
-        {
-            getContainerHostById( containerHost.getId() );
-        }
-        catch ( HostNotFoundException e )
-        {
-            throw new ResourceHostException(
-                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
-        }
-
-
-        try
-        {
-            CommandResult result = commandUtil.execute( resourceHostCommands
-                    .getBackupContainerCommand( containerHost.getContainerName(), destinationDirectory ), this );
-
-            Pattern pattern = Pattern.compile( "got backed up to (\\S+)\\s*\"" );
-            Matcher matcher = pattern.matcher( result.getStdOut() );
-            if ( matcher.find() && matcher.groupCount() == 1 )
-            {
-                return matcher.group( 1 );
-            }
-
-            throw new ResourceHostException(
-                    String.format( "Failed to parse filepath from output %s", result.getStdOut() ) );
-        }
-        catch ( CommandException e )
-        {
-            throw new ResourceHostException(
-                    String.format( "Error backing up container %s : %s", containerHost.getContainerName(),
-                            e.getMessage() ), e );
-        }
-    }
-
-
-    @Override
     public void destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
 

@@ -160,12 +160,4 @@ public class ResourceHostCommands
         return new RequestBuilder( String.format( "subutai cdn put -f %s -t %s", pathToFile, cdnToken ) )
                 .withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
     }
-
-
-    public RequestBuilder getBackupContainerCommand( final String containerName, final String destinationDirectory )
-    {
-        return new RequestBuilder(
-                String.format( "subutai backup %s --destination %s", containerName, destinationDirectory ) )
-                .withTimeout( Common.CLONE_TIMEOUT_SEC );
-    }
 }
