@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -28,7 +29,6 @@ import org.apache.http.util.EntityUtils;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
@@ -113,7 +113,7 @@ public class TemplateManagerImpl implements TemplateManager
 
                     String json = readContent( response );
 
-                    if ( !Strings.isNullOrEmpty( json ) )
+                    if ( !StringUtils.isBlank( json ) )
                     {
                         Set<Template> templates = JsonUtil.fromJson( json, new TypeToken<Set<Template>>()
                         {
@@ -137,7 +137,7 @@ public class TemplateManagerImpl implements TemplateManager
 
                         for ( Template template : freshTemplateList )
                         {
-                            if ( template != null && !Strings.isNullOrEmpty( template.getId() ) )
+                            if ( template != null && !StringUtils.isBlank( template.getId() ) )
                             {
                                 templatesCache.add( template );
                             }
@@ -172,7 +172,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public Template getTemplate( final String id )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( id ) );
 
         for ( Template template : getTemplates() )
         {
@@ -189,7 +189,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public Template getTemplateByName( final String name )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( name ) );
 
         Template verifiedTemplate = getVerifiedTemplateByName( name );
 
@@ -213,7 +213,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public List<Template> getTemplatesByOwner( final String owner )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( owner ), "Invalid owner" );
+        Preconditions.checkArgument( !StringUtils.isBlank( owner ), "Invalid owner" );
 
         List<Template> templates = Lists.newArrayList();
 
@@ -232,7 +232,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public Template getVerifiedTemplateByName( final String templateName )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( templateName ) );
 
         List<Template> verifiedTemplates = Lists.newArrayList();
 
@@ -388,7 +388,7 @@ public class TemplateManagerImpl implements TemplateManager
 
     public String obtainCdnToken( final String signedRequest )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( signedRequest ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( signedRequest ) );
 
         CloseableHttpClient client = getHttpsClient();
         try
@@ -468,7 +468,7 @@ public class TemplateManagerImpl implements TemplateManager
 
     public String getOwner( String token )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( token ) );
 
         CloseableHttpClient client = getHttpsClient();
         try

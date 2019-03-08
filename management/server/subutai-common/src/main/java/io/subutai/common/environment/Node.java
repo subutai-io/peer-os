@@ -1,6 +1,8 @@
 package io.subutai.common.environment;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
@@ -53,10 +55,10 @@ public class Node
                  @JsonProperty( "quota" ) ContainerQuota quota, @JsonProperty( "peerId" ) final String peerId,
                  @JsonProperty( "hostId" ) final String hostId, @JsonProperty( "templateId" ) String templateId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateId ), "Invalid template id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ), "Resource host id is null" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid host name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( name ), "Invalid node group name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( templateId ), "Invalid template id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostId ), "Resource host id is null" );
         Preconditions.checkNotNull( quota );
 
         this.hostname = hostname.replaceAll( "\\s+", "" );
@@ -102,7 +104,7 @@ public class Node
 
     public void setHostname( final String hostname )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid host name" );
 
         this.hostname = hostname.replaceAll( "\\s+", "" );
     }

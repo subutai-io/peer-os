@@ -15,8 +15,9 @@ import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -64,7 +65,7 @@ class CommandProcess
         Preconditions.checkNotNull( commandProcessor );
         Preconditions.checkNotNull( callback );
         Preconditions.checkNotNull( request );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( rhId ) );
 
         this.rhId = rhId;
 
@@ -215,11 +216,11 @@ class CommandProcess
     {
         if ( response != null )
         {
-            if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
+            if ( !StringUtils.isBlank( response.getStdOut() ) )
             {
                 stdOut.append( response.getStdOut() );
             }
-            if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
+            if ( !StringUtils.isBlank( response.getStdErr() ) )
             {
                 stdErr.append( response.getStdErr() );
             }

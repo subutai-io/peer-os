@@ -12,8 +12,9 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -65,9 +66,9 @@ public abstract class AbstractSubutaiHost implements Host
     protected AbstractSubutaiHost( final String peerId, final String hostId, final String hostname,
                                    HostArchitecture architecture )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( peerId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ) );
         Preconditions.checkNotNull( architecture );
 
         this.peerId = peerId;

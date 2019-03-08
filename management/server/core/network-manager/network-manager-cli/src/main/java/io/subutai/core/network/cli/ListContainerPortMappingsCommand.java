@@ -1,6 +1,7 @@
 package io.subutai.core.network.cli;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -40,9 +41,9 @@ public class ListContainerPortMappingsCommand extends SubutaiShellCommandSupport
         try
         {
             Protocol protocol =
-                    ( Strings.isNullOrEmpty( protocolName ) || "all".equalsIgnoreCase( protocolName ) ) ? null :
+                    ( StringUtils.isBlank( protocolName ) || "all".equalsIgnoreCase( protocolName ) ) ? null :
                     Protocol.valueOf( protocolName.toUpperCase() );
-            ResourceHost host = ( Strings.isNullOrEmpty( hostId ) || "mh".equalsIgnoreCase( hostId ) ) ?
+            ResourceHost host = ( StringUtils.isBlank( hostId ) || "mh".equalsIgnoreCase( hostId ) ) ?
                                 localPeer.getManagementHost() : localPeer.getResourceHostById( hostId );
 
             final ReservedPorts reservedPorts = host.getContainerPortMappings( protocol );

@@ -8,8 +8,9 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesUploadProgress;
@@ -141,8 +142,8 @@ public class RestServiceImpl implements RestService
         try
         {
             Preconditions.checkNotNull( publicKeyContainer );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( publicKeyContainer.getKey() ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( publicKeyContainer.getHostId() ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( publicKeyContainer.getKey() ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( publicKeyContainer.getHostId() ) );
             Preconditions.checkNotNull( publicKeyContainer.getFingerprint() );
 
             final PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
@@ -161,8 +162,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( pek ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( keyId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( pek ) );
 
             PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( pek );
             localPeer.addPeerEnvironmentPubKey( keyId, pubKeyRing );

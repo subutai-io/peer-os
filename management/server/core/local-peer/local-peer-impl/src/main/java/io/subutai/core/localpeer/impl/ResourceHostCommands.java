@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 
@@ -159,5 +161,20 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( String.format( "subutai cdn put -f %s -t %s", pathToFile, cdnToken ) )
                 .withTimeout( Common.TEMPLATE_EXPORT_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getSaveContainerSnapshotsCommand( final String containerName, final String label1,
+                                                            final String label2, final String destinationDirectory )
+    {
+        return new RequestBuilder( String.format( "subutai snapshot send -c %s -l %s %s", containerName,
+                StringUtils.isBlank( label2 ) ? label1 : label1 + "," + label2,
+                StringUtils.isBlank( destinationDirectory ) ? "" : "--destination " + destinationDirectory ) );
+    }
+
+
+    public RequestBuilder getRecreateContainerFilesystemCommand( final String containerName, final String pathToFile )
+    {
+        return new RequestBuilder( String.format( "subutai snapshot recv -c %s -f %s", containerName, pathToFile ) );
     }
 }

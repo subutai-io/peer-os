@@ -1,6 +1,8 @@
 package io.subutai.common.peer;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -12,7 +14,7 @@ public abstract class RequestListener
 
     protected RequestListener( final String recipient )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "invalid recipient" );
+        Preconditions.checkArgument( !StringUtils.isBlank( recipient ), "invalid recipient" );
 
         this.recipient = recipient;
     }

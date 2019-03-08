@@ -73,6 +73,43 @@ public interface ResourceHost extends Host, ResourceHostInfo
             throws ResourceHostException;
 
     /**
+     * Saves container filesystem (i.e. its snapshots) to a file. An archive "tar.gz" file containing the specified
+     * snapshots will be created and dumped to the specified directory as a result of this call
+     *
+     * @param label1 name of snapshot
+     * @param label2 optional name of second (more recent) snapshot to have incremental snapshot between label1 and
+     * label2, if null is passed then incremental snapshot between parent template and label1 is used
+     * @param destinationDirectory directory to save snapshot to, if null is passed then Common.RH_CACHE_DIR  is used
+     */
+    void saveContainerFilesystem( ContainerHost containerHost, String label1, String label2,
+                                  String destinationDirectory ) throws ResourceHostException;
+
+    /**
+     * Recreates container filesystem from snapshots. Note: Only a container filesystem is recreated, container itself
+     * is not fully functional after this call and an additional call to {@link ResourceHost#recreateContainer(String,
+     * String, String, int, String)} must be made as a last step. This method can be called as many times for the same
+     * container as there are snapshots files. It is important to keep the order of precedence between snapshots in the
+     * files, when calling this method several times for the same container
+     *
+     * @param containerName name for a new container
+     * @param pathToFile absolute path to a file with container snapshots
+     */
+    void recreateContainerFilesystem( String containerName, String pathToFile ) throws ResourceHostException;
+
+    /**
+     * Recreates container. This is the last method to call when recreating a container from snapshots file(s). See
+     * {@link ResourceHost#recreateContainerFilesystem(String, String)}
+     *
+     * @param containerName name of container
+     * @param hostname hostname to set for container
+     * @param ip address of container in form "ip/mask"
+     * @param vlan vlan number of container
+     * @param environmentId env id of container
+     */
+    void recreateContainer( String containerName, String hostname, String ip, int vlan, String environmentId )
+            throws ResourceHostException;
+
+    /**
      * Download a file from raw category on CDN
      *
      * @param fileId id of file to be downloaded

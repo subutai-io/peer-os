@@ -418,7 +418,7 @@ public class EnvironmentManagerImpl extends HostListener
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
         Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
@@ -508,9 +508,9 @@ public class EnvironmentManagerImpl extends HostListener
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
-        if ( !Strings.isNullOrEmpty( topology.getSshKey() ) )
+        if ( !StringUtils.isBlank( topology.getSshKey() ) )
         {
             Preconditions.checkArgument( StringUtil.isValidSshPublicKey( topology.getSshKey() ), "Invalid ssh key" );
         }
@@ -591,7 +591,7 @@ public class EnvironmentManagerImpl extends HostListener
 
         Preconditions.checkArgument( hasQuotaModification || hasContainerDestruction || hasContainerCreation,
                 "No environment modification task found" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
@@ -787,7 +787,7 @@ public class EnvironmentManagerImpl extends HostListener
     public void addSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( StringUtil.isValidSshPublicKey( sshKey ), "Invalid ssh key" );
         Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
@@ -840,8 +840,8 @@ public class EnvironmentManagerImpl extends HostListener
     public void removeSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( sshKey ), "Invalid ssh key" );
         Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
@@ -937,8 +937,8 @@ public class EnvironmentManagerImpl extends HostListener
                                    final long p2pSecretKeyTtlSec, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newP2pSecretKey ), "Invalid p2p secret key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( newP2pSecretKey ), "Invalid p2p secret key" );
         Preconditions.checkArgument( p2pSecretKeyTtlSec > 0, "Invalid p2p secret key time-to-live" );
         Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
@@ -989,7 +989,7 @@ public class EnvironmentManagerImpl extends HostListener
     public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
         Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         LocalEnvironment environment;
@@ -1103,8 +1103,8 @@ public class EnvironmentManagerImpl extends HostListener
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
         Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
@@ -1175,7 +1175,7 @@ public class EnvironmentManagerImpl extends HostListener
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ), "Invalid hostname" );
         Preconditions.checkState( !systemManager.isUpdateInProgress(), "System update in progress" );
 
         final LocalEnvironment environment =
@@ -1220,10 +1220,10 @@ public class EnvironmentManagerImpl extends HostListener
                                 final String version, final boolean privateTemplate )
             throws PeerException, EnvironmentNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( version ), "Invalid version" );
         Preconditions.checkArgument( version.matches( "^\\d+\\.\\d+\\.\\d+$" ), "Version must be in X.X.X format" );
         String cdnToken = identityManager.getActiveSession().getCdnToken();
         Preconditions.checkNotNull( cdnToken, "Cdn token is missing or expired" );
@@ -1279,7 +1279,7 @@ public class EnvironmentManagerImpl extends HostListener
 
     protected void removeActiveWorkflow( String environmentId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
 
         activeWorkflows.remove( environmentId );
     }
@@ -1388,8 +1388,8 @@ public class EnvironmentManagerImpl extends HostListener
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerHostId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
 
         final LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 
@@ -1855,7 +1855,7 @@ public class EnvironmentManagerImpl extends HostListener
     public void startMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
                                  final String environmentId ) throws EnvironmentManagerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkArgument( !StringUtils.isBlank( handlerId ), "Invalid alert handler id." );
         Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
 
         AlertHandler alertHandler = alertHandlers.get( handlerId );
@@ -1883,7 +1883,7 @@ public class EnvironmentManagerImpl extends HostListener
     public void stopMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
                                 final String environmentId ) throws EnvironmentManagerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkArgument( !StringUtils.isBlank( handlerId ), "Invalid alert handler id." );
         Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
 
         //remove subscription from database
@@ -1905,8 +1905,8 @@ public class EnvironmentManagerImpl extends HostListener
     public void addSshKeyToEnvironmentEntity( final String environmentId, final String sshKey )
             throws EnvironmentNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( sshKey ), "Invalid ssh key" );
 
         LocalEnvironment environment = ( LocalEnvironment ) loadEnvironment( environmentId );
 

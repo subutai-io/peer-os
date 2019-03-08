@@ -12,8 +12,9 @@ import java.util.Set;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -247,7 +248,7 @@ public class EnvironmentManagerSecureProxy extends HostListener
         //*********************************
 
         Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         return environmentManager.createEnvironment( topology, async );
@@ -736,9 +737,9 @@ public class EnvironmentManagerSecureProxy extends HostListener
     public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
             throws EnvironmentNotFoundException, PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ) );
 
         checkContainerPermission( environmentId, containerId, traitsBuilder( "ownership=All;update=true" ) );
 

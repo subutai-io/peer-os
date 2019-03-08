@@ -25,11 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -177,8 +177,8 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid environment name" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( topologyJson ), "Invalid environment topology" );
+            Preconditions.checkArgument( !StringUtils.isBlank( name ), "Invalid environment name" );
+            Preconditions.checkArgument( !StringUtils.isBlank( topologyJson ), "Invalid environment topology" );
 
             checkName( name );
 
@@ -528,12 +528,12 @@ public class RestServiceImpl implements RestService
     @Override
     public Response addSshKey( final String environmentId, final String key )
     {
-        if ( Strings.isNullOrEmpty( environmentId ) )
+        if ( StringUtils.isBlank( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
         }
-        else if ( Strings.isNullOrEmpty( key ) )
+        else if ( StringUtils.isBlank( key ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
@@ -558,12 +558,12 @@ public class RestServiceImpl implements RestService
     public Response removeSshKey( final String environmentId, final String key )
     {
 
-        if ( Strings.isNullOrEmpty( environmentId ) )
+        if ( StringUtils.isBlank( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
         }
-        else if ( Strings.isNullOrEmpty( key ) )
+        else if ( StringUtils.isBlank( key ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
@@ -610,7 +610,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response destroyContainer( final String containerId )
     {
-        if ( Strings.isNullOrEmpty( containerId ) )
+        if ( StringUtils.isBlank( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
@@ -643,7 +643,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getContainerState( final String containerId )
     {
-        if ( Strings.isNullOrEmpty( containerId ) )
+        if ( StringUtils.isBlank( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
@@ -687,7 +687,7 @@ public class RestServiceImpl implements RestService
                                     + " this operation." ) ).build();
         }
 
-        if ( Strings.isNullOrEmpty( containerId ) )
+        if ( StringUtils.isBlank( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
@@ -720,7 +720,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response stopContainer( final String containerId )
     {
-        if ( Strings.isNullOrEmpty( containerId ) )
+        if ( StringUtils.isBlank( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
@@ -753,7 +753,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listContainerSnapshots( final String containerId )
     {
-        if ( Strings.isNullOrEmpty( containerId ) )
+        if ( StringUtils.isBlank( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
@@ -783,17 +783,17 @@ public class RestServiceImpl implements RestService
     @Override
     public Response removeContainerSnapshot( final String containerId, final String partition, final String label )
     {
-        if ( Strings.isNullOrEmpty( containerId ) )
+        if ( StringUtils.isBlank( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
-        if ( Strings.isNullOrEmpty( partition ) )
+        if ( StringUtils.isBlank( partition ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid partition" ) ).build();
         }
-        if ( Strings.isNullOrEmpty( label ) )
+        if ( StringUtils.isBlank( label ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid label" ) ).build();
@@ -825,17 +825,17 @@ public class RestServiceImpl implements RestService
     @Override
     public Response rollbackContainerSnapshot( final String containerId, final String partition, final String label )
     {
-        if ( Strings.isNullOrEmpty( containerId ) )
+        if ( StringUtils.isBlank( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
-        if ( Strings.isNullOrEmpty( partition ) )
+        if ( StringUtils.isBlank( partition ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid partition" ) ).build();
         }
-        if ( Strings.isNullOrEmpty( label ) )
+        if ( StringUtils.isBlank( label ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid label" ) ).build();
@@ -868,17 +868,17 @@ public class RestServiceImpl implements RestService
     public Response addContainerSnapshot( final String containerId, final String partition, final String label,
                                           final boolean stopContainer )
     {
-        if ( Strings.isNullOrEmpty( containerId ) )
+        if ( StringUtils.isBlank( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
-        if ( Strings.isNullOrEmpty( partition ) )
+        if ( StringUtils.isBlank( partition ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid partition" ) ).build();
         }
-        if ( Strings.isNullOrEmpty( label ) )
+        if ( StringUtils.isBlank( label ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid label" ) ).build();

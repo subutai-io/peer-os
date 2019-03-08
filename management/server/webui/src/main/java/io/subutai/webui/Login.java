@@ -12,8 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
@@ -47,22 +48,22 @@ public class Login extends HttpServlet
 
             Preconditions.checkNotNull( identityManager, "Karaf Auth Module is loading, please try again later" );
 
-            if ( !Strings.isNullOrEmpty( newPassword ) )
+            if ( !StringUtils.isBlank( newPassword ) )
             {
                 identityManager.changeUserPassword( username, password, newPassword );
                 password = newPassword;
             }
-            else if ( !Strings.isNullOrEmpty( sign ) )
+            else if ( !StringUtils.isBlank( sign ) )
             {
                 identityManager.resetPassword( username, password, sign );
             }
 
-            if ( !Strings.isNullOrEmpty( username ) )
+            if ( !StringUtils.isBlank( username ) )
             {
                 sptoken = identityManager.getUserToken( username, password );
                 user = identityManager.authenticateByToken( sptoken );
             }
-            else if ( !Strings.isNullOrEmpty( sptoken ) )
+            else if ( !StringUtils.isBlank( sptoken ) )
             {
 
                 user = identityManager.authenticateByToken( sptoken );
@@ -138,7 +139,7 @@ public class Login extends HttpServlet
         fingerprint.setSecure( true );
 
 
-        if ( Strings.isNullOrEmpty( sptoken ) )
+        if ( StringUtils.isBlank( sptoken ) )
         {
             Cookie[] cookies = request.getCookies();
             for ( final Cookie cookie : cookies )

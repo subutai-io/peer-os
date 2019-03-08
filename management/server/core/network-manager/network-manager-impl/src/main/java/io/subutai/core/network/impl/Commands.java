@@ -3,7 +3,8 @@ package io.subutai.core.network.impl;
 
 import java.util.List;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
@@ -151,7 +152,7 @@ public class Commands
 
         if ( protocol == Protocol.HTTPS )
         {
-            if ( !Strings.isNullOrEmpty( sslCertPath ) )
+            if ( !StringUtils.isBlank( sslCertPath ) )
             {
                 args.add( "-c" );
                 args.add( sslCertPath );

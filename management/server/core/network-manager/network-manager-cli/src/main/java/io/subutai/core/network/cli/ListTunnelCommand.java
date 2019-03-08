@@ -1,6 +1,7 @@
 package io.subutai.core.network.cli;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -36,7 +37,7 @@ public class ListTunnelCommand extends SubutaiShellCommandSupport
 
         try
         {
-            Tunnels tunnels = Strings.isNullOrEmpty( hostId ) ? localPeer.getManagementHost().getTunnels() :
+            Tunnels tunnels = StringUtils.isBlank( hostId ) ? localPeer.getManagementHost().getTunnels() :
                               localPeer.getResourceHostById( hostId ).getTunnels();
 
             System.out.format( "Found %d tunnel(s)%n", tunnels.getTunnels().size() );

@@ -5,8 +5,9 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
@@ -52,8 +53,8 @@ public class TrackerOperationImpl implements TrackerOperation
 
     public TrackerOperationImpl( String source, String description, TrackerImpl tracker )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
+        Preconditions.checkArgument( !StringUtils.isBlank( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !StringUtils.isBlank( description ), "Description is null or empty" );
         Preconditions.checkNotNull( tracker, "Tracker is null" );
 
         this.description = description;
@@ -137,7 +138,7 @@ public class TrackerOperationImpl implements TrackerOperation
             return;
         }
 
-        if ( !Strings.isNullOrEmpty( logString ) )
+        if ( !StringUtils.isBlank( logString ) )
         {
             if ( log.length() > 0 )
             {

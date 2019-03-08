@@ -4,6 +4,8 @@ package io.subutai.common.network;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -72,7 +74,7 @@ public class UsedNetworkResources
 
     public synchronized void addP2pSubnet( String p2pSubnet )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSubnet ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pSubnet ) );
 
         p2pSubnets.add( IPUtil.getNetworkAddress( p2pSubnet ) );
     }
@@ -80,7 +82,7 @@ public class UsedNetworkResources
 
     public synchronized void addContainerSubnet( String containerSubnet )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerSubnet ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerSubnet ) );
 
         containerSubnets.add( IPUtil.getNetworkAddress( containerSubnet ) );
     }
@@ -88,7 +90,7 @@ public class UsedNetworkResources
 
     public boolean p2pSubnetExists( String subnet )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnet ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( subnet ) );
 
         String netAddress = IPUtil.getNetworkAddress( subnet );
         for ( String p2pSubnet : p2pSubnets )
@@ -105,7 +107,7 @@ public class UsedNetworkResources
 
     public boolean containerSubnetExists( String subnet )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnet ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( subnet ) );
 
         String netAddress = IPUtil.getNetworkAddress( subnet );
 

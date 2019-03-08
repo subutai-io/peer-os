@@ -517,7 +517,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         for ( CommandUtil.HostCommandResult result : readResults.getCommandResults() )
         {
-            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
+            if ( result.hasSucceeded() && !StringUtils.isBlank( result.getCommandResult().getStdOut() ) )
             {
                 sshPublicKeys.addKey( new SshKey( result.getHost().getId(), sshKeyType,
                         result.getCommandResult().getStdOut().trim() ) );
@@ -730,7 +730,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     public void addToAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( sshPublicKey ), "Invalid ssh key" );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -766,7 +766,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( sshPublicKey ), "Invalid ssh key" );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -802,9 +802,9 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     public void addAuthorizedSshKeyToUser( final String containerId, final String username, final String sshPublicKey )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "Invalid username" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( username ), "Invalid username" );
+        Preconditions.checkArgument( !StringUtils.isBlank( sshPublicKey ), "Invalid ssh key" );
 
         ContainerHost container = getContainerHostById( containerId );
 
@@ -824,9 +824,9 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     public void removeAuthorizedSshKeyFromUser( final String containerId, final String username,
                                                 final String sshPublicKey ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "Invalid username" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( username ), "Invalid username" );
+        Preconditions.checkArgument( !StringUtils.isBlank( sshPublicKey ), "Invalid ssh key" );
 
         ContainerHost container = getContainerHostById( containerId );
 
@@ -844,8 +844,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public void createUserIfNotExists( final String containerId, final String username ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "Invalid username" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( username ), "Invalid username" );
 
         ContainerHost container = getContainerHostById( containerId );
 
@@ -863,8 +863,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public void removeUserIfExists( final String containerId, final String username ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "Invalid username" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( username ), "Invalid username" );
 
         ContainerHost container = getContainerHostById( containerId );
 
@@ -1354,7 +1354,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public ContainerHost getContainerHostByHostName( String hostname ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Container hostname shouldn't be null" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Container hostname shouldn't be null" );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
@@ -1376,7 +1376,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public ContainerHost getContainerHostByContainerName( String containerName ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Container name shouldn't be null" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerName ), "Container name shouldn't be null" );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
@@ -1442,7 +1442,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public ResourceHost getResourceHostByHostName( String hostname ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid resource host hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid resource host hostname" );
 
 
         for ( ResourceHost resourceHost : getResourceHosts() )
@@ -1477,7 +1477,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public ResourceHost getResourceHostByContainerHostName( final String hostname ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid container hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid container hostname" );
 
         ContainerHost c = getContainerHostByHostName( hostname );
         ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) c;
@@ -1488,7 +1488,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public ResourceHost getResourceHostByContainerName( final String containerName ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerName ), "Invalid container name" );
 
         ContainerHost c = getContainerHostByContainerName( containerName );
         ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) c;
@@ -1539,7 +1539,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public Host findHostByName( final String hostname ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ) );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
@@ -1633,8 +1633,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
 
         ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
         ResourceHost resourceHost = containerHost.getParent();
@@ -1659,8 +1659,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                                              final boolean force ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
 
         ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
         ResourceHost resourceHost = containerHost.getParent();
@@ -1684,8 +1684,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                                       final boolean stopContainer ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
 
         ContainerHostEntity containerHost = ( ContainerHostEntity ) getContainerHostById( containerId.getId() );
         ResourceHost resourceHost = containerHost.getParent();
@@ -1803,7 +1803,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public void removeResourceHost( String rhId ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( rhId ) );
 
         //remove rh ssl cert
         securityManager.getKeyStoreManager().removeCertFromTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT, rhId );
@@ -1926,7 +1926,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( !StringUtils.isBlank( recipient ), "Invalid recipient" );
 
         for ( RequestListener requestListener : requestListeners )
         {
@@ -2074,7 +2074,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     public SshTunnel setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( sshIdleTimeout > 0 );
 
@@ -2096,7 +2096,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public List<ContainerHost> getPeerContainers( final String peerId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( peerId ) );
 
         List<ContainerHost> result = new ArrayList<>();
         for ( ResourceHost resourceHost : getResourceHosts() )
@@ -3013,7 +3013,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public Template getTemplateByName( final String templateName )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( templateName ), "Invalid template name" );
 
         return templateManager.getTemplateByName( templateName );
     }
@@ -3022,7 +3022,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public Template getTemplateById( final String templateId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateId ), "Invalid template id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( templateId ), "Invalid template id" );
 
         return templateManager.getTemplate( templateId );
     }
@@ -3271,7 +3271,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
         String newHostname = StringUtil.removeHtmlAndSpecialChars( hostname, true );
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ), "Invalid hostname" );
 
         //check if container with new hostname already exists on peer
         try
@@ -3303,13 +3303,13 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     @Override
     public void setRhHostname( final String rhId, final String hostname ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ), "Invalid RH id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( rhId ), "Invalid RH id" );
 
         ResourceHost resourceHost = getResourceHostById( rhId );
 
         String newHostname = StringUtil.removeHtmlAndSpecialChars( hostname, true );
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ), "Invalid hostname" );
 
 
         //check if RH with new hostname already exists on peer
@@ -3342,8 +3342,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                                                         final String newHostname ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( oldHostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ) );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -3417,8 +3417,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( oldHostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ) );
         Preconditions.checkNotNull( sshEncryptionType );
 
         Set<Host> hosts = Sets.newHashSet();
@@ -3738,8 +3738,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                                 final boolean isPrivateTemplate, final String token ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( version ), "Invalid version" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
+        Preconditions.checkArgument( !StringUtils.isBlank( version ), "Invalid version" );
+        Preconditions.checkArgument( !StringUtils.isBlank( token ), "Invalid token" );
 
         ResourceHost resourceHost = getResourceHostByContainerId( containerId.getId() );
 

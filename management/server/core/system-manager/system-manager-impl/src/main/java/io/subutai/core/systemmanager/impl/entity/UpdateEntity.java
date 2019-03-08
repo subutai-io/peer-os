@@ -9,8 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 
 @Entity
@@ -99,7 +100,7 @@ public class UpdateEntity
 
     public void setCurrentVersion( final String currentVersion )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( currentVersion ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( currentVersion ) );
 
         this.currentVersion = currentVersion;
     }

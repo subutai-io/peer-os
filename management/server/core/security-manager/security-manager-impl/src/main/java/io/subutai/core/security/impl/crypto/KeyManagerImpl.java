@@ -22,9 +22,9 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.PeerInfo;
@@ -477,7 +477,7 @@ public class KeyManagerImpl implements KeyManager
         {
             PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( publicKeyRing );
 
-            if ( Strings.isNullOrEmpty( identityId ) )
+            if ( StringUtils.isBlank( identityId ) )
             {
                 identityId = keyData.getManHostId();
             }
@@ -565,7 +565,7 @@ public class KeyManagerImpl implements KeyManager
         SecurityKey keyIden = null;
         try
         {
-            if ( Strings.isNullOrEmpty( identityId ) )
+            if ( StringUtils.isBlank( identityId ) )
             {
                 identityId = keyData.getManHostId();
             }
@@ -683,7 +683,7 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public String getPublicKeyRingAsASCII( String identityId )
     {
-        if ( Strings.isNullOrEmpty( identityId ) )
+        if ( StringUtils.isBlank( identityId ) )
         {
             identityId = keyData.getManHostId();
         }
@@ -720,7 +720,7 @@ public class KeyManagerImpl implements KeyManager
     {
         PGPPublicKeyRing publicKeyRing;
 
-        if ( Strings.isNullOrEmpty( identityId ) )
+        if ( StringUtils.isBlank( identityId ) )
         {
             identityId = keyData.getManHostId();
         }
@@ -760,7 +760,7 @@ public class KeyManagerImpl implements KeyManager
     public String getFingerprint( String identityId )
     {
 
-        if ( Strings.isNullOrEmpty( identityId ) )
+        if ( StringUtils.isBlank( identityId ) )
         {
             identityId = keyData.getManHostId();
         }
@@ -784,7 +784,7 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public PGPSecretKeyRing getSecretKeyRing( String identityId )
     {
-        if ( Strings.isNullOrEmpty( identityId ) )
+        if ( StringUtils.isBlank( identityId ) )
         {
             identityId = keyData.getManHostId();
         }
@@ -830,7 +830,7 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public InputStream getSecretKeyRingInputStream( String identityId )
     {
-        if ( Strings.isNullOrEmpty( identityId ) )
+        if ( StringUtils.isBlank( identityId ) )
         {
             identityId = keyData.getManHostId();
         }
@@ -863,7 +863,7 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public PGPSecretKey getSecretKey( String identityId )
     {
-        if ( Strings.isNullOrEmpty( identityId ) )
+        if ( StringUtils.isBlank( identityId ) )
         {
             identityId = keyData.getManHostId();
         }
@@ -896,7 +896,7 @@ public class KeyManagerImpl implements KeyManager
     public PGPPrivateKey getPrivateKey( String identityId )
     {
 
-        if ( Strings.isNullOrEmpty( identityId ) )
+        if ( StringUtils.isBlank( identityId ) )
         {
             identityId = keyData.getManHostId();
         }
@@ -990,8 +990,8 @@ public class KeyManagerImpl implements KeyManager
 
 
     /* *****************************
-      *
-      */
+     *
+     */
     SecurityKeyData getSecurityKeyData()
     {
         return keyData;

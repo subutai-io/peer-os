@@ -4,8 +4,9 @@ package io.subutai.core.messenger.impl;
 import java.sql.Timestamp;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.impl.entity.MessageEntity;
@@ -45,7 +46,7 @@ public class Envelope
 
         Preconditions.checkNotNull( targetPeerId, "Target peer id is null" );
         Preconditions.checkNotNull( message, "Message is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( !StringUtils.isBlank( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeToLive > 0, "Invalid time-to-live" );
 
         this.message = new MessageImpl( message );

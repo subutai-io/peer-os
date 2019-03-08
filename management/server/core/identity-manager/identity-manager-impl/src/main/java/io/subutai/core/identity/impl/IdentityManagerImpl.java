@@ -37,11 +37,11 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.cxf.message.Message;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -498,15 +498,15 @@ public class IdentityManagerImpl implements IdentityManager
         {
             UserToken userToken = new UserTokenEntity();
 
-            if ( Strings.isNullOrEmpty( token ) )
+            if ( StringUtils.isBlank( token ) )
             {
                 token = UUID.randomUUID().toString();
             }
-            if ( Strings.isNullOrEmpty( issuer ) )
+            if ( StringUtils.isBlank( issuer ) )
             {
                 issuer = "io.subutai";
             }
-            if ( Strings.isNullOrEmpty( secret ) )
+            if ( StringUtils.isBlank( secret ) )
             {
                 secret = UUID.randomUUID().toString();
             }
@@ -633,7 +633,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         if ( user != null )
         {
-            if ( Strings.isNullOrEmpty( authId ) )
+            if ( StringUtils.isBlank( authId ) )
             {
                 authId = UUID.randomUUID().toString();
             }
@@ -725,7 +725,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
-            if ( Strings.isNullOrEmpty( signedAuth ) || !encryptionTool
+            if ( StringUtils.isBlank( signedAuth ) || !encryptionTool
                     .verifyClearSign( signedAuth.trim().getBytes(), publicKeyRing ) )
             {
                 throw new InvalidLoginException( "Signed Auth verification failed." );
@@ -960,7 +960,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
             String secId = user.getSecurityKeyId();
 
-            if ( Strings.isNullOrEmpty( secId ) )
+            if ( StringUtils.isBlank( secId ) )
             {
                 secId = userId + "-" + UUID.randomUUID();
                 user.setSecurityKeyId( secId );
@@ -1192,7 +1192,7 @@ public class IdentityManagerImpl implements IdentityManager
             }
             //***********************************************
 
-            if ( Strings.isNullOrEmpty( password ) )
+            if ( StringUtils.isBlank( password ) )
             {
                 password = Integer.toString( ( new Random() ).nextInt() );
             }
@@ -1239,7 +1239,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         String id = "";
 
-        if ( Strings.isNullOrEmpty( delegateUserId ) )
+        if ( StringUtils.isBlank( delegateUserId ) )
         {
             id = user.getId() + "-" + UUID.randomUUID();
         }
@@ -1354,11 +1354,11 @@ public class IdentityManagerImpl implements IdentityManager
         User user = new UserEntity();
 
         //*********************************
-        if ( Strings.isNullOrEmpty( userName ) )
+        if ( StringUtils.isBlank( userName ) )
         {
             userName = UUID.randomUUID().toString();
         }
-        if ( Strings.isNullOrEmpty( password ) )
+        if ( StringUtils.isBlank( password ) )
         {
             password = UUID.randomUUID().toString();
         }
@@ -1460,7 +1460,7 @@ public class IdentityManagerImpl implements IdentityManager
             isValidEmail( user.getEmail() );
             //**************************************
 
-            if ( !Strings.isNullOrEmpty( password ) )
+            if ( !StringUtils.isBlank( password ) )
             {
                 isValidPassword( user.getUserName(), password );
                 String salt = user.getSalt();
@@ -1702,7 +1702,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private void isValidUserName( String userName )
     {
-        if ( Strings.isNullOrEmpty( userName ) || userName.length() < 4 )
+        if ( StringUtils.isBlank( userName ) || userName.length() < 4 )
         {
             throw new IllegalArgumentException( "User name cannot be shorter than 4 characters." );
         }
@@ -1719,10 +1719,10 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private void isValidPassword( String userName, String password )
     {
-        Preconditions.checkArgument( !( Strings.isNullOrEmpty( userName ) || userName.trim().isEmpty() ),
+        Preconditions.checkArgument( !( StringUtils.isBlank( userName ) || userName.trim().isEmpty() ),
                 "Username can not be blank" );
 
-        Preconditions.checkArgument( !( Strings.isNullOrEmpty( password ) || password.trim().length() < 4 ),
+        Preconditions.checkArgument( !( StringUtils.isBlank( password ) || password.trim().length() < 4 ),
                 "Password cannot be shorter than 4 characters" );
 
 
@@ -1844,7 +1844,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         LOGGER.debug( "Creating role {}", roleName );
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( roleName ), "Invalid role name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( roleName ), "Invalid role name" );
 
         if ( identityDataService.findRoleByName( roleName ) != null )
         {

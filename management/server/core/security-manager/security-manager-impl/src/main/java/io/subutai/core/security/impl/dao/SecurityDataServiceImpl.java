@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.security.api.dao.SecurityDataService;
@@ -63,12 +63,12 @@ public class SecurityDataServiceImpl implements SecurityDataService
             }
             else
             {
-                if ( Strings.isNullOrEmpty( pKeyId ) )
+                if ( StringUtils.isBlank( pKeyId ) )
                 {
                     SecurityKey.setSecretKeyFingerprint( sKeyId );
                 }
 
-                if ( Strings.isNullOrEmpty( sKeyId ) )
+                if ( StringUtils.isBlank( sKeyId ) )
                 {
                     SecurityKey.setPublicKeyFingerprint( pKeyId );
                 }

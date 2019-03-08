@@ -14,10 +14,10 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalCause;
@@ -95,7 +95,7 @@ public class HostRegistryImpl implements HostRegistry
     @Override
     public ContainerHostInfo getContainerHostInfoByHostname( final String hostname ) throws HostDisconnectedException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
 
         for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
@@ -116,7 +116,7 @@ public class HostRegistryImpl implements HostRegistry
     public ContainerHostInfo getContainerHostInfoByContainerName( final String containerName )
             throws HostDisconnectedException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerName ), "Invalid container name" );
 
         for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
@@ -167,7 +167,7 @@ public class HostRegistryImpl implements HostRegistry
     @Override
     public ResourceHostInfo getResourceHostInfoByHostname( final String hostname ) throws HostDisconnectedException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
 
         for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
@@ -226,7 +226,7 @@ public class HostRegistryImpl implements HostRegistry
     @Override
     public void removeResourceHost( final String id )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( id ) );
 
         hosts.invalidate( id );
     }
