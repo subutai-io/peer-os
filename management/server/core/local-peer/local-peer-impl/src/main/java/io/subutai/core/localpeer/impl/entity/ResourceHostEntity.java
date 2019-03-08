@@ -105,6 +105,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
     private static final Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
+    private static final Pattern RECREATE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully restored" );
     private transient final Cache<String, Map<String, Integer>> envTemplatesDownloadPercent = CacheBuilder.newBuilder().
             expireAfterAccess( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC, TimeUnit.SECONDS ).build();
     private transient final Cache<String, Map<String, Integer>> templatesUploadPercent = CacheBuilder.newBuilder().
@@ -683,8 +684,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void recreateContainer( final String containerName, final String hostname, final String ip, final int vlan,
-                                   final String environmentId ) throws ResourceHostException
+    public String recreateContainer( final String containerName, final String hostname, final String ip, final int vlan,
+                                     final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkArgument( !StringUtils.isBlank( containerName ), "Invalid container name" );
         Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
@@ -695,9 +696,46 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            //TODO take steps from clone command below
+            //generate registration token for container for 30 min
+            String containerToken = getRegistrationManager().generateContainerToken( 30 * 60 * 1000L );
+
+
+            CommandResult result = commandUtil.execute( resourceHostCommands
+                            .getRecreateContainerCommand( containerName, hostname, ip, vlan, environmentId,
+                                    containerToken ),
+                    this );
+
+            //parse ID from output
+
+            StringTokenizer st = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
+
+            String containerId = null;
+
+            while ( st.hasMoreTokens() )
+            {
+
+                final String nextToken = st.nextToken();
+
+                Matcher m = RECREATE_OUTPUT_PATTERN.matcher( nextToken );
+
+                if ( m.find() && m.groupCount() == 1 )
+                {
+                    containerId = m.group( 1 );
+                    break;
+                }
+            }
+
+
+            if ( StringUtils.isBlank( containerId ) )
+            {
+                LOG.error( "Container ID not found in the output of subutai restore command" );
+
+                throw new CommandException( "Container ID not found in the output of subutai restore command" );
+            }
+
+            return containerId;
         }
-        catch ( Exception e )
+        catch ( CommandException e )
         {
             throw new ResourceHostException(
                     String.format( "Error recreating container %s : %s", containerName, e.getMessage() ), e );

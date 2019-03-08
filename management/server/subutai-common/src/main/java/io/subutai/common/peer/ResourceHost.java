@@ -105,8 +105,10 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param ip address of container in form "ip/mask"
      * @param vlan vlan number of container
      * @param environmentId env id of container
+     *
+     * @return ID of container
      */
-    void recreateContainer( String containerName, String hostname, String ip, int vlan, String environmentId )
+    String recreateContainer( String containerName, String hostname, String ip, int vlan, String environmentId )
             throws ResourceHostException;
 
     /**

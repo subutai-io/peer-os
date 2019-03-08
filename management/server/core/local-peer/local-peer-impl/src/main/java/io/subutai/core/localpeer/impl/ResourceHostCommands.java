@@ -169,12 +169,25 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( String.format( "subutai snapshot send -c %s -l %s %s", containerName,
                 StringUtils.isBlank( label2 ) ? label1 : label1 + "," + label2,
-                StringUtils.isBlank( destinationDirectory ) ? "" : "--destination " + destinationDirectory ) );
+                StringUtils.isBlank( destinationDirectory ) ? "" : "--destination " + destinationDirectory ) )
+                .withTimeout( Common.CONTAINER_DUMP_RECREATE_TIMEOUT_SEC );
     }
 
 
     public RequestBuilder getRecreateContainerFilesystemCommand( final String containerName, final String pathToFile )
     {
-        return new RequestBuilder( String.format( "subutai snapshot recv -c %s -f %s", containerName, pathToFile ) );
+        return new RequestBuilder( String.format( "subutai snapshot recv -c %s -f %s", containerName, pathToFile ) )
+                .withTimeout( Common.CONTAINER_DUMP_RECREATE_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getRecreateContainerCommand( final String containerName, final String hostname,
+                                                       final String ip, final int vlan, final String environmentId,
+                                                       final String containerToken )
+    {
+        return new RequestBuilder(
+                String.format( "subutai restore %s -n \"%s %d\" -e %s -s %s && subutai hostname con %s %s",
+                        containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
+                .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 }
