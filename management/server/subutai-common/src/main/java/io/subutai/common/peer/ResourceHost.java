@@ -80,9 +80,11 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param label2 optional name of second (more recent) snapshot to have incremental snapshot between label1 and
      * label2, if null is passed then incremental snapshot between parent template and label1 is used
      * @param destinationDirectory directory to save snapshot to, if null is passed then Common.RH_CACHE_DIR  is used
+     *
+     * @return full path to a created archive file
      */
-    void saveContainerFilesystem( ContainerHost containerHost, String label1, String label2,
-                                  String destinationDirectory ) throws ResourceHostException;
+    String saveContainerFilesystem( ContainerHost containerHost, String label1, String label2,
+                                    String destinationDirectory ) throws ResourceHostException;
 
     /**
      * Recreates container filesystem from snapshots. Note: Only a container filesystem is recreated, container itself

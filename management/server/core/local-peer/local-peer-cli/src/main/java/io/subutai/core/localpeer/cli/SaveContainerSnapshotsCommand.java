@@ -38,16 +38,17 @@ public class SaveContainerSnapshotsCommand extends SubutaiShellCommandSupport
         ContainerHost containerHost = resourceHost.getContainerHostByContainerName( containerName );
 
         String[] labelArr = labels.split( "," );
+        String targetFile;
         if ( labelArr.length == 2 )
         {
-            resourceHost.saveContainerFilesystem( containerHost, labelArr[0], labelArr[1], null );
+            targetFile = resourceHost.saveContainerFilesystem( containerHost, labelArr[0], labelArr[1], null );
         }
         else
         {
-            resourceHost.saveContainerFilesystem( containerHost, labelArr[0], null, null );
+            targetFile = resourceHost.saveContainerFilesystem( containerHost, labelArr[0], null, null );
         }
 
-        System.out.println( "Done" );
+        System.out.println( "Saved to " + targetFile );
 
         return null;
     }

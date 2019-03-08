@@ -630,8 +630,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void saveContainerFilesystem( final ContainerHost containerHost, final String label1, final String label2,
-                                         final String destinationDirectory ) throws ResourceHostException
+    public String saveContainerFilesystem( final ContainerHost containerHost, final String label1, final String label2,
+                                           final String destinationDirectory ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
         Preconditions.checkArgument( !StringUtils.isBlank( label1 ), "Invalid label1" );
@@ -648,9 +648,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands
+            CommandResult result = commandUtil.execute( resourceHostCommands
                     .getSaveContainerSnapshotsCommand( containerHost.getContainerName(), label1, label2,
                             destinationDirectory ), this );
+
+            Pattern pattern = Pattern.compile( "got dumped to (\\S+)\\s*\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut() );
+            if ( matcher.find() && matcher.groupCount() == 1 )
+            {
+                return matcher.group( 1 );
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse filepath from output %s", result.getStdOut() ) );
         }
         catch ( CommandException e )
         {
