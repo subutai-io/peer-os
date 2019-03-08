@@ -8,17 +8,17 @@
     </a>
   </div>
 
-  <form
-      ng-init="newSnapshot.containerId=containerViewCtrl.editingContainer.id; newSnapshot.containerName=containerViewCtrl.editingContainer.containerName;newSnapshot.partition='all';">
+  <form name="myform"
+        ng-init="newSnapshot.containerId=containerViewCtrl.editingContainer.id; newSnapshot.containerName=containerViewCtrl.editingContainer.containerName;newSnapshot.partition='all';">
     <div>
       <table style="margin: 5px;">
         <tr>
           <td style="padding-right:5px;padding-left:5px;">
             <label class="b-popup-body-label">Snapshot name</label>
-            <input type="text" ng-model="newSnapshot.label" ng-required="true" style="width:100px"/>
+            <input type="text" ng-model="newSnapshot.label" style="width:100px" required="true"/>
           </td>
           <td>
-            <button style="width:50px" class="b-btn b-btn_green g-right"
+            <button ng-disabled="!myform.$valid" style="width:50px" class="b-btn b-btn_green g-right"
                     ng-click="containerViewCtrl.addSnapshot(newSnapshot); newSnapshot={}; newSnapshot.containerId=containerViewCtrl.editingContainer.id; newSnapshot.containerName=containerViewCtrl.editingContainer.containerName;newSnapshot.partition='all';">
               Add
             </button>
