@@ -1,6 +1,8 @@
 package io.subutai.common.protocol;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -23,9 +25,9 @@ public class P2PCredentials
                            @JsonProperty( "p2pSecretKey" ) final String p2pSecretKey,
                            @JsonProperty( "p2pTtlSeconds" ) final long p2pTtlSeconds )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSecretKey ), "Invalid p2p secret key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid p2p hash" );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pSecretKey ), "Invalid p2p secret key" );
         Preconditions.checkArgument( p2pTtlSeconds > 0, "Invalid time-to-live" );
 
         this.environmentId = environmentId;

@@ -1,7 +1,7 @@
 package io.subutai.core.localpeer.impl;
 
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
@@ -68,13 +68,11 @@ public class ResourceHostCommands
 
 
     public RequestBuilder getCloneContainerCommand( final String templateId, String containerName, String hostname,
-                                                    String ip, int vlan, String environmentId, String containerToken,
-                                                    String backupFile )
+                                                    String ip, int vlan, String environmentId, String containerToken )
     {
         return new RequestBuilder(
-                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s %s && subutai hostname con %s %s",
-                        templateId, containerName, ip, vlan, environmentId, containerToken,
-                        Strings.isNullOrEmpty( backupFile ) ? "" : "--backup " + backupFile, containerName, hostname ) )
+                String.format( "subutai clone id:%s %s -n \"%s %d\" -e %s -s %s && subutai hostname con %s %s",
+                        templateId, containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
@@ -166,10 +164,30 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getBackupContainerCommand( final String containerName, final String destinationDirectory )
+    public RequestBuilder getSaveContainerSnapshotsCommand( final String containerName, final String label1,
+                                                            final String label2, final String destinationDirectory )
+    {
+        return new RequestBuilder( String.format( "subutai snapshot send -c %s -l %s %s", containerName,
+                StringUtils.isBlank( label2 ) ? label1 : label1 + "," + label2,
+                StringUtils.isBlank( destinationDirectory ) ? "" : "--destination " + destinationDirectory ) )
+                .withTimeout( Common.CONTAINER_DUMP_RECREATE_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getRecreateContainerFilesystemCommand( final String containerName, final String pathToFile )
+    {
+        return new RequestBuilder( String.format( "subutai snapshot recv -c %s -f %s", containerName, pathToFile ) )
+                .withTimeout( Common.CONTAINER_DUMP_RECREATE_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getRecreateContainerCommand( final String containerName, final String hostname,
+                                                       final String ip, final int vlan, final String environmentId,
+                                                       final String containerToken )
     {
         return new RequestBuilder(
-                String.format( "subutai backup %s --destination %s", containerName, destinationDirectory ) )
+                String.format( "subutai restore %s -n \"%s %d\" -e %s -s %s && subutai hostname con %s %s",
+                        containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 }

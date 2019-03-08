@@ -1,6 +1,7 @@
 package io.subutai.core.network.cli;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -36,7 +37,7 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
         try
         {
             final P2PConnections connections =
-                    Strings.isNullOrEmpty( hostId ) ? localPeer.getManagementHost().getP2PConnections() :
+                    StringUtils.isBlank( hostId ) ? localPeer.getManagementHost().getP2PConnections() :
                     localPeer.getResourceHostById( hostId ).getP2PConnections();
 
             System.out.format( "Found %d P2P connection(s)%n", connections.getConnections().size() );

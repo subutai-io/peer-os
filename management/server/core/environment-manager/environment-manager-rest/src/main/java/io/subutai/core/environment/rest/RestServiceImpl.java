@@ -65,7 +65,7 @@ public class RestServiceImpl implements RestService
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( environmentCreationDto.getNodes() ),
                 "No containers provided" );
         Preconditions
-                .checkArgument( !( create && Strings.isNullOrEmpty( environmentCreationDto.getEnvironmentName() ) ),
+                .checkArgument( !( create && StringUtils.isBlank( environmentCreationDto.getEnvironmentName() ) ),
                         "Invalid environment name" );
 
         TemplateManager templateManager = ServiceLocator.lookup( TemplateManager.class );
@@ -76,17 +76,17 @@ public class RestServiceImpl implements RestService
         for ( NodeDto node : environmentCreationDto.getNodes() )
         {
             Preconditions
-                    .checkArgument( !Strings.isNullOrEmpty( node.getHostname() ), "No container hostname provided" );
+                    .checkArgument( !StringUtils.isBlank( node.getHostname() ), "No container hostname provided" );
             Preconditions.checkArgument(
-                    !Strings.isNullOrEmpty( node.getTemplateId() ) || !Strings.isNullOrEmpty( node.getTemplateName() ),
+                    !StringUtils.isBlank( node.getTemplateId() ) || !StringUtils.isBlank( node.getTemplateName() ),
                     "No template provided" );
 
-            String peerId = Strings.isNullOrEmpty( node.getPeerId() ) ? localPeer.getId() : node.getPeerId();
-            String rhId = Strings.isNullOrEmpty( node.getResourceHostId() ) ? localPeer.getManagementHost().getId() :
+            String peerId = StringUtils.isBlank( node.getPeerId() ) ? localPeer.getId() : node.getPeerId();
+            String rhId = StringUtils.isBlank( node.getResourceHostId() ) ? localPeer.getManagementHost().getId() :
                           node.getResourceHostId();
             String templateId = node.getTemplateId();
 
-            if ( Strings.isNullOrEmpty( templateId ) )
+            if ( StringUtils.isBlank( templateId ) )
             {
                 Template template = templateManager.getVerifiedTemplateByName( node.getTemplateName() );
 
@@ -96,8 +96,8 @@ public class RestServiceImpl implements RestService
                 templateId = template.getId();
             }
 
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( node.getResourceHostId() ) || (
-                    Strings.isNullOrEmpty( node.getResourceHostId() ) && StringUtils
+            Preconditions.checkArgument( !StringUtils.isBlank( node.getResourceHostId() ) || (
+                    StringUtils.isBlank( node.getResourceHostId() ) && StringUtils
                             .equals( peerId, localPeer.getId() ) ), "Invalid host for container provided" );
 
             ContainerQuota quota = new ContainerQuota( node.getSize() == null ? ContainerSize.TINY : node.getSize() );
@@ -106,7 +106,7 @@ public class RestServiceImpl implements RestService
                     new Node( node.getHostname(), node.getHostname(), quota, peerId, rhId, templateId ) );
         }
 
-        if ( !Strings.isNullOrEmpty( environmentCreationDto.getSshKey() ) )
+        if ( !StringUtils.isBlank( environmentCreationDto.getSshKey() ) )
         {
             topology.setSshKey( environmentCreationDto.getSshKey() );
             topology.setSshKeyType( SshEncryptionType.parseTypeFromKey( environmentCreationDto.getSshKey() ) );

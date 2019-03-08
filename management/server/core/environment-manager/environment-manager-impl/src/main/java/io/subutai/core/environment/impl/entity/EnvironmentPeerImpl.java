@@ -17,8 +17,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
@@ -53,7 +54,7 @@ public class EnvironmentPeerImpl implements EnvironmentPeer
 
     public EnvironmentPeerImpl( final String peerId, final Integer vlan )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( peerId ) );
         Preconditions.checkNotNull( vlan );
 
         this.peerId = peerId;

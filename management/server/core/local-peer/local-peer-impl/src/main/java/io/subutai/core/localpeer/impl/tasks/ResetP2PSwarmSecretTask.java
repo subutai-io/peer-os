@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl.tasks;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -20,8 +22,8 @@ public class ResetP2PSwarmSecretTask extends HostUtil.Task<Object>
                                     final long p2pSecretKeyTtl )
     {
         Preconditions.checkNotNull( resourceHost );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSecretKey ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pSecretKey ) );
         Preconditions.checkArgument( p2pSecretKeyTtl > 0 );
 
         this.resourceHost = resourceHost;

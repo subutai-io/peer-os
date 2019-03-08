@@ -6,19 +6,18 @@ import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Template;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-@Command( scope = "localpeer", name = "clone-container" )
-public class CloneContainerCommand extends SubutaiShellCommandSupport
+@Command( scope = "localpeer", name = "recreate-container" )
+public class RecreateContainerCommand extends SubutaiShellCommandSupport
 {
 
     @Argument( name = "resource host", description = "Resource host id", required = true )
     private String rhId;
 
-    @Argument( index = 1, name = "template name", description = "Name of template", required = true )
-    private String templateName;
+    @Argument( index = 1, name = "hostname", description = "Hostname of new container", required = true )
+    private String hostname;
 
     @Argument( index = 2, name = "container name", description = "Name of new container", required = true )
     private String containerName;
@@ -35,7 +34,7 @@ public class CloneContainerCommand extends SubutaiShellCommandSupport
     private final LocalPeer localPeer;
 
 
-    public CloneContainerCommand( final LocalPeer localPeer )
+    public RecreateContainerCommand( final LocalPeer localPeer )
     {
         this.localPeer = localPeer;
     }
@@ -47,9 +46,8 @@ public class CloneContainerCommand extends SubutaiShellCommandSupport
 
 
         ResourceHost resourceHost = localPeer.getResourceHostById( rhId );
-        Template template = localPeer.getTemplateByName( templateName );
 
-        String contId = resourceHost.cloneContainer( template, containerName, containerName, ip, vlan, envId );
+        String contId = resourceHost.recreateContainer( containerName, hostname, ip, vlan, envId );
         System.out.println( contId );
 
         return null;

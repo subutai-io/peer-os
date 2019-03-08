@@ -4,6 +4,8 @@ package io.subutai.common.environment;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -41,9 +43,9 @@ public class CreateEnvironmentContainersRequest
     public CreateEnvironmentContainersRequest( final String environmentId, final String initiatorPeerId,
                                                final String ownerId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( initiatorPeerId ), "Invalid initiator peer id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ownerId ), "Invalid owner id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( initiatorPeerId ), "Invalid initiator peer id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( ownerId ), "Invalid owner id" );
 
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;

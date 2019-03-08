@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Strings;
 
@@ -75,7 +76,7 @@ public class PGPKeyUtil
      */
     public static String getKeyId( String fingerprint )
     {
-        if ( !Strings.isNullOrEmpty( fingerprint ) && fingerprint.length() > 24 )
+        if ( !StringUtils.isBlank( fingerprint ) && fingerprint.length() > 24 )
         {
             return fingerprint.substring( 24 ).toUpperCase();
         }
@@ -110,7 +111,7 @@ public class PGPKeyUtil
      */
     public static String getShortKeyId( String fingerprint )
     {
-        if ( !Strings.isNullOrEmpty( fingerprint ) && fingerprint.length() > 32 )
+        if ( !StringUtils.isBlank( fingerprint ) && fingerprint.length() > 32 )
         {
             return fingerprint.substring( 32 ).toUpperCase();
         }

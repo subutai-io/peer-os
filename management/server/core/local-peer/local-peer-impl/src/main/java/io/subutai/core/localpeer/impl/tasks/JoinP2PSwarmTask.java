@@ -1,8 +1,9 @@
 package io.subutai.core.localpeer.impl.tasks;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.HostUtil;
@@ -22,10 +23,10 @@ public class JoinP2PSwarmTask extends HostUtil.Task<Object>
                              final String p2pHash, final String p2pSecretKey, final long p2pSecretKeyTtl )
     {
         Preconditions.checkNotNull( resourceHost );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pIp ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pInterfaceName ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSecretKey ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pIp ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pInterfaceName ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pSecretKey ) );
         Preconditions.checkArgument( p2pSecretKeyTtl > 0 );
 
         this.resourceHost = resourceHost;

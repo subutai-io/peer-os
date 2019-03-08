@@ -6,7 +6,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
@@ -37,7 +37,7 @@ public class RestServiceImpl implements RestService
         {
             String token = identityManager.getUserToken( userName, password );
 
-            if ( !Strings.isNullOrEmpty( token ) )
+            if ( !StringUtils.isBlank( token ) )
             {
                 return Response.ok( token ).build();
             }
@@ -80,7 +80,7 @@ public class RestServiceImpl implements RestService
         {
             String token = identityManager.getUserToken( userName, password );
 
-            if ( !Strings.isNullOrEmpty( token ) )
+            if ( !StringUtils.isBlank( token ) )
             {
                 AuthMessage authM = new AuthMessage();
                 authM.setToken( token );

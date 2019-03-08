@@ -1,6 +1,8 @@
 package io.subutai.common.task;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -33,9 +35,6 @@ public class CloneRequest
     @JsonProperty( value = "containerQuota" )
     private final ContainerQuota containerQuota;
 
-    @JsonProperty( value = "backupFile" )
-    private final String backupFile;
-
 
     public CloneRequest( @JsonProperty( value = "resourceHostId" ) final String resourceHostId,
                          @JsonProperty( value = "hostname" ) final String hostname,
@@ -43,13 +42,12 @@ public class CloneRequest
                          @JsonProperty( value = "ip" ) final String ip,
                          @JsonProperty( value = "templateId" ) final String templateId,
                          @JsonProperty( value = "templateArch" ) HostArchitecture templateArch,
-                         @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota,
-                         @JsonProperty( value = "backupFile" ) final String backupFile )
+                         @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota )
     {
         Preconditions.checkNotNull( resourceHostId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ) );
         Preconditions.checkNotNull( templateId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( ip ) && ip.matches( Common.CIDR_REGEX ) );
 
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
@@ -58,7 +56,6 @@ public class CloneRequest
         this.templateId = templateId;
         this.templateArch = templateArch;
         this.containerQuota = containerQuota;
-        this.backupFile = backupFile;
     }
 
 
@@ -116,18 +113,11 @@ public class CloneRequest
     }
 
 
-    public String getBackupFile()
-    {
-        return backupFile;
-    }
-
-
     @Override
     public String toString()
     {
         return "CloneRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
                 + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", templateId='" + templateId
-                + '\'' + ", templateArch=" + templateArch + ", containerQuota=" + containerQuota + ", backupFile='"
-                + backupFile + '\'' + '}';
+                + '\'' + ", templateArch=" + templateArch + ", containerQuota=" + containerQuota + '}';
     }
 }

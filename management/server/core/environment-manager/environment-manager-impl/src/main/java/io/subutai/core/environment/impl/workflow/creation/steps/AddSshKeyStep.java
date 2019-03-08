@@ -4,7 +4,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -34,7 +34,7 @@ public class AddSshKeyStep
     public void execute() throws EnvironmentManagerException, PeerException
     {
 
-        if ( !Strings.isNullOrEmpty( sshKey ) )
+        if ( !StringUtils.isBlank( sshKey ) )
         {
 
             Set<Peer> peers = environment.getPeers();
@@ -73,7 +73,6 @@ public class AddSshKeyStep
             {
                 throw new EnvironmentManagerException( "Failed to add SSH key on all peers" );
             }
-
         }
     }
 }

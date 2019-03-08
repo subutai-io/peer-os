@@ -353,8 +353,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	        vm.snapshots = [];
 	        for (var i in data){
 	            var snapshot = data[i]
-	            if (snapshot.partition == 'config'){
+	            if (snapshot.partition == 'rootfs'){
+	                snapshot.createdTime = new Date(snapshot.createdTimestamp).toLocaleString();
                     vm.snapshots.push(snapshot)
+                    vm.snapshots.sort(compareSnapshots)
 	            }
 	        }
 
@@ -443,6 +445,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		});
 	}
 
+	function compareSnapshots(a,b) {
+      if (a.createdTimestamp < b.createdTimestamp)
+        return -1;
+      if (a.createdTimestamp > b.createdTimestamp)
+        return 1;
+      return 0;
+    }
+
 	function addSnapshot(snapshot){
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
@@ -460,11 +470,12 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		function (stopContainer) {
 			window.onkeydown = previousWindowKeyDown;
 
-            environmentService.addContainerSnapshot(snapshot.containerId, snapshot.partition, snapshot.label, stopContainer ).success(function (data){
+            environmentService.addContainerSnapshot(snapshot.containerId, 'all', snapshot.label, stopContainer ).success(function (data){
 
                 snapshot.createdTimestamp = new Date().getTime();
-                snapshot.created = "just now";
+                snapshot.createdTime = new Date(snapshot.createdTimestamp).toLocaleString();
                 vm.snapshots.push(snapshot);
+                vm.snapshots.sort(compareSnapshots)
 
                 SweetAlert.swal ("Success!", "Container snapshot has been added", "success");
             }).error(function(data){

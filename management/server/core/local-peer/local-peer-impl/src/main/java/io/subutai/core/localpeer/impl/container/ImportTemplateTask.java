@@ -1,8 +1,9 @@
 package io.subutai.core.localpeer.impl.container;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
@@ -22,7 +23,7 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
     {
         Preconditions.checkNotNull( template );
         Preconditions.checkNotNull( resourceHost );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
 
         this.template = template;
         this.resourceHost = resourceHost;

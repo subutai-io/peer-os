@@ -16,8 +16,9 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
 
@@ -128,7 +129,7 @@ public class RestServiceImpl implements RestService
             {
                 String id = ( String ) iter.next();
 
-                if ( !Strings.isNullOrEmpty( id ) )
+                if ( !StringUtils.isBlank( id ) )
                 {
                     keyData.setUserId( keyData.getUserId() + ":" + id );
                 }
@@ -185,9 +186,9 @@ public class RestServiceImpl implements RestService
     public Response saveUser( final String username, final String fullName, final String password, final String email,
                               final String rolesJson, final Long userId, final String trustLevel )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "username is missing" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( email ), "email must be set" );
+        Preconditions.checkArgument( !StringUtils.isBlank( username ), "username is missing" );
+        Preconditions.checkArgument( !StringUtils.isBlank( fullName ), "fullname is missing" );
+        Preconditions.checkArgument( !StringUtils.isBlank( email ), "email must be set" );
 
         try
         {
@@ -208,7 +209,7 @@ public class RestServiceImpl implements RestService
                 user = identityManager.createUser( username, password, fullName, email, UserType.REGULAR.getId(),
                         Integer.parseInt( trustLevel ), false, true );
 
-                if ( !Strings.isNullOrEmpty( rolesJson ) )
+                if ( !StringUtils.isBlank( rolesJson ) )
                 {
                     List<Long> roleIds = jsonUtil.from( rolesJson, new TypeToken<ArrayList<Long>>()
                     {
@@ -282,7 +283,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response approveDelegatedUser( final String trustMessage )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( trustMessage ), "message is missing" );
+        Preconditions.checkArgument( !StringUtils.isBlank( trustMessage ), "message is missing" );
 
         try
         {
@@ -399,7 +400,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( rolename ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( rolename ) );
 
             Role role;
 
@@ -412,7 +413,7 @@ public class RestServiceImpl implements RestService
                 role = identityManager.getRole( roleId );
             }
 
-            if ( !Strings.isNullOrEmpty( permissionJson ) )
+            if ( !StringUtils.isBlank( permissionJson ) )
             {
                 ArrayList<PermissionDto> permissions =
                         JsonUtil.fromJson( permissionJson, new TypeToken<ArrayList<PermissionDto>>()
@@ -420,7 +421,7 @@ public class RestServiceImpl implements RestService
                         }.getType() );
 
 
-                if ( !Strings.isNullOrEmpty( rolename ) )
+                if ( !StringUtils.isBlank( rolename ) )
                 {
                     role.setName( rolename );
                 }
@@ -525,7 +526,7 @@ public class RestServiceImpl implements RestService
         try
         {
             Preconditions.checkNotNull( userId, "Invalid userId" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
+            Preconditions.checkArgument( !StringUtils.isBlank( token ), "Invalid token" );
             Preconditions.checkNotNull( period, "Invalid period" );
 
             Date newDate = new Date();
@@ -554,8 +555,8 @@ public class RestServiceImpl implements RestService
         try
         {
             Preconditions.checkNotNull( userId, "Invalid userId" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token id to be replaced" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( newToken ), "Invalid newToken" );
+            Preconditions.checkArgument( !StringUtils.isBlank( token ), "Invalid token id to be replaced" );
+            Preconditions.checkArgument( !StringUtils.isBlank( newToken ), "Invalid newToken" );
             Preconditions.checkNotNull( period, "Invalid period" );
             /*
 

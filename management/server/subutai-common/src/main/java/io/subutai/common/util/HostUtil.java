@@ -15,6 +15,8 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -44,7 +46,7 @@ public class HostUtil
 
     public boolean cancelEnvironmentTasks( String environmentId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
 
         Map<Task, EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.remove( environmentId );
 

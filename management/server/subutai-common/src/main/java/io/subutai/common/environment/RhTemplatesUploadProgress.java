@@ -3,6 +3,8 @@ package io.subutai.common.environment;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
@@ -22,7 +24,7 @@ public class RhTemplatesUploadProgress
                                       @JsonProperty( "templatesUploadProgress" )
                                       final Map<String, Integer> templatesUploadProgress )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( rhId ) );
         Preconditions.checkNotNull( templatesUploadProgress );
 
         this.rhId = rhId;

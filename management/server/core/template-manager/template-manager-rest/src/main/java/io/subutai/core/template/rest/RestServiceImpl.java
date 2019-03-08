@@ -6,8 +6,9 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.gson.Gson;
 
 import io.subutai.common.gson.required.RequiredDeserializer;
@@ -34,8 +35,8 @@ public class RestServiceImpl implements RestService
     public Response listTemplates()
     {
         List<Template> templates = templateManager.getTemplates().stream().filter(
-                n -> !Strings.isNullOrEmpty( n.getName() ) && !n.getName()
-                                                                .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
+                n -> !StringUtils.isBlank( n.getName() ) && !n.getName()
+                                                              .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
                                                   .collect( Collectors.toList() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
@@ -46,8 +47,8 @@ public class RestServiceImpl implements RestService
     public Response listOwnTemplates()
     {
         List<Template> templates = templateManager.getOwnTemplates().stream().filter(
-                n -> !Strings.isNullOrEmpty( n.getName() ) && !n.getName()
-                                                                .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
+                n -> !StringUtils.isBlank( n.getName() ) && !n.getName()
+                                                              .equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
                                                   .collect( Collectors.toList() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
@@ -83,7 +84,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-     public Response isRegisteredWithCdn()
+    public Response isRegisteredWithCdn()
     {
         return Response.ok().entity( templateManager.isRegisteredWithCdn() ).build();
     }

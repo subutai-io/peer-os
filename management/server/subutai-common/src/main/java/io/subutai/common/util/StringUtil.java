@@ -6,6 +6,7 @@ import org.jsoup.safety.Whitelist;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import com.google.common.base.Strings;
@@ -29,7 +30,7 @@ public class StringUtil
 
     public static String escapeHtml( String str )
     {
-        if ( Strings.isNullOrEmpty( str ) )
+        if ( StringUtils.isBlank( str ) )
         {
             return "";
         }
@@ -49,7 +50,7 @@ public class StringUtil
     public static boolean isValidSshPublicKey( String sshKey )
     {
 
-        if ( !Strings.isNullOrEmpty( sshKey ) )
+        if ( !StringUtils.isBlank( sshKey ) )
         {
             String[] parts = sshKey.trim().split( "\\s+" );
 
@@ -70,7 +71,7 @@ public class StringUtil
 
     public static String unEscapeHtml( String str )
     {
-        if ( Strings.isNullOrEmpty( str ) )
+        if ( StringUtils.isBlank( str ) )
         {
             return "";
         }
@@ -91,7 +92,7 @@ public class StringUtil
      */
     public static boolean containsHtml( String str )
     {
-        if ( Strings.isNullOrEmpty( str ) )
+        if ( StringUtils.isBlank( str ) )
         {
             return false;
         }
@@ -112,7 +113,7 @@ public class StringUtil
      */
     public static String removeHtml( String str )
     {
-        if ( Strings.isNullOrEmpty( str ) )
+        if ( StringUtils.isBlank( str ) )
         {
             return "";
         }
@@ -151,7 +152,7 @@ public class StringUtil
      */
     public static String removeSpecialChars( String str, boolean removeSpaces )
     {
-        if ( Strings.isNullOrEmpty( str ) )
+        if ( StringUtils.isBlank( str ) )
         {
             return "";
         }

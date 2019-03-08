@@ -1,6 +1,8 @@
 package io.subutai.common.environment;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -17,8 +19,8 @@ public class EnvironmentCreationRef
     public EnvironmentCreationRef( @JsonProperty( "trackerId" ) final String trackerId,
                                    @JsonProperty( "environmentId" ) final String environmentId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( trackerId ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( trackerId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
 
         this.trackerId = trackerId;
         this.environmentId = environmentId;

@@ -19,7 +19,7 @@ public abstract class MessageListener
 
     protected MessageListener( final String recipient )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "invalid recipient id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( recipient ), "invalid recipient id" );
         Preconditions.checkArgument( StringUtils.length( recipient ) <= MAX_RECIPIENT_ID_LEN,
                 String.format( "Max recipient length must be %d", MAX_RECIPIENT_ID_LEN ) );
 

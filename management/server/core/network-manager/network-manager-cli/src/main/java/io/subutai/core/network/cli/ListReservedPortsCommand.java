@@ -1,15 +1,13 @@
 package io.subutai.core.network.cli;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.ReservedPort;
 import io.subutai.common.protocol.ReservedPorts;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -38,7 +36,7 @@ public class ListReservedPortsCommand extends SubutaiShellCommandSupport
         try
         {
             final ReservedPorts reservedPorts =
-                    Strings.isNullOrEmpty( hostId ) ? localPeer.getManagementHost().getReservedPorts() :
+                    StringUtils.isBlank( hostId ) ? localPeer.getManagementHost().getReservedPorts() :
                     localPeer.getResourceHostById( hostId ).getReservedPorts();
 
             for ( ReservedPort reservedPort : reservedPorts.getReservedPorts() )

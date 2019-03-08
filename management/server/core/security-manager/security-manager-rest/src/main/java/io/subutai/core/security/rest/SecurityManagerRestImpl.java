@@ -8,6 +8,8 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -81,7 +83,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         {
             key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
 
-            if ( Strings.isNullOrEmpty( key ) )
+            if ( StringUtils.isBlank( key ) )
             {
                 logger.info( " ************* Public Key not found with id:" + identityId );
                 return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
@@ -286,7 +288,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
                                     .signPublicKey( keyData.getSourceKeyIdentityId(), keyData.getKeyText(),
                                             keyData.getTrustlevel() );
 
-        if ( Strings.isNullOrEmpty( key ) )
+        if ( StringUtils.isBlank( key ) )
         {
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }

@@ -4,12 +4,13 @@ package io.subutai.core.environment.cli;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
+import io.subutai.bazaar.share.quota.ContainerSize;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
@@ -17,7 +18,6 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.bazaar.share.quota.ContainerSize;
 
 
 /**
@@ -67,7 +67,7 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
 
         String peerId = peerManager.getLocalPeer().getId();
         final Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();

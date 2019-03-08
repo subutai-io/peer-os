@@ -26,15 +26,16 @@ import javax.persistence.UniqueConstraint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.BazaarEnvironment;
 import io.subutai.common.environment.ContainerDto;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.ContainerQuotaDto;
@@ -43,7 +44,6 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.BazaarEnvironment;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -185,11 +185,11 @@ public class LocalEnvironment implements Environment, Serializable
 
     public LocalEnvironment( String name, String sshKey, Long userId, String peerId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( name ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( peerId ) );
 
         this.name = name.trim();
-        if ( !Strings.isNullOrEmpty( sshKey ) )
+        if ( !StringUtils.isBlank( sshKey ) )
         {
             sshKeys.add( sshKey.trim() );
         }
@@ -272,7 +272,7 @@ public class LocalEnvironment implements Environment, Serializable
 
     public void addSshKey( final String sshKey )
     {
-        if ( !Strings.isNullOrEmpty( sshKey ) )
+        if ( !StringUtils.isBlank( sshKey ) )
         {
             sshKeys.add( sshKey );
         }
@@ -281,7 +281,7 @@ public class LocalEnvironment implements Environment, Serializable
 
     public void removeSshKey( final String sshKey )
     {
-        if ( !Strings.isNullOrEmpty( sshKey ) )
+        if ( !StringUtils.isBlank( sshKey ) )
         {
             sshKeys.remove( sshKey );
         }
@@ -304,7 +304,7 @@ public class LocalEnvironment implements Environment, Serializable
 
     protected void setName( String name )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( name ) );
 
         this.name = name;
     }
@@ -435,7 +435,7 @@ public class LocalEnvironment implements Environment, Serializable
     @Override
     public EnvironmentContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
 
         for ( final EnvironmentContainerHost containerHost : getContainerHosts() )
         {
@@ -595,8 +595,9 @@ public class LocalEnvironment implements Environment, Serializable
                     new ContainerDto( host.getId(), getId(), host.getHostname(), host.getIp(), host.getTemplateName(),
                             host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
                             host.getResourceHostId().getId(), isLocalContainer,
-                            this instanceof BazaarEnvironment ? Common.BAZAAR_ID : Common.SUBUTAI_ID, containerHostState,
-                            host.getTemplateId(), host.getContainerName(), host.getResourceHostId().getId() );
+                            this instanceof BazaarEnvironment ? Common.BAZAAR_ID : Common.SUBUTAI_ID,
+                            containerHostState, host.getTemplateId(), host.getContainerName(),
+                            host.getResourceHostId().getId() );
             containerDto.setQuota( quota );
             containerDtos.add( containerDto );
         }

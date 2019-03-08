@@ -1,6 +1,8 @@
 package io.subutai.common.security;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Strings;
 
 
@@ -11,7 +13,7 @@ public enum SshEncryptionType
 
     public static SshEncryptionType parseTypeFromKey( String sshKey )
     {
-        if ( !Strings.isNullOrEmpty( sshKey ) )
+        if ( !StringUtils.isBlank( sshKey ) )
         {
             if ( sshKey.contains( "ssh-rsa" ) )
             {

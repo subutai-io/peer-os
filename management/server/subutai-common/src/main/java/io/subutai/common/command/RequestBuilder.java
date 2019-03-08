@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -97,7 +99,7 @@ public class RequestBuilder
      */
     public RequestBuilder( String command )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( command ), "Command is null or empty" );
+        Preconditions.checkArgument( !StringUtils.isBlank( command ), "Command is null or empty" );
 
         this.command = command;
     }
@@ -116,7 +118,7 @@ public class RequestBuilder
 
     public RequestBuilder withCwd( String cwd )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( cwd ), "Current working directory is null or empty" );
+        Preconditions.checkArgument( !StringUtils.isBlank( cwd ), "Current working directory is null or empty" );
 
         this.cwd = cwd;
 
@@ -195,7 +197,7 @@ public class RequestBuilder
     public RequestBuilder withRunAs( String runAs )
     {
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( runAs ), "Run As is null or empty" );
+        Preconditions.checkArgument( !StringUtils.isBlank( runAs ), "Run As is null or empty" );
 
         this.runAs = runAs;
 

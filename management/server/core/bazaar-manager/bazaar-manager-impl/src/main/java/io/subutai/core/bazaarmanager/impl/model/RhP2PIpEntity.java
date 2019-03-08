@@ -4,9 +4,10 @@ package io.subutai.core.bazaarmanager.impl.model;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.settings.Common;
@@ -26,8 +27,8 @@ public class RhP2PIpEntity implements RhP2pIp
 
     public RhP2PIpEntity( @JsonProperty( "rhId" ) final String rhId, @JsonProperty( "p2pIp" ) final String p2pIp )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ), "Resource host id is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pIp ), "Resource host IP is null or empty" );
+        Preconditions.checkArgument( !StringUtils.isBlank( rhId ), "Resource host id is null or empty" );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pIp ), "Resource host IP is null or empty" );
         Preconditions.checkArgument( p2pIp.matches( Common.IP_REGEX ) );
 
         this.rhId = rhId;
@@ -35,7 +36,9 @@ public class RhP2PIpEntity implements RhP2pIp
     }
 
 
-    public RhP2PIpEntity() {}
+    public RhP2PIpEntity()
+    {
+    }
 
 
     @Override
