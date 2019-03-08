@@ -91,13 +91,6 @@
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="localpeer/backup-container">
-      <action class="io.subutai.core.localpeer.cli.BackupContainerCommand">
-        <argument ref="localPeer" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="localpeer/upload-file">
       <action class="io.subutai.core.localpeer.cli.UploadRawFileToCdnCommand">
         <argument ref="localPeer" />

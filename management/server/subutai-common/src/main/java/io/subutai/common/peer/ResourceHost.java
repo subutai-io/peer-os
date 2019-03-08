@@ -93,16 +93,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
      */
     String uploadRawFileToCdn( String pathToFile, String cdnToken ) throws ResourceHostException;
 
-    /**
-     * Backs up container to archive
-     *
-     * @param containerHost container t0 backup
-     * @param destinationDirectory destination directory to save backup to, if null is passed then default directory
-     * Common.RH_CACHE_DIR is used
-     *
-     * @return full path to created backup archive
-     */
-    String backupContainer( ContainerHost containerHost, String destinationDirectory ) throws ResourceHostException;
 
     /**
      * Destroys hosted container
@@ -156,7 +146,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @return ID of container
      */
     String cloneContainer( Template template, String containerName, String hostname, String ip, int vlan,
-                           String environmentId, String backupFile ) throws ResourceHostException;
+                           String environmentId ) throws ResourceHostException;
 
     void setContainerQuota( ContainerHost containerHost, ContainerQuota containerQuota ) throws ResourceHostException;
 
