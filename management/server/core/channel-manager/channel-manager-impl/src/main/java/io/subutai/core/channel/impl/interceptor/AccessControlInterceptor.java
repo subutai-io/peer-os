@@ -8,6 +8,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
@@ -15,8 +16,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-
-import com.google.common.base.Strings;
 
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
@@ -131,7 +130,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             {
                 sptoken = request.getParameter( "sptoken" );
 
-                if ( Strings.isNullOrEmpty( sptoken ) )
+                if ( StringUtils.isBlank( sptoken ) )
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     sptoken = headers.getHeaderString( "sptoken" );
@@ -139,7 +138,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
                 //******************Get sptoken from cookies *****************
 
-                if ( Strings.isNullOrEmpty( sptoken ) )
+                if ( StringUtils.isBlank( sptoken ) )
                 {
                     Cookie[] cookies = request.getCookies();
                     for ( final Cookie cookie : cookies )
@@ -151,7 +150,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                     }
                 }
 
-                if ( Strings.isNullOrEmpty( sptoken ) )
+                if ( StringUtils.isBlank( sptoken ) )
                 {
                     return null;
                 }

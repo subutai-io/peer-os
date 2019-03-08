@@ -185,7 +185,7 @@ public class SystemManagerImpl implements SystemManager
             Path karafLogDirPath = Paths.get( System.getenv( "SUBUTAI_APP_DATA_PATH" ), "/data/log/" );
 
             Path currentKarafLogFilePath;
-            if ( Strings.isNullOrEmpty( logFile ) )
+            if ( StringUtils.isBlank( logFile ) )
             {
                 currentKarafLogFilePath = karafLogDirPath.resolve( "karaf.log" );
             }

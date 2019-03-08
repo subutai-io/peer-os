@@ -17,8 +17,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.model.Permission;
@@ -78,7 +79,7 @@ public class RoleEntity implements Role
     @Override
     public void setName( final String name )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( name ) );
 
         this.name = name.toLowerCase();
     }

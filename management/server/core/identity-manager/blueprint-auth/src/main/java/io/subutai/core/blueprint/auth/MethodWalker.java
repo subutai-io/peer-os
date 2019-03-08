@@ -15,8 +15,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 
 import org.apache.commons.collections.Unmodifiable;
-
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.security.relation.RelationCredibility;
 import io.subutai.common.security.relation.RelationInfoManager;
@@ -191,7 +190,7 @@ public class MethodWalker
         try
         {
             RelationLink result = null;
-            if ( !Strings.isNullOrEmpty( varName ) )
+            if ( !StringUtils.isBlank( varName ) )
             {
                 result = selectFromMethodParameters( varName );
                 if ( result == null )

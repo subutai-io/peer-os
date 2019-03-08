@@ -7,8 +7,9 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.environment.HostAddresses;
@@ -69,7 +70,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( hostname ) );
 
             localPeer.setContainerHostname( containerId, hostname );
         }
@@ -156,8 +157,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         {
             Preconditions.checkNotNull( containerId );
             Preconditions.checkNotNull( containerId.getId() );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( partition ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( label ) );
 
             localPeer.removeContainerSnapshot( containerId, partition, label );
         }
@@ -177,8 +178,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         {
             Preconditions.checkNotNull( containerId );
             Preconditions.checkNotNull( containerId.getId() );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( partition ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( label ) );
 
             localPeer.rollbackToContainerSnapshot( containerId, partition, label, force );
         }
@@ -198,8 +199,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         {
             Preconditions.checkNotNull( containerId );
             Preconditions.checkNotNull( containerId.getId() );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( label ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( partition ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( label ) );
 
             localPeer.addContainerSnapshot( containerId, partition, label, stop );
         }
@@ -272,7 +273,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( sshPublicKey ) );
 
             localPeer.addToAuthorizedKeys( environmentId, sshPublicKey );
         }
@@ -290,7 +291,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( sshPublicKey ) );
 
             localPeer.removeFromAuthorizedKeys( environmentId, sshPublicKey );
         }
@@ -350,7 +351,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( containerId.getId() ) );
 
             ContainerQuota resourceValue = localPeer.getQuota( containerId );
 
@@ -371,7 +372,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         {
             Preconditions.checkNotNull( containerId );
             Preconditions.checkNotNull( containerQuota );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( containerId.getId() ) );
 
             localPeer.setQuota( containerId, containerQuota );
 
@@ -392,7 +393,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         {
             Preconditions.checkNotNull( containerId );
             Preconditions.checkNotNull( containerSize );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( containerId.getId() ) );
 
             localPeer.setContainerSize( containerId, containerSize );
 
@@ -412,7 +413,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( containerId.getId() ) );
 
             return localPeer.getResourceHostIdByContainerId( containerId );
         }
@@ -491,8 +492,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( oldHostname ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( newHostname ) );
 
             localPeer.updateEtcHostsWithNewContainerHostname( environmentId, oldHostname, newHostname );
         }
@@ -530,8 +531,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( oldHostname ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( newHostname ) );
             Preconditions.checkNotNull( sshEncryptionType );
 
             localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname,
@@ -550,8 +551,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( peerId ) );
 
             EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 
@@ -572,8 +573,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( containerId ) );
 
             EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 
@@ -595,9 +596,9 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( containerId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( hostname ) );
 
             EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 
@@ -618,8 +619,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
+            Preconditions.checkArgument( !StringUtils.isBlank( containerId ) );
 
             EnvironmentManager environmentManager = ServiceLocator.lookup( EnvironmentManager.class );
 

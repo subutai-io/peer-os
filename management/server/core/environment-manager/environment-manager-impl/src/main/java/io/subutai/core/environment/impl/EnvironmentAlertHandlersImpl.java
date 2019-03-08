@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -43,7 +44,7 @@ public class EnvironmentAlertHandlersImpl implements EnvironmentAlertHandlers
     public void add( EnvironmentAlertHandler environmentAlertHandler, AlertHandler alertHandler )
     {
         Preconditions.checkNotNull( environmentAlertHandler, "Invalid environment alert handler" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentAlertHandler.getAlertHandlerId() ),
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentAlertHandler.getAlertHandlerId() ),
                 "Invalid environment handler id" );
         Preconditions.checkNotNull( environmentAlertHandler.getAlertHandlerPriority(),
                 "Invalid environment handler priority" );

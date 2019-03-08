@@ -4,6 +4,8 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.peer.Peer;
@@ -34,7 +36,7 @@ public class RemoveSshKeyStep
     public void execute() throws EnvironmentManagerException, PeerException
     {
 
-        if ( !Strings.isNullOrEmpty( sshKey ) )
+        if ( !StringUtils.isBlank( sshKey ) )
         {
 
 

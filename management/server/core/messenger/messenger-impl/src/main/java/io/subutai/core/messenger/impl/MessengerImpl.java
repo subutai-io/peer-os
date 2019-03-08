@@ -12,8 +12,9 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.dao.DaoManager;
@@ -97,7 +98,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
     {
         Preconditions.checkNotNull( peer, "Peer is null" );
         Preconditions.checkNotNull( message, "Message is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( !StringUtils.isBlank( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeToLive > 0, "Invalid time-to-live" );
 
         try

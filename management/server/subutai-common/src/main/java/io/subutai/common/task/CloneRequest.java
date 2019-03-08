@@ -1,6 +1,8 @@
 package io.subutai.common.task;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -43,9 +45,9 @@ public class CloneRequest
                          @JsonProperty( value = "containerQuota" ) final ContainerQuota containerQuota )
     {
         Preconditions.checkNotNull( resourceHostId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ) );
         Preconditions.checkNotNull( templateId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( ip ) && ip.matches( Common.CIDR_REGEX ) );
 
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;

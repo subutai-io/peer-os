@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
@@ -59,7 +59,7 @@ public class IndexFilter implements Filter
                         //identityManager.getActiveUser() returns always null here
                         User user = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
 
-                        if ( Strings.isNullOrEmpty( user.getFingerprint() ) )
+                        if ( StringUtils.isBlank( user.getFingerprint() ) )
                         {
                             throw new IllegalStateException( "No Peer owner is set yet..." );
                         }

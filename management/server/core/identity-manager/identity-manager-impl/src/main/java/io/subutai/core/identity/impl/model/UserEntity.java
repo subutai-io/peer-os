@@ -18,8 +18,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.PermissionObject;
@@ -129,7 +130,7 @@ public class UserEntity implements User
     @Override
     public void setUserName( final String userName )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( userName ) && !userName.trim().isEmpty() );
+        Preconditions.checkArgument( !StringUtils.isBlank( userName ) && !userName.trim().isEmpty() );
 
         this.userName = userName.trim().toLowerCase();
     }
@@ -159,7 +160,7 @@ public class UserEntity implements User
     @Override
     public void setPassword( final String password )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) && !password.trim().isEmpty() );
+        Preconditions.checkArgument( !StringUtils.isBlank( password ) && !password.trim().isEmpty() );
 
         this.password = password.trim();
     }

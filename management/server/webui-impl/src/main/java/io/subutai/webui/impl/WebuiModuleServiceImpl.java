@@ -12,7 +12,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.webui.api.WebuiModule;
 import io.subutai.webui.api.WebuiModuleService;
@@ -110,7 +110,7 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
             {
                 String moduleInfo = module.getAngularDependecyList();
 
-                if ( !Strings.isNullOrEmpty( moduleInfo ) && !isPluginPresent( module, builder ) )
+                if ( !StringUtils.isBlank( moduleInfo ) && !isPluginPresent( module, builder ) )
                 {
                     //add only if a plugin with such a name is not already present
                     builder.append( moduleInfo ).append( "\n" );

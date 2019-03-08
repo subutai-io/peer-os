@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -43,7 +45,7 @@ public class DiskResourceValueParser implements ResourceValueParser
     @Override
     public ByteValueResource parse( String resource )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( resource ), "Invalid resource string" );
+        Preconditions.checkArgument( !StringUtils.isBlank( resource ), "Invalid resource string" );
 
         Matcher quotaMatcher = QUOTA_PATTERN.matcher( resource.trim() );
         if ( quotaMatcher.matches() )

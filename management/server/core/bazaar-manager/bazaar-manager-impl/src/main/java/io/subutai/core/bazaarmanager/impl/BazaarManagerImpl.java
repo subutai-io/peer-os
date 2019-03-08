@@ -337,8 +337,8 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
     public void registerPeer( String email, String password, String peerName, String peerScope )
             throws BazaarManagerException, ResourceHostException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( email ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( password ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( email ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( password ) );
 
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 

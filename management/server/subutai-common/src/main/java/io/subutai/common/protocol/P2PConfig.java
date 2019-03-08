@@ -3,6 +3,8 @@ package io.subutai.common.protocol;
 
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -63,7 +65,7 @@ public class P2PConfig
 
     public RhP2pIp findByRhId( String rhId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( rhId ) );
 
         for ( RhP2pIp rhP2pIp : rhP2pIps )
         {

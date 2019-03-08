@@ -8,11 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.settings.Common;
@@ -94,9 +95,9 @@ public class NetworkResourceEntity implements NetworkResource
                                   @JsonProperty( "username" ) final String username,
                                   @JsonProperty( "userId" ) final String userId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSubnet ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerSubnet ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pSubnet ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerSubnet ) );
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 

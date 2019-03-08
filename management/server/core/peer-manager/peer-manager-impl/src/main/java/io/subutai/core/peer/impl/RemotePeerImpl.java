@@ -14,8 +14,9 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 import io.subutai.bazaar.share.quota.ContainerQuota;
@@ -123,7 +124,7 @@ public class RemotePeerImpl implements RemotePeer
                            MessageResponseListener messageResponseListener, Object provider,
                            final PeerManagerImpl peerManager )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( localPeerId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( localPeerId ) );
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( peerInfo );
         Preconditions.checkNotNull( messenger );
@@ -184,8 +185,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void excludePeerFromEnvironment( final String environmentId, final String peerId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( peerId ), "Invalid peer id" );
 
         environmentWebClient.excludePeerFromEnvironment( environmentId, peerId );
     }
@@ -195,8 +196,8 @@ public class RemotePeerImpl implements RemotePeer
     public void excludeContainerFromEnvironment( final String environmentId, final String containerId )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
 
         environmentWebClient.excludeContainerFromEnvironment( environmentId, containerId );
     }
@@ -206,9 +207,9 @@ public class RemotePeerImpl implements RemotePeer
     public void updateContainerHostname( final String environmentId, final String containerId, final String hostname )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
 
         environmentWebClient.updateContainerHostname( environmentId, containerId, hostname );
     }
@@ -218,8 +219,8 @@ public class RemotePeerImpl implements RemotePeer
     public void placeEnvironmentInfoByContainerId( final String environmentId, final String containerId )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerId ), "Invalid container id" );
 
         environmentWebClient.placeEnvironmentInfoByContainerId( environmentId, containerId );
     }
@@ -310,8 +311,8 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
 
         environmentWebClient.removeContainerSnapshot( containerId, partition, label );
     }
@@ -324,8 +325,8 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
 
         environmentWebClient.rollbackContainerSnapshot( containerId, partition, label, force );
     }
@@ -338,8 +339,8 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( label ), "Invalid label name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
 
         environmentWebClient.addContainerSnapshot( containerId, partition, label, stopContainer );
     }
@@ -429,7 +430,7 @@ public class RemotePeerImpl implements RemotePeer
     public void addToAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( sshPublicKey ), "Invalid ssh key" );
 
         environmentWebClient.addSshKey( environmentId, sshPublicKey );
     }
@@ -472,7 +473,7 @@ public class RemotePeerImpl implements RemotePeer
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( sshPublicKey ), "Invalid ssh key" );
 
         environmentWebClient.removeSshKey( environmentId, sshPublicKey );
     }
@@ -661,7 +662,7 @@ public class RemotePeerImpl implements RemotePeer
                                                       final Map<String, String> headers ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( !StringUtils.isBlank( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( requestTimeout > 0, "Invalid request timeout" );
 
         MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeerId ), recipient, headers );
@@ -953,8 +954,8 @@ public class RemotePeerImpl implements RemotePeer
                                                         final String newHostname ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( oldHostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ) );
 
         environmentWebClient.updateEtcHostsWithNewContainerHostname( environmentId, oldHostname, newHostname );
     }
@@ -978,8 +979,8 @@ public class RemotePeerImpl implements RemotePeer
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( oldHostname ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ) );
         Preconditions.checkNotNull( sshEncryptionType );
 
         environmentWebClient.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname,
@@ -1086,7 +1087,7 @@ public class RemotePeerImpl implements RemotePeer
     public void setContainerHostname( final ContainerId containerId, final String hostname ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
 
         environmentWebClient.setContainerHostName( containerId, hostname );
     }

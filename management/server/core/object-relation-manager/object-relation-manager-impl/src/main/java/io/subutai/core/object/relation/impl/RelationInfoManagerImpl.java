@@ -1,7 +1,6 @@
 package io.subutai.core.object.relation.impl;
 
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,8 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -48,8 +48,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     private SecurityManager securityManager;
 
 
-    public RelationInfoManagerImpl( final RelationDataService relationDataService, final IdentityManager
-            identityManager, final SecurityManager securityManager )
+    public RelationInfoManagerImpl( final RelationDataService relationDataService,
+                                    final IdentityManager identityManager, final SecurityManager securityManager )
     {
         this.identityManager = identityManager;
         this.relationDataService = relationDataService;
@@ -71,19 +71,20 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             byte[] decrypted = encryptionTool.decrypt( extractedText, secretKeyRing, "" );
 
             String decryptedMessage = new String( decrypted, StandardCharsets.UTF_8 );
-            RelationChallengeImpl relationChallengeImpl = JsonUtil.fromJson( decryptedMessage, RelationChallengeImpl
-                    .class );
+            RelationChallengeImpl relationChallengeImpl =
+                    JsonUtil.fromJson( decryptedMessage, RelationChallengeImpl.class );
 
-            if ( relationChallengeImpl.getTtl() > 0 && relationChallengeImpl.getTimestamp() + relationChallengeImpl
-                    .getTtl() < System.currentTimeMillis() )
+            if ( relationChallengeImpl.getTtl() > 0
+                    && relationChallengeImpl.getTimestamp() + relationChallengeImpl.getTtl() < System
+                    .currentTimeMillis() )
             {
                 throw new RelationVerificationException( "Relation token timeout exceeded." );
             }
 
             if ( relationChallengeImpl.getStatus() == RelationStatus.STATED )
             {
-                RelationChallengeImpl persistedToken = relationDataService.getRelationToken( relationChallengeImpl
-                        .getToken() );
+                RelationChallengeImpl persistedToken =
+                        relationDataService.getRelationToken( relationChallengeImpl.getToken() );
                 if ( relationChallengeImpl.equals( persistedToken ) )
                 {
                     persistedToken.setStatus( RelationStatus.VERIFIED );
@@ -173,8 +174,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-
-
     // return -3 means no relation exist
     private int getDeeper( final RelationInfo relationInfo, final RelationLink target, final RelationLink object,
                            Set<RelationLink> relationLinks )
@@ -238,7 +237,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                         ownership = -1;
                     }
                 }
-                else if ( !Strings.isNullOrEmpty( valueB ) && !valueB.equals( valueA ) )
+                else if ( !StringUtils.isBlank( valueB ) && !valueB.equals( valueA ) )
                 {
                     return -1;
                 }
@@ -251,8 +250,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean groupHasWritePermissions( final RelationMeta relationMeta )
     {
-        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, true, false, false, Ownership.GROUP.getLevel
-                () );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, true, false, false, Ownership.GROUP.getLevel() );
 
         Map<String, String> traits = Maps.newHashMap();
         traits.put( "ownership", Ownership.GROUP.getName() );
@@ -293,30 +292,21 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-
-
-
-
-
-
-
-
     @Override
-    public void checkRelation( final RelationLink targetObject, final RelationInfoMeta relationInfoMeta, final String
-            encodedToken )
-            throws RelationVerificationException
+    public void checkRelation( final RelationLink targetObject, final RelationInfoMeta relationInfoMeta,
+                               final String encodedToken ) throws RelationVerificationException
     {
         checkRelation( getDelegatedUserLink( targetObject ), targetObject, relationInfoMeta, encodedToken );
     }
 
 
     @Override
-    public void checkRelation( final RelationLink source, final RelationLink targetObject, final RelationInfoMeta
-            relationInfoMeta, final String encodedToken )
+    public void checkRelation( final RelationLink source, final RelationLink targetObject,
+                               final RelationInfoMeta relationInfoMeta, final String encodedToken )
             throws RelationVerificationException
     {
 
-        if ( !Strings.isNullOrEmpty( encodedToken ) )
+        if ( !StringUtils.isBlank( encodedToken ) )
         {
             decryptAndVerifyChallenge( encodedToken, source.getKeyId() );
         }
@@ -333,7 +323,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         // When relation info is found check that relation was granted from verified source
         for ( final Relation targetRelation : byTargetRelations )
         {
-            if ( targetRelation.getRelationStatus() == RelationStatus.STATED && Strings.isNullOrEmpty( encodedToken ) )
+            if ( targetRelation.getRelationStatus() == RelationStatus.STATED && StringUtils.isBlank( encodedToken ) )
             {
                 logger.error( "You should pass relation token challenge first." );
                 throw new RelationVerificationException( "You should pass relation token challenge first." );
@@ -373,7 +363,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         // and new relation link doesn't exceed relation link grantee has
         for ( final Relation sourceRelation : bySourceRelations )
         {
-            if ( sourceRelation.getRelationStatus() == RelationStatus.STATED && Strings.isNullOrEmpty( encodedToken ) )
+            if ( sourceRelation.getRelationStatus() == RelationStatus.STATED && StringUtils.isBlank( encodedToken ) )
             {
                 logger.error( "You should pass relation token challenge first." );
                 throw new RelationVerificationException( "You should pass relation token challenge first." );

@@ -13,8 +13,9 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.dao.DaoManager;
@@ -56,7 +57,7 @@ public class TrackerImpl implements Tracker
     @Override
     public TrackerOperationView getTrackerOperation( String source, UUID operationTrackId )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !StringUtils.isBlank( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( operationTrackId, "Operation track id is null" );
 
         if ( identityManager.isAdmin() )
@@ -78,7 +79,7 @@ public class TrackerImpl implements Tracker
      */
     boolean saveTrackerOperation( String source, TrackerOperationImpl po )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !StringUtils.isBlank( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( po, "Tracker operation is null" );
 
         try
@@ -121,8 +122,8 @@ public class TrackerImpl implements Tracker
     @Override
     public TrackerOperation createTrackerOperation( String source, String description )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
-        Preconditions.checkNotNull( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
+        Preconditions.checkArgument( !StringUtils.isBlank( source ), SOURCE_IS_EMPTY_MSG );
+        Preconditions.checkNotNull( !StringUtils.isBlank( description ), "Description is null or empty" );
 
         TrackerOperationImpl po = new TrackerOperationImpl( source.toUpperCase(), description, this );
 
@@ -149,7 +150,7 @@ public class TrackerImpl implements Tracker
     public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit )
     {
         Preconditions.checkArgument( limit > 0, "Limit must be greater than 0" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !StringUtils.isBlank( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( fromDate, "From Date is null" );
         Preconditions.checkNotNull( toDate, "To Date is null" );
 

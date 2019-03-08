@@ -11,6 +11,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Strings;
@@ -66,7 +67,7 @@ public class IPUtil
 
     public static boolean isValid( final String ip )
     {
-        return !Strings.isNullOrEmpty( ip ) && ip.matches( Common.IP_REGEX );
+        return !StringUtils.isBlank( ip ) && ip.matches( Common.IP_REGEX );
     }
 
 

@@ -11,8 +11,7 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import org.apache.commons.lang3.ArrayUtils;
-
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
@@ -57,7 +56,7 @@ public class EncryptionToolImpl implements EncryptionTool
     @Override
     public byte[] decrypt( final byte[] message, String secretKeyHostId, String pwd ) throws PGPException
     {
-        if ( Strings.isNullOrEmpty( pwd ) )
+        if ( StringUtils.isBlank( pwd ) )
         {
             pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
         }
@@ -75,7 +74,7 @@ public class EncryptionToolImpl implements EncryptionTool
     public byte[] decryptAndVerify( final byte[] message, PGPSecretKey secretKey, String pwd, PGPPublicKey pubKey )
             throws PGPException
     {
-        if ( Strings.isNullOrEmpty( pwd ) )
+        if ( StringUtils.isBlank( pwd ) )
         {
             pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
         }
@@ -140,7 +139,7 @@ public class EncryptionToolImpl implements EncryptionTool
     @Override
     public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing, String pwd ) throws PGPException
     {
-        if ( Strings.isNullOrEmpty( pwd ) )
+        if ( StringUtils.isBlank( pwd ) )
         {
             pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
         }
@@ -211,7 +210,7 @@ public class EncryptionToolImpl implements EncryptionTool
                                   final PGPPublicKey publicKey, final boolean armored ) throws PGPException
     {
 
-        if ( Strings.isNullOrEmpty( secretPwd ) )
+        if ( StringUtils.isBlank( secretPwd ) )
         {
             secretPwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
         }
@@ -265,8 +264,8 @@ public class EncryptionToolImpl implements EncryptionTool
 
 
     /* *****************************************
-         *
-         */
+     *
+     */
     @Override
     public ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage ) throws PGPException
     {
@@ -287,8 +286,8 @@ public class EncryptionToolImpl implements EncryptionTool
 
 
     /* *****************************************
-    *
-    */
+     *
+     */
     @Override
     public KeyPair generateKeyPair( String userId, String secretPwd, boolean armored ) throws PGPException
     {
@@ -312,7 +311,7 @@ public class EncryptionToolImpl implements EncryptionTool
     {
         try
         {
-            if ( Strings.isNullOrEmpty( secretKeyPassword ) )
+            if ( StringUtils.isBlank( secretKeyPassword ) )
             {
                 secretKeyPassword = keyManager.getSecurityKeyData().getSecretKeyringPwd();
             }

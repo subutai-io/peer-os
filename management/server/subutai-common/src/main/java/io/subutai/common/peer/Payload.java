@@ -1,6 +1,8 @@
 package io.subutai.common.peer;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.util.JsonUtil;
@@ -21,7 +23,7 @@ public class Payload
 
     public <T> T getMessage( Class<T> clazz )
     {
-        if ( !Strings.isNullOrEmpty( request ) )
+        if ( !StringUtils.isBlank( request ) )
         {
             return JsonUtil.fromJsonString( request, clazz );
         }

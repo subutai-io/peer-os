@@ -180,7 +180,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
                                      ContainerQuota containerQuota, String resourceHostId )
     {
         Preconditions.checkNotNull( peerId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( templateId );
         Preconditions.checkNotNull( containerQuota );
@@ -457,7 +457,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public EnvironmentContainerHost addTag( final String tag )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( tag ) );
 
         this.tags.add( tag );
 
@@ -468,7 +468,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
     @Override
     public EnvironmentContainerHost removeTag( final String tag )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( tag ) );
 
         this.tags.remove( tag );
 
@@ -499,7 +499,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost
 
     public EnvironmentContainerHost setHostname( final String hostname, boolean metadataOnly ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
         Preconditions
                 .checkArgument( !StringUtils.equalsIgnoreCase( this.hostname, hostname ), "No change in hostname" );
 

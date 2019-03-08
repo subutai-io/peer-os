@@ -1,6 +1,8 @@
 package io.subutai.common.protocol;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -28,8 +30,8 @@ public class Tunnel
                    @JsonProperty( "tunnelIp" ) final String tunnelIp, @JsonProperty( "vlan" ) final int vlan,
                    @JsonProperty( "vni" ) final long vni )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelName ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( tunnelName ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( tunnelIp ) );
         Preconditions.checkArgument( tunnelIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );

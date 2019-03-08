@@ -7,8 +7,9 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
@@ -58,11 +59,11 @@ public class NetworkManagerImpl implements NetworkManager
                               final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( localIp ), "Invalid ip" );
+        Preconditions.checkArgument( !StringUtils.isBlank( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !StringUtils.isBlank( localIp ), "Invalid ip" );
         Preconditions.checkArgument( localIp.matches( Common.IP_REGEX ), "Invalid ip" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( secretKey ), "Invalid secret key" );
         Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
 
 
@@ -77,9 +78,9 @@ public class NetworkManagerImpl implements NetworkManager
                                   final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !StringUtils.isBlank( secretKey ), "Invalid secret key" );
         Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
 
 
@@ -92,7 +93,7 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void removeP2PSwarm( final Host host, String p2pHash ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid P2P hash" );
 
         execute( host, commands.getRemoveP2PSwarmCommand( p2pHash ) );
     }
@@ -101,7 +102,7 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void removeP2PIface( Host host, String interfaceName ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( interfaceName ), "Invalid interface name" );
 
         execute( host, commands.getRemoveP2PIfaceCommand( interfaceName ) );
     }
@@ -112,8 +113,8 @@ public class NetworkManagerImpl implements NetworkManager
                                      final long ttlSeconds ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !StringUtils.isBlank( newSecretKey ), "Invalid secret key" );
         Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
 
         execute( host, commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
@@ -214,8 +215,8 @@ public class NetworkManagerImpl implements NetworkManager
                               final long vni ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelName ), "Invalid tunnel name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ), "Invalid tunnel ip" );
+        Preconditions.checkArgument( !StringUtils.isBlank( tunnelName ), "Invalid tunnel name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( tunnelIp ), "Invalid tunnel ip" );
         Preconditions.checkArgument( tunnelIp.matches( Common.IP_REGEX ), "Invalid tunnel ip" );
         Preconditions
                 .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan" );
@@ -231,7 +232,7 @@ public class NetworkManagerImpl implements NetworkManager
     public void deleteTunnel( final Host host, final String tunnelName ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelName ), "Invalid tunnel name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( tunnelName ), "Invalid tunnel name" );
 
         execute( host, commands.getDeleteTunnelCommand( tunnelName ) );
     }
@@ -270,7 +271,7 @@ public class NetworkManagerImpl implements NetworkManager
     public SshTunnel setupContainerSshTunnel( final String containerIp, final int sshIdleTimeout )
             throws NetworkManagerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ), "Invalid container IP" );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerIp ), "Invalid container IP" );
         Preconditions.checkArgument( sshIdleTimeout > 0, "Timeout must be greater than 0" );
         Preconditions.checkArgument( containerIp.matches( Common.HOSTNAME_REGEX ), "Invalid container IP" );
 
@@ -420,7 +421,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
@@ -435,7 +436,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
@@ -454,9 +455,9 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
         Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( domain ) );
         Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
@@ -475,9 +476,9 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( protocol );
         Preconditions.checkArgument( protocol == Protocol.HTTP || protocol == Protocol.HTTPS );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( domain ) );
         Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( containerPort, Common.MIN_PORT, Common.MAX_PORT ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( rhPort, Common.MIN_PORT, Common.MAX_PORT ) );
@@ -495,6 +496,6 @@ public class NetworkManagerImpl implements NetworkManager
 
         CommandResult result = execute( host, commands.getGetIPAddressCommand() );
 
-        return !Strings.isNullOrEmpty( result.getStdOut() ) ? result.getStdOut().trim() : result.getStdOut();
+        return !StringUtils.isBlank( result.getStdOut() ) ? result.getStdOut().trim() : result.getStdOut();
     }
 }

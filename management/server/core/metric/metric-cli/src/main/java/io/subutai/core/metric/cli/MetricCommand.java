@@ -4,19 +4,19 @@ package io.subutai.core.metric.cli;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
+import io.subutai.common.metric.HistoricalMetrics;
+import io.subutai.common.metric.Series;
+import io.subutai.common.metric.SeriesBatch;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.common.metric.HistoricalMetrics;
-import io.subutai.common.metric.Series;
-import io.subutai.common.metric.SeriesBatch;
 
 
 /**
@@ -65,7 +65,7 @@ public class MetricCommand extends SubutaiShellCommandSupport
                 System.out.println( series );
             }
 
-            if ( !Strings.isNullOrEmpty( batch.getMessages() ) )
+            if ( !StringUtils.isBlank( batch.getMessages() ) )
             {
                 System.err.println( batch.getMessages() );
             }

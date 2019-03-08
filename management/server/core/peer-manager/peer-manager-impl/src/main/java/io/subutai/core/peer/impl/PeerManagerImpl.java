@@ -25,9 +25,10 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.NetworkException;
@@ -444,8 +445,8 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     @Override
     public void setName( final String peerId, final String newName ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newName ), "Invalid peer name" );
+        Preconditions.checkArgument( !StringUtils.isBlank( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( newName ), "Invalid peer name" );
 
 
         PeerData peerData = loadPeerData( peerId );
@@ -480,8 +481,8 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     @Override
     public void updatePeerUrl( final String peerId, final String ip ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid peer ip" );
+        Preconditions.checkArgument( !StringUtils.isBlank( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( !StringUtils.isBlank( ip ), "Invalid peer ip" );
 
         PeerData peerData = loadPeerData( peerId );
 
@@ -1420,8 +1421,8 @@ public class PeerManagerImpl implements PeerManager, HeartbeatListener
     public void setPublicUrl( final String peerId, final String publicUrl, final int securePort, boolean useRhIp )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( publicUrl ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( peerId ) );
+        Preconditions.checkArgument( !StringUtils.isBlank( publicUrl ) );
         Preconditions.checkArgument( securePort > 0 );
 
         synchronized ( localPeer )
