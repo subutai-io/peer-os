@@ -28,6 +28,9 @@ public class SnapshotEventProcessor extends BazaarRequester implements SnapshotE
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
+    // name of the partition, which indicates whole container
+    private final String SNAPSHOT_CONFIG_PARTITION = "config";
+
     private LocalPeer localPeer;
 
 
@@ -96,8 +99,12 @@ public class SnapshotEventProcessor extends BazaarRequester implements SnapshotE
 
             for ( final Snapshot snapshot : snapshots.getSnapshots() )
             {
-                peerSnapshotsDto.getSnapshots().add( new SnapshotDto( container.getId(), snapshot.getLabel(),
-                        snapshot.getCreated() ) );
+                // omit component partitions, filter only container parent(whole container) partition
+                if ( SNAPSHOT_CONFIG_PARTITION.equals( snapshot.getPartition() ) )
+                {
+                    peerSnapshotsDto.getSnapshots().add( new SnapshotDto( container.getId(), snapshot.getLabel(),
+                            snapshot.getCreated() ) );
+                }
             }
         }
 
