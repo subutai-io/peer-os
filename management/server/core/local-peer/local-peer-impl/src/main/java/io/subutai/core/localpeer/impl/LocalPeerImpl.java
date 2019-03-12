@@ -38,7 +38,6 @@ import org.apache.karaf.bundle.core.BundleStateService;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -92,6 +91,8 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
+import io.subutai.common.host.SnapshotEvent;
+import io.subutai.common.host.SnapshotEventListener;
 import io.subutai.common.host.Snapshots;
 import io.subutai.common.metric.HistoricalMetrics;
 import io.subutai.common.metric.QuotaAlertValue;
@@ -191,6 +192,10 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
 
+import static io.subutai.common.host.SnapshotEvent.CREATE;
+import static io.subutai.common.host.SnapshotEvent.DELETE;
+import static io.subutai.common.host.SnapshotEvent.ROLLBACK;
+
 
 /**
  * Local peer implementation
@@ -229,6 +234,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     private transient ExecutorService threadPool = Executors.newCachedThreadPool();
     private transient Set<LocalPeerEventListener> peerEventListeners = Sets.newHashSet();
     private AtomicInteger containerCreationCounter = new AtomicInteger();
+    private List<SnapshotEventListener> snapshotEventListeners = Lists.newArrayList();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, CommandExecutor commandExecutor,
@@ -1641,6 +1647,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         try
         {
             resourceHost.removeContainerSnapshot( containerHost, partition, label );
+
+            notifySnapshotEventListeners( containerId, DELETE );
         }
         catch ( Exception e )
         {
@@ -1667,6 +1675,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         try
         {
             resourceHost.rollbackToContainerSnapshot( containerHost, partition, label, force );
+
+            notifySnapshotEventListeners( containerId, ROLLBACK );
         }
         catch ( Exception e )
         {
@@ -1692,6 +1702,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         try
         {
             resourceHost.addContainerSnapshot( containerHost, partition, label, stopContainer );
+
+            notifySnapshotEventListeners( containerId, CREATE );
         }
         catch ( Exception e )
         {
@@ -4191,5 +4203,48 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             //ignore
         }
     }
-}
 
+
+    @Override
+    public void addSnapshotEventListener( final SnapshotEventListener listener )
+    {
+        if ( listener != null )
+        {
+            this.snapshotEventListeners.add( listener );
+        }
+    }
+
+
+    private void notifySnapshotEventListeners( final ContainerId containerId, final SnapshotEvent snapshotEvent )
+    {
+        for ( final SnapshotEventListener snapshotEventListener : snapshotEventListeners )
+        {
+            threadPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        switch ( snapshotEvent )
+                        {
+                            case CREATE:
+                                snapshotEventListener.onSnapshotCreate( containerId );
+                                break;
+                            case DELETE:
+                                snapshotEventListener.onSnapshotDelete( containerId );
+                                break;
+                            case ROLLBACK:
+                                snapshotEventListener.onSnapshotRestore( containerId );
+                                break;
+                        }
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.warn( "Failed to notify SnapshotEventListener: {}", e.getMessage() );
+                    }
+                }
+            } );
+        }
+    }
+}

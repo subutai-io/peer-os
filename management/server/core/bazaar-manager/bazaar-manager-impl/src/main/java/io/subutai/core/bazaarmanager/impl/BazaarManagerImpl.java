@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.bazaar.share.common.BazaarEventListener;
@@ -49,15 +48,17 @@ import io.subutai.core.bazaarmanager.impl.http.BazaarRestClient;
 import io.subutai.core.bazaarmanager.impl.model.ConfigEntity;
 import io.subutai.core.bazaarmanager.impl.processor.BazaarEnvironmentProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.HeartbeatProcessor;
-import io.subutai.core.bazaarmanager.impl.processor.port_map.ProxyProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.UserTokenProcessor;
 import io.subutai.core.bazaarmanager.impl.processor.port_map.ContainerPortMapProcessor;
+import io.subutai.core.bazaarmanager.impl.processor.port_map.ProxyProcessor;
 import io.subutai.core.bazaarmanager.impl.requestor.ContainerEventProcessor;
 import io.subutai.core.bazaarmanager.impl.requestor.ContainerMetricsProcessor;
 import io.subutai.core.bazaarmanager.impl.requestor.LogProcessor;
 import io.subutai.core.bazaarmanager.impl.requestor.P2pStatusSender;
 import io.subutai.core.bazaarmanager.impl.requestor.PeerMetricsProcessor;
 import io.subutai.core.bazaarmanager.impl.requestor.VersionInfoProcessor;
+import io.subutai.core.bazaarmanager.impl.snapshot.SnapshotEventProcessor;
+import io.subutai.core.bazaarmanager.impl.snapshot.SnapshotProcessor;
 import io.subutai.core.bazaarmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.bazaarmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.bazaarmanager.impl.util.EnvironmentUserHelper;
@@ -79,6 +80,7 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
 {
     private static final long PEER_METRICS_SEND_INTERVAL_MIN = 10;
     private static final int CONTAINER_METRIC_SEND_INTERVAL_MIN = 15;
+    private static final int SNAPSHOTS_SYNC_INTERVAL_MIN = 10;
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -244,6 +246,14 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
                         CONTAINER_METRIC_SEND_INTERVAL_MIN );
         requestorsRunner.scheduleWithFixedDelay( containerMetricsProcessor, 1, CONTAINER_METRIC_SEND_INTERVAL_MIN,
                 TimeUnit.MINUTES );
+
+        //***********
+        SnapshotEventProcessor snapshotEventProcessor = new SnapshotEventProcessor( this, restClient, localPeer );
+
+        localPeer.addSnapshotEventListener( snapshotEventProcessor );
+
+        requestorsRunner.scheduleWithFixedDelay( snapshotEventProcessor, 1, SNAPSHOTS_SYNC_INTERVAL_MIN,
+                TimeUnit.MINUTES );
     }
 
 
@@ -265,10 +275,13 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
 
         UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx );
 
+        SnapshotProcessor snapshotProcessor = new SnapshotProcessor( ctx );
+
         heartbeatProcessor = new HeartbeatProcessor( this, peerManager, restClient, localPeer.getId() )
                 .addProcessor( bazaarEnvironmentProcessor ).addProcessor( tunnelProcessor )
                 .addProcessor( environmentTelemetryProcessor ).addProcessor( proxyProcessor )
-                .addProcessor( containerPortMapProcessor ).addProcessor( userTokenProcessor );
+                .addProcessor( containerPortMapProcessor ).addProcessor( userTokenProcessor )
+                .addProcessor( snapshotProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,

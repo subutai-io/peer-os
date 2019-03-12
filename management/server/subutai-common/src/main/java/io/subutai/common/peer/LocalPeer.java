@@ -11,6 +11,7 @@ import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.SnapshotEventNotifier;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.protocol.P2pIps;
@@ -21,7 +22,7 @@ import io.subutai.common.util.HostUtil;
 /**
  * Local peer interface
  */
-public interface LocalPeer extends Peer
+public interface LocalPeer extends Peer, SnapshotEventNotifier
 {
 
 
