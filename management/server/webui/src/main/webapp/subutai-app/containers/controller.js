@@ -454,6 +454,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
     }
 
 	function addSnapshot(snapshot){
+
+        snapshot.label = snapshot.label.trim()
+        if ( /^env-/i.test(snapshot.label)){
+                    SweetAlert.swal("Invalid snapshot name", "The snapshot name must not start with \"env-\"", "error");
+
+                    return;
+        }
+
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Stop container?",
