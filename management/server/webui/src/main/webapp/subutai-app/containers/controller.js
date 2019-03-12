@@ -62,6 +62,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.rollbackSnapshot = rollbackSnapshot;
 	vm.removeSnapshot = removeSnapshot;
 	vm.addSnapshot = addSnapshot;
+	vm.trimPrefix = trimPrefix;
     vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
@@ -454,6 +455,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
     }
 
 	function addSnapshot(snapshot){
+
+        snapshot.label = snapshot.label.trim()
+        if ( /^env-/i.test(snapshot.label)){
+                    SweetAlert.swal("Invalid snapshot name", "The snapshot name must not start with \"env-\"", "error");
+
+                    return;
+        }
+
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Stop container?",
@@ -482,6 +491,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
                 SweetAlert.swal("ERROR!", data.ERROR, "error");
             });
 		});
+	}
+
+	function trimPrefix(label){
+	    return label.replace(/^(env-)/i,"");
 	}
 
 
