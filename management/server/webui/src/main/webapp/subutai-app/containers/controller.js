@@ -62,6 +62,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.rollbackSnapshot = rollbackSnapshot;
 	vm.removeSnapshot = removeSnapshot;
 	vm.addSnapshot = addSnapshot;
+	vm.trimPrefix = trimPrefix;
     vm.isAdmin = isAdmin;
 
 	environmentService.getContainersType().success(function (data) {
@@ -490,6 +491,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
                 SweetAlert.swal("ERROR!", data.ERROR, "error");
             });
 		});
+	}
+
+	function trimPrefix(label){
+	    return label.replace(/^(env-)/i,"");
 	}
 
 

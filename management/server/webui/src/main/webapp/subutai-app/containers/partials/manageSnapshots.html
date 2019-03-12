@@ -38,7 +38,7 @@
         <td>Remove</td>
       </tr>
       <tr ng-repeat="(idx, snapshot) in containerViewCtrl.snapshots">
-        <td>{{ snapshot.label }}</td>
+        <td>{{ containerViewCtrl.trimPrefix(snapshot.label); }}</td>
         <td>{{ snapshot.createdTime }}</td>
         <td>
           <a href
