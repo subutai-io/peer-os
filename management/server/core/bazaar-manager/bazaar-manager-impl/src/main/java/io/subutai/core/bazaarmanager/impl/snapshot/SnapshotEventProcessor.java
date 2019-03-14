@@ -1,6 +1,8 @@
 package io.subutai.core.bazaarmanager.impl.snapshot;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -8,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.bazaar.share.dto.snapshots.PeerSnapshotsDto;
 import io.subutai.bazaar.share.dto.snapshots.SnapshotDto;
+import io.subutai.common.host.IntegralSnapshot;
 import io.subutai.common.host.Snapshot;
 import io.subutai.common.host.SnapshotEventListener;
 import io.subutai.common.host.Snapshots;
@@ -27,9 +30,6 @@ import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 public class SnapshotEventProcessor extends BazaarRequester implements SnapshotEventListener
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
-
-    // name of the partition, which indicates whole container
-    private final String SNAPSHOT_CONFIG_PARTITION = "config";
 
     private LocalPeer localPeer;
 
@@ -97,13 +97,33 @@ public class SnapshotEventProcessor extends BazaarRequester implements SnapshotE
                 continue;
             }
 
+            // collect integral snapshots
+            Map<String, IntegralSnapshot> integralSnapshots = new HashMap<>();
             for ( final Snapshot snapshot : snapshots.getSnapshots() )
             {
-                // omit component partitions, filter only container parent(whole container) partition
-                if ( SNAPSHOT_CONFIG_PARTITION.equals( snapshot.getPartition() ) )
+                if ( integralSnapshots.containsKey( snapshot.getLabel() ) )
                 {
-                    peerSnapshotsDto.getSnapshots().add( new SnapshotDto( container.getId(), snapshot.getLabel(),
-                            snapshot.getCreated() ) );
+                    integralSnapshots.get( snapshot.getLabel() )
+                                     .setPartitionSnapshot( snapshot.getPartition(), snapshot );
+                }
+                else
+                {
+                    IntegralSnapshot integralSnapshot =
+                            new IntegralSnapshot( snapshot.getContainerName(), snapshot.getLabel(), null, null, null,
+                                    null );
+                    integralSnapshot.setPartitionSnapshot( snapshot.getPartition(), snapshot );
+                    integralSnapshots.put( snapshot.getLabel(), integralSnapshot );
+                }
+            }
+
+            // filter out integral snapshots and add them to result
+            for ( final IntegralSnapshot integralSnapshot : integralSnapshots.values() )
+            {
+                if ( integralSnapshot.isIntegral() )
+                {
+                    peerSnapshotsDto.getSnapshots()
+                                    .add( new SnapshotDto( container.getId(), integralSnapshot.getLabel(),
+                                            integralSnapshot.getSnapshotDate() ) );
                 }
             }
         }
