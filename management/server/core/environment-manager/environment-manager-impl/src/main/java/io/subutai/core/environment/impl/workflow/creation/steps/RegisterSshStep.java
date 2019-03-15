@@ -6,7 +6,9 @@ import java.util.concurrent.Callable;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.exception.ActionFailedException;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -86,7 +88,12 @@ public class RegisterSshStep
                 @Override
                 public Object call() throws Exception
                 {
-                    peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+                    Containers failedHosts = peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+
+                    if ( !failedHosts.getContainers().isEmpty() )
+                    {
+                        throw new ActionFailedException( "Failed to add ssh keys on each host" );
+                    }
 
                     return null;
                 }

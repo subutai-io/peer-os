@@ -3,6 +3,7 @@ package io.subutai.common.peer;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
@@ -278,7 +279,15 @@ public interface Peer extends RelationLink
     SshKeys readOrCreateSshKeysForEnvironment( EnvironmentId environmentId, SshEncryptionType sshKeyType )
             throws PeerException;
 
-    void configureSshInEnvironment( EnvironmentId environmentId, SshKeys sshKeys ) throws PeerException;
+    /**
+     * Adds {@param sshKeys} to each host that belongs to the specified environment
+     *
+     * @param environmentId id of environment
+     * @param sshKeys ssh keys to add
+     *
+     * @return set of hosts where ssh key addition failed
+     */
+    Containers configureSshInEnvironment( EnvironmentId environmentId, SshKeys sshKeys ) throws PeerException;
 
     void removeFromAuthorizedKeys( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
