@@ -12,6 +12,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 
 import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
@@ -458,7 +459,7 @@ public class EnvironmentWebClient
     }
 
 
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
+    public Containers configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
         WebClient client = null;
@@ -470,6 +471,7 @@ public class EnvironmentWebClient
             client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
 
             response = client.post( sshKeys );
         }
@@ -483,7 +485,7 @@ public class EnvironmentWebClient
             WebClientBuilder.close( client );
         }
 
-        WebClientBuilder.checkResponse( response );
+        return WebClientBuilder.checkResponse( response, Containers.class );
     }
 
 

@@ -38,7 +38,6 @@ import org.apache.karaf.bundle.core.BundleStateService;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -543,20 +542,23 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
+    public Containers configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
+
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkNotNull( sshKeys, "SshPublicKey is null" );
         Preconditions.checkArgument( !sshKeys.isEmpty(), "No ssh keys" );
 
         Set<Host> hosts = Sets.newHashSet();
+        Set<ContainerHost> failedHosts = Sets.newHashSet();
+        Containers failedContainers = new Containers();
 
         hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
 
         if ( hosts.isEmpty() )
         {
-            return;
+            return failedContainers;
         }
 
         //add keys in portions, since all can not fit into one command, it fails
@@ -586,33 +588,57 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                     {
                         LOG.error( "Failed to add ssh keys on host {}: {}", result.getHost().getHostname(),
                                 result.getFailureReason() );
+
+                        //collect failed hosts
+                        failedHosts.add( ( ContainerHost ) result.getHost() );
                     }
                 }
+            }
+        }
 
-                if ( appendResults.hasFailures() )
+        if ( failedHosts.isEmpty() )
+        {
+            //config ssh
+            CommandUtil.HostCommandResults configResults = commandUtil
+                    .executeFailFast( localPeerCommands.getConfigSSHCommand(), hosts, environmentId.getId() );
+
+            for ( CommandUtil.HostCommandResult result : configResults.getCommandResults() )
+            {
+                if ( !result.hasSucceeded() )
                 {
-                    throw new PeerException( "Failed to add ssh keys on each host" );
+                    LOG.error( "Failed to configure ssh on host {}: {}", result.getHost().getHostname(),
+                            result.getFailureReason() );
+
+                    //collect failed hosts
+                    failedHosts.add( ( ContainerHost ) result.getHost() );
                 }
             }
         }
 
-        //config ssh
-        CommandUtil.HostCommandResults configResults =
-                commandUtil.executeFailFast( localPeerCommands.getConfigSSHCommand(), hosts, environmentId.getId() );
-
-        for ( CommandUtil.HostCommandResult result : configResults.getCommandResults() )
+        try
         {
-            if ( !result.hasSucceeded() )
+
+            for ( ContainerHost c : failedHosts )
             {
-                LOG.error( "Failed to configure ssh on host {}: {}", result.getHost().getHostname(),
-                        result.getFailureReason() );
+                ContainerHostInfo info;
+                try
+                {
+                    info = hostRegistry.getContainerHostInfoById( c.getId() );
+                }
+                catch ( HostDisconnectedException e )
+                {
+                    info = new ContainerHostInfoModel( c );
+                }
+                failedContainers.addContainer( info );
             }
         }
-
-        if ( configResults.hasFailures() )
+        catch ( Exception e )
         {
-            throw new PeerException( "Failed to configure ssh on each host" );
+            LOG.error( e.getMessage() );
+            throw new PeerException( String.format( "Error getting environment containers: %s", e.getMessage() ), e );
         }
+
+        return failedContainers;
     }
 
 
@@ -726,6 +752,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     }
 
 
+    //todo we can return ids of hosts where ssh key addition/configuration failed
     @Override
     public void addToAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
