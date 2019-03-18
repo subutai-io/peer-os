@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>test-parent</artifactId>
-    <version>8.3.2-SNAPSHOT</version>
+    <version>8.4.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-cli</artifactId>
