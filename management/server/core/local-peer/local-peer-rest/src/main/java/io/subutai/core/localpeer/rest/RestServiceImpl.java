@@ -62,25 +62,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response isInited()
-    {
-        return localPeer.isInitialized() ? Response.ok().build() :
-               Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
-    }
-
-
-    @Override
-    public Response isReady()
-    {
-        LocalPeer.State state = localPeer.getState();
-
-        return state == LocalPeer.State.FAILED ? Response.serverError().build() :
-               state == LocalPeer.State.READY ? Response.ok().build() :
-               Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
-    }
-
-
-    @Override
     public Response ping()
     {
         return Response.ok().build();

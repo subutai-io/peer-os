@@ -25,15 +25,10 @@ import javax.annotation.security.RolesAllowed;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.karaf.bundle.core.BundleState;
-import org.apache.karaf.bundle.core.BundleStateService;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -189,6 +184,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
+import io.subutai.health.HealthService;
 
 
 /**
@@ -205,6 +201,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     private static final BigDecimal ONE_HUNDRED = new BigDecimal( "100.00" );
 
     private transient DaoManager daoManager;
+    private transient HealthService healthService;
     private transient TemplateManager templateManager;
     transient Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
     private transient CommandExecutor commandExecutor;
@@ -231,7 +228,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, CommandExecutor commandExecutor,
-                          HostRegistry hostRegistry, Monitor monitor, SecurityManager securityManager )
+                          HostRegistry hostRegistry, Monitor monitor, SecurityManager securityManager,
+                          HealthService healthService )
     {
         this.daoManager = daoManager;
         this.templateManager = templateManager;
@@ -239,6 +237,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
+        this.healthService = healthService;
     }
 
 
@@ -944,43 +943,9 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public State getState()
+    public boolean isReady()
     {
-        boolean failed = false;
-
-        boolean ready = true;
-
-        BundleContext ctx = FrameworkUtil.getBundle( LocalPeerImpl.class ).getBundleContext();
-
-        BundleStateService bundleStateService = ServiceLocator.lookup( BundleStateService.class );
-
-        Bundle[] bundles = ctx.getBundles();
-
-        if ( bundles.length < BUNDLE_COUNT )
-        {
-            LOG.warn( "Bundle count is {}", bundles.length );
-
-            return State.LOADING;
-        }
-
-        for ( Bundle bundle : bundles )
-        {
-            if ( bundleStateService.getState( bundle ) == BundleState.Failure )
-            {
-                failed = true;
-
-                break;
-            }
-
-            if ( !( ( bundle.getState() == Bundle.ACTIVE ) || ( bundle.getState() == Bundle.RESOLVED ) ) )
-            {
-                ready = false;
-
-                break;
-            }
-        }
-
-        return failed ? State.FAILED : ready ? State.READY : State.LOADING;
+        return healthService.getState() == HealthService.State.READY;
     }
 
 
