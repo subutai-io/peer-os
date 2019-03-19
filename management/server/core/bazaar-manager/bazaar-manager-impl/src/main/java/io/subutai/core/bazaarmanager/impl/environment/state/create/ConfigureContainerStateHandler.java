@@ -9,6 +9,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
+import io.subutai.bazaar.share.dto.environment.EnvironmentDto;
+import io.subutai.bazaar.share.dto.environment.EnvironmentNodeDto;
+import io.subutai.bazaar.share.dto.environment.EnvironmentNodesDto;
+import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.bazaar.share.dto.environment.SSHKeyDto;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
@@ -24,11 +30,6 @@ import io.subutai.core.bazaarmanager.api.RestResult;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.bazaarmanager.impl.environment.state.Context;
 import io.subutai.core.bazaarmanager.impl.environment.state.StateHandler;
-import io.subutai.bazaar.share.dto.environment.EnvironmentDto;
-import io.subutai.bazaar.share.dto.environment.EnvironmentNodeDto;
-import io.subutai.bazaar.share.dto.environment.EnvironmentNodesDto;
-import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
-import io.subutai.bazaar.share.dto.environment.SSHKeyDto;
 
 
 public class ConfigureContainerStateHandler extends StateHandler
@@ -151,7 +152,10 @@ public class ConfigureContainerStateHandler extends StateHandler
                 {
                     if ( peer.isOnline() )
                     {
-                        peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+                        Containers failedHosts =
+                                peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+
+                        //TODO check failed hosts
 
                         //add peer to dto
                         for ( SSHKeyDto sshKeyDto : peerDto.getEnvironmentInfo().getSshKeys() )

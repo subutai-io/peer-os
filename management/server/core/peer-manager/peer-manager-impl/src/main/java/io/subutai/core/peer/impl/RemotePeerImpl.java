@@ -415,14 +415,14 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
+    public Containers configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkNotNull( sshKeys, "SshPublicKey is null" );
         Preconditions.checkArgument( !sshKeys.isEmpty(), "No ssh keys" );
 
-        environmentWebClient.configureSshInEnvironment( environmentId, sshKeys );
+        return environmentWebClient.configureSshInEnvironment( environmentId, sshKeys );
     }
 
 
