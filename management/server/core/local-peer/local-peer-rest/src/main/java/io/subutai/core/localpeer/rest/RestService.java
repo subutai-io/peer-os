@@ -28,30 +28,22 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
 
 
-public interface RestService
+interface RestService
 {
 
     @GET
     @Path( "/mhpresent" )
-    public Response isMhPresent();
-
-    @GET
-    @Path( "/inited" )
-    public Response isInited();
-
-    @GET
-    @Path( "/ready" )
-    public Response isReady();
+    Response isMhPresent();
 
     @GET
     @Path( "/ping" )
-    public Response ping();
+    Response ping();
 
     @GET
     @Path( "/info" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public PeerInfo getPeerInfo();
+    PeerInfo getPeerInfo();
 
 
     @POST

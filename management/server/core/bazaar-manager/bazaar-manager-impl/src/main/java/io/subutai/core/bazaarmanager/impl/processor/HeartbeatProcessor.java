@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 
-import io.subutai.common.peer.LocalPeer;
+import io.subutai.bazaar.share.dto.HeartbeatResponseDto;
 import io.subutai.common.settings.Common;
 import io.subutai.core.bazaarmanager.api.RestClient;
 import io.subutai.core.bazaarmanager.api.RestResult;
@@ -22,7 +22,6 @@ import io.subutai.core.bazaarmanager.api.StateLinkProcessor;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.bazaarmanager.impl.BazaarManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.bazaar.share.dto.HeartbeatResponseDto;
 
 
 public class HeartbeatProcessor implements Runnable
@@ -158,8 +157,7 @@ public class HeartbeatProcessor implements Runnable
             return;
         }
 
-        if ( !( peerManager.getLocalPeer().getState() == LocalPeer.State.READY && peerManager.getLocalPeer()
-                                                                                             .isMHPresent() ) )
+        if ( !( peerManager.getLocalPeer().isReady() && peerManager.getLocalPeer().isMHPresent() ) )
         {
             return;
         }
