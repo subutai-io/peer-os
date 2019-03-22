@@ -1,6 +1,6 @@
 [Unit]
-Description=SS Management server.
-Documentation=https://github.com/subutai-io/base/wiki
+Description=Subutai Management Console
+Documentation=https://github.com/subutai-io/peer-os/wiki
 After=network-online.target
 
 [Service]

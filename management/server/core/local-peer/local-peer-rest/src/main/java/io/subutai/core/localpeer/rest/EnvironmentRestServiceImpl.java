@@ -312,9 +312,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( sshKeys );
             Preconditions.checkArgument( !sshKeys.isEmpty() );
 
-            localPeer.configureSshInEnvironment( environmentId, sshKeys );
-
-            return Response.ok().build();
+            return Response.ok(localPeer.configureSshInEnvironment( environmentId, sshKeys )).build();
         }
         catch ( Exception e )
         {

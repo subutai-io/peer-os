@@ -35,7 +35,7 @@ public class EnvironmentManagerInitTask implements Runnable
     {
         //due to karaf bundle loading scheme, this bundle can be loaded several times
         //skip the loads when local peer is not ready yet
-        if ( localPeer.getState() != LocalPeer.State.READY )
+        if ( localPeer.isReady() )
         {
             return;
         }

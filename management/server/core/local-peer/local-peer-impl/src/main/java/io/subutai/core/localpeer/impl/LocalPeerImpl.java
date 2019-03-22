@@ -25,20 +25,14 @@ import javax.annotation.security.RolesAllowed;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.karaf.bundle.core.BundleState;
-import org.apache.karaf.bundle.core.BundleStateService;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -190,6 +184,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
+import io.subutai.health.HealthService;
 
 
 /**
@@ -206,6 +201,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     private static final BigDecimal ONE_HUNDRED = new BigDecimal( "100.00" );
 
     private transient DaoManager daoManager;
+    private transient HealthService healthService;
     private transient TemplateManager templateManager;
     transient Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
     private transient CommandExecutor commandExecutor;
@@ -232,7 +228,8 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, CommandExecutor commandExecutor,
-                          HostRegistry hostRegistry, Monitor monitor, SecurityManager securityManager )
+                          HostRegistry hostRegistry, Monitor monitor, SecurityManager securityManager,
+                          HealthService healthService )
     {
         this.daoManager = daoManager;
         this.templateManager = templateManager;
@@ -240,6 +237,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
+        this.healthService = healthService;
     }
 
 
@@ -543,20 +541,23 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
+    public Containers configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
+
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkNotNull( sshKeys, "SshPublicKey is null" );
         Preconditions.checkArgument( !sshKeys.isEmpty(), "No ssh keys" );
 
         Set<Host> hosts = Sets.newHashSet();
+        Set<ContainerHost> failedHosts = Sets.newHashSet();
+        Containers failedContainers = new Containers();
 
         hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
 
         if ( hosts.isEmpty() )
         {
-            return;
+            return failedContainers;
         }
 
         //add keys in portions, since all can not fit into one command, it fails
@@ -586,33 +587,57 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
                     {
                         LOG.error( "Failed to add ssh keys on host {}: {}", result.getHost().getHostname(),
                                 result.getFailureReason() );
+
+                        //collect failed hosts
+                        failedHosts.add( ( ContainerHost ) result.getHost() );
                     }
                 }
+            }
+        }
 
-                if ( appendResults.hasFailures() )
+        if ( failedHosts.isEmpty() )
+        {
+            //config ssh
+            CommandUtil.HostCommandResults configResults = commandUtil
+                    .executeFailFast( localPeerCommands.getConfigSSHCommand(), hosts, environmentId.getId() );
+
+            for ( CommandUtil.HostCommandResult result : configResults.getCommandResults() )
+            {
+                if ( !result.hasSucceeded() )
                 {
-                    throw new PeerException( "Failed to add ssh keys on each host" );
+                    LOG.error( "Failed to configure ssh on host {}: {}", result.getHost().getHostname(),
+                            result.getFailureReason() );
+
+                    //collect failed hosts
+                    failedHosts.add( ( ContainerHost ) result.getHost() );
                 }
             }
         }
 
-        //config ssh
-        CommandUtil.HostCommandResults configResults =
-                commandUtil.executeFailFast( localPeerCommands.getConfigSSHCommand(), hosts, environmentId.getId() );
-
-        for ( CommandUtil.HostCommandResult result : configResults.getCommandResults() )
+        try
         {
-            if ( !result.hasSucceeded() )
+
+            for ( ContainerHost c : failedHosts )
             {
-                LOG.error( "Failed to configure ssh on host {}: {}", result.getHost().getHostname(),
-                        result.getFailureReason() );
+                ContainerHostInfo info;
+                try
+                {
+                    info = hostRegistry.getContainerHostInfoById( c.getId() );
+                }
+                catch ( HostDisconnectedException e )
+                {
+                    info = new ContainerHostInfoModel( c );
+                }
+                failedContainers.addContainer( info );
             }
         }
-
-        if ( configResults.hasFailures() )
+        catch ( Exception e )
         {
-            throw new PeerException( "Failed to configure ssh on each host" );
+            LOG.error( e.getMessage() );
+            throw new PeerException( String.format( "Error getting environment containers: %s", e.getMessage() ), e );
         }
+
+        return failedContainers;
     }
 
 
@@ -726,6 +751,7 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
     }
 
 
+    //todo we can return ids of hosts where ssh key addition/configuration failed
     @Override
     public void addToAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
@@ -917,43 +943,9 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
 
 
     @Override
-    public State getState()
+    public boolean isReady()
     {
-        boolean failed = false;
-
-        boolean ready = true;
-
-        BundleContext ctx = FrameworkUtil.getBundle( LocalPeerImpl.class ).getBundleContext();
-
-        BundleStateService bundleStateService = ServiceLocator.lookup( BundleStateService.class );
-
-        Bundle[] bundles = ctx.getBundles();
-
-        if ( bundles.length < BUNDLE_COUNT )
-        {
-            LOG.warn( "Bundle count is {}", bundles.length );
-
-            return State.LOADING;
-        }
-
-        for ( Bundle bundle : bundles )
-        {
-            if ( bundleStateService.getState( bundle ) == BundleState.Failure )
-            {
-                failed = true;
-
-                break;
-            }
-
-            if ( !( ( bundle.getState() == Bundle.ACTIVE ) || ( bundle.getState() == Bundle.RESOLVED ) ) )
-            {
-                ready = false;
-
-                break;
-            }
-        }
-
-        return failed ? State.FAILED : ready ? State.READY : State.LOADING;
+        return healthService.getState() == HealthService.State.READY;
     }
 
 

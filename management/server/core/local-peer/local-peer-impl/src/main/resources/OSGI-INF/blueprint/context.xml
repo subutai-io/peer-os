@@ -38,6 +38,9 @@
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
+  <reference id="healthService" availability="mandatory"
+             interface="io.subutai.health.HealthService" />
+
   <bean id="localPeer" class="io.subutai.core.localpeer.impl.LocalPeerImpl" init-method="init"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="daoManagerPeer" />
@@ -46,6 +49,7 @@
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="securityManager" />
+    <argument ref="healthService" />
     <property name="identityManager" ref="identityManager" />
     <property name="relationManager" ref="relationManager" />
   </bean>
@@ -68,7 +72,6 @@
   <service ref="localPeer" interface="io.subutai.common.peer.LocalPeer" />
 
   <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />
-
 
   <reference-list id="peerLstnr"
                   interface="io.subutai.common.peer.LocalPeerEventListener"

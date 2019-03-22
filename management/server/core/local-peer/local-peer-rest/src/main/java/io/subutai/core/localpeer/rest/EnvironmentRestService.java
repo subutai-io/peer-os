@@ -114,6 +114,7 @@ public interface EnvironmentRestService
     @POST
     @Path( "{environmentId}/containers/sshkeys" )
     @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
     Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId, SshKeys sshKeys );
 
     @GET
