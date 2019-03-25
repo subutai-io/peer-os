@@ -20,6 +20,8 @@ import org.apache.openjpa.persistence.EntityManagerFactoryImpl;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
+import io.subutai.bazaar.share.resource.ByteValueResource;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandUtil;
@@ -68,8 +70,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
-import io.subutai.bazaar.share.quota.ContainerQuota;
-import io.subutai.bazaar.share.resource.ByteValueResource;
+import io.subutai.health.HealthService;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -215,14 +216,19 @@ public class LocalPeerImplTest
     @Mock
     Future future;
 
+    @Mock
+    HealthService healthService;
+
 
     class LocalPeerImplForTest extends LocalPeerImpl
     {
         public LocalPeerImplForTest( final DaoManager daoManager, final TemplateManager templateManager,
                                      final CommandExecutor commandExecutor, final HostRegistry hostRegistry,
-                                     final Monitor monitor, final SecurityManager securityManager )
+                                     final Monitor monitor, final SecurityManager securityManager,
+                                     final HealthService healthService )
         {
-            super( daoManager, templateManager, commandExecutor, hostRegistry, monitor, securityManager );
+            super( daoManager, templateManager, commandExecutor, hostRegistry, monitor, securityManager,
+                    healthService );
         }
     }
 
@@ -241,7 +247,7 @@ public class LocalPeerImplTest
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
         localPeer = spy( new LocalPeerImplForTest( daoManager, templateRegistry, commandExecutor, hostRegistry, monitor,
-                securityManager ) );
+                securityManager, healthService ) );
         localPeer.setIdentityManager( identityManager );
         localPeer.setRelationManager( relationManager );
 
@@ -641,5 +647,14 @@ public class LocalPeerImplTest
 
 
         resourceHost.updateHostInfo( resourceHostInfo );
+    }
+
+
+    @Test
+    public void testIsReady()
+    {
+        doReturn( HealthService.State.READY ).when( healthService ).getState();
+
+        assertTrue( localPeer.isReady() );
     }
 }

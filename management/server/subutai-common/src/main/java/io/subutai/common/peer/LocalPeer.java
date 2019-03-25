@@ -182,12 +182,7 @@ public interface LocalPeer extends Peer, SnapshotEventNotifier
 
     void setRhHostname( String rhId, String hostname ) throws PeerException;
 
-    State getState();
-
-    enum State
-    {
-        LOADING, FAILED, READY
-    }
+    boolean isReady();
 
     void registerResourceHost( ResourceHostInfo resourceHostInfo );
 
