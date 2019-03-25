@@ -1,6 +1,8 @@
 package io.subutai.bazaar.share.dto.snapshots;
 
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
@@ -15,8 +17,11 @@ public class SnapshotOperationDto
 
     private String containerId;
     private Command command;
-    private SnapshotDto snapshot;
+    private UUID commandId;
+    private String label;
+    private String partition;
     private boolean stopContainer;
+    private boolean forceRollback;
     private boolean successful;
     private String errors;
 
@@ -26,13 +31,13 @@ public class SnapshotOperationDto
     }
 
 
-    public SnapshotOperationDto( final String containerId, final Command command, final SnapshotDto snapshot,
-                                 final boolean stopContainer )
+    public SnapshotOperationDto( final String containerId, final Command command, final String label,
+                                 final String partition )
     {
         this.containerId = containerId;
         this.command = command;
-        this.snapshot = snapshot;
-        this.stopContainer = stopContainer;
+        this.label = label;
+        this.partition = partition;
     }
 
 
@@ -60,15 +65,39 @@ public class SnapshotOperationDto
     }
 
 
-    public SnapshotDto getSnapshot()
+    public UUID getCommandId()
     {
-        return snapshot;
+        return commandId;
     }
 
 
-    public void setSnapshot( final SnapshotDto snapshot )
+    public void setCommandId( final UUID commandId )
     {
-        this.snapshot = snapshot;
+        this.commandId = commandId;
+    }
+
+
+    public String getLabel()
+    {
+        return label;
+    }
+
+
+    public void setLabel( final String label )
+    {
+        this.label = label;
+    }
+
+
+    public String getPartition()
+    {
+        return partition;
+    }
+
+
+    public void setPartition( final String partition )
+    {
+        this.partition = partition;
     }
 
 
@@ -81,6 +110,18 @@ public class SnapshotOperationDto
     public void setStopContainer( final boolean stopContainer )
     {
         this.stopContainer = stopContainer;
+    }
+
+
+    public boolean isForceRollback()
+    {
+        return forceRollback;
+    }
+
+
+    public void setForceRollback( final boolean forceRollback )
+    {
+        this.forceRollback = forceRollback;
     }
 
 

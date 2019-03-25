@@ -130,7 +130,8 @@ public class SnapshotEventProcessor extends BazaarRequester implements SnapshotE
 
         try
         {
-            RestResult<Object> restResult = restClient.post( "/rest/v1/peer/snapshots", peerSnapshotsDto );
+            RestResult<Object> restResult = restClient
+                    .post( String.format( "/rest/v1/peers/%s/snapshots", this.localPeer.getId() ), peerSnapshotsDto );
 
             if ( !restResult.isSuccess() )
             {

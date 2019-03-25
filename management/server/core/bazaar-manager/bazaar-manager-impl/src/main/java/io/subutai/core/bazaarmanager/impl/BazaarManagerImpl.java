@@ -58,7 +58,6 @@ import io.subutai.core.bazaarmanager.impl.requestor.P2pStatusSender;
 import io.subutai.core.bazaarmanager.impl.requestor.PeerMetricsProcessor;
 import io.subutai.core.bazaarmanager.impl.requestor.VersionInfoProcessor;
 import io.subutai.core.bazaarmanager.impl.snapshot.SnapshotEventProcessor;
-import io.subutai.core.bazaarmanager.impl.snapshot.SnapshotProcessor;
 import io.subutai.core.bazaarmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.bazaarmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.bazaarmanager.impl.util.EnvironmentUserHelper;
@@ -252,8 +251,8 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
 
         localPeer.addSnapshotEventListener( snapshotEventProcessor );
 
-        requestorsRunner.scheduleWithFixedDelay( snapshotEventProcessor, 1, SNAPSHOTS_SYNC_INTERVAL_MIN,
-                TimeUnit.MINUTES );
+        requestorsRunner
+                .scheduleWithFixedDelay( snapshotEventProcessor, 1, SNAPSHOTS_SYNC_INTERVAL_MIN, TimeUnit.MINUTES );
     }
 
 
@@ -275,13 +274,10 @@ public class BazaarManagerImpl extends HostListener implements BazaarManager
 
         UserTokenProcessor userTokenProcessor = new UserTokenProcessor( ctx );
 
-        SnapshotProcessor snapshotProcessor = new SnapshotProcessor( ctx );
-
         heartbeatProcessor = new HeartbeatProcessor( this, peerManager, restClient, localPeer.getId() )
                 .addProcessor( bazaarEnvironmentProcessor ).addProcessor( tunnelProcessor )
                 .addProcessor( environmentTelemetryProcessor ).addProcessor( proxyProcessor )
-                .addProcessor( containerPortMapProcessor ).addProcessor( userTokenProcessor )
-                .addProcessor( snapshotProcessor );
+                .addProcessor( containerPortMapProcessor ).addProcessor( userTokenProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 5, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
