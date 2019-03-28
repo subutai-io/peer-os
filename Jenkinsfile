@@ -11,7 +11,7 @@ try {
     
     switch (env.BRANCH_NAME) {
         case ~/master/: cdnHost = "masterbazaar.subutai.io"; break;
-        case ~/dev/: cdnHost = "devbazaar.subutai.io"; break;
+        case ~/dev/: cdnHost = "devbazaar-2.subutai.io"; break;
         default: cdnHost = "bazaar.subutai.io"
     }
 
@@ -85,7 +85,7 @@ try {
             set +e
 			sudo subutai destroy management
 			set -e
-            sudo subutai clone debian-stretch management
+            sudo subutai clone debian-stretch:subutai:0.4.6 management
 			/bin/sleep 20
 			cp ${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
@@ -121,18 +121,25 @@ try {
                 curl -X DELETE "https://${cdnHost}/rest/v1/cdn/template?token=${token}&id=${OLD_ID}"
             fi
             """
-
+        if (env.BRANCH_NAME == 'dev') {
             // Exporting template
+            sh """
+            set -e
+			sudo subutai -d export management -r "${artifactVersion}" --local --token "${token}"
+            """
+        }
+        else {
             sh """
             set -e
 			sudo subutai export management -r "${artifactVersion}" --local --token "${token}"
             """
-                        
+        }
+
         stage("Upload management template to IPFS node")
         notifyBuildDetails = "\nFailed Step - Upload management template to IPFS node"
 
             //TODO upload to CDN
-
+        
             sh """
             set +e
             cd /var/cache/subutai/
