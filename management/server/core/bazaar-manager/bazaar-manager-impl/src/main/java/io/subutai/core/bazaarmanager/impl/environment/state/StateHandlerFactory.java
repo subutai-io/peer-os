@@ -11,6 +11,7 @@ import io.subutai.core.bazaarmanager.impl.environment.state.create.ExchangeInfoS
 import io.subutai.core.bazaarmanager.impl.environment.state.create.ReserveNetworkStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.SetupTunnelStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.destroy.DeletePeerStateHandler;
+import io.subutai.core.bazaarmanager.impl.environment.state.snapshot.ProcessSnapshotStateHandler;
 
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.BUILD_CONTAINER;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.CHANGE_CONTAINER_STATE;
@@ -19,6 +20,7 @@ import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerSta
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_ENVIRONMENT;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.DELETE_PEER;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.EXCHANGE_INFO;
+import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.PROCESS_SNAPSHOT;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.RESERVE_NETWORK;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.SETUP_TUNNEL;
 
@@ -45,6 +47,8 @@ public class StateHandlerFactory
 
     private final StateHandler checkNetworkStateHandler;
 
+    private final StateHandler processSnapshotStatehandler;
+
 
     public StateHandlerFactory( Context ctx )
     {
@@ -67,6 +71,8 @@ public class StateHandlerFactory
         configureEnvironmentStateHandler = new ConfigureEnvironmentStateHandler( ctx );
 
         checkNetworkStateHandler = new CheckNetworkStateHandler( ctx );
+
+        processSnapshotStatehandler = new ProcessSnapshotStateHandler( ctx );
     }
 
 
@@ -109,6 +115,10 @@ public class StateHandlerFactory
         else if ( state == CHECK_NETWORK )
         {
             handler = checkNetworkStateHandler;
+        }
+        else if ( state == PROCESS_SNAPSHOT )
+        {
+            handler = processSnapshotStatehandler;
         }
 
         return handler;
