@@ -127,7 +127,7 @@ public abstract class StateHandler
     }
 
 
-    protected void handleError( EnvironmentPeerDto peerDto, Exception e )
+    protected void  handleError( EnvironmentPeerDto peerDto, Exception e )
     {
         peerDto.setError( description + ". " + e.getMessage() );
 
