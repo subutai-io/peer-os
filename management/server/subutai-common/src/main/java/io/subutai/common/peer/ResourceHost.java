@@ -292,4 +292,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     boolean update();
 
     boolean ping();
+
+    String getTimezoneOffset() throws ResourceHostException;
 }

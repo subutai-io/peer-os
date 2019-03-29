@@ -1,6 +1,9 @@
 package io.subutai.core.localpeer.impl;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -656,5 +659,17 @@ public class LocalPeerImplTest
         doReturn( HealthService.State.READY ).when( healthService ).getState();
 
         assertTrue( localPeer.isReady() );
+    }
+
+
+    @Test
+    public void testTime() throws ParseException
+    {
+        SimpleDateFormat parser = new SimpleDateFormat( "EEE MMM d H:mm yyyy X" );
+
+        //date +"%z"
+        Date date = parser.parse( "Thu Mar 28 14:51 2019" + " +0000" );
+
+        System.out.println(date);
     }
 }
