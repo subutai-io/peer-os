@@ -289,6 +289,8 @@ public class ResourceHostEntityTest
                 + "subutai/fs/Container1-pfe-1-2/rootfs@my-snapshot    Thu Feb 28 10:53 2019\n"
                 + "subutai/fs/Container1-pfe-1-2/var@my-snapshot       Thu Feb 28 10:53 2019" ).when( commandResult ).getStdOut();
 
+        doReturn( "+0000"  ).when( resourceHostEntity ).getTimezoneOffset();
+
         Snapshots snapshots = resourceHostEntity.listContainerHostSnapshots( containerHost );
 
         assertNotNull( snapshots );

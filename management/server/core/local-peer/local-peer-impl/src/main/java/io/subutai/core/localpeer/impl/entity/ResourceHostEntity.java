@@ -453,6 +453,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
+        String timezoneOffset = getTimezoneOffset();
+
         try
         {
             CommandResult commandResult = commandUtil
@@ -485,9 +487,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                         if ( m.find() && m.groupCount() == 2 )
                         {
 
-                            SimpleDateFormat parser = new SimpleDateFormat( "EEE MMM d H:mm yyyy zzz" );
+                            SimpleDateFormat parser = new SimpleDateFormat( "EEE MMM d H:mm yyyy X" );
 
-                            Date date = parser.parse( timestamp + " UTC" );
+                            Date date = parser.parse( timestamp + " " + timezoneOffset );
 
                             String partition = m.group( 1 );
                             if ( partition.equalsIgnoreCase( containerHost.getContainerName() ) )
@@ -511,6 +513,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException(
                     String.format( "Error listing container %s snapshots: %s", containerHost.getHostname(),
                             e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String getTimezoneOffset() throws ResourceHostException
+    {
+        try
+        {
+            CommandResult result = commandUtil.execute( resourceHostCommands.getGetTimezonOffsetCommand(), this );
+            return result.getStdOut().trim();
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error getting timezone offset: %s", e.getMessage() ), e );
         }
     }
 
