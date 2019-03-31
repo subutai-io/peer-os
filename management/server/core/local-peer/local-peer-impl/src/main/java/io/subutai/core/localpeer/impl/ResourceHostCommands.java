@@ -196,4 +196,10 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( "date +\"%z\"" );
     }
+
+
+    public RequestBuilder getCheckLxcExistsCommand( String name )
+    {
+        return new RequestBuilder( String.format( "subutai exists %s", name ) );
+    }
 }

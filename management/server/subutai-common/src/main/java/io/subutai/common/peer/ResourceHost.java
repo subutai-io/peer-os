@@ -220,6 +220,13 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     Set<ContainerInfo> listExistingContainersInfo() throws ResourceHostException;
 
+    /**
+     * Checks if lxc instance exists
+     *
+     * @param name name of container or template
+     */
+    Boolean lxcExists( String name ) throws ResourceHostException;
+
 
     ReservedPorts getReservedPorts() throws ResourceHostException;
 
