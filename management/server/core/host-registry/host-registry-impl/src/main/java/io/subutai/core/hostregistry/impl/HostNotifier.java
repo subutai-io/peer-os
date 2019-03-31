@@ -184,14 +184,7 @@ public class HostNotifier implements Runnable
 
                     try
                     {
-                        for ( String name : resourceHost.listExistingContainerNames() )
-                        {
-                            if ( oldContainerInfo.getContainerName().equalsIgnoreCase( name ) )
-                            {
-                                containerStillExists = true;
-                                break;
-                            }
-                        }
+                        containerStillExists = resourceHost.lxcExists( oldContainerInfo.getContainerName() );
                     }
                     catch ( ResourceHostException e )
                     {
