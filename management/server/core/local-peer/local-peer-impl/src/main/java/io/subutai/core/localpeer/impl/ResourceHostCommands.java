@@ -190,4 +190,16 @@ public class ResourceHostCommands
                         containerName, ip, vlan, environmentId, containerToken, containerName, hostname ) )
                 .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
+
+
+    public RequestBuilder getGetTimezonOffsetCommand()
+    {
+        return new RequestBuilder( "date +\"%z\"" );
+    }
+
+
+    public RequestBuilder getCheckLxcExistsCommand( String name )
+    {
+        return new RequestBuilder( String.format( "subutai exists %s", name ) );
+    }
 }

@@ -2,6 +2,7 @@ package io.subutai.core.hostregistry.impl;
 
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,6 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostListener;
 
@@ -181,19 +181,14 @@ public class HostNotifier implements Runnable
                 try
                 {
                     ResourceHost resourceHost = localPeer.getResourceHostByContainerId( oldContainerInfo.getId() );
-
                     try
                     {
-                        for ( String name : resourceHost.listExistingContainerNames() )
-                        {
-                            if ( oldContainerInfo.getContainerName().equalsIgnoreCase( name ) )
-                            {
-                                containerStillExists = true;
-                                break;
-                            }
-                        }
+                        //sleep 10 sec to let filesystem recover in case of snapshot rollback
+                        TimeUnit.SECONDS.sleep( 10 );
+
+                        containerStillExists = resourceHost.lxcExists( oldContainerInfo.getContainerName() );
                     }
-                    catch ( ResourceHostException e )
+                    catch ( Exception e )
                     {
                         //just in case skip container removal in this round since we can not check
                         containerStillExists = true;
