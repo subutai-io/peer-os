@@ -11,7 +11,7 @@ try {
     
     switch (env.BRANCH_NAME) {
         case ~/master/: cdnHost = "masterbazaar.subutai.io"; break;
-        case ~/dev/: cdnHost = "devbazaar-2.subutai.io"; break;
+        case ~/dev/: cdnHost = "devbazaar.subutai.io"; break;
         default: cdnHost = "bazaar.subutai.io"
     }
 
