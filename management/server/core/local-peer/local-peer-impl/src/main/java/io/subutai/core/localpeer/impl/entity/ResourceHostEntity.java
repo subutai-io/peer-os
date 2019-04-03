@@ -487,7 +487,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                         if ( m.find() && m.groupCount() == 2 )
                         {
 
-                            SimpleDateFormat parser = new SimpleDateFormat( "EEE MMM d H:mm yyyy X" );
+                            SimpleDateFormat parser = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS X" );
 
                             Date date = parser.parse( timestamp + " " + timezoneOffset );
 
@@ -1775,6 +1775,22 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
         return containerNames;
+    }
+
+
+    @Override
+    public Boolean lxcExists( final String name ) throws ResourceHostException
+    {
+        try
+        {
+            CommandResult result = execute( resourceHostCommands.getCheckLxcExistsCommand( name ) );
+            return result.hasSucceeded();
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error checking lxc instance existence: %s", e.getMessage() ), e );
+        }
     }
 
 

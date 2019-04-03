@@ -280,16 +280,15 @@ public class ResourceHostEntityTest
     {
         resourceHostEntity.addContainerHost( containerHost );
 
-        doReturn( "NAME                                                CREATION\n"
-                + "subutai/fs/Container1-pfe-1-2@my-snapshot           Thu Feb 28 10:53 2019\n"
-                + "\n"
-                + "  \n"
-                + "subutai/fs/Container1-pfe-1-2/home@my-snapshot      Thu Feb 28 10:53 2019\n"
-                + "subutai/fs/Container1-pfe-1-2/opt@my-snapshot       Thu Feb 28 10:53 2019\n"
-                + "subutai/fs/Container1-pfe-1-2/rootfs@my-snapshot    Thu Feb 28 10:53 2019\n"
-                + "subutai/fs/Container1-pfe-1-2/var@my-snapshot       Thu Feb 28 10:53 2019" ).when( commandResult ).getStdOut();
+        doReturn( "NAME                                        :CREATED\n"
+                + "subutai/fs/Container1-xkb-1-2@first         2019-04-01T02:51:44.806\n"
+                + "subutai/fs/Container1-xkb-1-2/home@first    2019-04-01T02:51:44.806\n"
+                + "subutai/fs/Container1-xkb-1-2/opt@first     2019-04-01T02:51:44.806\n"
+                + "subutai/fs/Container1-xkb-1-2/rootfs@first  2019-04-01T02:51:44.806\n"
+                + "subutai/fs/Container1-xkb-1-2/var@first     2019-04-01T02:51:44.806\n" ).when( commandResult )
+                                                                                           .getStdOut();
 
-        doReturn( "+0000"  ).when( resourceHostEntity ).getTimezoneOffset();
+        doReturn( "+0000" ).when( resourceHostEntity ).getTimezoneOffset();
 
         Snapshots snapshots = resourceHostEntity.listContainerHostSnapshots( containerHost );
 
