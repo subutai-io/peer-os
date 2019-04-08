@@ -154,7 +154,7 @@ public class BuildContainerStateHandler extends StateHandler
         try
         {
             ctx.localPeer.prepareTemplates(
-                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), peerDto.getKurjunToken(),
+                    new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), peerDto.getCdnToken(),
                             rhTemplates ) );
         }
         catch ( PeerException e )

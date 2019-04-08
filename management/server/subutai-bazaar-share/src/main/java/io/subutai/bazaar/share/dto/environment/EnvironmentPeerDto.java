@@ -11,6 +11,7 @@ import io.subutai.bazaar.share.dto.PublicKeyContainer;
 import io.subutai.bazaar.share.dto.UserTokenDto;
 import io.subutai.bazaar.share.dto.ansible.AnsibleDto;
 
+
 @JsonIgnoreProperties( ignoreUnknown = true )
 public class EnvironmentPeerDto
 {
@@ -62,8 +63,7 @@ public class EnvironmentPeerDto
 
     private String playbook;
 
-    //TODO rename to cdnToken
-    private String kurjunToken;
+    private String cdnToken;
 
     private AnsibleDto ansibleDto;
 
@@ -353,15 +353,15 @@ public class EnvironmentPeerDto
     }
 
 
-    public String getKurjunToken()
+    public String getCdnToken()
     {
-        return kurjunToken;
+        return cdnToken;
     }
 
 
-    public void setKurjunToken( final String kurjunToken )
+    public void setCdnToken( final String cdnToken )
     {
-        this.kurjunToken = kurjunToken;
+        this.cdnToken = cdnToken;
     }
 
 
