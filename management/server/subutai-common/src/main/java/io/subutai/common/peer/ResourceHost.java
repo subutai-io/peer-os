@@ -134,6 +134,29 @@ public interface ResourceHost extends Host, ResourceHostInfo
      */
     String uploadRawFileToCdn( String pathToFile, String cdnToken ) throws ResourceHostException;
 
+    /**
+     * Encrypts file with password. Encrypted file is created in the same directory as source file. If relative path is
+     * passed then file is searched within io.subutai.common.settings.Common#RH_CACHE_DIR
+     *
+     * @param pathToFile path to source file to encrypt
+     * @param password password
+     *
+     * @return full path to encrypted file
+     */
+    String encryptFile( String pathToFile, String password ) throws ResourceHostException;
+
+
+    /**
+     * Decrypts file with password, Decrypted file is created in the same directory as source file. If relative path is
+     * passed then file is searched within io.subutai.common.settings.Common#RH_CACHE_DIR
+     *
+     * @param pathToFile path to source file to decrypt
+     * @param password password
+     *
+     * @return full path to decrypted file
+     */
+    String decryptFile( String pathToFile, String password ) throws ResourceHostException;
+
 
     /**
      * Destroys hosted container
