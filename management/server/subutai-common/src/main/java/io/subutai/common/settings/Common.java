@@ -108,6 +108,8 @@ public class Common
     public static final int MIN_PORT = 1;
     public static final int MAX_PORT = 65535;
 
+    public static final int FILE_ENCRYPT_TIMEOUT_SEC = 10 * 60; // 10 min
+
 
     private Common()
     {

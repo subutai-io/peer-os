@@ -202,4 +202,18 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( String.format( "subutai exists %s", name ) );
     }
+
+
+    public RequestBuilder getEncryptFileCommand( final String pathToFile, final String password )
+    {
+        return new RequestBuilder( String.format( "subutai file encrypt -s %s -p %s", pathToFile, password ) )
+                .withTimeout( Common.FILE_ENCRYPT_TIMEOUT_SEC );
+    }
+
+
+    public RequestBuilder getDecryptFileCommand( final String pathToFile, final String password )
+    {
+        return new RequestBuilder( String.format( "subutai file decrypt -s %s -p %s", pathToFile, password ) )
+                .withTimeout( Common.FILE_ENCRYPT_TIMEOUT_SEC );
+    }
 }
