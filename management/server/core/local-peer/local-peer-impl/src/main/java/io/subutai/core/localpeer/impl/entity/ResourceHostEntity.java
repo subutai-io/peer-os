@@ -834,6 +834,64 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public String encryptFile( final String pathToFile, final String password ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !StringUtils.isBlank( pathToFile ), "Invalid file path" );
+        Preconditions.checkArgument( !StringUtils.isBlank( password ), "Invalid password" );
+
+        try
+        {
+            CommandResult result =
+                    commandUtil.execute( resourceHostCommands.getEncryptFileCommand( pathToFile, password ), this );
+
+            Pattern pattern = Pattern.compile( "Encrypted file to\\s*(\\S+)\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut() );
+            if ( matcher.find() && matcher.groupCount() == 1 )
+            {
+                return matcher.group( 1 );
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse file path from output %s", result.getStdOut() ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error encrypting file %s: %s", pathToFile, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String decryptFile( final String pathToFile, final String password ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !StringUtils.isBlank( pathToFile ), "Invalid file path" );
+        Preconditions.checkArgument( !StringUtils.isBlank( password ), "Invalid password" );
+
+        try
+        {
+            CommandResult result =
+                    commandUtil.execute( resourceHostCommands.getDecryptFileCommand( pathToFile, password ), this );
+
+            Pattern pattern = Pattern.compile( "Decrypted file to\\s*(\\S+)\"" );
+            Matcher matcher = pattern.matcher( result.getStdOut() );
+            if ( matcher.find() && matcher.groupCount() == 1 )
+            {
+                return matcher.group( 1 );
+            }
+
+            throw new ResourceHostException(
+                    String.format( "Failed to parse file path from output %s", result.getStdOut() ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error decrypting file %s: %s", pathToFile, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public void destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
 
