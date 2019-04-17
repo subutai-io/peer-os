@@ -139,7 +139,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * passed then file is searched within io.subutai.common.settings.Common#RH_CACHE_DIR
      *
      * @param pathToFile path to source file to encrypt
-     * @param password password
+     * @param password password, must not contain single-quote symbol otherwise it is removed
      *
      * @return full path to encrypted file
      */
@@ -151,7 +151,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * passed then file is searched within io.subutai.common.settings.Common#RH_CACHE_DIR
      *
      * @param pathToFile path to source file to decrypt
-     * @param password password
+     * @param password password, must not contain single-quote symbol otherwise it is removed
      *
      * @return full path to decrypted file
      */

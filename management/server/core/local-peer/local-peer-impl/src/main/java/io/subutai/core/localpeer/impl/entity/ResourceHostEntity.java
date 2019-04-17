@@ -834,9 +834,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public String encryptFile( final String pathToFile, final String password ) throws ResourceHostException
+    public String encryptFile( final String pathToFile, String password ) throws ResourceHostException
     {
         Preconditions.checkArgument( !StringUtils.isBlank( pathToFile ), "Invalid file path" );
+        Preconditions.checkArgument( !StringUtils.isBlank( password ), "Invalid password" );
+        password = password.replace( "'", "" );
         Preconditions.checkArgument( !StringUtils.isBlank( password ), "Invalid password" );
 
         try
@@ -863,9 +865,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public String decryptFile( final String pathToFile, final String password ) throws ResourceHostException
+    public String decryptFile( final String pathToFile, String password ) throws ResourceHostException
     {
         Preconditions.checkArgument( !StringUtils.isBlank( pathToFile ), "Invalid file path" );
+        Preconditions.checkArgument( !StringUtils.isBlank( password ), "Invalid password" );
+        password = password.replace( "'", "" );
         Preconditions.checkArgument( !StringUtils.isBlank( password ), "Invalid password" );
 
         try
