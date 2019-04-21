@@ -11,6 +11,7 @@ import io.subutai.core.bazaarmanager.impl.environment.state.create.ExchangeInfoS
 import io.subutai.core.bazaarmanager.impl.environment.state.create.ReserveNetworkStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.SetupTunnelStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.destroy.DeletePeerStateHandler;
+import io.subutai.core.bazaarmanager.impl.environment.state.snapshot.BackupStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.snapshot.ProcessSnapshotStateHandler;
 
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.BUILD_CONTAINER;
@@ -23,6 +24,7 @@ import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerSta
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.PROCESS_SNAPSHOT;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.RESERVE_NETWORK;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.SETUP_TUNNEL;
+import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.BACKUP_CONTAINER;
 
 
 public class StateHandlerFactory
@@ -49,6 +51,8 @@ public class StateHandlerFactory
 
     private final StateHandler processSnapshotStatehandler;
 
+    private final StateHandler backupStateHandler;
+
 
     public StateHandlerFactory( Context ctx )
     {
@@ -73,6 +77,8 @@ public class StateHandlerFactory
         checkNetworkStateHandler = new CheckNetworkStateHandler( ctx );
 
         processSnapshotStatehandler = new ProcessSnapshotStateHandler( ctx );
+
+        backupStateHandler = new BackupStateHandler( ctx );
     }
 
 
@@ -119,6 +125,10 @@ public class StateHandlerFactory
         else if ( state == PROCESS_SNAPSHOT )
         {
             handler = processSnapshotStatehandler;
+        }
+        else if ( state == BACKUP_CONTAINER )
+        {
+            handler = backupStateHandler;
         }
 
         return handler;
