@@ -309,9 +309,9 @@ public class RestoreStateHandler extends StateHandler
             ResourceHost rh = ctx.localPeer.getResourceHostById( restoreCmd.getResourceHostId() );
             for ( final CdnBackupFileDto cdnBackupFileDto : restoreCmd.getBackupFileSequence() )
             {
-                String filePath = rh.downloadRawFileFromCdn( cdnBackupFileDto.getCdnId(), null );
+                String encryptedFilePath = rh.downloadRawFileFromCdn( cdnBackupFileDto.getCdnId(), null );
 
-                filePath = rh.decryptFile( filePath, cdnBackupFileDto.getPassword() );
+                String decryptedFilePath = rh.decryptFile( encryptedFilePath, cdnBackupFileDto.getPassword() );
 
                 ArrayList<String> backupFiles = backupFilesByContainers.get( restoreCmd.getContainerHostname() );
                 if ( backupFiles == null )
@@ -319,7 +319,18 @@ public class RestoreStateHandler extends StateHandler
                     backupFiles = new ArrayList<>();
                     backupFilesByContainers.put( restoreCmd.getContainerHostname(), backupFiles );
                 }
-                backupFiles.add( filePath );
+                backupFiles.add( decryptedFilePath );
+
+                try
+                {
+                    // remove encrypted file
+                    ctx.localPeer
+                            .execute( new RequestBuilder( String.format( "rm %s", encryptedFilePath ) ), rh, null );
+                }
+                catch ( Exception e )
+                {
+                    log.error( "Failed to remove encrypted backup file {}", encryptedFilePath, e );
+                }
             }
         }
 
