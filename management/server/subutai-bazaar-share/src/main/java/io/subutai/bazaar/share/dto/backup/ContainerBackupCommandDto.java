@@ -1,15 +1,12 @@
 package io.subutai.bazaar.share.dto.backup;
 
 
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 @JsonIgnoreProperties( ignoreUnknown = true )
 public class ContainerBackupCommandDto
 {
-    // inbound parameters
     private String commandId;
     private String containerId;
     private String fromSnapshotLabel; // optional, snapshot from which to start incremental backup
@@ -17,12 +14,7 @@ public class ContainerBackupCommandDto
     private boolean removeCreatedSnapshots;
     private boolean keepBackupFiles;
 
-    // result
-    private String backupCdnId;
-    private String encryptionPassword;
-    private Date fromSnapshotDate;
-    private Date snapshotDate;
-    private String error;
+    private BackupCommandResultDto result = new BackupCommandResultDto();
 
 
     public ContainerBackupCommandDto()
@@ -115,69 +107,21 @@ public class ContainerBackupCommandDto
     }
 
 
-    public String getBackupCdnId()
-    {
-        return backupCdnId;
-    }
-
-
-    public void setBackupCdnId( final String backupCdnId )
-    {
-        this.backupCdnId = backupCdnId;
-    }
-
-
-    public String getEncryptionPassword()
-    {
-        return encryptionPassword;
-    }
-
-
-    public void setEncryptionPassword( final String encryptionPassword )
-    {
-        this.encryptionPassword = encryptionPassword;
-    }
-
-
-    public Date getFromSnapshotDate()
-    {
-        return fromSnapshotDate;
-    }
-
-
-    public void setFromSnapshotDate( final Date fromSnapshotDate )
-    {
-        this.fromSnapshotDate = fromSnapshotDate;
-    }
-
-
-    public Date getSnapshotDate()
-    {
-        return snapshotDate;
-    }
-
-
-    public void setSnapshotDate( final Date snapshotDate )
-    {
-        this.snapshotDate = snapshotDate;
-    }
-
-
-    public String getError()
-    {
-        return error;
-    }
-
-
-    public void setError( final String error )
-    {
-        this.error = error;
-    }
-
-
     public boolean isIncremental()
     {
         return fromSnapshotLabel != null && !fromSnapshotLabel.trim().isEmpty();
+    }
+
+
+    public BackupCommandResultDto getResult()
+    {
+        return result;
+    }
+
+
+    public void setResult( BackupCommandResultDto resultDto )
+    {
+        this.result = resultDto;
     }
 
 

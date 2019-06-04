@@ -3,6 +3,7 @@ package io.subutai.core.bazaarmanager.impl.environment.state.snapshot;
 
 import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.bazaar.share.dto.snapshots.SnapshotOperationDto;
+import io.subutai.bazaar.share.dto.snapshots.SnapshotOperationResultDto;
 import io.subutai.bazaar.share.dto.snapshots.SnapshotOperationsDto;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.PeerException;
@@ -53,14 +54,13 @@ public class ProcessSnapshotStateHandler extends StateHandler
                         break;
                 }
 
-                operation.setSuccessful( true );
+                operation.setResult( new SnapshotOperationResultDto( true, null ) );
             }
             catch ( PeerException e )
             {
                 log.error( "Failed to process snapshot operation {}: {}", operation, e.getMessage(), e );
 
-                operation.setSuccessful( false );
-                operation.setErrors( e.getMessage() );
+                operation.setResult( new SnapshotOperationResultDto( false, e.getMessage() ) );
 
                 break;
             }

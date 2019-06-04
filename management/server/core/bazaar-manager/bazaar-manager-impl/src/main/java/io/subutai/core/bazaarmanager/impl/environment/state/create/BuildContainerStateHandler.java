@@ -16,7 +16,6 @@ import io.subutai.bazaar.share.dto.environment.ContainerStateDto;
 import io.subutai.bazaar.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.bazaar.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
-import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
@@ -26,7 +25,6 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
@@ -114,13 +112,11 @@ public class BuildContainerStateHandler extends StateHandler
 
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
-            ContainerQuota quota = nodeDto.getContainerQuota();
-
             log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
                     nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
-            Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), quota, peerDto.getPeerId(),
-                    nodeDto.getHostId(), nodeDto.getTemplateId() );
+            Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getContainerQuota(),
+                    peerDto.getPeerId(), nodeDto.getHostId(), nodeDto.getTemplateId() );
 
             nodes.add( node );
         }
@@ -139,11 +135,6 @@ public class BuildContainerStateHandler extends StateHandler
             }
 
             templates.add( node.getTemplateId() );
-        }
-
-        if ( rhTemplates.isEmpty() )
-        {
-            return;
         }
 
         if ( rhTemplates.isEmpty() )
@@ -287,7 +278,7 @@ public class BuildContainerStateHandler extends StateHandler
     private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws BazaarManagerException
     {
         return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64, nodeDto.getContainerQuota() );
+                nodeDto.getIp(), nodeDto.getTemplateId(), DEFAULT_HOST_ARCH, nodeDto.getContainerQuota() );
     }
 
 

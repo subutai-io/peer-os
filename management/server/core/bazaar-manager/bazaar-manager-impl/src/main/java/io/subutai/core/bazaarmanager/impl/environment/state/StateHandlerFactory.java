@@ -2,6 +2,7 @@ package io.subutai.core.bazaarmanager.impl.environment.state;
 
 
 import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState;
+import io.subutai.core.bazaarmanager.impl.environment.state.backup.RestoreStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.change.ContainerStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.BuildContainerStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.CheckNetworkStateHandler;
@@ -11,7 +12,7 @@ import io.subutai.core.bazaarmanager.impl.environment.state.create.ExchangeInfoS
 import io.subutai.core.bazaarmanager.impl.environment.state.create.ReserveNetworkStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.create.SetupTunnelStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.destroy.DeletePeerStateHandler;
-import io.subutai.core.bazaarmanager.impl.environment.state.snapshot.BackupStateHandler;
+import io.subutai.core.bazaarmanager.impl.environment.state.backup.BackupStateHandler;
 import io.subutai.core.bazaarmanager.impl.environment.state.snapshot.ProcessSnapshotStateHandler;
 
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.BUILD_CONTAINER;
@@ -23,6 +24,7 @@ import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerSta
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.EXCHANGE_INFO;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.PROCESS_SNAPSHOT;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.RESERVE_NETWORK;
+import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.RESTORE_CONTAINER;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.SETUP_TUNNEL;
 import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerState.BACKUP_CONTAINER;
 
@@ -53,6 +55,8 @@ public class StateHandlerFactory
 
     private final StateHandler backupStateHandler;
 
+    private final StateHandler restoreStateHandler;
+
 
     public StateHandlerFactory( Context ctx )
     {
@@ -79,58 +83,64 @@ public class StateHandlerFactory
         processSnapshotStatehandler = new ProcessSnapshotStateHandler( ctx );
 
         backupStateHandler = new BackupStateHandler( ctx );
+
+        restoreStateHandler = new RestoreStateHandler( ctx );
     }
 
 
     public StateHandler getHandler( PeerState state )
     {
-        StateHandler handler = notFoundStateHandler;
-
         if ( state == EXCHANGE_INFO )
         {
-            handler = exchangeInfoStateHandler;
+            return exchangeInfoStateHandler;
         }
         else if ( state == RESERVE_NETWORK )
         {
-            handler = reserveNetworkStateHandler;
+            return reserveNetworkStateHandler;
         }
         else if ( state == SETUP_TUNNEL )
         {
-            handler = setupTunnelStateHandler;
+            return setupTunnelStateHandler;
         }
         else if ( state == BUILD_CONTAINER )
         {
-            handler = buildContainerStateHandler;
+            return buildContainerStateHandler;
         }
         else if ( state == CONFIGURE_CONTAINER )
         {
-            handler = configureContainerStateHandler;
+            return configureContainerStateHandler;
         }
         else if ( state == CHANGE_CONTAINER_STATE )
         {
-            handler = containerStateHandler;
+            return containerStateHandler;
         }
         else if ( state == DELETE_PEER )
         {
-            handler = deletePeerStateHandler;
+            return deletePeerStateHandler;
         }
         else if ( state == CONFIGURE_ENVIRONMENT )
         {
-            handler = configureEnvironmentStateHandler;
+            return configureEnvironmentStateHandler;
         }
         else if ( state == CHECK_NETWORK )
         {
-            handler = checkNetworkStateHandler;
+            return checkNetworkStateHandler;
         }
         else if ( state == PROCESS_SNAPSHOT )
         {
-            handler = processSnapshotStatehandler;
+            return processSnapshotStatehandler;
         }
         else if ( state == BACKUP_CONTAINER )
         {
-            handler = backupStateHandler;
+            return backupStateHandler;
         }
-
-        return handler;
+        else if ( state == RESTORE_CONTAINER )
+        {
+            return restoreStateHandler;
+        }
+        else
+        {
+            return notFoundStateHandler;
+        }
     }
 }

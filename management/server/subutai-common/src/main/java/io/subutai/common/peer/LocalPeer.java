@@ -4,12 +4,14 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.bazaar.share.quota.ContainerQuota;
 import io.subutai.bazaar.share.quota.Quota;
 import io.subutai.bazaar.share.resource.ContainerResourceType;
 import io.subutai.bazaar.share.resource.PeerResources;
 import io.subutai.common.environment.Nodes;
 import io.subutai.common.environment.PeerTemplatesUploadProgress;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.SnapshotEventNotifier;
 import io.subutai.common.network.ReservedNetworkResources;
@@ -192,5 +194,8 @@ public interface LocalPeer extends Peer, SnapshotEventNotifier
                          String token ) throws PeerException;
 
     FitCheckResult checkResources( Nodes nodes ) throws PeerException;
+
+    void registerContainer( String rhId, String envId, String containerId, String hostname, HostArchitecture arch,
+                            String tplId, String ownerId, ContainerQuota quota ) throws PeerException;
 }
 

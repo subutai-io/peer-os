@@ -60,7 +60,7 @@ public class Utils
 
         if ( specialChars )
         {
-            chars.append( "!@#$%^&*()-=[]{};:.," );
+            chars.append( "!#$%^&*()=[]{};:.,<>?" );
         }
 
         int length = minLength + new Random().nextInt( maxLength - minLength );

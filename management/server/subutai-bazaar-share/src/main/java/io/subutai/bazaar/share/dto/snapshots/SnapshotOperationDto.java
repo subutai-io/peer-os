@@ -22,8 +22,8 @@ public class SnapshotOperationDto
     private String partition;
     private boolean stopContainer;
     private boolean forceRollback;
-    private boolean successful;
-    private String errors;
+
+    private SnapshotOperationResultDto result = new SnapshotOperationResultDto();
 
 
     public SnapshotOperationDto()
@@ -125,26 +125,14 @@ public class SnapshotOperationDto
     }
 
 
-    public boolean isSuccessful()
+    public SnapshotOperationResultDto getResult()
     {
-        return successful;
+        return result;
     }
 
 
-    public void setSuccessful( final boolean successful )
+    public void setResult( SnapshotOperationResultDto resultDto )
     {
-        this.successful = successful;
-    }
-
-
-    public String getErrors()
-    {
-        return errors;
-    }
-
-
-    public void setErrors( final String errors )
-    {
-        this.errors = errors;
+        this.result = resultDto;
     }
 }

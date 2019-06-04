@@ -1,9 +1,10 @@
-package io.subutai.core.bazaarmanager.impl.environment.state.snapshot;
+package io.subutai.core.bazaarmanager.impl.environment.state.backup;
 
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.subutai.bazaar.share.dto.backup.BackupCommandResultDto;
 import io.subutai.bazaar.share.dto.backup.BackupCommandsDto;
 import io.subutai.bazaar.share.dto.backup.ContainerBackupCommandDto;
 import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
@@ -102,8 +103,7 @@ public class BackupStateHandler extends StateHandler
                 try
                 {
                     String fileIdOnCdn = rh.uploadRawFileToCdn( pathToEncryptedBackupFile, cdnToken );
-                    backup.setBackupCdnId( fileIdOnCdn );
-                    backup.setEncryptionPassword( password );
+                    backup.setResult( new BackupCommandResultDto( fileIdOnCdn, password, null, null ) );
                     log.debug( "backup CDN ID is {}", fileIdOnCdn );
                 }
                 catch ( ResourceHostException e )
@@ -120,7 +120,7 @@ public class BackupStateHandler extends StateHandler
             catch ( Exception e )
             {
                 log.error( "Failed to take backup: {}", e.getMessage(), e );
-                backup.setError( e.getMessage() );
+                backup.getResult().setError( e.getMessage() );
             }
             finally
             {
@@ -175,7 +175,7 @@ public class BackupStateHandler extends StateHandler
             rh.addContainerSnapshot( containerHost, DEFAULT_PARTITION, backup.getSnapshotLabel(), true );
 
             Snapshot snapshot = findSnapshot( rh, containerHost, backup.getSnapshotLabel() );
-            backup.setSnapshotDate( snapshot.getCreated() );
+            backup.getResult().setSnapshotDate( snapshot.getCreated() );
 
             return true;
         }
