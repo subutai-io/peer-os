@@ -80,7 +80,7 @@ public class ExchangeInfoStateHandler extends StateHandler
 
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
-            if ( nodeDto.getState() == ContainerStateDto.BUILDING )
+            if ( nodeDto.getState() == ContainerStateDto.BUILDING || nodeDto.getState() == ContainerStateDto.RESTORING )
             {
                 newNodes.add( new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getContainerQuota(),
                         ctx.localPeer.getId(), nodeDto.getHostId(), nodeDto.getTemplateId() ) );

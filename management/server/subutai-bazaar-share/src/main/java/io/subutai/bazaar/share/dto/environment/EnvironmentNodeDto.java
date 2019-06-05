@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.subutai.bazaar.share.quota.ContainerQuota;
 
+
 @JsonIgnoreProperties( ignoreUnknown = true )
 public class EnvironmentNodeDto
 {
@@ -39,8 +40,10 @@ public class EnvironmentNodeDto
 
     private int ipAddressOffset;
 
+    @Deprecated
     private String port;
 
+    @Deprecated
     private boolean hasDomain;
 
     private Set<String> sshKeys = new HashSet<>();
@@ -173,7 +176,7 @@ public class EnvironmentNodeDto
 
     public void addSshKey( final String sshKey )
     {
-        if ( !( this.sshKeys == null ) )
+        if ( this.sshKeys != null )
         {
             this.sshKeys.add( sshKey );
         }
@@ -245,24 +248,28 @@ public class EnvironmentNodeDto
     }
 
 
+    @Deprecated
     public String getPort()
     {
         return port;
     }
 
 
+    @Deprecated
     public void setPort( final String port )
     {
         this.port = port;
     }
 
 
+    @Deprecated
     public boolean isHasDomain()
     {
         return hasDomain;
     }
 
 
+    @Deprecated
     public void setHasDomain( final boolean hasDomain )
     {
         this.hasDomain = hasDomain;

@@ -537,8 +537,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
-        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( label ), "Invalid label name" );
 
         try
         {
@@ -574,8 +574,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                              final boolean force ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
-        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( label ), "Invalid label name" );
 
         try
         {
@@ -613,8 +613,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                       final boolean stopContainer ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
-        Preconditions.checkArgument( !StringUtils.isBlank( partition ), "Invalid partition name" );
-        Preconditions.checkArgument( !StringUtils.isBlank( label ), "Invalid label name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( partition ), "Invalid partition name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( label ), "Invalid label name" );
 
         try
         {
@@ -651,7 +651,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                            final String destinationDirectory ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
-        Preconditions.checkArgument( !StringUtils.isBlank( label1 ), "Invalid label1" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( label1 ), "Invalid label1" );
 
         try
         {
@@ -692,8 +692,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void recreateContainerFilesystem( final String containerName, final String pathToFile )
             throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( containerName ), "Invalid container name" );
-        Preconditions.checkArgument( !StringUtils.isBlank( pathToFile ), "Invalid path to snapshots file" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( containerName ), "Invalid container name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( pathToFile ), "Invalid path to snapshots file" );
 
         try
         {
@@ -714,12 +714,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public String recreateContainer( final String containerName, final String hostname, final String ip, final int vlan,
                                      final String environmentId ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( containerName ), "Invalid container name" );
-        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
-        Preconditions.checkArgument( !StringUtils.isBlank( ip ), "Invalid ip" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( containerName ), "Invalid container name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( ip ), "Invalid ip" );
         Preconditions
                 .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan" );
-        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( environmentId ), "Invalid environment id" );
 
         try
         {
@@ -774,7 +774,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public String downloadRawFileFromCdn( final String fileId, String destinationDirectory )
             throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( fileId ), "Invalid file id" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( fileId ), "Invalid file id" );
         if ( destinationDirectory == null || destinationDirectory.trim().isEmpty() )
         {
             destinationDirectory = Common.RH_CACHE_DIR;
@@ -807,8 +807,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public String uploadRawFileToCdn( final String pathToFile, final String cdnToken ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( pathToFile ), "Invalid file path" );
-        Preconditions.checkArgument( !StringUtils.isBlank( cdnToken ), "Invalid CDN token" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( pathToFile ), "Invalid file path" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( cdnToken ), "Invalid CDN token" );
 
         try
         {
@@ -962,7 +962,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public ContainerHost getContainerHostByHostName( final String hostname ) throws HostNotFoundException
     {
 
-        Preconditions.checkArgument( !StringUtils.isBlank( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( hostname ), "Invalid hostname" );
 
         for ( ContainerHost containerHost : getContainerHosts() )
         {
@@ -981,7 +981,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public ContainerHost getContainerHostByContainerName( final String containerName ) throws HostNotFoundException
     {
 
-        Preconditions.checkArgument( !StringUtils.isBlank( containerName ), "Invalid container name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( containerName ), "Invalid container name" );
 
         for ( ContainerHost containerHost : getContainerHosts() )
         {
@@ -1016,7 +1016,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public ContainerHost getContainerHostById( final String id ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( id ), "Invalid container id" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( id ), "Invalid container id" );
 
         for ( ContainerHost containerHost : getContainerHosts() )
         {
@@ -1033,7 +1033,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public ContainerHost getContainerHostByIp( final String ip ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( ip ), "Invalid container ip" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( ip ), "Invalid container ip" );
 
         for ( ContainerHost containerHost : getContainerHosts() )
         {
@@ -1050,7 +1050,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final String environmentId )
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( environmentId ), "Invalid environment id" );
 
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainerHosts() )
@@ -1067,7 +1067,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public Set<ContainerHost> getContainerHostsByOwnerId( final String ownerId )
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( ownerId ), "Invalid owner id" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( ownerId ), "Invalid owner id" );
 
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainerHosts() )
@@ -1084,7 +1084,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public Set<ContainerHost> getContainerHostsByPeerId( final String peerId )
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( peerId ), "Invalid peer id" );
 
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainerHosts() )
@@ -1184,10 +1184,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void joinP2PSwarm( final String p2pIp, final String interfaceName, final String p2pHash,
                               final String secretKey, final long secretKeyTtlSec ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( p2pIp ), "Invalid p2p IP" );
-        Preconditions.checkArgument( !StringUtils.isBlank( interfaceName ), "Invalid interface name" );
-        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid p2p hash" );
-        Preconditions.checkArgument( !StringUtils.isBlank( secretKey ), "Invalid secret" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( p2pIp ), "Invalid p2p IP" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( p2pHash ), "Invalid p2p hash" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( secretKey ), "Invalid secret" );
         Preconditions.checkArgument( secretKeyTtlSec > 0, "Ttl must be greater than 0" );
 
         try
@@ -1212,9 +1212,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void joinP2PSwarmDHCP( final String interfaceName, final String p2pHash, final String secretKey,
                                   final long secretKeyTtlSec ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( interfaceName ), "Invalid interface name" );
-        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid p2p hash" );
-        Preconditions.checkArgument( !StringUtils.isBlank( secretKey ), "Invalid secret" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( p2pHash ), "Invalid p2p hash" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( secretKey ), "Invalid secret" );
         Preconditions.checkArgument( secretKeyTtlSec > 0, "Ttl must be greater than 0" );
 
         try
@@ -1238,7 +1238,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void removeP2PSwarm( String p2pHash ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid p2p hash" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( p2pHash ), "Invalid p2p hash" );
 
         try
         {
@@ -1257,7 +1257,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void removeP2PNetworkIface( String interfaceName ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( interfaceName ), "Invalid interface name" );
 
         try
         {
@@ -1275,8 +1275,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void resetSwarmSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
             throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( p2pHash ), "Invalid p2p hash" );
-        Preconditions.checkArgument( !StringUtils.isBlank( newSecretKey ), "Invalid secret" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( p2pHash ), "Invalid p2p hash" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( newSecretKey ), "Invalid secret" );
         Preconditions.checkArgument( ttlSeconds > 0, "Ttl must be greater than 0" );
 
         try
@@ -1344,7 +1344,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void importTemplate( final Template template, final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
-        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( environmentId ), "Invalid environment id" );
 
         try
         {
@@ -1460,9 +1460,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
-        Preconditions.checkArgument( !StringUtils.isBlank( containerName ), "Invalid container name" );
-        Preconditions.checkArgument( !StringUtils.isBlank( ip ), "Invalid ip" );
-        Preconditions.checkArgument( !StringUtils.isBlank( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( containerName ), "Invalid container name" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( ip ), "Invalid ip" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( environmentId ), "Invalid environment id" );
         Preconditions
                 .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan" );
 
@@ -1709,7 +1709,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, "Invalid container" );
-        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ), "Invalid hostname" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( newHostname ), "Invalid hostname" );
 
         //check if new hostname differs from current one
         if ( !StringUtils.equalsIgnoreCase( containerHost.getHostname(), newHostname ) )
@@ -1731,7 +1731,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void setHostname( final String newHostname ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !StringUtils.isBlank( newHostname ), "Invalid hostname" );
+        Preconditions.checkArgument( StringUtils.isNotBlank( newHostname ), "Invalid hostname" );
 
         if ( !StringUtils.equalsIgnoreCase( this.hostname, newHostname ) )
         {

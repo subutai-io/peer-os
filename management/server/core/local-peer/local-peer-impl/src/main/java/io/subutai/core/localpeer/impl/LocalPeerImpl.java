@@ -80,6 +80,7 @@ import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
@@ -1279,6 +1280,68 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
             }
 
             return new CreateEnvironmentContainersResponse( cloneResults, reservedNetworkResource );
+        }
+        finally
+        {
+            containerCreationCounter.decrementAndGet();
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public void registerContainer( String resourceHostId, String environmentId, String containerId,
+                                   String containerHostname, HostArchitecture arch, String templateId, String ownerId,
+                                   ContainerQuota quota ) throws PeerException
+    {
+        Preconditions.checkArgument( StringUtils.isNotBlank( environmentId ), "Environment not specified." );
+        Preconditions.checkArgument( StringUtils.isNotBlank( containerId ), "Container not specified." );
+        Preconditions.checkArgument( StringUtils.isNotBlank( containerHostname ), "Container hostname not specified." );
+
+        try
+        {
+            containerCreationCounter.incrementAndGet();
+
+            NetworkResource reservedNetworkResource =
+                    getReservedNetworkResources().findByEnvironmentId( environmentId );
+
+            if ( reservedNetworkResource == null )
+            {
+                throw new PeerException(
+                        String.format( "No reserved network resources found for environment %s", environmentId ) );
+            }
+
+            final HostInterfaces interfaces = new HostInterfaces();
+            String contName = null;
+
+            for ( final ContainerHostInfo notRegisteredContainer : getNotRegisteredContainers() )
+            {
+                if ( notRegisteredContainer.getId().equals( containerId ) )
+                {
+                    contName = notRegisteredContainer.getContainerName();
+                    for ( final HostInterfaceModel hostInterfaceModel : notRegisteredContainer.getHostInterfaces()
+                                                                                              .getAll() )
+                    {
+                        if ( hostInterfaceModel.getName().equals( "eth0" ) )
+                        {
+                            interfaces.addHostInterface( hostInterfaceModel );
+                            break;
+                        }
+                    }
+                }
+
+                if ( !interfaces.getAll().isEmpty() )
+                {
+                    break;
+                }
+            }
+
+            ContainerHostEntity containerHostEntity =
+                    new ContainerHostEntity( getId(), containerId, containerHostname, arch, interfaces, contName,
+                            templateId, environmentId, ownerId, this.getId(), quota,
+                            reservedNetworkResource.getVlan() );
+
+            registerContainer( resourceHostId, containerHostEntity );
         }
         finally
         {

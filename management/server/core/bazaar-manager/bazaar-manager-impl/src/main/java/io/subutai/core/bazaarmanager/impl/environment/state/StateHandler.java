@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.core.bazaarmanager.api.RestResult;
 import io.subutai.core.bazaarmanager.api.exception.BazaarManagerException;
 import io.subutai.core.identity.api.IdentityManager;
@@ -25,6 +26,8 @@ import static io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto.PeerSta
 public abstract class StateHandler
 {
     private static final String PATH = "/rest/v1/environments/%s/peers/%s";
+
+    protected static final HostArchitecture DEFAULT_HOST_ARCH = HostArchitecture.AMD64;
 
     protected final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -78,7 +81,8 @@ public abstract class StateHandler
     {
         try
         {
-            UserToken userToken = ctx.envUserHelper.getUserTokenFromBazaar( peerDto.getEnvironmentInfo().getSsOwnerId() );
+            UserToken userToken =
+                    ctx.envUserHelper.getUserTokenFromBazaar( peerDto.getEnvironmentInfo().getSsOwnerId() );
             return userToken.getFullToken();
         }
         catch ( Exception e )
@@ -127,7 +131,7 @@ public abstract class StateHandler
     }
 
 
-    protected void  handleError( EnvironmentPeerDto peerDto, Exception e )
+    protected void handleError( EnvironmentPeerDto peerDto, Exception e )
     {
         peerDto.setError( description + ". " + e.getMessage() );
 
