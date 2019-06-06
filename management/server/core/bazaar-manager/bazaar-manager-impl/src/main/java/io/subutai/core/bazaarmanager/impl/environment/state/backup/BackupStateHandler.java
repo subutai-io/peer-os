@@ -1,10 +1,13 @@
 package io.subutai.core.bazaarmanager.impl.environment.state.backup;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.subutai.bazaar.share.dto.backup.BackupCommandResultDto;
+import org.apache.commons.lang3.StringUtils;
+
 import io.subutai.bazaar.share.dto.backup.BackupCommandsDto;
 import io.subutai.bazaar.share.dto.backup.ContainerBackupCommandDto;
 import io.subutai.bazaar.share.dto.environment.EnvironmentPeerDto;
@@ -67,7 +70,7 @@ public class BackupStateHandler extends StateHandler
                 {
                     isNewTempSnapshotCreated = createSnapshotIfNotExist( rh, containerHost, backup );
                 }
-                catch ( ResourceHostException e )
+                catch ( ResourceHostException | PeerException e )
                 {
                     throw new ResourceHostException(
                             "Failed to create snapshot to take backup from: " + e.getMessage() );
@@ -103,7 +106,8 @@ public class BackupStateHandler extends StateHandler
                 try
                 {
                     String fileIdOnCdn = rh.uploadRawFileToCdn( pathToEncryptedBackupFile, cdnToken );
-                    backup.setResult( new BackupCommandResultDto( fileIdOnCdn, password, null, null ) );
+                    backup.getResult().setBackupCdnId( fileIdOnCdn );
+                    backup.getResult().setEncryptionPassword( password );
                     log.debug( "backup CDN ID is {}", fileIdOnCdn );
                 }
                 catch ( ResourceHostException e )
@@ -166,21 +170,41 @@ public class BackupStateHandler extends StateHandler
 
 
     private boolean createSnapshotIfNotExist( ResourceHost rh, ContainerHost containerHost,
-                                              ContainerBackupCommandDto backup ) throws ResourceHostException
+                                              ContainerBackupCommandDto backup )
+            throws ResourceHostException, PeerException
     {
-        if ( null == findSnapshot( rh, containerHost, backup.getSnapshotLabel() ) )
+        Snapshot snapshot = null;
+
+        if ( StringUtils.isBlank( backup.getSnapshotLabel() ) )
+        {
+            backup.setSnapshotLabel( generateBackupSnapshotLabel( new Date() ) );
+        }
+        else
+        {
+            snapshot = findSnapshot( rh, containerHost, backup.getSnapshotLabel() );
+        }
+
+        if ( snapshot == null )
         {
             log.debug( "Snapshot {} for backup of container {} doesn't exist. Creating.", backup.getSnapshotLabel(),
                     containerHost.getContainerName() );
-            rh.addContainerSnapshot( containerHost, DEFAULT_PARTITION, backup.getSnapshotLabel(), true );
+            ctx.localPeer
+                    .addContainerSnapshot( containerHost.getContainerId(), DEFAULT_PARTITION, backup.getSnapshotLabel(),
+                            true );
 
-            Snapshot snapshot = findSnapshot( rh, containerHost, backup.getSnapshotLabel() );
+            snapshot = findSnapshot( rh, containerHost, backup.getSnapshotLabel() );
             backup.getResult().setSnapshotDate( snapshot.getCreated() );
 
             return true;
         }
 
         return false;
+    }
+
+
+    private String generateBackupSnapshotLabel( Date toDate )
+    {
+        return "backup-" + new SimpleDateFormat( "yyyyMMdd-HHmmss" ).format( toDate );
     }
 
 
