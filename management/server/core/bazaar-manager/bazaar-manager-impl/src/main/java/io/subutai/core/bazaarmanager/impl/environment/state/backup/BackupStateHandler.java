@@ -116,6 +116,10 @@ public class BackupStateHandler extends StateHandler
                 }
 
                 // cleanup
+                if ( backup.isIncremental() && backup.isRemoveStartingSnapshot() )
+                {
+                    removeSnapshotAsync( containerHost, backup.getFromSnapshotLabel() );
+                }
                 if ( backup.isRemoveCreatedSnapshots() && isNewTempSnapshotCreated )
                 {
                     removeSnapshotAsync( containerHost, backup.getSnapshotLabel() );

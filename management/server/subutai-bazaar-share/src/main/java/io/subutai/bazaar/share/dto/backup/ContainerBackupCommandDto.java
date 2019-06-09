@@ -11,6 +11,7 @@ public class ContainerBackupCommandDto
     private String containerId;
     private String fromSnapshotLabel; // optional, snapshot from which to start incremental backup
     private String snapshotLabel; // snapshot, on which backup is taken
+    private boolean removeStartingSnapshot;
     private boolean removeCreatedSnapshots;
     private boolean keepBackupFiles;
 
@@ -23,13 +24,14 @@ public class ContainerBackupCommandDto
 
 
     public ContainerBackupCommandDto( final String commandId, final String containerId, final String fromSnapshotLabel,
-                                      final String snapshotLabel, final boolean removeCreatedSnapshots,
-                                      final boolean keepBackupFiles )
+                                      final String snapshotLabel, final boolean removeStartingSnapshot,
+                                      final boolean removeCreatedSnapshots, final boolean keepBackupFiles )
     {
         this.commandId = commandId;
         this.containerId = containerId;
         this.fromSnapshotLabel = fromSnapshotLabel;
         this.snapshotLabel = snapshotLabel;
+        this.removeStartingSnapshot = removeStartingSnapshot;
         this.removeCreatedSnapshots = removeCreatedSnapshots;
         this.keepBackupFiles = keepBackupFiles;
     }
@@ -80,6 +82,18 @@ public class ContainerBackupCommandDto
     public void setSnapshotLabel( final String snapshotLabel )
     {
         this.snapshotLabel = snapshotLabel;
+    }
+
+
+    public boolean isRemoveStartingSnapshot()
+    {
+        return removeStartingSnapshot;
+    }
+
+
+    public void setRemoveStartingSnapshot( final boolean removeStartingSnapshot )
+    {
+        this.removeStartingSnapshot = removeStartingSnapshot;
     }
 
 
