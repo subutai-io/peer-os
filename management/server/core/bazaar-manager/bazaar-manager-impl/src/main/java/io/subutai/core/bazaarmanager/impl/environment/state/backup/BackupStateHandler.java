@@ -29,7 +29,7 @@ import io.subutai.core.bazaarmanager.impl.util.Utils;
 public class BackupStateHandler extends StateHandler
 {
     private final String path = "/rest/v1/environments/%s/peers/%s/backups";
-    private final String DEFAULT_PARTITION = "all";
+    static final String DEFAULT_PARTITION = "all";
 
     private ExecutorService executor = Executors.newFixedThreadPool( 5 );
 
@@ -72,8 +72,8 @@ public class BackupStateHandler extends StateHandler
                 }
                 catch ( ResourceHostException | PeerException e )
                 {
-                    throw new ResourceHostException(
-                            "Failed to create snapshot to take backup from: " + e.getMessage() );
+                    throw new ResourceHostException( "Failed to create snapshot to take backup from: " + e.getMessage(),
+                            e );
                 }
 
                 // do backup
@@ -86,7 +86,7 @@ public class BackupStateHandler extends StateHandler
                 }
                 catch ( ResourceHostException e )
                 {
-                    throw new ResourceHostException( "Failed to export container file system: " + e.getMessage() );
+                    throw new ResourceHostException( "Failed to export container file system: " + e.getMessage(), e );
                 }
 
                 // encrypt backup file
@@ -99,7 +99,7 @@ public class BackupStateHandler extends StateHandler
                 }
                 catch ( ResourceHostException e )
                 {
-                    throw new ResourceHostException( "Failed to encrypt backup file: " + e.getMessage() );
+                    throw new ResourceHostException( "Failed to encrypt backup file: " + e.getMessage(), e );
                 }
 
                 // upload backup to CDN
@@ -112,7 +112,7 @@ public class BackupStateHandler extends StateHandler
                 }
                 catch ( ResourceHostException e )
                 {
-                    throw new ResourceHostException( "Failed to upload backup to CDN: " + e.getMessage() );
+                    throw new ResourceHostException( "Failed to upload backup to CDN: " + e.getMessage(), e );
                 }
 
                 // cleanup

@@ -219,6 +219,16 @@ public class RestoreStateHandler extends StateHandler
                 {
                     removeFileAsync( rh, filePath );
                 }
+
+                log.debug( "9. Deleting snapshots by restored container..." );
+                for ( final String filePath : backupFilesByContainers.get( restoreCmd.getContainerHostname() ) )
+                {
+                    String label = extractSnapshotLabel( filePath, restoreCmd.getContainerOldName() );
+                    if ( StringUtils.isNotBlank( label ) )
+                    {
+                        removeSnapshotAsync( containerHost, label );
+                    }
+                }
             }
             catch ( ResourceHostException | PeerException e )
             {
@@ -353,6 +363,47 @@ public class RestoreStateHandler extends StateHandler
                 catch ( CommandException e )
                 {
                     log.error( "Failed to remove restored backup file {}", pathToFile, e );
+                }
+            }
+        } );
+    }
+
+
+    private String extractSnapshotLabel( String backupFilePath, String oldContainerName )
+    {
+        String label = null;
+        try
+        {
+            String s = StringUtils.substringBetween( backupFilePath, oldContainerName, ".tar.gz" );
+            label = StringUtils.substringAfterLast( s, "_" );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Couldn't extract snapshot label from file '{}' and container '{}': {}", backupFilePath,
+                    oldContainerName, e.getMessage() );
+        }
+
+        return label;
+    }
+
+
+    private void removeSnapshotAsync( final ContainerHost containerHost, final String snapshotLabel )
+    {
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                log.debug( "Removing snapshot {} of container {}", snapshotLabel, containerHost.getContainerName() );
+                try
+                {
+                    ctx.localPeer.removeContainerSnapshot( containerHost.getContainerId(),
+                            BackupStateHandler.DEFAULT_PARTITION, snapshotLabel );
+                }
+                catch ( PeerException e )
+                {
+                    log.error( "Failed to remove snapshot {} by container {}", snapshotLabel,
+                            containerHost.getContainerName(), e );
                 }
             }
         } );
