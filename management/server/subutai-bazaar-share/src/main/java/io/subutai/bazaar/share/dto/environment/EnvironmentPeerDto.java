@@ -11,13 +11,15 @@ import io.subutai.bazaar.share.dto.PublicKeyContainer;
 import io.subutai.bazaar.share.dto.UserTokenDto;
 import io.subutai.bazaar.share.dto.ansible.AnsibleDto;
 
+
 @JsonIgnoreProperties( ignoreUnknown = true )
 public class EnvironmentPeerDto
 {
     public enum PeerState
     {
         EXCHANGE_INFO, RESERVE_NETWORK, SETUP_TUNNEL, BUILD_CONTAINER, CONFIGURE_CONTAINER, CONFIGURE_DOMAIN,
-        CHANGE_CONTAINER_STATE, CONFIGURE_ENVIRONMENT, CHECK_NETWORK, DELETE_PEER, PROCESS_SNAPSHOT, WAIT, READY, ERROR
+        CHANGE_CONTAINER_STATE, CONFIGURE_ENVIRONMENT, CHECK_NETWORK, DELETE_PEER, PROCESS_SNAPSHOT, WAIT, READY, ERROR,
+        BACKUP_CONTAINER, RESTORE_CONTAINER
     }
 
 
@@ -62,8 +64,7 @@ public class EnvironmentPeerDto
 
     private String playbook;
 
-    //TODO rename to cdnToken
-    private String kurjunToken;
+    private String cdnToken;
 
     private AnsibleDto ansibleDto;
 
@@ -353,15 +354,15 @@ public class EnvironmentPeerDto
     }
 
 
-    public String getKurjunToken()
+    public String getCdnToken()
     {
-        return kurjunToken;
+        return cdnToken;
     }
 
 
-    public void setKurjunToken( final String kurjunToken )
+    public void setCdnToken( final String cdnToken )
     {
-        this.kurjunToken = kurjunToken;
+        this.cdnToken = cdnToken;
     }
 
 
