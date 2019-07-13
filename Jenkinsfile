@@ -93,7 +93,11 @@ try {
 			sudo subutai attach management "echo 'deb http://deb.subutai.io/subutai ${aptRepo} main' > /etc/apt/sources.list.d/subutai-repo.list"
             sudo subutai attach management "apt-get update && apt upgrade -y"
 			sudo subutai attach management "sync"
-			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
+			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs"
+            sudo subutai attach management "dpkg --add-architecture i386"
+            sudo subutai attach management "sed -i "s/deb/deb [arch=amd64,i386] /g" /etc/apt/source.list"
+            sudo subutai attach management "apt-get update"
+            sudo subutai attach management "apt-get -y install openjdk-8-jre"
 			sudo cp ~/influxdb.conf /var/lib/lxc/management/rootfs/etc/influxdb/influxdb.conf
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
