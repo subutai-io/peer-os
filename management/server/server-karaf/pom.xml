@@ -320,7 +320,7 @@
                   <packageVersion>${project.version}</packageVersion>
                   <maintainerName>Subutai</maintainerName>
                   <packageDependencies>
-                    <packageDependencies>openjdk-8-jre-headless</packageDependencies>
+                    <packageDependencies>openjdk-8-jre-headless:i386</packageDependencies>
                     <packageDependencies>curl</packageDependencies>
                     <packageDependencies>influxdb</packageDependencies>
                   </packageDependencies>
