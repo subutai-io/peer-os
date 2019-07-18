@@ -97,7 +97,7 @@ try {
             sudo subutai attach management "dpkg --add-architecture i386"
             sudo subutai attach management "sed -i 's+deb+deb [arch=amd64,i386]+' /etc/apt/sources.list"
             sudo subutai attach management "apt-get update"
-            sudo subutai attach management "apt-get -y install openjdk-8-jre:i386"
+            sudo subutai attach management "apt-get -y install openjdk-8-jre:i386 openjdk-8-jre-headless:i386"
 			sudo cp ~/influxdb.conf /var/lib/lxc/management/rootfs/etc/influxdb/influxdb.conf
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
