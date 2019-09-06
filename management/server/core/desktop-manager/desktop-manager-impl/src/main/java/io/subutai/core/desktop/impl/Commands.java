@@ -6,7 +6,7 @@ import io.subutai.common.command.RequestBuilder;
 
 public class Commands
 {
-    private static final String DESKTOP_ENV_VALUE = "echo $XDG_CURRENT_DESKTOP"; //
+    private static final String DESKTOP_ENV_VALUE = "pgrep -l 'x2go' | awk '{print $2}'"; //
     private static final String X2GO_SERVER_SEARCH = "service --status-all | grep x2goserver";
     private static final String USER = "x2go";
 
