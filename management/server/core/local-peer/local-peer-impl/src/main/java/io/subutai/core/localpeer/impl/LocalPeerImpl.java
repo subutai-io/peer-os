@@ -1135,13 +1135,9 @@ public class LocalPeerImpl extends HostListener implements LocalPeer, Disposable
         {
             for ( Node node : nodes.getNewNodes() )
             {
-                double requestedRam =
-                        node.getQuota().get( ContainerResourceType.RAM ).getAsRamResource().getResource().doubleValue();
-                double requestedDisk =
-                        node.getQuota().get( ContainerResourceType.DISK ).getAsDiskResource().getResource()
-                            .doubleValue();
-                double requestedCpu =
-                        node.getQuota().get( ContainerResourceType.CPU ).getAsCpuResource().getResource().doubleValue();
+                double requestedRam = node.getQuota().getContainerSize().getRamQuota();
+                double requestedDisk = node.getQuota().getContainerSize().getDiskQuota();
+                double requestedCpu = node.getQuota().getContainerSize().getCpuQuota();
 
                 ResourceHost resourceHost = getResourceHostById( node.getHostId() );
 
