@@ -114,6 +114,9 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
                 DestroyPortMap destroyPortMap = new DestroyPortMap( ctx );
                 destroyPortMap.deleteMap( portMapDto );
                 break;
+            case RECREATE:
+                recreatePortMap( portMapDto );
+                break;
             case ERROR:
                 break;
             case USED:
@@ -121,6 +124,14 @@ public class ContainerPortMapProcessor implements StateLinkProcessor
             default:
                 log.error( "Port map state is unknown ={} ", portMapDto.getState() );
         }
+    }
+
+
+    private void recreatePortMap( PortMapDto portMapDto )
+    {
+        DestroyPortMap destroyPortMap = new DestroyPortMap( ctx );
+        destroyPortMap.deleteMap( portMapDto );
+        createMap( portMapDto );
     }
 
 
