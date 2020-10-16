@@ -78,6 +78,7 @@ try {
         // create management template
 
             sh """
+	    ip addr
 		   	set +x
             set -e
 		    sudo sed 's/URL =.*/URL = ${cdnHost}/gI' -i /etc/subutai/agent.conf
