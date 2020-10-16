@@ -85,7 +85,7 @@ try {
             set +e
 			sudo subutai destroy management
 			set -e
-            sudo subutai clone debian-buster management
+            sudo subutai -d clone debian-buster management
 			/bin/sleep 20
 			cp ${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
 			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
