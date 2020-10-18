@@ -32,10 +32,6 @@ try {
         def mvnHome = tool 'M3'
         def workspace = pwd()
 
-        sudo subutai tunnel add localhost
-	    
-        echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQNXl+vAiN9GsWSXys58pk8ogrn/BjTy+WdCju4XYfgKbjBAL37eei+I6fTBJ42jZ5Y1irq/H5wPYeNt55VVdOonJJ52YLDnCs66PPUID8zXFn5aQv9Ti9k+qxZX6/3Rbx7FhKyxNP1SOZ9TcQVLPlZtY3o6yfxp32Wf92A14iHUY80XWkLhe6BeKWM68DKLfafNIcRD30jRh0vtyUQaTOV9VC+g3nX1AKcVnLufvXaJ4144ZsJSRDbxJDT2WxVgazkCGvG7ki0qQzfTnRUbFbd9l5DDET42QpLu4z5fI1LN/I+ickz6WKJjs4yvZQcfwHGipaJdQhf3Gco0JvpsNf root@scp" >> ~/.ssh/authorized_keys;
-
 	    stage("Build management deb package") 
         // Use maven to to build deb and template files of management
         notifyBuildDetails = "\nFailed Step - Build management deb package"
@@ -46,6 +42,17 @@ try {
         // build deb
         sh """
 		cd management
+
+        set +x
+
+        set -e
+
+        sudo subutai tunnel add localhost
+        
+        echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQNXl+vAiN9GsWSXys58pk8ogrn/BjTy+WdCju4XYfgKbjBAL37eei+I6fTBJ42jZ5Y1irq/H5wPYeNt55VVdOonJJ52YLDnCs66PPUID8zXFn5aQv9Ti9k+qxZX6/3Rbx7FhKyxNP1SOZ9TcQVLPlZtY3o6yfxp32Wf92A14iHUY80XWkLhe6BeKWM68DKLfafNIcRD30jRh0vtyUQaTOV9VC+g3nX1AKcVnLufvXaJ4144ZsJSRDbxJDT2WxVgazkCGvG7ki0qQzfTnRUbFbd9l5DDET42QpLu4z5fI1LN/I+ickz6WKJjs4yvZQcfwHGipaJdQhf3Gco0JvpsNf root@scp" >> ~/.ssh/authorized_keys;
+
+
+
         git checkout ${env.BRANCH_NAME}
 		sed 's/export BAZAAR_IP=.*/export BAZAAR_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
