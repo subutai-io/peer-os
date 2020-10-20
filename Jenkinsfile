@@ -100,7 +100,7 @@ try {
 			sudo subutai attach management "echo 'deb http://deb.subutai.io/subutai ${aptRepo} main' > /etc/apt/sources.list.d/subutai-repo.list"
             sudo subutai attach management "apt-get update && apt upgrade -y"
 			sudo subutai attach management "sync"
-			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs adoptopenjdk-8-hotspot-jre"
+			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs adoptopenjdk-8-hotspot adoptopenjdk-8-hotspot-jre"
             sudo cp ~/influxdb.conf /var/lib/lxc/management/rootfs/etc/influxdb/influxdb.conf
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
