@@ -23,7 +23,7 @@ public class PortMapDto
 
     public enum State
     {
-        CREATING, RESERVED, USED, DESTROYING, ERROR, DELETED
+        CREATING, RESERVED, USED, DESTROYING, ERROR, DELETED, RECREATE
     }
 
 

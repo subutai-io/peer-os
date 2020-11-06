@@ -32,7 +32,7 @@ try {
         def mvnHome = tool 'M3'
         def workspace = pwd()
 
-        stage("Build management deb package") 
+	    stage("Build management deb package") 
         // Use maven to to build deb and template files of management
         notifyBuildDetails = "\nFailed Step - Build management deb package"
 
@@ -42,6 +42,10 @@ try {
         // build deb
         sh """
 		cd management
+
+        set +x
+        set -e
+
         git checkout ${env.BRANCH_NAME}
 		sed 's/export BAZAAR_IP=.*/export BAZAAR_IP=${cdnHost}/g' -i server/server-karaf/src/main/assembly/bin/setenv
 		if [[ "${env.BRANCH_NAME}" == "dev" ]]; then
@@ -77,23 +81,27 @@ try {
                 
         // create management template
 
-            sh """
-		   	set +x
+            sh """	
+	    set +x
+	    
             set -e
 		    sudo sed 's/URL =.*/URL = ${cdnHost}/gI' -i /etc/subutai/agent.conf
             sudo sed 's/SshJumpServer =.*/SshJumpServer = ${jumpServer}/gI' -i /etc/subutai/agent.conf
             set +e
 			sudo subutai destroy management
 			set -e
-            sudo subutai clone debian-stretch:subutai:0.4.5 management
+            sudo subutai -d clone debian-buster management
 			/bin/sleep 20
 			cp ${workspace}/${debFileName} /var/lib/lxc/management/rootfs/tmp/
-			sudo subutai attach management "apt-get update && apt-get install dirmngr -y"
+			sudo subutai attach management "apt-get update && apt-get install dirmngr curl -y"
 			sudo subutai attach management "apt-key adv --recv-keys --keyserver keyserver.ubuntu.com C6B2AC7FBEB649F1"
+			sudo subutai attach management "apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 8AC3B29174885C03"
+			sudo subutai attach management "curl https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -"
+			sudo subutai attach management "echo 'deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main' > /etc/apt/sources.list.d/adoptopenjdk.list"
 			sudo subutai attach management "echo 'deb http://deb.subutai.io/subutai ${aptRepo} main' > /etc/apt/sources.list.d/subutai-repo.list"
             sudo subutai attach management "apt-get update && apt upgrade -y"
 			sudo subutai attach management "sync"
-			sudo subutai attach management "apt-get -y install curl influxdb influxdb-certs openjdk-8-jre"
+			sudo subutai attach management "apt-get -y install influxdb influxdb-certs adoptopenjdk-8-hotspot adoptopenjdk-8-hotspot-jre"
             sudo cp ~/influxdb.conf /var/lib/lxc/management/rootfs/etc/influxdb/influxdb.conf
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
 			sudo subutai attach management "systemctl stop management"
