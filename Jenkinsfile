@@ -104,6 +104,7 @@ try {
 			sudo subutai attach management "apt-get -y install influxdb influxdb-certs adoptopenjdk-8-hotspot adoptopenjdk-8-hotspot-jre"
             sudo cp ~/influxdb.conf /var/lib/lxc/management/rootfs/etc/influxdb/influxdb.conf
 			sudo subutai attach management "dpkg -i /tmp/${debFileName}"
+			sudo subutai attach management "systemctl enable management"
 			sudo subutai attach management "systemctl stop management"
 			sudo subutai attach management "rm -rf /opt/subutai-mng/keystores/"
             sudo subutai attach management "rm -rf /opt/subutai-mng/db"
