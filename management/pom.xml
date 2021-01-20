@@ -129,7 +129,7 @@
     <jsoup.version>1.10.1</jsoup.version>
 
     <!-- Jackson JSON lib lib -->
-    <jackson.version>2.9.7</jackson.version>
+    <jackson.version>2.12.1</jackson.version>
 
     <!-- Database  -->
     <openjpa.version>2.3.0</openjpa.version>
