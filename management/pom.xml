@@ -135,7 +135,7 @@
     <openjpa.version>2.3.0</openjpa.version>
     <derby.version>10.12.1.1</derby.version>
 
-    <org.apache.httpcomonents.httpclient.version>4.5.2</org.apache.httpcomonents.httpclient.version>
+    <org.apache.httpcomonents.httpclient.version>4.5.13</org.apache.httpcomonents.httpclient.version>
     <org.apache.httpcomonents.httpcore.version>4.4.5</org.apache.httpcomonents.httpcore.version>
     <org.apache.commons.lang3.version>3.4</org.apache.commons.lang3.version>
     <org.apache.commons.io.version>2.4</org.apache.commons.io.version>
