@@ -120,7 +120,7 @@
     <junit.version>4.11</junit.version>
 
     <!-- bouncycastle -->
-    <org.bouncycastle.version>1.52</org.bouncycastle.version>
+    <org.bouncycastle.version>1.67</org.bouncycastle.version>
 
     <!-- JWT lib -->
     <nimbus.jwt.version>5.9</nimbus.jwt.version>
